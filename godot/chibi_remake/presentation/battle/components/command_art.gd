@@ -62,7 +62,7 @@ func _build_cmd_art() -> void:
 	_ui.worker_button.pressed.connect(ports._act_open_officer_pick)
 	_ui.join_button = ports._mk_button(_ui.ui_layer,12)
 	_ui.join_button.text="加入"
-	_ui.join_button.pressed.connect(func():_ui.host._cmd_begin("join"))
+	_ui.join_button.pressed.connect(func():_ui.host.commands.military._cmd_begin("join"))
 	# 悬停提示
 	_ui.art_tip = Label.new()
 	_ui.art_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -294,21 +294,21 @@ func _on_panel_slot(i: int) -> void:
 	if i < _ui.art_buttons.size() and bool(_ui.art_buttons[i].btn.get_meta("cmd_disabled", false)):
 		return
 	match str(specs[i].cmd):
-		"attack": _ui.host._cmd_begin("attack")
-		"move": _ui.host._cmd_begin("move")
-		"transport": _ui.host._cmd_begin("transport")
+		"attack": _ui.host.commands.military._cmd_begin("attack")
+		"move": _ui.host.commands.military._cmd_begin("move")
+		"transport": _ui.host.commands.military._cmd_begin("transport")
 		"build": _open_build_menu()
-		"repair": _ui.host._cmd_begin("repair")
+		"repair": _ui.host.commands.military._cmd_begin("repair")
 		"rest": ports._act_rest()
 		"disband":
 			ports._act_disband()
 			_ui.art_sub = ""
 			ports.update_panel()
-		"board": _ui.host._cmd_begin("board")
-		"unload": _ui.host._cmd_begin("unload")
+		"board": _ui.host.commands.military._cmd_begin("board")
+		"unload": _ui.host.commands.military._cmd_begin("unload")
 		"form": ports._act_open_officer_pick()
-		"join": _ui.host._cmd_begin("join")
-		"return": _ui.host.player_commands.submit(25,_ui.host._return_selected_cargo)
+		"join": _ui.host.commands.military._cmd_begin("join")
+		"return": _ui.host.player_commands.submit(25,_ui.host.commands.military._return_selected_cargo)
 		"watch": ports._act_watch()
 		"formation":
 			_ui.art_sub = "" if _ui.art_sub == "form" else "form"
@@ -317,16 +317,16 @@ func _on_panel_slot(i: int) -> void:
 			_ui.art_sub = "" if _ui.art_sub == "hot" else "hot"
 			_refresh_cmd_art()
 		"duel":
-			_ui.host._duel_begin()
+			_ui.host.commands.military._duel_begin()
 			_ui.art_sub = ""
 			_refresh_cmd_art()
 
 func _open_build_menu() -> void:
-	if _ui.host._selected_construction_workers().is_empty():
-		_ui.host._feedback("建造由麾下带工人的武将发起；独立工人请先组建队伍")
+	if _ui.host.commands.military._selected_construction_workers().is_empty():
+		_ui.host.commands.world._feedback("建造由麾下带工人的武将发起；独立工人请先组建队伍")
 		return
 	if _ui.host.build_types.is_empty():
-		_ui.host._feedback("本关没有可建造的建筑")
+		_ui.host.commands.world._feedback("本关没有可建造的建筑")
 		return
 	_ui.build_menu = true
 	_ui.art_sub = ""
@@ -335,13 +335,13 @@ func _open_build_menu() -> void:
 func _on_art_hot(i: int) -> void:
 	if not _jimou_indices().has(i):
 		return
-	_ui.host._jimou_begin(i)
+	_ui.host.commands.military._jimou_begin(i)
 	_ui.art_sub = ""
 	_refresh_cmd_art()
 
 func _on_art_form(i: int) -> void:
 	if not _unlocked_indices(true).has(i): return
-	_ui.host.player_commands.submit(10,_ui.host._set_formation.bind(i),Vector2.ZERO,-1,i)
+	_ui.host.player_commands.submit(10,_ui.host.commands.military._set_formation.bind(i),Vector2.ZERO,-1,i)
 	_ui.art_sub = ""
 	_refresh_cmd_art()
 

@@ -67,7 +67,7 @@ func _run() -> void:
 	battle.ai_res = {2: {"gold": 999.0, "wood": 80.0, "food": 71.0, "stone": 66.0}}
 	battle.task_latches = {"first": true}
 	battle.ai._think = {2: 17}
-	assert(game.save_game(battle.units, battle.commands._resources(), battle.commands._save_extra()))
+	assert(game.save_game(battle.units, battle.commands.world._resources(), battle.commands.session._save_extra()))
 	var snapshot: Dictionary = game.load_save()
 	assert(battle.saver.apply_snapshot(snapshot))
 	u = battle.units[0]
@@ -82,14 +82,14 @@ func _run() -> void:
 	print("ARCH-017/018 PASS: crash recovery, content revision, no-view full snapshot")
 	# 同一快照继续执行两个 tick，必须与未载入分支逐字段一致。
 	u.state = "idle"; u.target = null; u.path = []; u.pi = 0
-	assert(game.save_game(battle.units, battle.commands._resources(), battle.commands._save_extra()))
+	assert(game.save_game(battle.units, battle.commands.world._resources(), battle.commands.session._save_extra()))
 	var before: Dictionary = game.load_save()
-	battle.commands._sim_step(battle.SIM_DT)
-	assert(game.save_game(battle.units, battle.commands._resources(), battle.commands._save_extra()))
+	battle.commands.world._sim_step(battle.SIM_DT)
+	assert(game.save_game(battle.units, battle.commands.world._resources(), battle.commands.session._save_extra()))
 	var expected: Dictionary = game.load_save()
 	assert(battle.saver.apply_snapshot(before))
-	battle.commands._sim_step(battle.SIM_DT)
-	assert(game.save_game(battle.units, battle.commands._resources(), battle.commands._save_extra()))
+	battle.commands.world._sim_step(battle.SIM_DT)
+	assert(game.save_game(battle.units, battle.commands.world._resources(), battle.commands.session._save_extra()))
 	var actual: Dictionary = game.load_save()
 	expected.erase("savedAt"); actual.erase("savedAt")
 	expected.erase("checksum"); actual.erase("checksum")
@@ -128,15 +128,15 @@ func _run() -> void:
 	mobiles[1].state = "attack"; mobiles[1].target = enemy; mobiles[1].cool = 0.5
 	mobiles[2].hold = true
 	battle.trainings = [{"owner": 4, "b": production, "unit": 30, "t": 2.0, "ticks": true, "cost": {"gold": 50}}]
-	assert(game.save_game(battle.units, battle.commands._resources(), battle.commands._save_extra()))
+	assert(game.save_game(battle.units, battle.commands.world._resources(), battle.commands.session._save_extra()))
 	var concurrent: Dictionary = game.load_save()
-	battle.commands._sim_step(battle.SIM_DT)
-	assert(game.save_game(battle.units, battle.commands._resources(), battle.commands._save_extra()))
+	battle.commands.world._sim_step(battle.SIM_DT)
+	assert(game.save_game(battle.units, battle.commands.world._resources(), battle.commands.session._save_extra()))
 	var continued: Dictionary = game.load_save()
 	assert(battle.saver.apply_snapshot(concurrent))
 	assert(battle.trainings[0].owner == 4)
-	battle.commands._sim_step(battle.SIM_DT)
-	assert(game.save_game(battle.units, battle.commands._resources(), battle.commands._save_extra()))
+	battle.commands.world._sim_step(battle.SIM_DT)
+	assert(game.save_game(battle.units, battle.commands.world._resources(), battle.commands.session._save_extra()))
 	var recovered: Dictionary = game.load_save()
 	continued.erase("savedAt"); recovered.erase("savedAt")
 	continued.erase("checksum"); recovered.erase("checksum")
@@ -161,7 +161,7 @@ func _run() -> void:
 	assert(battle.rules.tick() == 1)
 	battle.selected = [hero]
 	hero.is_building = false; hero.state = "move"; hero.path = [Vector2.ZERO]
-	battle.commands.stop_selected()
+	battle.commands.military.stop_selected()
 	assert(hero.state == "idle" and hero.path.is_empty() and hero.target == null)
 	print("ARCH-020/023 PASS: ordered task latches, once-only bridge event, command boundary")
 	var actual_units: Array = battle.units

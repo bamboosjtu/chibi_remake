@@ -3,16 +3,24 @@ extends "res://named_port.gd"
 
 
 func _footprint_cells(o: Dictionary) -> Array:
-	return _require(_provider_interaction_paths, "interaction_paths")._footprint_cells(o)
+	var provider = _require(_provider_interaction_paths, "interaction_paths")
+	if provider == null: return []
+	return provider._footprint_cells(o)
 
 func _nav_layer(u: Dictionary) -> int:
-	return _require(_provider_command_groups, "command_groups")._nav_layer(u)
+	var provider = _require(_provider_command_groups, "command_groups")
+	if provider == null: return 0
+	return provider._nav_layer(u)
 
 func _place_unit(u: Dictionary) -> void:
-	_require(_provider_battle_simulation, "battle_simulation")._place_unit(u)
+	var provider = _require(_provider_battle_simulation, "battle_simulation")
+	if provider == null: return
+	provider._place_unit(u)
 
 func _spd_mult(u: Dictionary) -> float:
-	return _require(_provider_abilities, "abilities")._spd_mult(u)
+	var provider = _require(_provider_abilities, "abilities")
+	if provider == null: return 0.0
+	return provider._spd_mult(u)
 
 const CONTRACTS := {"abilities": ["_spd_mult"], "battle_simulation": ["_place_unit"], "command_groups": ["_nav_layer"], "interaction_paths": ["_footprint_cells"]}
 var _provider_abilities: WeakRef
@@ -22,13 +30,13 @@ var _provider_interaction_paths: WeakRef
 
 func connect_services(services: Dictionary) -> Array:
 	var missing: Array = []
-	_provider_abilities = weakref(services["abilities"]) if services.has("abilities") else null
-	_provider_battle_simulation = weakref(services["battle_simulation"]) if services.has("battle_simulation") else null
-	_provider_command_groups = weakref(services["command_groups"]) if services.has("command_groups") else null
-	_provider_interaction_paths = weakref(services["interaction_paths"]) if services.has("interaction_paths") else null
+	_provider_abilities = weakref(services["abilities"]) if services.get("abilities") != null else null
+	_provider_battle_simulation = weakref(services["battle_simulation"]) if services.get("battle_simulation") != null else null
+	_provider_command_groups = weakref(services["command_groups"]) if services.get("command_groups") != null else null
+	_provider_interaction_paths = weakref(services["interaction_paths"]) if services.get("interaction_paths") != null else null
 	for provider in CONTRACTS:
 		for method in CONTRACTS[provider]:
-			if not services.has(provider) or not services[provider].has_method(method): missing.append({"provider":provider,"method":method})
+			if services.get(provider) == null or not services[provider].has_method(method): missing.append({"provider":provider,"method":method})
 	return missing
 
 func disconnect_services() -> void:

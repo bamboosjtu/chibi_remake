@@ -1,4 +1,5 @@
 extends RefCounted
+const PROXY_FIELDS := ["saver", "cam", "bgm", "sfx", "remaster_art", "view", "cheat_input_open", "hover_text", "show_units", "show_buildings", "hud_acc", "show_debug"]
 ## Scene-owned services and nodes. No simulation rules.
 const RemasterArt = preload("res://presentation/battle/art_catalog.gd")
 

@@ -53,7 +53,7 @@ func _run() -> void:
 		for u in battle.units:
 			if battle.view.unit_nodes(u).get("skin", null) != null:
 				skins += 1
-				battle.commands._set_frame(u, 0)
+				battle.commands.world._set_frame(u, 0)
 			assert(Vector2(u.ax, u.ay) == Vector2(battle.view.unit_nodes(u).spr.position.x + float(u.w) * 0.5, battle.view.unit_nodes(u).spr.position.y + float(u.h)))
 		assert(_state(battle) == before)
 		hashes.append(before)

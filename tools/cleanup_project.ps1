@@ -1,4 +1,4 @@
-param([switch]$Execute, [switch]$WorkOnly, [switch]$PruneVerification, [switch]$RetiredMediaOnly, [string]$ReportPath = 'docs/cleanup-report.json')
+﻿param([switch]$Execute, [switch]$WorkOnly, [switch]$PruneVerification, [switch]$RetiredMediaOnly, [string]$ReportPath = 'docs/cleanup-report.json')
 # 不能用 Stop：Godot 的证书警告会经原生 stderr 变成终止性错误，
 # 整个构建当场中断（本项目已因此踩坑三次）。错误处理靠 try/catch + $LASTEXITCODE。
 $ErrorActionPreference='Continue'

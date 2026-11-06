@@ -10,6 +10,9 @@ const layout={id:'chibil1',rows:2,cols:2,width:176,height:182,layers:[[[0,0],[0,
 const writeLayout=()=>fs.writeFileSync(path.join(source,'chibil1.json'),JSON.stringify(layout));writeLayout();
 const refresh=()=>{const r=spawnSync(process.execPath,['tools/terrain_sources.mjs','--source',source,'--write'],{encoding:'utf8'});assert.equal(r.status,0,r.stderr);};refresh();
 function build(extra=[],expected=0){const r=spawnSync(process.execPath,['tools/build_terrain.mjs','--source',source,'--cache',cache,'--engine',engine,...extra],{encoding:'utf8',timeout:180000});fs.appendFileSync(path.join(fixture,'test.log'),r.stdout+r.stderr);assert.equal(r.status,expected,r.stdout+r.stderr);return r.stdout;}
+const fakeEngine=path.join(fixture,'same-version-engine');
+function identity(bytes){fs.writeFileSync(fakeEngine,bytes);const r=spawnSync(process.execPath,['tools/build_terrain.mjs','--source',source,'--engine',fakeEngine,'--keys-only'],{encoding:'utf8'});assert.equal(r.status,0,r.stderr);return JSON.parse(r.stdout);}
+assert.notDeepEqual(identity('engine build A'),identity('engine build B'),'Same version with different engine bytes must invalidate the cache');
 build(['--fail-before-publish'],1);
 assert(!fs.existsSync(path.join(cache,'maps')),'Interrupted generation must not publish completion');
 assert.match(build(),/1 rebuilt/);assert.match(build(),/0 rebuilt/);

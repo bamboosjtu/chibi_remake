@@ -6,7 +6,7 @@ static func warehouses(b: Node2D) -> void:
   var depot: Dictionary={}
   for dy in [0,200,-200,400,-400,600,-600]:
    for dx in [0,300,-300,600,-600,900,-900]:
-    depot=b.commands._place_building(b.player_owner,uid,Vector2(base.ax+dx,base.ay+dy))
+    depot=b.commands.economy._place_building(b.player_owner,uid,Vector2(base.ax+dx,base.ay+dy))
     if not depot.is_empty():break
    if not depot.is_empty():break
   assert(not depot.is_empty(),"fixture warehouse")

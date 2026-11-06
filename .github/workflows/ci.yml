@@ -38,6 +38,8 @@ jobs:
             exit 1
           }
           Write-Output 'POWERSHELL SYNTAX PASS'
+      - name: Windows PowerShell 5.1 encoding compatibility
+        run: node tools/powershell_encoding.mjs && node tools/test_powershell_encoding.mjs
 
   godot-smoke:
     runs-on: ubuntu-latest

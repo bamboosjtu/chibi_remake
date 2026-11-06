@@ -81,7 +81,7 @@ func run() -> void:
 	if not bldg.is_empty():
 		host.show_buildings = true
 		host.selected = [bldg]
-		host.commands._update_visual(bldg)
+		host.commands.world._update_visual(bldg)
 		print("SELFTEST building: unit=%d z_index=%d (ay=%d) diamond=%s hbar=%s grid=%d count=%d" % [
 			int(bldg.unit), int(host.view.unit_nodes(bldg).spr.z_index), int(bldg.ay), str(host.view.unit_nodes(bldg).diamond.visible),
 			str(host.view.unit_nodes(bldg).hbar != null), int(bldg.grid), int(bldg.count)])
@@ -94,14 +94,14 @@ func run() -> void:
 	var train_bldg: Dictionary = {}
 	for u in host.units:
 		if bool(u.is_building) and int(u.owner) == host.player_owner and bool(u.alive) and not bool(u.get("site", false)):
-			if not host.commands.train_types_for(int(u.unit)).is_empty():
+			if not host.commands.economy.train_types_for(int(u.unit)).is_empty():
 				train_bldg = u
 				break
 	if train_bldg.is_empty():
 		self._skip("生产按钮 生产（B1）：本图我方没有可生产的建筑")
 	var before_train = host.trainings.size()
 	host.selected = [train_bldg] if not train_bldg.is_empty() else []
-	if not host.commands._train_list_for_selection().is_empty():host.commands._start_train(host.commands._train_list_for_selection()[0])
+	if not host.commands.economy._train_list_for_selection().is_empty():host.commands.economy._start_train(host.commands.economy._train_list_for_selection()[0])
 	await host.get_tree().process_frame
 	# process_frame is emitted before node processing; allow the queued command's frame pump to run.
 	await host.get_tree().process_frame
@@ -132,7 +132,7 @@ func run() -> void:
 		if not foe.is_empty():
 			print("SELFTEST damage: %s(攻%.0f) → %s(武%.0f × mitig%.0f / 100) = %.1f" % [
 				str(sample.name), float(sample.attack), str(foe.name),
-				float(foe.get("officer_might", 0)), float(foe.get("mitig", 0)), host.commands._damage(sample, foe)])
+				float(foe.get("officer_might", 0)), float(foe.get("mitig", 0)), host.commands.military._damage(sample, foe)])
 
 	# --- ARCH-005：关卡注册表不得收录数据库文件或坏 JSON ---
 	var lv = Game.list_levels()
@@ -146,13 +146,13 @@ func run() -> void:
 	var probe: Dictionary = {}
 	for u in host.units:
 		# 用**陆军**探针：水战图上的船走水面层，用封闭陆地块测它没有意义。
-		if not u.is_building and u.owner == host.player_owner and u.alive and not host.commands._is_naval(u):
+		if not u.is_building and u.owner == host.player_owner and u.alive and not host.commands.military._is_naval(u):
 			probe = u
 			break
 	if not probe.is_empty():
 		# 注意：_cell_of_px 会 clamp，所以"场外坐标"其实总可达 —— 那样测不出问题。
 		# 真正的不可达要自己造：把目标周围 13×13 全标实心，超过 _near_walkable 的 5 圈搜索半径。
-		var src = host.commands._near_walkable(host.commands._cell_of_px(probe.ax, probe.ay))
+		var src = host.commands.orders._near_walkable(host.commands.orders._cell_of_px(probe.ax, probe.ay))
 		var mr = int(host.map_data.rows)
 		var mc = int(host.map_data.cols)
 		# 封闭块是 ±6 格：目标格必须离地图边缘 ≥7 格，否则"封块"被裁掉、旁边留出可走格，
@@ -174,11 +174,11 @@ func run() -> void:
 					continue
 				host.nav.block(q)
 				touched.append(q)
-		var tp = host.commands._anchor_of(tgt_cell.x, tgt_cell.y)
-		var bad = host.commands._path_to(probe, tp, true)
+		var tp = host.commands.orders._anchor_of(tgt_cell.x, tgt_cell.y)
+		var bad = host.commands.orders._path_to(probe, tp, true)
 		host.feedback_text = ""
 		host.selected = [probe]
-		host.commands._order_at(tp)
+		host.commands.orders._order_at(tp)
 		print("SELFTEST path: 封闭目标段数=%d (0=正确拒绝)  反馈=\"%s\"  状态=%s  src=%s tgt=%s rows=%d cols=%d tgt_solid=%s to_cell=%s near=%s near_solid=%s touched=%d" % [
 			bad.size(), host.feedback_text, str(probe.state), str(src), str(tgt_cell),
 			int(host.map_data.rows), int(host.map_data.cols), str(host.nav.is_solid(tgt_cell)),
@@ -199,11 +199,11 @@ func run() -> void:
 		var vuid = int(victim.uid)
 		victim.alive = false
 		victim.die_t = 99.0
-		host.commands._prune_dead()
+		host.commands.world._prune_dead()
 		var n_before = host.units.size()
-		var saved_ok = host.commands._save_game()
+		var saved_ok = host.commands.session._save_game()
 		var next_before = host.next_uid
-		host.commands._apply_save()
+		host.commands.session._apply_save()
 		var resurrected = false
 		for u in host.units:
 			if int(u.uid) == vuid:
@@ -212,7 +212,7 @@ func run() -> void:
 			str(saved_ok), n_before, host.units.size(), vuid, str(resurrected), next_before, host.next_uid])
 		self._check(not resurrected, "阵亡单位读档后不复活（ARCH-001）")
 		self._check(int(host.next_uid) == int(next_before), "nextUid 从存档恢复（ARCH-002）")
-	host.commands._save_game()
+	host.commands.session._save_game()
 	print("SELFTEST: save written, has_save=%s" % str(Game.has_save()))
 	# --- #5：原版胜负判定（单位 **与建筑** 都要清空；资源 1 为 0 也判负）---
 	if host.scenario_mission in host.SPECIAL_OBJECTIVE_MISSIONS:
@@ -241,7 +241,7 @@ func run() -> void:
 				u.alive = false
 			host.objective_done = false
 			host.task_latches.clear()
-			host.commands._check_end()
+			host.commands.world._check_end()
 			var e_win = host.game_end
 			for u in enemies:
 				u.alive = true
@@ -251,13 +251,13 @@ func run() -> void:
 					u.alive = false
 			host.objective_done = false
 			host.task_latches.clear()
-			host.commands._check_end()
+			host.commands.world._check_end()
 			var e_units_only = host.game_end
 			for u in mine_all:
 				u.alive = false
 			host.objective_done = false
 			host.task_latches.clear()
-			host.commands._check_end()
+			host.commands.world._check_end()
 			print("SELFTEST endrule: 敌军全灭=%d(应1)  只死我单位=%d(应0,建筑还在)  我单位+建筑全灭=%d(应2)" % [e_win, e_units_only, host.game_end])
 			self._check(e_win == 1, "敌军单位+建筑全灭 → 胜利")
 			self._check(e_units_only == 0, "只死单位（建筑还在）→ 尚未失败")
@@ -274,7 +274,7 @@ func run() -> void:
 
 	# --- 脚本目标正向验证（CB.EXE FUN_00404800）---
 	# 把「达成即胜」那条目标要求的武将挪进矩形，应当判**胜利**。
-	if host.commands._objective_kind() == "scripted":
+	if host.commands.world._objective_kind() == "scripted":
 		var winst: Dictionary = {}
 		for st in host.SCRIPTED_OBJECTIVES.get(host.scenario_mission, []):
 			if bool((st as Dictionary).get("win", false)):
@@ -301,7 +301,7 @@ func run() -> void:
 					break
 			host.game_end = 0
 			host.objective_done = false
-			host.commands._check_end()
+			host.commands.world._check_end()
 			if moved == 0:
 				print("SELFTEST objective: **该图我方没有武将 index=%d** —— 无法验证" % want)
 			else:
@@ -311,6 +311,6 @@ func run() -> void:
 			host.game_end = 0
 			host.objective_done = false
 
-	await host.commands._screenshot()
+	await host.commands.session._screenshot()
 	self._selftest_summary()      # 按失败数决定退出码（不再是永远退出 0）
 	return

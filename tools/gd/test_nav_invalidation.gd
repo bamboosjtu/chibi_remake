@@ -107,7 +107,7 @@ func _run() -> void:
 	var ever_blocked := false
 	var max_blocked := 0
 	for i in range(240):                   # 8 秒模拟步，手动推进
-		battle.commands._sim_step(battle.SIM_DT)
+		battle.commands.world._sim_step(battle.SIM_DT)
 		var c: Vector2i = battle.nav.cell_of_px(mover.ax, mover.ay)
 		assert(not battle.nav.is_solid(c), "单位踏入实心格（REQ-003 核心判据）")
 		ever_blocked = ever_blocked or int(mover.get("blocked_n", 0)) > 0
@@ -151,7 +151,7 @@ func _run() -> void:
 	assert(battle.nav.is_solid(gdest))
 	var gave_up := false
 	for i in range(60):
-		battle.commands._sim_step(battle.SIM_DT)
+		battle.commands.world._sim_step(battle.SIM_DT)
 		var c2: Vector2i = battle.nav.cell_of_px(giver.ax, giver.ay)
 		assert(not battle.nav.is_solid(c2), "弃单场景中踏入实心格")
 		if giver.state == "idle":
@@ -168,7 +168,7 @@ func _run() -> void:
 	var target: Vector2i = sc
 	var escape_ok := false
 	for n in battle.nav.neighbors(sc):
-		if not battle.nav.is_solid(n) and battle.commands._cell_unit(n).is_empty():
+		if not battle.nav.is_solid(n) and battle.commands.world._cell_unit(n).is_empty():
 			target = n
 			escape_ok = true
 			break
@@ -185,7 +185,7 @@ func _run() -> void:
 	assert(not stuck.path.is_empty(), "实心格起点的单位寻路失败：被自己的起点判死")
 	var left := false
 	for i in range(30):
-		battle.commands._sim_step(battle.SIM_DT)
+		battle.commands.world._sim_step(battle.SIM_DT)
 		if battle.nav.cell_of_px(stuck.ax, stuck.ay) != sc:
 			left = true
 			break

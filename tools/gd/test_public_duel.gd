@@ -9,7 +9,7 @@ func run() -> void:
 	e.officer.might=1;e.officer.level=0;e.officer.tier=4;e.ax=a.ax+88;e.ay=a.ay
 	b.visibility.update(b.units,b.player_owner)
 	var hp:float=e.hp
-	b.commands._duel_begin();b.commands._duel_at(Vector2(e.ax,e.ay-e.h*0.5))
+	b.commands.military._duel_begin();b.commands.military._duel_at(Vector2(e.ax,e.ay-e.h*0.5))
 	assert(not paused and not b.duel_pending and e.hp<hp)
 	print("PUBLIC DUEL PASS no original video / accepted duel settles once without pause")
 	b.free();quit()

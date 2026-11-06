@@ -29,4 +29,4 @@ func _present_duel(outcome: String, onm: String, enm: String, ticket: int) -> vo
 	settle.call() # Pure simulation or absent media still settles the exact same round.
 
 func _complete_duel(ticket: int, epoch: int) -> void:
-	if is_instance_valid(node) and node.world.get_instance_id() == epoch: node.commands._resolve_duel(ticket)
+	if is_instance_valid(node) and node.world.get_instance_id() == epoch: node.commands.military._resolve_duel(ticket)

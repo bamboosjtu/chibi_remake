@@ -13,15 +13,15 @@ func _process(_delta: float) -> void:
 	update_at(get_global_mouse_position(), host.view.hud_metrics.battle_rect.has_point(get_viewport().get_mouse_position()))
 
 func update_at(world: Vector2, on_battle := true) -> void:
-	if host.cmd_pending_kind() != "build" or not on_battle:
+	if host.commands.orders.cmd_pending_kind() != "build" or not on_battle:
 		visible = false; signature = ""; return
 	visible = true
 	var bid := int(host.cmd_pending_data.unit)
 	var cell: Vector2i = host.nav.cell_of_px(world.x, world.y)
-	var key := "%s/%s/%s/%s/%s/%s/%s" % [bid, cell, host.sim_tick, host.nav.version, host.units.size(), host.selected.map(func(u): return int(u.uid)), host._resources()]
+	var key := "%s/%s/%s/%s/%s/%s/%s" % [bid, cell, host.sim_tick, host.nav.version, host.units.size(), host.selected.map(func(u): return int(u.uid)), host.commands.world._resources()]
 	if key == signature: return
 	signature = key
-	placement = host.build_placement_at(world, host.cmd_pending_data)
+	placement = host.commands.economy.build_placement_at(world, host.cmd_pending_data)
 	var meta: Dictionary = host.map_data.units.get(str(bid), {})
 	if ghost == null or kind != bid:
 		if ghost != null: ghost.free()

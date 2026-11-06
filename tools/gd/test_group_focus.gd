@@ -31,9 +31,9 @@ func run() -> void:
 	battle.selected.clear()
 	if not other.is_empty(): battle.selected.append(other)
 	battle.selected.append(hero)
-	battle.commands._group_assign(9)
+	battle.commands.military._group_assign(9)
 	battle.selected.clear()
-	var ok: bool = battle.commands.focus_group(9)
+	var ok: bool = battle.commands.session.focus_group(9)
 	if not ok or battle.selected.is_empty():
 		push_error("GROUP FOCUS FAIL: recall returned no selection")
 		quit(1)

@@ -106,3 +106,11 @@ gh release upload v0.1.1 dist/package/* --clobber
 ```
 
 - 下载包后先运行 `join-release.ps1` 合并分卷并校验 SHA256，再启动 `ChibiRTS.exe`。
+
+发布和分卷均不要求签名。验收、完整性哈希及原子版本切换继续作为发行门禁。
+
+地形缓存键包含实际引擎二进制 SHA-256、源输入、烘焙脚本和编码参数；同版本号的不同引擎构建也必须重新烘焙。`tools/inputs/terrain_equivalence.sha256` 固化整改前运行 JPEG 经既有 q78 传输编码后的历史哈希，配套 JSON 记录源输入身份、34 图几何摘要及 LOD 数量。该快照来自独立历史缓存，并逐项核对源素材重建结果；不可用生成结果自动覆盖预期。
+
+`contracts` 运行 `compare_terrain_rebuild.mjs --declarations` 检查历史清单完整性和源输入身份，不宣称已生成地形。正式构建在烘焙后运行不带该参数的比较，逐个验证 35,664 个分块及几何；新克隆不再依赖本机历史 `_work` 目录。修改地图源或编码参数需要单独评审其预期变化。
+
+`tools/ci_windows.ps1` 固定执行打包目录安全、发布/回滚/锁及候选锁恢复测试。含非 ASCII 的 PowerShell 脚本使用带 BOM 的 UTF-8，CI 同时检查语法和 Windows PowerShell 5.1 编码兼容性。候选验证使用操作系统独占文件句柄，进程异常结束后自动释放；临时调试引擎采用唯一文件名，旧临时文件不会被误认成正在运行的验证，也不纳入发行哈希清单。

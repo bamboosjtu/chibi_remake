@@ -16,13 +16,13 @@ func _run() -> void:
 	b.set_process(false); b.cli_mode = true
 	var commander: Dictionary = {}
 	for u in b.units:
-		if u.owner == b.player_owner and b.commands._construction_workers(u).size() > 0:
+		if u.owner == b.player_owner and b.commands.military._construction_workers(u).size() > 0:
 			commander = u
 			break
 	assert(not commander.is_empty(), "chibic1 应有武将率领的工人队")
 	b.selected.clear()
-	b.commands._select_click(Vector2(commander.ax, commander.ay - commander.h * 0.5), false)
-	var workers: Array = b.commands._selected_workers()
+	b.commands.orders._select_click(Vector2(commander.ax, commander.ay - commander.h * 0.5), false)
+	var workers: Array = b.commands.economy._selected_workers()
 	assert(workers.size() == 4, "点选武将应展开四名工人")
 	var origin := Vector2(commander.ax, commander.ay)
 	var trees: Array = b.decor_targets.filter(func(o): return bool(o.get("alive", false)) and int(o.get("unit", -1)) == 100)
@@ -30,10 +30,10 @@ func _run() -> void:
 	trees.sort_custom(func(a, c): return origin.distance_squared_to(Vector2(a.ax, a.ay)) < origin.distance_squared_to(Vector2(c.ax, c.ay)))
 	var tree: Dictionary = trees[0]
 	var click := Vector2(float(tree.ax), float(tree.ay) - minf(20.0, float(tree.h) * 0.5))
-	assert(not b.commands._resource_at(click).is_empty(), "点击位置应命中木材")
-	b.commands._order_context(click)
+	assert(not b.commands.economy._resource_at(click).is_empty(), "点击位置应命中木材")
+	b.commands.orders._order_context(click)
 	var clicked_patch := {}
-	for cell in b.commands._resource_patch_cells(tree): clicked_patch[cell] = true
+	for cell in b.commands.orders._resource_patch_cells(tree): clicked_patch[cell] = true
 	for worker in workers:
 		var assigned_tree: Dictionary = worker.get("gather_obj", {})
 		assert(str(worker.state) == "gather" and not assigned_tree.is_empty(), "工人队应接到采集令")
@@ -42,9 +42,9 @@ func _run() -> void:
 	var wood0: float = float(b.wood)
 	var delivered := false
 	for i in range(2700):
-		b.commands._update_gates()
+		b.commands.world._update_gates()
 		for w in workers:
-			b.commands._step_unit(w, 1.0 / 30.0)
+			b.commands.orders._step_unit(w, 1.0 / 30.0)
 		if b.wood >= wood0 + 200.0 - 0.01:
 			delivered = true
 			break
@@ -55,18 +55,18 @@ func _run() -> void:
 	# R02：新建帅帐（CONF-20：3×3=9 格）与读档重建必须得到同一片占格；读档不得把工人包进建筑。
 	var placed: Dictionary = {}
 	for center in [Vector2(1600, 1600), Vector2(2000, 2200), Vector2(1200, 2400)]:
-		placed = b.commands._place_building(b.player_owner, 0, center)
+		placed = b.commands.economy._place_building(b.player_owner, 0, center)
 		if not placed.is_empty():
 			break
 	assert(not placed.is_empty(), "R02: 应能新建帅帐")
 	var hq_uid: int = int(placed.uid)
-	var built_cells: Array = b.commands._footprint_cells(placed).duplicate()
+	var built_cells: Array = b.commands.orders._footprint_cells(placed).duplicate()
 	assert(built_cells.size() == 9, "R02: 帅帐应为 3×3=9 格，实际 %d" % built_cells.size())
 	assert(b.nav.footprint_outline(built_cells).size() == 4, "CONF-20: 实际占格合并后必须是四边形")
 	b.nav.rebuild_buildings(b.units)
 	assert(placed.occupied_cells.size() == 9, "R02: rebuild_buildings 必须与新建同格数")
-	var payload: Dictionary = b.commands._save_extra()
-	assert(game.save_game(b.units, b.commands._resources(), payload))
+	var payload: Dictionary = b.commands.session._save_extra()
+	assert(game.save_game(b.units, b.commands.world._resources(), payload))
 	var loaded: Dictionary = game.load_save()
 	assert(not loaded.is_empty() and b.saver.apply_snapshot(loaded), "R02: 存档应可恢复")
 	var hq: Dictionary = b.units.filter(func(u): return int(u.uid) == hq_uid)[0]
@@ -79,7 +79,7 @@ func _run() -> void:
 	for unit in b.units:
 		if not bool(unit.get("alive", false)) or bool(unit.get("is_building", false)) or bool(unit.get("attached", false)):
 			continue
-		for raw in b.commands._footprint_cells(unit):
+		for raw in b.commands.orders._footprint_cells(unit):
 			assert(not cell_set.has(raw), "R02: 读档后单位不能被包进帅帐 %s" % [raw])
 	print("HQ FOOTPRINT PASS new/rebuild/load share 3x3 cells and no unit is embedded")
 	b.free()

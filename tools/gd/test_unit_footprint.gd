@@ -22,16 +22,16 @@ func _run() -> void:
 
 	# 4 格单位出生时不得与已有单位占格重叠。
 	var worker: Dictionary = b.units.filter(func(u): return u.alive and int(u.owner) == b.player_owner and int(u.unit) == 30)[0]
-	var wc: Vector2i = b.commands._unit_cell(worker)
-	var start: Vector2i = b.commands._free_unit_cell(wc, 0, -1, 34)
-	assert(start.x >= 0 and not b.commands._unit_placement_free(wc, 34, 0, -1))
-	assert(b.commands._unit_placement_free(start, 34, 0, -1))
+	var wc: Vector2i = b.commands.world._unit_cell(worker)
+	var start: Vector2i = b.commands.world._free_unit_cell(wc, 0, -1, 34)
+	assert(start.x >= 0 and not b.commands.world._unit_placement_free(wc, 34, 0, -1))
+	assert(b.commands.world._unit_placement_free(start, 34, 0, -1))
 	var p: Vector2 = b.nav.anchor_of(start.x, start.y)
-	assert(b.commands._spawn_unit(34, b.player_owner, p.x, p.y, false))
+	assert(b.commands.world._spawn_unit(34, b.player_owner, p.x, p.y, false))
 	var tank: Dictionary = b.units.back()
-	var cells: Array = b.commands._footprint_cells(tank)
+	var cells: Array = b.commands.orders._footprint_cells(tank)
 	assert(cells.size() == 4, "车兵应为 4 格占位")
 	for c in cells:
-		assert(b.commands._unit_placement_free(c, 34, 0, int(tank.uid)) or c == start)
+		assert(b.commands.world._unit_placement_free(c, 34, 0, int(tank.uid)) or c == start)
 	print("UNIT FOOTPRINT PASS class0/1/3, parity, spawn placement")
 	b.free(); finished = true; quit(0)

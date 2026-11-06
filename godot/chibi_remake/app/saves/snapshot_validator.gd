@@ -44,7 +44,7 @@ func prepare(d: Dictionary, arr: Array) -> Dictionary:
 		var uid := int(rec.get("uid", -1))
 		if uid < 0 or ids.has(uid) or not host.map_data.units.has(str(int(rec.get("unit", -1)))):
 			return {}
-		if host.commands._sheet_ref_for(int(rec.unit), int(rec.get("owner", -1))) == "":
+		if host.commands.world._sheet_ref_for(int(rec.unit), int(rec.get("owner", -1))) == "":
 			return {}
 		if not rec.has("x") or not rec.has("y") or not is_finite(float(rec.x)) or not is_finite(float(rec.y)):
 			return {}
@@ -163,12 +163,12 @@ func prepare(d: Dictionary, arr: Array) -> Dictionary:
 		if owner <= 0 or not ids.has(uid) or production_buildings.has(uid) or int(job.t) >= host.TECH_TICKS or idx >= host.TECH_TABLE.size(): return {}
 		var building: Dictionary = ids[uid]
 		if not bool(building.get("building",false)) or int(building.owner) != owner or not bool(building.get("alive",false)) or float(building.get("dieT",-1)) >= 0 or bool(building.get("simulation",{}).get("site",false)): return {}
-		var line: String = host.commands._tech_line_of(idx)
+		var line: String = host.commands.technology._tech_line_of(idx)
 		var lines: Array = host.TECH_BUILDING_LINES.get(int(building.unit),[])
 		if owner != host.player_owner and int(building.unit) in [4,5]: lines = ["bow"]
 		if not lines.has(line) or not _valid_cost.call(job.get("cost",{})): return {}
 		var key := "%d/%d" % [owner,idx]
-		if not host.commands.tech_is_sell(idx) and researching.has(key): return {}
+		if not host.commands.technology.tech_is_sell(idx) and researching.has(key): return {}
 		researching[key] = true; production_buildings[uid] = true
 	for rec2 in arr:
 		if not rec2 is Dictionary:

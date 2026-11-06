@@ -29,3 +29,5 @@ jobs:
         run: node tools/audit_clone_inputs.mjs --index
       - name: Rebuildable terrain source declarations
         run: node tools/terrain_sources.mjs --index
+      - name: Historical terrain equivalence reference coverage
+        run: node tools/compare_terrain_rebuild.mjs --declarations

@@ -21,8 +21,8 @@ func fixture(phase: int) -> Node2D:
 	sim.nav.setup(sim.map_data);sim.visibility.setup(Vector2(1848,700))
 	for item in [[0,6,22],[30,8,19],[30,8,25]]:
 		var p:Vector2=sim.nav.anchor_of(item[1],item[2])
-		assert(sim.commands._spawn_unit(item[0],2,p.x,p.y,true))
-	sim.commands._build_decor_targets();sim.nav.rebuild_buildings(sim.units)
+		assert(sim.commands.world._spawn_unit(item[0],2,p.x,p.y,true))
+	sim.commands.economy._build_decor_targets();sim.nav.rebuild_buildings(sim.units)
 	sim.selected=sim.units.filter(func(u):return int(u.unit)==30)
 	return sim
 
@@ -30,19 +30,19 @@ func entire_field(phase: int) -> void:
 	var sim:=fixture(phase)
 	var center:Dictionary=sim.decor_cells["14_22"]
 	assert(sim.nav.is_solid(Vector2i(14,22)),"live center blocks ordinary movement")
-	assert(sim.commands._order_gather(center)==2,"an interior click must assign real reachable boundary resources")
+	assert(sim.commands.economy._order_gather(center)==2,"an interior click must assign real reachable boundary resources")
 	var workers:Array=sim.selected.duplicate()
 	var reloaded:=false
 	for tick in range(20000):
 		sim.sim_tick+=1
 		for worker in workers:
-			sim.commands._step_unit(worker,sim.SIM_DT)
-			var cell:Vector2i=sim.commands._unit_cell(worker)
+			sim.commands.orders._step_unit(worker,sim.SIM_DT)
+			var cell:Vector2i=sim.commands.world._unit_cell(worker)
 			var source:Dictionary=sim.decor_cells.get("%d_%d"%[cell.x,cell.y],{})
 			assert(source.is_empty() or not source.alive,"no walking through unharvested resource cells")
 		if not reloaded and sim.decor_targets.filter(func(o):return not o.alive).size()>=10:
 			var game:=root.get_node("Game")
-			assert(game.save_game(sim.units,sim.commands._resources(),sim.commands._save_extra()))
+			assert(game.save_game(sim.units,sim.commands.world._resources(),sim.commands.session._save_extra()))
 			assert(sim.saver.apply_snapshot(game.load_save()))
 			workers=sim.units.filter(func(u):return int(u.unit)==30)
 			reloaded=true
@@ -50,7 +50,7 @@ func entire_field(phase: int) -> void:
 	assert(reloaded and sim.decor_targets.all(func(o):return not o.alive),"must harvest the center, not stop after the outer rows")
 	assert(is_equal_approx(float(sim.food if phase==2 else sim.wood),5000),"all 25 cells must actually reach the depot")
 	assert(not sim.nav.is_solid(Vector2i(14,22)),"harvested center becomes usable floor")
-	assert(not sim.commands._path_to(workers[0],sim.nav.anchor_of(14,22),true).is_empty())
+	assert(not sim.commands.orders._path_to(workers[0],sim.nav.anchor_of(14,22),true).is_empty())
 	sim.nav.rebuild_buildings(sim.units)
 	assert(not sim.nav.is_solid(Vector2i(14,22)),"building-grid rebuild must not seal harvested ground again")
 	print("RESOURCE FRONTIER PASS phase=",phase," 25 cells / center / 5000 delivered / no live-cell traversal / mid-field save / rebuild")
@@ -83,22 +83,22 @@ func run() -> void:
 	var scout:Dictionary=battle.selected[0]
 	var routes:=0
 	for enemy in enemies:
-		var path:Array=battle.commands._edge_interaction_path(scout,enemy)
+		var path:Array=battle.commands.orders._edge_interaction_path(scout,enemy)
 		if not path.is_empty():routes+=1
 	assert(routes>0,"enemy camp must be reachable from the player's starting area")
 	print("FIRST MISSION ENEMIES PASS 21 alive / north-east camp / reachable from player start")
 	# Select the worker commander, then issue one explicit attack on a house.
 	var house:Dictionary=battle.units.filter(func(u):return int(u.unit) in [24,25] and u.alive)[0]
-	var team:Array=battle.commands._command_units()
+	var team:Array=battle.commands.military._command_units()
 	assert(team.size()==5)
-	assert(battle.commands._attack_selected(house)==team.size(),"workers must receive the same explicit attack order as their commander")
+	assert(battle.commands.orders._attack_selected(house)==team.size(),"workers must receive the same explicit attack order as their commander")
 	for member in team:assert(member.target==house and member.state=="attack")
 	var worker:Dictionary=team.filter(func(u):return int(u.unit)==30)[0]
-	var edge:Vector2=battle.commands._edge_point(house,Vector2(house.ax-150,house.ay+30),battle.DEPOSIT_EDGE_PX)
+	var edge:Vector2=battle.commands.orders._edge_point(house,Vector2(house.ax-150,house.ay+30),battle.DEPOSIT_EDGE_PX)
 	worker.ax=edge.x;worker.ay=edge.y;worker.A=battle.nav.cell_of_px(edge.x,edge.y).x;worker.B=battle.nav.cell_of_px(edge.x,edge.y).y
 	var hp:float=house.hp
 	for tick in range(300):
-		battle.commands._step_unit(worker,battle.SIM_DT)
+		battle.commands.orders._step_unit(worker,battle.SIM_DT)
 		if float(house.hp)<hp:break
 	assert(float(house.hp)<hp,"a worker must really damage the neutral house")
 	print("WORKER TEAM ATTACK PASS commander + four workers / same target / real worker damage")

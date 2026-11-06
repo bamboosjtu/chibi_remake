@@ -125,7 +125,7 @@ func sync_selection() -> void:
 	for label in values: label.show()
 	rank_label.visible=not officer.is_empty()
 	if not officer.is_empty():
-		rank_label.text=host.commands.officer_rank_name(officer)
+		rank_label.text=host.commands.military.officer_rank_name(officer)
 		rank_label.tooltip_text="%d级 · %s" % [int(officer.level),rank_label.text]
 	portrait.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED if bool(u.is_building) else TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	if officer.is_empty():
@@ -138,7 +138,7 @@ func sync_selection() -> void:
 		portrait.material = null
 		var letters := str(officer.get("name", "")).replace(" ", "")
 		name_label.text = "\n".join(letters.split(""))
-		detail.text = "官职 %s" % str(host.commands.officer_rank_name(officer))
+		detail.text = "官职 %s" % str(host.commands.military.officer_rank_name(officer))
 	var soldiers := 0
 	if not officer.is_empty():
 		for member in host.units:
@@ -184,7 +184,7 @@ func _sync_building_work(u: Dictionary) -> void:
 	for label in values: label.hide()
 	var site: bool = u.get("site", false)
 	rank_label.visible = not site
-	var level := clampi(int(host.commands.ai_level(int(u.owner))), 0, 3) if int(u.unit) in [0,1] else 0
+	var level := clampi(int(host.commands.economy.ai_level(int(u.owner))), 0, 3) if int(u.unit) in [0,1] else 0
 	rank_label.text = ["一级", "二级", "三级", "四级"][level]
 	progress_bar.visible = site
 	progress_bar.value = 100.0 * float(u.hp) / maxf(1.0, float(u.maxhp)) if site else 0.0
@@ -199,10 +199,10 @@ func _sync_building_work(u: Dictionary) -> void:
 		progress_bar.show()
 		progress_bar.value = 100.0 * (1.0 - float(training.t) / maxf(1.0, float(definition.hp)))
 		break
-	var research: Dictionary = host.commands._research_for_building(u)
+	var research: Dictionary = host.commands.technology._research_for_building(u)
 	if not research.is_empty():
-		var selling: bool = host.commands.tech_is_sell(int(research.tech))
-		work_icon.texture = view.command_catalog.work_icon(host.commands.tech_row(int(research.tech))) if selling else view._unit_icon(u)
+		var selling: bool = host.commands.technology.tech_is_sell(int(research.tech))
+		work_icon.texture = view.command_catalog.work_icon(host.commands.technology.tech_row(int(research.tech))) if selling else view._unit_icon(u)
 		view.command_catalog.decorate_sale(work_icon, selling)
 		work_icon.show()
 		progress_bar.show()

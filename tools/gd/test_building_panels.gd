@@ -36,7 +36,7 @@ func run() -> void:
 	var panel = b.view.classic_panel
 	assert(panel.captions[0].text == "归属" and panel.values[0].text == str(leader.officer.name).replace(" ", ""))
 	assert(b.view.art_buttons[3].btn.visible and b.view.art_buttons[3].btn.get_meta("command_id") == 16146)
-	assert(b.commands._spawn_unit(23, b.player_owner, 1000, 1600, true))
+	assert(b.commands.world._spawn_unit(23, b.player_owner, 1000, 1600, true))
 	var bank: Dictionary = b.units.back()
 	b.gold = 100000; b.wood = 100000; b.food = 100000; b.stone = 100000
 	b.selected = [bank]
@@ -44,28 +44,28 @@ func run() -> void:
 	assert(b.view.cmd_capsules.size() == 6)
 	for i in range(6): assert(b.view.cmd_buttons[i].visible and b.view.cmd_buttons[i].icon != null and b.view.cmd_buttons[i].text == "")
 	assert(is_equal_approx(b.view.cmd_buttons[0].position.y, b.view.cmd_buttons[2].position.y))
-	assert(b.commands._start_tech(12))
-	for tick in range(80): b.commands._process_tech(b.SIM_DT)
+	assert(b.commands.technology._start_tech(12))
+	for tick in range(80): b.commands.technology._process_tech(b.SIM_DT)
 	await capture("bank-selling")
 	assert(panel.work_icon.visible and panel.progress_bar.visible and panel.progress_bar.value == 40)
 	assert(b.view.cmd_capsules.size() == 1 and b.view.cmd_buttons[0].icon != null)
 	b.view._on_cmd(0); b.player_commands.pump()
-	assert(not b.commands.tech_research_active())
+	assert(not b.commands.technology.tech_research_active())
 	var hq: Dictionary = b.units.filter(func(u): return int(u.unit) == 0 and int(u.owner) == b.player_owner)[0]
-	b.selected = [hq]; assert(b.commands._queue_train(b.player_owner, hq, 30))
+	b.selected = [hq]; assert(b.commands.economy._queue_train(b.player_owner, hq, 30))
 	b.trainings[0].t = 60
 	await capture("hq-training")
 	assert(panel.work_icon.visible and panel.work_badge.text == "100人" and panel.progress_bar.value == 40)
 	assert(b.view.cmd_capsules.size() == 1)
-	b.commands._cancel_training(hq)
-	assert(b.commands._spawn_unit(12, b.player_owner, 1050, 1600, true))
+	b.commands.economy._cancel_training(hq)
+	assert(b.commands.world._spawn_unit(12, b.player_owner, 1050, 1600, true))
 	var barracks: Dictionary = b.units.back()
-	b.selected = [barracks]; assert(b.commands._queue_train(b.player_owner, barracks, 32))
+	b.selected = [barracks]; assert(b.commands.economy._queue_train(b.player_owner, barracks, 32))
 	b.trainings[0].t = 50
 	await capture("barracks-training")
 	assert(panel.work_icon.visible and panel.work_badge.text == "100人" and panel.progress_bar.value == 50)
-	b.commands._cancel_training(barracks)
-	assert(b.commands._spawn_unit(18, b.player_owner, 1100, 1600, true))
+	b.commands.economy._cancel_training(barracks)
+	assert(b.commands.world._spawn_unit(18, b.player_owner, 1100, 1600, true))
 	var site: Dictionary = b.units.back(); site.site = true; site.hp = site.maxhp * 0.25
 	b.selected = [site]
 	for dimensions in [Vector2i(640,480), Vector2i(1280,720), Vector2i(1920,1080)]:

@@ -28,7 +28,7 @@ func run() -> void:
 	assert(terrain._pending.is_empty() and terrain.active==cached,"revisiting resident chunks must not decode/upload again")
 	var leader: Dictionary=battle.selected[0]
 	var worker: Dictionary=battle.units.filter(func(u):return int(u.owner)==battle.player_owner and int(u.unit)==30)[0]
-	assert(battle.commands._spawn_unit(45,battle.player_owner,600,2200,true))
+	assert(battle.commands.world._spawn_unit(45,battle.player_owner,600,2200,true))
 	var archer: Dictionary=battle.units.back()
 	var sim: Node2D=load("res://main.gd").new()
 	var walk: Array=[];walk.resize(40*80);walk.fill(1)
@@ -42,8 +42,8 @@ func run() -> void:
 		actor.ax=start.x;actor.ay=start.y;actor.A=5;actor.B=20
 		actor.path=[start,start+Vector2(1,0),start+Vector2(2,0),start+Vector2(110,0)]
 		actor.pi=0;actor.state="move";actor.haste_t=0;actor.slow_t=0
-		sim.units=[actor];sim.commands._rebuild_unit_index()
-		sim.commands._follow(actor,0.1)
+		sim.units=[actor];sim.commands.world._rebuild_unit_index()
+		sim.commands.orders._follow(actor,0.1)
 		assert(is_equal_approx(float(actor.ax)-start.x,11.0),"short waypoints must not discard the tick's travel distance")
 		assert(is_equal_approx(float(actor.ay),start.y))
 	# A shortcut must respect the temporary forbidden crop cells too.
@@ -74,10 +74,10 @@ func run() -> void:
 	archer.moved=true;archer.anim=0.15;archer.state="move";archer.dir=0
 	Locomotion.ensure(archer);archer.walk_tick=4;archer.move_facing=0;archer.move_turning=false
 	battle.cam.position=Vector2(archer.ax,archer.ay);battle.cam.force_update_scroll()
-	battle.commands._update_visual(archer)
-	assert(battle.view.unit_nodes(archer).frame==battle.commands._clip_frame(archer,"turn",2,2),"walking advances once per two updates, independently of attack rate")
+	battle.commands.world._update_visual(archer)
+	assert(battle.view.unit_nodes(archer).frame==battle.commands.military._clip_frame(archer,"turn",2,2),"walking advances once per two updates, independently of attack rate")
 	var frame: int=battle.view.unit_nodes(archer).frame
-	battle.cam.position=Vector2(1800,900);archer.anim=0.25;battle.commands._update_visual(archer)
+	battle.cam.position=Vector2(1800,900);archer.anim=0.25;battle.commands.world._update_visual(archer)
 	assert(not battle.view.unit_nodes(archer).spr.visible and battle.view.unit_nodes(archer).frame==frame,"offscreen units must not stream animation frames")
 	# Check all 26 original type/direction lengths, including 8/12 and 9/18 rows.
 	var reference_path:String=get_script().resource_path.get_base_dir().path_join("../../research/movements/data/movement.json").simplify_path()
@@ -99,8 +99,8 @@ func run() -> void:
 				sample.walk_tick=tick;var pose:Dictionary=battle.view.mobile_pose(sample)
 				assert(int(pose.step)==tick/2)
 				assert(pose.clip=="turn" and int(pose.direction)==(direction+2)%8)
-				assert(battle.commands._clip_frame(sample,str(pose.clip),int(pose.direction),int(pose.step))==int(definition.clips.turn[(direction+2)%8][tick/2]))
-				frames_seen[battle.commands._clip_frame(sample,str(pose.clip),int(pose.direction),int(pose.step))]=true
+				assert(battle.commands.military._clip_frame(sample,str(pose.clip),int(pose.direction),int(pose.step))==int(definition.clips.turn[(direction+2)%8][tick/2]))
+				frames_seen[battle.commands.military._clip_frame(sample,str(pose.clip),int(pose.direction),int(pose.step))]=true
 			assert(frames_seen.size()==expected_frames.size())
 	assert(active_types>=21)
 	var legacy:Dictionary={"dir":5,"move_facing":0,"walk_tick":99,"move_started":true,"is_building":false}
@@ -121,18 +121,18 @@ func run() -> void:
 	worker.state="move";worker.moved=true;worker.carry=0;worker.dir=0
 	Locomotion.ensure(worker);worker.move_facing=0;worker.move_turning=false;worker.walk_tick=1
 	battle.view.capture_motion();worker.walk_tick=2;worker.ax+=3.0
-	battle.cam.position=Vector2(worker.ax,worker.ay);battle.cam.force_update_scroll();battle.commands._update_visual(worker)
-	battle.view.interpolate_motion(0.5);assert(battle.view.unit_nodes(worker).frame==battle.commands._clip_frame(worker,"turn",2,0))
-	battle.view.interpolate_motion(1.0);assert(battle.view.unit_nodes(worker).frame==battle.commands._clip_frame(worker,"turn",2,1))
+	battle.cam.position=Vector2(worker.ax,worker.ay);battle.cam.force_update_scroll();battle.commands.world._update_visual(worker)
+	battle.view.interpolate_motion(0.5);assert(battle.view.unit_nodes(worker).frame==battle.commands.military._clip_frame(worker,"turn",2,0))
+	battle.view.interpolate_motion(1.0);assert(battle.view.unit_nodes(worker).frame==battle.commands.military._clip_frame(worker,"turn",2,1))
 	assert(worker.walk_tick==2,"rendering must not advance the gait clock")
 	sim.free();battle.free()
 	# A real five-member team receives five separate, body-sized destinations.
 	battle=load("res://main.tscn").instantiate();root.add_child(battle)
 	battle.set_process(false);battle.cli_mode=true
 	await process_frame;await process_frame
-	battle.commands._move_selected_to(battle.nav.anchor_of(20,190))
+	battle.commands.orders._move_selected_to(battle.nav.anchor_of(20,190))
 	var endpoints:=[]
-	for actor in battle.commands._command_units():
+	for actor in battle.commands.military._command_units():
 		assert(actor.state=="move" and not actor.path.is_empty())
 		var goal: Vector2=actor.path.back()
 		var cell: Vector2i=battle.nav.cell_of_px(goal.x,goal.y)
@@ -140,9 +140,9 @@ func run() -> void:
 		endpoints.append(cell)
 	assert(endpoints.size()==5)
 	# Persist a corner midway; after load the visual state and next update agree.
-	var actor:Dictionary=battle.commands._command_units()[0]
+	var actor:Dictionary=battle.commands.military._command_units()[0]
 	Locomotion.ensure(actor);actor.move_facing=2;actor.dir=5;actor.walk_tick=37;actor.turn_tick=3;actor.move_turning=true;actor.move_started=true
-	assert(battle.commands._save_game())
+	assert(battle.commands.session._save_game())
 	var snapshot:Dictionary=root.get_node("Game").load_save()
 	var copied:=actor.duplicate(true);Locomotion.step(copied)
 	assert(battle.saver.apply_snapshot(snapshot))

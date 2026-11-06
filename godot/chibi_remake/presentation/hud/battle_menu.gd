@@ -158,7 +158,7 @@ func _close_settings() -> void:
 	panel.show()
 
 func _select_speed(index: int) -> void:
-	host.commands.set_sim_speed(index)
+	host.commands.world.set_sim_speed(index)
 	_update_speed_buttons()
 
 func _update_speed_buttons() -> void:
@@ -175,7 +175,7 @@ func load_game() -> void:
 
 func _slot_confirmed(slot: int, title: String) -> void:
 	if slots_dialog.saving:
-		if not host.commands._save_game(slot,title):
+		if not host.commands.session._save_game(slot,title):
 			slots_dialog.show_error("保存失败（%s），原有记录已保留。" % str(Game.last_save_error.get("stage","unknown")));return
 		slots_dialog.dismiss();panel.show()
 		status.text="保存成功 · 记录 %02d" % slot
@@ -201,7 +201,7 @@ func _slot_confirmed(slot: int, title: String) -> void:
 		slots_dialog.show_error("进度与当前关卡内容不匹配，原有记录已保留。")
 
 func return_to_menu() -> void:
-	if not host.commands._save_game():
+	if not host.commands.session._save_game():
 		status.text = "保存失败：%s（错误%d）\n位置：%s\n旧存档已保留，请检查该目录或返回游戏重试。" % [str(Game.last_save_error.get("stage", "unknown")), int(Game.last_save_error.get("code", FAILED)), str(Game.last_save_error.get("directory", Game.SAVE_PATH.get_base_dir()))]
 		leave_button.show()
 		return
@@ -209,7 +209,7 @@ func return_to_menu() -> void:
 
 func quit_game() -> void:
 	# 退出前先落盘；失败则留在菜单并提示，避免“点退出丢进度”。
-	if host.commands._save_game():
+	if host.commands.session._save_game():
 		get_tree().quit()
 	else:
 		status.text = "保存失败，未退出。请重试、返回游戏，或选择不保存返回主菜单。"

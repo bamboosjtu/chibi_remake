@@ -6,6 +6,7 @@ $ErrorActionPreference='Continue'
 . (Join-Path $PSScriptRoot 'build_environment.ps1')
 Set-Location -LiteralPath $BuildRoot
 try {
+    if ($SkipImport) { Write-Warning "-SkipImport is deprecated; new staging projects always import resources" }
     if ($SkipVerify -and !$NoPublish) { throw '-SkipVerify requires -NoPublish; unverified builds cannot be published' }
     $sourceCommit=(& git -C $BuildRoot rev-parse HEAD 2>$null)
     if (!$sourceCommit) { $sourceCommit='unknown' }
@@ -29,6 +30,8 @@ try {
     if ($LASTEXITCODE -ne 0) { throw "Terrain source rebuild failed" }
 	& node tools/runtime_assets.mjs --check --hash
 	if ($LASTEXITCODE -ne 0) { throw 'Declared runtime asset check failed' }
+    & node tools/compare_terrain_rebuild.mjs
+    if ($LASTEXITCODE -ne 0) { throw 'Rebuilt terrain differs from historical reference' }
     $stage=Join-Path $BuildRoot ('_work/build/stage-'+$id)
     & node tools/stage_release.mjs $stage
     if ($LASTEXITCODE -ne 0) { throw 'Resource dependency staging failed' }

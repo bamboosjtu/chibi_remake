@@ -16,7 +16,7 @@ func run() -> void:
 	battle.view.event_view.restore_history()
 	assert(battle.world.definition.is_read_only())
 	assert(battle.world.definition.units.is_read_only())
-	var snapshot: Dictionary = game.snapshot(battle.units,battle.commands._resources(),battle.commands._save_extra())
+	var snapshot: Dictionary = game.snapshot(battle.units,battle.commands.world._resources(),battle.commands.session._save_extra())
 	var before: Dictionary = Digest.sections(battle,game)
 	var entry_id: int = battle.get_instance_id()
 	var commands_id: int = battle.commands.get_instance_id()

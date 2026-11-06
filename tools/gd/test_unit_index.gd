@@ -28,7 +28,7 @@ func blank() -> void:
 
 func install(list: Array) -> void:
 	sim.units = list
-	sim.commands._rebuild_unit_index()
+	sim.commands.world._rebuild_unit_index()
 
 func make(uid: int, owner: int, kind: int, cell: Vector2i) -> Dictionary:
 	var u: Dictionary = template.duplicate(true)
@@ -47,8 +47,8 @@ func brute_cell_unit(cell: Vector2i, exclude_uid: int, layer: int) -> bool:
 		if not bool(other.get("alive", false)) or float(other.get("die_t", -1)) >= 0.0: continue
 		if bool(other.get("is_building", false)) or bool(other.get("attached", false)): continue
 		if int(other.get("uid", -1)) == exclude_uid: continue
-		if sim.commands._nav_layer(other) != layer: continue
-		if cell in sim.commands._footprint_cells(other):
+		if sim.commands.military._nav_layer(other) != layer: continue
+		if cell in sim.commands.orders._footprint_cells(other):
 			return true
 	return false
 
@@ -57,7 +57,7 @@ func verify_index() -> void:
 		for b in range(0, 40, 5):
 			var cell := Vector2i(a, b)
 			for layer in [0]:
-				var indexed: bool = not sim.commands._cell_unit(cell, -1, layer).is_empty()
+				var indexed: bool = not sim.commands.world._cell_unit(cell, -1, layer).is_empty()
 				var brute: bool = brute_cell_unit(cell, -1, layer)
 				assert(indexed == brute, "R13: 索引与全量扫描不一致 cell=%s layer=%d (%s != %s)" % [cell, layer, indexed, brute])
 
@@ -74,19 +74,19 @@ func run() -> void:
 		blank()
 		for i in range(n):
 			sim.units.append(make(i, 1 + int(i / 200), 32, Vector2i(i % 38 + 1, i / 38 + 1)))
-		sim.commands._rebuild_unit_index()
+		sim.commands.world._rebuild_unit_index()
 		verify_index()
 		# 预热后取三批 10 tick 的中位数：排除冷启动与一次性的系统负载抖动，
 		# 持续超预算仍会被 100ms 断言拦下。
 		for tick in range(3):
 			for body in sim.units:
-				sim.commands._step_unit(body, sim.SIM_DT)
+				sim.commands.orders._step_unit(body, sim.SIM_DT)
 		var samples: Array = []
 		for batch in range(3):
 			var begin: int = Time.get_ticks_usec()
 			for tick in range(10):
 				for body in sim.units:
-					sim.commands._step_unit(body, sim.SIM_DT)
+					sim.commands.orders._step_unit(body, sim.SIM_DT)
 			samples.append(float(Time.get_ticks_usec() - begin) / 10000.0)
 		samples.sort()
 		var each_ms: float = float(samples[1])
@@ -100,24 +100,24 @@ func run() -> void:
 	var a := make(1, 1, 32, Vector2i(10, 10))
 	var b := make(2, 1, 34, Vector2i(12, 10))
 	install([a, b])
-	assert(not sim.commands._cell_unit(Vector2i(10, 10), -1, 0).is_empty())
-	assert(not sim.commands._cell_unit(Vector2i(11, 9), -1, 0).is_empty(), "四格单位的后排格也应入索引")
+	assert(not sim.commands.world._cell_unit(Vector2i(10, 10), -1, 0).is_empty())
+	assert(not sim.commands.world._cell_unit(Vector2i(11, 9), -1, 0).is_empty(), "四格单位的后排格也应入索引")
 	a.ax = sim.nav.anchor_of(20, 10).x; a.ay = sim.nav.anchor_of(20, 10).y
 	a.A = 20; a.B = 10
-	sim.commands._place_unit(a)
-	assert(sim.commands._cell_unit(Vector2i(10, 10), -1, 0).is_empty(), "移动后旧格必须释放")
-	assert(not sim.commands._cell_unit(Vector2i(20, 10), -1, 0).is_empty(), "移动后新格必须占用")
+	sim.commands.world._place_unit(a)
+	assert(sim.commands.world._cell_unit(Vector2i(10, 10), -1, 0).is_empty(), "移动后旧格必须释放")
+	assert(not sim.commands.world._cell_unit(Vector2i(20, 10), -1, 0).is_empty(), "移动后新格必须占用")
 	b.attached = true
-	sim.commands._index_sync(b)
-	assert(sim.commands._cell_unit(Vector2i(12, 10), -1, 0).is_empty(), "装载后身体格必须释放")
-	assert(sim.commands._cell_unit(Vector2i(11, 9), -1, 0).is_empty(), "装载后四格单位后排也要释放")
+	sim.commands.world._index_sync(b)
+	assert(sim.commands.world._cell_unit(Vector2i(12, 10), -1, 0).is_empty(), "装载后身体格必须释放")
+	assert(sim.commands.world._cell_unit(Vector2i(11, 9), -1, 0).is_empty(), "装载后四格单位后排也要释放")
 	b.attached = false
-	sim.commands._index_sync(b)
-	assert(not sim.commands._cell_unit(Vector2i(12, 10), -1, 0).is_empty(), "下船后身体格重新占用")
-	sim.commands._kill(a)
-	assert(sim.commands._cell_unit(Vector2i(20, 10), -1, 0).is_empty(), "阵亡后身体格必须释放")
-	sim.commands._free_unit_at(sim.units.find(b))
-	assert(sim.commands._cell_unit(Vector2i(12, 10), -1, 0).is_empty(), "移除后身体格必须释放")
+	sim.commands.world._index_sync(b)
+	assert(not sim.commands.world._cell_unit(Vector2i(12, 10), -1, 0).is_empty(), "下船后身体格重新占用")
+	sim.commands.military._kill(a)
+	assert(sim.commands.world._cell_unit(Vector2i(20, 10), -1, 0).is_empty(), "阵亡后身体格必须释放")
+	sim.commands.world._free_unit_at(sim.units.find(b))
+	assert(sim.commands.world._cell_unit(Vector2i(12, 10), -1, 0).is_empty(), "移除后身体格必须释放")
 	print("UNIT INDEX PASS timing=%s / 800 budget / move-kill-attach-free incremental integrity" % [str(timings)])
 	done = true
 	sim.free()

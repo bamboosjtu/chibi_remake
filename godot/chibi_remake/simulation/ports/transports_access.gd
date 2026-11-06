@@ -23,19 +23,29 @@ var units:
 	set(value): battle.units = value
 
 func _cancel_unit_command(u: Dictionary) -> void:
-	_require(_provider_command_groups, "command_groups")._cancel_unit_command(u)
+	var provider = _require(_provider_command_groups, "command_groups")
+	if provider == null: return
+	provider._cancel_unit_command(u)
 
 func _footprint_cells(o: Dictionary) -> Array:
-	return _require(_provider_interaction_paths, "interaction_paths")._footprint_cells(o)
+	var provider = _require(_provider_interaction_paths, "interaction_paths")
+	if provider == null: return []
+	return provider._footprint_cells(o)
 
 func _path_to(u: Dictionary, target_px: Vector2, exact: bool) -> Array:
-	return _require(_provider_movement, "movement")._path_to(u, target_px, exact)
+	var provider = _require(_provider_movement, "movement")
+	if provider == null: return []
+	return provider._path_to(u, target_px, exact)
 
 func _unit_cell(u: Dictionary) -> Vector2i:
-	return _require(_provider_spatial_index, "spatial_index")._unit_cell(u)
+	var provider = _require(_provider_spatial_index, "spatial_index")
+	if provider == null: return Vector2i.ZERO
+	return provider._unit_cell(u)
 
 func _unit_placement_free(anchor: Vector2i, unit_id: int, layer := 0, exclude_uid := -1) -> bool:
-	return _require(_provider_spatial_index, "spatial_index")._unit_placement_free(anchor, unit_id, layer, exclude_uid)
+	var provider = _require(_provider_spatial_index, "spatial_index")
+	if provider == null: return false
+	return provider._unit_placement_free(anchor, unit_id, layer, exclude_uid)
 
 const CONTRACTS := {"command_groups": ["_cancel_unit_command"], "interaction_paths": ["_footprint_cells"], "movement": ["_path_to"], "spatial_index": ["_unit_cell", "_unit_placement_free"]}
 var _provider_command_groups: WeakRef
@@ -45,13 +55,13 @@ var _provider_spatial_index: WeakRef
 
 func connect_services(services: Dictionary) -> Array:
 	var missing: Array = []
-	_provider_command_groups = weakref(services["command_groups"]) if services.has("command_groups") else null
-	_provider_interaction_paths = weakref(services["interaction_paths"]) if services.has("interaction_paths") else null
-	_provider_movement = weakref(services["movement"]) if services.has("movement") else null
-	_provider_spatial_index = weakref(services["spatial_index"]) if services.has("spatial_index") else null
+	_provider_command_groups = weakref(services["command_groups"]) if services.get("command_groups") != null else null
+	_provider_interaction_paths = weakref(services["interaction_paths"]) if services.get("interaction_paths") != null else null
+	_provider_movement = weakref(services["movement"]) if services.get("movement") != null else null
+	_provider_spatial_index = weakref(services["spatial_index"]) if services.get("spatial_index") != null else null
 	for provider in CONTRACTS:
 		for method in CONTRACTS[provider]:
-			if not services.has(provider) or not services[provider].has_method(method): missing.append({"provider":provider,"method":method})
+			if services.get(provider) == null or not services[provider].has_method(method): missing.append({"provider":provider,"method":method})
 	return missing
 
 func disconnect_services() -> void:

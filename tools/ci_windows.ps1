@@ -1,4 +1,4 @@
-param([switch]$SkipArtCheck,[switch]$FullRegression)
+﻿param([switch]$SkipArtCheck,[switch]$FullRegression)
 # Windows CI: minimal smoke by default; full gameplay checks are opt-in.
 # Requires the local Godot engine and declared runtime assets, not art masters.
 # Godot may write a certificate warning to stderr; every native result is checked below.
@@ -23,6 +23,11 @@ $env:LOCALAPPDATA=Join-Path $root '_work/ci/localappdata'
 New-Item -ItemType Directory -Force $env:APPDATA,$env:LOCALAPPDATA | Out-Null
 $godot=Join-Path $root 'Godot_v4.7.2-stable_win64_console.exe'
 if (!(Test-Path $godot)) { throw '缺少 Godot 引擎：Godot_v4.7.2-stable_win64_console.exe' }
+
+foreach ($test in @('test_package_safety.ps1','test_publish.ps1','test_candidate_lock.ps1')) {
+    & (Join-Path $PSScriptRoot $test)
+    if (!$?) { throw ('Windows tool regression failed: '+$test) }
+}
 
 Write-Host '== architecture boundaries and regression suites =='
 node tools/architecture_check.mjs

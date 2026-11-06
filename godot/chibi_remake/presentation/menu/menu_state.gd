@@ -1,4 +1,5 @@
 extends RefCounted
+const PROXY_FIELDS := ["media_view", "slots_dialog", "level_panel", "level_face", "level_scroll", "level_list", "level_back", "title_label", "main_buttons", "toast", "toast_serial", "row_parity", "campaign_panel", "campaign_cursor", "campaign_slots", "campaign_frames", "campaign_tex", "campaign_choice", "campaign", "scrim", "subtitle_label", "level_title", "level_hint", "C_FACE", "C_FACE_IN", "C_GROOVE", "C_BEVEL", "C_HEAD", "C_HINT", "C_ACCENT", "C_WOOD_A", "C_WOOD_B", "C_WOOD_RIM", "C_WOOD_DARK", "C_WOOD_HOVER", "C_WOOD_HOVER_RIM", "C_WOOD_PRESS", "C_WOOD_TXT", "C_GOLD", "C_GOLD_HOVER", "C_GOLD_PRESS", "C_GOLD_RIM", "C_GOLD_DARK", "C_GOLD_TXT", "sb_row_a", "sb_row_b", "sb_row_hover", "sb_row_press", "sb_row_focus", "sb_gold", "sb_gold_hover", "sb_gold_press", "sb_gold_focus"]
 ## Presentation-owned node references and interaction state.
 const RemasterArt = preload("res://presentation/battle/art_catalog.gd")
 

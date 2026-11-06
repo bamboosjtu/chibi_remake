@@ -59,10 +59,14 @@ var units:
 	set(value): battle.units = value
 
 func _grant_officer_exp(u: Dictionary, amount: float) -> void:
-	_require(_provider_officer_teams, "officer_teams")._grant_officer_exp(u, amount)
+	var provider = _require(_provider_officer_teams, "officer_teams")
+	if provider == null: return
+	provider._grant_officer_exp(u, amount)
 
 func _nav_layer(u: Dictionary) -> int:
-	return _require(_provider_command_groups, "command_groups")._nav_layer(u)
+	var provider = _require(_provider_command_groups, "command_groups")
+	if provider == null: return 0
+	return provider._nav_layer(u)
 
 const CONTRACTS := {"command_groups": ["_nav_layer"], "officer_teams": ["_grant_officer_exp"]}
 var _provider_command_groups: WeakRef
@@ -70,11 +74,11 @@ var _provider_officer_teams: WeakRef
 
 func connect_services(services: Dictionary) -> Array:
 	var missing: Array = []
-	_provider_command_groups = weakref(services["command_groups"]) if services.has("command_groups") else null
-	_provider_officer_teams = weakref(services["officer_teams"]) if services.has("officer_teams") else null
+	_provider_command_groups = weakref(services["command_groups"]) if services.get("command_groups") != null else null
+	_provider_officer_teams = weakref(services["officer_teams"]) if services.get("officer_teams") != null else null
 	for provider in CONTRACTS:
 		for method in CONTRACTS[provider]:
-			if not services.has(provider) or not services[provider].has_method(method): missing.append({"provider":provider,"method":method})
+			if services.get(provider) == null or not services[provider].has_method(method): missing.append({"provider":provider,"method":method})
 	return missing
 
 func disconnect_services() -> void:

@@ -29,7 +29,7 @@ func run() -> void:
 	enemy.officer.might=1;enemy.officer.level=0;enemy.officer.tier=4
 	caster.hp=caster.maxhp;enemy.hp=enemy.maxhp
 	b.visibility.update(b.units,b.player_owner)
-	b.commands._duel_begin();seed(17);b.commands._duel_at(Vector2(enemy.ax,enemy.ay-enemy.h*0.5))
+	b.commands.military._duel_begin();seed(17);b.commands.military._duel_at(Vector2(enemy.ax,enemy.ay-enemy.h*0.5))
 	assert(paused and b.view.event_view.active)
 	await create_timer(2,true).timeout
 	assert(caster.hp==caster.maxhp and enemy.hp==enemy.maxhp)
@@ -46,7 +46,7 @@ func run() -> void:
 	await b.view.event_view.media_finished
 	assert(not paused and caster.hp==caster.maxhp*0.9 and enemy.hp==0)
 	print("DUEL NATIVE PASS natural 28-second playback / decoded frames / delayed ending title / exact settlement")
-	b.cli_mode=false;b.game_end=1;b.view.completion.automatic=true;b.commands._show_end(1)
+	b.cli_mode=false;b.game_end=1;b.view.completion.automatic=true;b.commands.world._show_end(1)
 	await capture("victory-next-chapter")
 	assert(paused and b.view.completion.countdown)
 	b.view.completion.stay();assert(not paused and not b.view.completion.countdown)

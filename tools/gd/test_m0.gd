@@ -52,7 +52,7 @@ func run() -> void:
 			if i % 3 > 0:
 				assert(is_equal_approx(button.position.y, b.view.art_buttons[i - 1].btn.position.y))
 	print("M0 LAYOUT PASS: 1920x1080, 1560x1440, 640x480")
-	var ok: bool = game.save_game(b.units, b.commands._resources(), b.commands._save_extra())
+	var ok: bool = game.save_game(b.units, b.commands.world._resources(), b.commands.session._save_extra())
 	print("M0 SAVE view=",b.view != null," result=",ok," error=",game.Store.last_error)
 	if not ok: quit(1); return
 	assert(b.saver.apply_snapshot(game.load_save()))
@@ -106,7 +106,7 @@ func run() -> void:
 	game.current_map="chibic1"
 	var other: Node2D=load("res://main.tscn").instantiate();root.add_child(other)
 	other.set_process(false);other.cli_mode=true;other.gold=5678
-	assert(other.commands._save_game(20,"另一战役"));other.free()
+	assert(other.commands.session._save_game(20,"另一战役"));other.free()
 	game.current_map="chibil1"
 	main_menu._on_load();choose(main_menu.slots_dialog,20);main_menu.slots_dialog._confirm()
 	await process_frame;await process_frame

@@ -10,7 +10,7 @@ func _initialize() -> void:
 	run.call_deferred()
 
 func roundtrip(label: String) -> bool:
-	if not game.save_game(battle.units, battle.commands._resources(), battle.commands._save_extra()):
+	if not game.save_game(battle.units, battle.commands.world._resources(), battle.commands.session._save_extra()):
 		printerr("NAVAL CASUALTY FAIL save ", label); return false
 	var payload: Dictionary=game.load_save()
 	var ids: Dictionary={}
@@ -24,25 +24,25 @@ func run() -> void:
 	game=root.get_node("Game");game.current_map="chibic13"
 	battle=load("res://main.tscn").instantiate();root.add_child(battle)
 	battle.set_process(false);battle.cli_mode=true
-	var owner: int=battle.commands.ai_owners()[0]
+	var owner: int=battle.commands.economy.ai_owners()[0]
 	var members: Array=[]
 	for i in range(8):
 		var centre:=Vector2i(-1,-1)
 		for index in range(battle.map_data.waterWalkable.size()):
 			if int(battle.map_data.waterWalkable[index])!=1:continue
 			var cell:=Vector2i(index/int(battle.map_data.cols),index%int(battle.map_data.cols))
-			if battle.commands._unit_placement_free(cell,46,1):
+			if battle.commands.world._unit_placement_free(cell,46,1):
 				centre=cell;break
 		assert(centre.x>=0,"Naval fixture requires free water")
 		var anchor: Vector2=battle.nav.anchor_of(centre.x,centre.y)
-		assert(battle.commands._spawn_unit(46,owner,anchor.x,anchor.y))
+		assert(battle.commands.world._spawn_unit(46,owner,anchor.x,anchor.y))
 		members.append(int(battle.units.back().uid))
 	var rec: Dictionary=battle.ai.naval.record(owner,0)
 	rec.members=members;rec.flagship=members[0];rec.ready=true
 	if not roundtrip("full slot"):
 		done=true;quit(1);return
 	var victim: Dictionary=battle.units.filter(func(u):return int(u.uid)==int(members[0]))[0]
-	battle.commands._kill(victim)
+	battle.commands.military._kill(victim)
 	battle.ai.naval.refresh(owner)
 	if not roundtrip("seven survivors after flagship death"):
 		done=true;quit(1);return
@@ -50,12 +50,12 @@ func run() -> void:
 	assert(rec.members.size()==7 and not rec.ready and rec.flagship==members[1])
 	# Saving immediately after a second casualty must not serialize stale membership.
 	victim=battle.units.filter(func(u):return int(u.uid)==int(members[1]))[0]
-	battle.commands._kill(victim)
+	battle.commands.military._kill(victim)
 	assert(roundtrip("six survivors before AI refresh"))
 	rec=battle.ai.naval.record(owner,0)
 	assert(rec.members.size()==6 and not rec.ready and rec.flagship==members[2])
 	for uid in rec.members.duplicate():
-		battle.commands._kill(battle.units.filter(func(u):return int(u.uid)==int(uid))[0])
+		battle.commands.military._kill(battle.units.filter(func(u):return int(u.uid)==int(uid))[0])
 	assert(roundtrip("complete loss before AI refresh"))
 	rec=battle.ai.naval.record(owner,0)
 	assert(rec.members.is_empty() and not rec.ready and int(rec.flagship)==-1)

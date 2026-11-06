@@ -57,7 +57,7 @@ func _fill(battle: Node2D) -> int:
 		var unit_id: int = int(COMBAT_TYPES[attempts % COMBAT_TYPES.size()])
 		var ax := rng.randf_range(120.0, terrain_w - 120.0)
 		var ay := rng.randf_range(120.0, terrain_h - 120.0)
-		if battle.commands._spawn_unit(unit_id, owner, ax, ay, false):
+		if battle.commands.world._spawn_unit(unit_id, owner, ax, ay, false):
 			spawned += 1
 	# Give a bounded share of the troops an enemy so pathfinding, attacks and
 	# projectiles run, while the rest stay as AI reserve.
@@ -66,7 +66,7 @@ func _fill(battle: Node2D) -> int:
 		if engaging >= engage: break
 		if not bool(unit.get("alive", false)) or bool(unit.get("is_building", false)): continue
 		if int(unit.get("unit", 0)) in COMBAT_TYPES and str(unit.get("state", "")) in ["idle", ""]:
-			var enemy: Dictionary = battle.commands._nearest_enemy(unit, 100000.0)
+			var enemy: Dictionary = battle.commands.military._nearest_enemy(unit, 100000.0)
 			if not enemy.is_empty():
 				unit.target = enemy
 				unit.state = "attack"
@@ -98,12 +98,12 @@ func run() -> void:
 		battle.view = null
 	var spawned := _fill(battle)
 	var measured_units := _mobile_count(battle)
-	for i in range(60): battle.commands._sim_step(Config.SIM_DT)
+	for i in range(60): battle.commands.world._sim_step(Config.SIM_DT)
 	var times: Array = []
 	for i in range(ticks):
 		if i % 10 == 0: await process_frame
 		var begin := Time.get_ticks_usec()
-		battle.commands._sim_step(Config.SIM_DT)
+		battle.commands.world._sim_step(Config.SIM_DT)
 		times.append(float(Time.get_ticks_usec() - begin) / 1000.0)
 	var sorted := times.duplicate()
 	sorted.sort()

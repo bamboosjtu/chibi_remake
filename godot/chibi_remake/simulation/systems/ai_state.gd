@@ -1,4 +1,5 @@
 extends RefCounted
+const PROXY_FIELDS := ["host", "_think", "_plan", "_build_clock", "_assault", "_assault_period", "_intercept", "_research_cursor", "_retreat", "plan", "slots", "naval"]
 ## AI counters, plans and training slots.
 const Settings = preload("res://simulation/systems/ai_config.gd")
 const THINK_PERIOD = Settings.THINK_PERIOD

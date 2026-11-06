@@ -4,8 +4,7 @@ const SIM_DT = preload("res://simulation/battle_config.gd").SIM_DT
 var world := preload("res://simulation/battle_world.gd").new()
 var state = world.state
 var _modules: Dictionary = world._modules
-var commands: RefCounted:
-	get: return self
+var commands := preload("res://app/battle_commands.gd").new()
 var view = null
 var saver: RefCounted
 var ai: RefCounted:
@@ -13,9 +12,14 @@ var ai: RefCounted:
 	set(value): state.ai = value
 
 func _get(key: StringName):
-	return state.get(key)
+	if key in state.PROXY_FIELDS: return state.get(key)
+	push_error("Unknown snapshot state property: " + str(key))
+	return null
 
 func _set(key: StringName, value) -> bool:
+	if key not in state.PROXY_FIELDS:
+		push_error("Unknown snapshot state property: " + str(key))
+		return false
 	state.set(key, value)
 	return true
 
@@ -23,8 +27,12 @@ func prepare(source: RefCounted, definition: Dictionary = {}) -> bool:
 	preload("res://simulation/battle_state_fields.gd").copy_inputs(source, state)
 	world.set_definition(definition if not definition.is_empty() else source.map_data)
 	state.map_data = world.definition.duplicate(true)
-	var registry := world.connect_services("snapshot")
-	if not registry.conflicts.is_empty() or not registry.missing.is_empty(): return false
+	var access := world._access.duplicate()
+	# Candidates expose simulation commands only, and never construct application services.
+	for key in commands.port_objects():
+		if key != "commands.session": access[key] = commands.port_objects()[key]
+	var report := preload("res://composition_contract.gd").wire(world._modules, "snapshot", access)
+	if not report.missing.is_empty(): return false
 	state.nav.setup(state.map_data)
 	state.visibility.setup(Vector2(float(state.map_data.terrainW), float(state.map_data.terrainH)))
 	state.command_rules = preload("res://simulation/systems/command_rules.gd").new(world)
@@ -36,49 +44,5 @@ func prepare(source: RefCounted, definition: Dictionary = {}) -> bool:
 
 func dispose() -> void:
 	saver = null
+	commands.disconnect_services()
 	if world != null: world.dispose()
-
-func _apply_tech_bonuses(u: Dictionary) -> void:
-	_modules["technology"]._apply_tech_bonuses(u)
-
-func _officer_by_index(idx: int) -> Dictionary:
-	return _modules["officer_pool"]._officer_by_index(idx)
-
-func _officer_pool_state() -> Dictionary:
-	return _modules["officer_pool"]._officer_pool_state()
-
-func _restore_officer_pool(state: Dictionary) -> void:
-	_modules["officer_pool"]._restore_officer_pool(state)
-
-func _spawn_unit(unit_id: int, owner: int, ax: float, ay: float, restoring := false) -> bool:
-	return _modules["entity_factory"]._spawn_unit(unit_id, owner, ax, ay, restoring)
-
-func _build_decor_targets() -> void:
-	_modules["harvest_orders"]._build_decor_targets()
-
-func _rebuild_unit_index() -> void:
-	_modules["spatial_index"]._rebuild_unit_index()
-
-func _remove_decor(obj: Dictionary) -> void:
-	_modules["harvest_orders"]._remove_decor(obj)
-
-func _reset_jimou() -> void:
-	_modules["abilities"]._reset_jimou()
-
-func _enforce_team_limits() -> void:
-	_modules["command_groups"]._enforce_team_limits()
-
-func _place_unit(u: Dictionary) -> void:
-	_modules["battle_simulation"]._place_unit(u)
-
-func _update_gates() -> void:
-	_modules["battle_simulation"]._update_gates()
-
-func _free_unit_at(i: int) -> void:
-	_modules["battle_simulation"]._free_unit_at(i)
-
-func _resolve_navigation_overlaps() -> void:
-	_modules["movement"]._resolve_navigation_overlaps()
-
-func _update_visual(u: Dictionary) -> void:
-	_modules["battle_simulation"]._update_visual(u)

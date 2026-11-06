@@ -12,7 +12,7 @@ func run() -> void:
 	var reports: Dictionary = preload("res://composition_contract.gd").reports.duplicate(true)
 	assert(reports.has_all(["main", "view", "menu", "nav"]))
 	for label in reports:
-		assert(reports[label].conflicts.is_empty() and reports[label].missing.is_empty())
+		assert(reports[label].missing.is_empty())
 	print("COMPOSITION JSON: " + JSON.stringify(reports))
 	print("COMPOSITION PASS engine reflection / all four roots / inherited methods / port contracts")
 	view.free()

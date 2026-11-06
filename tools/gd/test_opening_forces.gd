@@ -21,14 +21,14 @@ func run() -> void:
 		assert(battle.player_owner == chapter.sides[0].owner and battle.scenario_avi == chapter.avi)
 		for side in chapter.sides:
 			sides += 1
-			var balance: Dictionary = battle.commands._resources() if side.player else battle.commands._ai_res_of(int(side.owner))
+			var balance: Dictionary = battle.commands.world._resources() if side.player else battle.commands.economy._ai_res_of(int(side.owner))
 			for kind in ["gold", "food", "wood", "stone"]: assert(balance[kind] == side.resources[kind], str(chapter.id)+" resource "+kind)
 			var leaders: Array = battle.units.filter(func(u): return int(u.owner) == int(side.owner) and not u.get("officer", {}).is_empty())
 			var expected_leaders := 0
 			for officer in side.officers:
 				var expected_count := 0
 				for count in officer.troops.values(): expected_count += int(count)
-				var model: Dictionary = battle.commands._officer_by_index(int(officer.id) - 1)
+				var model: Dictionary = battle.commands.military._officer_by_index(int(officer.id) - 1)
 				assert(not model.is_empty() and int(model.might) == int(officer.might) and int(model.intellect) == int(officer.intellect))
 				var level := maxi(0, int(officer.rank) - 1) if officer.rank != null else 0
 				if int(officer.id) <= 33 and level == 0: level = 5

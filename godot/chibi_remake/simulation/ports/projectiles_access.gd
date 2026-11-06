@@ -17,13 +17,19 @@ var map_data:
 	set(value): battle.map_data = value
 
 func _cell_of_px(px: float, py: float) -> Vector2i:
-	return _require(_provider_movement, "movement")._cell_of_px(px, py)
+	var provider = _require(_provider_movement, "movement")
+	if provider == null: return Vector2i.ZERO
+	return provider._cell_of_px(px, py)
 
 func _damage(a: Dictionary, d: Dictionary) -> float:
-	return _require(_provider_combat, "combat")._damage(a, d)
+	var provider = _require(_provider_combat, "combat")
+	if provider == null: return 0.0
+	return provider._damage(a, d)
 
 func _projectile_arrived(effect: Dictionary) -> void:
-	_require(_provider_combat, "combat")._projectile_arrived(effect)
+	var provider = _require(_provider_combat, "combat")
+	if provider == null: return
+	provider._projectile_arrived(effect)
 
 const CONTRACTS := {"combat": ["_damage", "_projectile_arrived"], "movement": ["_cell_of_px"]}
 var _provider_combat: WeakRef
@@ -31,11 +37,11 @@ var _provider_movement: WeakRef
 
 func connect_services(services: Dictionary) -> Array:
 	var missing: Array = []
-	_provider_combat = weakref(services["combat"]) if services.has("combat") else null
-	_provider_movement = weakref(services["movement"]) if services.has("movement") else null
+	_provider_combat = weakref(services["combat"]) if services.get("combat") != null else null
+	_provider_movement = weakref(services["movement"]) if services.get("movement") != null else null
 	for provider in CONTRACTS:
 		for method in CONTRACTS[provider]:
-			if not services.has(provider) or not services[provider].has_method(method): missing.append({"provider":provider,"method":method})
+			if services.get(provider) == null or not services[provider].has_method(method): missing.append({"provider":provider,"method":method})
 	return missing
 
 func disconnect_services() -> void:

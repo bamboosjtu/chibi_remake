@@ -59,7 +59,7 @@ func _clear_console_capture() -> void:
 
 func _input(event: InputEvent) -> void:
 	if _dismiss_ability_menu(event): return
-	if _ui.host.handle_cheat_input(event):
+	if _ui.host.commands.session.handle_cheat_input(event):
 		_clear_console_capture()
 		surface.get_viewport().set_input_as_handled()
 		return
@@ -148,7 +148,7 @@ func _input(event: InputEvent) -> void:
 		[_ui.worker_button,_ui.join_button][idx].button_pressed=false
 		if not _ui._hud_press_cancelled and not hit.is_empty() and str(hit.pool)=="aux" and int(hit.idx)==idx:
 			if idx==0:ports._act_open_officer_pick()
-			else:_ui.host._cmd_begin("join")
+			else:_ui.host.commands.military._cmd_begin("join")
 		return
 	var pressed_btn: Button = null
 	if pool == "cmd" and idx >= 0 and idx < _ui.cmd_buttons.size():
@@ -248,7 +248,7 @@ func _hud_select_hook(want_building: bool) -> void:
 	var read_back: Vector2 = surface.get_global_mouse_position()
 	var path: String = "合成鼠标事件"
 	if _ui.host.selected.is_empty():
-		_ui.host._select_click(world, false)          # 宿主的真实选择入口（main._input 点击时调的就是它）
+		_ui.host.commands.orders._select_click(world, false)          # 宿主的真实选择入口（main._input 点击时调的就是它）
 		path = "退化：直接调 main._select_click"
 	print("HUD: --hud-select 点选「%s」 世界=%s 注入画布=%s 回读世界=%s 偏差=%.1f 路径=%s 已选=%d" % [
 		str(target.name), str(world), str(canvas_pos), str(read_back),

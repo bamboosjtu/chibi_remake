@@ -25,7 +25,7 @@ func run() -> void:
 		var event:=InputEventKey.new();event.keycode=key;event.pressed=true;b._unhandled_input(event)
 	assert(b.sec_visible==visible)
 	b.simulation_rng.randi()
-	assert(game.save_game(b.units,b.commands._resources(),b.commands._save_extra()))
+	assert(game.save_game(b.units,b.commands.world._resources(),b.commands.session._save_extra()))
 	var next:int=b.simulation_rng.randi()
 	assert(b.saver.apply_snapshot(game.load_save()))
 	assert(b.simulation_rng.randi()==next)

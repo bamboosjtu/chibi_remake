@@ -27,7 +27,7 @@ var _fields: Dictionary = {}
 func army_for(owner: int) -> Array:
 	return decisions.army_for(owner)
 func _init(h: Object) -> void:
-	for property in _ai_state.get_property_list(): _fields[property.name] = true
+	for field in _ai_state.PROXY_FIELDS: _fields[field] = true
 	_ai_state.host = h.simulation_access("ai") if h.has_method("simulation_access") else h
 	_ai_state.slots = preload("res://simulation/systems/ai_training_slots.gd").new(_ai_state.host)
 	_ai_state.naval = preload("res://simulation/systems/ai_naval_slots.gd").new(_ai_state.host)
@@ -127,10 +127,12 @@ func _build_step(owner: int) -> void:
 
 func _get(key: StringName):
 	if _fields.has(key): return _ai_state.get(key)
+	push_error("Unknown AI state property: " + str(key))
 	return null
 
 func _set(key: StringName, value) -> bool:
 	if _fields.has(key): _ai_state.set(key, value); return true
+	push_error("Unknown AI state property: " + str(key))
 	return false
 
 static func available_slots(behavior: int, gate: int, level: int, human_level: int, human_gold: float, mission: int) -> Array:

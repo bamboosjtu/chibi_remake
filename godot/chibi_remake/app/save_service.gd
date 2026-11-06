@@ -43,7 +43,7 @@ func apply_snapshot(d: Dictionary) -> bool:
 		var applied_v4 := _apply_v4(d, arr)
 		if applied_v4:
 			if host.player_commands != null: host.player_commands.clear()
-			host.commands._rebuild_unit_index()   # R13：交换世界后整表重建（含 uid 重编号）
+			host.commands.world._rebuild_unit_index()   # R13：交换世界后整表重建（含 uid 重编号）
 		return applied_v4
 	if ver > Game.SAVE_VERSION:
 		return false
@@ -58,7 +58,7 @@ func restore_legacy(d: Dictionary, arr: Array, ver: int) -> bool:
 	_restore_resources(d)
 	if applied == 0:
 		push_warning("load save: %d 条记录一条都没能应用（存档与当前关卡不匹配？）" % arr.size())
-	host.commands._rebuild_unit_index()
+	host.commands.world._rebuild_unit_index()
 	if applied > 0:
 		host.auto_control = false # v1-v3 have no delegation flag.
 	return applied > 0
@@ -114,12 +114,12 @@ func _apply_unit_record(u: Dictionary, rec: Dictionary) -> void:
 	var oi := int(rec.get("officerIndex", -1))
 	u["officer"] = {}
 	if oi >= 0:
-		var o: Dictionary = host.commands._officer_by_index(oi)
+		var o: Dictionary = host.commands.military._officer_by_index(oi)
 		if not o.is_empty():
 			u["officer"] = o
 			u["officer_might"] = float(o.get("might", 0))
 			u["officer_intellect"] = float(o.get("intellect", 0))
-	host.commands._place_unit(u)            # 表现层 + R13 占格索引（视图缺席时也同步索引）
+	host.commands.world._place_unit(u)            # 表现层 + R13 占格索引（视图缺席时也同步索引）
 	if host.view != null:
 		host.view.unit_nodes(u).spr.visible = u.alive
 		host.view.unit_nodes(u).spr.modulate = Color(1, 1, 1, maxf(0.0, 1.0 - maxf(0.0, u.die_t) * 0.55))
@@ -181,7 +181,7 @@ func save_extra() -> Dictionary:
 		"explored": host.visibility.snapshot(), "projectiles":host.projectiles.snapshot(), "fireFields":host.fire_fields.snapshot(), "decorResources": decor,
 		"aiResources": host.ai_res, "groups": host.control_groups,
 		"taskLatches": host.task_latches, "officerProgress": host.officer_progress, "terrainChanges": host.terrain_changes, "taskEvents": host.task_events, "objectiveDone": host.objective_done,
-		"officerPool": host.commands._officer_pool_state(),
+		"officerPool": host.commands.military._officer_pool_state(),
 		# 科技树：等级表（player_tech）与进行中的研究（tech_progress，含已扣费用以便取消返还）。
 		"playerTech": host.player_tech.duplicate(true),
 		"armyTech": host.army_tech.duplicate(true),

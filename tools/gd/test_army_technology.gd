@@ -11,11 +11,11 @@ func _initialize() -> void:
 	run.call_deferred()
 
 func spawn(type: int, owner: int) -> Dictionary:
-	assert(battle.commands._spawn_unit(type,owner,1000,1800,true))
+	assert(battle.commands.world._spawn_unit(type,owner,1000,1800,true))
 	return battle.units.back()
 
 func saved() -> Dictionary:
-	assert(game.save_game(battle.units,battle.commands._resources(),battle.commands._save_extra()))
+	assert(game.save_game(battle.units,battle.commands.world._resources(),battle.commands.session._save_extra()))
 	return game.load_save()
 
 func by_uid(uid: int) -> Dictionary:
@@ -29,15 +29,15 @@ func run() -> void:
 	var a := spawn(32,1); var b := spawn(32,2); var human := spawn(32,3)
 	var worker := spawn(30,1); var building := spawn(2,1)
 	var towers: Array = [spawn(18,1),spawn(19,1)]
-	var corpse := spawn(32,1); battle.commands._kill(corpse,{})
+	var corpse := spawn(32,1); battle.commands.military._kill(corpse,{})
 	var dead_hp: float = corpse.hp
 	var dead_max: float = corpse.maxhp
 	a.hp -= 20
 	var human_before := [human.hp,human.maxhp,human.attack_bonus,human.attack_b_bonus,human.defence_bonus]
 	var b_before := [b.hp,b.maxhp,b.attack_bonus]
 	# Execute the confirmed effects for AI1; scheduling is deliberately outside this probe.
-	for index in [0,1,5,8,9,19,20,21,22]: battle.commands._apply_tech_effects(index,1)
-	assert(battle.commands.ai_level(1) == 2 and battle.commands.ai_level(2) == 0 and battle.commands.ai_level(3) == 0)
+	for index in [0,1,5,8,9,19,20,21,22]: battle.commands.technology._apply_tech_effects(index,1)
+	assert(battle.commands.economy.ai_level(1) == 2 and battle.commands.economy.ai_level(2) == 0 and battle.commands.economy.ai_level(3) == 0)
 	assert(a.hp == a.base_maxhp - 20 + 800 and a.maxhp == a.base_maxhp)
 	assert(worker.hp == worker.base_maxhp and building.hp == building.base_maxhp and building.maxhp == building.base_maxhp + 800)
 	for tower in towers: assert(tower.maxhp == tower.base_maxhp and tower.hp == tower.base_maxhp)
@@ -45,13 +45,13 @@ func run() -> void:
 	assert(human_before == [human.hp,human.maxhp,human.attack_bonus,human.attack_b_bonus,human.defence_bonus])
 	assert(b_before == [b.hp,b.maxhp,b.attack_bonus] and battle.player_tech == State.initial())
 	var current_hp: float = a.hp
-	for index in [0,1,0,8,6,8]: battle.commands._apply_tech_effects(index,1)
-	assert(a.hp == current_hp and a.attack_bonus == 9 and battle.commands.ai_level(1) == 2)
+	for index in [0,1,0,8,6,8]: battle.commands.technology._apply_tech_effects(index,1)
+	assert(a.hp == current_hp and a.attack_bonus == 9 and battle.commands.economy.ai_level(1) == 2)
 	var born := spawn(32,1)
 	assert(born.maxhp == born.base_maxhp and born.hp == born.base_maxhp + 800 and born.attack_bonus == 9)
 	print("ARMY TECH ISOLATION PASS AI result only / worker-building HP / both towers exempt / dead body unchanged / monotonic completion / new spawn")
 	# Two AI factions have different research while the player remains unresearched.
-	for index in [0,3,4,5,6,11,18,20]: battle.commands._apply_tech_effects(index,2)
+	for index in [0,3,4,5,6,11,18,20]: battle.commands.technology._apply_tech_effects(index,2)
 	assert(b.hp == b.base_maxhp + 400 and b.attack_bonus == 3 and b.defence_bonus == 6)
 	var fleets := {}
 	for owner in [1,2]:
@@ -70,9 +70,9 @@ func run() -> void:
 	var hp: float = human.hp
 	a.ax = human.ax; a.ay = human.ay; a.state = "attack"; a.target = human; a.cool = 0
 	var damage := maxi(1,int(a.attack + 9 - human.defence))
-	assert(battle.commands._damage(a,human) == damage)
+	assert(battle.commands.military._damage(a,human) == damage)
 	for tick in range(300):
-		battle.commands._step_unit(a,battle.SIM_DT)
+		battle.commands.orders._step_unit(a,battle.SIM_DT)
 		if human.hp < hp: break
 	assert(human.hp == hp - damage)
 	print("ARMY TECH COMBAT PASS two independent AI / ordinary weapons and armour / catapult / ships / transport unarmed / actual attack")
@@ -97,13 +97,13 @@ func run() -> void:
 		record.simulation.attack_bonus = 999; record.simulation.defence_bonus = 999
 	assert(battle.saver.apply_snapshot(good))
 	a = by_uid(a_uid); b = by_uid(b_uid); born = by_uid(born_uid)
-	assert(a.attack_bonus == 9 and b.attack_bonus == 3 and battle.commands.ai_level(1) == 2 and battle.commands.ai_level(2) == 1)
+	assert(a.attack_bonus == 9 and b.attack_bonus == 3 and battle.commands.economy.ai_level(1) == 2 and battle.commands.economy.ai_level(2) == 1)
 	assert(a.hp == current_hp and born.hp == born.base_maxhp + 800)
 	var hp_after: float = born.hp
-	battle.commands._apply_tech_effects(1,1); assert(born.hp == hp_after)
+	battle.commands.technology._apply_tech_effects(1,1); assert(born.hp == hp_after)
 	# Old v6 snapshot without armyTech starts AI research at zero, not stale live values.
 	var old := saved(); old.simulation.erase("armyTech")
-	assert(battle.saver.apply_snapshot(old) and battle.commands.ai_level(1) == 0 and battle.commands.ai_level(2) == 0)
+	assert(battle.saver.apply_snapshot(old) and battle.commands.economy.ai_level(1) == 0 and battle.commands.economy.ai_level(2) == 0)
 	assert(by_uid(a_uid).attack_bonus == 0, str(by_uid(a_uid).attack_bonus))
 	assert(battle.player_tech.values().all(func(value): return float(value) == 0))
 	print("ARMY TECH SAVE PASS per-owner levels and HP / cached bonuses ignored / invalid state atomic / legacy missing field resets AI")
@@ -113,8 +113,8 @@ func run() -> void:
 	battle = load("res://main.tscn").instantiate(); root.add_child(battle)
 	battle.set_process(false); battle.ai = null
 	var fourth := spawn(32,4)
-	battle.commands._apply_tech_effects(6,4)
-	assert(fourth.attack_bonus == 3 and battle.commands._tech_for(2).weapon == 0 and battle.player_tech.weapon == 0)
+	battle.commands.technology._apply_tech_effects(6,4)
+	assert(fourth.attack_bonus == 3 and battle.commands.technology._tech_for(2).weapon == 0 and battle.player_tech.weapon == 0)
 	assert(battle.saver.apply_snapshot(saved()))
 	print("ARMY TECH FACTIONS PASS all four faction IDs, including multi-enemy chapters")
 	battle.free(); done = true; quit()

@@ -19,13 +19,19 @@ var units:
 	set(value): battle.units = value
 
 func _apply_hit(target: Dictionary, damage: float, source_uid: int) -> void:
-	_require(_provider_combat, "combat")._apply_hit(target, damage, source_uid)
+	var provider = _require(_provider_combat, "combat")
+	if provider == null: return
+	provider._apply_hit(target, damage, source_uid)
 
 func _cell_of_px(px: float, py: float) -> Vector2i:
-	return _require(_provider_movement, "movement")._cell_of_px(px, py)
+	var provider = _require(_provider_movement, "movement")
+	if provider == null: return Vector2i.ZERO
+	return provider._cell_of_px(px, py)
 
 func _footprint_cells(o: Dictionary) -> Array:
-	return _require(_provider_interaction_paths, "interaction_paths")._footprint_cells(o)
+	var provider = _require(_provider_interaction_paths, "interaction_paths")
+	if provider == null: return []
+	return provider._footprint_cells(o)
 
 const CONTRACTS := {"combat": ["_apply_hit"], "interaction_paths": ["_footprint_cells"], "movement": ["_cell_of_px"]}
 var _provider_combat: WeakRef
@@ -34,12 +40,12 @@ var _provider_movement: WeakRef
 
 func connect_services(services: Dictionary) -> Array:
 	var missing: Array = []
-	_provider_combat = weakref(services["combat"]) if services.has("combat") else null
-	_provider_interaction_paths = weakref(services["interaction_paths"]) if services.has("interaction_paths") else null
-	_provider_movement = weakref(services["movement"]) if services.has("movement") else null
+	_provider_combat = weakref(services["combat"]) if services.get("combat") != null else null
+	_provider_interaction_paths = weakref(services["interaction_paths"]) if services.get("interaction_paths") != null else null
+	_provider_movement = weakref(services["movement"]) if services.get("movement") != null else null
 	for provider in CONTRACTS:
 		for method in CONTRACTS[provider]:
-			if not services.has(provider) or not services[provider].has_method(method): missing.append({"provider":provider,"method":method})
+			if services.get(provider) == null or not services[provider].has_method(method): missing.append({"provider":provider,"method":method})
 	return missing
 
 func disconnect_services() -> void:

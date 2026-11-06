@@ -55,7 +55,7 @@ func make_resource(uid: int, cell: Vector2i) -> Dictionary:
 
 func install(list: Array) -> void:
 	sim.units = list
-	sim.commands._rebuild_unit_index()
+	sim.commands.world._rebuild_unit_index()
 
 func run() -> void:
 	root.get_node("Game").current_map = "chibic1"
@@ -97,7 +97,7 @@ func run() -> void:
 		if y != 20:
 			sim.nav.block(Vector2i(11, y))      # 只留 y=20 的绕行口
 	install([worker, behind_wall, same_side])
-	var chosen: Dictionary = sim.commands._nearest_harvest_by_path(worker, "stone")
+	var chosen: Dictionary = sim.commands.economy._nearest_harvest_by_path(worker, "stone")
 	assert(not chosen.is_empty(), "R15: 两侧资源都应可达")
 	assert(is_same(chosen.object, same_side), "R15: 应按路径长度而不是直线距离选择（实际 %s）" % str(chosen.object.get("uid", -1)))
 
@@ -108,17 +108,17 @@ func run() -> void:
 	var alt_outside_worker_vision := make_resource(41, Vector2i(14, 10))
 	install([worker, origin, alt_outside_worker_vision])
 	assert(Vector2(worker.ax, worker.ay).distance_to(Vector2(alt_outside_worker_vision.ax, alt_outside_worker_vision.ay)) > worker.vision * sim.tile_w)
-	assert(sim.commands._nearby_same_resource(origin, worker, {}).is_empty(), "R15: 替代资源也必须在工人有效视野内")
+	assert(sim.commands.economy._nearby_same_resource(origin, worker, {}).is_empty(), "R15: 替代资源也必须在工人有效视野内")
 	var alt_inside := make_resource(42, Vector2i(34, 10))
 	install([worker, origin, alt_outside_worker_vision, alt_inside])
-	assert(is_same(sim.commands._nearby_same_resource(origin, worker, {}), alt_inside), "R15: 视野内替代资源应可分配")
+	assert(is_same(sim.commands.economy._nearby_same_resource(origin, worker, {}), alt_inside), "R15: 视野内替代资源应可分配")
 	# Explicit dense-field fallback must also preserve ordinary mineral fallback.
 	for dx in range(-1, 2):
 		for dy in range(-1, 2):
 			if dx != 0 or dy != 0: sim.nav.block(Vector2i(20 + dx, 10 + dy))
 	sim.selected = [worker]
-	assert(sim.commands._edge_interaction_path(worker, origin).is_empty())
-	assert(sim.commands._order_gather(origin) == 1 and is_same(worker.gather_obj, alt_inside), "R15: explicit inaccessible mineral keeps vision-limited alternative assignment")
+	assert(sim.commands.orders._edge_interaction_path(worker, origin).is_empty())
+	assert(sim.commands.economy._order_gather(origin) == 1 and is_same(worker.gather_obj, alt_inside), "R15: explicit inaccessible mineral keeps vision-limited alternative assignment")
 	print("HARVEST RETARGET PASS worker-centred vision / farsight / path cost / alternative assignment")
 	done = true
 	sim.free()

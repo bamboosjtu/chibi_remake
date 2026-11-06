@@ -10,7 +10,7 @@ func run() -> void:
 	battle.set_process(false)
 	battle.cli_mode = true
 	var event_view: CanvasLayer = battle.view.event_view
-	assert(event_view.host.has_method("_save_extra"), "Event playback must recognize the battle capability")
+	assert(event_view.host.has_method("is_battle_context") and event_view.host.is_battle_context(), "Event playback must recognize the battle capability")
 	battle.task_events.append({"id": 6, "tick": battle.sim_tick})
 	event_view._process(0)
 	assert(event_view.cursor == battle.task_events.size(), "Battle event dispatch must advance its cursor")
@@ -22,14 +22,14 @@ func run() -> void:
 		for key in ["spr", "skin", "diamond", "hbar", "hfill", "gate_module"]:
 			assert(not unit.has(key), "Simulation records must not own presentation nodes")
 		assert(battle.view.unit_nodes(unit).has("spr"))
-	assert(battle.commands._save_game())
+	assert(battle.commands.session._save_game())
 	var snapshot: Dictionary = root.get_node("Game").load_save()
-	var before: String = JSON.stringify(battle.commands._save_extra())
+	var before: String = JSON.stringify(battle.commands.session._save_extra())
 	var selection: Array = battle.selected.duplicate()
 	var invalid: Dictionary = snapshot.duplicate(true)
 	invalid.units[0].simulation.build_targetUid = 2147483646
 	assert(not battle.saver.apply_snapshot(invalid))
-	assert(JSON.stringify(battle.commands._save_extra()) == before and battle.selected == selection)
+	assert(JSON.stringify(battle.commands.session._save_extra()) == before and battle.selected == selection)
 	assert(battle.saver.apply_snapshot(snapshot))
 	assert(battle.state.get_instance_id() != state_id)
 	for unit in battle.units:

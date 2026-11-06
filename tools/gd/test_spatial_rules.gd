@@ -31,7 +31,7 @@ func position(u: Dictionary, c: Vector2i) -> void:
 ## 手工夹具直接替换 units 后必须重建 R13 占格索引（正常流程由 _place_unit 增量维护）。
 func install(list: Array) -> void:
 	sim.units = list
-	sim.commands._rebuild_unit_index()
+	sim.commands.world._rebuild_unit_index()
 
 func make(uid: int, owner: int, kind: int, cell: Vector2i, hp := 1000.0) -> Dictionary:
 	var u: Dictionary = template.duplicate(true)
@@ -64,14 +64,14 @@ func run() -> void:
 				sim.nav.block(Vector2i(10 + dx, 10 + dy))
 	install([a, b])
 	var old := Vector2(a.ax, a.ay)
-	sim.commands._separate_unit(a)
+	sim.commands.world._separate_unit(a)
 	assert(Vector2(a.ax, a.ay) == old, "R05: 无连通空位时不能瞬移，位移=%f" % old.distance_to(Vector2(a.ax, a.ay)))
 	assert(int(a.A) == 10 and int(a.B) == 10, "R05: 应保持原格")
 	# 打开一个相邻格后，只能让位到**可连通**的相邻格。
 	sim.nav.unblock(Vector2i(11, 10))
 	for tick in range(20):
 		var before:=Vector2(float(a.ax),float(a.ay))
-		sim.commands._separate_unit(a)
+		sim.commands.world._separate_unit(a)
 		assert(before.distance_to(Vector2(a.ax,a.ay))<=sim.SPEED*sim.SIM_DT+0.001,"yield must not teleport")
 		if int(a.A)==11 and int(a.B)==10:break
 	assert(int(a.A) == 11 and int(a.B) == 10, "R05: 应让位到刚打开的相邻格")
@@ -86,7 +86,7 @@ func run() -> void:
 		sim.nav.block(cell)
 	install([a, b])
 	for tick in range(20):
-		sim.commands._separate_unit(a)
+		sim.commands.world._separate_unit(a)
 		if Vector2i(int(a.A),int(a.B))!=Vector2i(10,10):break
 	var new_cell := Vector2i(int(a.A), int(a.B))
 	assert(new_cell != Vector2i(10, 10), "R05: 存在连通空位时应让位")
@@ -103,12 +103,12 @@ func run() -> void:
 	install([a, b])
 	var hp0 := float(b.hp)
 	for tick in range(8):
-		sim.commands._step_unit_inner(a, sim.SIM_DT)
+		sim.commands.orders._step_unit_inner(a, sim.SIM_DT)
 	assert(float(b.hp) == hp0, "R06: 中间有墙时近战不能扣血（hp %.1f → %.1f）" % [hp0, float(b.hp)])
 	# 拆掉阻挡后同一距离应恢复命中（保留拥堵补偿的初衷）。
 	sim.nav.unblock(Vector2i(11, 10))
 	for tick in range(16):
-		sim.commands._step_unit_inner(a, sim.SIM_DT)
+		sim.commands.orders._step_unit_inner(a, sim.SIM_DT)
 	assert(float(b.hp) < hp0, "R06: 无阻挡的两格近战仍应命中（hp %.1f）" % float(b.hp))
 
 	# ---- R04：四格单位的整条路线不得让身体穿越封锁格 ----
@@ -116,7 +116,7 @@ func run() -> void:
 	a = make(1, 1, 37, Vector2i(10, 10))
 	sim.nav.block(Vector2i(10, 11))
 	install([a])
-	var route: Array = sim.commands._path_to(a, sim.nav.anchor_of(10, 18), true)
+	var route: Array = sim.commands.orders._path_to(a, sim.nav.anchor_of(10, 18), true)
 	assert(not route.is_empty(), "R04: 四格单位应能绕开封锁格到达目标")
 	var body_collisions: Array = []
 	for point in route:
@@ -128,7 +128,7 @@ func run() -> void:
 	# 单格单位仍可穿过同一走廊（形状差异确实生效）。
 	var walker := make(2, 1, 32, Vector2i(10, 10))
 	install([walker])
-	var single: Array = sim.commands._path_to(walker, sim.nav.anchor_of(10, 18), true)
+	var single: Array = sim.commands.orders._path_to(walker, sim.nav.anchor_of(10, 18), true)
 	assert(not single.is_empty(), "R04: 单格单位路线存在")
 
 	# ---- R14：终点被占不能丢单，应就近停靠 ----
@@ -139,11 +139,11 @@ func run() -> void:
 	a.path = [Vector2(b.ax, b.ay)]
 	a.pi = 0
 	install([a, b])
-	sim.commands._step_unit(a, sim.SIM_DT)
+	sim.commands.orders._step_unit(a, sim.SIM_DT)
 	assert(str(a.state) == "move", "R14: 终点被占后仍应保持移动命令")
 	assert(not (a.path as Array).is_empty(), "R14: 应改道到附近合法落脚格")
 	for tick in range(120):
-		sim.commands._step_unit(a, sim.SIM_DT)
+		sim.commands.orders._step_unit(a, sim.SIM_DT)
 		if str(a.state) == "idle":
 			break
 	assert(str(a.state) == "idle", "R14: 就近停靠后应结束移动")

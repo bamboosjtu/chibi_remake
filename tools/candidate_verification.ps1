@@ -27,7 +27,7 @@ function Assert-CandidateVerification([string]$Directory, $Build) {
     foreach ($result in $evidence.results) {
         if ($result.ok -isnot [bool] -or $result.ok -ne $true -or ($result.code -isnot [int] -and $result.code -isnot [long]) -or $result.code -ne 0 -or $result.timedOut -isnot [bool] -or $result.timedOut -ne $false -or @($result.missing).Count -gt 0) { throw ('Candidate verification failed: '+$result.name) }
     }
-    $files=@(Get-ChildItem -LiteralPath $Directory -File -Recurse | Where-Object { ($_.Extension -in @('.exe','.pck','.dll') -or $_.Name -eq 'portable.txt') -and $_.Name -ne '_validation-engine.exe' })
+    $files=@(Get-ChildItem -LiteralPath $Directory -File -Recurse | Where-Object { ($_.Extension -in @('.exe','.pck','.dll') -or $_.Name -eq 'portable.txt') -and $_.Name -notlike '_validation-engine*.exe' })
     if ($files.Count -ne @($evidence.artifacts).Count) { throw 'Candidate verification artifact set changed' }
     foreach ($file in $files) {
         $relative=$file.FullName.Substring($Directory.TrimEnd('\','/').Length+1).Replace('\','/')

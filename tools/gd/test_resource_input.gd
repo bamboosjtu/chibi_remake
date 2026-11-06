@@ -37,35 +37,35 @@ func run() -> void:
 		battle.cam.position = point - (battle.view.battle_rect().get_center() - root.get_visible_rect().size*0.5) / battle.cam.zoom
 		battle.view.clamp_camera(); battle.cam.force_update_scroll()
 		battle.selected = [battle.selected[0]] # 点击将领也必须派出麾下四名工人。
-		battle.commands._cmd_begin("move")
+		battle.commands.military._cmd_begin("move")
 		var screen := battle.get_canvas_transform() * point
 		assert(battle.view.battle_rect().has_point(screen))
 		click_at(screen, MOUSE_BUTTON_RIGHT)
-		assert(battle.commands.cmd_pending_kind() == "")
+		assert(battle.commands.orders.cmd_pending_kind() == "")
 		var picked: Dictionary = workers[0].gather_obj
 		assert(not picked.is_empty() and int(picked.phase) == phase)
 		var clicked_patch := {}
-		for cell in battle.commands._resource_patch_cells(picked): clicked_patch[cell] = true
+		for cell in battle.commands.orders._resource_patch_cells(picked): clicked_patch[cell] = true
 		for assigned_worker in workers:
 			var assigned: Dictionary = assigned_worker.get("gather_obj", {})
 			assert(assigned_worker.state == "gather" and not assigned.is_empty())
-			assert(battle.commands._yield_of(int(assigned.unit)) == battle.commands._yield_of(int(picked.unit)))
+			assert(battle.commands.economy._yield_of(int(assigned.unit)) == battle.commands.economy._yield_of(int(picked.unit)))
 			var assigned_cell: Vector2i = battle.nav.cell_of_px(float(assigned.ax), float(assigned.ay))
 			assert(clicked_patch.has(assigned_cell), "所有工人都应采集被点击的连通资源片")
-		var before: Dictionary = battle.commands._resources()
-		var kind: String = battle.commands._yield_of(int(picked.unit))
+		var before: Dictionary = battle.commands.world._resources()
+		var kind: String = battle.commands.economy._yield_of(int(picked.unit))
 		var loaded := {}; var delivered := {}
 		for step in range(18000):
-			battle.commands._update_gates()
+			battle.commands.world._update_gates()
 			for worker in workers:
 				var cargo: float = worker.carry
-				battle.commands._step_unit(worker, 1.0/30.0)
+				battle.commands.orders._step_unit(worker, 1.0/30.0)
 				if worker.carry > 0: loaded[worker.uid] = true
 				if cargo > 0 and worker.carry == 0: delivered[worker.uid] = true
 			if delivered.size() == 4: break
 		assert(loaded.size() == 4 and delivered.size() == 4, "phase %d loaded %d workers, delivered %d" % [phase, loaded.size(), delivered.size()])
-		assert(battle.commands._resources()[kind] - before[kind] >= 800, "必须实际入库，不能只检查命令状态")
-		print("RESOURCE INPUT PASS phase=",phase," screen=",screen," cargo+delivery=4 income=",battle.commands._resources()[kind]-before[kind])
+		assert(battle.commands.world._resources()[kind] - before[kind] >= 800, "必须实际入库，不能只检查命令状态")
+		print("RESOURCE INPUT PASS phase=",phase," screen=",screen," cargo+delivery=4 income=",battle.commands.world._resources()[kind]-before[kind])
 		battle.free()
 	root.get_node("Game").current_map = "chibil1"
 	battle = load("res://main.tscn").instantiate()
@@ -76,8 +76,8 @@ func run() -> void:
 	var view: Node2D = battle.view
 	for i in range(2):
 		click_at(view.art_buttons[i].btn.get_global_rect().get_center(), MOUSE_BUTTON_LEFT)
-		assert(battle.commands.cmd_pending_kind() == ["move", "attack"][i])
-	battle.commands._clear_pending()
+		assert(battle.commands.orders.cmd_pending_kind() == ["move", "attack"][i])
+	battle.commands.orders._clear_pending()
 	click_at(view.art_buttons[3].btn.get_global_rect().get_center(), MOUSE_BUTTON_LEFT)
 	assert(view.build_menu and battle.build_types.size() == 12 and view.cmd_page_count == 2)
 	assert(battle.build_types[0].gold == 30 and battle.build_types[0].food == 1000 and battle.build_types[0].stone == 500)
@@ -92,18 +92,18 @@ func run() -> void:
 	# 仅选队长，从图标落地粮仓，验证缺失建筑定义确实能生成并由麾下施工。
 	battle.selected = [battle.selected[0]]
 	var captain: Dictionary = battle.selected[0]
-	var builders: Array = battle.commands._construction_workers(captain)
+	var builders: Array = battle.commands.military._construction_workers(captain)
 	click_at(view.art_buttons[3].btn.get_global_rect().get_center(), MOUSE_BUTTON_LEFT)
 	click_at(view.cmd_buttons[1].get_global_rect().get_center(), MOUSE_BUTTON_LEFT)
-	assert(battle.commands.cmd_pending_kind() == "build" and int(battle.cmd_pending_data.unit) == 10)
-	var before_build: Dictionary = battle.commands._resources()
-	var origin: Vector2i = battle.commands._unit_cell(captain)
+	assert(battle.commands.orders.cmd_pending_kind() == "build" and int(battle.cmd_pending_data.unit) == 10)
+	var before_build: Dictionary = battle.commands.world._resources()
+	var origin: Vector2i = battle.commands.world._unit_cell(captain)
 	var placement: Dictionary = {}
 	for r in range(3, 20):
 		for dx in range(-r, r + 1):
 			for dy in range(-r, r + 1):
 				if maxi(absi(dx), absi(dy)) != r: continue
-				var query: Dictionary = battle.commands.build_placement_at(battle.nav.anchor_of(origin.x + dx, origin.y + dy), battle.cmd_pending_data)
+				var query: Dictionary = battle.commands.economy.build_placement_at(battle.nav.anchor_of(origin.x + dx, origin.y + dy), battle.cmd_pending_data)
 				if query.valid: placement = query; break
 			if not placement.is_empty(): break
 		if not placement.is_empty(): break
@@ -118,10 +118,10 @@ func run() -> void:
 	for worker in builders: assert(worker.state == "build" and worker.build_target == sites[0])
 	# 中止后右键已有粮仓工地继续施工；必须优先于“己方粮仓是卸货点”。
 	var site: Dictionary = sites[0]
-	var paid_build: Dictionary = battle.commands._resources().duplicate()
+	var paid_build: Dictionary = battle.commands.world._resources().duplicate()
 	battle.selected = [captain]
-	for worker in builders: battle.commands._cancel_unit_command(worker)
-	for tick in range(16): battle.commands._process_sites(battle.SIM_DT)
+	for worker in builders: battle.commands.military._cancel_unit_command(worker)
+	for tick in range(16): battle.commands.economy._process_sites(battle.SIM_DT)
 	assert(site.hp == 0)
 	var site_point := Vector2(site.ax, site.ay - site.h * 0.5)
 	battle.cam.position = site_point - (view.battle_rect().get_center() - root.get_visible_rect().size * 0.5) / battle.cam.zoom
@@ -130,24 +130,24 @@ func run() -> void:
 	assert(view.battle_rect().has_point(site_screen))
 	click_at(site_screen, MOUSE_BUTTON_RIGHT)
 	assert(builders.all(func(w): return w.state == "build" and w.build_target == site))
-	assert(battle.commands._resources() == paid_build)
+	assert(battle.commands.world._resources() == paid_build)
 	# 运输按钮后点击工地复用同一路径，不新增建筑、不扣费。
-	for worker in builders: battle.commands._cancel_unit_command(worker)
+	for worker in builders: battle.commands.military._cancel_unit_command(worker)
 	view._close_art_sub(); view.update_panel()
 	click_at(view.art_buttons[2].btn.get_global_rect().get_center(), MOUSE_BUTTON_LEFT)
-	assert(battle.commands.cmd_pending_kind() == "transport")
+	assert(battle.commands.orders.cmd_pending_kind() == "transport")
 	click_at(site_screen, MOUSE_BUTTON_LEFT)
-	assert(battle.commands.cmd_pending_kind() == "" and builders.all(func(w): return w.state == "build" and w.build_target == site))
-	assert(battle.commands._resources() == paid_build)
+	assert(battle.commands.orders.cmd_pending_kind() == "" and builders.all(func(w): return w.state == "build" and w.build_target == site))
+	assert(battle.commands.world._resources() == paid_build)
 	print("CONSTRUCTION INPUT PASS right-click and transport on existing granary site / commander resolves4workers / no second cost")
 	for step in range(18000):
-		battle.commands._update_gates()
-		for worker in builders: battle.commands._step_unit(worker, 1.0/30.0)
+		battle.commands.world._update_gates()
+		for worker in builders: battle.commands.orders._step_unit(worker, 1.0/30.0)
 		if not bool(sites[0].site): break
 	assert(not bool(sites[0].site) and sites[0].hp == sites[0].maxhp)
 	# 加入建筑定义不应破坏上一正式版的同关卡存档；未知版本仍必须拒绝。
 	var game := root.get_node("Game")
-	assert(game.save_game(battle.units, battle.commands._resources(), battle.commands._save_extra()))
+	assert(game.save_game(battle.units, battle.commands.world._resources(), battle.commands.session._save_extra()))
 	var snapshot: Dictionary = game.load_save()
 	var file := FileAccess.open("res://data/db/registry_compatibility.json", FileAccess.READ)
 	var contract: Dictionary = JSON.parse_string(file.get_as_text())

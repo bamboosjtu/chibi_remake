@@ -37,7 +37,7 @@ func make(uid: int, owner: int, kind: int, cell: Vector2i, building := false) ->
 
 func install(list: Array) -> void:
 	sim.units = list
-	sim.commands._rebuild_unit_index()
+	sim.commands.world._rebuild_unit_index()
 
 func run() -> void:
 	root.get_node("Game").current_map = "chibic1"
@@ -53,11 +53,11 @@ func run() -> void:
 	var second := make(2, 1, 32, Vector2i(15, 10))
 	var third_building := make(3, 2, 1, Vector2i(30, 30), true)
 	install([player, second, third_building])
-	sim.commands._check_end()
+	sim.commands.world._check_end()
 	assert(sim.game_end == 0, "R12: 第三参战方仍有建筑时不能结束")
 	third_building.alive = false
 	third_building.die_t = 0.0
-	sim.commands._check_end()
+	sim.commands.world._check_end()
 	assert(sim.game_end == 1, "R12: 第 3 参战方清空必须获得专属胜利（game_end=%d）" % sim.game_end)
 	assert(sim.objective_done, "R12: 专属胜利必须标记 objective_done")
 	assert(bool(sim.task_latches.get("29/win", false)), "R12: 专属胜利阶段必须锁存")
@@ -81,7 +81,7 @@ func run() -> void:
 	battle.game_end = 0
 	battle.objective_done = false
 	battle.task_latches.clear()
-	battle.commands._check_end()
+	battle.commands.world._check_end()
 	assert(battle.game_end == 1 and battle.objective_done, "R12: chibic13 清空第三参战方应专属胜利")
 	assert(battle.units.any(func(u): return int(u.owner) == second_owner and bool(u.alive) and float(u.die_t) < 0.0), "R12: 第 2 方应仍存活")
 	print("SCENARIO 29 MAP PASS chibic13 third side=%d cleared while side %d remains" % [third, second_owner])

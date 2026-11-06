@@ -32,7 +32,7 @@ func blank() -> void:
 
 func install(list: Array) -> void:
 	sim.units = list
-	sim.commands._rebuild_unit_index()
+	sim.commands.world._rebuild_unit_index()
 	sim.visibility.update(list, sim.player_owner)
 
 func make(uid: int, owner: int, kind: int, cell: Vector2i) -> Dictionary:
@@ -68,17 +68,17 @@ func run() -> void:
 	var ai2 := make(2, 2, 32, Vector2i(11, 10))
 	var human := make(3, 3, 32, Vector2i(15, 10))
 	install([ai1, ai2, human])
-	var threat: Dictionary = sim.commands._nearest_enemy_threat(ai1)
+	var threat: Dictionary = sim.commands.military._nearest_enemy_threat(ai1)
 	assert(not threat.is_empty() and int(threat.owner) == 3, "R09: AI 应把玩家当威胁，实际 %s" % str(threat.get("owner", -1)))
-	var nearest: Dictionary = sim.commands._nearest_enemy(ai1, 99999.0)
+	var nearest: Dictionary = sim.commands.military._nearest_enemy(ai1, 99999.0)
 	assert(not nearest.is_empty() and int(nearest.owner) == 3, "R09: AI 箭楼不能选其他 AI")
-	assert(int(sim.commands._nearest_enemy(human, 99999.0).owner) == 2, "R09: 玩家仍可攻击最近的 AI")
-	sim.commands.ai_order_assault(1)
+	assert(int(sim.commands.military._nearest_enemy(human, 99999.0).owner) == 2, "R09: 玩家仍可攻击最近的 AI")
+	sim.commands.military.ai_order_assault(1)
 	assert(str(ai1.state) == "attack" and int(ai1.target.owner) == 3, "R09: 普通进攻目标必须是玩家方")
 	ai1.state = "idle"; ai1.target = null
-	sim.commands._free_unit_at(sim.units.find(human))
-	assert(sim.commands._nearest_enemy_threat(ai1).is_empty(), "R09: 没有玩家单位时 AI 不攻击其他 AI")
-	sim.commands.ai_order_assault(1)
+	sim.commands.world._free_unit_at(sim.units.find(human))
+	assert(sim.commands.military._nearest_enemy_threat(ai1).is_empty(), "R09: 没有玩家单位时 AI 不攻击其他 AI")
+	sim.commands.military.ai_order_assault(1)
 	assert(str(ai1.state) == "idle" and ai1.target == null, "R09: 多 AI 地图不得互攻")
 
 	# ---- R10：撤退按群、消费历史攻击者、其他群照常进攻 ----
@@ -98,7 +98,7 @@ func run() -> void:
 	assert(b_leader.state == "idle" and b_member.state == "idle", "R10: 未被攻击的群不撤退")
 	assert(int(a_leader.last_attacker_uid) == -1 and int(a_member.last_attacker_uid) == -1, "R10: 触发后必须消费历史攻击记录")
 	# 其他群仍能接受进攻命令。
-	sim.commands.ai_order_assault(1, first.keys())
+	sim.commands.military.ai_order_assault(1, first.keys())
 	assert(str(b_leader.state) == "attack" and str(b_member.state) == "attack", "R10: 撤退不应阻断其他群进攻")
 	# 撤退恢复只看锚点命令结束，且同一历史攻击不能再次触发。
 	a_leader.state = "idle"; a_member.state = "idle"
@@ -110,7 +110,7 @@ func run() -> void:
 	a_leader.state = "idle"; a_member.state = "idle"
 	brain._retreat_step(1)
 	a_leader.last_attacker_uid = int(attacker.uid)
-	sim.commands._kill(attacker)
+	sim.commands.military._kill(attacker)
 	assert(brain._retreat_step(1).is_empty(), "R10: 攻击者死亡后不撤退")
 	# 快照：新格式按群保存并通过校验；旧格式 int 迁移不假装仍在撤退。
 	a_leader.state = "idle"; a_member.state = "idle"
@@ -139,21 +139,21 @@ func run() -> void:
 	repairer.state = "repair"; repairer.repair_target = captain
 	install([captain] + workers + [gatherer, repairer])
 	brain._worker_step(1)
-	assert(not sim.commands.ai_construction_commander(1).is_empty(), "R11: 补满 5 名工人后必须有施工队长")
+	assert(not sim.commands.economy.ai_construction_commander(1).is_empty(), "R11: 补满 5 名工人后必须有施工队长")
 	for w in workers:
 		assert(int(w.group_officer) == 0, "R11: 补员必须进入施工编组")
 	assert(int(gatherer.group_officer) == -1 and str(gatherer.state) == "gather", "R11: 不得抢走采集工人")
 	assert(int(repairer.group_officer) == -1 and str(repairer.state) == "repair", "R11: 不得抢走修理工人")
-	assert(sim.commands._construction_workers(captain).size() == 5, "R11: 施工队应为 5 名工人")
+	assert(sim.commands.military._construction_workers(captain).size() == 5, "R11: 施工队应为 5 名工人")
 	# 原工人全部阵亡：队长仍空闲，新生产的工人应重新编入施工队。
 	for w in workers:
-		sim.commands._kill(w)
+		sim.commands.military._kill(w)
 	var fresh := make(40, 1, 30, Vector2i(16, 10))
 	sim.units.append(fresh)
 	sim._index_units_size = sim.units.size()
 	brain._worker_step(1)
 	assert(int(fresh.group_officer) == 0, "R11: 阵亡后补出的工人必须重新进入施工编组")
-	assert(sim.commands._construction_workers(captain).size() == 1, "R11: 新工人应成为施工队成员")
+	assert(sim.commands.military._construction_workers(captain).size() == 1, "R11: 新工人应成为施工队成员")
 	print("AI WORKERS PASS replenishment enters construction group / gather-repair preserved / recover after wipe")
 	done = true
 	sim.free()

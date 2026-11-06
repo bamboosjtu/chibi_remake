@@ -34,8 +34,8 @@ func run() -> void:
 	for state in ["move","attack","gather","deliver","build","repair","rest","board"]:
 		for action in ["move","attack"]:
 			dirty(w,state,enemy)
-			if action=="move":b.commands._move_selected_to(destination)
-			else:assert(b.commands._attack_selected(enemy)==1)
+			if action=="move":b.commands.orders._move_selected_to(destination)
+			else:assert(b.commands.orders._attack_selected(enemy)==1)
 			assert(clean(w))
 			assert(w.state==action and (w.target==enemy if action=="attack" else w.target==null))
 	# Shift只参与选择；右键新目标仍替换，未追加命令。
@@ -52,19 +52,19 @@ func run() -> void:
 	site.site=true;site.hp=100;site.build_cost={"gold":100,"wood":100}
 	var other:Dictionary=workers[1]
 	w.build_target=site;w.state="build";other.build_target=site;other.state="build"
-	var before:Dictionary=b.commands._resources().duplicate()
-	b.commands._move_selected_to(destination)
+	var before:Dictionary=b.commands.world._resources().duplicate()
+	b.commands.orders._move_selected_to(destination)
 	assert(site.alive and site.site and site.hp==100 and other.build_target==site and other.state=="build")
-	assert(b.commands._resources()==before)
+	assert(b.commands.world._resources()==before)
 	# 采集指令也须解除修理/休息/上船引用；负载保留，先交货再采新资源。
 	var resource:Dictionary=b.decor_targets.filter(func(o):return o.alive and int(o.unit)==102)[0]
-	dirty(w,"repair",site);b.commands._begin_gather(w,resource,[destination])
+	dirty(w,"repair",site);b.commands.economy._begin_gather(w,resource,[destination])
 	assert(w.state=="deliver" and w.gather_obj==resource and w.build_target==null and w.repair_target==null and w.board_target==null)
 	assert(w.carry==137 and w.delivery_ticks==0)
-	b.commands._move_selected_to(destination);assert(clean(w))
+	b.commands.orders._move_selected_to(destination);assert(clean(w))
 	var uid:int=w.uid
 	var game:=root.get_node("Game")
-	assert(game.save_game(b.units,b.commands._resources(),b.commands._save_extra()))
+	assert(game.save_game(b.units,b.commands.world._resources(),b.commands.session._save_extra()))
 	assert(b.saver.apply_snapshot(game.load_save()))
 	w=b.units.filter(func(u):return u.uid==uid)[0]
 	assert(clean(w));assert(w.state=="move")

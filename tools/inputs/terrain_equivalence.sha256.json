@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "provenance": "Historical q78 transport of pre-remediation runtime JPEGs; independently compared against source rebuild, not regenerated from the new output",
+  "sourceInputsSha256": "2573f1f8e36d3edaede9cc129d3417096b01f8ed38bffe8e4e0000d30b78413a",
+  "files": 35664,
+  "maps": {
+    "chibic1": {
+      "chunks": 224,
+      "geometrySha256": "aee9e1b40dbe3398c032ca4357545e1aee27f6f02c99a27c10a5def7c17be0a7"
+    },
+    "chibic10": {
+      "chunks": 396,
+      "geometrySha256": "20423143a31dfeba9e7f9ffba5d4059c1156c976822572bf1e06b455f739b7a1"
+    },
+    "chibic11": {
+      "chunks": 396,
+      "geometrySha256": "20423143a31dfeba9e7f9ffba5d4059c1156c976822572bf1e06b455f739b7a1"
+    },
+    "chibic12": {
+      "chunks": 396,
+      "geometrySha256": "20423143a31dfeba9e7f9ffba5d4059c1156c976822572bf1e06b455f739b7a1"
+    },
+    "chibic13": {
+      "chunks": 396,
+      "geometrySha256": "20423143a31dfeba9e7f9ffba5d4059c1156c976822572bf1e06b455f739b7a1"
+    },
+    "chibic14": {
+      "chunks": 396,
+      "geometrySha256": "20423143a31dfeba9e7f9ffba5d4059c1156c976822572bf1e06b455f739b7a1"
+    },
+    "chibic15": {
+      "chunks": 396,
+      "geometrySha256": "20423143a31dfeba9e7f9ffba5d4059c1156c976822572bf1e06b455f739b7a1"
+    },
+    "chibic16": {
+      "chunks": 396,
+      "geometrySha256": "20423143a31dfeba9e7f9ffba5d4059c1156c976822572bf1e06b455f739b7a1"
+    },
+    "chibic17": {
+      "chunks": 396,
+      "geometrySha256": "20423143a31dfeba9e7f9ffba5d4059c1156c976822572bf1e06b455f739b7a1"
+    },
+    "chibic2": {
+      "chunks": 224,
+      "geometrySha256": "aee9e1b40dbe3398c032ca4357545e1aee27f6f02c99a27c10a5def7c17be0a7"
+    },
+    "chibic3": {
+      "chunks": 280,
+      "geometrySha256": "0db51a1815d2e5f633782586dc75e977285d324cb5d02176a96eeb0b9a400085"
+    },
+    "chibic4": {
+      "chunks": 320,
+      "geometrySha256": "e38bcb122b227e08192a4d45517443c145fd4a0cdffd8f6d33cb5b5d8387ccb0"
+    },
+    "chibic5": {
+      "chunks": 280,
+      "geometrySha256": "0db51a1815d2e5f633782586dc75e977285d324cb5d02176a96eeb0b9a400085"
+    },
+    "chibic6": {
+      "chunks": 396,
+      "geometrySha256": "20423143a31dfeba9e7f9ffba5d4059c1156c976822572bf1e06b455f739b7a1"
+    },
+    "chibic7": {
+      "chunks": 396,
+      "geometrySha256": "20423143a31dfeba9e7f9ffba5d4059c1156c976822572bf1e06b455f739b7a1"
+    },
+    "chibic8": {
+      "chunks": 396,
+      "geometrySha256": "20423143a31dfeba9e7f9ffba5d4059c1156c976822572bf1e06b455f739b7a1"
+    },
+    "chibic9": {
+      "chunks": 396,
+      "geometrySha256": "20423143a31dfeba9e7f9ffba5d4059c1156c976822572bf1e06b455f739b7a1"
+    },
+    "chibil1": {
+      "chunks": 224,
+      "geometrySha256": "aee9e1b40dbe3398c032ca4357545e1aee27f6f02c99a27c10a5def7c17be0a7"
+    },
+    "chibil10": {
+      "chunks": 396,
+      "geometrySha256": "20423143a31dfeba9e7f9ffba5d4059c1156c976822572bf1e06b455f739b7a1"
+    },
+    "chibil11": {
+      "chunks": 396,
+      "geometrySha256": "20423143a31dfeba9e7f9ffba5d4059c1156c976822572bf1e06b455f739b7a1"
+    },
+    "chibil12": {
+      "chunks": 396,
+      "geometrySha256": "20423143a31dfeba9e7f9ffba5d4059c1156c976822572bf1e06b455f739b7a1"
+    },
+    "chibil13": {
+      "chunks": 396,
+      "geometrySha256": "20423143a31dfeba9e7f9ffba5d4059c1156c976822572bf1e06b455f739b7a1"
+    },
+    "chibil14": {
+      "chunks": 396,
+      "geometrySha256": "20423143a31dfeba9e7f9ffba5d4059c1156c976822572bf1e06b455f739b7a1"
+    },
+    "chibil15": {
+      "chunks": 396,
+      "geometrySha256": "20423143a31dfeba9e7f9ffba5d4059c1156c976822572bf1e06b455f739b7a1"
+    },
+    "chibil16": {
+      "chunks": 396,
+      "geometrySha256": "20423143a31dfeba9e7f9ffba5d4059c1156c976822572bf1e06b455f739b7a1"
+    },
+    "chibil2": {
+      "chunks": 224,
+      "geometrySha256": "aee9e1b40dbe3398c032ca4357545e1aee27f6f02c99a27c10a5def7c17be0a7"
+    },
+    "chibil3": {
+      "chunks": 280,
+      "geometrySha256": "0db51a1815d2e5f633782586dc75e977285d324cb5d02176a96eeb0b9a400085"
+    },
+    "chibil4": {
+      "chunks": 280,
+      "geometrySha256": "0db51a1815d2e5f633782586dc75e977285d324cb5d02176a96eeb0b9a400085"
+    },
+    "chibil5": {
+      "chunks": 280,
+      "geometrySha256": "0db51a1815d2e5f633782586dc75e977285d324cb5d02176a96eeb0b9a400085"
+    },
+    "chibil6": {
+      "chunks": 280,
+      "geometrySha256": "0db51a1815d2e5f633782586dc75e977285d324cb5d02176a96eeb0b9a400085"
+    },
+    "chibil7a": {
+      "chunks": 396,
+      "geometrySha256": "20423143a31dfeba9e7f9ffba5d4059c1156c976822572bf1e06b455f739b7a1"
+    },
+    "chibil7b": {
+      "chunks": 280,
+      "geometrySha256": "0db51a1815d2e5f633782586dc75e977285d324cb5d02176a96eeb0b9a400085"
+    },
+    "chibil8": {
+      "chunks": 396,
+      "geometrySha256": "20423143a31dfeba9e7f9ffba5d4059c1156c976822572bf1e06b455f739b7a1"
+    },
+    "chibil9": {
+      "chunks": 396,
+      "geometrySha256": "20423143a31dfeba9e7f9ffba5d4059c1156c976822572bf1e06b455f739b7a1"
+    }
+  },
+  "snapshotSha256": "89b4a1ed4ae940c7353aa37b7ccb628186dfa2330a7d442ad98bf8a0f1b5a0d9",
+  "historicalRuntimeManifestSha256": "0e0667359b0cda1c23b4c17f1cdb4206924f56700ecd5b876086b6c6f7504b76"
+}

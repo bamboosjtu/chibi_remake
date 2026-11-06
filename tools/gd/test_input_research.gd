@@ -49,11 +49,11 @@ func run() -> void:
 	assert(view.command_panel.slots.size()==15 and view.command_panel.mask==255)
 	for frame in [98,106,113,122,154,155,162,167,168,169]:
 		assert(catalog.icon(frame).get_width()>=190 and catalog.icon(frame).get_height()>=190,"every active command uses painted HD art")
-	assert(view._handle_cmd_key(key(KEY_Q)) and battle.commands.cmd_pending_kind()=="move")
+	assert(view._handle_cmd_key(key(KEY_Q)) and battle.commands.orders.cmd_pending_kind()=="move")
 	assert(view.art_buttons[0].btn.get_meta("visual_state")==1)
 	assert(view._handle_cmd_key(key(KEY_Q,false)))
 	assert(view.art_buttons[0].btn.get_meta("visual_state")==0)
-	battle.commands._clear_pending()
+	battle.commands.orders._clear_pending()
 	var button: Control=view.art_buttons[5].btn
 	var point := button.get_global_rect().get_center()
 	mouse(view,point,true)
@@ -92,7 +92,7 @@ func run() -> void:
 	battle.player_commands.clear();battle.selected=workers;view.update_panel()
 	var before_gold: float=battle.gold
 	assert(battle.player_commands.submit(16,charge)>0)
-	assert(battle.commands._save_game())
+	assert(battle.commands.session._save_game())
 	var saved: Dictionary=root.get_node("Game").load_save()
 	assert(battle.gold==before_gold-100 and float(saved.resources.gold)==battle.gold,"pending cost and saved resources must be one snapshot")
 	print("COMMAND RESEARCH PASS registry / 15 slots / three states / release and cancel / QWE-ASD-ZXC / frame queue / first actor / 64 slots")
@@ -104,7 +104,7 @@ func run() -> void:
 	var unit: Dictionary=workers[0]
 	point=aim(Vector2(unit.ax,unit.ay-float(unit.h)*0.5))
 	assert(cursor.resolve(battle,point).row==6,"unit hover")
-	battle.commands._cmd_begin("attack")
+	battle.commands.military._cmd_begin("attack")
 	assert(cursor.resolve(battle,point).row==2,"friendly attack cursor")
 	var enemies: Array=battle.units.filter(func(u):return u.alive and int(u.owner)!=battle.player_owner and int(u.owner)>0)
 	assert(not enemies.is_empty())
@@ -114,11 +114,11 @@ func run() -> void:
 	var target: Dictionary=battle.decor_targets.filter(func(o):return int(o.phase)==0)[0]
 	var draw: Array=battle.remaster_art.runtime_info("resource-decor").frames[0].draw
 	point=aim(Vector2(target.ax,target.ay)-Vector2(22,60)+Vector2(draw[0]+draw[2]*0.5,draw[1]+draw[3]*0.5))
-	battle.commands._cmd_begin("transport")
+	battle.commands.military._cmd_begin("transport")
 	assert(cursor.resolve(battle,point).row==5,"resource sickle")
 	battle.selecting=true
 	assert(cursor.resolve(battle,point).row==7,"drag overrides resource hover")
-	battle.selecting=false;battle.commands._clear_pending()
+	battle.selecting=false;battle.commands.orders._clear_pending()
 	battle.cam.position=Vector2(battle.map_data.terrainW,battle.map_data.terrainH)*0.5
 	assert(cursor.resolve(battle,Vector2(0,300))=={"bank":"B","row":7})
 	cursor.draw_at(battle,Vector2(0,300))

@@ -41,7 +41,7 @@ func _refresh_cmd_panel() -> void:
 	if _ui.officer_pick and not sel.is_empty():
 		# 候选 = 未被占用的 + **选中部队自己持有的**（可移出再指派，原版 CTRL_GROUP_Sub）。
 		# 只用 available_officers 的话，名单分完之后这里永远是"没有可用的将领"。
-		var avail: Array = _ui.host.officers_for_selection(_ui.host.player_owner, sel)
+		var avail: Array = _ui.host.commands.military.officers_for_selection(_ui.host.player_owner, sel)
 		if avail.is_empty():
 			specs.append({
 				"text": "没有可用的将领", "enabled": false,
@@ -66,7 +66,7 @@ func _refresh_cmd_panel() -> void:
 		var bts0: Array = _ui.host.build_types
 		for bi in range(bts0.size()):
 			var bopt0: Dictionary = bts0[bi]
-			var reason: String = _ui.host.building_block_reason(int(bopt0.unit))
+			var reason: String = _ui.host.commands.economy.building_block_reason(int(bopt0.unit))
 			var bok0: bool = ports._can_afford(bopt0) and reason == ""
 			specs.append({
 				"text": "建造 %s   %s" % [str(bopt0.get("name", "?")), ports._cost_text(bopt0)],
@@ -90,14 +90,14 @@ func _refresh_cmd_panel() -> void:
 				str(site.get("name", "?")), int(hp), int(mx), int(100.0 * hp / mx)]
 			specs.append(_cancel_spec("取消建造", ports._act_cancel_site.bind(site)))
 		elif not b.is_empty():
-			var busy: bool = _ui.host._building_work_busy(b)
+			var busy: bool = _ui.host.commands.technology._building_work_busy(b)
 			if busy:
 				_apply_cmd_specs([_cancel_work_spec(b)], "")
 				return
 
 			# 生产清单按**建筑类型**取（帅帐→工兵、兵营→对应兵种、船坞→运输船/水军）；
 			# 原版没有生产项的建筑（粮仓/木材场/钱庄/箭楼…）返回空表。
-			var tts: Array = _ui.host.train_types_for(int(b.unit))
+			var tts: Array = _ui.host.commands.economy.train_types_for(int(b.unit))
 			for i in range(tts.size()):
 				var tt: Dictionary = tts[i]
 				var ok: bool = ports._can_afford(tt) and not busy
@@ -125,7 +125,7 @@ func _refresh_cmd_panel() -> void:
 			# 没有图集时它就是等价的可点击清单（同一批 main 命令入口）。
 			if ports._worker_count(sel) > 0:
 				specs.append({"text": "运输", "enabled": true, "tip": "点资源点：工人往返搬运（载重 200）。", "act": ports._act_transport})
-				specs.append({"text": "建造", "enabled": not _ui.host._selected_construction_workers().is_empty(), "tip": "带工人的武将发起建造；工人到位后每4tick施工。", "act": ports._open_build_menu})
+				specs.append({"text": "建造", "enabled": not _ui.host.commands.military._selected_construction_workers().is_empty(), "tip": "带工人的武将发起建造；工人到位后每4tick施工。", "act": ports._open_build_menu})
 				specs.append({"text": "修理", "enabled": true, "tip": "点我方单位/建筑：+16 兵力，四资源各 −16。", "act": ports._act_repair})
 			else:
 				specs.append({"text": "警戒", "enabled": true, "tip": "取消当前命令、原地待命（不再自动索敌）。", "act": ports._act_watch})
@@ -263,7 +263,7 @@ func cmd_box_ready() -> bool:
 
 func _refresh_hotkeys() -> void:
 	var b: Dictionary = ports._selected_building()
-	var tts: Array = _ui.host.train_types_for(int(b.unit)) if not b.is_empty() else []
+	var tts: Array = _ui.host.commands.economy.train_types_for(int(b.unit)) if not b.is_empty() else []
 	for i in range(_ui.hot_buttons.size()):
 		var e: Dictionary = _ui.hot_buttons[i]
 		var btn: Button = e.btn
@@ -274,8 +274,8 @@ func _refresh_hotkeys() -> void:
 		# 编队优先：原版左缘 1..10 就是编队热键（main 已实现 Ctrl+数字 编入 / 数字 呼出）。
 		# **组为空时才回退到生产热键** —— 与 main 的按键回退规则完全一致，
 		# 否则同一个数字键在 HUD 上和键盘上会有两种含义。
-		var gsz: int = int(_ui.host.control_group_size(i + 1))
-		var working_site: Dictionary = _ui.host.control_group_work_site(i + 1)
+		var gsz: int = int(_ui.host.commands.military.control_group_size(i + 1))
+		var working_site: Dictionary = _ui.host.commands.military.control_group_work_site(i + 1)
 		var work_badge: Label = e.work_badge
 		work_badge.visible = not working_site.is_empty()
 		work_badge.position = Vector2(14, 12) * _ui.ui_scale
@@ -292,7 +292,7 @@ func _refresh_hotkeys() -> void:
 				tip = "先选中我方建筑才能生产（同按键 %d）" % (i + 1)
 			else:
 				act = ports._act_train.bind(i)
-				var busy: bool = _ui.host._building_work_busy(b)
+				var busy: bool = _ui.host.commands.technology._building_work_busy(b)
 				usable = ports._can_afford(tt) and not busy
 				tip = "生产 %s（%s）%s" % [str(tt.name), ports._cost_text(tt), " —— 建筑工作中" if busy else ("" if usable else " —— 资源不足")]
 		else:
@@ -317,21 +317,21 @@ func _refresh_hotkeys() -> void:
 			pip.visible = false
 
 func _add_tech_specs(specs: Array, bid: int) -> void:
-	var active: bool = bool(_ui.host.tech_research_active())
-	var ids: Array = _ui.host.tech_rows_for_building(bid)
+	var active: bool = bool(_ui.host.commands.technology.tech_research_active())
+	var ids: Array = _ui.host.commands.technology.tech_rows_for_building(bid)
 	for id_v in ids:
 		var idx := int(id_v)
-		var row: Dictionary = _ui.host.tech_row(idx)
-		var sell: bool = bool(_ui.host.tech_is_sell(idx))
-		var next: bool = bool(_ui.host.tech_is_next(idx))
-		var unlocked: bool = bool(_ui.host.tech_unlocked(idx))
-		var cost: Dictionary = _ui.host.tech_cost(idx)
+		var row: Dictionary = _ui.host.commands.technology.tech_row(idx)
+		var sell: bool = bool(_ui.host.commands.technology.tech_is_sell(idx))
+		var next: bool = bool(_ui.host.commands.technology.tech_is_next(idx))
+		var unlocked: bool = bool(_ui.host.commands.technology.tech_unlocked(idx))
+		var cost: Dictionary = _ui.host.commands.technology.tech_cost(idx)
 		var affordable: bool = ports._can_afford(cost)
-		var busy: bool = not ports._selected_building().is_empty() and _ui.host._building_work_busy(ports._selected_building())
+		var busy: bool = not ports._selected_building().is_empty() and _ui.host.commands.technology._building_work_busy(ports._selected_building())
 		var ok: bool = next and unlocked and affordable and not busy
-		var tip: String = "%s。%s" % [str(_ui.host.tech_effect_desc(idx)), str(_ui.host.tech_tip(idx))]
+		var tip: String = "%s。%s" % [str(_ui.host.commands.technology.tech_effect_desc(idx)), str(_ui.host.commands.technology.tech_tip(idx))]
 		if not unlocked or not next:
-			tip += " —— " + str(_ui.host.tech_block_reason(idx))
+			tip += " —— " + str(_ui.host.commands.technology.tech_block_reason(idx))
 		elif busy:
 			tip += " —— 该建筑正在工作（完成或取消后才能再开始）"
 		elif not affordable:
@@ -345,7 +345,7 @@ func _add_tech_specs(specs: Array, bid: int) -> void:
 			"sale": sell,
 			"badge": ("5000" if idx >= 15 else "1000") if sell else "",
 			"enabled": ok,
-			"tip": "%s %s\n费用：%s%s" % [verb, tip, str(_ui.host.tech_cost_text(idx)), "" if ok else "\n（当前不可用）"],
+			"tip": "%s %s\n费用：%s%s" % [verb, tip, str(_ui.host.commands.technology.tech_cost_text(idx)), "" if ok else "\n（当前不可用）"],
 			"act": ports._act_research.bind(idx),
 		})
 	# 原版取消入口 16025 → 模式 0x18，按 75% 返还（§11.3 第 4 条）。
@@ -354,6 +354,6 @@ func _add_tech_specs(specs: Array, bid: int) -> void:
 			"text": "取消研究",
 			"enabled": true,
 			"tip": "取消「%s」，返还已扣费用的 75%%（整除）。剩余 %d tick。" % [
-				str(_ui.host.tech_research_name()), int(_ui.host.tech_research_remaining())],
+				str(_ui.host.commands.technology.tech_research_name()), int(_ui.host.commands.technology.tech_research_remaining())],
 			"act": ports._act_cancel_research,
 		})

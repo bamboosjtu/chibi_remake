@@ -30,7 +30,7 @@ func run() -> void:
 	var saved_slot: int=picker.selected_slot
 	picker._confirm()
 	assert(menu.status.text.begins_with("保存成功"),menu.status.text)
-	b.commands.set_sim_speed(0)
+	b.commands.world.set_sim_speed(0)
 	menu.load_game()
 	var loader=menu.slots_dialog
 	var index: int=-1

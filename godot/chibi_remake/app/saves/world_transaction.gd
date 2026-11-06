@@ -43,7 +43,7 @@ func _install(live: Node2D, candidate: RefCounted) -> bool:
 		view.projectile_view.impacts.clear()
 		if view.cmd_box_ready(): view.update_panel()
 	live.visibility.set_full_reveal(live.cheat_reveal)
-	live.commands._set_cheat_input(false)
+	live.commands.session._set_cheat_input(false)
 	candidate.world = null
 	candidate.saver = null
 	previous.dispose()
@@ -67,7 +67,7 @@ func _free_nodes(records: Dictionary) -> void:
 func apply_legacy(live: Node2D, old: Dictionary, records: Array, version: int) -> bool:
 	var game: Node = live.get_node("/root/Game")
 	if not Fields.omissions(live.state).is_empty(): return false
-	var seed: Dictionary = game.snapshot(live.units, live.commands._resources(), live.saver.save_extra())
+	var seed: Dictionary = game.snapshot(live.units, live.commands.world._resources(), live.saver.save_extra())
 	seed.map = str(live.map_id)
 	var validator = preload("res://app/saves/snapshot_validator.gd").new(live, live.saver.content_revision, live.saver._valid_cost, live.saver._valid_integer)
 	var plan: Dictionary = validator.prepare(seed,seed.units)

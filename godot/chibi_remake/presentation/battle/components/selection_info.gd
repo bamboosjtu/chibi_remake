@@ -67,7 +67,7 @@ func _unit_icon(u: Dictionary) -> Texture2D:
 		hd.atlas = skin.texture
 		hd.region = skin.region_rect
 		return hd
-	var path: String = str(_ui.host._sheet_ref_for(int(u.unit), int(u.owner)))
+	var path: String = str(_ui.host.commands.world._sheet_ref_for(int(u.unit), int(u.owner)))
 	if path == "" or not ResourceLoader.exists("res://" + path):
 		return null
 	var tex: Texture2D = ports._sheet(path)
@@ -111,7 +111,7 @@ func _refresh_sel_frame() -> void:
 			var lv := int(off.get("level", 0))
 			var need := 0
 			if lv >= 0 and lv < int(_ui.host.EXP_LEVELS.size()): need = int(_ui.host.EXP_LEVELS[lv])
-			_ui.sel_rank.text = "归属 %s   %s   经验 %d/%d" % [str(off.get("name", "?")), str(_ui.host.officer_rank_name(off)), int(off.get("exp", 0)), need]
+			_ui.sel_rank.text = "归属 %s   %s   经验 %d/%d" % [str(off.get("name", "?")), str(_ui.host.commands.military.officer_rank_name(off)), int(off.get("exp", 0)), need]
 		else:
 			_ui.sel_rank.text = "%s   #%d" % ["建筑" if bool(u.is_building) else "部队", int(u.unit)]
 	else:
@@ -185,7 +185,7 @@ func _dominant(sel: Array) -> Dictionary:
 	return {"unit": best_id, "n": best, "sample": sample[best_id]}
 
 func _act_assign_officer(idx: int) -> void:
-	_ui.host.player_commands.submit(14,_ui.host._order_form_up.bind(idx),Vector2.ZERO,-1,idx)
+	_ui.host.player_commands.submit(14,_ui.host.commands.military._order_form_up.bind(idx),Vector2.ZERO,-1,idx)
 	_ui.officer_pick = false
 	ports._refresh_cmd_panel()
 
@@ -262,7 +262,7 @@ func _rebuild_stats_text() -> void:
 				if trs.is_empty():
 					lines.append("生产队列：空")
 				for tr in trs:
-					lines.append("生产中 %s  余 %.1fs" % [str(_ui.host._unit_name(int(tr.unit))), float(tr.t) * _ui.host.clock.period()])
+					lines.append("生产中 %s  余 %.1fs" % [str(_ui.host.commands.world._unit_name(int(tr.unit))), float(tr.t) * _ui.host.clock.period()])
 			else:
 				# 与原版面板同序：攻击力 / 防御力 / 射程 / 视野（均取自 DATA.EXP）
 				lines.append("攻击力 %.0f    防御力 %.0f" % [float(u.attack), float(u.defence)])
@@ -277,7 +277,7 @@ func _rebuild_stats_text() -> void:
 				#   **士气本模拟没有建模** —— 明说，不编一个数字出来。
 				lines.append("经验 %d   谋略 %.0f" % [int(off.get("level", 0)), float(u.get("officer_intellect", 0))])
 				lines.append("粮数 %.0f   士气（未建模）" % float(u.get("carry", 0.0)))
-			var ca: Vector2i = _ui.host._cell_of_px(float(u.ax), float(u.ay))
+			var ca: Vector2i = _ui.host.commands.orders._cell_of_px(float(u.ax), float(u.ay))
 			lines.append("位置 A=%d B=%d   状态 %s" % [ca.x, ca.y, str(u.state)])
 			lines.append("uid %d   归属 %d" % [int(u.uid), int(u.owner)])
 		else:
@@ -310,7 +310,7 @@ func _sel_state_text() -> String:
 	return ",".join(parts) if parts.size() > 0 else "-"
 
 func update_hover() -> void:
-	var hu: Dictionary = _ui.host._hover_unit(surface.get_global_mouse_position())
+	var hu: Dictionary = _ui.host.commands.orders._hover_unit(surface.get_global_mouse_position())
 	_ui.host.hover_text = ""
 	if _ui.host.show_debug and not hu.is_empty():
 		_ui.host.hover_text = "%s  hp %.0f/%.0f  owner %d" % [str(hu.name), float(hu.hp), float(hu.maxhp), int(hu.owner)]

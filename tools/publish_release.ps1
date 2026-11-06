@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][string]$Executable,[string]$ReleaseRoot,[switch]$FailBeforeCommit,[switch]$AllowDirty)
+﻿param([Parameter(Mandatory=$true)][string]$Executable,[string]$ReleaseRoot,[switch]$FailBeforeCommit,[switch]$AllowDirty)
 # No Godot invocation here: filesystem errors must stop before pointer commit.
 $ErrorActionPreference='Stop'
 $projectRoot=Split-Path $PSScriptRoot -Parent

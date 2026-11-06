@@ -8,8 +8,8 @@ func _initialize() -> void:
 	run.call_deferred()
 
 func capture(name: String) -> void:
-	for u in battle.units:battle.commands._update_visual(u)
-	battle.view.update_panel();battle.commands._view_hud()
+	for u in battle.units:battle.commands.world._update_visual(u)
+	battle.view.update_panel();battle.commands.session._view_hud()
 	await process_frame;await process_frame
 	for child in battle.view.get_children():
 		if child.get_script()!=null and child.get_script().resource_path.ends_with("terrain_stream.gd"):

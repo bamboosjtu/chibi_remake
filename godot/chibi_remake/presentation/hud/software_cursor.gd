@@ -70,24 +70,24 @@ func resolve(host: Node2D, pointer: Vector2) -> Dictionary:
 	if not view.battle_rect().has_point(pointer): return {"bank":"A","row":0}
 	if host.selecting: return {"bank":"A","row":7}
 	var point: Vector2 = host.get_canvas_transform().affine_inverse()*pointer
-	var hit: Dictionary = host.commands._hover_unit(point)
-	var mode: String = host.commands.cmd_pending_kind()
+	var hit: Dictionary = host.commands.orders._hover_unit(point)
+	var mode: String = host.commands.orders.cmd_pending_kind()
 	var result := 0
 	match mode:
 		"attack":
 			result = 1
-			var target: Dictionary=host.commands._attack_target_at(point)
+			var target: Dictionary=host.commands.orders._attack_target_at(point)
 			if not target.is_empty():
 				result = 3
-				if int(target.owner)==0 and not host.commands._selected_has_nonworker_attacker(): result=2
+				if int(target.owner)==0 and not host.commands.orders._selected_has_nonworker_attacker(): result=2
 			elif not hit.is_empty(): result=2
 		"transport":
 			result = 4
-			if not host.commands._resource_at(point).is_empty() or not host.commands._resource_at(point+Vector2(0,15)).is_empty(): result=5
+			if not host.commands.economy._resource_at(point).is_empty() or not host.commands.economy._resource_at(point+Vector2(0,15)).is_empty(): result=5
 		"join":
 			result = 8
-			var own: Dictionary = host.commands._own_object_at(point)
-			if not own.is_empty() and not host.commands._commander_for(own).is_empty(): result=9
+			var own: Dictionary = host.commands.orders._own_object_at(point)
+			if not own.is_empty() and not host.commands.military._commander_for(own).is_empty(): result=9
 		_: result = 6 if not hit.is_empty() else 0
 	return {"bank":"A","row":result}
 

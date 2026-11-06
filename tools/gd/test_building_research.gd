@@ -25,7 +25,7 @@ func run() -> void:
 	battle.set_process(false);battle.cli_mode=true;battle.ai=null
 	var game:=root.get_node("Game")
 	gates()
-	assert(game.save_game(battle.units,battle.commands._resources(),battle.commands._save_extra()))
+	assert(game.save_game(battle.units,battle.commands.world._resources(),battle.commands.session._save_extra()))
 	var snapshot: Dictionary=game.load_save()
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--legacy-save="):
@@ -72,41 +72,41 @@ func run() -> void:
 	battle.visibility.current.fill(1);battle.visibility.explored.fill(1)
 	var house: Dictionary=battle.units.filter(func(u):return int(u.unit) in [24,25] and u.alive and u.die_t<0)[0]
 	var point:=Vector2(house.ax,house.ay-house.h*0.5)
-	battle.commands._select_click(point,false)
+	battle.commands.orders._select_click(point,false)
 	assert(battle.selected.size()==1 and battle.selected[0]==house)
 	battle.view.update_panel()
 	assert(battle.view.cmd_capsules.is_empty(),"neutral house inspection never exposes player production commands")
-	assert(battle.commands._attack_target_at(point)==house)
-	var edge: Vector2=battle.commands._edge_point(house,Vector2(house.ax-150,house.ay+30),battle.DEPOSIT_EDGE_PX)
-	assert(battle.commands._spawn_unit(36,battle.player_owner,edge.x,edge.y,true))
+	assert(battle.commands.orders._attack_target_at(point)==house)
+	var edge: Vector2=battle.commands.orders._edge_point(house,Vector2(house.ax-150,house.ay+30),battle.DEPOSIT_EDGE_PX)
+	assert(battle.commands.world._spawn_unit(36,battle.player_owner,edge.x,edge.y,true))
 	var fighter: Dictionary=battle.units.back()
-	battle.selected=[fighter];battle.commands._cmd_begin("attack");battle.commands._resolve_pending(point)
+	battle.selected=[fighter];battle.commands.military._cmd_begin("attack");battle.commands.orders._resolve_pending(point)
 	assert(fighter.target==house and fighter.state=="attack")
 	var hp: float=house.hp
 	for tick in range(900):
-		battle.commands._step_unit(fighter,battle.SIM_DT)
+		battle.commands.orders._step_unit(fighter,battle.SIM_DT)
 		if house.hp<hp:break
 	assert(house.hp<hp,"issuing the attack must actually damage the house")
 	print("HOUSE INTERACTION PASS neutral selection / read-only HUD / explicit attack / damage")
 	# Building fees and source-confirmed menu dependencies, independent of HQ.
-	assert(battle.commands.ai_unit_cost(0)=={"gold":30.0,"wood":500.0,"food":1000.0,"stone":500.0})
-	assert(battle.commands.ai_unit_cost(30)=={"gold":400.0,"wood":50.0,"food":50.0,"stone":0.0})
-	assert(battle.commands.tech_rows_for_building(4).has(3) and battle.commands.tech_rows_for_building(14).is_empty())
-	for row in [13,16]:assert(battle.commands.tech_cost(row).stone in [1000.0,5000.0] and battle.commands.tech_cost(row).food==0)
-	for row in [14,17]:assert(battle.commands.tech_cost(row).food in [1000.0,5000.0] and battle.commands.tech_cost(row).stone==0)
+	assert(battle.commands.economy.ai_unit_cost(0)=={"gold":30.0,"wood":500.0,"food":1000.0,"stone":500.0})
+	assert(battle.commands.economy.ai_unit_cost(30)=={"gold":400.0,"wood":50.0,"food":50.0,"stone":0.0})
+	assert(battle.commands.technology.tech_rows_for_building(4).has(3) and battle.commands.technology.tech_rows_for_building(14).is_empty())
+	for row in [13,16]:assert(battle.commands.technology.tech_cost(row).stone in [1000.0,5000.0] and battle.commands.technology.tech_cost(row).food==0)
+	for row in [14,17]:assert(battle.commands.technology.tech_cost(row).food in [1000.0,5000.0] and battle.commands.technology.tech_cost(row).stone==0)
 	var rules=load("res://simulation/systems/building_rules.gd")
 	var frames:=[]
 	for hp_fraction in [0.0,0.34,0.67,1.0]:frames.append(rules.construction_frame(hp_fraction*2400,2400,battle.map_data.units["0"],10))
 	assert(frames==[9,8,1,0],"HQ uses construction stages, not a linear damage-frame sweep")
 	for tier in [0,1,2,3]:
 		battle.player_tech.level=tier
-		var infantry: Array=battle.commands.train_types_for(12)
+		var infantry: Array=battle.commands.economy.train_types_for(12)
 		assert(infantry.size()==tier+1 and infantry.back().unit==[32,38,41,43][tier])
 		battle.scenario_sides[0].init[0]=(tier+1)%3
-		assert(battle.commands.train_types_for(12)==infantry,"scenario init[0] must not override the building's production tier")
-	assert(battle.commands.train_types_for(8)[0].unit==34)
-	assert(battle.commands.train_types_for(20).map(func(entry):return entry.unit)==[46,47,48,49])
-	assert(not battle.commands._dock_can_launch(Vector2(400,2200)),"inland waterless ground is not a dock site")
+		assert(battle.commands.economy.train_types_for(12)==infantry,"scenario init[0] must not override the building's production tier")
+	assert(battle.commands.economy.train_types_for(8)[0].unit==34)
+	assert(battle.commands.economy.train_types_for(20).map(func(entry):return entry.unit)==[46,47,48,49])
+	assert(not battle.commands.economy._dock_can_launch(Vector2(400,2200)),"inland waterless ground is not a dock site")
 	print("BUILDING RESEARCH PASS costs / bow / sales / construction stages / HQ tiers / catapult / four ships / shoreline")
 	battle.free()
 	# A real coastal map already has all production buildings, including a dock.
@@ -119,13 +119,13 @@ func run() -> void:
 	for pair in [[9,34],[7,40],[13,41],[13,43],[15,42],[15,44],[20,46],[20,47],[20,48],[20,49]]:
 		var building: Dictionary=battle.units.filter(func(u):return int(u.unit)==int(pair[0]) and int(u.owner)==battle.player_owner)[0]
 		var before:int=battle.units.size()
-		assert(battle.commands._queue_train(battle.player_owner,building,int(pair[1])))
+		assert(battle.commands.economy._queue_train(battle.player_owner,building,int(pair[1])))
 		var ticks:=int(battle.map_data.units[str(pair[1])].hp)
-		for tick in range(ticks):battle.commands._process_trainings(battle.SIM_DT)
+		for tick in range(ticks):battle.commands.economy._process_trainings(battle.SIM_DT)
 		assert(battle.trainings.is_empty() and battle.units.size()==before+1,"newly admitted unit must finish and leave its building: %d"%int(pair[1]))
 		var unit: Dictionary=battle.units.back()
 		assert(int(unit.unit)==int(pair[1]) and unit.officer.is_empty())
 		if int(pair[0])==20:
-			assert(battle.commands._nav_layer(unit)==1 and battle.nav.is_water(Vector2i(unit.A,unit.B)),"ships must actually launch on navigable water")
+			assert(battle.commands.military._nav_layer(unit)==1 and battle.nav.is_water(Vector2i(unit.A,unit.B)),"ships must actually launch on navigable water")
 	print("RESEARCHED PRODUCTION PASS catapult / 500 cavalry / 500-1000 infantry+archer / four ship types launch on water")
 	battle.free();done=true;quit()

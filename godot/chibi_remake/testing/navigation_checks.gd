@@ -10,7 +10,7 @@ func _init(battle: Node2D, runner: RefCounted) -> void:
 	_suite = weakref(runner) if runner != null else null
 
 func _selftest_naval() -> void:
-	print("SELFTEST naval: water_layer=%s 水面格=%d" % [str(host.nav.has_water), host.commands._water_cell_count()])
+	print("SELFTEST naval: water_layer=%s 水面格=%d" % [str(host.nav.has_water), host.commands.world._water_cell_count()])
 	if not host.nav.has_water:
 		suite._skip("水战：本图没有水面数据（waterWalkable）")
 		return
@@ -19,7 +19,7 @@ func _selftest_naval() -> void:
 	var land_unit: Dictionary = {}
 	for u in host.units:
 		if bool(u.get("alive", false)) and not bool(u.is_building) and int(u.get("owner", -1)) == host.player_owner \
-				and not host.commands._is_naval(u) and not bool(u.get("attached", false)):
+				and not host.commands.military._is_naval(u) and not bool(u.get("attached", false)):
 			land_unit = u
 			break
 	if land_unit.is_empty():
@@ -45,7 +45,7 @@ func _selftest_naval() -> void:
 					continue
 				# R04：船是 4 格占位，必须挑身体完全落在水面、且确实能停下的靠岸格；
 				# 否则 _spawn_unit 会为了合法船体把船挪离岸边，装载距离超出 80px。
-				if host.nav.is_water(n) and not host.nav.is_solid(n, 1) and host.commands._unit_placement_free(n, host.TRANSPORT_UNIT, 1, -1):
+				if host.nav.is_water(n) and not host.nav.is_solid(n, 1) and host.commands.world._unit_placement_free(n, host.TRANSPORT_UNIT, 1, -1):
 					waters.append(n)
 		if not waters.is_empty():
 			ship_cell = waters[0]
@@ -59,7 +59,7 @@ func _selftest_naval() -> void:
 		suite._skip("水战：本图找不到陆路可达的海岸")
 		return
 	var sp = host.nav.anchor_of(ship_cell.x, ship_cell.y)
-	if not host.commands._spawn_unit(host.TRANSPORT_UNIT, host.player_owner, sp.x, sp.y):
+	if not host.commands.world._spawn_unit(host.TRANSPORT_UNIT, host.player_owner, sp.x, sp.y):
 		suite._skip("水战：运输船图集缺失，无法生成测试船")
 		return
 	var ship: Dictionary = host.units.back()
@@ -91,16 +91,16 @@ func _selftest_naval() -> void:
 		suite._skip("水战：本图没有 8 格外的连通水面")
 	# 陆军上船：靠近 → 附着
 	host.selected = [land_unit]
-	var ordered = host.commands._order_board(ship)
+	var ordered = host.commands.orders._order_board(ship)
 	suite._check(ordered == 1, "上船命令接受陆军（模式 0xC）")
 	var steps = 0
 	while steps < 3000 and not bool(land_unit.get("attached", false)):
-		host.commands._step_unit(land_unit, 1.0 / 30.0)
+		host.commands.orders._step_unit(land_unit, 1.0 / 30.0)
 		steps += 1
 		if steps % 300 == 0:
 			print("SELFTEST naval trace: t=%.0fs state=%s path=%d dist=%.0f 反馈=%s" % [
 				float(steps) / 30.0, str(land_unit.get("state", "?")),
-				(land_unit.get("path", []) as Array).size(), host.commands._dist_to_obj(land_unit, ship), host.feedback_text])
+				(land_unit.get("path", []) as Array).size(), host.commands.orders._dist_to_obj(land_unit, ship), host.feedback_text])
 	print("SELFTEST naval: 上船用了 %.1f 秒 attached=%s 载员=%d loaded=%s" % [
 		float(steps) / 30.0, str(bool(land_unit.get("attached", false))),
 		int(ship.get("carry_n", 0)), str(bool(ship.get("loaded", false)))])
@@ -131,9 +131,9 @@ func _selftest_naval() -> void:
 		return
 	host.selected = [ship]
 	var lp = host.nav.anchor_of(land_cell.x, land_cell.y)
-	var unloaded = host.commands._order_unload(ship, lp)
+	var unloaded = host.commands.orders._order_unload(ship, lp)
 	for tick in range(4):
-		host.commands._step_unit(ship, 1.0 / 30.0)
+		host.commands.orders._step_unit(ship, 1.0 / 30.0)
 	print("SELFTEST naval: 下船 %d 支 → attached=%s 载员=%d 落点=(%d,%d) 水面=%s" % [
 		unloaded, str(bool(land_unit.get("attached", false))), int(ship.get("carry_n", 0)),
 		int(land_unit.A), int(land_unit.B), str(host.nav.is_water(host.nav.cell_of_px(land_unit.ax, land_unit.ay)))])
@@ -164,24 +164,24 @@ func _diag_nav() -> void:
 			workers.append(u)
 	print("DIAG 我方工人=%d" % workers.size())
 	for w in workers:
-		var c: Vector2i = host.commands._cell_of_px(float(w.ax), float(w.ay))
+		var c: Vector2i = host.commands.orders._cell_of_px(float(w.ax), float(w.ay))
 		var nw: Vector2i = host.nav.near_walkable(c)
 		print("DIAG 工人 uid=%d px=(%.0f,%.0f) cell=(%d,%d) solid=%s → near_walkable=(%d,%d) solid=%s 位移=%d" % [
 			int(w.uid), float(w.ax), float(w.ay), c.x, c.y, str(host.nav.is_solid(c)),
 			nw.x, nw.y, str(host.nav.is_solid(nw)), maxi(absi(nw.x - c.x), absi(nw.y - c.y))])
 	for o in host.units:
-		if not o.alive or host.commands._yield_of(int(o.unit)) == "":
+		if not o.alive or host.commands.economy._yield_of(int(o.unit)) == "":
 			continue
-		var oc: Vector2i = host.commands._cell_of_px(float(o.ax), float(o.ay))
+		var oc: Vector2i = host.commands.orders._cell_of_px(float(o.ax), float(o.ay))
 		var onw: Vector2i = host.nav.near_walkable(oc)
 		var fp: Array = o.get("occupied_cells", [])
 		print("DIAG 资源 uid=%d(%s) px=(%.0f,%.0f) cell=(%d,%d) solid=%s → near_walkable=(%d,%d) solid=%s 占地格=%d" % [
-			int(o.uid), host.commands._yield_of(int(o.unit)), float(o.ax), float(o.ay), oc.x, oc.y, str(host.nav.is_solid(oc)),
+			int(o.uid), host.commands.economy._yield_of(int(o.unit)), float(o.ax), float(o.ay), oc.x, oc.y, str(host.nav.is_solid(oc)),
 			onw.x, onw.y, str(host.nav.is_solid(onw)), fp.size()])
 		if not workers.is_empty():
 			var w0: Dictionary = workers[0]
-			var wc: Vector2i = host.nav.near_walkable(host.commands._cell_of_px(float(w0.ax), float(w0.ay)))
-			var pth = host.commands._path_to(w0, Vector2(float(o.ax), float(o.ay)), false)
+			var wc: Vector2i = host.nav.near_walkable(host.commands.orders._cell_of_px(float(w0.ax), float(w0.ay)))
+			var pth = host.commands.orders._path_to(w0, Vector2(float(o.ax), float(o.ay)), false)
 			print("DIAG   从工人到该资源：path=%d  起点solid=%s 终点solid=%s 起==终=%s" % [
 				pth.size(), str(host.nav.is_solid(wc)), str(host.nav.is_solid(onw)), str(wc == onw)])
 			var ids = host.nav.astar.get_id_path(host.nav._id(wc), host.nav._id(onw))

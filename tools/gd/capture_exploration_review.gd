@@ -20,7 +20,7 @@ func run() -> void:
 	var cleared:=0
 	for resource in battle.decor_targets:
 		if resource.alive:continue
-		var cell:Vector2i=battle.commands._unit_cell(resource)
+		var cell:Vector2i=battle.commands.world._unit_cell(resource)
 		var id:int=battle.nav._id(cell)
 		if int(battle.map_data.waterWalkable[id])!=0 or int(battle.nav.occupancy.get(id,0))>0 or battle.nav.gate_cells.has(id):continue
 		assert(not battle.nav.is_solid(cell),"old save's harvested ground must reopen")
@@ -29,8 +29,8 @@ func run() -> void:
 	var mini:Control=battle.view.minimap
 	assert(mini.map_texture!=null and mini.map_texture.get_width()==384)
 	await process_frame;await process_frame
-	battle.view.update_panel();battle.commands._view_hud();mini.queue_redraw()
-	for unit in battle.units:battle.commands._update_visual(unit)
+	battle.view.update_panel();battle.commands.session._view_hud();mini.queue_redraw()
+	for unit in battle.units:battle.commands.world._update_visual(unit)
 	# Wait for native terrain uploads, without advancing the player's game.
 	for child in battle.view.get_children():
 		if child.get_script()!=null and child.get_script().resource_path.ends_with("terrain_stream.gd"):
@@ -38,7 +38,7 @@ func run() -> void:
 			while Time.get_ticks_msec()<deadline:
 				if child._pending.is_empty() and not child._wanted.is_empty() and child._wanted.keys().all(func(k):return child.active.has(k)):break
 				await create_timer(0.01,true).timeout
-	battle.commands._view_hud();mini.queue_redraw()
+	battle.commands.session._view_hud();mini.queue_redraw()
 	await process_frame;await process_frame;await RenderingServer.frame_post_draw
 	var image:=root.get_texture().get_image()
 	assert(image.save_png(output.path_join("saved-exploration.png"))==OK)

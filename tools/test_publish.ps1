@@ -1,4 +1,4 @@
-# 不能用 Stop：Godot 的证书警告会经原生 stderr 变成终止性错误，
+﻿# 不能用 Stop：Godot 的证书警告会经原生 stderr 变成终止性错误，
 # 整个构建当场中断（本项目已因此踩坑三次）。错误处理靠 try/catch + $LASTEXITCODE。
 $ErrorActionPreference='Continue'
 $root=Split-Path $PSScriptRoot -Parent
@@ -42,6 +42,8 @@ $evidence=@{
     artifacts=@(Get-ChildItem -LiteralPath $candidate -File -Recurse | Where-Object { $_.Extension -in @('.exe','.pck','.dll') } | ForEach-Object { @{path=$_.FullName.Substring($candidate.Length+1).Replace('\','/');sha256=(Get-FileHash -LiteralPath $_.FullName).Hash} })
     results=@($names | ForEach-Object { @{name=$_;ok=$true;code=0;timedOut=$false;missing=@()} })
 }
+# Abandoned validation engines are temporary tooling, never release artifacts.
+[IO.File]::WriteAllText((Join-Path $candidate '_validation-engine-abandoned.exe'),'abandoned')
 $evidencePath=Join-Path $candidate 'verification.json'
 . (Join-Path $PSScriptRoot 'candidate_verification.ps1')
 $resultFixture=Join-Path $fixture 'results'
@@ -154,7 +156,11 @@ $beforeLocked=(Get-FileHash -LiteralPath (Join-Path $release 'current.json')).Ha
 $locked=[IO.File]::Open((Join-Path $release 'ChibiRTS.exe'),[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::Read)
 try {
     try { & (Join-Path $changedTools 'publish_release.ps1') -Executable $exe -ReleaseRoot $release; throw 'Locked launcher replacement was accepted' }
-    catch { if ($_.Exception.Message -notmatch 'being used by another process|另一个进程|正由另一进程') { throw } }
+    catch {
+        $exception=$_.Exception
+        while ($exception.InnerException) { $exception=$exception.InnerException }
+        if (($exception.HResult -band 0xffff) -notin @(32,33)) { throw }
+    }
 } finally { $locked.Dispose() }
 if ((Get-FileHash -LiteralPath (Join-Path $release 'current.json')).Hash -ne $beforeLocked) { throw 'Locked changed launcher modified current pointer' }
 Write-Output 'LAUNCHER LOCK PASS unchanged source reuses locked entry / changed source preserves previous pointer'

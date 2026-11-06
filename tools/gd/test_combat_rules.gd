@@ -29,7 +29,7 @@ func run() -> void:
 	root.get_node("Game").current_map="chibil1"
 	var b:Node2D=load("res://main.tscn").instantiate()
 	root.add_child(b);b.set_process(false);b.cli_mode=true;b.ai=null
-	assert(b.commands._stamina_of(a)==80)
+	assert(b.commands.military._stamina_of(a)==80)
 	# 各档兵器/弓术/盔甲四效果列；A和B各自独立，武将不吃普通科技加成。
 	for level in range(1,4):
 		b.player_tech={"weapon":level,"bow":level,"armor":level}
@@ -38,14 +38,14 @@ func run() -> void:
 			for id in ids:
 				var u:Dictionary=b.units.filter(func(unit):return unit.owner==b.player_owner)[0].duplicate()
 				u.unit=id;u.officer={};u.attack=12;u.attack_b=15;u.defence=4;u.defence_b=7
-				b.commands._apply_tech_bonuses(u)
+				b.commands.technology._apply_tech_bonuses(u)
 				assert(u.attack_bonus==(3+category)*level)
 				assert(u.attack_b_bonus==(2+category)*level)
 				assert(u.defence_bonus==(2+category)*level and u.defence_b_bonus==u.defence_bonus)
 				assert(Rules.attack(u)==12+(3+category)*level)
 				assert(Rules.attack(u,true)==15+(2+category)*level)
 	var hero:Dictionary=b.units.filter(func(unit):return not unit.officer.is_empty())[0]
-	assert(b.commands._stamina_of(hero)==float(hero.officer.might)+Rules.grade(hero.officer))
+	assert(b.commands.military._stamina_of(hero)==float(hero.officer.might)+Rules.grade(hero.officer))
 	# 快船/战船分别占独立研究位；连船使用用户确认的相邻字段规则。
 	for ship_level in range(3):
 		for armored in [0,1]:
@@ -57,7 +57,7 @@ func run() -> void:
 					var ship:Dictionary=hero.duplicate(true)
 					ship.unit=id;ship.officer={};ship.attack=10;ship.attack_b=30;ship.defence=4;ship.defence_b=7
 					if id==52:ship.officer={"might":66,"tier":1,"level":6}
-					b.commands._apply_tech_bonuses(ship)
+					b.commands.technology._apply_tech_bonuses(ship)
 					var attack_b:=0.0
 					var defence:=0.0
 					if id==46:attack_b=6.0 if ship_level>=1 else 0.0;defence=6.0*armored
@@ -69,8 +69,8 @@ func run() -> void:
 	print("COMBAT NAVAL PASS 18 research combinations x 5 ship types / separate A-B / flagship grade / linked-ship adjacent fields")
 	b.player_tech={"weapon":3,"bow":3,"armor":3,"ship_atk":2,"ship_def":1,"catapult":2}
 	var game:=root.get_node("Game")
-	for u in b.units:b.commands._apply_tech_bonuses(u)
-	assert(game.save_game(b.units,b.commands._resources(),b.commands._save_extra()))
+	for u in b.units:b.commands.technology._apply_tech_bonuses(u)
+	assert(game.save_game(b.units,b.commands.world._resources(),b.commands.session._save_extra()))
 	var snapshot:Dictionary=game.load_save()
 	# 迁移旧缓存，读档应按等级重算，而非保留旧版统一+3/+2。
 	for rec in snapshot.units:rec.simulation.attack_bonus=999

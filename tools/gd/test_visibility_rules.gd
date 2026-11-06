@@ -54,41 +54,41 @@ func run() -> void:
 	root.get_node("Game").current_map = "chibil1"
 	var b: Node2D = load("res://main.tscn").instantiate(); root.add_child(b)
 	b.set_process(false); b.cli_mode = true; b.ai = null
-	var hero: Dictionary = b.units.filter(func(u):return u.owner == b.player_owner and b.commands._is_hero_unit(u))[0]
+	var hero: Dictionary = b.units.filter(func(u):return u.owner == b.player_owner and b.commands.military._is_hero_unit(u))[0]
 	var enemy: Dictionary = b.units.filter(func(u):return u.owner != 0 and u.owner != b.player_owner and not u.is_building)[0]
-	for unit in b.units: b.commands._cancel_unit_command(unit)
+	for unit in b.units: b.commands.military._cancel_unit_command(unit)
 	for key in Timers.STATUS_KEYS: hero[key] = 1
 	hero.attached = true; hero.state = "move"; hero.path = [Vector2(hero.ax+44,hero.ay)]
 	var before := Vector2(hero.ax,hero.ay)
-	b.commands._step_unit(hero,b.SIM_DT)
+	b.commands.orders._step_unit(hero,b.SIM_DT)
 	assert(Timers.STATUS_KEYS.all(func(key):return hero[key] == 0))
 	assert(hero.state == "move" and hero.path.size() == 1 and Vector2(hero.ax,hero.ay) == before)
-	hero.attached = false; b.commands._cancel_unit_command(hero); hero.hold=true; enemy.hold=true
+	hero.attached = false; b.commands.military._cancel_unit_command(hero); hero.hold=true; enemy.hold=true
 	enemy.ax = hero.ax + 44; enemy.ay = hero.ay
 	var hp: float = hero.hp; var enemy_hp: float = enemy.hp
 	for step in range(120):
-		b.commands._step_unit(hero,b.SIM_DT); b.commands._step_unit(enemy,b.SIM_DT)
+		b.commands.orders._step_unit(hero,b.SIM_DT); b.commands.orders._step_unit(enemy,b.SIM_DT)
 	assert(hero.state == "idle" and enemy.state == "idle" and hero.hp == hp and enemy.hp == enemy_hp)
 	hero.state = "attack"; hero.target = enemy; hero.cool = 0
 	for step in range(300):
-		b.commands._step_unit(hero,b.SIM_DT)
+		b.commands.orders._step_unit(hero,b.SIM_DT)
 		if enemy.hp < enemy_hp: break
 	assert(enemy.hp < enemy_hp and enemy.state == "idle", "explicit attack works without implicit retaliation")
 	# 避免其他原有关卡单位影响最近目标，使用隔离世界验证双向箭楼与AI互不射击。
 	b.units = [hero,enemy]
-	assert(b.commands._spawn_unit(18,b.player_owner,hero.ax,hero.ay,true))
+	assert(b.commands.world._spawn_unit(18,b.player_owner,hero.ax,hero.ay,true))
 	var tower: Dictionary = b.units.back()
 	b.visibility.update(b.units,b.player_owner)
-	b.commands._step_unit(tower,b.SIM_DT)
+	b.commands.orders._step_unit(tower,b.SIM_DT)
 	assert(tower.state == "attack" and is_same(tower.target,enemy))
 	enemy.ax = tower.ax + float(tower.atk_range) * b.tile_w + 100
 	var tower_pos := Vector2(tower.ax,tower.ay)
-	b.commands._step_unit(tower,b.SIM_DT)
+	b.commands.orders._step_unit(tower,b.SIM_DT)
 	assert(tower.state == "idle" and Vector2(tower.ax,tower.ay) == tower_pos)
 	tower.owner = enemy.owner; enemy.ax = tower.ax+44; enemy.owner = 4
-	hero.attached = true; b.commands._step_unit(tower,b.SIM_DT)
+	hero.attached = true; b.commands.orders._step_unit(tower,b.SIM_DT)
 	assert(tower.state == "idle", "AI towers must not fire on other AI factions")
-	hero.attached = false; hero.ax = tower.ax+44; b.commands._step_unit(tower,b.SIM_DT)
+	hero.attached = false; hero.ax = tower.ax+44; b.commands.orders._step_unit(tower,b.SIM_DT)
 	assert(tower.state == "attack" and is_same(tower.target,hero))
 	print("VISIBILITY EXECUTION PASS passenger timers / hold preserves idle / explicit attack / towers both sides / no AI-versus-AI / stationary")
 	done = true; b.queue_free(); await process_frame; quit(0)

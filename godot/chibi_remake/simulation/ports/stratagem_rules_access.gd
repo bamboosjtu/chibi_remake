@@ -23,10 +23,14 @@ var visibility:
 	set(value): battle.visibility = value
 
 func _commander_for(u: Dictionary) -> Dictionary:
-	return _require(_provider_command_groups, "command_groups")._commander_for(u)
+	var provider = _require(_provider_command_groups, "command_groups")
+	if provider == null: return {}
+	return provider._commander_for(u)
 
 func _hostile_owners(a: int, b: int) -> bool:
-	return _require(_provider_combat, "combat")._hostile_owners(a, b)
+	var provider = _require(_provider_combat, "combat")
+	if provider == null: return false
+	return provider._hostile_owners(a, b)
 
 const CONTRACTS := {"combat": ["_hostile_owners"], "command_groups": ["_commander_for"]}
 var _provider_combat: WeakRef
@@ -34,11 +38,11 @@ var _provider_command_groups: WeakRef
 
 func connect_services(services: Dictionary) -> Array:
 	var missing: Array = []
-	_provider_combat = weakref(services["combat"]) if services.has("combat") else null
-	_provider_command_groups = weakref(services["command_groups"]) if services.has("command_groups") else null
+	_provider_combat = weakref(services["combat"]) if services.get("combat") != null else null
+	_provider_command_groups = weakref(services["command_groups"]) if services.get("command_groups") != null else null
 	for provider in CONTRACTS:
 		for method in CONTRACTS[provider]:
-			if not services.has(provider) or not services[provider].has_method(method): missing.append({"provider":provider,"method":method})
+			if services.get(provider) == null or not services[provider].has_method(method): missing.append({"provider":provider,"method":method})
 	return missing
 
 func disconnect_services() -> void:

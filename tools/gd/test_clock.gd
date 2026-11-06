@@ -9,28 +9,28 @@ func run() -> void:
  game.current_map="chibil1"
  var b:Node2D=load("res://main.tscn").instantiate()
  root.add_child(b);b.set_process(false);b.cli_mode=true;b.ai=null
- assert(game.save_game(b.units,b.commands._resources(),b.commands._save_extra()))
+ assert(game.save_game(b.units,b.commands.world._resources(),b.commands.session._save_extra()))
  var initial:Dictionary=game.load_save()
  for speed in range(4):
   for fps in [10,30,60,144]:
    assert(b.saver.apply_snapshot(initial))
    b.ai=null
-   assert(b.commands.set_sim_speed(speed))
+   assert(b.commands.world.set_sim_speed(speed))
    for frame in range(fps*6):b._process(1.0/float(fps))
    while b.sim_acc+0.000000001>=b.clock.period():b._process(0)
    assert(b.sim_tick==int(round(6.0/b.clock.period())),"tick count changes with rendering FPS")
   print("CLOCK PASS speed=",speed," period=",b.clock.period()," ticks=",b.sim_tick," at10/30/60/144fps")
  # 长帧超过每帧预算后不能丢tick。
- assert(b.saver.apply_snapshot(initial));b.ai=null;b.commands.set_sim_speed(3)
+ assert(b.saver.apply_snapshot(initial));b.ai=null;b.commands.world.set_sim_speed(3)
  b._process(1.0)
  assert(b.sim_tick==b.SIM_MAX_CATCHUP and b.sim_acc>0.8)
  while b.sim_acc+0.000000001>=b.clock.period():b._process(0)
  assert(b.sim_tick==50 and b.sim_acc<0.000001)
- b.commands.set_sim_speed(0);b.sim_acc=0.05;b.commands.set_sim_speed(3)
+ b.commands.world.set_sim_speed(0);b.sim_acc=0.05;b.commands.world.set_sim_speed(3)
  assert(is_equal_approx(b.sim_acc,0.01))
- assert(game.save_game(b.units,b.commands._resources(),b.commands._save_extra()))
+ assert(game.save_game(b.units,b.commands.world._resources(),b.commands.session._save_extra()))
  var snapshot:Dictionary=game.load_save()
- b.commands.set_sim_speed(0);b.sim_acc=0
+ b.commands.world.set_sim_speed(0);b.sim_acc=0
  assert(b.saver.apply_snapshot(snapshot) and b.clock.speed_index==3 and is_equal_approx(b.sim_acc,0.01))
  var invalid:Dictionary=snapshot.duplicate(true)
  invalid.simulation.speedIndex=99

@@ -3,14 +3,6 @@ extends RefCounted
 ## Probing must not leave directories behind: the previous version created the
 ## fallback folder on every launch even when nothing was ever saved into it.
 
-static func save_path() -> String:
-	var candidates := directories()
-	for directory in candidates:
-		if writable(directory):
-			if directory == candidates.back(): push_warning("User profile is not writable; save location: "+directory)
-			return directory.path_join("save.json")
-	return candidates[0].path_join("save.json")
-
 static func directories() -> Array[String]:
 	var candidates: Array[String] = []
 	var portable := portable_dir()

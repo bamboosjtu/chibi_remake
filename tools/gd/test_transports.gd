@@ -14,11 +14,11 @@ func open_battle(map_id: String) -> void:
 	game.current_map=map_id
 	b=load("res://main.tscn").instantiate();root.add_child(b)
 	b.set_process(false);b.cli_mode=true;b.ai=null
-	while not b.units.is_empty():b.commands._free_unit_at(b.units.size()-1)
+	while not b.units.is_empty():b.commands.world._free_unit_at(b.units.size()-1)
 	b.nav.rebuild_buildings(b.units)
 
 func spawn(kind: int, point: Vector2, owner: int=-1) -> Dictionary:
-	assert(b.commands._spawn_unit(kind,b.player_owner if owner<0 else owner,point.x,point.y,true))
+	assert(b.commands.world._spawn_unit(kind,b.player_owner if owner<0 else owner,point.x,point.y,true))
 	return b.units.back()
 
 func connected_land(start:Vector2i,limit:int) -> Array:
@@ -35,7 +35,7 @@ func shore_pair() -> Array:
 	for a in range(4,int(b.map_data.rows)-4):
 		for row in range(9,int(b.map_data.cols)-9):
 			var sea:=Vector2i(a,row)
-			if not b.nav.is_water(sea) or not b.commands._unit_placement_free(sea,47,1):continue
+			if not b.nav.is_water(sea) or not b.commands.world._unit_placement_free(sea,47,1):continue
 			var point:Vector2=b.nav.anchor_of(sea.x,sea.y)
 			var probe:Dictionary={"unit":47,"ax":point.x,"ay":point.y,"is_building":false}
 			var anchors:Array=b.transports.coastal_anchors(probe,30)
@@ -44,7 +44,7 @@ func shore_pair() -> Array:
 	return []
 
 func snapshot() -> Dictionary:
-	assert(game.save_game(b.units,b.commands._resources(),b.commands._save_extra()))
+	assert(game.save_game(b.units,b.commands.world._resources(),b.commands.session._save_extra()))
 	return game.load_save()
 
 func find(uid: int) -> Dictionary:
@@ -71,14 +71,14 @@ func clear_landed(people:Array,removed:=-1) -> void:
 		var vessel:Dictionary=b.units.filter(func(u):return int(u.unit)==47 and bool(u.alive) and float(u.die_t)<0)[0]
 		if not b.transports.adjacent(person,vessel):continue
 		var route:Array=[]
-		for cell in connected_land(b.commands._unit_cell(person),256):
-			if b.transports.edge_distance_at(cell,int(person.unit),vessel)<=2 or not b.commands._unit_placement_free(cell,int(person.unit),0,int(person.uid)):continue
-			route=b.commands._path_to(person,b.nav.anchor_of(cell.x,cell.y),false)
+		for cell in connected_land(b.commands.world._unit_cell(person),256):
+			if b.transports.edge_distance_at(cell,int(person.unit),vessel)<=2 or not b.commands.world._unit_placement_free(cell,int(person.unit),0,int(person.uid)):continue
+			route=b.commands.orders._path_to(person,b.nav.anchor_of(cell.x,cell.y),false)
 			if not route.is_empty():break
 		assert(not route.is_empty(),"coast must connect to inland destination")
 		person.path=route;person.pi=0;person.state="move"
 		for tick in range(400):
-			b.commands._step_unit(person,b.SIM_DT)
+			b.commands.orders._step_unit(person,b.SIM_DT)
 			if person.state=="idle":break
 
 func run() -> void:
@@ -91,24 +91,24 @@ func run() -> void:
 	for i in range(17):
 		var unit:=spawn(30,point);unit.carry=50+i;unit.carry_kind="wood"
 		people.append(int(unit.uid))
-	b.selected=people.slice(0,16).map(func(uid):return find(uid));b.commands._group_assign(1)
+	b.selected=people.slice(0,16).map(func(uid):return find(uid));b.commands.military._group_assign(1)
 	for i in range(16):
 		var unit:=find(people[i]);b.selected=[unit]
-		assert(b.commands._order_board(ship)==1);b.commands._step_unit(unit,b.SIM_DT)
+		assert(b.commands.orders._order_board(ship)==1);b.commands.orders._step_unit(unit,b.SIM_DT)
 		assert(unit.attached and unit.state=="boarded" and unit.aboard_uid==ship.uid and b.selected.is_empty())
 		assert(unit.path.is_empty() and unit.board_target==null and unit.repair_target==null and unit.gather_obj==null)
 		assert(unit.carry==50+i and unit.carry_kind=="wood")
 	assert(ship.carry_n==16 and ship.carry_hp==1600 and ship.loaded)
-	assert(b.commands.control_group_size(1)==0 and not b.commands._group_recall(1))
-	var stored_member: Dictionary=find(people[0]);b.selected=[stored_member];b.commands._cmd_watch();b.commands._cmd_rest()
+	assert(b.commands.military.control_group_size(1)==0 and not b.commands.military._group_recall(1))
+	var stored_member: Dictionary=find(people[0]);b.selected=[stored_member];b.commands.military._cmd_watch();b.commands.military._cmd_rest()
 	assert(stored_member.state=="boarded" and stored_member.attached)
 	var extra:=find(people[16]);b.selected=[extra]
-	assert(b.commands._order_board(ship)==0 and not b.commands._attach_to_ship(extra,ship))
-	assert(not b.commands._attach_to_ship(find(people[0]),ship) and ship.carry_n==16)
-	var foreign:=spawn(47,b.nav.anchor_of(sea.x,sea.y),int(b.commands.ai_owners()[0]))
-	assert(b.commands._order_board(foreign)==0 and not b.commands._attach_to_ship(extra,foreign))
-	var stale: Dictionary=ship.duplicate();assert(b.commands._order_board(stale)==0)
-	foreign.die_t=0;assert(b.commands._order_board(foreign)==0) # 保持死亡，避免占着 sea 格阻止后续船停靠
+	assert(b.commands.orders._order_board(ship)==0 and not b.commands.orders._attach_to_ship(extra,ship))
+	assert(not b.commands.orders._attach_to_ship(find(people[0]),ship) and ship.carry_n==16)
+	var foreign:=spawn(47,b.nav.anchor_of(sea.x,sea.y),int(b.commands.economy.ai_owners()[0]))
+	assert(b.commands.orders._order_board(foreign)==0 and not b.commands.orders._attach_to_ship(extra,foreign))
+	var stale: Dictionary=ship.duplicate();assert(b.commands.orders._order_board(stale)==0)
+	foreign.die_t=0;assert(b.commands.orders._order_board(foreign)==0) # 保持死亡，避免占着 sea 格阻止后续船停靠
 	var aboard:=snapshot();assert(aboard.v==8 and b.saver.apply_snapshot(aboard))
 	ship=find(ship_uid)
 	assert(ship.carry_n==16 and ship.carry_hp==1600)
@@ -127,7 +127,7 @@ func run() -> void:
 		b.player_commands.pump()
 		assert(b.cmd_pending=="" and ship.unload_active)
 		for tick in range(64):
-			b.commands._step_unit(ship,b.SIM_DT)
+			b.commands.orders._step_unit(ship,b.SIM_DT)
 			if tick%4==3:clear_landed(people)
 		b.view.update_hud_text()
 		assert(ship.carry_n==0)
@@ -135,38 +135,38 @@ func run() -> void:
 		print("TRANSPORT UI PASS actual icon without ground click /16-0 capacity / cargo HP panel / paused hidden passengers")
 	# 载员状态在船内继续流逝，自己的命令/动画不推进。
 	var passenger:=find(people[0]);passenger.haste_t=2;var before: Vector2=Vector2(passenger.ax,passenger.ay)
-	for tick in range(2):b.commands._step_unit(passenger,b.SIM_DT)
+	for tick in range(2):b.commands.orders._step_unit(passenger,b.SIM_DT)
 	assert(passenger.haste_t==0 and Vector2(passenger.ax,passenger.ay)==before and passenger.attached)
 	print("TRANSPORT BOARD PASS actual order /16 capacity / duplicate-foreign-stale-dying rejected / cargo preserved / selection removed / status ticks / loaded save")
-	var ai_owner: int=b.commands.ai_owners()[0]
+	var ai_owner: int=b.commands.economy.ai_owners()[0]
 	ship.owner=ai_owner
 	for uid in people.slice(0,16):find(uid).owner=ai_owner
-	b.commands.ai_order_assault(ai_owner);b.commands.ai_order_intercept(ai_owner,extra,99999);b.commands.ai_order_rally(ai_owner)
+	b.commands.military.ai_order_assault(ai_owner);b.commands.military.ai_order_intercept(ai_owner,extra,99999);b.commands.military.ai_order_rally(ai_owner)
 	assert(people.slice(0,16).all(func(uid):return find(uid).state=="boarded" and find(uid).attached))
-	assert(not b.commands.ai_focus_unit(ai_owner).get("attached",false))
-	assert(not b.commands._nearest_enemy_threat(extra).get("attached",false))
+	assert(not b.commands.military.ai_focus_unit(ai_owner).get("attached",false))
+	assert(not b.commands.military._nearest_enemy_threat(extra).get("attached",false))
 	assert(b.saver.apply_snapshot(snapshot()))
 	assert(b.saver.apply_snapshot(aboard));ship=find(ship_uid);extra=find(people[16])
 	print("TRANSPORT AI PASS carried units excluded from assault-intercept-rally / focus and threats / manifest remains valid")
 	# 船走水层；混选陆军不复用船的水路。
-	b.selected=[ship,extra];b.commands._move_selected_to(b.nav.anchor_of(sea.x,sea.y))
+	b.selected=[ship,extra];b.commands.orders._move_selected_to(b.nav.anchor_of(sea.x,sea.y))
 	for u in [ship,extra]:
-		for waypoint in u.path:assert(not b.nav.is_solid(b.nav.cell_of_px(waypoint.x,waypoint.y),b.commands._nav_layer(u)))
-	b.commands._cancel_unit_command(extra)
+		for waypoint in u.path:assert(not b.nav.is_solid(b.nav.cell_of_px(waypoint.x,waypoint.y),b.commands.military._nav_layer(u)))
+	b.commands.military._cancel_unit_command(extra)
 	var destination:=Vector2i(-1,-1)
 	for cell in b.nav.neighbors(sea):
 		if b.nav.is_water(cell) and not b.nav.is_solid(cell,1):destination=cell;break
 	assert(destination.x>=0)
-	b.selected=[ship];b.commands._move_selected_to(b.nav.anchor_of(destination.x,destination.y))
+	b.selected=[ship];b.commands.orders._move_selected_to(b.nav.anchor_of(destination.x,destination.y))
 	for tick in range(80):
-		b.commands._step_unit(ship,b.SIM_DT)
+		b.commands.orders._step_unit(ship,b.SIM_DT)
 		assert(b.nav.is_water(b.nav.cell_of_px(ship.ax,ship.ay)))
 		if ship.state=="idle":break
 	assert(ship.state=="idle" and ship.carry_n==16)
 	# 正常新命令可替换，装载清单与货物仍在。
-	b.selected=[ship];b.commands._move_selected_to(b.nav.anchor_of(sea.x,sea.y))
+	b.selected=[ship];b.commands.orders._move_selected_to(b.nav.anchor_of(sea.x,sea.y))
 	for tick in range(80):
-		b.commands._step_unit(ship,b.SIM_DT)
+		b.commands.orders._step_unit(ship,b.SIM_DT)
 		if ship.state=="idle":break
 	# R04：运输船是 4 格占位，目标水面格若让船体压岸，只能停在最近的合法水面。
 	var returned: Vector2i=b.nav.cell_of_px(ship.ax,ship.ay)
@@ -179,17 +179,17 @@ func run() -> void:
 		if cell==land:continue
 		var blocker:=spawn(32,b.nav.anchor_of(cell.x,cell.y));blockers.append(int(blocker.uid))
 	# 岸边第17名工人占着唯一格，全部失败；移开它后逐tick只允许一人落位。
-	assert(b.commands._order_unload(ship,point)==1 and ship.state=="unload" and ship.carry_n==16)
+	assert(b.commands.orders._order_unload(ship,point)==1 and ship.state=="unload" and ship.carry_n==16)
 	var blocked:=snapshot();assert(b.saver.apply_snapshot(blocked))
 	ship=find(ship_uid);extra=find(people[16])
-	b.commands._step_unit(ship,b.SIM_DT);assert(ship.carry_n==16 and ship.state=="unload")
-	b.selected=[ship];b.commands._move_selected_to(b.nav.anchor_of(destination.x,destination.y))
+	b.commands.orders._step_unit(ship,b.SIM_DT);assert(ship.carry_n==16 and ship.state=="unload")
+	b.selected=[ship];b.commands.orders._move_selected_to(b.nav.anchor_of(destination.x,destination.y))
 	assert(ship.state=="move" and ship.carry_n==16)
-	b.commands._cmd_watch();b.commands._step_unit(ship,b.SIM_DT)
+	b.commands.military._cmd_watch();b.commands.orders._step_unit(ship,b.SIM_DT)
 	assert(ship.state=="idle" and ship.carry_n==16,"new move-watch preserves unload state and passengers")
-	assert(b.commands._order_unload(ship,point)==1 and ship.unload_active)
-	var removed: int=extra.uid;b.commands._free_unit_at(b.units.find(extra))
-	for tick in range(8): b.commands._step_unit(ship,b.SIM_DT)
+	assert(b.commands.orders._order_unload(ship,point)==1 and ship.unload_active)
+	var removed: int=extra.uid;b.commands.world._free_unit_at(b.units.find(extra))
+	for tick in range(8): b.commands.orders._step_unit(ship,b.SIM_DT)
 	assert(ship.carry_n==15 and ship.unload_active)
 	var first_landed: Dictionary={}
 	for uid in people:
@@ -197,15 +197,15 @@ func run() -> void:
 		var unit:=find(uid)
 		if not unit.attached:first_landed=unit
 	assert(not first_landed.is_empty() and b.nav.cell_of_px(first_landed.ax,first_landed.ay)==land)
-	b.commands._step_unit(ship,b.SIM_DT);assert(ship.carry_n==15,"no two passengers on same landing cell")
+	b.commands.orders._step_unit(ship,b.SIM_DT);assert(ship.carry_n==15,"no two passengers on same landing cell")
 	var partial:=snapshot();assert(b.saver.apply_snapshot(partial))
 	ship=find(ship_uid)
-	for uid in blockers:b.commands._free_unit_at(b.units.find(find(uid)))
+	for uid in blockers:b.commands.world._free_unit_at(b.units.find(find(uid)))
 	for tick in range(64):
-		b.commands._step_unit(ship,b.SIM_DT)
+		b.commands.orders._step_unit(ship,b.SIM_DT)
 		if tick%4==3:clear_landed(people,removed)
 	assert(ship.carry_n==0 and ship.carry_hp==0 and not ship.loaded and ship.state=="idle")
-	assert(b.commands.control_group_size(1)==16)
+	assert(b.commands.military.control_group_size(1)==16)
 	var used:={}
 	for uid in people:
 		if uid==removed:continue
@@ -240,26 +240,26 @@ func run() -> void:
 	assert(ship.carry_n==16 and ship.carry_hp==1600 and ship.loaded)
 	assert(find(people[0]).state=="boarded" and find(people[0]).path.is_empty() and find(people[0]).target==null)
 	# 载员受全军升级影响时汇总同步；单个载员死亡和整船沉没都不能留下活体孤儿。
-	b.commands._apply_tech_effects(0,b.player_owner)
+	b.commands.technology._apply_tech_effects(0,b.player_owner)
 	var upgraded:=snapshot();assert(b.saver.apply_snapshot(upgraded));ship=find(ship_uid)
 	assert(ship.carry_hp==1600)
-	b.commands._kill(find(people[0]));assert(ship.carry_n==15 and ship.carry_hp==1500)
+	b.commands.military._kill(find(people[0]));assert(ship.carry_n==15 and ship.carry_hp==1500)
 	assert(b.saver.apply_snapshot(snapshot()));ship=find(ship_uid)
 	# R01：科技升级的普通部队当前 HP 高于基础上限，这是合法状态；登船/船内升级/受伤都要能读档。
 	var troop_cell: Vector2i=b.transports.landing_cell(ship,{})
 	assert(troop_cell.x>=0,"R01: 需要船边可落位格")
 	var troop:=spawn(32,b.nav.anchor_of(troop_cell.x,troop_cell.y))
 	var troop_uid:=int(troop.uid)
-	b.commands._apply_tech_effects(1,b.player_owner) # 大本营再升一级：升二级已让新兵携带 +400，本级再 +400
+	b.commands.technology._apply_tech_effects(1,b.player_owner) # 大本营再升一级：升二级已让新兵携带 +400，本级再 +400
 	assert(troop.hp==float(troop.maxhp)+800.0 and troop.tech_hp_bonus==800 and troop.hp>troop.maxhp)
 	troop.hp=300.0 # 升级后受伤再登船
-	assert(b.commands._attach_to_ship(troop,ship) and ship.carry_n==16)
+	assert(b.commands.orders._attach_to_ship(troop,ship) and ship.carry_n==16)
 	var upgraded_boarding:=snapshot()
 	assert(b.saver.apply_snapshot(upgraded_boarding),"R01: 升级后登船的快照必须可恢复")
 	troop=find(troop_uid);ship=find(ship_uid)
 	assert(troop.attached and troop.hp==300.0 and troop.maxhp==100.0 and troop.tech_hp_bonus==800.0)
 	# 船内升级（大本营升四级，科技等级再 +1）后仍可存读。
-	b.commands._apply_tech_effects(2,b.player_owner)
+	b.commands.technology._apply_tech_effects(2,b.player_owner)
 	assert(troop.hp==700.0 and troop.tech_hp_bonus==1200.0 and troop.hp>troop.maxhp)
 	assert(b.saver.apply_snapshot(snapshot()),"R01: 船内升级后的快照必须可恢复")
 	troop=find(troop_uid);ship=find(ship_uid)
@@ -269,20 +269,20 @@ func run() -> void:
 	bad.hp=99999.0;bad.simulation.tech_hp_bonus=0.0
 	assert(not b.saver.apply_snapshot(invalid_hp),"R01: 超出基础上限+科技加成的 HP 必须拒绝")
 	# 未升级部队（对照组）同样能登船读档。
-	b.commands._kill(find(troop_uid));assert(ship.carry_n==15)
+	b.commands.military._kill(find(troop_uid));assert(ship.carry_n==15)
 	var plain:=spawn(32,b.nav.anchor_of(troop_cell.x,troop_cell.y))
 	var plain_uid:=int(plain.uid)
-	assert(b.commands._attach_to_ship(plain,ship) and ship.carry_n==16)
+	assert(b.commands.orders._attach_to_ship(plain,ship) and ship.carry_n==16)
 	assert(b.saver.apply_snapshot(snapshot()));ship=find(ship_uid);plain=find(plain_uid)
 	assert(plain.attached and plain.hp==plain.maxhp+1200.0) # 对照：新兵同样带满科技当前 HP
-	b.commands._kill(plain);assert(ship.carry_n==15)
+	b.commands.military._kill(plain);assert(ship.carry_n==15)
 	print("TRANSPORT TECH-HP PASS upgraded hp>maxhp boards / damaged / in-cargo upgrade / inflight HP rejected")
 	ship.carry_n=0;ship.carry_hp=0 # 旧派生计数即使漂移，沉船也按真实关联清理。
-	b.commands._kill(ship)
+	b.commands.military._kill(ship)
 	assert(ship.carry_n==0 and ship.carry_hp==0 and not ship.loaded)
 	assert(people.slice(0,16).all(func(uid):return find(uid).die_t>=0 and find(uid).attached and find(uid).aboard_uid==-1))
 	# 先清船尸体再保存，仍可恢复全部隐藏的死亡载员且不复活。
-	b.commands._free_unit_at(b.units.find(ship))
+	b.commands.world._free_unit_at(b.units.find(ship))
 	var sunk:=snapshot();assert(b.saver.apply_snapshot(sunk))
 	assert(people.slice(0,16).all(func(uid):return find(uid).die_t>=0 or not find(uid).alive))
 	print("TRANSPORT SNAPSHOT PASS v8 manifest atomic / legacy v7 summary rebuilt / HQ HP sync / passenger death / sink all / ship removed / no resurrection")
@@ -291,11 +291,11 @@ func run() -> void:
 		open_battle(map_id);pair=shore_pair();sea=pair[0];land=pair[1]
 		ship=spawn(47,b.nav.anchor_of(sea.x,sea.y));ship_uid=int(ship.uid)
 		var unit:=spawn(32,b.nav.anchor_of(land.x,land.y));var uid: int=unit.uid
-		b.selected=[unit];assert(b.commands._order_board(ship)==1);b.commands._step_unit(unit,b.SIM_DT)
+		b.selected=[unit];assert(b.commands.orders._order_board(ship)==1);b.commands.orders._step_unit(unit,b.SIM_DT)
 		assert(unit.attached and b.saver.apply_snapshot(snapshot()))
 		ship=find(ship_uid);unit=find(uid)
-		assert(b.commands._order_unload(ship,b.nav.anchor_of(land.x,land.y))==1)
-		for tick in range(4): b.commands._step_unit(ship,b.SIM_DT)
+		assert(b.commands.orders._order_unload(ship,b.nav.anchor_of(land.x,land.y))==1)
+		for tick in range(4): b.commands.orders._step_unit(ship,b.SIM_DT)
 		assert(not unit.attached)
 		print("TRANSPORT MAP PASS ",map_id)
 	print("TRANSPORT WORLDS PASS 11 naval maps / actual coastline / board / loaded snapshot / unique landing")

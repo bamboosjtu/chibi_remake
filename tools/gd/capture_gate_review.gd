@@ -23,14 +23,14 @@ func run() -> void:
 			worker.state = "move" if opened else "idle"
 			worker.path = [Vector2(gate.ax,gate.ay)] if opened else []
 			worker.pi = 0
-			b.commands._place_unit(worker); b.commands._update_gates()
+			b.commands.world._place_unit(worker); b.commands.world._update_gates()
 			assert(bool(gate.gate_open) == opened)
 			b.visibility.update(b.units,b.player_owner)
 			b.selected = []; b.cam.zoom = Vector2.ONE * 2.5
 			var focus := Vector2(gate.ax,gate.ay-33)
 			b.cam.position = focus - (b.view.battle_rect().get_center()-root.get_visible_rect().size*.5)/b.cam.zoom
 			b.view.clamp_camera(); b.cam.force_update_scroll()
-			for unit in b.units: b.commands._update_visual(unit)
+			for unit in b.units: b.commands.world._update_visual(unit)
 			if "--bare-walls" in OS.get_cmdline_user_args():
 				b.view.unit_nodes(gate).skin.visible = false
 				b.view.unit_nodes(gate).gate_module.visible = false

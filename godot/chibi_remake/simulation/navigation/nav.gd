@@ -4,21 +4,22 @@ var state = preload("res://simulation/navigation/navigation_state.gd").new()
 var grid = preload("res://simulation/navigation/navigation_grid.gd").new(state)
 var paths = preload("res://simulation/navigation/path_queries.gd").new(state)
 var _fields: Dictionary = {}
-var _api_conflicts: Array = []
 var _api_missing: Array = []
 
 func _init() -> void:
-	for property in state.get_property_list(): _fields[property.name] = true
+	for field in state.PROXY_FIELDS: _fields[field] = true
 	var services := {"grid": grid, "paths": paths}
 	var report := preload("res://composition_contract.gd").wire(services, "nav")
 	_api_missing = report.missing
 
 func _get(key: StringName):
 	if _fields.has(key): return state.get(key)
+	push_error("Unknown simulation/navigation/nav.gd state property: " + str(key))
 	return null
 
 func _set(key: StringName, value) -> bool:
 	if _fields.has(key): state.set(key, value); return true
+	push_error("Unknown simulation/navigation/nav.gd state property: " + str(key))
 	return false
 
 func setup(md: Dictionary) -> void:

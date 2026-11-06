@@ -48,9 +48,9 @@ func run() -> void:
 			var button: TextureRect = view.art_buttons[9+i].btn
 			assert(button.visible == ((skill_masks[level] & (1 << i)) != 0))
 			assert(button.get_global_rect() == grid[i], "skills retain main-command size and fixed slots")
-			b.commands._reset_jimou(); b.commands._jimou_begin(i)
+			b.commands.military._reset_jimou(); b.commands.military._jimou_begin(i)
 			assert(b.jimou_pending == (i if button.visible else -1), "execution and UI share the same unlock rule")
-		b.commands._reset_jimou()
+		b.commands.military._reset_jimou()
 		assert(not view.art_back.visible)
 		view.art_sub = "form"; view._refresh_cmd_art()
 		for i in range(10):
@@ -63,14 +63,14 @@ func run() -> void:
 			assert(view.art_buttons[30].btn.visible and view._handle_cmd_key(key(KEY_C)))
 			assert(view.art_sub == "form")
 		else:
-			var before: int = b.commands._state_digest()
-			b.commands._set_formation(9)
-			assert(b.commands._state_digest() == before, "locked formations cannot be forced through execution")
+			var before: int = b.commands.world._state_digest()
+			b.commands.military._set_formation(9)
+			assert(b.commands.world._state_digest() == before, "locked formations cannot be forced through execution")
 	leader.officer.level = 2
 	view.art_sub = "hot"; view._refresh_cmd_art()
 	assert(not view._handle_cmd_key(key(KEY_W)))
 	assert(view._handle_cmd_key(key(KEY_X)) and b.jimou_pending == 7, "X remains recovery in bottom-centre slot")
-	b.commands._reset_jimou(); view.art_sub = "hot"; view._refresh_cmd_art()
+	b.commands.military._reset_jimou(); view.art_sub = "hot"; view._refresh_cmd_art()
 	await capture("level2-skills")
 	for menu in ["hot", "form"]:
 		view.art_sub = menu; view._refresh_cmd_art()

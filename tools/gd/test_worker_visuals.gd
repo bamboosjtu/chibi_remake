@@ -77,7 +77,7 @@ func gallery() -> void:
 	var names := ["E", "SE", "S", "SW", "W", "NW", "N", "NE"]
 	for row in range(4):
 		for heading in range(8):
-			assert(battle.commands._spawn_unit(30,battle.player_owner,800,2000,true))
+			assert(battle.commands.world._spawn_unit(30,battle.player_owner,800,2000,true))
 			var unit: Dictionary = battle.units.back()
 			unit.state="move"; unit.moved=true; unit.dir=heading; unit.move_facing=heading
 			unit.carry=0 if row==0 else 100; unit.carry_kind=["wood","wood","stone","food"][row]

@@ -30,16 +30,16 @@ func run() -> void:
 	var point:=Vector2(target.ax,target.ay)-Vector2(22,60)+Vector2(draw[0]+draw[2]*0.5,draw[1]+draw[3]*0.5)
 	battle.cam.zoom=Vector2.ONE*2.5
 	battle.cam.position=point-(battle.view.battle_rect().get_center()-root.get_visible_rect().size*0.5)/battle.cam.zoom
-	battle.cam.force_update_scroll();battle.commands._view_hud();battle.view.update_panel()
+	battle.cam.force_update_scroll();battle.commands.session._view_hud();battle.view.update_panel()
 	for i in range(45):await process_frame
-	battle.commands._cmd_begin("transport")
+	battle.commands.military._cmd_begin("transport")
 	var pointer: Vector2=battle.get_canvas_transform()*point
 	await process_frame;await process_frame
 	cursor.draw_at(battle,pointer)
 	assert(cursor.sprite.visible and cursor.bank=="A" and cursor.row==5,"real software cursor should render resource state")
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(output.path_join("resource-cursor.png"))
-	battle.commands._clear_pending();battle.commands._feedback("")
+	battle.commands.orders._clear_pending();battle.commands.world._feedback("")
 	pointer=battle.view.art_buttons[2].btn.get_global_rect().get_center()
 	await process_frame;await process_frame
 	battle.view.draw_hover_at(pointer);cursor.draw_at(battle,pointer)
@@ -51,15 +51,15 @@ func run() -> void:
 	battle.cam.position=focus-(battle.view.battle_rect().get_center()-root.get_visible_rect().size*0.5)/battle.cam.zoom
 	battle.cam.force_update_scroll()
 	for worker in workers:worker.group_officer=-1
-	battle.selected=workers.slice(0,2);battle.view.update_panel();battle.commands._view_hud()
-	for unit in battle.units:battle.commands._update_visual(unit)
+	battle.selected=workers.slice(0,2);battle.view.update_panel();battle.commands.session._view_hud()
+	for unit in battle.units:battle.commands.world._update_visual(unit)
 	battle.view.draw_hover_at(Vector2(600,600));cursor.draw_at(battle,Vector2(600,600))
 	for i in range(30):await process_frame
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(output.path_join("independent-workers-hd.png"))
 	assert(battle.view._panel_specs().map(func(s):return s.cmd)==["move","form","join","board"])
 	battle.selected=[hq];battle.view.update_panel()
-	for unit in battle.units:battle.commands._update_visual(unit)
+	for unit in battle.units:battle.commands.world._update_visual(unit)
 	await process_frame;await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(output.path_join("building-selection.png"))
 	var menu=battle.view.battle_menu

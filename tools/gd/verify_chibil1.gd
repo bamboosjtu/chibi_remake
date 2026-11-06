@@ -38,7 +38,7 @@ func _run() -> void:
 	check(battle.selected.size() == 1 and battle.selected[0].uid == mine[0].uid, "opening selects commander body for the full team menu")
 	check(int(mine[0].officer.index) == 42 and int(mine[0].unit) == 29, "MED 43 = Xu Shu, scholar commander")
 	check(battle.units.filter(func(u): return int(u.unit) == 30 and int(u.owner)==battle.player_owner and int(u.group_officer)==int(mine[0].officer.index)).size() == 4, "four bound workers preserved when commander spawned")
-	check(battle.commands.available_officers(2).map(func(o): return int(o.index)) == [39, 35, 34, 33, 46, 45, 42].filter(func(i): return i != 42), "one-based campaign roster")
+	check(battle.commands.military.available_officers(2).map(func(o): return int(o.index)) == [39, 35, 34, 33, 46, 45, 42].filter(func(i): return i != 42), "one-based campaign roster")
 	battle.view.update_panel()
 	check(battle.view.classic_panel.visible and battle.view.classic_panel.portrait.texture != null, "officer portrait")
 	check(battle.view.classic_panel.portrait.texture.resource_path == "res://art/full/officers/042-portrait-v2.png", "accepted HD identity bound")

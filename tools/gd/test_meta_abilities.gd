@@ -19,7 +19,7 @@ func fixture() -> void:
 	if template.is_empty():
 		template = b.map_data.units.duplicate(true)
 		officer = b.selected[0].officer.duplicate(true)
-	while not b.units.is_empty(): b.commands._free_unit_at(b.units.size()-1)
+	while not b.units.is_empty(): b.commands.world._free_unit_at(b.units.size()-1)
 	var land: Array = []
 	land.resize(60*120); land.fill(1)
 	b.map_data = {"rows":60,"cols":120,"tileW":44,"terrainW":2684,"terrainH":2684,"walkable":land,"terrainWalkable":land.duplicate(),"units":template.duplicate(true),"objects":[],"decor":[],"navigation":{}}
@@ -31,14 +31,14 @@ func fixture() -> void:
 
 func spawn(kind: int, cell: Vector2i, owner := 2) -> Dictionary:
 	var point: Vector2 = b.nav.anchor_of(cell.x,cell.y)
-	assert(b.commands._spawn_unit(kind,owner,point.x,point.y,true))
+	assert(b.commands.world._spawn_unit(kind,owner,point.x,point.y,true))
 	return b.units.back()
 
 func hero(cell: Vector2i, index := 42) -> Dictionary:
 	var unit := spawn(29,cell)
 	var data := officer.duplicate(true)
 	data.index=index; data.level=9
-	b.commands._attach_officer(unit,data)
+	b.commands.world._attach_officer(unit,data)
 	unit.mou=1000
 	return unit
 
@@ -53,7 +53,7 @@ func type_text(value: String) -> void:
 	for character in value: key(character.to_upper().unicode_at(0),character.unicode_at(0))
 
 func snapshot() -> Dictionary:
-	assert(game.save_game(b.units,b.commands._resources(),b.commands._save_extra()))
+	assert(game.save_game(b.units,b.commands.world._resources(),b.commands.session._save_extra()))
 	return game.load_save()
 
 func reference(name: String, file: String) -> Dictionary:
@@ -103,17 +103,17 @@ func console_and_levels() -> void:
 	for i in range(12): key(KEY_F3)
 	assert(leader.officer.level==0 and int(leader.officer.get("exp",0))==exp and not b.show_debug)
 	key(KEY_F3,0,true); assert(b.show_debug)
-	key(KEY_F4); assert(leader.officer.level==1 and b.commands._officer_by_index(42).level==1)
+	key(KEY_F4); assert(leader.officer.level==1 and b.commands.military._officer_by_index(42).level==1)
 	key(KEY_F5); assert(b.feedback_text.contains("F5"))
-	var before: Dictionary=b.commands._resources(); key(KEY_F10); assert(b.commands._resources()==before)
+	var before: Dictionary=b.commands.world._resources(); key(KEY_F10); assert(b.commands.world._resources()==before)
 	key(KEY_ENTER); type_text("eternal"); key(KEY_ENTER); assert(not b.cheats_enabled)
 	key(KEY_F4); assert(leader.officer.level==1)
 	key(KEY_ENTER); type_text("eternaleternal"); assert(b.cheats_enabled,"completed matches still require a mismatch before a new sequence")
 	key(KEY_ENTER); key(KEY_ENTER); type_text("eternal"); key(KEY_ENTER); assert(not b.cheats_enabled)
 	var levels: Array=[{"map":"a1","campaign":"a"},{"map":"a2","campaign":"a"},{"map":"a3","campaign":"a"},{"map":"b1","campaign":"b"}]
-	assert(b.commands._cheat_adjacent_level(levels,"a2",-1)=="a1")
-	assert(b.commands._cheat_adjacent_level(levels,"a2",1)=="a3")
-	assert(b.commands._cheat_adjacent_level(levels,"a1",-1)=="" and b.commands._cheat_adjacent_level(levels,"a3",1)=="")
+	assert(b.commands.session._cheat_adjacent_level(levels,"a2",-1)=="a1")
+	assert(b.commands.session._cheat_adjacent_level(levels,"a2",1)=="a3")
+	assert(b.commands.session._cheat_adjacent_level(levels,"a1",-1)=="" and b.commands.session._cheat_adjacent_level(levels,"a3",1)=="")
 	print("META INPUT PASS real viewport input / exact matcher / fifth-char toggle / no command leakage / gated keys / levels0-9 noXP / CtrlF3 / campaign bounds")
 
 func building_shortcut() -> void:
@@ -122,20 +122,20 @@ func building_shortcut() -> void:
 	var worker := spawn(30,Vector2i(28,47)); worker.group_officer=42
 	leader.team_kind="worker"; b.selected=[leader]; b.cheats_enabled=true
 	var option: Dictionary=b.build_types.filter(func(o):return int(o.unit)==12)[0]
-	assert(b.commands.building_block_reason(12)!="")
+	assert(b.commands.economy.building_block_reason(12)!="")
 	key(KEY_F6)
-	assert(b.commands.building_block_reason(12)=="" and b.commands.building_block_reason(12,3)!="")
-	assert(b.commands.building_block_reason(999)!="")
+	assert(b.commands.economy.building_block_reason(12)=="" and b.commands.economy.building_block_reason(12,3)!="")
+	assert(b.commands.economy.building_block_reason(999)!="")
 	var point: Vector2=b.nav.anchor_of(34,45)
 	b.gold=0
-	assert(not b.commands._build_site_at(point,option) and b.units.size()==2)
+	assert(not b.commands.economy._build_site_at(point,option) and b.units.size()==2)
 	b.gold=10000
-	var before: Dictionary=b.commands._resources()
-	assert(b.commands._build_site_at(point,option))
-	var cost: Dictionary=b.commands.ai_unit_cost(12)
-	for resource in ["gold","wood","food","stone"]: assert(b.commands._resources()[resource]==before[resource]-float(cost.get(resource,0)))
-	assert(not b.commands.build_placement_at(point,option).valid,"F6 must preserve occupied-footprint checks")
-	key(KEY_F6); assert(b.commands.building_block_reason(12)!="")
+	var before: Dictionary=b.commands.world._resources()
+	assert(b.commands.economy._build_site_at(point,option))
+	var cost: Dictionary=b.commands.economy.ai_unit_cost(12)
+	for resource in ["gold","wood","food","stone"]: assert(b.commands.world._resources()[resource]==before[resource]-float(cost.get(resource,0)))
+	assert(not b.commands.economy.build_placement_at(point,option).valid,"F6 must preserve occupied-footprint checks")
+	key(KEY_F6); assert(b.commands.economy.building_block_reason(12)!="")
 	print("META BUILD PASS own prerequisites only / invalid types rejected / insufficient funds / actual payment / occupied footprint remains blocked")
 
 func damage_fog_and_autoplay() -> void:
@@ -160,18 +160,18 @@ func damage_fog_and_autoplay() -> void:
 	key(KEY_F8); assert(not b.visibility.is_visible(outside))
 	key(KEY_F7)
 	var hp: float=leader.hp
-	b.commands._apply_hit(leader,9999,int(enemy.uid)); assert(leader.hp==hp and leader.alive)
+	b.commands.military._apply_hit(leader,9999,int(enemy.uid)); assert(leader.hp==hp and leader.alive)
 	assert(b.fire_fields.ignite(Vector2(leader.ax,leader.ay)))
 	for i in range(5): b.fire_fields.step()
 	assert(leader.hp==hp)
 	leader.burn_t=1.0; leader.burn_dps=300
-	b.commands._step_unit(leader,b.SIM_DT); assert(leader.hp==hp and leader.burn_t<1)
+	b.commands.orders._step_unit(leader,b.SIM_DT); assert(leader.hp==hp and leader.burn_t<1)
 	var enemy_hp: float=enemy.hp
-	b.commands._apply_hit(enemy,10,int(leader.uid)); assert(enemy.hp==enemy_hp-10)
-	key(KEY_F7); b.commands._apply_hit(leader,10,int(enemy.uid)); assert(leader.hp==hp-10)
+	b.commands.military._apply_hit(enemy,10,int(leader.uid)); assert(enemy.hp==enemy_hp-10)
+	key(KEY_F7); b.commands.military._apply_hit(leader,10,int(enemy.uid)); assert(leader.hp==hp-10)
 	key(KEY_F2); b.sim_tick=41
-	b.commands._step_auto_control(); assert(idle.state=="idle","autoplay must respect fog")
-	key(KEY_F8); b.commands._step_auto_control()
+	b.commands.session._step_auto_control(); assert(idle.state=="idle","autoplay must respect fog")
+	key(KEY_F8); b.commands.session._step_auto_control()
 	assert(idle.state=="attack" and is_same(idle.target,enemy))
 	assert(held.state=="idle" and busy.state=="move" and worker.state=="idle")
 	print("META RULES PASS reversible fog / no exploration pollution / melee-projectile-fire shared immunity / legacy burn / only own side / idle combat delegation")
@@ -189,7 +189,7 @@ func save_controls() -> void:
 	assert(b.state.get_instance_id()!=state_id and b.visibility.full_reveal and b.cheat_invulnerable==false)
 	var legacy := stored.duplicate(true); legacy.simulation.erase("autoControl")
 	assert(b.saver.apply_snapshot(legacy) and not b.auto_control)
-	assert(not b.commands._save_extra().simulation.has("autoControl"))
+	assert(not b.commands.session._save_extra().simulation.has("autoControl"))
 	var v3 := stored.duplicate(true); v3.v=3
 	b.auto_control=true; key(KEY_ENTER)
 	assert(b.cheat_input_open and b.saver.apply_snapshot(v3))
@@ -212,18 +212,18 @@ func teams_and_formations() -> void:
 	assert(b.stratagems.target_team(members.back().duplicate(true)).is_empty(),"stale copied entities must be rejected")
 	b.selected=[leader,unrelated,foreign,attached,dying,inside]
 	var before: Array=[leader.hp,leader.attack,leader.defence,leader.status_173]
-	var origin: Vector2i=b.commands._cell_of_px(leader.ax,leader.ay)
-	b.commands._set_formation(0)
+	var origin: Vector2i=b.commands.orders._cell_of_px(leader.ax,leader.ay)
+	b.commands.military._set_formation(0)
 	assert(leader.fo_x==0 and leader.fo_y==-4 and leader.state=="move")
 	assert(b.nav.cell_of_px(leader.path.back().x,leader.path.back().y)==origin+Vector2i(0,-4))
 	for i in range(expected.size()):
 		assert(expected[i].formation==0 and [int(expected[i].fo_x),int(expected[i].fo_y)]==Config.FORM_OFFSETS[0][i])
 	for excluded in [members[14],members[15],unrelated,foreign,attached,dying,inside]: assert(excluded.formation==-1)
 	assert([leader.hp,leader.attack,leader.defence,leader.status_173]==before)
-	assert(b.commands._formation_target_cell(leader,Vector2i(-100,-100))==Vector2i(3,3))
-	assert(b.commands._formation_target_cell(leader,Vector2i(1000,1000))==Vector2i(56,117))
-	b.selected=[unrelated]; b.commands._set_formation(2); assert(unrelated.formation==-1)
-	b.selected=[leader]; b.game_end=1; b.commands._set_formation(1); assert(leader.formation==0)
+	assert(b.commands.military._formation_target_cell(leader,Vector2i(-100,-100))==Vector2i(3,3))
+	assert(b.commands.military._formation_target_cell(leader,Vector2i(1000,1000))==Vector2i(56,117))
+	b.selected=[unrelated]; b.commands.military._set_formation(2); assert(unrelated.formation==-1)
+	b.selected=[leader]; b.game_end=1; b.commands.military._set_formation(1); assert(leader.formation==0)
 	print("FORMATION TEAM PASS canonical commander-first15 / stable clicked-member order / foreign-stale-dead-aboard-interior rejected / immediate leader offset / bounds / no stats / no arbitrary selection")
 
 func farsight_refresh() -> void:
@@ -234,11 +234,11 @@ func farsight_refresh() -> void:
 	b.visibility.update(b.units,b.player_owner)
 	var remote := Vector2(caster.ax+220,caster.ay)
 	assert(not b.visibility.is_visible(remote))
-	b.commands._jimou_begin(3)
-	b.commands._jimou_cast_at(Vector2(caster.ax,caster.ay-float(caster.h)*0.5))
+	b.commands.military._jimou_begin(3)
+	b.commands.military._jimou_cast_at(Vector2(caster.ax,caster.ay-float(caster.h)*0.5))
 	assert(caster.farsight_t==800 and caster.mou==900 and b.visibility.is_visible(remote))
 	caster.farsight_t=1; caster.hold=true
-	b.commands._step_unit(caster,b.SIM_DT); b.visibility.update(b.units,b.player_owner)
+	b.commands.orders._step_unit(caster,b.SIM_DT); b.visibility.update(b.units,b.player_owner)
 	assert(caster.farsight_t==0 and not b.visibility.is_visible(remote))
 	assert(b.visibility.effective_vision(caster)==1)
 	print("STRATAGEM VISIBILITY PASS immediate cast reveal /800 unit updates / restore base vision / explored memory")

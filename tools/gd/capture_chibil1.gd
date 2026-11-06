@@ -31,17 +31,17 @@ func run() -> void:
 		assert(not pair.is_empty())
 		var ship_point: Vector2=battle.nav.anchor_of(pair[0].x,pair[0].y)
 		var land_point: Vector2=battle.nav.anchor_of(pair[1].x,pair[1].y)
-		assert(battle.commands._spawn_unit(47,battle.player_owner,ship_point.x,ship_point.y,true))
+		assert(battle.commands.world._spawn_unit(47,battle.player_owner,ship_point.x,ship_point.y,true))
 		var ship: Dictionary=battle.units.back()
 		for i in range(2):
-			assert(battle.commands._spawn_unit(32,battle.player_owner,land_point.x,land_point.y,true))
+			assert(battle.commands.world._spawn_unit(32,battle.player_owner,land_point.x,land_point.y,true))
 			battle.selected=[battle.units.back()]
-			assert(battle.commands._order_board(ship)==1);battle.commands._step_unit(battle.units.back(),battle.SIM_DT)
+			assert(battle.commands.orders._order_board(ship)==1);battle.commands.orders._step_unit(battle.units.back(),battle.SIM_DT)
 		assert(ship.carry_n==2)
 		battle.selected=[ship];battle.visibility.update(battle.units,battle.player_owner)
 		battle.cam.position=ship_point-(battle.view.battle_rect().get_center()-surface.get_visible_rect().size*0.5)/battle.cam.zoom
 		battle.view.clamp_camera();battle.cam.force_update_scroll()
-	if "--disband" in OS.get_cmdline_user_args(): battle.commands._order_disband()
+	if "--disband" in OS.get_cmdline_user_args(): battle.commands.military._order_disband()
 	if "--resource-remnants" in OS.get_cmdline_user_args():
 		load(get_script().resource_path.get_base_dir().path_join("economy_fixture.gd")).warehouses(battle)
 		var workers: Array = battle.units.filter(func(u): return int(u.unit) == 30 and int(u.owner)==battle.player_owner)
@@ -49,10 +49,10 @@ func run() -> void:
 		var start := Vector2(workers[0].ax,workers[0].ay)
 		crops.sort_custom(func(a,b): return start.distance_squared_to(Vector2(a.ax,a.ay)) < start.distance_squared_to(Vector2(b.ax,b.ay)))
 		var crop: Dictionary = crops[0]
-		battle.commands._order_gather(crop)
+		battle.commands.economy._order_gather(crop)
 		for tick in range(360):
-			battle.commands._update_gates()
-			for worker in workers: battle.commands._step_unit(worker,battle.SIM_DT)
+			battle.commands.world._update_gates()
+			for worker in workers: battle.commands.orders._step_unit(worker,battle.SIM_DT)
 			battle.visibility.update(battle.units,battle.player_owner)
 		assert(not crop.alive and crop.phase == 3)
 		var focus := Vector2(crop.ax,crop.ay)
@@ -61,40 +61,40 @@ func run() -> void:
 	if "--production-menu" in OS.get_cmdline_user_args():
 		load(get_script().resource_path.get_base_dir().path_join("economy_fixture.gd")).warehouses(battle)
 		var base: Dictionary = battle.selected[0]
-		var barracks: Dictionary = battle.commands._place_building(battle.player_owner,12,Vector2(base.ax+300,base.ay+100))
+		var barracks: Dictionary = battle.commands.economy._place_building(battle.player_owner,12,Vector2(base.ax+300,base.ay+100))
 		assert(not barracks.is_empty())
 		battle.player_tech.level = 1
 		battle.selected = [barracks]
 	if "--research-menu" in OS.get_cmdline_user_args():
 		var hero: Dictionary = battle.selected[0]
-		assert(battle.commands._spawn_unit(14,battle.player_owner,hero.ax+100,hero.ay,true))
+		assert(battle.commands.world._spawn_unit(14,battle.player_owner,hero.ax+100,hero.ay,true))
 		battle.gold=10000;battle.wood=10000;battle.stone=10000
 		battle.selected=[battle.units.back()]
-		assert(battle.commands._start_tech(3))
-		for tick in range(100): battle.commands._process_tech(battle.SIM_DT)
+		assert(battle.commands.technology._start_tech(3))
+		for tick in range(100): battle.commands.technology._process_tech(battle.SIM_DT)
 	if "--combat-flight" in OS.get_cmdline_user_args():
 		var leader: Dictionary=battle.selected[0]
 		var point:=Vector2(leader.ax,leader.ay)
-		assert(battle.commands._spawn_unit(45,battle.player_owner,point.x-60,point.y+50,true))
+		assert(battle.commands.world._spawn_unit(45,battle.player_owner,point.x-60,point.y+50,true))
 		var archer: Dictionary=battle.units.back()
-		assert(battle.commands._spawn_unit(34,battle.player_owner,point.x-100,point.y+90,true))
+		assert(battle.commands.world._spawn_unit(34,battle.player_owner,point.x-100,point.y+90,true))
 		var cat: Dictionary=battle.units.back()
-		assert(battle.commands._spawn_unit(32,int(battle.commands.ai_owners()[0]),point.x+200,point.y+50,true))
+		assert(battle.commands.world._spawn_unit(32,int(battle.commands.economy.ai_owners()[0]),point.x+200,point.y+50,true))
 		var target: Dictionary=battle.units.back()
 		for attacker in [archer,cat]:
 			attacker.state="attack";attacker.target=target;attacker.action_phase=2
-			battle.commands._fire_attack(attacker,target)
+			battle.commands.military._fire_attack(attacker,target)
 		for tick in range(8):battle.projectiles.step()
 		assert(battle.projectiles.active.size()==2)
 		battle.selected=[archer];battle.visibility.update(battle.units,battle.player_owner)
 
 	if "--harvest" in OS.get_cmdline_user_args():
 		var workers: Array = battle.units.filter(func(u): return int(u.unit) == 30 and int(u.owner)==battle.player_owner)
-		var resource: Dictionary = battle.commands._nearest_resource(Vector2(workers[0].ax, workers[0].ay))
-		battle.commands._order_at(Vector2(resource.ax, resource.ay - 20))
+		var resource: Dictionary = battle.commands.economy._nearest_resource(Vector2(workers[0].ax, workers[0].ay))
+		battle.commands.orders._order_at(Vector2(resource.ax, resource.ay - 20))
 		for step in range(210):
-			battle.commands._update_gates()
-			for worker in workers: battle.commands._step_unit(worker, 1.0 / 30.0)
+			battle.commands.world._update_gates()
+			for worker in workers: battle.commands.orders._step_unit(worker, 1.0 / 30.0)
 			battle.visibility.update(battle.units, battle.player_owner)
 		var focus := Vector2(workers[0].ax, workers[0].ay)
 		battle.cam.position = focus - (battle.view.battle_rect().get_center() - surface.get_visible_rect().size * 0.5) / battle.cam.zoom
@@ -110,7 +110,7 @@ func run() -> void:
 		worker.ax = float(gate.ax) + 22; worker.ay = float(gate.ay) - 33
 		if "--gate-closed" in OS.get_cmdline_user_args(): worker.ay = float(gate.ay) - 143
 		battle.view.place_unit(worker)
-		battle.commands._update_gates()
+		battle.commands.world._update_gates()
 		assert(bool(gate.gate_open) == ("--gate-open" in OS.get_cmdline_user_args()))
 		battle.visibility.update(battle.units, battle.player_owner)
 		var focus := Vector2(gate.ax, gate.ay - 33)

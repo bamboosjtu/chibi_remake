@@ -73,6 +73,8 @@ func _add_gate_patches(map_id: String) -> void:
 		gate_patches.append(sprite)
 
 func _setup_gate_apertures(map_id: String) -> void:
+	# A queued setup may run after a campaign switch removed this scene.
+	if not is_inside_tree() or not is_instance_valid(host) or not host.is_inside_tree(): return
 	var apertures := PackedVector4Array()
 	var slopes := PackedFloat32Array()
 	for u in host.units:

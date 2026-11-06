@@ -14,7 +14,7 @@ func _selftest_gather() -> void:
 	#      等于绕过了用户实际使用的那条路（"要组建后才能采集"就是这么漏掉的）。
 	var rnodes: Array = []
 	for u in host.units:
-		if u.alive and u.die_t < 0.0 and host.commands._yield_of(int(u.unit)) != "":
+		if u.alive and u.die_t < 0.0 and host.commands.economy._yield_of(int(u.unit)) != "":
 			rnodes.append(u)
 	var rnode: Dictionary = {}
 	var rw: Dictionary = {}
@@ -26,13 +26,13 @@ func _selftest_gather() -> void:
 		# 严格仓库规则下，没有对应卸货建筑时工人会保留货物并停下。
 		# 自检先挑“已有对应仓库”的资源；没有就临时放一座测试仓库，避免把规则误判成不回运。
 		for cand in rnodes:
-			var kind0 = host.commands._yield_of(int(cand.unit))
-			if not host.commands._deposits_for(rw, kind0).is_empty():
+			var kind0 = host.commands.economy._yield_of(int(cand.unit))
+			if not host.commands.economy._deposits_for(rw, kind0).is_empty():
 				rnode = cand
 				break
 		if rnode.is_empty():
 			rnode = rnodes[0]
-			var kind1 = host.commands._yield_of(int(rnode.unit))
+			var kind1 = host.commands.economy._yield_of(int(rnode.unit))
 			var dep_ids: Array = host.DEPOSIT_UNITS.get(kind1, [])
 			if not dep_ids.is_empty():
 				var placed = suite.technology._selftest_ensure_building(dep_ids, Vector2(rnode.ax, rnode.ay))
@@ -47,17 +47,17 @@ func _selftest_gather() -> void:
 		var wc = host.nav.near_walkable(host.nav.cell_of_px(float(rw.ax), float(rw.ay)))
 		var wa = host.nav.anchor_of(wc.x, wc.y)
 		rw["ax"] = wa.x; rw["ay"] = wa.y; rw["A"] = wc.x; rw["B"] = wc.y
-		host.commands._clear_pending()
+		host.commands.orders._clear_pending()
 		host.selected.clear()
 		host.selected.append(rw)
 		# 点在资源点的**身体中心**（与 _resource_at 的判定同口径）
 		var click = Vector2(float(rnode.ax), float(rnode.ay) - float(rnode.h) * 0.5)
-		host.commands._order_at(click)
+		host.commands.orders._order_at(click)
 		var gobj = rw.get("gather_obj", null)
 		var gobj_uid: int = int((gobj as Dictionary).get("uid", -1)) if gobj is Dictionary else -1
 		print("SELFTEST 采集点击: 右键资源点 → state=%s obj=%s path=%d  (资源 uid=%d 种类=%s)" % [
 			str(rw.get("state", "?")), str(gobj_uid), rw.get("path", []).size(),
-			int(rnode.get("uid", -1)), host.commands._yield_of(int(rnode.unit))])
+			int(rnode.get("uid", -1)), host.commands.economy._yield_of(int(rnode.unit))])
 		if str(rw.get("state", "")) != "gather":
 			# 本图工人**走不到任何资源点**（栅栏/水面全围住）—— 前提不成立，
 			# 不是产品缺陷。_order_gather 会拒绝而不是假装接受（已单独验证）。
@@ -76,13 +76,13 @@ func _selftest_gather() -> void:
 			goal = rnode
 		var steps = 0
 		var maxs = 3000                 # 100 秒上限：够走完本图 100+ 途经点的迂回
-		while steps < maxs and host.commands._edge_cell_distance(rw, goal) != host.EDGE_DISTANCE:
-			host.commands._step_unit(rw, 1.0 / 30.0)
+		while steps < maxs and host.commands.orders._edge_cell_distance(rw, goal) != host.EDGE_DISTANCE:
+			host.commands.orders._step_unit(rw, 1.0 / 30.0)
 			steps += 1
 		var secs = float(steps) / 30.0
-		var arrived = host.commands._edge_cell_distance(rw, goal) == host.EDGE_DISTANCE
+		var arrived = host.commands.orders._edge_cell_distance(rw, goal) == host.EDGE_DISTANCE
 		print("SELFTEST 采集点击: 走到资源点(实际目标 uid=%d)用 %.1f 秒（到达=%s，边缘格距=%d）" % [
-			int(goal.get("uid", -1)), secs, str(arrived), host.commands._edge_cell_distance(rw, goal)])
+			int(goal.get("uid", -1)), secs, str(arrived), host.commands.orders._edge_cell_distance(rw, goal)])
 		if not arrived:
 			var fp = Vector2(float(rw.ax), float(rw.ay))
 			var fcell = host.nav.cell_of_px(fp.x, fp.y)
@@ -109,10 +109,10 @@ func _selftest_gather() -> void:
 						if c.x < 0 or c.y < 0 or c.x >= int(host.map_data.rows) or c.y >= int(host.map_data.cols) or host.nav.is_solid(c):
 							continue
 						var p = host.nav.anchor_of(c.x, c.y)
-						if host.commands._edge_cell_distance({"ax": p.x, "ay": p.y}, goal) != host.EDGE_DISTANCE:
+						if host.commands.orders._edge_cell_distance({"ax": p.x, "ay": p.y}, goal) != host.EDGE_DISTANCE:
 							continue
 						rw.ax = p.x; rw.ay = p.y; rw.A = c.x; rw.B = c.y; rw.path = []; rw.pi = 0
-						host.commands._place_unit(rw)
+						host.commands.world._place_unit(rw)
 						placed_near = true
 						break
 					if placed_near:
@@ -127,7 +127,7 @@ func _selftest_gather() -> void:
 		var pre_carry = float(rw.get("carry", 0.0))
 		var gsteps = 0
 		while gsteps < 300 and float(rw.get("carry", 0.0)) <= pre_carry:
-			host.commands._step_unit(rw, 1.0 / 30.0)
+			host.commands.orders._step_unit(rw, 1.0 / 30.0)
 			gsteps += 1
 		print("SELFTEST 采集点击: 到位后再 %.1f 秒开始装货 carry=%.0f（原来 %.0f）" % [
 			float(gsteps) / 30.0, float(rw.get("carry", 0.0)), pre_carry])
@@ -135,15 +135,15 @@ func _selftest_gather() -> void:
 		if secs > 20.0:
 			print("SELFTEST 采集点击: 注意：到达要 %.1f 秒 —— 期间只有「采集 … 直线 N px」这条反馈在告诉玩家命令已生效" % secs)
 		# 接着验证资源仍存在，卸货后可以继续采集。
-		var nxt = host.commands._nearest_resource(Vector2(rw.ax, rw.ay))
+		var nxt = host.commands.economy._nearest_resource(Vector2(rw.ax, rw.ay))
 		suite._check(not nxt.is_empty(), "卸货后能找到一个最近的资源点接着采（链式采集）")
 		# ---- 真实走完运输闭环（不许瞬移）：装满 → 步行回建筑卸货 → 再去采集 ----
 		# 专测用户报的「资源运不回去 / 穿障碍物」。此前这里只有瞬移测试，
 		# 走回去的那条路从未被验证过（问题就是这样漏掉的）。
 		var r_base = host.gold + host.wood + host.food + host.stone
 		# 严格仓库：先保证本图有该资源类的卸货建筑，否则工人会正确地停在 deliver→idle。
-		var need_kind = host.commands._yield_of(int(goal.unit))
-		if not need_kind.is_empty() and host.commands._deposits_for(rw, need_kind).is_empty():
+		var need_kind = host.commands.economy._yield_of(int(goal.unit))
+		if not need_kind.is_empty() and host.commands.economy._deposits_for(rw, need_kind).is_empty():
 			var dep_ids2: Array = host.DEPOSIT_UNITS.get(need_kind, [])
 			if not dep_ids2.is_empty():
 				var placed2 = suite.technology._selftest_ensure_building(dep_ids2, Vector2(rw.ax, rw.ay))
@@ -157,7 +157,7 @@ func _selftest_gather() -> void:
 		var solid_steps = 0
 		var trace: Array = []
 		while secs2 < 180.0 and delivered < 2.0:
-			host.commands._step_unit(rw, 1.0 / 10.0)
+			host.commands.orders._step_unit(rw, 1.0 / 10.0)
 			secs2 += 1.0 / 10.0
 			var cur2 = Vector2(rw.ax, rw.ay)
 			if cur2.distance_to(lastp) < 0.5:
@@ -169,10 +169,10 @@ func _selftest_gather() -> void:
 				solid_steps += 1
 			delivered = floor((host.gold + host.wood + host.food + host.stone - r_base) / host.CARRY_CAPACITY)
 			if int(round(secs2 * 10.0)) % 150 == 0:
-				var dp2 = host.commands._nearest_deposit(int(rw.owner), cur2)
+				var dp2 = host.commands.economy._nearest_deposit(int(rw.owner), cur2)
 				var dd2 = 0.0
 				if not dp2.is_empty():
-					dd2 = host.commands._dist_to_obj(rw, dp2)
+					dd2 = host.commands.orders._dist_to_obj(rw, dp2)
 				trace.append("t=%.0fs state=%s pos=(%.0f,%.0f) path=%d carry=%.0f 到最近卸货点=%.0fpx" % [
 					secs2, str(rw.get("state", "?")), cur2.x, cur2.y,
 					(rw.get("path", []) as Array).size(), float(rw.get("carry", 0.0)), dd2])
@@ -190,13 +190,13 @@ func _selftest_gather() -> void:
 	# ---- 以下保持原有的两段式运输验证 ----
 	var node: Dictionary = {}
 	for u in host.units:
-		if u.alive and u.die_t < 0.0 and host.commands._yield_of(int(u.unit)) != "":
+		if u.alive and u.die_t < 0.0 and host.commands.economy._yield_of(int(u.unit)) != "":
 			node = u
 			break
 	if node.is_empty():
 		suite._skip("采集：本图没有资源点")
 		return
-	var kind = host.commands._yield_of(int(node.unit))
+	var kind = host.commands.economy._yield_of(int(node.unit))
 	var w: Dictionary = {}
 	for u in host.units:
 		if u.alive and not u.is_building and int(u.owner) == host.player_owner and int(u.unit) == 30:
@@ -210,7 +210,7 @@ func _selftest_gather() -> void:
 	w["hold"] = false
 	host.selected.clear()
 	host.selected.append(w)
-	if host.commands._order_gather(node) == 0:
+	if host.commands.economy._order_gather(node) == 0:
 		suite._skip("采集：_order_gather 未接受该目标")
 		host.selected.clear()
 		return
@@ -221,7 +221,7 @@ func _selftest_gather() -> void:
 		actual = node
 
 	# ---- 第一段：走到资源点装满一担 ----
-	var ep = host.commands._edge_point(actual, Vector2(float(w.ax), float(w.ay)))
+	var ep = host.commands.orders._edge_point(actual, Vector2(float(w.ax), float(w.ay)))
 	w["ax"] = ep.x
 	w["ay"] = ep.y
 	w["path"] = []
@@ -232,7 +232,7 @@ func _selftest_gather() -> void:
 	if actual.has("stock"):
 		actual["stock"] = maxf(float(actual.get("stock", 0.0)), host.CARRY_CAPACITY * 2.0)
 	var r0 = host.gold + host.wood + host.food + host.stone
-	host.commands._step_unit(w, 0.01)
+	host.commands.orders._step_unit(w, 0.01)
 	var r1 = host.gold + host.wood + host.food + host.stone
 	var carry = float(w.get("carry", 0.0))
 	print("SELFTEST 采集: %s 资源点(实际目标 uid=%d) → 装满 state=%s carry=%.0f  四资源 %.0f -> %.0f（装货时**不应**增加）" % [
@@ -245,24 +245,24 @@ func _selftest_gather() -> void:
 	suite._check(is_equal_approx(r1, r0), "**装货时资源不入库**（货在工人身上）")
 
 	# ---- 第二段：走到对应资源类的最近我方建筑卸货 ----
-	var drops: Array = host.commands._deposits_for(w, kind)
+	var drops: Array = host.commands.economy._deposits_for(w, kind)
 	if drops.is_empty():
 		var dep_ids3: Array = host.DEPOSIT_UNITS.get(kind, [])
 		if not dep_ids3.is_empty():
 			suite.technology._selftest_ensure_building(dep_ids3, Vector2(w.ax, w.ay))
-			drops = host.commands._deposits_for(w, kind)
+			drops = host.commands.economy._deposits_for(w, kind)
 	if drops.is_empty():
 		suite._skip("运输：我方没有对应 %s 的卸货建筑" % kind)
 		host.selected.clear()
 		return
 	var drop: Dictionary = drops[0]
-	var dep = host.commands._edge_point(drop, Vector2(float(w.ax), float(w.ay)), host.DEPOSIT_EDGE_PX)
+	var dep = host.commands.orders._edge_point(drop, Vector2(float(w.ax), float(w.ay)), host.DEPOSIT_EDGE_PX)
 	w["ax"] = dep.x
 	w["ay"] = dep.y
 	w["path"] = []
 	# 卸货按每 4 tick 轮询；连走 4 拍确保成交。
 	for i in range(4):
-		host.commands._step_unit(w, 0.01)
+		host.commands.orders._step_unit(w, 0.01)
 	var r2 = host.gold + host.wood + host.food + host.stone
 	if not is_equal_approx(r2 - r1, host.CARRY_CAPACITY):
 		suite._skip("本图卸货点不可达（跳过入库断言）")

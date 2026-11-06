@@ -27,7 +27,7 @@ func _run() -> void:
 	await process_frame; await process_frame
 	var view: Node2D = battle.view
 	# 四资源采用不相等余额，避免开局数值和图标同时错位却互相掩盖。
-	var funds: Dictionary = battle.commands._resources().duplicate()
+	var funds: Dictionary = battle.commands.world._resources().duplicate()
 	battle.gold = 701; battle.food = 702; battle.wood = 703; battle.stone = 704
 	view._refresh_res_slots()
 	var resource_kinds := ["gold", "food", "wood", "stone"]
@@ -44,7 +44,7 @@ func _run() -> void:
 	var hq: Dictionary=battle.units.filter(func(u):return u.owner==battle.player_owner and int(u.unit)==0)[0]
 	var captain: Dictionary=battle.selected[0]
 	var worker_unit: Dictionary=battle.units.filter(func(u):return int(u.unit)==30 and int(u.owner)==battle.player_owner)[0]
-	battle.selected=[hq];battle.commands._update_visual(hq)
+	battle.selected=[hq];battle.commands.world._update_visual(hq)
 	view.update_panel()
 	assert(view.classic_panel.portrait.stretch_mode==TextureRect.STRETCH_KEEP_ASPECT_CENTERED,"building portrait shows the complete structure")
 	var outline: PackedVector2Array=battle.view.unit_nodes(hq).diamond.points
@@ -65,9 +65,9 @@ func _run() -> void:
 	assert(view.panel_kind() == "worker", "选工人队将领本体显示八项指令")
 	assert(view.art_buttons[2].btn.visible, "工人组第 3 格（运输）可见")
 	_click(view.art_buttons[2].btn.get_global_rect().get_center())
-	assert(battle.commands.cmd_pending_kind() == "transport", "点「运输」进入选资源点状态")
-	battle.commands._clear_pending()
-	battle.commands._order_gather_nearest()
+	assert(battle.commands.orders.cmd_pending_kind() == "transport", "点「运输」进入选资源点状态")
+	battle.commands.orders._clear_pending()
+	battle.commands.economy._order_gather_nearest()
 	assert(workers.filter(func(w): return w.state == "gather").size() == 4, "运输命令让 4 名工人进入采集")
 	# ---- 战斗组面板 + 解散（第 7 格 = 帧 160「解散」）----
 	var hero: Dictionary = {}
@@ -86,7 +86,7 @@ func _run() -> void:
 	assert(view.art_buttons[6].btn.visible, "战斗组第 7 格（解散）可见")
 	_click(view.art_buttons[6].btn.get_global_rect().get_center())
 	assert(battle.selected.is_empty(), "解散清空选择（原版模式 6）")
-	assert(not battle.commands.officer_in_use(hero_idx), "解散后武将释放")
+	assert(not battle.commands.military.officer_in_use(hero_idx), "解散后武将释放")
 	for unit in battle.units: assert(unit.uid != old_uid, "将本体已移除")
 	for worker in workers: assert(worker.state == "gather", "解散不影响工人的工作命令")
 	# ---- 组建：工人组旁的「组建」入口 → 分页名单 → 该武将 ----
@@ -158,14 +158,14 @@ func _run() -> void:
 	battle.set_process(false); battle.cli_mode = true
 	await process_frame; await process_frame
 	view = battle.view
-	assert(battle.commands._spawn_unit(32, battle.player_owner, 600.0, 2200.0, true), "创建真实步兵测试队伍")
+	assert(battle.commands.world._spawn_unit(32, battle.player_owner, 600.0, 2200.0, true), "创建真实步兵测试队伍")
 	var fighters: Array = battle.units.filter(func(u): return u.alive and not u.is_building and int(u.owner) == int(battle.player_owner) and int(u.unit) == 32)
 	assert(not fighters.is_empty())
 	battle.selected = [fighters[0]]
 	assert(battle.view.panel_kind()=="ungrouped")
-	var available: Array=battle.commands.available_officers(battle.player_owner)
+	var available: Array=battle.commands.military.available_officers(battle.player_owner)
 	assert(not available.is_empty())
-	battle.commands._order_form_up(int(available[0].index))
+	battle.commands.military._order_form_up(int(available[0].index))
 	view.update_panel()
 	assert(view.panel_kind() == "combat")
 	var names: Array = []
@@ -181,21 +181,21 @@ func _run() -> void:
 	print("INTERACTION PASS engine input: worker eight/combat nine, formation+strategy, transport, disband, paginated regroup, minimap click+drag, edge frame, aligned resources+portrait")
 	view._close_art_sub()
 	# 车兵所同时有生产与研究；弓术已移回木材场，不能再用弓兵所夹具。
-	assert(battle.commands._spawn_unit(8,battle.player_owner,600,2200,true))
+	assert(battle.commands.world._spawn_unit(8,battle.player_owner,600,2200,true))
 	var school: Dictionary=battle.units.back()
 	battle.gold=100000;battle.wood=100000;battle.food=100000;battle.stone=100000
-	battle.selected=[school];assert(battle.commands._start_tech(18));view.update_panel()
+	battle.selected=[school];assert(battle.commands.technology._start_tech(18));view.update_panel()
 	assert(view.cmd_capsules.size()==1 and not view.cmd_capsules.any(func(spec):return bool(spec.get("production",false))))
 	assert(not view.cmd_capsules.any(func(spec):return spec.text.begins_with("取消生产")))
 	assert(view.cmd_capsules.any(func(spec):return spec.text.begins_with("取消研究") and spec.enabled))
 	assert(view.hot_buttons[0].btn.disabled)
-	for tick in range(100): battle.commands._process_tech(battle.SIM_DT)
+	for tick in range(100): battle.commands.technology._process_tech(battle.SIM_DT)
 	view.update_panel()
 	assert(view.classic_panel.progress_bar.visible and view.classic_panel.progress_bar.value==50)
 	assert(view.classic_panel.work_icon.visible)
-	assert(battle.commands._cancel_tech() and battle.commands._queue_train(battle.player_owner,school,34));view.update_panel()
+	assert(battle.commands.technology._cancel_tech() and battle.commands.economy._queue_train(battle.player_owner,school,34));view.update_panel()
 	assert(view.cmd_capsules.any(func(spec):return spec.text.begins_with("取消生产") and spec.enabled))
 	assert(not view.cmd_capsules.any(func(spec):return spec.text.begins_with("取消研究")))
-	assert(view.cmd_capsules.size()==1 and not view.cmd_capsules.any(func(spec):return spec.text==battle.commands.tech_row(18).name))
+	assert(view.cmd_capsules.size()==1 and not view.cmd_capsules.any(func(spec):return spec.text==battle.commands.technology.tech_row(18).name))
 	print("BUILDING WORK HUD PASS training and research disabled while busy / matching cancel only / hotkey agrees")
 	battle.free(); finished = true; quit()

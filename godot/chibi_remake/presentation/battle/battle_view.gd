@@ -5,7 +5,6 @@ const GRID_FALLBACK := 8
 var _ui = preload("res://presentation/battle/components/battle_view_state.gd").new()
 var _components: Dictionary = {}
 var _fields: Dictionary = {}
-var _api_conflicts: Array = []
 var _api_missing: Array = []
 var worker_button: Button:
 	get: return _ui.worker_button
@@ -100,7 +99,7 @@ func _init(battle: Node2D) -> void:
 	add_child(_ui.projectile_view)
 	_ui.construction_preview = preload("res://presentation/battle/build_preview.gd").new(access)
 	add_child(_ui.construction_preview)
-	for property in _ui.get_property_list(): _fields[property.name] = true
+	for field in _ui.PROXY_FIELDS: _fields[field] = true
 	_components["controller"] = preload("res://presentation/battle/components/controller.gd").new(_ui, self)
 	_components["unit_visuals"] = preload("res://presentation/battle/components/unit_visuals.gd").new(_ui, self)
 	_components["camera_controller"] = preload("res://presentation/battle/components/camera_controller.gd").new(_ui, self)
@@ -116,15 +115,17 @@ func _init(battle: Node2D) -> void:
 	var report := preload("res://composition_contract.gd").wire(_components, "view")
 	_api_missing = report.missing
 
-func registry_abort() -> bool:
-	return preload("res://composition_contract.gd").abort_if_broken("view", _api_conflicts, _api_missing)
+func contract_abort() -> bool:
+	return preload("res://composition_contract.gd").abort_if_broken("view", _api_missing)
 
 func _get(key: StringName):
 	if _fields.has(key): return _ui.get(key)
+	push_error("Unknown presentation/battle/battle_view.gd state property: " + str(key))
 	return null
 
 func _set(key: StringName, value) -> bool:
 	if _fields.has(key): _ui.set(key, value); return true
+	push_error("Unknown presentation/battle/battle_view.gd state property: " + str(key))
 	return false
 
 func maybe_play_intro(md: Dictionary) -> void:

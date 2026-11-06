@@ -72,13 +72,12 @@ var saver: RefCounted:
 
 var _access: Dictionary:
 	get: return world._access
-var _api_conflicts: Array = []
 var _api_missing: Array = []
 
 func _init() -> void:
 	_modules = world._modules
-	for property in state.get_property_list(): _state_fields[property.name] = true
-	for property in scene.get_property_list(): _scene_fields[property.name] = true
+	for field in state.PROXY_FIELDS: _state_fields[field] = true
+	for field in scene.PROXY_FIELDS: _scene_fields[field] = true
 	_wire_world()
 
 func _wire_world() -> void:
@@ -88,10 +87,10 @@ func _wire_world() -> void:
 	if not _application_services.has("duel_controller"): _application_services["duel_controller"] = preload("res://app/battle/duel_controller.gd").new(state, scene, self)
 	if not _application_services.has("scene_controller"): _application_services["scene_controller"] = preload("res://app/battle/scene_controller.gd").new(state, scene, self)
 	_modules.merge(_application_services)
-	var registry := preload("res://composition_contract.gd").wire(_modules, "main", _access)
-	_api_conflicts = registry.conflicts
-	_api_missing = registry.missing
-	commands.connect_services(_modules)
+	var access := _access.duplicate()
+	access.merge(commands.port_objects())
+	var report := preload("res://composition_contract.gd").wire(_modules, "main", access)
+	_api_missing = report.missing
 	if not state.effects.visual_requested.is_connected(_on_visual): state.effects.visual_requested.connect(_on_visual)
 	if not state.effects.sound_requested.is_connected(_on_sound): state.effects.sound_requested.connect(_on_sound)
 	if not state.effects.duel_requested.is_connected(_on_duel): state.effects.duel_requested.connect(_on_duel)
@@ -99,6 +98,7 @@ func _wire_world() -> void:
 func _get(key: StringName):
 	if _state_fields.has(key): return state.get(key)
 	if _scene_fields.has(key): return scene.get(key)
+	push_error("Unknown main.gd state property: " + str(key))
 	return null
 
 func _set(key: StringName, value) -> bool:
@@ -108,6 +108,7 @@ func _set(key: StringName, value) -> bool:
 		return true
 	if _state_fields.has(key): state.set(key, value); return true
 	if _scene_fields.has(key): scene.set(key, value); return true
+	push_error("Unknown main.gd state property: " + str(key))
 	return false
 
 func _on_visual(action: String, arguments: Array) -> void:
@@ -125,7 +126,7 @@ func _on_visual(action: String, arguments: Array) -> void:
 		"show_end": scene.view.show_end(arguments[0])
 		"update_panel": scene.view.update_panel()
 		"set_unit_attached": scene.view.set_unit_attached(arguments[0],arguments[1])
-		_: preload("res://composition_contract.gd").abort_if_broken("visual event",[],[{"method":action}])
+		_: preload("res://composition_contract.gd").abort_if_broken("visual event", [{"method":action}])
 
 func _on_sound(action: String, arguments: Array) -> void:
 	if scene.sfx == null: return
@@ -133,20 +134,20 @@ func _on_sound(action: String, arguments: Array) -> void:
 		"play_select": scene.sfx.play_select(arguments[0])
 		"play_attack": scene.sfx.play_attack(arguments[0])
 		"play_id": scene.sfx.play_id(arguments[0])
-		_: preload("res://composition_contract.gd").abort_if_broken("sound event",[],[{"method":action}])
+		_: preload("res://composition_contract.gd").abort_if_broken("sound event", [{"method":action}])
 
 func _ready() -> void:
-	# An ambiguous composition dispatches calls to the wrong service; never load
-	# a map on top of that. registry.gd also enforces this in exported builds.
-	if preload("res://composition_contract.gd").abort_if_broken("main", _api_conflicts, _api_missing): return
-	await _modules["bootstrap"]._ready()
+	# Validate all required providers before initializing a map.
+	# The same explicit contract check runs in exported builds.
+	if preload("res://composition_contract.gd").abort_if_broken("main", _api_missing): return
+	await commands.session.bootstrap_ready()
 func _notification(what: int) -> void:
 	if what != Node.NOTIFICATION_WM_CLOSE_REQUEST: return
-	_modules["scene_controller"]._notification(what)
+	commands.session.notify_window(what)
 func _unhandled_input(event: InputEvent) -> void:
-	_modules["scene_controller"]._unhandled_input(event)
+	commands.session.unhandled_input(event)
 func _process(delta: float) -> void:
-	_modules["scene_controller"]._process(delta)
+	commands.session.process_frame(delta)
 func _exit_tree() -> void:
 	dispose_services()
 
@@ -166,7 +167,7 @@ func simulation_access(domain: String) -> RefCounted:
 
 
 func _on_duel(outcome: String, onm: String, enm: String, ticket: int) -> void:
-	_modules["duel_controller"]._present_duel(outcome, onm, enm, ticket)
+	commands.session.present_duel(outcome, onm, enm, ticket)
 
 func exchange_world(next_world: RefCounted) -> RefCounted:
 	var previous: RefCounted = world

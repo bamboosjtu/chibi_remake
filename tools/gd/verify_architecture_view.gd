@@ -81,7 +81,7 @@ func _run() -> void:
 	assert(gpu_peak < 805306368, "Render texture memory exceeds 768 MiB budget")
 	var u: Dictionary = battle.units[0]
 	u.hold = true; u.cool = 0.75
-	assert(root.get_node("Game").save_game(battle.units, battle.commands._resources(), battle.commands._save_extra()))
+	assert(root.get_node("Game").save_game(battle.units, battle.commands.world._resources(), battle.commands.session._save_extra()))
 	assert(battle.saver.apply_snapshot(root.get_node("Game").load_save()))
 	assert(battle.units[0].hold and is_equal_approx(battle.units[0].cool, 0.75))
 	assert(battle.view.event_view.cursor == battle.task_events.size())

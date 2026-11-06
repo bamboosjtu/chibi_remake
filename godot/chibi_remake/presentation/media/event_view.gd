@@ -19,7 +19,7 @@ var segment_index:=0
 
 func _init(h:Node) -> void:
 	host=h
-	if host.has_method("_save_extra"):cursor=host.task_events.size()
+	if host.has_method("is_battle_context"):cursor=host.task_events.size()
 	events=JSON.parse_string(FileAccess.get_file_as_string("res://data/db/events.json")).events
 	catalog=JSON.parse_string(FileAccess.get_file_as_string("res://data/db/video_catalog.json")).files
 
@@ -58,7 +58,7 @@ func _layout_video(path:String) -> void:
 	caption.position=player.position-Vector2(0,64);caption.size=Vector2(native.x,60)
 
 func restore_history() -> void:
-	if host.has_method("_save_extra"):
+	if host.has_method("is_battle_context"):
 		if host.view!=null:host.view.opening_pending=false
 		cursor=host.task_events.size()
 	active=false;completion=Callable();ending_caption="";segments=[];caption.hide()
@@ -103,7 +103,7 @@ func _process(_delta:float) -> void:
 		if not ending_caption.is_empty() and ((not segments.is_empty() and segment_index>0) or (segments.is_empty() and ending_at>=0 and player.stream_position>=ending_at)):
 			caption.text=ending_caption;caption.show()
 		return
-	if not host.has_method("_save_extra") or get_tree().paused or cursor>=host.task_events.size():return
+	if not host.has_method("is_battle_context") or get_tree().paused or cursor>=host.task_events.size():return
 	var entry:Dictionary=events.get(str(int(host.task_events[cursor].id)),{})
 	cursor+=1
 	if entry.has("video") and FileAccess.file_exists(entry.video):play_media(str(entry.video))

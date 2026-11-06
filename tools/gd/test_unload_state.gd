@@ -11,7 +11,7 @@ func _initialize() -> void:
 	run.call_deferred()
 
 func spawn(kind: int, point: Vector2) -> Dictionary:
-	assert(b.commands._spawn_unit(kind, b.player_owner, point.x, point.y, true))
+	assert(b.commands.world._spawn_unit(kind, b.player_owner, point.x, point.y, true))
 	return b.units.back()
 
 func find(uid: int) -> Dictionary:
@@ -33,7 +33,7 @@ func shore_pair() -> Array:
 	for a in range(4,int(b.map_data.rows)-4):
 		for row in range(9,int(b.map_data.cols)-9):
 			var sea:=Vector2i(a,row)
-			if not b.nav.is_water(sea) or not b.commands._unit_placement_free(sea,47,1):continue
+			if not b.nav.is_water(sea) or not b.commands.world._unit_placement_free(sea,47,1):continue
 			var point:Vector2=b.nav.anchor_of(sea.x,sea.y)
 			var probe:Dictionary={"unit":47,"ax":point.x,"ay":point.y,"is_building":false}
 			var anchors:Array=b.transports.coastal_anchors(probe,30)
@@ -42,7 +42,7 @@ func shore_pair() -> Array:
 	return []
 
 func snapshot() -> Dictionary:
-	assert(game.save_game(b.units, b.commands._resources(), b.commands._save_extra()))
+	assert(game.save_game(b.units, b.commands.world._resources(), b.commands.session._save_extra()))
 	return game.load_save()
 
 ## 用 uid 记录整场（船 + 载员）的可比较状态。
@@ -69,7 +69,7 @@ func run() -> void:
 	b.cli_mode = true
 	b.ai = null
 	while not b.units.is_empty():
-		b.commands._free_unit_at(b.units.size() - 1)
+		b.commands.world._free_unit_at(b.units.size() - 1)
 	b.nav.rebuild_buildings(b.units)
 
 	var pair := shore_pair()
@@ -81,11 +81,11 @@ func run() -> void:
 	for i in range(2):
 		var worker := spawn(30, b.nav.anchor_of(land.x, land.y))
 		people.append(int(worker.uid))
-		assert(b.commands._attach_to_ship(worker, ship))
+		assert(b.commands.orders._attach_to_ship(worker, ship))
 	assert(int(ship.carry_n) == 2 and ship.loaded)
-	assert(b.commands._order_unload(ship, b.nav.anchor_of(land.x, land.y)) == 1)
+	assert(b.commands.orders._order_unload(ship, b.nav.anchor_of(land.x, land.y)) == 1)
 	for tick in range(3):
-		b.commands._step_unit(ship, b.SIM_DT)
+		b.commands.orders._step_unit(ship, b.SIM_DT)
 	assert(int(ship.unload_t) == 3 and int(ship.carry_n) == 2, "夹具：tick 3 尚未落位")
 	# 运输船可接收新命令（state=move）后继续卸载；这正是评审复现的字段组合。
 	ship.state = "move"
@@ -100,7 +100,7 @@ func run() -> void:
 	var watched: Array = [ship_uid] + people
 	# A：不读档，继续 13 tick。
 	for tick in range(13):
-		b.commands._step_unit(ship, b.SIM_DT)
+		b.commands.orders._step_unit(ship, b.SIM_DT)
 	var without_load := capture(watched)
 
 	# B：恢复同一快照后继续 13 tick。
@@ -110,7 +110,7 @@ func run() -> void:
 	assert(bool(ship.get("unload_active", false)), "R03: 读档保留持续卸载标志")
 	assert(int(ship.get("unload_t", -1)) == 3, "R03: 读档保留卸载相位")
 	for tick in range(13):
-		b.commands._step_unit(ship, b.SIM_DT)
+		b.commands.orders._step_unit(ship, b.SIM_DT)
 	var after_load := capture(watched)
 	assert(after_load == without_load, "R03: 读档前后继续相同 tick 必须得到相同载员与位置\nA=%s\nB=%s" % [str(without_load), str(after_load)])
 	assert(int(find(ship_uid).carry_n) == 0, "R03: 两名载员都应在 16 tick 内落位")

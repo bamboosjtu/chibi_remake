@@ -22,23 +22,23 @@ func restore(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 	var decor_snapshot: Dictionary = plan.decor
 	# ---- 校验通过：开始交换世界 ----
 	# R07：待确认的施法/单挑引用属于旧世界，恢复后不能保留为可执行状态。
-	host.commands._reset_jimou()
+	host.commands.military._reset_jimou()
 	host.duel_pending = false
-	host.commands._build_decor_targets()
+	host.commands.economy._build_decor_targets()
 	for key in decor_snapshot:
 		var entry: Dictionary = decor_snapshot[key]
 		var target: Dictionary = host.decor_cells[str(key)]
 		target.stock = float(entry.stock)
-		if target.stock <= 0: host.commands._remove_decor(target)
+		if target.stock <= 0: host.commands.economy._remove_decor(target)
 
-	host.commands._restore_officer_pool(simulation.get("officerPool", {}))
+	host.commands.military._restore_officer_pool(simulation.get("officerPool", {}))
 	host.selected.clear()
 	while not host.units.is_empty():
-		host.commands._free_unit_at(host.units.size() - 1)
+		host.commands.world._free_unit_at(host.units.size() - 1)
 	host.next_uid = 0
 	var by_uid := {}
 	for rec in arr:
-		if not host.commands._spawn_unit(int(rec.unit), int(rec.owner), float(rec.x), float(rec.y), true):
+		if not host.commands.world._spawn_unit(int(rec.unit), int(rec.owner), float(rec.x), float(rec.y), true):
 			push_error("Snapshot unit failed after validation")
 			return false
 		var u: Dictionary = host.units.back()
@@ -65,7 +65,7 @@ func restore(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 		preload("res://simulation/systems/locomotion.gd").restore(state,u)
 		if host.view != null and bool(u.get("attached",false)):
 			host.view.set_unit_attached(u,true) # 暂停读档也立即隐藏载员，不等下一次模拟更新。
-		if host.view != null and int(u.get("site_inside_uid", -1)) >= 0: host.commands._update_visual(u)
+		if host.view != null and int(u.get("site_inside_uid", -1)) >= 0: host.commands.world._update_visual(u)
 		if not state.has("gather_ticks"): u.gather_ticks = int(round(float(u.gather_t) / host.SIM_DT))
 		by_uid[int(u.uid)] = u
 	# 所有实体建好后再解析引用，采矿／卸货目标可以排在工人后面。
@@ -82,7 +82,7 @@ func restore(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 		elif str(reference.get("kind", "")) == "spent":
 			u.gather_obj = {"unit":int(reference.unit),"ax":float(reference.x),"ay":float(reference.y),"alive":false,"die_t":0.0}
 	host.next_uid = int(d.nextUid)
-	host.commands._enforce_team_limits()
+	host.commands.military._enforce_team_limits()
 	for uid in ids:
 		host.next_uid = maxi(host.next_uid, int(uid) + 1)
 	host.game_end = int(d.get("gameEnd", 0))
@@ -111,7 +111,7 @@ func restore(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 	host.army_tech = _numeric_keys.call(simulation.get("armyTech", {})).duplicate(true)
 	# 攻防加成是科技等级的派生数据；旧档的单口径缓存不能覆盖新四计算器。
 	for unit in host.units:
-		host.commands._apply_tech_bonuses(unit)
+		host.commands.technology._apply_tech_bonuses(unit)
 	host.research_jobs = simulation.get("researchJobs",[]).duplicate(true)
 	host.tech_progress = {}
 	var tp = simulation.get("techProgress", {})
@@ -127,15 +127,15 @@ func restore(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 	host.nav.rebuild_buildings(host.units)
 	# R02：读档重建的占地必须与新建一致；旧档若把单位留在建筑占地里，这里按重建后的
 	# 真实阻挡把它们挪到最近可走格，避免“合法工人被包进帅帐”。
-	host.commands._resolve_navigation_overlaps()
+	host.commands.orders._resolve_navigation_overlaps()
 	host.transports.restore(int(d.v))
-	host.commands._update_gates()
+	host.commands.world._update_gates()
 	host.visibility.restore(str(simulation.get("explored", "")), host.units, host.player_owner)
 	if host.view != null and host.view.event_view != null:
 		host.view.capture_motion()
 		host.view.event_view.restore_history()
 		for unit in host.units:
-			if unit.alive and float(unit.die_t)<0: host.commands._update_visual(unit)
+			if unit.alive and float(unit.die_t)<0: host.commands.world._update_visual(unit)
 		if host.view.completion != null:
 			host.view.completion.reset()
 			host.view.end_label.hide()

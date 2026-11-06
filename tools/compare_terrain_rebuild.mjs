@@ -1,26 +1,36 @@
-import fs from 'node:fs';import path from 'node:path';import crypto from 'node:crypto';import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import assert from 'node:assert/strict';
 const args=process.argv.slice(2),option=(key,fallback)=>args.includes(key)?args[args.indexOf(key)+1]:fallback;
-const generated=option('--generated','_work/terrain/current');
-const old=option('--original','godot/chibi_remake');
-const cache=option('--transport-cache','_work/build/terrain-cache/jpeg-q78-v1');
-const rows=new Map(fs.readFileSync(option('--reference-snapshot','_work/remediation/before/runtime_assets.sha256'),'utf8').trim().split(/\r?\n/).map(line=>{const [sha,,file]=line.split('\t');return [file,sha];}));
-const digest=buffer=>crypto.createHash('sha256').update(buffer).digest('hex');let files=0,equal=0,missing=0;
-const hashes=new Map(),differences=[];
-for(const id of JSON.parse(fs.readFileSync('source/terrain/index.json')).maps){
- const relative='art/full/terrain_chunks/'+id;
- const before=JSON.parse(fs.readFileSync(path.join(old,relative,'manifest.json'))),after=JSON.parse(fs.readFileSync(path.join(generated,relative,'manifest.json')));
- assert.equal(after.worldWidth,before.worldWidth,id);assert.equal(after.worldHeight,before.worldHeight,id);assert.equal(after.chunks.length,before.chunks.length,id);
- before.chunks.forEach((chunk,index)=>{
-  assert.deepEqual(after.chunks[index].rect,chunk.rect,id+' rect '+index);
-  for(const [lod,entry] of Object.entries(chunk.lods)){
-   files++;const sourceSha=rows.get(entry.texture.replace(/^res:\/\//,''));const reference=path.join(cache,sourceSha+'.bin');
-   const actual=path.join(generated,after.chunks[index].lods[lod].texture.replace(/^res:\/\//,''));
-   if(!fs.existsSync(reference)){missing++;continue;}
-   if(!hashes.has(reference))hashes.set(reference,digest(fs.readFileSync(reference)));
-   if(hashes.get(reference)===digest(fs.readFileSync(actual)))equal++;else if(differences.length<100)differences.push({id,index,lod,reference,actual});
-  }
- });
+const digest=buffer=>crypto.createHash('sha256').update(buffer).digest('hex');
+const reference=option('--reference','tools/inputs/terrain_equivalence.sha256');
+const metadata=JSON.parse(fs.readFileSync(reference+'.json','utf8'));
+const bytes=fs.readFileSync(reference);
+assert.equal(digest(bytes),metadata.snapshotSha256,'Terrain reference snapshot changed');
+const sources=JSON.parse(fs.readFileSync('source/terrain/inputs.json','utf8'));
+assert.equal(digest(JSON.stringify(sources.files)),metadata.sourceInputsSha256,'Terrain reference source inputs changed');
+const maps=JSON.parse(fs.readFileSync('source/terrain/index.json','utf8')).maps;
+assert.deepEqual(Object.keys(metadata.maps).sort(),[...maps].sort(),'Terrain reference must cover all maps');
+const rows=bytes.toString('utf8').trim().split(/\r?\n/).map(line=>line.split('\t'));
+const paths=new Set();
+for(const [sha,file] of rows){
+ assert.match(sha,/^[a-f0-9]{64}$/);assert.match(file,/^art\/full\/terrain_chunks\/chibi[a-z0-9]+\/[\w]+\.bin$/);
+ assert(!paths.has(file),'Duplicate terrain reference: '+file);paths.add(file);
+ assert(maps.includes(file.split('/')[3]),'Undeclared terrain map: '+file);
 }
-const result={maps:34,files,identical:equal,missingReferences:missing,differenceSamples:differences};
-fs.mkdirSync('_work/remediation',{recursive:true});fs.writeFileSync('_work/remediation/terrain-comparison.json',JSON.stringify(result,null,2)+'\n');
-console.log(JSON.stringify({...result,differenceSamples:differences.slice(0,3)}));if(equal!==files)process.exitCode=1;
+assert.equal(rows.length,metadata.files);
+for(const id of maps)assert.equal(rows.filter(row=>row[1].split('/')[3]===id).length,metadata.maps[id].chunks*3,id+' LOD count');
+if(args.includes('--declarations')){
+ console.log('TERRAIN EQUIVALENCE DECLARATIONS PASS '+maps.length+' maps / '+rows.length+' historical transport hashes');
+ process.exit(0);
+}
+const generated=option('--generated','_work/terrain/current');
+let equal=0;
+for(const [sha,file] of rows){assert.equal(digest(fs.readFileSync(path.join(generated,file))),sha,'Terrain differs from historical transport: '+file);equal++;}
+for(const id of maps){
+ const manifest=JSON.parse(fs.readFileSync(path.join(generated,'art/full/terrain_chunks',id,'manifest.json')));
+ const geometry={width:manifest.worldWidth,height:manifest.worldHeight,chunks:manifest.chunks.map(c=>({rect:c.rect,lods:Object.keys(c.lods).sort()}))};
+ assert.equal(digest(JSON.stringify(geometry)),metadata.maps[id].geometrySha256,id+' geometry differs');
+}
+console.log('TERRAIN EQUIVALENCE PASS '+maps.length+' maps / '+equal+' identical historical chunks / geometry and LODs');

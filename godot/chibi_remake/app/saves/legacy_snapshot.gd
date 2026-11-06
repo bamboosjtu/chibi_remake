@@ -43,7 +43,7 @@ func _apply_v3(d: Dictionary, arr: Array) -> int:
 			if not cand.is_empty() and int(cand.unit) == unit_id and int(cand.owner) == owner:
 				target = cand
 		if target.is_empty():
-			if host.commands._spawn_unit(unit_id, owner, float(rec.get("x", 0.0)), float(rec.get("y", 0.0))):
+			if host.commands.world._spawn_unit(unit_id, owner, float(rec.get("x", 0.0)), float(rec.get("y", 0.0))):
 				target = host.units[host.units.size() - 1]
 				respawned += 1
 			else:
@@ -63,7 +63,7 @@ func _apply_v3(d: Dictionary, arr: Array) -> int:
 	while i >= 0:
 		var u: Dictionary = host.units[i]
 		if bool(u.get("map_object", false)) and not mentioned.has(int(u.uid)):
-			host.commands._free_unit_at(i)
+			host.commands.world._free_unit_at(i)
 			removed += 1
 		i -= 1
 
@@ -112,7 +112,7 @@ func _apply_legacy(d: Dictionary, arr: Array, ver: int) -> int:
 			if not cand.is_empty() and int(cand.unit) == unit_id and int(cand.owner) == owner:
 				target = cand
 		if target.is_empty():
-			if host.commands._spawn_unit(unit_id, owner, float(rec[2]), float(rec[3])):
+			if host.commands.world._spawn_unit(unit_id, owner, float(rec[2]), float(rec[3])):
 				target = host.units[host.units.size() - 1]
 				if host.view != null: host.view.rekey_unit(target, uid)
 				target["uid"] = uid

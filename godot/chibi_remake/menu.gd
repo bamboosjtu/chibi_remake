@@ -44,7 +44,6 @@ const ARROW_STEP := 135                 # ▲▼ 一次滚 3 行
 var _ui = preload("res://presentation/menu/menu_state.gd").new()
 var _components: Dictionary = {}
 var _fields: Dictionary = {}
-var _api_conflicts: Array = []
 var _api_missing: Array = []
 var media_view: CanvasLayer:
 	get: return _ui.media_view
@@ -120,7 +119,7 @@ var sb_gold_focus: StyleBoxFlat:
 	set(value): _ui.sb_gold_focus = value
 
 func _init() -> void:
-	for property in _ui.get_property_list(): _fields[property.name] = true
+	for field in _ui.PROXY_FIELDS: _fields[field] = true
 	_components["automation_driver"] = preload("res://presentation/menu/automation_driver.gd").new(_ui, self)
 	_components["controller"] = preload("res://presentation/menu/controller.gd").new(_ui, self)
 	_components["menu_styles"] = preload("res://presentation/menu/menu_styles.gd").new(_ui, self)
@@ -131,14 +130,16 @@ func _init() -> void:
 
 func _get(key: StringName):
 	if _fields.has(key): return _ui.get(key)
+	push_error("Unknown menu.gd state property: " + str(key))
 	return null
 
 func _set(key: StringName, value) -> bool:
 	if _fields.has(key): _ui.set(key, value); return true
+	push_error("Unknown menu.gd state property: " + str(key))
 	return false
 
-func registry_abort() -> bool:
-	return preload("res://composition_contract.gd").abort_if_broken("menu", _api_conflicts, _api_missing)
+func contract_abort() -> bool:
+	return preload("res://composition_contract.gd").abort_if_broken("menu", _api_missing)
 
 func _flat(bg: Color, border: Color, width: int, radius: int) -> StyleBoxFlat:
 	return _components["menu_styles"]._flat(bg, border, width, radius)
@@ -152,8 +153,8 @@ func _build_styles() -> void:
 	_components["menu_styles"]._build_styles()
 func _ready() -> void:
 	# An ambiguous composition dispatches calls to the wrong component; never
-	# build the menu on top of that. registry.gd already asserts in debug builds.
-	if registry_abort(): return
+	# build the menu on top of that. Contract rejection also runs in exported builds.
+	if contract_abort(): return
 	await _components["controller"]._ready()
 func _notification(what: int) -> void:
 	if what != Node.NOTIFICATION_WM_CLOSE_REQUEST: return
