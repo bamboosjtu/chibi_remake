@@ -8,6 +8,7 @@
 /.workbuddy/
 /赤壁简体中文光盘版/
 tmp/
+/发布/
 userdata/
 
 # Build outputs and test results.
