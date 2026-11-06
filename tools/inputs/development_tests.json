@@ -416,6 +416,12 @@
       "markers": [
         "WORLD EXCHANGE PASS"
       ]
+    },
+    {
+      "script": "test_presentation_diagnostics",
+      "markers": [
+        "PRESENTATION DIAGNOSTICS PASS"
+      ]
     }
   ]
 }

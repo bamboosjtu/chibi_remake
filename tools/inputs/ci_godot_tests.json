@@ -28,6 +28,12 @@
       "args": [
         "--noview"
       ]
+    },
+    {
+      "script": "test_presentation_diagnostics",
+      "markers": [
+        "PRESENTATION DIAGNOSTICS PASS"
+      ]
     }
   ]
 }

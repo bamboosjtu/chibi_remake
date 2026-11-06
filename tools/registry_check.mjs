@@ -30,18 +30,28 @@ for(const [file,entry] of Object.entries(manifest.ports)){
  if(/\b(?:invoke|api\.get)\(|var _fn\w*\s*:/.test(text))throw Error(file+': obsolete dispatch');
  const declared=JSON.parse(text.match(/^const CONTRACTS := (.+)$/m)?.[1]??'null');
  if(!declared)throw Error(file+': missing explicit contract');
- assert.deepEqual(declared,entry.providers,file+': manifest contract differs from source');
+ if('providers' in entry)throw Error(file+': remove duplicated providers from composition.json; CONTRACTS in the port source is authoritative');
  const providers=manifest.hosts[entry.host];
  for(const [provider,requirements] of Object.entries(declared)){
   if(!providers[provider])throw Error(file+': unknown provider '+provider);
   const provided=methods(providers[provider]);
   for(const method of requirements){if(!provided.has(method))throw Error(file+': '+provider+'.'+method+' missing');bindings++;}
  }
- for(const wrapper of text.matchAll(/^func \w+\([^\n]*\n(?:(?:\t[^\n]*|[ \t]*)\n)*/gm)){
-  const binding=wrapper[0].match(/var provider = _require\(_provider_(\w+), "([^\"]+)"\)/);
-  if(!binding)continue;
-  if(binding[1]!==binding[2]||!wrapper[0].includes('if provider == null: return'))throw Error(file+': unguarded provider');
-  for(const call of wrapper[0].matchAll(/provider\.(\w+)\(/g))if(!declared[binding[1]]?.includes(call[1]))throw Error(file+': undeclared direct call '+binding[1]+'.'+call[1]);
+ // Ignore comments, preserving quoted provider names. Guard layout may use
+ // spaces/tabs, line breaks, blank lines or comments between the statements.
+ const code=text.replace(/("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|#[^\r\n]*/g,(all,string)=>string??'');
+ for(const wrapper of code.matchAll(/^func \w+\([\s\S]*?(?=^(?:func|const|var)\b|(?![\s\S]))/gm)){
+  const body=wrapper[0];
+  const binding=body.match(/var\s+provider\s*(?::\s*\w+\s*)?=\s*_require\s*\(\s*_provider_(\w+)\s*,\s*(["'])(\w+)\2\s*\)/);
+  if(!binding){if(/\b_require\s*\(/.test(body))throw Error(file+': unrecognized provider binding');continue;}
+  const guard=body.match(/^([ \t]+)if\s+provider\s*==\s*null\s*:[ \t]*(?:return\b|\r?\n\s*?([ \t]+)return\b)/m);
+  const indent=s=>s.replaceAll('\t','    ').length;
+  const guarded=guard && (!guard[2]||indent(guard[2])>indent(guard[1])) && guard.index>binding.index;
+  if(binding[1]!==binding[3]||!guarded)throw Error(file+': unguarded provider');
+  for(const call of body.matchAll(/provider\s*\.\s*(\w+)\s*\(/g)){
+   if(call.index<guard.index+guard[0].length)throw Error(file+': provider called before lifetime guard');
+   if(!declared[binding[1]]?.includes(call[1]))throw Error(file+': undeclared direct call '+binding[1]+'.'+call[1]);
+  }
  }
 }
 function walk(dir){return fs.readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.name.startsWith('.')||['art','media','data','assets','addons'].includes(e.name)?[]:e.isDirectory()?walk(path.join(dir,e.name)):e.name.endsWith('.gd')?[path.join(dir,e.name)]:[]);}

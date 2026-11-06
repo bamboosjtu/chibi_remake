@@ -31,7 +31,7 @@ static func wire(services: Dictionary, label: String, access: Dictionary = {}) -
 
 static func abort_if_broken(label: String, missing: Array) -> bool:
 	if missing.is_empty(): return false
-	push_error(label + ": explicit port contract failed: " + JSON.stringify(missing))
+	push_error(label + ": explicit port contract failed: " + JSON.stringify(missing) + "; shutdown requested (exit 1); current frame continues with defaults until the main loop exits")
 	var loop := Engine.get_main_loop()
 	if loop is SceneTree: loop.quit(1)
 	return true

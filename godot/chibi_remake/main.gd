@@ -33,6 +33,7 @@ var state: State:
 var scene := preload("res://app/battle_scene_state.gd").new()
 var _state_fields: Dictionary = {}
 var _scene_fields: Dictionary = {}
+var _presentation_diagnostics := preload("res://presentation/battle/event_diagnostics.gd").new()
 
 var ai: RefCounted:
 	get: return state.ai
@@ -123,10 +124,12 @@ func _on_visual(action: String, arguments: Array) -> void:
 		"update_visual": scene.view.update_visual(arguments[0])
 		"set_frame": scene.view.set_frame(arguments[0],arguments[1])
 		"attach_unit": scene.view.attach_unit(arguments[0],arguments[1],arguments[2],arguments[3],arguments[4])
-		"show_end": scene.view.show_end(arguments[0])
+		"show_end":
+			_presentation_diagnostics.report()
+			scene.view.show_end(arguments[0])
 		"update_panel": scene.view.update_panel()
 		"set_unit_attached": scene.view.set_unit_attached(arguments[0],arguments[1])
-		_: preload("res://composition_contract.gd").abort_if_broken("visual event", [{"method":action}])
+		_: _presentation_diagnostics.unknown("visual", action)
 
 func _on_sound(action: String, arguments: Array) -> void:
 	if scene.sfx == null: return
@@ -134,7 +137,7 @@ func _on_sound(action: String, arguments: Array) -> void:
 		"play_select": scene.sfx.play_select(arguments[0])
 		"play_attack": scene.sfx.play_attack(arguments[0])
 		"play_id": scene.sfx.play_id(arguments[0])
-		_: preload("res://composition_contract.gd").abort_if_broken("sound event", [{"method":action}])
+		_: _presentation_diagnostics.unknown("sound", action)
 
 func _ready() -> void:
 	# Validate all required providers before initializing a map.
@@ -152,6 +155,7 @@ func _exit_tree() -> void:
 	dispose_services()
 
 func dispose_services() -> void:
+	_presentation_diagnostics.report()
 	if state.player_commands != null:
 		state.player_commands.clear()
 		for connection in state.player_commands.commands_applied.get_connections():

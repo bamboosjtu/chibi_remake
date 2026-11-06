@@ -56,1486 +56,190 @@
   },
   "ports": {
     "simulation/ports/abilities_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "battle_simulation": [
-          "_feedback"
-        ],
-        "combat": [
-          "_kill"
-        ],
-        "command_groups": [
-          "_commander_for"
-        ],
-        "movement": [
-          "_cell_of_px",
-          "_move_unit_to_cell"
-        ],
-        "selection": [
-          "_enemy_at",
-          "_player_at"
-        ],
-        "world_orders": [
-          "_clear_pending"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/ai_economy_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "command_groups": [
-          "_commander_for",
-          "_construction_workers"
-        ],
-        "production": [
-          "_queue_train",
-          "train_types_for"
-        ],
-        "technology": [
-          "_ai_side",
-          "_building_work_busy",
-          "_combat_member_count",
-          "_queue_research",
-          "_tech_for",
-          "_tech_line_of",
-          "ai_tech_gate"
-        ],
-        "construction_orders": [
-          "building_block_reason"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/ai_orders_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "ai_economy": [
-          "_ai_forming",
-          "_working_construction_team",
-          "ai_group_of",
-          "ai_production_building"
-        ],
-        "combat": [
-          "_hostile_owners"
-        ],
-        "command_groups": [
-          "_cancel_unit_command"
-        ],
-        "harvest_orders": [
-          "_yield_of"
-        ],
-        "movement": [
-          "_path_to"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/battle_simulation_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "campaign": [
-          "_check_end"
-        ],
-        "cheat_rules": [
-          "_step_auto_control"
-        ],
-        "combat": [
-          "_die_step"
-        ],
-        "construction_orders": [
-          "_process_sites"
-        ],
-        "officer_teams": [
-          "_process_officer_recovery",
-          "_unassign_officer"
-        ],
-        "production": [
-          "_process_trainings"
-        ],
-        "spatial_index": [
-          "_index_forget",
-          "_index_sync",
-          "_target_forget",
-          "_target_sync"
-        ],
-        "technology": [
-          "_process_tech"
-        ],
-        "unit_actions": [
-          "_step_unit"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/campaign_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "campaign": [
-          "_show_end"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/cheat_rules_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "abilities": [
-          "_jimou_caster_for_selection"
-        ],
-        "officer_pool": [
-          "_sync_officer_to_pool"
-        ],
-        "combat": [
-          "_nearest_enemy"
-        ],
-        "command_groups": [
-          "_cancel_unit_command"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/combat_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "abilities": [
-          "_reset_jimou"
-        ],
-        "battle_simulation": [
-          "_fade_unit",
-          "_finish_death",
-          "_set_frame"
-        ],
-        "command_groups": [
-          "_commander_for",
-          "_nav_layer"
-        ],
-        "interaction_paths": [
-          "_footprint_cells"
-        ],
-        "movement": [
-          "_cell_of_px"
-        ],
-        "officer_teams": [
-          "_grant_officer_exp",
-          "_unassign_officer"
-        ],
-        "spatial_index": [
-          "_index_ensure_current",
-          "_index_forget",
-          "_target_forget"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/command_groups_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "abilities": [
-          "_reset_jimou"
-        ],
-        "battle_simulation": [
-          "_feedback"
-        ],
-        "officer_teams": [
-          "_order_disband"
-        ],
-        "technology": [
-          "_is_worker_unit"
-        ],
-        "transport_orders": [
-          "_unload_selected"
-        ],
-        "world_orders": [
-          "_clear_pending"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/construction_orders_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "ai_economy": [
-          "_dock_can_launch",
-          "ai_can_build",
-          "ai_production_building",
-          "ai_unit_cost"
-        ],
-        "battle_simulation": [
-          "_feedback",
-          "_free_unit_at"
-        ],
-        "combat": [
-          "_kill"
-        ],
-        "command_groups": [
-          "_cancel_unit_command",
-          "_cmd_begin",
-          "_commander_for",
-          "_construction_workers",
-          "_nav_layer",
-          "_selected_construction_workers"
-        ],
-        "entity_factory": [
-          "_make_unit",
-          "_sheet_ref_for"
-        ],
-        "harvest_orders": [
-          "_selected_workers"
-        ],
-        "interaction_paths": [
-          "_edge_cell_distance",
-          "_edge_neighbors",
-          "_footprint_cells",
-          "_interaction_path"
-        ],
-        "movement": [
-          "_anchor_of",
-          "_cell_of_px",
-          "_near_walkable"
-        ],
-        "officer_teams": [
-          "_grant_officer_exp"
-        ],
-        "production": [
-          "_army_count"
-        ],
-        "spatial_index": [
-          "_cell_unit",
-          "_target_sync"
-        ],
-        "technology": [
-          "_is_worker_unit"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/entity_factory_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "battle_simulation": [
-          "_place_unit"
-        ],
-        "command_groups": [
-          "_nav_layer"
-        ],
-        "entity_factory": [
-          "_sheet_ref_for"
-        ],
-        "production": [
-          "_army_count"
-        ],
-        "spatial_index": [
-          "_free_unit_cell",
-          "_index_remember",
-          "_target_sync"
-        ],
-        "technology": [
-          "_apply_tech_bonuses"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/harvest_orders_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "battle_simulation": [
-          "_feedback"
-        ],
-        "command_groups": [
-          "_cancel_unit_command"
-        ],
-        "interaction_paths": [
-          "_edge_interaction_choice",
-          "_reachable_resource_for",
-          "_resource_patch_cells",
-          "_resource_patch_interaction_choice"
-        ],
-        "spatial_index": [
-          "_unit_cell"
-        ],
-        "technology": [
-          "_is_worker_unit"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/interaction_paths_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "command_groups": [
-          "_nav_layer"
-        ],
-        "harvest_orders": [
-          "_yield_of"
-        ],
-        "movement": [
-          "_path_to"
-        ],
-        "spatial_index": [
-          "_cell_unit",
-          "_unit_cell"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/movement_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "abilities": [
-          "_spd_mult"
-        ],
-        "battle_simulation": [
-          "_feedback",
-          "_place_unit"
-        ],
-        "command_groups": [
-          "_cancel_unit_command",
-          "_nav_layer"
-        ],
-        "interaction_paths": [
-          "_footprint_cells"
-        ],
-        "spatial_index": [
-          "_unit_cell",
-          "_unit_placement_free"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/officer_pool_dependencies.gd": {
-      "host": "main",
-      "providers": {}
+      "host": "main"
     },
     "simulation/ports/officer_teams_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "abilities": [
-          "_reset_jimou"
-        ],
-        "battle_simulation": [
-          "_clear_control_group_for",
-          "_clear_officer_control_groups",
-          "_feedback",
-          "_free_unit_at",
-          "_place_unit"
-        ],
-        "command_groups": [
-          "_cancel_unit_command",
-          "_commander_for",
-          "_group_units"
-        ],
-        "entity_factory": [
-          "_attach_officer",
-          "_make_unit",
-          "_sheet_ref_for"
-        ],
-        "interaction_paths": [
-          "_edge_interaction_path"
-        ],
-        "officer_pool": [
-          "_officer_by_index",
-          "_officer_held_only_by_selection",
-          "_sync_officer_to_pool",
-          "officer_in_use"
-        ],
-        "production": [
-          "_army_count",
-          "_commander_count"
-        ],
-        "spatial_index": [
-          "_free_unit_cell"
-        ],
-        "technology": [
-          "_apply_tech_bonuses",
-          "_is_worker_unit"
-        ],
-        "combat": [
-          "officer_rank_name"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/production_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "ai_economy": [
-          "ai_level",
-          "ai_unit_cost"
-        ],
-        "battle_simulation": [
-          "_feedback"
-        ],
-        "campaign": [
-          "_unit_name"
-        ],
-        "entity_factory": [
-          "_sheet_ref_for",
-          "_spawn_unit"
-        ],
-        "technology": [
-          "_building_work_busy"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/selection_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "harvest_orders": [
-          "_yield_of"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/spatial_index_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "abilities": [
-          "_spd_mult"
-        ],
-        "battle_simulation": [
-          "_place_unit"
-        ],
-        "command_groups": [
-          "_nav_layer"
-        ],
-        "interaction_paths": [
-          "_footprint_cells"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/technology_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "battle_simulation": [
-          "_feedback"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/transport_orders_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "abilities": [
-          "_reset_jimou"
-        ],
-        "battle_simulation": [
-          "_feedback",
-          "_place_unit"
-        ],
-        "command_groups": [
-          "_cancel_unit_command",
-          "_command_units",
-          "_is_naval"
-        ],
-        "spatial_index": [
-          "_index_forget",
-          "_target_forget"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/unit_actions_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "battle_simulation": [
-          "_feedback"
-        ],
-        "combat": [
-          "_fire_attack",
-          "_kill",
-          "_melee_line_clear",
-          "_nearest_enemy"
-        ],
-        "command_groups": [
-          "_cancel_unit_command"
-        ],
-        "construction_orders": [
-          "_do_repair",
-          "_site_entry_path",
-          "_valid_build_worker"
-        ],
-        "harvest_orders": [
-          "_deposit_carry",
-          "_deposits_for"
-        ],
-        "interaction_paths": [
-          "_deposit_ready",
-          "_dist_to_obj",
-          "_edge_cell_distance",
-          "_edge_interaction_choice",
-          "_edge_interaction_path",
-          "_interaction_path"
-        ],
-        "movement": [
-          "_follow",
-          "_path_to"
-        ],
-        "officer_teams": [
-          "_auto_assign_new_team"
-        ],
-        "spatial_index": [
-          "_contains_unit",
-          "_separate_unit",
-          "_unit_cell"
-        ],
-        "transport_orders": [
-          "_attach_to_ship",
-          "_retry_unload"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/world_orders_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "abilities": [
-          "_duel_at",
-          "_formation_target_cell",
-          "_jimou_cast_at",
-          "_reset_jimou"
-        ],
-        "battle_simulation": [
-          "_feedback"
-        ],
-        "command_groups": [
-          "_cancel_unit_command",
-          "_command_units",
-          "_nav_layer"
-        ],
-        "construction_orders": [
-          "_build_site_at",
-          "_order_build",
-          "_order_repair"
-        ],
-        "harvest_orders": [
-          "_order_gather",
-          "_resource_at"
-        ],
-        "movement": [
-          "_anchor_of_cell",
-          "_cell_of_px",
-          "_march_destination",
-          "_path_to"
-        ],
-        "officer_teams": [
-          "_order_join"
-        ],
-        "selection": [
-          "_attack_target_at",
-          "_enemy_at",
-          "_neutral_object_at",
-          "_own_object_at"
-        ],
-        "technology": [
-          "_is_worker_unit"
-        ],
-        "transport_orders": [
-          "_cmd_board_at",
-          "_cmd_unload_at"
-        ]
-      }
+      "host": "main"
     },
     "app/battle/ports/bootstrap_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "battle_simulation": [
-          "_update_gates"
-        ],
-        "campaign": [
-          "_show_end"
-        ],
-        "command_groups": [
-          "_group_assign"
-        ],
-        "entity_factory": [
-          "_attach_officer",
-          "_make_unit",
-          "_sheet_ref_for",
-          "_spawn_unit"
-        ],
-        "harvest_orders": [
-          "_build_decor_targets"
-        ],
-        "movement": [
-          "_resolve_navigation_overlaps"
-        ],
-        "officer_pool": [
-          "_officer_by_index",
-          "_officer_pool_state"
-        ],
-        "scene_controller": [
-          "_apply_save",
-          "_build_terrain",
-          "_build_ui",
-          "_demo",
-          "_fatal",
-          "_screenshot",
-          "_setup_camera",
-          "_write_smoke"
-        ],
-        "spatial_index": [
-          "_rebuild_unit_index"
-        ]
-      }
+      "host": "main"
     },
     "app/battle/ports/cheat_controller_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "battle_simulation": [
-          "_feedback"
-        ],
-        "cheat_rules": [
-          "_cheat_action"
-        ],
-        "scene_controller": [
-          "_screenshot"
-        ]
-      }
+      "host": "main"
     },
     "app/battle/ports/duel_controller_dependencies.gd": {
-      "host": "main",
-      "providers": {}
+      "host": "main"
     },
     "app/battle/ports/scene_controller_dependencies.gd": {
-      "host": "main",
-      "providers": {
-        "battle_simulation": [
-          "_feedback",
-          "_resources",
-          "_sim_step",
-          "_state_digest"
-        ],
-        "cheat_controller": [
-          "handle_cheat_input"
-        ],
-        "combat": [
-          "_nearest_enemy"
-        ],
-        "command_groups": [
-          "_group_assign",
-          "_group_recall"
-        ],
-        "harvest_orders": [
-          "_order_gather",
-          "_resource_at"
-        ],
-        "selection": [
-          "_select_box",
-          "_select_click"
-        ],
-        "world_orders": [
-          "_order_at",
-          "_order_context",
-          "cmd_pending_kind"
-        ]
-      }
+      "host": "main"
     },
     "presentation/battle/components/ports/controller_dependencies.gd": {
-      "host": "view",
-      "providers": {}
+      "host": "view"
     },
     "presentation/battle/components/ports/unit_visuals_dependencies.gd": {
-      "host": "view",
-      "providers": {}
+      "host": "view"
     },
     "presentation/battle/components/ports/camera_controller_dependencies.gd": {
-      "host": "view",
-      "providers": {}
+      "host": "view"
     },
     "presentation/battle/components/ports/hud_build_dependencies.gd": {
-      "host": "view",
-      "providers": {
-        "command_actions": [
-          "_on_cmd",
-          "_on_hotkey"
-        ],
-        "command_model": [
-          "_on_cmd_page"
-        ],
-        "controller": [
-          "_intro_finished",
-          "_res_icon_path"
-        ],
-        "hud_input": [
-          "_hud_click_hook",
-          "_hud_select_hook"
-        ],
-        "hud_layout": [
-          "_apply_metrics",
-          "_draw_ornament"
-        ],
-        "selection_info": [
-          "_act_close_officer_pick"
-        ]
-      }
+      "host": "view"
     },
     "presentation/battle/components/ports/hud_layout_dependencies.gd": {
-      "host": "view",
-      "providers": {
-        "camera_controller": [
-          "set_zoom"
-        ],
-        "command_art": [
-          "_layout_cmd_art"
-        ],
-        "legacy_layout": [
-          "_apply_metrics_original"
-        ]
-      }
+      "host": "view"
     },
     "presentation/battle/components/ports/world_layers_dependencies.gd": {
-      "host": "view",
-      "providers": {}
+      "host": "view"
     },
     "presentation/battle/components/ports/hud_input_dependencies.gd": {
-      "host": "view",
-      "providers": {
-        "camera_controller": [
-          "_minimap_navigate"
-        ],
-        "command_actions": [
-          "_on_cmd",
-          "_on_hotkey"
-        ],
-        "command_art": [
-          "_close_art_sub",
-          "_handle_cmd_key",
-          "_set_art_state"
-        ],
-        "command_model": [
-          "_on_cmd_page"
-        ],
-        "selection_info": [
-          "_act_close_officer_pick",
-          "_act_open_officer_pick",
-          "_sel_state_text"
-        ]
-      }
+      "host": "view"
     },
     "presentation/battle/components/ports/selection_info_dependencies.gd": {
-      "host": "view",
-      "providers": {
-        "camera_controller": [
-          "zoom_x"
-        ],
-        "command_model": [
-          "_refresh_cmd_panel"
-        ],
-        "hud_layout": [
-          "_layout_status_labels",
-          "_refresh_metrics"
-        ],
-        "unit_visuals": [
-          "_sheet",
-          "unit_nodes"
-        ]
-      }
+      "host": "view"
     },
     "presentation/battle/components/ports/command_art_dependencies.gd": {
-      "host": "view",
-      "providers": {
-        "command_actions": [
-          "_act_disband",
-          "_act_rest",
-          "_act_watch",
-          "_on_cmd"
-        ],
-        "command_model": [
-          "_on_cmd_page",
-          "_refresh_cmd_panel",
-          "panel_kind",
-          "update_panel"
-        ],
-        "hud_build": [
-          "_mk_button",
-          "_mk_label"
-        ],
-        "selection_info": [
-          "_act_close_officer_pick",
-          "_act_open_officer_pick"
-        ]
-      }
+      "host": "view"
     },
     "presentation/battle/components/ports/command_model_dependencies.gd": {
-      "host": "view",
-      "providers": {
-        "command_actions": [
-          "_act_attack",
-          "_act_board",
-          "_act_build",
-          "_act_cancel_research",
-          "_act_cancel_site",
-          "_act_cancel_train",
-          "_act_disband",
-          "_act_duel",
-          "_act_form_menu",
-          "_act_group",
-          "_act_hot_menu",
-          "_act_move",
-          "_act_repair",
-          "_act_research",
-          "_act_rest",
-          "_act_train",
-          "_act_transport",
-          "_act_watch"
-        ],
-        "command_art": [
-          "_open_build_menu",
-          "_refresh_cmd_art"
-        ],
-        "hud_build": [
-          "_mk_label"
-        ],
-        "hud_layout": [
-          "_place_left",
-          "_refresh_metrics"
-        ],
-        "selection_info": [
-          "_act_assign_officer",
-          "_can_afford",
-          "_cost_text",
-          "_mobile_count",
-          "_rebuild_stats_text",
-          "_refresh_banner",
-          "_refresh_sel_frame",
-          "_refresh_troop",
-          "_selected_building",
-          "_selected_site",
-          "_worker_count"
-        ]
-      }
+      "host": "view"
     },
     "presentation/battle/components/ports/command_actions_dependencies.gd": {
-      "host": "view",
-      "providers": {
-        "command_art": [
-          "_refresh_cmd_art"
-        ],
-        "command_model": [
-          "_refresh_cmd_panel"
-        ],
-        "selection_info": [
-          "_selected_building"
-        ]
-      }
+      "host": "view"
     },
     "presentation/battle/components/ports/legacy_layout_dependencies.gd": {
-      "host": "view",
-      "providers": {
-        "camera_controller": [
-          "clamp_camera"
-        ],
-        "command_art": [
-          "_layout_cmd_art"
-        ],
-        "hud_layout": [
-          "_decorate_frame",
-          "_layout_status_labels",
-          "_pin_right",
-          "_place_left"
-        ]
-      }
+      "host": "view"
     },
     "presentation/menu/ports/automation_driver_dependencies.gd": {
-      "host": "menu",
-      "providers": {
-        "campaign_dialog": [
-          "_portrait_status"
-        ],
-        "controller": [
-          "_on_back",
-          "_on_start"
-        ],
-        "level_dialog": [
-          "_arrow_wiring",
-          "_first_row"
-        ]
-      }
+      "host": "menu"
     },
     "presentation/menu/ports/controller_dependencies.gd": {
-      "host": "menu",
-      "providers": {
-        "automation_driver": [
-          "_report_campaign_dialog",
-          "_report_level_dialog",
-          "_report_scroll_state",
-          "_run_keytest",
-          "_run_mouse_click",
-          "_run_mouse_matrix"
-        ],
-        "campaign_dialog": [
-          "_build_campaign_dialog",
-          "_campaign_alias",
-          "_move_campaign",
-          "_refresh_campaign_cursor",
-          "_release_focus",
-          "_set_campaign",
-          "_set_title_visible"
-        ],
-        "level_dialog": [
-          "_build_level_dialog",
-          "_fill_level_list",
-          "_first_row",
-          "_focus_row",
-          "_scroll_by",
-          "_scroll_to"
-        ],
-        "menu_styles": [
-          "_build_styles"
-        ]
-      }
+      "host": "menu"
     },
     "presentation/menu/ports/menu_styles_dependencies.gd": {
-      "host": "menu",
-      "providers": {}
+      "host": "menu"
     },
     "presentation/menu/ports/campaign_dialog_dependencies.gd": {
-      "host": "menu",
-      "providers": {
-        "controller": [
-          "_on_back",
-          "_on_campaign_confirm"
-        ],
-        "menu_styles": [
-          "_gold_button",
-          "_wood_frame",
-          "_wood_plate"
-        ]
-      }
+      "host": "menu"
     },
     "presentation/menu/ports/level_dialog_dependencies.gd": {
-      "host": "menu",
-      "providers": {
-        "controller": [
-          "_on_back",
-          "_on_level"
-        ],
-        "menu_styles": [
-          "_flat"
-        ]
-      }
+      "host": "menu"
     },
     "simulation/ports/navigation_grid_dependencies.gd": {
-      "host": "nav",
-      "providers": {}
+      "host": "nav"
     },
     "simulation/ports/path_queries_dependencies.gd": {
-      "host": "nav",
-      "providers": {
-        "grid": [
-          "_grid",
-          "_id",
-          "_in_bounds",
-          "_refresh_gate_points",
-          "anchor_of",
-          "cell_of_px",
-          "is_solid",
-          "near_walkable",
-          "neighbors"
-        ]
-      }
+      "host": "nav"
     },
     "simulation/ports/ai_access.gd": {
-      "host": "main",
-      "providers": {
-        "ai_economy": [
-          "_naval_research_gate",
-          "ai_behavior",
-          "ai_building_kinds",
-          "ai_can_afford",
-          "ai_can_build",
-          "ai_construction_commander",
-          "ai_construction_kinds",
-          "ai_enqueue_train",
-          "ai_force_units",
-          "ai_gift",
-          "ai_gold",
-          "ai_group_of",
-          "ai_level",
-          "ai_owners",
-          "ai_production_building",
-          "ai_queue_hq_upgrade",
-          "ai_research_building",
-          "ai_set_gold",
-          "ai_unit_cost",
-          "ai_worker_count"
-        ],
-        "ai_orders": [
-          "ai_focus_unit",
-          "ai_order_assault",
-          "ai_order_assault_l1",
-          "ai_order_intercept",
-          "ai_order_rally"
-        ],
-        "combat": [
-          "_hostile_owners"
-        ],
-        "command_groups": [
-          "_cancel_unit_command",
-          "_construction_workers",
-          "_is_hero_unit"
-        ],
-        "construction_orders": [
-          "ai_place_building"
-        ],
-        "movement": [
-          "_path_to"
-        ],
-        "production": [
-          "_cancel_training",
-          "_queue_train"
-        ],
-        "technology": [
-          "_queue_research",
-          "_tech_line_of",
-          "_tech_line_pos",
-          "_tech_line_progress",
-          "ai_tech_gate"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/command_rules_access.gd": {
-      "host": "main",
-      "providers": {
-        "command_groups": [
-          "_commander_for",
-          "_selected_construction_workers"
-        ],
-        "technology": [
-          "_is_worker_unit"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/construction_interior_access.gd": {
-      "host": "main",
-      "providers": {
-        "battle_simulation": [
-          "_place_unit",
-          "_update_visual"
-        ],
-        "command_groups": [
-          "_cancel_unit_command",
-          "_commander_for",
-          "_construction_workers",
-          "_nav_layer"
-        ],
-        "construction_orders": [
-          "_complete_site",
-          "_site_entry_path",
-          "_valid_build_worker"
-        ],
-        "interaction_paths": [
-          "_edge_cell_distance"
-        ],
-        "movement": [
-          "_follow"
-        ],
-        "spatial_index": [
-          "_unit_placement_free"
-        ],
-        "technology": [
-          "_is_worker_unit"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/economy_access.gd": {
-      "host": "main",
-      "providers": {
-        "ai_economy": [
-          "_ai_res_of"
-        ],
-        "battle_simulation": [
-          "_feedback",
-          "_resources"
-        ],
-        "harvest_orders": [
-          "_deposits_for",
-          "_food_capacity"
-        ],
-        "interaction_paths": [
-          "_deposit_ready"
-        ],
-        "officer_teams": [
-          "_grant_officer_exp"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/fire_fields_access.gd": {
-      "host": "main",
-      "providers": {
-        "combat": [
-          "_apply_hit"
-        ],
-        "interaction_paths": [
-          "_footprint_cells"
-        ],
-        "movement": [
-          "_cell_of_px"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/harvesting_access.gd": {
-      "host": "main",
-      "providers": {
-        "battle_simulation": [
-          "_feedback"
-        ],
-        "combat": [
-          "_kill"
-        ],
-        "harvest_orders": [
-          "_begin_gather",
-          "_clicked_harvest_patch",
-          "_nearest_harvest_by_path",
-          "_remove_decor",
-          "_yield_of"
-        ],
-        "interaction_paths": [
-          "_edge_interaction_choice"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/player_commands_access.gd": {
-      "host": "main",
-      "providers": {
-        "battle_simulation": [
-          "_feedback"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/projectiles_access.gd": {
-      "host": "main",
-      "providers": {
-        "combat": [
-          "_damage",
-          "_projectile_arrived"
-        ],
-        "movement": [
-          "_cell_of_px"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/scenario_rules_access.gd": {
-      "host": "main",
-      "providers": {
-        "command_groups": [
-          "_nav_layer"
-        ],
-        "officer_teams": [
-          "_grant_officer_exp"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/stratagem_rules_access.gd": {
-      "host": "main",
-      "providers": {
-        "combat": [
-          "_hostile_owners"
-        ],
-        "command_groups": [
-          "_commander_for"
-        ]
-      }
+      "host": "main"
     },
     "simulation/ports/transports_access.gd": {
-      "host": "main",
-      "providers": {
-        "command_groups": [
-          "_cancel_unit_command"
-        ],
-        "interaction_paths": [
-          "_footprint_cells"
-        ],
-        "movement": [
-          "_path_to"
-        ],
-        "spatial_index": [
-          "_unit_cell",
-          "_unit_placement_free"
-        ]
-      }
+      "host": "main"
     },
     "app/commands/world_commands.gd": {
-      "host": "main",
-      "providers": {
-        "battle_simulation": [
-          "_feedback",
-          "_finish_death",
-          "_free_unit_at",
-          "_place_unit",
-          "_prune_dead",
-          "_resources",
-          "_set_frame",
-          "_sim_step",
-          "_state_digest",
-          "_update_gates",
-          "_update_visual",
-          "set_sim_speed"
-        ],
-        "entity_factory": [
-          "_attach_officer",
-          "_sheet_ref_for",
-          "_spawn_unit"
-        ],
-        "spatial_index": [
-          "_cell_unit",
-          "_free_unit_cell",
-          "_index_eligible",
-          "_index_sync",
-          "_rebuild_unit_index",
-          "_separate_unit",
-          "_unit_cell",
-          "_unit_placement_free"
-        ],
-        "campaign": [
-          "_check_end",
-          "_force_counts",
-          "_objective_kind",
-          "_show_end",
-          "_unit_name",
-          "_water_cell_count"
-        ]
-      }
+      "host": "main"
     },
     "app/commands/technology_commands.gd": {
-      "host": "main",
-      "providers": {
-        "technology": [
-          "_ai_side",
-          "_apply_tech_bonuses",
-          "_apply_tech_effects",
-          "_building_work_busy",
-          "_cancel_tech",
-          "_combat_tech_category",
-          "_combat_tech_value",
-          "_is_melee_unit",
-          "_is_worker_unit",
-          "_player_unit_count",
-          "_process_tech",
-          "_queue_research",
-          "_research_for_building",
-          "_start_tech",
-          "_tech_for",
-          "_tech_line_of",
-          "tech_block_reason",
-          "tech_cost",
-          "tech_cost_text",
-          "tech_effect_desc",
-          "tech_is_next",
-          "tech_is_sell",
-          "tech_research_active",
-          "tech_research_name",
-          "tech_research_remaining",
-          "tech_row",
-          "tech_rows_for_building",
-          "tech_tip",
-          "tech_unlocked"
-        ]
-      }
+      "host": "main"
     },
     "app/commands/military_commands.gd": {
-      "host": "main",
-      "providers": {
-        "officer_pool": [
-          "_officer_by_index",
-          "_officer_pool_state",
-          "_restore_officer_pool",
-          "available_officers",
-          "officer_in_use",
-          "officers_for_selection"
-        ],
-        "abilities": [
-          "_duel_accept",
-          "_duel_at",
-          "_duel_begin",
-          "_formation_target_cell",
-          "_jimou_begin",
-          "_jimou_cast_at",
-          "_reset_jimou",
-          "_resolve_duel",
-          "_set_formation",
-          "_spd_mult",
-          "_stamina_of"
-        ],
-        "command_groups": [
-          "_cancel_unit_command",
-          "_cmd_begin",
-          "_cmd_disband",
-          "_cmd_rest",
-          "_cmd_watch",
-          "_command_units",
-          "_commander_for",
-          "_construction_workers",
-          "_enforce_team_limits",
-          "_group_assign",
-          "_group_recall",
-          "_is_hero_unit",
-          "_is_naval",
-          "_nav_layer",
-          "_return_selected_cargo",
-          "_selected_construction_workers",
-          "control_group_leader",
-          "control_group_size",
-          "control_group_work_site",
-          "stop_selected"
-        ],
-        "officer_teams": [
-          "_assign_officer_to",
-          "_form_hero_unit",
-          "_grant_officer_exp",
-          "_order_disband",
-          "_order_form_up",
-          "_order_join",
-          "_process_officer_recovery",
-          "_unassign_officer"
-        ],
-        "combat": [
-          "_apply_hit",
-          "_clip_dir",
-          "_clip_frame",
-          "_damage",
-          "_die_step",
-          "_fire_attack",
-          "_kill",
-          "_nearest_enemy",
-          "officer_rank_name"
-        ],
-        "ai_orders": [
-          "_l1_target",
-          "_nearest_enemy_threat",
-          "ai_focus_unit",
-          "ai_order_assault",
-          "ai_order_intercept",
-          "ai_order_rally"
-        ]
-      }
+      "host": "main"
     },
     "app/commands/session_commands.gd": {
-      "host": "main",
-      "providers": {
-        "scene_controller": [
-          "_apply_save",
-          "_save_extra",
-          "_save_game",
-          "_screenshot",
-          "_sheet",
-          "_view_hud",
-          "focus_group",
-          "_notification",
-          "_unhandled_input",
-          "_process"
-        ],
-        "cheat_controller": [
-          "_cheat_adjacent_level",
-          "_set_cheat_input",
-          "handle_cheat_input"
-        ],
-        "cheat_rules": [
-          "_step_auto_control"
-        ],
-        "bootstrap": [
-          "_ready"
-        ],
-        "duel_controller": [
-          "_present_duel"
-        ]
-      }
+      "host": "main"
     },
     "app/commands/orders_commands.gd": {
-      "host": "main",
-      "providers": {
-        "movement": [
-          "_anchor_of",
-          "_anchor_of_cell",
-          "_cell_of_px",
-          "_follow",
-          "_near_walkable",
-          "_path_to",
-          "_resolve_navigation_overlaps"
-        ],
-        "world_orders": [
-          "_attack_selected",
-          "_clear_pending",
-          "_context_mode",
-          "_move_selected_to",
-          "_order_at",
-          "_order_context",
-          "_resolve_pending",
-          "_selected_has_nonworker_attacker",
-          "cmd_pending_kind"
-        ],
-        "interaction_paths": [
-          "_dist_to_obj",
-          "_edge_cell_distance",
-          "_edge_interaction_choice",
-          "_edge_interaction_path",
-          "_edge_neighbors",
-          "_edge_point",
-          "_footprint_cells",
-          "_resource_patch_cells",
-          "_resource_patch_interaction_choice"
-        ],
-        "unit_actions": [
-          "_step_unit",
-          "_step_unit_inner"
-        ],
-        "selection": [
-          "_attack_target_at",
-          "_enemy_at",
-          "_hover_unit",
-          "_own_object_at",
-          "_player_at",
-          "_select_click"
-        ],
-        "transport_orders": [
-          "_attach_to_ship",
-          "_order_board",
-          "_order_unload"
-        ]
-      }
+      "host": "main"
     },
     "app/commands/economy_commands.gd": {
-      "host": "main",
-      "providers": {
-        "production": [
-          "_army_count",
-          "_cancel_training",
-          "_commander_count",
-          "_process_trainings",
-          "_queue_train",
-          "_start_train",
-          "_train_list_for_selection",
-          "train_types_for"
-        ],
-        "construction_orders": [
-          "_assign_build_worker",
-          "_build_site_at",
-          "_cancel_site",
-          "_complete_site",
-          "_do_repair",
-          "_order_repair",
-          "_place_building",
-          "_process_sites",
-          "_site_entry_path",
-          "_start_build",
-          "_valid_build_worker",
-          "ai_place_building",
-          "build_placement_at",
-          "building_block_reason"
-        ],
-        "harvest_orders": [
-          "_begin_gather",
-          "_build_decor_targets",
-          "_deposit_carry",
-          "_deposits_for",
-          "_food_capacity",
-          "_nearby_same_resource",
-          "_nearest_deposit",
-          "_nearest_harvest_by_path",
-          "_nearest_resource",
-          "_order_gather",
-          "_order_gather_nearest",
-          "_remove_decor",
-          "_resource_at",
-          "_selected_workers",
-          "_yield_of"
-        ],
-        "ai_economy": [
-          "_ai_forming",
-          "_ai_res_of",
-          "_dock_can_launch",
-          "ai_construction_commander",
-          "ai_disband_slot",
-          "ai_level",
-          "ai_owners",
-          "ai_queue_hq_upgrade",
-          "ai_set_gold",
-          "ai_unit_cost"
-        ]
-      }
+      "host": "main"
     }
   }
 }
