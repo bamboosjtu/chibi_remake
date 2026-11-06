@@ -1,0 +1,499 @@
+[
+  {
+    "index": 0,
+    "offset": 0,
+    "length": 14,
+    "kind": "ui",
+    "text": "（显示文字）"
+  },
+  {
+    "index": 1,
+    "offset": 14,
+    "length": 18,
+    "kind": "ui",
+    "text": "我军部队遭敌进攻"
+  },
+  {
+    "index": 2,
+    "offset": 32,
+    "length": 18,
+    "kind": "ui",
+    "text": "我军建筑遭敌攻击"
+  },
+  {
+    "index": 3,
+    "offset": 50,
+    "length": 10,
+    "kind": "ui",
+    "text": "建造完成"
+  },
+  {
+    "index": 4,
+    "offset": 60,
+    "length": 10,
+    "kind": "ui",
+    "text": "完成建筑"
+  },
+  {
+    "index": 5,
+    "offset": 70,
+    "length": 10,
+    "kind": "ui",
+    "text": "升级完成"
+  },
+  {
+    "index": 6,
+    "offset": 80,
+    "length": 10,
+    "kind": "ui",
+    "text": "训练完成"
+  },
+  {
+    "index": 7,
+    "offset": 90,
+    "length": 20,
+    "kind": "ui",
+    "text": "军费不够，无法建造"
+  },
+  {
+    "index": 8,
+    "offset": 110,
+    "length": 20,
+    "kind": "ui",
+    "text": "军费不够，无法升级"
+  },
+  {
+    "index": 9,
+    "offset": 130,
+    "length": 20,
+    "kind": "ui",
+    "text": "军费不够，无法训练"
+  },
+  {
+    "index": 10,
+    "offset": 150,
+    "length": 26,
+    "kind": "ui",
+    "text": "谋略值不够无法使用该计谋"
+  },
+  {
+    "index": 11,
+    "offset": 176,
+    "length": 32,
+    "kind": "ui",
+    "text": "粮仓不够无法屯粮，请多修建粮仓"
+  },
+  {
+    "index": 12,
+    "offset": 208,
+    "length": 34,
+    "kind": "ui",
+    "text": "一支部队最多十五个士兵，无法加入"
+  },
+  {
+    "index": 13,
+    "offset": 242,
+    "length": 36,
+    "kind": "ui",
+    "text": "我将领战斗英勇，斩获甚多，晋升一级"
+  },
+  {
+    "index": 14,
+    "offset": 278,
+    "length": 24,
+    "kind": "ui",
+    "text": "此计谋只能用于己方部队"
+  },
+  {
+    "index": 15,
+    "offset": 302,
+    "length": 24,
+    "kind": "ui",
+    "text": "此计谋只能用于敌方部队"
+  },
+  {
+    "index": 16,
+    "offset": 326,
+    "length": 20,
+    "kind": "ui",
+    "text": "地形不对，无法建造"
+  },
+  {
+    "index": 17,
+    "offset": 346,
+    "length": 34,
+    "kind": "ui",
+    "text": "目标不在视野（10格）内，不能使用"
+  },
+  {
+    "index": 18,
+    "offset": 380,
+    "length": 24,
+    "kind": "ui",
+    "text": "目标不是部队，不能使用"
+  },
+  {
+    "index": 19,
+    "offset": 404,
+    "length": 30,
+    "kind": "ui",
+    "text": "战场上的物体过多，不能增加了"
+  },
+  {
+    "index": 20,
+    "offset": 434,
+    "length": 34,
+    "kind": "ui",
+    "text": "部队数不能超过20个，无法组建部队"
+  },
+  {
+    "index": 21,
+    "offset": 468,
+    "length": 32,
+    "kind": "ui",
+    "text": "级别不够，还没有可以使用的计谋"
+  },
+  {
+    "index": 22,
+    "offset": 500,
+    "length": 18,
+    "kind": "ui",
+    "text": "水军将领不能单挑"
+  },
+  {
+    "index": 23,
+    "offset": 518,
+    "length": 20,
+    "kind": "ui",
+    "text": "距离太远，不能单挑"
+  },
+  {
+    "index": 24,
+    "offset": 538,
+    "length": 26,
+    "kind": "ui",
+    "text": "单挑开关关闭了，不能单挑"
+  },
+  {
+    "index": 25,
+    "offset": 564,
+    "length": 18,
+    "kind": "ui",
+    "text": "混乱计谋使用失败"
+  },
+  {
+    "index": 26,
+    "offset": 582,
+    "length": 20,
+    "kind": "ui",
+    "text": "请选择自己的运输船"
+  },
+  {
+    "index": 27,
+    "offset": 602,
+    "length": 22,
+    "kind": "ui",
+    "text": "加入时请选择一支部队"
+  },
+  {
+    "index": 28,
+    "offset": 624,
+    "length": 24,
+    "kind": "ui",
+    "text": "加入时请选择自己的部队"
+  },
+  {
+    "index": 29,
+    "offset": 648,
+    "length": 16,
+    "kind": "ui",
+    "text": "请选择敌人将领"
+  },
+  {
+    "index": 30,
+    "offset": 664,
+    "length": 2,
+    "kind": "reserved",
+    "text": ""
+  },
+  {
+    "index": 31,
+    "offset": 666,
+    "length": 2,
+    "kind": "reserved",
+    "text": ""
+  },
+  {
+    "index": 32,
+    "offset": 668,
+    "length": 2,
+    "kind": "reserved",
+    "text": ""
+  },
+  {
+    "index": 33,
+    "offset": 670,
+    "length": 2,
+    "kind": "reserved",
+    "text": ""
+  },
+  {
+    "index": 34,
+    "offset": 672,
+    "length": 2,
+    "kind": "reserved",
+    "text": ""
+  },
+  {
+    "index": 35,
+    "offset": 674,
+    "length": 28,
+    "kind": "section-header",
+    "text": "（任务说明《文字.txt》中）"
+  },
+  {
+    "index": 36,
+    "offset": 702,
+    "length": 58,
+    "kind": "level-briefing",
+    "text": "　　曹军距离新野不远，迅速组建一支部队，抵御曹军的进攻。"
+  },
+  {
+    "index": 37,
+    "offset": 760,
+    "length": 46,
+    "kind": "level-briefing",
+    "text": "　　利用曹仁轻敌之机，攻克樊城，击败曹仁部。"
+  },
+  {
+    "index": 38,
+    "offset": 806,
+    "length": 56,
+    "kind": "level-briefing",
+    "text": "　　利用博望坡有利地形，阻击曹军，击败夏侯┲所率曹军。"
+  },
+  {
+    "index": 39,
+    "offset": 862,
+    "length": 34,
+    "kind": "level-briefing",
+    "text": "　　击败来犯的曹仁军，守卫新野。"
+  },
+  {
+    "index": 40,
+    "offset": 896,
+    "length": 30,
+    "kind": "level-briefing",
+    "text": "　　击退曹操大军，坚守樊城。"
+  },
+  {
+    "index": 41,
+    "offset": 926,
+    "length": 56,
+    "kind": "level-briefing",
+    "text": "　　部队进入襄阳城，如果无法进入襄阳，则部队撤往江陵。"
+  },
+  {
+    "index": 42,
+    "offset": 982,
+    "length": 42,
+    "kind": "level-briefing",
+    "text": "　　部队继续撤往江陵，击退追击的蔡瑁军。"
+  },
+  {
+    "index": 43,
+    "offset": 1024,
+    "length": 34,
+    "kind": "level-briefing",
+    "text": "　　坚守襄阳重镇，抵御曹军进攻。"
+  },
+  {
+    "index": 44,
+    "offset": 1058,
+    "length": 38,
+    "kind": "level-briefing",
+    "text": "　　救回失散的刘禅，回到长坂桥以南。"
+  },
+  {
+    "index": 45,
+    "offset": 1096,
+    "length": 54,
+    "kind": "level-briefing",
+    "text": "　　消灭进犯江夏的曹军部队，以确保与孙权的联合作战。"
+  },
+  {
+    "index": 46,
+    "offset": 1150,
+    "length": 34,
+    "kind": "level-briefing",
+    "text": "　　击败曹操水军，摧毁曹军水寨。"
+  },
+  {
+    "index": 47,
+    "offset": 1184,
+    "length": 34,
+    "kind": "level-briefing",
+    "text": "　　击败曹操水军，摧毁曹军水寨。"
+  },
+  {
+    "index": 48,
+    "offset": 1218,
+    "length": 36,
+    "kind": "level-briefing",
+    "text": "　　击败曹军，抵抗曹军的连锁战船。"
+  },
+  {
+    "index": 49,
+    "offset": 1254,
+    "length": 30,
+    "kind": "level-briefing",
+    "text": "　　在赤壁彻底击败曹操水军。"
+  },
+  {
+    "index": 50,
+    "offset": 1284,
+    "length": 32,
+    "kind": "level-briefing",
+    "text": "　　截击从乌林退往南郡的曹操。"
+  },
+  {
+    "index": 51,
+    "offset": 1316,
+    "length": 40,
+    "kind": "level-briefing",
+    "text": "　　歼灭曹仁军，攻克南郡城，收复荆州。"
+  },
+  {
+    "index": 52,
+    "offset": 1356,
+    "length": 48,
+    "kind": "level-briefing",
+    "text": "　　击败昔日的盟友，孙权，完成兴复汉室的愿望。"
+  },
+  {
+    "index": 53,
+    "offset": 1404,
+    "length": 38,
+    "kind": "level-briefing",
+    "text": "　　侦察刘备军实力，击败关平，周仓。"
+  },
+  {
+    "index": 54,
+    "offset": 1442,
+    "length": 36,
+    "kind": "level-briefing",
+    "text": "　　击败关羽张飞，打开新野的大门。"
+  },
+  {
+    "index": 55,
+    "offset": 1478,
+    "length": 28,
+    "kind": "level-briefing",
+    "text": "　　进攻博望，击败刘备军。"
+  },
+  {
+    "index": 56,
+    "offset": 1506,
+    "length": 28,
+    "kind": "level-briefing",
+    "text": "　　攻克新野，歼灭刘备军。"
+  },
+  {
+    "index": 57,
+    "offset": 1534,
+    "length": 28,
+    "kind": "level-briefing",
+    "text": "　　进攻樊城，歼灭刘备军。"
+  },
+  {
+    "index": 58,
+    "offset": 1562,
+    "length": 42,
+    "kind": "level-briefing",
+    "text": "　　歼灭向南逃窜的刘备，以迫降荆州刘表。"
+  },
+  {
+    "index": 59,
+    "offset": 1604,
+    "length": 30,
+    "kind": "level-briefing",
+    "text": "　　轻骑追赶刘备，歼灭敌军。"
+  },
+  {
+    "index": 60,
+    "offset": 1634,
+    "length": 54,
+    "kind": "level-briefing",
+    "text": "　　攻克江陵，掌握荆州的钱粮重地，为进取江南作准备。"
+  },
+  {
+    "index": 61,
+    "offset": 1688,
+    "length": 52,
+    "kind": "level-briefing",
+    "text": "　　击败江夏的刘备军，以保护大军进攻江南时的侧翼。"
+  },
+  {
+    "index": 62,
+    "offset": 1740,
+    "length": 24,
+    "kind": "level-briefing",
+    "text": "　　击败周瑜所率水军。"
+  },
+  {
+    "index": 63,
+    "offset": 1764,
+    "length": 32,
+    "kind": "level-briefing",
+    "text": "　　击败孙权水军摧毁敌军水寨。"
+  },
+  {
+    "index": 64,
+    "offset": 1796,
+    "length": 28,
+    "kind": "level-briefing",
+    "text": "　　用连锁战船击败孙权军。"
+  },
+  {
+    "index": 65,
+    "offset": 1824,
+    "length": 48,
+    "kind": "level-briefing",
+    "text": "　　击败周瑜，黄盖水军，防御从陆上来的刘备军。"
+  },
+  {
+    "index": 66,
+    "offset": 1872,
+    "length": 26,
+    "kind": "level-briefing",
+    "text": "　　逃出乌林，撤往南郡。"
+  },
+  {
+    "index": 67,
+    "offset": 1898,
+    "length": 36,
+    "kind": "level-briefing",
+    "text": "　　守住南郡城，阻止刘备继续北上。"
+  },
+  {
+    "index": 68,
+    "offset": 1934,
+    "length": 24,
+    "kind": "level-briefing",
+    "text": "　　彻底歼灭周瑜水军。"
+  },
+  {
+    "index": 69,
+    "offset": 1958,
+    "length": 44,
+    "kind": "level-briefing",
+    "text": "　　歼灭孙权刘备联军的最后力量，统一天下。"
+  },
+  {
+    "index": 70,
+    "offset": 2002,
+    "length": 2,
+    "kind": "reserved",
+    "text": ""
+  }
+]

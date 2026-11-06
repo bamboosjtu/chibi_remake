@@ -1,0 +1,21 @@
+{
+  "assetId": "units-041-page-07",
+  "bytes": 1440941.0,
+  "colorType": 6.0,
+  "generatedAt": "2026-10-18T00:33:45.576Z",
+  "generator": "built-in image_gen",
+  "height": 992.0,
+  "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type41, animation page7. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 416:260. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose. Source flat cyan utility silhouettes 7,8,9,10,11,12,13,14,15 retain exact flat cyan outline: no invented rocks, ponds or scenery. Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements.",
+  "promptFile": "godot/chibi_remake/art/production/unit-037-051-final-prompts.json",
+  "sha256": "7a578e8b2fd9acd7bb3ed3ddaf47fa445e1b869b7f14bfe6e120763109813285",
+  "sourceGeneratedFile": "C:\\Users\\bambo\\.codex\\generated_images\\01a13348-db65-7b23-b66a-63227eb4490d\\exec-7062a33c-13c7-4b0c-b459-16ddca559064.png",
+  "status": "generated-awaiting-validation",
+  "texture": "godot/chibi_remake/art/full/units/041/page-07-v2.png",
+  "validation": {
+    "excludedSourceLabelsOrBlanks": 0,
+    "structure": "pass",
+    "visual": "pending",
+    "visualFrameCount": 16
+  },
+  "width": 1586.0
+}

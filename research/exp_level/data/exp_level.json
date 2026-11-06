@@ -1,0 +1,1148 @@
+{
+  "schemaVersion": 1,
+  "generated": "2026-10-27",
+  "source": {
+    "binary": {
+      "name": "CB.EXE",
+      "sha256": "2db7cc102e6fde547ab05d77cfddabc2079f5bc9be9b6b59b17bf435c5798cb7"
+    },
+    "data": {
+      "file": "SET/DATA.EXP",
+      "xor": "0x22",
+      "sha256": "62ca7e17f505df823e4f63fd8ebe72d02726306e01f6f5db524e34625062a654"
+    }
+  },
+  "thresholds": [
+    200,
+    500,
+    1000,
+    1800,
+    3000,
+    5000,
+    8000,
+    12000,
+    18000,
+    27000
+  ],
+  "cumulative": [
+    {
+      "from": 0,
+      "to": 1,
+      "exp": 200,
+      "cumulativeToNext": 200
+    },
+    {
+      "from": 1,
+      "to": 2,
+      "exp": 500,
+      "cumulativeToNext": 700
+    },
+    {
+      "from": 2,
+      "to": 3,
+      "exp": 1000,
+      "cumulativeToNext": 1700
+    },
+    {
+      "from": 3,
+      "to": 4,
+      "exp": 1800,
+      "cumulativeToNext": 3500
+    },
+    {
+      "from": 4,
+      "to": 5,
+      "exp": 3000,
+      "cumulativeToNext": 6500
+    },
+    {
+      "from": 5,
+      "to": 6,
+      "exp": 5000,
+      "cumulativeToNext": 11500
+    },
+    {
+      "from": 6,
+      "to": 7,
+      "exp": 8000,
+      "cumulativeToNext": 19500
+    },
+    {
+      "from": 7,
+      "to": 8,
+      "exp": 12000,
+      "cumulativeToNext": 31500
+    },
+    {
+      "from": 8,
+      "to": 9,
+      "exp": 18000,
+      "cumulativeToNext": 49500
+    }
+  ],
+  "level_cap": 9,
+  "level_up": {
+    "rule": "if (level < 9 && xp >= threshold[level]) { xp -= threshold[level]; level += 1; }",
+    "one_level_per_award": true,
+    "carry_over": true,
+    "at_cap": "XP keeps accumulating but level stays 9 (the 27000 value is never consumed).",
+    "message": "我将领战斗英勇，斩获甚多，晋升一级",
+    "message_id": "0x0C (FUN_0041a460)",
+    "sound_id": "0x6A (FUN_0041b1a0)",
+    "player_side_only": true
+  },
+  "xp_sources": [
+    {
+      "kind": "kill",
+      "target": "击杀者所辖武将",
+      "amount": "死者类型的击杀经验列",
+      "detail": "DATA.EXP 每类单位的第 17 个数值（DAT_004af5a4[type*0x38]）；同时按士气列调整双方士气。",
+      "evidence": "ev_b63301bf95ab74d47e9ae8b7b56961e37d5fa9993f8c8adc290b64529b386b9c"
+    },
+    {
+      "kind": "construction",
+      "target": "施工队/工程队所辖武将",
+      "amount": "建筑类型的击杀经验列",
+      "detail": "工地完工时给所辖武将加该建筑类型的 killXp，并查升级。",
+      "evidence": "ev_55909ed9a0f1cace01650c9c711189c9a24aa6092cc74d8054c6441437c64926"
+    },
+    {
+      "kind": "delivery",
+      "target": "交付队所辖武将",
+      "amount": 1,
+      "detail": "每次资源交付/入库走非工程队分支时 +1 经验（同函数还负责入库与粮满回滚）。",
+      "evidence": "ev_7d4bcaad68fe8faf5aaad19c96d0a8c79df028335617652c1bcb23010fcddfa5"
+    },
+    {
+      "kind": "event",
+      "target": "事件指定武将",
+      "amount": "事件参数 eventExperience（具体数值未解出）",
+      "detail": "任务事件文本如「在长坂坡救回糜竺，经验增加」；部分事件在 scenario_rules 中用 experienceParameter: eventExperience 标记。",
+      "evidence": "用户文档 + godot/chibi_remake/data/db/scenario_rules.json"
+    }
+  ],
+  "stat_effects": {
+    "rank_table": [
+      {
+        "index": 0,
+        "name": "步兵校尉",
+        "grade": 3,
+        "secondary": 0,
+        "tier": 1
+      },
+      {
+        "index": 1,
+        "name": "屯骑校尉",
+        "grade": 2,
+        "secondary": 1,
+        "tier": 1
+      },
+      {
+        "index": 2,
+        "name": "射声校尉",
+        "grade": 1,
+        "secondary": 2,
+        "tier": 1
+      },
+      {
+        "index": 3,
+        "name": "虎贲校尉",
+        "grade": 0,
+        "secondary": 3,
+        "tier": 1
+      },
+      {
+        "index": 4,
+        "name": "步兵中郎将",
+        "grade": 5,
+        "secondary": 1,
+        "tier": 2
+      },
+      {
+        "index": 5,
+        "name": "屯骑中郎将",
+        "grade": 4,
+        "secondary": 2,
+        "tier": 2
+      },
+      {
+        "index": 6,
+        "name": "射声中郎将",
+        "grade": 2,
+        "secondary": 4,
+        "tier": 2
+      },
+      {
+        "index": 7,
+        "name": "虎贲中郎将",
+        "grade": 3,
+        "secondary": 3,
+        "tier": 2
+      },
+      {
+        "index": 8,
+        "name": "偏将",
+        "grade": 6,
+        "secondary": 3,
+        "tier": 3
+      },
+      {
+        "index": 9,
+        "name": "裨将",
+        "grade": 3,
+        "secondary": 6,
+        "tier": 3
+      },
+      {
+        "index": 10,
+        "name": "牙门将军",
+        "grade": 8,
+        "secondary": 4,
+        "tier": 4
+      },
+      {
+        "index": 11,
+        "name": "旗门将军",
+        "grade": 4,
+        "secondary": 8,
+        "tier": 4
+      },
+      {
+        "index": 12,
+        "name": "骠骑将军",
+        "grade": 9,
+        "secondary": 6,
+        "tier": 5
+      },
+      {
+        "index": 13,
+        "name": "车骑将军",
+        "grade": 6,
+        "secondary": 9,
+        "tier": 5
+      },
+      {
+        "index": 14,
+        "name": "龙骧将军",
+        "grade": 12,
+        "secondary": 6,
+        "tier": 6
+      },
+      {
+        "index": 15,
+        "name": "虎威将军",
+        "grade": 6,
+        "secondary": 12,
+        "tier": 6
+      },
+      {
+        "index": 16,
+        "name": "前将军",
+        "grade": 14,
+        "secondary": 7,
+        "tier": 7
+      },
+      {
+        "index": 17,
+        "name": "后将军",
+        "grade": 12,
+        "secondary": 9,
+        "tier": 7
+      },
+      {
+        "index": 18,
+        "name": "左将军",
+        "grade": 7,
+        "secondary": 14,
+        "tier": 7
+      },
+      {
+        "index": 19,
+        "name": "右将军",
+        "grade": 9,
+        "secondary": 12,
+        "tier": 7
+      },
+      {
+        "index": 20,
+        "name": "镇南将军",
+        "grade": 16,
+        "secondary": 8,
+        "tier": 8
+      },
+      {
+        "index": 21,
+        "name": "镇西将军",
+        "grade": 8,
+        "secondary": 16,
+        "tier": 8
+      },
+      {
+        "index": 22,
+        "name": "镇东将军",
+        "grade": 10,
+        "secondary": 14,
+        "tier": 8
+      },
+      {
+        "index": 23,
+        "name": "镇北将军",
+        "grade": 14,
+        "secondary": 10,
+        "tier": 8
+      },
+      {
+        "index": 24,
+        "name": "征东将军",
+        "grade": 18,
+        "secondary": 9,
+        "tier": 9
+      },
+      {
+        "index": 25,
+        "name": "征西将军",
+        "grade": 9,
+        "secondary": 18,
+        "tier": 9
+      },
+      {
+        "index": 26,
+        "name": "征南将军",
+        "grade": 11,
+        "secondary": 16,
+        "tier": 9
+      },
+      {
+        "index": 27,
+        "name": "征北将军",
+        "grade": 16,
+        "secondary": 11,
+        "tier": 9
+      },
+      {
+        "index": 28,
+        "name": "大将军",
+        "grade": 20,
+        "secondary": 20,
+        "tier": 10
+      }
+    ],
+    "grade_table": [
+      {
+        "level": 0,
+        "cells": [
+          {
+            "category": 1,
+            "name": "骑将",
+            "rank": "屯骑校尉",
+            "grade": 2
+          },
+          {
+            "category": 2,
+            "name": "步将",
+            "rank": "步兵校尉",
+            "grade": 3
+          },
+          {
+            "category": 3,
+            "name": "弓将",
+            "rank": "射声校尉",
+            "grade": 1
+          },
+          {
+            "category": 4,
+            "name": "文将",
+            "rank": "虎贲校尉",
+            "grade": 0
+          }
+        ]
+      },
+      {
+        "level": 1,
+        "cells": [
+          {
+            "category": 1,
+            "name": "骑将",
+            "rank": "屯骑中郎将",
+            "grade": 4
+          },
+          {
+            "category": 2,
+            "name": "步将",
+            "rank": "步兵中郎将",
+            "grade": 5
+          },
+          {
+            "category": 3,
+            "name": "弓将",
+            "rank": "射声中郎将",
+            "grade": 2
+          },
+          {
+            "category": 4,
+            "name": "文将",
+            "rank": "虎贲中郎将",
+            "grade": 3
+          }
+        ]
+      },
+      {
+        "level": 2,
+        "cells": [
+          {
+            "category": 1,
+            "name": "骑将",
+            "rank": "偏将",
+            "grade": 6
+          },
+          {
+            "category": 2,
+            "name": "步将",
+            "rank": "裨将",
+            "grade": 3
+          },
+          {
+            "category": 3,
+            "name": "弓将",
+            "rank": "偏将",
+            "grade": 6
+          },
+          {
+            "category": 4,
+            "name": "文将",
+            "rank": "裨将",
+            "grade": 3
+          }
+        ]
+      },
+      {
+        "level": 3,
+        "cells": [
+          {
+            "category": 1,
+            "name": "骑将",
+            "rank": "牙门将军",
+            "grade": 8
+          },
+          {
+            "category": 2,
+            "name": "步将",
+            "rank": "旗门将军",
+            "grade": 4
+          },
+          {
+            "category": 3,
+            "name": "弓将",
+            "rank": "牙门将军",
+            "grade": 8
+          },
+          {
+            "category": 4,
+            "name": "文将",
+            "rank": "旗门将军",
+            "grade": 4
+          }
+        ]
+      },
+      {
+        "level": 4,
+        "cells": [
+          {
+            "category": 1,
+            "name": "骑将",
+            "rank": "骠骑将军",
+            "grade": 9
+          },
+          {
+            "category": 2,
+            "name": "步将",
+            "rank": "车骑将军",
+            "grade": 6
+          },
+          {
+            "category": 3,
+            "name": "弓将",
+            "rank": "骠骑将军",
+            "grade": 9
+          },
+          {
+            "category": 4,
+            "name": "文将",
+            "rank": "车骑将军",
+            "grade": 6
+          }
+        ]
+      },
+      {
+        "level": 5,
+        "cells": [
+          {
+            "category": 1,
+            "name": "骑将",
+            "rank": "龙骧将军",
+            "grade": 12
+          },
+          {
+            "category": 2,
+            "name": "步将",
+            "rank": "虎威将军",
+            "grade": 6
+          },
+          {
+            "category": 3,
+            "name": "弓将",
+            "rank": "龙骧将军",
+            "grade": 12
+          },
+          {
+            "category": 4,
+            "name": "文将",
+            "rank": "虎威将军",
+            "grade": 6
+          }
+        ]
+      },
+      {
+        "level": 6,
+        "cells": [
+          {
+            "category": 1,
+            "name": "骑将",
+            "rank": "后将军",
+            "grade": 12
+          },
+          {
+            "category": 2,
+            "name": "步将",
+            "rank": "前将军",
+            "grade": 14
+          },
+          {
+            "category": 3,
+            "name": "弓将",
+            "rank": "左将军",
+            "grade": 7
+          },
+          {
+            "category": 4,
+            "name": "文将",
+            "rank": "右将军",
+            "grade": 9
+          }
+        ]
+      },
+      {
+        "level": 7,
+        "cells": [
+          {
+            "category": 1,
+            "name": "骑将",
+            "rank": "镇西将军",
+            "grade": 8
+          },
+          {
+            "category": 2,
+            "name": "步将",
+            "rank": "镇南将军",
+            "grade": 16
+          },
+          {
+            "category": 3,
+            "name": "弓将",
+            "rank": "镇东将军",
+            "grade": 10
+          },
+          {
+            "category": 4,
+            "name": "文将",
+            "rank": "镇北将军",
+            "grade": 14
+          }
+        ]
+      },
+      {
+        "level": 8,
+        "cells": [
+          {
+            "category": 1,
+            "name": "骑将",
+            "rank": "征西将军",
+            "grade": 9
+          },
+          {
+            "category": 2,
+            "name": "步将",
+            "rank": "征东将军",
+            "grade": 18
+          },
+          {
+            "category": 3,
+            "name": "弓将",
+            "rank": "征南将军",
+            "grade": 11
+          },
+          {
+            "category": 4,
+            "name": "文将",
+            "rank": "征北将军",
+            "grade": 16
+          }
+        ]
+      },
+      {
+        "level": 9,
+        "cells": [
+          {
+            "category": 1,
+            "name": "骑将",
+            "rank": "大将军",
+            "grade": 20
+          },
+          {
+            "category": 2,
+            "name": "步将",
+            "rank": "大将军",
+            "grade": 20
+          },
+          {
+            "category": 3,
+            "name": "弓将",
+            "rank": "大将军",
+            "grade": 20
+          },
+          {
+            "category": 4,
+            "name": "文将",
+            "rank": "大将军",
+            "grade": 20
+          }
+        ]
+      }
+    ],
+    "formulas": {
+      "duel_stamina": "武 + 品级（0..120；UI/单挑按 ×100/120 显示）",
+      "attack_a": "floor((品级 + 武) × 类型攻A / 100)",
+      "attack_b": "floor((品级 + 武) × 类型攻B / 100)",
+      "defense_a": "floor(武 × 类型防A / 100)",
+      "defense_b": "floor(武 × 类型防B / 100)",
+      "unit_hp": "类型 HP（将本体 500），与等级无关"
+    },
+    "notes": [
+      "等级只通过品级值提升单挑体力与攻击；防御公式不含品级，因此升级不加防御。",
+      "升级不直接改单位 HP；将本体 HP 为类型 500，初始即 500（DATA.EXP 的 100 会被装载器覆盖）。",
+      "DATA.EXP 的等级列是 1 基，装载时减 1；基础数据全部为 0 级。"
+    ],
+    "categories": {
+      "1": {
+        "name": "骑将",
+        "typeId": 35,
+        "hp": 500,
+        "atkA": 70,
+        "atkB": 0,
+        "defA": 6,
+        "defB": 6
+      },
+      "2": {
+        "name": "步将",
+        "typeId": 31,
+        "hp": 500,
+        "atkA": 50,
+        "atkB": 0,
+        "defA": 6,
+        "defB": 6
+      },
+      "3": {
+        "name": "弓将",
+        "typeId": 33,
+        "hp": 500,
+        "atkA": 40,
+        "atkB": 40,
+        "defA": 6,
+        "defB": 6
+      },
+      "4": {
+        "name": "文将",
+        "typeId": 29,
+        "hp": 500,
+        "atkA": 28,
+        "atkB": 0,
+        "defA": 4,
+        "defB": 4
+      }
+    },
+    "stratagem_unlock": [
+      {
+        "levels": "0–2",
+        "count": 3
+      },
+      {
+        "levels": "3–4",
+        "count": 6
+      },
+      {
+        "levels": "5",
+        "count": 8
+      },
+      {
+        "levels": "6–9",
+        "count": 9
+      }
+    ]
+  },
+  "kill_xp": [
+    {
+      "id": 0,
+      "name": "帅帐",
+      "category": "building",
+      "killXp": 150,
+      "morale": 4,
+      "hp": 2400
+    },
+    {
+      "id": 1,
+      "name": "帅帐",
+      "category": "building",
+      "killXp": 150,
+      "morale": 4,
+      "hp": 2400
+    },
+    {
+      "id": 2,
+      "name": "武器库",
+      "category": "building",
+      "killXp": 40,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 3,
+      "name": "武器库",
+      "category": "building",
+      "killXp": 40,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 4,
+      "name": "木材场",
+      "category": "building",
+      "killXp": 40,
+      "morale": 2,
+      "hp": 1200
+    },
+    {
+      "id": 5,
+      "name": "木材场",
+      "category": "building",
+      "killXp": 40,
+      "morale": 2,
+      "hp": 1200
+    },
+    {
+      "id": 6,
+      "name": "骑兵所",
+      "category": "building",
+      "killXp": 80,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 7,
+      "name": "骑兵所",
+      "category": "building",
+      "killXp": 80,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 8,
+      "name": "车兵所",
+      "category": "building",
+      "killXp": 60,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 9,
+      "name": "车兵所",
+      "category": "building",
+      "killXp": 60,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 10,
+      "name": "粮仓",
+      "category": "building",
+      "killXp": 15,
+      "morale": 1,
+      "hp": 800
+    },
+    {
+      "id": 11,
+      "name": "粮仓",
+      "category": "building",
+      "killXp": 15,
+      "morale": 1,
+      "hp": 800
+    },
+    {
+      "id": 12,
+      "name": "步兵所",
+      "category": "building",
+      "killXp": 50,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 13,
+      "name": "步兵所",
+      "category": "building",
+      "killXp": 50,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 14,
+      "name": "弓兵所",
+      "category": "building",
+      "killXp": 50,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 15,
+      "name": "弓兵所",
+      "category": "building",
+      "killXp": 50,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 16,
+      "name": "城门",
+      "category": "building",
+      "killXp": 30,
+      "morale": 2,
+      "hp": 1400
+    },
+    {
+      "id": 17,
+      "name": "城门",
+      "category": "building",
+      "killXp": 30,
+      "morale": 2,
+      "hp": 1400
+    },
+    {
+      "id": 18,
+      "name": "箭楼",
+      "category": "building",
+      "killXp": 40,
+      "morale": 1,
+      "hp": 350
+    },
+    {
+      "id": 19,
+      "name": "箭楼",
+      "category": "building",
+      "killXp": 40,
+      "morale": 1,
+      "hp": 350
+    },
+    {
+      "id": 20,
+      "name": "船坞",
+      "category": "building",
+      "killXp": 80,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 21,
+      "name": "特殊",
+      "category": "building",
+      "killXp": 80,
+      "morale": 2,
+      "hp": 200
+    },
+    {
+      "id": 22,
+      "name": "铁矿",
+      "category": "building",
+      "killXp": 0,
+      "morale": 0,
+      "hp": 10000
+    },
+    {
+      "id": 23,
+      "name": "钱庄",
+      "category": "building",
+      "killXp": 40,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 24,
+      "name": "民居",
+      "category": "building",
+      "killXp": 40,
+      "morale": 1,
+      "hp": 800
+    },
+    {
+      "id": 25,
+      "name": "民居",
+      "category": "building",
+      "killXp": 40,
+      "morale": 1,
+      "hp": 800
+    },
+    {
+      "id": 26,
+      "name": "大旗",
+      "category": "building",
+      "killXp": 50,
+      "morale": 2,
+      "hp": 1000
+    },
+    {
+      "id": 27,
+      "name": "男平民",
+      "category": "unit",
+      "killXp": 0,
+      "morale": 0,
+      "hp": 100
+    },
+    {
+      "id": 28,
+      "name": "女平民",
+      "category": "unit",
+      "killXp": 0,
+      "morale": 0,
+      "hp": 100
+    },
+    {
+      "id": 29,
+      "name": "文将",
+      "category": "unit",
+      "killXp": 10,
+      "morale": 3,
+      "hp": 500
+    },
+    {
+      "id": 30,
+      "name": "工人",
+      "category": "unit",
+      "killXp": 1,
+      "morale": 1,
+      "hp": 100
+    },
+    {
+      "id": 31,
+      "name": "步将",
+      "category": "unit",
+      "killXp": 10,
+      "morale": 3,
+      "hp": 500
+    },
+    {
+      "id": 32,
+      "name": "步兵",
+      "category": "unit",
+      "killXp": 2,
+      "morale": 1,
+      "hp": 100
+    },
+    {
+      "id": 33,
+      "name": "弓将",
+      "category": "unit",
+      "killXp": 10,
+      "morale": 3,
+      "hp": 500
+    },
+    {
+      "id": 34,
+      "name": "车兵",
+      "category": "unit",
+      "killXp": 15,
+      "morale": 2,
+      "hp": 100
+    },
+    {
+      "id": 35,
+      "name": "骑将",
+      "category": "unit",
+      "killXp": 10,
+      "morale": 3,
+      "hp": 500
+    },
+    {
+      "id": 36,
+      "name": "骑兵",
+      "category": "unit",
+      "killXp": 5,
+      "morale": 1,
+      "hp": 100
+    },
+    {
+      "id": 37,
+      "name": "骑兵",
+      "category": "unit",
+      "killXp": 10,
+      "morale": 2,
+      "hp": 200
+    },
+    {
+      "id": 38,
+      "name": "步兵",
+      "category": "unit",
+      "killXp": 4,
+      "morale": 2,
+      "hp": 200
+    },
+    {
+      "id": 39,
+      "name": "弓兵",
+      "category": "unit",
+      "killXp": 4,
+      "morale": 2,
+      "hp": 200
+    },
+    {
+      "id": 40,
+      "name": "骑兵",
+      "category": "unit",
+      "killXp": 25,
+      "morale": 4,
+      "hp": 500
+    },
+    {
+      "id": 41,
+      "name": "步兵",
+      "category": "unit",
+      "killXp": 8,
+      "morale": 3,
+      "hp": 500
+    },
+    {
+      "id": 42,
+      "name": "弓兵",
+      "category": "unit",
+      "killXp": 8,
+      "morale": 3,
+      "hp": 500
+    },
+    {
+      "id": 43,
+      "name": "步兵",
+      "category": "unit",
+      "killXp": 20,
+      "morale": 4,
+      "hp": 1000
+    },
+    {
+      "id": 44,
+      "name": "弓兵",
+      "category": "unit",
+      "killXp": 20,
+      "morale": 4,
+      "hp": 1000
+    },
+    {
+      "id": 45,
+      "name": "弓兵",
+      "category": "unit",
+      "killXp": 2,
+      "morale": 1,
+      "hp": 100
+    },
+    {
+      "id": 46,
+      "name": "水兵",
+      "category": "unit",
+      "killXp": 10,
+      "morale": 1,
+      "hp": 200
+    },
+    {
+      "id": 47,
+      "name": "运输船",
+      "category": "unit",
+      "killXp": 20,
+      "morale": 2,
+      "hp": 100
+    },
+    {
+      "id": 48,
+      "name": "水兵",
+      "category": "unit",
+      "killXp": 25,
+      "morale": 2,
+      "hp": 1000
+    },
+    {
+      "id": 49,
+      "name": "连船",
+      "category": "unit",
+      "killXp": 50,
+      "morale": 4,
+      "hp": 2000
+    },
+    {
+      "id": 50,
+      "name": "短云梯",
+      "category": "unit",
+      "killXp": 20,
+      "morale": 2,
+      "hp": 100
+    },
+    {
+      "id": 51,
+      "name": "长云梯",
+      "category": "unit",
+      "killXp": 30,
+      "morale": 2,
+      "hp": 200
+    },
+    {
+      "id": 48,
+      "name": "旗舰",
+      "category": "unit",
+      "killXp": 10,
+      "morale": 3,
+      "hp": 1000
+    }
+  ],
+  "rosters": [
+    {
+      "label": "吴",
+      "count": 33
+    },
+    {
+      "label": "蜀",
+      "count": 14
+    },
+    {
+      "label": "魏",
+      "count": 51
+    },
+    {
+      "label": "群",
+      "count": 19
+    }
+  ],
+  "hero_count": 117,
+  "evidence": {
+    "delivery_xp": "ev_7d4bcaad68fe8faf5aaad19c96d0a8c79df028335617652c1bcb23010fcddfa5",
+    "kill_xp": "ev_b63301bf95ab74d47e9ae8b7b56961e37d5fa9993f8c8adc290b64529b386b9c",
+    "construction_xp": "ev_55909ed9a0f1cace01650c9c711189c9a24aa6092cc74d8054c6441437c64926",
+    "rank_index": "ev_1966679a9889f187075e1014514b3bc402b2fd67375fb899364f735e22308eda",
+    "duel_stamina": "ev_25cf07722ccc9f5f0a6c60a6642888c8aca158baf1e3410c00fdedcd5cb448dd",
+    "rank_name": "ev_98350414d9b51811ffd0c755a2166617a874286bd559996d6ed7a0612383d775",
+    "attack_formula": "ev_7732f456e172daee85fa493af9f54a9ef522191b05584fa6a4b79346f99a4bbf",
+    "defense_formula": "ev_bbbaf241b9b5354e083b8d6e3641591c245f7e106a6ef75df9dd7d815ad8b1f1",
+    "data_loader": "ev_ba4cf1aaa1034a41c218011919d3ae6dbc346df30b91ccad9bcb3f1b08de2a85"
+  }
+}

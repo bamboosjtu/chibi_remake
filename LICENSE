@@ -1,0 +1,39 @@
+# 三国赤壁 · 高清重制 社区 MOD 许可协议 v1.0
+
+Copyright (c) 2026 赤壁社区 MOD 组（以下简称“本 MOD”）
+
+本协议适用于本仓库中由本 MOD 作者创作的部分：源代码、构建脚本、文档，以及明确标注为由本 MOD 重绘/新制的图像与音频素材。原作《三国赤壁》（1997，北京前导软件）、电视剧《三国演义》（1994，中国电视剧制作中心 / 中央电视台）及其各自的角色、画面、视频、音乐、文本等权利，仍归各自权利人所有，**不在本协议授权范围内**。
+
+## 1. 授权
+
+在遵守本协议全部条件的前提下，任何人可以：
+
+- 免费游玩、复制、分发本 MOD 的完整发布包；
+- 阅读、修改本 MOD 的源代码与构建脚本，并制作非商业的衍生 MOD；
+- 在非商业的社区活动、直播、视频和文章中展示本 MOD。
+
+## 2. 条件
+
+1. **非商业**：不得出售本 MOD，不得将其放入付费墙、付费下载、广告分成或任何以本 MOD 直接营利的产品/服务中。
+2. **署名**：分发时必须保留本 `LICENSE`、`NOTICE.md` 与致谢内容，并注明“非官方社区 MOD”。
+3. **原作边界**：不得把本 MOD 说成官方作品，不得使用原作权利人、电视剧出品方的名义进行宣传或背书。
+4. **原版素材**：本 MOD 包含由原版游戏转换而来的关卡数据与过场视频（见 `NOTICE.md`）。分发者必须提醒使用者：需自行合法持有原版《三国赤壁》；权利人要求时，应立即停止分发并删除相关素材。
+5. **第三方组件**：Godot Engine、Noto Sans CJK SC 等第三方组件按各自许可证分发（见 `NOTICE.md`），本协议不改变其许可条件。
+
+## 3. 无担保
+
+本 MOD 按“现状”提供，不附带任何明示或默示担保，包括但不限于可玩性、特定用途适用性和不侵权担保。因使用本 MOD 造成的任何损失，作者不承担责任。
+
+## 4. 终止
+
+违反本协议任一条款，授权自动终止。终止后不得继续分发本 MOD；已分发的副本应由分发者下架。
+
+## 5. 其他
+
+本协议不构成对原作或电视剧权利人的任何挑战。若权利人认为本 MOD 侵犯其权利，请通过仓库 issue 联系；我们会在核实后立即停止分发并删除相关内容。
+
+---
+
+## English summary (not a substitute for the Chinese text)
+
+This is a **non-commercial, unofficial community MOD** for the 1997 game *三国赤壁* (北京前导软件). Code and newly created assets are licensed for free non-commercial use, modification and redistribution **with attribution and this notice**. Original game assets, the 1994 TV series *三国演义*, and all third-party components remain under their respective owners' rights and are **not** licensed here. No warranty. Distribution must not imply official endorsement. Users are expected to own a legal copy of the original game.

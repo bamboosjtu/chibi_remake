@@ -1,0 +1,330 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "path": "catalog.json",
+      "bytes": 31478,
+      "sha256": "1bd0b59a84cf8da507364e5f4008d85395a81d724c5a9434794ea4ae6a48da15"
+    },
+    {
+      "path": "chibic1.json",
+      "bytes": 428982,
+      "sha256": "1f62c746e34d7d450818beb63b098af4f3eecd4d7b02d01eef57c09b804e86e6"
+    },
+    {
+      "path": "chibic10.json",
+      "bytes": 765488,
+      "sha256": "f2afe283039b3bee14c871a583232f715a61341767a00d4808301d88c2c13314"
+    },
+    {
+      "path": "chibic11.json",
+      "bytes": 769166,
+      "sha256": "901dc1c7302f2c0c5c0e7dedce68c7484d1f3b3c2a34ea2e82bd8d6eac473e46"
+    },
+    {
+      "path": "chibic12.json",
+      "bytes": 768482,
+      "sha256": "a54cdbc2098132753c5f1e4708cb8e12754170caaecd0e154cb97b434eaa4b95"
+    },
+    {
+      "path": "chibic13.json",
+      "bytes": 768265,
+      "sha256": "9528a6685634f9f628723dd754e4a7bf69900bc68126febf660129e61e230ce4"
+    },
+    {
+      "path": "chibic14.json",
+      "bytes": 769604,
+      "sha256": "5026e87ef3f64d66a2124d03d921a58d22b24b07f64f86ca4a4990e7aa05dff6"
+    },
+    {
+      "path": "chibic15.json",
+      "bytes": 768354,
+      "sha256": "d7fd1c6e0698b94848c1cbfa95bf9f18ec890eae43d6834d2997e90957b98317"
+    },
+    {
+      "path": "chibic16.json",
+      "bytes": 765927,
+      "sha256": "49c69ce6af593c04464f6d947db8a19e1f1962caf7ec40ac5357946ce778e1e6"
+    },
+    {
+      "path": "chibic17.json",
+      "bytes": 769397,
+      "sha256": "a3b1418019c44e7a765f2995ce3c54d19f821cb98dc33325467f169483201f9d"
+    },
+    {
+      "path": "chibic2.json",
+      "bytes": 428546,
+      "sha256": "f99fdc15bbaf31ee7f3f793e4489a79cdc6b473b85c12d8412ab494412dcb4a1"
+    },
+    {
+      "path": "chibic3.json",
+      "bytes": 564036,
+      "sha256": "1609f41109d20cf6a93be3ca9b2499cb0410c56433b74406e78051140ea0e1d7"
+    },
+    {
+      "path": "chibic4.json",
+      "bytes": 579421,
+      "sha256": "d97e0704f6421c36cea0ccef6be78efaa553d41c6486c478e99b24c74f7d7a74"
+    },
+    {
+      "path": "chibic5.json",
+      "bytes": 566946,
+      "sha256": "79bc18040b639f4dc448d755cfe2d4ca502e2a8449f7583bca5fcdf49521e371"
+    },
+    {
+      "path": "chibic6.json",
+      "bytes": 760840,
+      "sha256": "50084f1a1913f49339f94c4a859800fc217a571d62558166bd3ee9e670e4a623"
+    },
+    {
+      "path": "chibic7.json",
+      "bytes": 758754,
+      "sha256": "2f2107c5aa5b7e2657262160c42766d7fae5bc7a631ea6ec5509beb2bba16071"
+    },
+    {
+      "path": "chibic8.json",
+      "bytes": 766340,
+      "sha256": "da65ec0765466774f17afc1d7b703a49de11565780bbc40320d87f684996134e"
+    },
+    {
+      "path": "chibic9.json",
+      "bytes": 766872,
+      "sha256": "29ad50aec0374b53cc200115e30ab05d609ff3e50897a527eda6c3a3f746e2aa"
+    },
+    {
+      "path": "chibil1.json",
+      "bytes": 429411,
+      "sha256": "d10098580631d2450368576279d16ef8541be30c0ed523281b07985c4895ee48"
+    },
+    {
+      "path": "chibil10.json",
+      "bytes": 770118,
+      "sha256": "a69ad7aa735bdd25fcd648753915b0ecc01c4a4d87872a59a27e33b61a4e3fd9"
+    },
+    {
+      "path": "chibil11.json",
+      "bytes": 770242,
+      "sha256": "ccac1fd4a594e1e1aa7814dc1f24f9c3b725094381eebfeb128f0997dd49916b"
+    },
+    {
+      "path": "chibil12.json",
+      "bytes": 767685,
+      "sha256": "cee11fa150b17cd02e39f067083de7167c2bb187158118fc58977bc28c4d172d"
+    },
+    {
+      "path": "chibil13.json",
+      "bytes": 768525,
+      "sha256": "b322bffe706b9d13376360aaaa434b9b2b2fc6d39cf6ee7ea0629fee1a634dd8"
+    },
+    {
+      "path": "chibil14.json",
+      "bytes": 767524,
+      "sha256": "f39bee82f930c57c1fae8e7c3cf32f8967c8ce541e49d398add312e8f5eb9029"
+    },
+    {
+      "path": "chibil15.json",
+      "bytes": 767291,
+      "sha256": "4bbd1a78ed0ff2d0ecca3e9e20444ba81f4f393360a61a7ec12134c158c9bbc2"
+    },
+    {
+      "path": "chibil16.json",
+      "bytes": 770725,
+      "sha256": "fb71c7b0f7324e00659dad59da5bba9990b3660972202942b771f8202df88fd3"
+    },
+    {
+      "path": "chibil2.json",
+      "bytes": 431357,
+      "sha256": "112770c323d506d83ae087c37eb5a087d3885ed2eff7846e1d5496aa2122f855"
+    },
+    {
+      "path": "chibil3.json",
+      "bytes": 570451,
+      "sha256": "1df205c47e520ff08eb58b2b8b01a5c0fa1149aea0d4931b76c66b4e74f032e8"
+    },
+    {
+      "path": "chibil4.json",
+      "bytes": 572254,
+      "sha256": "8ce5ab7dff37c2e3f75327ca0eeea2e3e0e3b2e338043159c5a8ed7aa7b41048"
+    },
+    {
+      "path": "chibil5.json",
+      "bytes": 569404,
+      "sha256": "b03ccae77d104ad49a8949224615848c33847850ea3a7f382337d6240a039b4d"
+    },
+    {
+      "path": "chibil6.json",
+      "bytes": 570212,
+      "sha256": "c71f8aa71678514120e7cb34b27a1436c64686fd5b873ebfd235d482357268b7"
+    },
+    {
+      "path": "chibil7a.json",
+      "bytes": 760450,
+      "sha256": "7824058c8bf4818b1c21f7964cb06715e90868d8cd120a5c466b0c9d1bb6cab8"
+    },
+    {
+      "path": "chibil7b.json",
+      "bytes": 570657,
+      "sha256": "70a32ada452b142ca5d1518805b3991b6a693d82c0d910a282ed195ea27c4d5a"
+    },
+    {
+      "path": "chibil8.json",
+      "bytes": 760644,
+      "sha256": "8cce68ced0255beba81aad9b73a32995d74213cc0c892708fb82a6aca8ad7106"
+    },
+    {
+      "path": "chibil9.json",
+      "bytes": 766766,
+      "sha256": "e0fe133b06d0b3af69a91340e9e336bce45a2a4cec53447bf11aa7e7656a8698"
+    },
+    {
+      "path": "index.json",
+      "bytes": 2175,
+      "sha256": "5b78b6e0787197c3f6555172aa799becf4d83e4d44721e2e6ba2608d41fef5ea"
+    },
+    {
+      "path": "mapping.json",
+      "bytes": 35423,
+      "sha256": "834c7a655c87dcb025bc80ec19a77c0331a095167185976fe963b1e2931f4e5d"
+    },
+    {
+      "path": "masks/terrain-00-source.png",
+      "bytes": 6980,
+      "sha256": "8e830ea26ab6d7eb627f21509ba3b31fa331529322c78a09a0d3777bb8d126c8"
+    },
+    {
+      "path": "masks/terrain-01-source.png",
+      "bytes": 5788,
+      "sha256": "141ecf05cf934c6b21f151787d6957f86c8d8a836b6494a1e62d89dbb1b1d360"
+    },
+    {
+      "path": "masks/terrain-02-source.png",
+      "bytes": 5714,
+      "sha256": "91da999f59a01a9ac08522984670846e19350b0bb515ee0f50aaa73a8d75a9fd"
+    },
+    {
+      "path": "masks/terrain-03-source.png",
+      "bytes": 6065,
+      "sha256": "6a199d7932a515a403bc444313924aca7aff9f95d76193154d6f3cf59112d2fe"
+    },
+    {
+      "path": "masks/terrain-04-source.png",
+      "bytes": 6113,
+      "sha256": "b1b688a7a61c2ea75d7a08a8d90646cc9f08b6d7cd931f85915c975c4ab528b2"
+    },
+    {
+      "path": "masks/terrain-05-source.png",
+      "bytes": 5375,
+      "sha256": "9418d608f227c99c23f27b27f99c13ef936ea6840c898e18718a37e385525fd2"
+    },
+    {
+      "path": "masks/terrain-06-source.png",
+      "bytes": 6654,
+      "sha256": "6d0830bf79e1872f365f521cf872194aa8d5ada6734a74d040253fe81f18b748"
+    },
+    {
+      "path": "masks/terrain-07-source.png",
+      "bytes": 9997,
+      "sha256": "cadbd191d3f604457bd78db5b16912fced98901a2ca775709fd60d2e5a5e309c"
+    },
+    {
+      "path": "masks/terrain-08-source.png",
+      "bytes": 12609,
+      "sha256": "f56174d9f860e8ed34a7524371278810bbbac7de105421877aa382c3359c80c0"
+    },
+    {
+      "path": "masks/terrain-09-source.png",
+      "bytes": 7294,
+      "sha256": "8701f13056fe2b334708c12ba06ca44b1322c20aaf660748c91ba9b735f5d1f4"
+    },
+    {
+      "path": "masks/terrain-10-source.png",
+      "bytes": 5372,
+      "sha256": "f4c939030f9f767350c0fb4cfc612dc35db44ecd5f81bee372477a3f68981ea6"
+    },
+    {
+      "path": "masks/terrain-11-source.png",
+      "bytes": 6254,
+      "sha256": "eefa4dd1bb37d89e7475d15190522cb734594cd748bfdc3b8547eff177860b31"
+    },
+    {
+      "path": "masks/terrain-12-source.png",
+      "bytes": 2798,
+      "sha256": "3660c809d57e2b3be532f3ad8f5ebaf22e59dc254c98eb25d17fb239120aaf38"
+    },
+    {
+      "path": "masks/terrain-13-source.png",
+      "bytes": 3143,
+      "sha256": "0aa8b9081df7be1a0a4ef3c955a34c26e792b03ae0a68c47671fdebc96b16b92"
+    },
+    {
+      "path": "paint/00.png",
+      "bytes": 1004959,
+      "sha256": "222bc279c7a8ddcd84b7759dead16249c68935aae80f4bc71fad9495d5504161"
+    },
+    {
+      "path": "paint/01.png",
+      "bytes": 1080123,
+      "sha256": "92b1e28d6681d60a8c352b2afc366ccce11ddff67e4d2ef7c763b24792ae2314"
+    },
+    {
+      "path": "paint/02.png",
+      "bytes": 988351,
+      "sha256": "792c18cef81cb940b497436366a3496160d1168bca4e07b2c66cd4065d4daade"
+    },
+    {
+      "path": "paint/03.png",
+      "bytes": 751136,
+      "sha256": "ef6d9c76c7426ccfacdc5dee9d179d504cd0be8c1b65077148f41a937146ea12"
+    },
+    {
+      "path": "paint/04.png",
+      "bytes": 979417,
+      "sha256": "643c0510e3c3f1ad37840079fd1fa272e79cc0ab52d4f430e14307bb2255ed4d"
+    },
+    {
+      "path": "paint/05.png",
+      "bytes": 1542912,
+      "sha256": "8a7eb35536bebd0391a287b1ce988f41a9936fd75c6dbbe3271a72a7226bd809"
+    },
+    {
+      "path": "paint/06.png",
+      "bytes": 2862082,
+      "sha256": "f08884d3aa1dd6bb5c498d07121f46360141268286eaea840d48a33846b43919"
+    },
+    {
+      "path": "paint/07.png",
+      "bytes": 2860092,
+      "sha256": "a261e2bb1809ab0d787b037838b44075326c5f3aa051505e115727b1e731c6a7"
+    },
+    {
+      "path": "paint/08.png",
+      "bytes": 2172305,
+      "sha256": "20ceeecdedb01818c7f7b8b5d721a774f3a630b40b52a59e9b56deed32efd034"
+    },
+    {
+      "path": "paint/09.png",
+      "bytes": 1332497,
+      "sha256": "66c348376dc8229f532c9658f24ab8caa66ac1f15279fd2fb13eca4c4e0b2d59"
+    },
+    {
+      "path": "paint/10.png",
+      "bytes": 1183604,
+      "sha256": "b9f71888560a4b3ec1cd5ff43f03196866a8312443947cbc9da35ee0aa59e655"
+    },
+    {
+      "path": "paint/11.png",
+      "bytes": 1466786,
+      "sha256": "09e6c0ca3ff3b73c863906ded85a4bee7613f46d9dc933938750576f2e718504"
+    },
+    {
+      "path": "paint/12.png",
+      "bytes": 1119803,
+      "sha256": "d1b38c694af7e33e4fe9456d105fa5180237e11ca213d9cab1b9e874c08a8f69"
+    },
+    {
+      "path": "paint/13.png",
+      "bytes": 1300634,
+      "sha256": "f7f8c5e804d7032048baf3c19ca549c26f4fa917a4958d0a18eff69e64fa8902"
+    }
+  ]
+}

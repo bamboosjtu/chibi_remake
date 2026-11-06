@@ -1,0 +1,433 @@
+{
+  "schemaVersion": 1,
+  "source": "CB.EXE FUN_00404800 / FUN_004045a0 / FUN_0041ab30",
+  "missions": {
+    "5": {
+      "stages": [
+        {
+          "id": "a",
+          "condition": {
+            "kind": "officer_in_rect",
+            "officer": 40,
+            "rect": [
+              47,
+              65,
+              126,
+              144
+            ]
+          },
+          "effects": [
+            {
+              "kind": "status_delta",
+              "side": "enemy",
+              "amount": -50
+            },
+            {
+              "kind": "event",
+              "id": 3
+            }
+          ]
+        },
+        {
+          "id": "win",
+          "condition": {
+            "kind": "officer_in_rect",
+            "officer": 40,
+            "rect": [
+              87,
+              105,
+              266,
+              284
+            ]
+          },
+          "win": true
+        }
+      ]
+    },
+    "8": {
+      "stages": [
+        {
+          "id": "a",
+          "condition": {
+            "kind": "officer_in_rect",
+            "officer": 34,
+            "rect": [
+              1,
+              19,
+              76,
+              94
+            ]
+          },
+          "effects": [
+            {
+              "kind": "event",
+              "id": 6
+            },
+            {
+              "kind": "clear_tiles",
+              "layer": 1,
+              "cells": [
+                [
+                  10,
+                  84
+                ],
+                [
+                  11,
+                  84
+                ],
+                [
+                  10,
+                  83
+                ],
+                [
+                  10,
+                  85
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "b",
+          "requires": [
+            "a"
+          ],
+          "condition": {
+            "kind": "officer_in_rect",
+            "officer": 34,
+            "rect": [
+              91,
+              109,
+              291,
+              309
+            ]
+          },
+          "win": true
+        },
+        {
+          "id": "c",
+          "condition": {
+            "kind": "all",
+            "conditions": [
+              {
+                "kind": "unit_in_rect",
+                "rect": [
+                  78,
+                  96,
+                  253,
+                  271
+                ],
+                "side": "enemy"
+              },
+              {
+                "kind": "officer_in_rect",
+                "officer": 35,
+                "rect": [
+                  82,
+                  100,
+                  264,
+                  282
+                ]
+              }
+            ]
+          },
+          "effects": [
+            {
+              "kind": "status_delta",
+              "side": "enemy",
+              "amount": -40
+            },
+            {
+              "kind": "event",
+              "id": 7
+            }
+          ]
+        }
+      ]
+    },
+    "14": {
+      "stages": [
+        {
+          "id": "a",
+          "condition": {
+            "kind": "officers_near",
+            "officer": 60,
+            "otherOfficer": 34,
+            "otherSide": "player",
+            "radius": 10
+          },
+          "effects": [
+            {
+              "kind": "status_delta",
+              "side": "player",
+              "amount": 20
+            },
+            {
+              "kind": "event",
+              "id": 9
+            }
+          ],
+          "yield": true
+        },
+        {
+          "id": "b",
+          "condition": {
+            "kind": "officers_near",
+            "officer": 60,
+            "otherOfficer": 35,
+            "otherSide": "player",
+            "radius": 10
+          },
+          "effects": [
+            {
+              "kind": "status_delta",
+              "side": "player",
+              "amount": 20
+            },
+            {
+              "kind": "event",
+              "id": 10
+            }
+          ],
+          "yield": true
+        },
+        {
+          "id": "c",
+          "condition": {
+            "kind": "officers_near",
+            "officer": 60,
+            "otherOfficer": 36,
+            "otherSide": "player",
+            "radius": 10
+          },
+          "effects": [
+            {
+              "kind": "event",
+              "id": 11
+            }
+          ],
+          "win": true
+        },
+        {
+          "id": "rect",
+          "condition": {
+            "kind": "officer_in_rect",
+            "officer": 60,
+            "rect": [
+              11,
+              29,
+              34,
+              52
+            ]
+          },
+          "win": true
+        }
+      ]
+    },
+    "19": {
+      "stages": [
+        {
+          "id": "event",
+          "condition": {
+            "kind": "all",
+            "conditions": [
+              {
+                "kind": "unit_in_rect",
+                "rect": [
+                  41,
+                  59,
+                  51,
+                  69
+                ]
+              },
+              {
+                "kind": "enemy_mobile_present"
+              }
+            ]
+          },
+          "effects": [
+            {
+              "kind": "enemy_order",
+              "target": [
+                50,
+                60
+              ],
+              "experienceParameter": "eventExperience"
+            }
+          ]
+        }
+      ]
+    },
+    "20": {
+      "stages": [
+        {
+          "id": "event",
+          "condition": {
+            "kind": "all",
+            "conditions": [
+              {
+                "kind": "unit_in_rect",
+                "rect": [
+                  54,
+                  72,
+                  232,
+                  250
+                ]
+              },
+              {
+                "kind": "enemy_mobile_present"
+              }
+            ]
+          },
+          "effects": [
+            {
+              "kind": "enemy_order",
+              "target": [
+                63,
+                241
+              ],
+              "experienceParameter": "eventExperience"
+            }
+          ]
+        }
+      ]
+    },
+    "27": {
+      "stages": [
+        {
+          "id": "a",
+          "condition": {
+            "kind": "unit_type_present",
+            "unit": 49
+          },
+          "effects": [
+            {
+              "kind": "event",
+              "id": 5
+            }
+          ]
+        }
+      ]
+    },
+    "29": {
+      "stages": [
+        {
+          "id": "event",
+          "condition": {
+            "kind": "all",
+            "conditions": [
+              {
+                "kind": "unit_in_rect",
+                "rect": [
+                  45,
+                  63,
+                  162,
+                  180
+                ]
+              },
+              {
+                "kind": "enemy_mobile_present"
+              }
+            ]
+          },
+          "effects": [
+            {
+              "kind": "enemy_order",
+              "target": [
+                54,
+                171
+              ],
+              "experienceParameter": "eventExperience"
+            }
+          ]
+        },
+        {
+          "id": "win",
+          "condition": {
+            "kind": "side_cleared",
+            "sideIndex": 2
+          },
+          "win": true
+        }
+      ]
+    },
+    "30": {
+      "stages": [
+        {
+          "id": "a",
+          "condition": {
+            "kind": "officers_near",
+            "officer": 60,
+            "otherOfficer": 34,
+            "otherSide": "enemy",
+            "radius": 10
+          },
+          "effects": [
+            {
+              "kind": "status_delta",
+              "side": "player",
+              "amount": -20
+            },
+            {
+              "kind": "event",
+              "id": 9
+            }
+          ],
+          "yield": true
+        },
+        {
+          "id": "b",
+          "condition": {
+            "kind": "officers_near",
+            "officer": 60,
+            "otherOfficer": 35,
+            "otherSide": "enemy",
+            "radius": 10
+          },
+          "effects": [
+            {
+              "kind": "status_delta",
+              "side": "player",
+              "amount": -20
+            },
+            {
+              "kind": "event",
+              "id": 10
+            }
+          ],
+          "yield": true
+        },
+        {
+          "id": "c",
+          "condition": {
+            "kind": "officers_near",
+            "officer": 60,
+            "otherOfficer": 36,
+            "otherSide": "enemy",
+            "radius": 10
+          },
+          "effects": [
+            {
+              "kind": "event",
+              "id": 11
+            }
+          ],
+          "win": true
+        },
+        {
+          "id": "rect",
+          "condition": {
+            "kind": "unit_in_rect",
+            "rect": [
+              11,
+              29,
+              34,
+              52
+            ]
+          },
+          "win": true
+        }
+      ]
+    }
+  }
+}

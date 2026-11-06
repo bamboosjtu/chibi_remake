@@ -1,0 +1,78 @@
+name: ci
+
+# Hosted checks are deliberately lightweight: syntax plus a Godot headless
+# first-map smoke without LFS art or export templates. Full regressions and
+# multi-GB packaging remain local operations.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript and JSON syntax
+        run: node tools/syntax_check.mjs
+      - name: PowerShell syntax
+        shell: pwsh
+        run: |
+          $failed = @()
+          foreach ($file in (git ls-files '*.ps1')) {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path -LiteralPath $file).Path, [ref]$tokens, [ref]$errors) | Out-Null
+            if ($errors.Count -gt 0) {
+              $failed += ($file + ': ' + $errors[0].Message)
+            }
+          }
+          if ($failed.Count -gt 0) {
+            $failed | ForEach-Object { Write-Error $_ }
+            exit 1
+          }
+          Write-Output 'POWERSHELL SYNTAX PASS'
+
+  godot-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Godot 4.7.2
+        run: |
+          curl -fsSL --retry 3 -o "$RUNNER_TEMP/godot.zip" \
+            https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip
+          unzip -q "$RUNNER_TEMP/godot.zip" -d "$RUNNER_TEMP/godot"
+          chmod +x "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+          echo "GODOT_ENGINE=$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" >> "$GITHUB_ENV"
+      - name: Godot script compile and first-map smoke
+        run: |
+          node tools/run_regressions.mjs \
+            --suite tools/inputs/ci_godot_tests.json \
+            --engine "$GODOT_ENGINE" \
+            --project godot/chibi_remake \
+            --scripts tools/gd \
+            --output _work/ci-godot
+      - name: Engine composition contracts
+        run: node tools/registry_check.mjs --runtime-log _work/ci-godot/dump_composition.log
+      - name: Invalid compositions must exit nonzero
+        run: node tools/test_registry_runtime.mjs --engine "$GODOT_ENGINE"
+      - name: Fetch minimal terrain source fixture
+        run: git lfs pull --include="source/terrain/paint/00.png,source/terrain/masks/terrain-00-source.png" --exclude=""
+      - name: Rebuildable terrain cache and failure recovery
+        run: node tools/test_terrain_pipeline.mjs --engine "$GODOT_ENGINE"
+      - name: Upload Godot logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: godot-ci-logs
+          path: _work/ci-godot

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>原版《赤壁》秘籍与启用方式</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin:0; padding:32px; background:#12141a; color:#e6e6e6; font:15px/1.65 "Segoe UI","Microsoft YaHei",sans-serif; }
+  h1,h2,h3 { font-weight:600; letter-spacing:.02em; }
+  h1 { font-size:27px; margin:0 0 4px; }
+  h2 { margin:38px 0 12px; font-size:19px; color:#ffd27a; }
+  h3 { margin:20px 0 8px; font-size:15px; color:#ffd27a; }
+  .sub { color:#9aa0ad; margin-bottom:20px; }
+  code { background:#1d212b; padding:1px 5px; border-radius:4px; color:#a8d5ff; }
+  .note { background:#1b1f27; border-left:3px solid #ffd27a; padding:10px 14px; border-radius:4px; color:#c9ced8; }
+  .warn { border-left-color:#ff9d6e; }
+  .cards { display:flex; gap:12px; flex-wrap:wrap; margin:18px 0; }
+  .stat { background:#181c24; border:1px solid #2a2f3a; border-radius:10px; padding:12px 18px; min-width:135px; }
+  .stat b { display:block; font-size:24px; color:#ffd27a; }
+  .stat span { color:#9aa0ad; font-size:13px; }
+  table { border-collapse:collapse; width:100%; margin-top:8px; }
+  th,td { border-bottom:1px solid #262b35; padding:6px 9px; text-align:left; vertical-align:top; }
+  th { color:#9aa0ad; font-weight:500; font-size:13px; white-space:nowrap; }
+  .scroll { overflow-x:auto; }
+  a { color:#8ec5ff; }
+  .panel { background:#181c24; border:1px solid #2a2f3a; border-radius:10px; padding:14px; }
+  .panel img { width:100%; background:#0b0d12; border:1px solid #2a2f3a; }
+  .ok { color:#8fe3a3; } .no { color:#ff9d9d; }
+  .meta { color:#9aa0ad; font-size:13px; }
+</style>
+</head>
+<body>
+<h1>原版《赤壁》秘籍与启用方式</h1>
+<div class="sub">CB.EXE <code>2db7cc10…c5798cb7</code> · REA/Ghidra 静态分析 · 按“秘籍/作弊模式”记录</div>
+
+<div class="note warn">
+  <b>口径</b>：以 CB.EXE 原始代码为准；历史秘籍文章只用于对照。文中“F7 无敌”“F9 +10000”等均已用代码校正。
+</div>
+
+<div class="cards">
+  <div class="stat"><b>eternal</b><span>第 5 字符即生效</span></div>
+  <div class="stat"><b>F2–F9</b><span>需要秘籍 flag</span></div>
+  <div class="stat"><b>+10000</b><span>F9 四项资源</span></div>
+  <div class="stat"><b>F11</b><span>截图（无需 flag）</span></div>
+</div>
+
+<h2>1. 启用流程</h2>
+<div class="panel">
+  <img src="assets/cheat_flow.svg" alt="秘籍启用流程">
+  <ol>
+    <li>游戏画面按 <b>Enter</b>，打开“信息：”输入条。</li>
+    <li>输入英文 <b><code>eternal</code></b>（小写最稳）。代码比较 <code>0x484BF8</code> 的字符串，只检查前 5 个字符。</li>
+    <li>输入到第 5 个字符 <code>n</code> 时，<code>DAT_00484BEC = 1 - 旧值</code>，秘籍模式已翻转；完整输入 <code>eternal</code> 仍可。</li>
+    <li>再按 Enter 关闭输入条。F2–F9 的作弊分支现在生效；再次输入可关闭秘籍。</li>
+  </ol>
+</div>
+
+<h2>2. 秘籍键</h2>
+<div class="scroll">
+<table>
+  <tr><th>键</th><th>VK</th><th>名称</th><th>效果</th><th>需 flag</th></tr>
+  <tr><td>F2</td><td><code>0x71</code></td><td>自动进行游戏</td><td>切换 <code>DAT_00485318</code>；主更新 <code>FUN_0045AFE0</code> 使用</td><td>是</td></tr>
+  <tr><td>F3</td><td><code>0x72</code></td><td>选中武将降级</td><td><code>FUN_0042B190(0)</code>；等级 −1，最低 0</td><td>是</td></tr>
+  <tr><td>F4</td><td><code>0x73</code></td><td>选中武将升级</td><td><code>FUN_0042B190(1)</code>；等级 +1，最高 9</td><td>是</td></tr>
+  <tr><td>F5</td><td><code>0x74</code></td><td>界面/指针开关（待确认）</td><td>翻转 <code>DAT_00483190</code>/<code>DAT_00484C00</code>，刷新光标矩形</td><td>是</td></tr>
+  <tr><td>F6</td><td><code>0x75</code></td><td>取消建造前置</td><td>翻转 <code>DAT_00483424</code>；菜单掩码全开，绕过建造失败分支</td><td>是</td></tr>
+  <tr><td>F7</td><td><code>0x76</code></td><td>无敌</td><td>翻转 <code>DAT_00483428</code>；当前 side 受击伤害强制 0</td><td>是</td></tr>
+  <tr><td>F8</td><td><code>0x77</code></td><td>地图全开</td><td>翻转 <code>DAT_004850C8</code>；刷新可见性</td><td>是</td></tr>
+  <tr><td>F9</td><td><code>0x78</code></td><td>四项资源 +10000</td><td>金/粮/木/铁各 +<code>0x2710</code>，可重复累加</td><td>是</td></tr>
+  <tr><td>F10</td><td><code>0x79</code></td><td>无动作</td><td>跳表直接返回</td><td>否</td></tr>
+  <tr><td>F11</td><td><code>0x7A</code></td><td>截图</td><td><code>FUN_0041ACA0</code>，写 BMP 到游戏目录</td><td>否</td></tr>
+</table>
+</div>
+<p class="meta">F3/F4 只对当前选中的第一个武将生效；F6 的“资源是否仍扣”不能从当前分支直接断言；F5 的视觉表现需要实机确认。</p>
+
+<h2>3. 键位图</h2>
+<div class="panel"><img src="assets/cheat_keys.svg" alt="秘籍键位图"></div>
+
+<h2>4. 非秘籍隐藏键</h2>
+<div class="scroll">
+<table>
+  <tr><th>键</th><th>作用</th><th>代码/备注</th></tr>
+  <tr><td>Enter</td><td>打开/关闭信息输入条</td><td><code>0x4544D1</code>；<code>DAT_00482A10</code></td></tr>
+  <tr><td>Esc</td><td>关闭信息输入条</td><td><code>0x454562</code></td></tr>
+  <tr><td>[</td><td>选前一关（秘籍开启时）</td><td><code>0x454792</code>；<code>FUN_0045B4A0(-2)</code></td></tr>
+  <tr><td>]</td><td>选后一关（秘籍开启时）</td><td><code>0x4547A1</code>；<code>DAT_0048531C=1</code></td></tr>
+  <tr><td>P</td><td>画面移到敌人</td><td><code>0x4547B0</code>；不需要 flag</td></tr>
+  <tr><td>F11</td><td>截图</td><td><code>0x454713</code>；不需要 flag</td></tr>
+  <tr><td>Ctrl</td><td>选同部队全部士兵</td><td>操作说明，不是秘籍</td></tr>
+  <tr><td>Shift</td><td>把框选士兵加入已选部队</td><td>操作说明，不是秘籍</td></tr>
+</table>
+</div>
+
+<h2>5. 与旧文章的差异</h2>
+<div class="note warn">
+  <ul>
+    <li><b>F7</b>：静态代码是“当前 side 受击伤害 0”，没有建造/行进加速；旧文章中的速度说法不采用。</li>
+    <li><b>F9</b>：代码每项 <b>+10000</b>，不是 +1000。</li>
+    <li><b>eternal</b>：代码只比较前 5 个字符 <code>etern</code>，不是必须完整 7 字符才触发。</li>
+    <li><b>F6</b>：确认菜单/前置失败分支绕过；是否免费需逐个建造入口验证。</li>
+    <li><b>F5</b>：标志效果确认，画面名称待实机确认。</li>
+  </ul>
+</div>
+
+<h2>6. 证据</h2>
+<div class="scroll">
+<table>
+  <tr><th>结论</th><th>Evidence</th></tr>
+  <tr><td>字符串 eternal / xref</td><td><code>0x484BF8</code> · ev_71f29ad1…；<code>0x45482C</code> · ev_057ee83d…</td></tr>
+  <tr><td>键分发/输入比较</td><td><code>0x4544B3</code>–<code>0x454F9A</code>；跳表 <code>0x454FEC</code> · ev_6d0d4150…</td></tr>
+  <tr><td>F3/F4 等级 ±1</td><td><code>FUN_0042B190</code> · ev_31c38143…</td></tr>
+  <tr><td>F6 菜单/建造</td><td><code>FUN_00428810</code> · ev_fec20239…；<code>FUN_00428A50</code> · ev_b55dca03…</td></tr>
+  <tr><td>F7 伤害为 0</td><td><code>FUN_0041FE90</code> / <code>FUN_0041FEE0</code> · ev_9e41ceee… / ev_6e7e59d6…</td></tr>
+  <tr><td>F8 地图</td><td><code>FUN_00459A00</code> · ev_53ef46c3…</td></tr>
+  <tr><td>F11 截图</td><td><code>FUN_0041ACA0</code> · ev_ca3d2a83…</td></tr>
+  <tr><td>F2 主更新</td><td><code>FUN_0045AFE0</code> · ev_39bb4716…</td></tr>
+</table>
+</div>
+
+<h2>7. 文件</h2>
+<ul>
+  <li><a href="README.md">README.md</a> — 完整分析</li>
+  <li><a href="data/cheats.json">data/cheats.json</a> — 秘籍/隐藏键/证据</li>
+  <li><a href="data/cheats.csv">data/cheats.csv</a> — 平表</li>
+  <li><a href="data/assets.json">data/assets.json</a> — 图索引</li>
+  <li><a href="tools/extract_meta.mjs">tools/extract_meta.mjs</a> — 可重复校验/生成脚本</li>
+</ul>
+</body>
+</html>

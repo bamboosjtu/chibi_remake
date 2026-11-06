@@ -1,0 +1,40 @@
+{
+  "productionSheet": "assets/production_sheet.png",
+  "icons": "assets/tech_<command>_<stem>.png",
+  "iconList": [
+    "assets/tech_16031_hq_up_1_a.png",
+    "assets/tech_16032_hq_up_2_a.png",
+    "assets/tech_16033_hq_up_3_a.png",
+    "assets/tech_16034_hq_up_1_b.png",
+    "assets/tech_16035_hq_up_2_b.png",
+    "assets/tech_16036_hq_up_3_b.png",
+    "assets/tech_16040_bow_1.png",
+    "assets/tech_16041_bow_2.png",
+    "assets/tech_16042_bow_3.png",
+    "assets/tech_16050_weapon_1.png",
+    "assets/tech_16051_weapon_2.png",
+    "assets/tech_16052_weapon_3.png",
+    "assets/tech_16053_armor_1.png",
+    "assets/tech_16054_armor_2.png",
+    "assets/tech_16055_armor_3.png",
+    "assets/tech_16060_sell_wood_1000.png",
+    "assets/tech_16061_sell_iron_1000.png",
+    "assets/tech_16062_sell_food_1000.png",
+    "assets/tech_16063_sell_wood_5000.png",
+    "assets/tech_16064_sell_iron_5000.png",
+    "assets/tech_16065_sell_food_5000.png",
+    "assets/tech_16111_catapult_1.png",
+    "assets/tech_16112_catapult_2.png",
+    "assets/tech_16124_navy_fast.png",
+    "assets/tech_16125_navy_war.png",
+    "assets/tech_16126_navy_armor.png"
+  ],
+  "branches": [
+    "assets/branch_hq.png",
+    "assets/branch_wood.png",
+    "assets/branch_weapon.png",
+    "assets/branch_vehicle.png",
+    "assets/branch_dock.png"
+  ],
+  "tree": "assets/tech_tree.svg"
+}

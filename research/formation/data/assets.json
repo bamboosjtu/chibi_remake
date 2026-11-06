@@ -1,0 +1,24 @@
+{
+  "iconSheet": "assets/formations_sheet.png",
+  "icons": [
+    "assets/formation_16190_icon.png",
+    "assets/formation_16191_icon.png",
+    "assets/formation_16192_icon.png",
+    "assets/formation_16193_icon.png",
+    "assets/formation_16194_icon.png",
+    "assets/formation_16195_icon.png",
+    "assets/formation_16196_icon.png",
+    "assets/formation_16197_icon.png",
+    "assets/formation_16198_icon.png",
+    "assets/formation_16199_icon.png"
+  ],
+  "pagingIcons": [
+    "assets/formation_16200_icon.png",
+    "assets/formation_16201_icon.png"
+  ],
+  "layoutOverview": "assets/formation_layouts.svg",
+  "layoutTemplate": "assets/formation_<command>_layout.svg",
+  "flow": "assets/formation_flow.svg",
+  "data": "data/formations.json",
+  "csv": "data/formations.csv"
+}

@@ -1,0 +1,371 @@
+{
+  "schemaVersion": 1,
+  "generated": "2026-10-29",
+  "source": {
+    "file": "CB.EXE",
+    "sha256": "2db7cc102e6fde547ab05d77cfddabc2079f5bc9be9b6b59b17bf435c5798cb7",
+    "menuFormat": "XOR 0x22 ASCII menu layout; decoded by FUN_0041bb20",
+    "note": "仅以原版 CB.EXE/菜单资源静态分析为准；docs/重制实现只作差异对照。"
+  },
+  "conclusion": {
+    "available": false,
+    "summary": "主菜单第三项「对战模式」（command 21000）在原版 CB.EXE 中没有处理动作。它不是可玩的单机/热座/联网模式，只是保留的按钮和残留多人菜单资源。",
+    "clickBehavior": "FUN_00409d70 的分支为 `if (param_2 != 21000) { ... }`，没有 else 或 PostMessage；命中 21000 时直接返回。",
+    "notImplemented": [
+      "没有从 21000 到 M_NET/M_IPX/M_MODEM/M_SERIAL 的调用。",
+      "没有 Winsock/IPX/TAPI/串口传输导入，不能建立真实联机。",
+      "没有本地 AI 遭遇战/热座设置入口。"
+    ]
+  },
+  "mainMenu": {
+    "menuFile": "SET/M_MAIN.EXP",
+    "decoded": "207\t\t252\t\t225\t\t190  \t171\t\t207\t\t252\t\t225\t\t30\t\t20100  \t53\t\t207\t\t292\t\t225\t\t30\t\t20200  \t273\t\t207\t\t332\t\t225\t\t30\t\t21000  \t29\t\t207\t\t372\t\t225\t\t30\t\t26000  \t26\t\t207\t\t412\t\t225\t\t30\t\t27000  ",
+    "items": [
+      {
+        "index": 0,
+        "label": "开始游戏",
+        "frame": 171,
+        "command": 20100,
+        "x": 207,
+        "y": 252,
+        "w": 225,
+        "h": 30,
+        "asset": "assets/main_menu_start.png"
+      },
+      {
+        "index": 1,
+        "label": "读取进度",
+        "frame": 53,
+        "command": 20200,
+        "x": 207,
+        "y": 292,
+        "w": 225,
+        "h": 30,
+        "asset": "assets/main_menu_load.png"
+      },
+      {
+        "index": 2,
+        "label": "对战模式",
+        "frame": 273,
+        "command": 21000,
+        "x": 207,
+        "y": 332,
+        "w": 225,
+        "h": 30,
+        "asset": "assets/main_menu_battle.png"
+      },
+      {
+        "index": 3,
+        "label": "历史简介",
+        "frame": 29,
+        "command": 26000,
+        "x": 207,
+        "y": 372,
+        "w": 225,
+        "h": 30,
+        "asset": "assets/main_menu_history.png"
+      },
+      {
+        "index": 4,
+        "label": "退出游戏",
+        "frame": 26,
+        "command": 27000,
+        "x": 207,
+        "y": 412,
+        "w": 225,
+        "h": 30,
+        "asset": "assets/main_menu_exit.png"
+      }
+    ],
+    "battleItem": {
+      "index": 2,
+      "label": "对战模式",
+      "frame": 273,
+      "command": 21000,
+      "x": 207,
+      "y": 332,
+      "w": 225,
+      "h": 30,
+      "asset": "assets/main_menu_battle.png"
+    },
+    "buttonStates": "assets/main_menu_battle_states.png",
+    "contactSheet": "assets/main_menu_items.png",
+    "note": "主菜单按钮图标帧 171/53/273/29/26；第三项帧 273 的完整 225×120 条带含普通/悬停/按下/灰色禁用四态。"
+  },
+  "handler": {
+    "function": "FUN_00409d70",
+    "address": "0x409D70",
+    "branch": "else if (param_2 < 0x5209) { if (param_2 != 21000) { ... } }",
+    "result": "21000 无动作；0x4f1c/0x4f1d 分支才加载 M_NET，但与主菜单第三项无连接。",
+    "networkLoadFunctions": {
+      "M_NET": "FUN_00405e80(0x5209)",
+      "M_IPX": "FUN_00405e80(0x55f1)",
+      "M_MODEM": "FUN_00405e80(0x59d9)",
+      "M_SERIAL": "FUN_00405e80(0x5dc1)"
+    }
+  },
+  "networkMenus": {
+    "M_NET": {
+      "title": "网络连接选择（残留在代码中的对战菜单）",
+      "file": "SET/M_NET.EXP",
+      "commands": [
+        {
+          "command": 24000,
+          "label": "串口连接（记录未见可读文字）",
+          "frame": null,
+          "x": 226,
+          "y": 225,
+          "inferred": true
+        },
+        {
+          "command": 25000,
+          "label": "INTERNET连接",
+          "frame": 30,
+          "x": 39,
+          "y": 266,
+          "w": 225,
+          "h": 30,
+          "asset": "assets/net_internet.png"
+        },
+        {
+          "command": 22000,
+          "label": "网络连接",
+          "frame": 10,
+          "x": 39,
+          "y": 306,
+          "w": 225,
+          "h": 30,
+          "asset": "assets/net_lan.png"
+        },
+        {
+          "command": 23000,
+          "label": "调制解调器连接",
+          "frame": 13,
+          "x": 39,
+          "y": 346,
+          "w": 225,
+          "h": 30,
+          "asset": "assets/net_modem.png"
+        },
+        {
+          "command": 21010,
+          "label": "请输入您的姓名",
+          "frame": 14,
+          "x": 374,
+          "y": 239,
+          "w": 225,
+          "h": 60,
+          "asset": "assets/net_name.png"
+        },
+        {
+          "command": 21004,
+          "label": "取消",
+          "frame": 7,
+          "x": 468,
+          "y": 335,
+          "w": 126,
+          "h": 30,
+          "asset": "assets/net_cancel.png"
+        }
+      ]
+    },
+    "M_IPX": {
+      "title": "IPX/局域网战局列表",
+      "file": "SET/M_IPX.EXP",
+      "commands": [
+        {
+          "command": 22200,
+          "label": "创建战局",
+          "frame": 9,
+          "x": 35,
+          "y": 265,
+          "w": 225,
+          "h": 30,
+          "asset": "assets/ipx_create.png"
+        },
+        {
+          "command": 22500,
+          "label": "加入战局",
+          "frame": 11,
+          "x": 35,
+          "y": 305,
+          "w": 225,
+          "h": 30,
+          "asset": "assets/ipx_join.png"
+        },
+        {
+          "command": 22800,
+          "label": "观看战局",
+          "frame": 17,
+          "x": 35,
+          "y": 345,
+          "w": 225,
+          "h": 30,
+          "asset": "assets/ipx_watch.png"
+        },
+        {
+          "command": 22110,
+          "label": "上翻",
+          "frame": 2,
+          "x": 584,
+          "y": 221,
+          "w": 23,
+          "h": 29,
+          "asset": null
+        },
+        {
+          "command": 22120,
+          "label": "下翻",
+          "frame": 1,
+          "x": 584,
+          "y": 343,
+          "w": 23,
+          "h": 29,
+          "asset": null
+        },
+        {
+          "command": 22130,
+          "label": "取消",
+          "frame": 7,
+          "x": 472,
+          "y": 400,
+          "w": 126,
+          "h": 30,
+          "asset": "assets/ipx_cancel.png"
+        },
+        {
+          "command": 22111,
+          "label": "战局列表行",
+          "frame": 50,
+          "x": 281,
+          "y": 216,
+          "w": 300,
+          "h": 40,
+          "asset": null,
+          "rows": [
+            216,
+            256,
+            296,
+            336
+          ]
+        }
+      ]
+    },
+    "M_MODEM": {
+      "title": "调制解调器拨号",
+      "file": "SET/M_MODEM.EXP",
+      "commands": [
+        {
+          "command": 23100,
+          "label": "拨号",
+          "frame": 16,
+          "x": 207,
+          "y": 260,
+          "w": 225,
+          "h": 30,
+          "asset": "assets/modem_dial.png"
+        },
+        {
+          "command": 23020,
+          "label": "等待拨号",
+          "frame": 20,
+          "x": 207,
+          "y": 300,
+          "w": 225,
+          "h": 30,
+          "asset": "assets/modem_wait.png"
+        },
+        {
+          "command": 23010,
+          "label": "取消",
+          "frame": 7,
+          "x": 256,
+          "y": 375,
+          "w": 126,
+          "h": 30,
+          "asset": "assets/modem_cancel.png"
+        }
+      ]
+    },
+    "M_SERIAL": {
+      "title": "串口/直连",
+      "file": "SET/M_SERIAL.EXP",
+      "commands": [
+        {
+          "command": 24020,
+          "label": "创建战局",
+          "frame": 9,
+          "x": 207,
+          "y": 260,
+          "w": 225,
+          "h": 30,
+          "asset": "assets/serial_create.png"
+        },
+        {
+          "command": 26070,
+          "label": "加入战局",
+          "frame": 11,
+          "x": 207,
+          "y": 300,
+          "w": 225,
+          "h": 30,
+          "asset": "assets/serial_join.png"
+        },
+        {
+          "command": 24010,
+          "label": "取消",
+          "frame": 7,
+          "x": 256,
+          "y": 375,
+          "w": 126,
+          "h": 30,
+          "asset": "assets/serial_cancel.png"
+        }
+      ]
+    }
+  },
+  "networkEvidence": {
+    "reachableFromBattleItem": false,
+    "mIpxXref": "0x406b52",
+    "menuTransport": "Menus only; no socket/serial/TAPI calls found.",
+    "imports": [
+      "KERNEL32.dll",
+      "USER32.dll",
+      "GDI32.dll",
+      "DDRAW.dll",
+      "DSOUND.dll",
+      "WINMM.dll",
+      "IMM32.dll",
+      "AVIFIL32.dll",
+      "MSVFW32.dll"
+    ],
+    "importedNetworkDlls": [],
+    "note": "M_NET/M_IPX/M_MODEM/M_SERIAL 的按钮资源与加载器存在，但没有可用的对战传输；M_IPX 确实被 0x55f1 加载器引用，不是完全孤立文件。"
+  },
+  "evidence": {
+    "xorDecoder": "ev_d0731b4f09ceb34828baef9e489e2cf6b0a9207218c8650f44eb43768c34a471",
+    "menuLoader": "ev_7873f82d6c6338671bf189acd6270190cadbdc3da886ac306b0d937a3af670be",
+    "mIpxXref": "ev_d72adfe159c1a51208fe5d9bc852ae028e5d8cbd523dabc72885a3d96742486f",
+    "mainMenuHandler": "FUN_00409d70 @ 0x409D70 (branch at 0x409D70/line 8353; no 21000 action)",
+    "menuFiles": {
+      "M_MAIN": "fff05624028f6841895121a29d81b30e5fcbe915375c634473149d9670e0fbce",
+      "M_NET": "5301a4ed6761bf861b875d4d7d929787f09ffca893c0f7fa7096ee8c747320af",
+      "M_IPX": "f06dc1bc1778ba95d9c8becd7b832648fb23707574f488c724f9fa0266a180cd",
+      "M_MODEM": "8dfd89abc8c2c6b37d4600347d4ee4c5b6b451384716ce0323cd436249143401",
+      "M_SERIAL": "56be51fc392971920e4859423915e67dfd6132232701283fb20c21e20018998c",
+      "M_NEWGAM": "4939cdbd62bfffa657c43c5e8ddcf7aed32f534a9ef04337f85babf25b5d9ccc",
+      "M_SINGLE": "89570798c74f88826c7f366c67020ad06e9899a2f2b4ffae006553c271d65426",
+      "M_MLOAD": "93c48f628bfcff01d13c3538eb2e368f4987b8f29c1538a195519a308d8907c8"
+    }
+  },
+  "files": {
+    "mainBattleButton": "assets/main_menu_battle.png",
+    "mainBattleStates": "assets/main_menu_battle_states.png",
+    "mainMenuItems": "assets/main_menu_items.png",
+    "network": "assets/net_internet.png, assets/net_lan.png, assets/net_modem.png, assets/net_name.png, assets/net_cancel.png",
+    "ipx": "assets/ipx_create.png, assets/ipx_join.png, assets/ipx_watch.png, assets/ipx_cancel.png",
+    "modem": "assets/modem_dial.png, assets/modem_wait.png, assets/modem_cancel.png",
+    "serial": "assets/serial_create.png, assets/serial_join.png, assets/serial_cancel.png",
+    "flow": "assets/battle_mode_flow.svg"
+  }
+}

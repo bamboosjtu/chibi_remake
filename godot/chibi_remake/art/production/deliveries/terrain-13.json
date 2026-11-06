@@ -1,0 +1,26 @@
+{
+  "assetId": "terrain-13",
+  "bytes": 1300634.0,
+  "colorType": 6.0,
+  "generatedAt": "2026-10-13T09:30:53.880Z",
+  "generator": "built-in image_gen",
+  "height": 725.0,
+  "prompt": "Use case: style-transfer. Finished transparent terrain tile atlas 地面道具 for 三国赤壁 HD redraw. Repaint ALL cells in the reference atlas while preserving EXACT canvas proportions, original layout, diamond ground silhouettes, cliff/wall heights, edge cutouts and seamless neighboring variants. Each tile originally 44x42; exact 5 columns x 1 rows. Preserve original color palette, isometric 2:1 orthographic perspective and upper-left light. Fully redraw detailed hand-painted grass/earth/water/stone/wood material appropriate to reference; no change to geography, no scenery or extra objects. Fourfold reference resolution if possible. True transparent alpha wherever reference is transparent. No labels/grid/text/black rectangle/checkerboard/watermark. All variants required, not one isolated tile. Keep all source-empty cells empty and each occupied cell in its EXACT source position. Do not compact, rearrange or evenly fill the atlas. Never move any tile to another row or column.",
+  "promptFile": "godot/chibi_remake/art/production/source-faithful-prompts-v2.json",
+  "sha256": "f7f8c5e804d7032048baf3c19ca549c26f4fa917a4958d0a18eff69e64fa8902",
+  "sourceGeneratedFile": "C:\\Users\\bambo\\.codex\\generated_images\\01a13348-db65-7b23-b66a-63227eb4490d\\exec-270cb680-8e4c-4765-b64c-33c5966a0190.png",
+  "status": "generated-awaiting-validation",
+  "texture": "godot/chibi_remake/art/full/terrain/13-atlas-v1.png",
+  "userAcceptance": {
+    "date": "2026-10-13",
+    "reason": "用户已人工验证高清图，要求直接替换对应素材，不再逐项美术复核。",
+    "reviewer": "user"
+  },
+  "validation": {
+    "excludedSourceLabelsOrBlanks": 0,
+    "structure": "pass",
+    "visual": "pass",
+    "visualFrameCount": 5
+  },
+  "width": 2169.0
+}

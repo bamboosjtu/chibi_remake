@@ -1,0 +1,539 @@
+{
+  "source": "SET/INTERFAC.EXP frames 58-89; command N maps to type N-16150",
+  "sets": {
+    "A": {
+      "label": "Even-ID / 阵营 A 美术",
+      "entries": [
+        {
+          "frame": 58,
+          "command": 16150,
+          "typeId": 0,
+          "name": "建造主帅帐",
+          "buildable": true,
+          "playerBuildableRemake": true,
+          "set": "A",
+          "page": 1
+        },
+        {
+          "frame": 59,
+          "command": 16160,
+          "typeId": 10,
+          "name": "建造粮仓",
+          "buildable": true,
+          "playerBuildableRemake": true,
+          "set": "A",
+          "page": 1
+        },
+        {
+          "frame": 60,
+          "command": 16154,
+          "typeId": 4,
+          "name": "建造木柴加工场",
+          "buildable": true,
+          "playerBuildableRemake": true,
+          "set": "A",
+          "page": 1
+        },
+        {
+          "frame": 61,
+          "command": 16152,
+          "typeId": 2,
+          "name": "建造兵器制造厂",
+          "buildable": true,
+          "playerBuildableRemake": true,
+          "set": "A",
+          "page": 1
+        },
+        {
+          "frame": 62,
+          "command": 16173,
+          "typeId": 23,
+          "name": "建造钱庄",
+          "buildable": true,
+          "playerBuildableRemake": true,
+          "set": "A",
+          "page": 1
+        },
+        {
+          "frame": 63,
+          "command": 16162,
+          "typeId": 12,
+          "name": "建造步兵所",
+          "buildable": true,
+          "playerBuildableRemake": true,
+          "set": "A",
+          "page": 1
+        },
+        {
+          "frame": 64,
+          "command": 16156,
+          "typeId": 6,
+          "name": "建造骑兵所",
+          "buildable": true,
+          "playerBuildableRemake": true,
+          "set": "A",
+          "page": 1
+        },
+        {
+          "frame": 65,
+          "command": 16164,
+          "typeId": 14,
+          "name": "建造弓兵所",
+          "buildable": true,
+          "playerBuildableRemake": true,
+          "set": "A",
+          "page": 1
+        },
+        {
+          "frame": 66,
+          "command": 16158,
+          "typeId": 8,
+          "name": "建造车兵所",
+          "buildable": true,
+          "playerBuildableRemake": false,
+          "set": "A",
+          "page": 1
+        },
+        {
+          "frame": 67,
+          "command": 16170,
+          "typeId": 20,
+          "name": "建造船厂",
+          "buildable": true,
+          "playerBuildableRemake": false,
+          "set": "A",
+          "page": 2
+        },
+        {
+          "frame": 68,
+          "command": 16168,
+          "typeId": 18,
+          "name": "建造塔楼",
+          "buildable": true,
+          "playerBuildableRemake": true,
+          "set": "A",
+          "page": 2
+        },
+        {
+          "frame": 69,
+          "command": 16176,
+          "typeId": 26,
+          "name": "建造帅旗",
+          "buildable": true,
+          "playerBuildableRemake": true,
+          "set": "A",
+          "page": 2
+        },
+        {
+          "frame": 70,
+          "command": 16166,
+          "typeId": 16,
+          "name": "建造城门",
+          "buildable": true,
+          "playerBuildableRemake": false,
+          "set": "A",
+          "page": 2
+        },
+        {
+          "frame": 71,
+          "command": 16180,
+          "typeId": null,
+          "name": "向上翻页",
+          "buildable": false,
+          "playerBuildableRemake": false,
+          "set": "A",
+          "page": 2
+        },
+        {
+          "frame": 72,
+          "command": 16181,
+          "typeId": null,
+          "name": "向下翻页",
+          "buildable": false,
+          "playerBuildableRemake": false,
+          "set": "A",
+          "page": 2
+        },
+        {
+          "frame": 73,
+          "command": 16186,
+          "typeId": 24,
+          "name": "民居",
+          "buildable": false,
+          "playerBuildableRemake": false,
+          "set": "A",
+          "page": 2
+        }
+      ]
+    },
+    "B": {
+      "label": "Odd-ID / 阵营 B 美术",
+      "entries": [
+        {
+          "frame": 74,
+          "command": 16151,
+          "typeId": 1,
+          "name": "建造主帅帐",
+          "buildable": true,
+          "playerBuildableRemake": true,
+          "set": "B",
+          "page": 1
+        },
+        {
+          "frame": 75,
+          "command": 16161,
+          "typeId": 11,
+          "name": "建造粮仓",
+          "buildable": true,
+          "playerBuildableRemake": true,
+          "set": "B",
+          "page": 1
+        },
+        {
+          "frame": 76,
+          "command": 16155,
+          "typeId": 5,
+          "name": "建造木柴加工场",
+          "buildable": true,
+          "playerBuildableRemake": true,
+          "set": "B",
+          "page": 1
+        },
+        {
+          "frame": 77,
+          "command": 16153,
+          "typeId": 3,
+          "name": "建造兵器制造厂",
+          "buildable": true,
+          "playerBuildableRemake": true,
+          "set": "B",
+          "page": 1
+        },
+        {
+          "frame": 78,
+          "command": 16173,
+          "typeId": 23,
+          "name": "建造钱庄",
+          "buildable": true,
+          "playerBuildableRemake": true,
+          "set": "B",
+          "page": 1
+        },
+        {
+          "frame": 79,
+          "command": 16163,
+          "typeId": 13,
+          "name": "建造步兵所",
+          "buildable": true,
+          "playerBuildableRemake": true,
+          "set": "B",
+          "page": 1
+        },
+        {
+          "frame": 80,
+          "command": 16157,
+          "typeId": 7,
+          "name": "建造骑兵所",
+          "buildable": true,
+          "playerBuildableRemake": true,
+          "set": "B",
+          "page": 1
+        },
+        {
+          "frame": 81,
+          "command": 16165,
+          "typeId": 15,
+          "name": "建造弓兵所",
+          "buildable": true,
+          "playerBuildableRemake": true,
+          "set": "B",
+          "page": 1
+        },
+        {
+          "frame": 82,
+          "command": 16159,
+          "typeId": 9,
+          "name": "建造车兵所",
+          "buildable": true,
+          "playerBuildableRemake": false,
+          "set": "B",
+          "page": 1
+        },
+        {
+          "frame": 83,
+          "command": 16170,
+          "typeId": 20,
+          "name": "建造船厂",
+          "buildable": true,
+          "playerBuildableRemake": false,
+          "set": "B",
+          "page": 2
+        },
+        {
+          "frame": 84,
+          "command": 16169,
+          "typeId": 19,
+          "name": "建造塔楼",
+          "buildable": true,
+          "playerBuildableRemake": true,
+          "set": "B",
+          "page": 2
+        },
+        {
+          "frame": 85,
+          "command": 16176,
+          "typeId": 26,
+          "name": "建造帅旗",
+          "buildable": true,
+          "playerBuildableRemake": true,
+          "set": "B",
+          "page": 2
+        },
+        {
+          "frame": 86,
+          "command": 16167,
+          "typeId": 17,
+          "name": "建造城门",
+          "buildable": true,
+          "playerBuildableRemake": false,
+          "set": "B",
+          "page": 2
+        },
+        {
+          "frame": 87,
+          "command": 16183,
+          "typeId": null,
+          "name": "向上翻页",
+          "buildable": false,
+          "playerBuildableRemake": false,
+          "set": "B",
+          "page": 2
+        },
+        {
+          "frame": 88,
+          "command": 16184,
+          "typeId": null,
+          "name": "向下翻页",
+          "buildable": false,
+          "playerBuildableRemake": false,
+          "set": "B",
+          "page": 2
+        },
+        {
+          "frame": 89,
+          "command": 16187,
+          "typeId": 25,
+          "name": "民居",
+          "buildable": false,
+          "playerBuildableRemake": false,
+          "set": "B",
+          "page": 2
+        }
+      ]
+    }
+  },
+  "page1Order": [
+    "帅帐",
+    "粮仓",
+    "木材场",
+    "武器库",
+    "钱庄",
+    "步兵所",
+    "弓兵所",
+    "骑兵所",
+    "车兵所"
+  ],
+  "codePrerequisites": {
+    "source": "FUN_00428810 mask bits; panel 0x111DE pointer order",
+    "flags": {
+      "HQ": "DAT_005af2a4 (types 0/1)",
+      "granary": "DAT_005af2c4 (types 10/11)",
+      "wood": "DAT_005af2e4 (types 4/5)",
+      "weapon": "DAT_005af2ec (types 2/3)"
+    },
+    "page1": [
+      {
+        "building": "钱庄",
+        "requires": [
+          "帅帐"
+        ],
+        "mask": "bit4; HQ absent -> clear"
+      },
+      {
+        "building": "步兵所",
+        "requires": [
+          "粮仓"
+        ],
+        "mask": "bit5; granary absent -> clear"
+      },
+      {
+        "building": "弓兵所",
+        "requires": [
+          "木材场"
+        ],
+        "mask": "bit6; wood absent -> clear"
+      },
+      {
+        "building": "骑兵所",
+        "requires": [
+          "粮仓",
+          "木材场"
+        ],
+        "mask": "bit7; granary/wood absent -> clear"
+      }
+    ],
+    "page2": {
+      "mask": "uVar2 (second build menu, 0x11210)",
+      "clears": [
+        "weapon absent -> bit2",
+        "tier 0 -> bits0,1",
+        "always bits4,6"
+      ],
+      "note": "Second menu likely dock/tower/banner/gate; exact button order not fully decoded."
+    },
+    "page1Slots": [
+      {
+        "slot": 0,
+        "bit": 1,
+        "pointer": "0x4A0230",
+        "command": 16150,
+        "type": 0,
+        "name": "帅帐"
+      },
+      {
+        "slot": 1,
+        "bit": 2,
+        "pointer": "0x496E18",
+        "command": 16160,
+        "type": 10,
+        "name": "粮仓"
+      },
+      {
+        "slot": 2,
+        "bit": 4,
+        "pointer": "0x49BFA8",
+        "command": 16154,
+        "type": 4,
+        "name": "木材场"
+      },
+      {
+        "slot": 3,
+        "bit": 8,
+        "pointer": "0x498EF8",
+        "command": 16152,
+        "type": 2,
+        "name": "武器库"
+      },
+      {
+        "slot": 4,
+        "bit": 16,
+        "pointer": "0x497B38",
+        "command": 16173,
+        "type": 23,
+        "name": "钱庄"
+      },
+      {
+        "slot": 5,
+        "bit": 32,
+        "pointer": "0x4958A8",
+        "command": 16162,
+        "type": 12,
+        "name": "步兵所"
+      },
+      {
+        "slot": 6,
+        "bit": 64,
+        "pointer": "0x497730",
+        "command": 16164,
+        "type": 14,
+        "name": "弓兵所"
+      },
+      {
+        "slot": 7,
+        "bit": 128,
+        "pointer": "0x493B28",
+        "command": 16156,
+        "type": 6,
+        "name": "骑兵所"
+      },
+      {
+        "slot": 8,
+        "bit": 256,
+        "pointer": "0x49FAF0",
+        "command": 16158,
+        "type": 8,
+        "name": "车兵所"
+      }
+    ],
+    "note": "The mask bits are inferred from the 0x4A1818 panel pointer order (HQ, granary, wood, weapon, money, infantry, archer, cavalry, chariot). The docs/remake table says cavalry <- weapon; the original page-1 mask instead gates cavalry on granary+wood, while weapon is used by the second (building-side) menu mask. Treat the per-entry mapping as high-confidence, not yet screenshot-verified."
+  },
+  "remakeDesignPrerequisites": [
+    {
+      "building": "步兵所",
+      "requires": [
+        "粮仓"
+      ]
+    },
+    {
+      "building": "弓兵所",
+      "requires": [
+        "木材场"
+      ]
+    },
+    {
+      "building": "箭楼",
+      "requires": [
+        "木材场"
+      ]
+    },
+    {
+      "building": "骑兵所",
+      "requires": [
+        "武器库"
+      ]
+    }
+  ],
+  "playerBuildableRemake": [
+    {
+      "id": 0,
+      "name": "帅帐"
+    },
+    {
+      "id": 10,
+      "name": "粮仓"
+    },
+    {
+      "id": 4,
+      "name": "木材场"
+    },
+    {
+      "id": 2,
+      "name": "武器库"
+    },
+    {
+      "id": 23,
+      "name": "钱庄"
+    },
+    {
+      "id": 26,
+      "name": "大旗"
+    },
+    {
+      "id": 18,
+      "name": "箭楼"
+    },
+    {
+      "id": 12,
+      "name": "步兵所"
+    },
+    {
+      "id": 14,
+      "name": "弓兵所"
+    },
+    {
+      "id": 6,
+      "name": "骑兵所"
+    }
+  ],
+  "note": "Original build command range 0x3F16..0x3F30 covers all 27 types; types 21/22/24/25 have no build icon. The remake restricts the player list to 10 categories; the original worker menu 0x111DE shows 9 categories (including 车兵所) and a second building-side menu 0x11210 uses the other mask."
+}

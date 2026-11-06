@@ -1,0 +1,164 @@
+[
+  {
+    "assetId": "units-034-page-01",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-034-page-01.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-034-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Repaint FIRST image EXACT pose grid for faithful HD 三国赤壁 animation atlas, 车兵 type34, page1. SECOND image is ONE design/material swatch ONLY, never a pose guide. Exactly 4 EQUAL COLUMNS x 4 EQUAL ROWS. Preserve source row-major pose order and EACH cell facing, limbs, horse or cart angle, weapon, silhouette and relative anchor. Do not invent or rearrange directions, or substitute repeated idle figures. Same character costume, horse color, metal/wood and palette across cells; blue/cyan is team cloth. Detailed hand-painted steel rivets, silk, leather and hair, warm upper-left light. A true detailed repaint, no enlarged pixels. Every cell contains its source pose.  Preserve low prone/fallen silhouettes ONLY where the FIRST image has them. Other cells must stay upright. Do not copy the style swatch pose to all cells. Preserve source relative footprint and transparent margins. Canvas aspect 352:268, NO external padding or extra rows/columns. Genuine transparent alpha immediately around sprites. No text, labels, grid, watermark, halo, colored backdrop, checkerboard or scene."
+  },
+  {
+    "assetId": "units-034-page-02",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-034-page-02.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-034-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Repaint FIRST image EXACT pose grid for faithful HD 三国赤壁 animation atlas, 车兵 type34, page2. SECOND image is ONE design/material swatch ONLY, never a pose guide. Exactly 4 EQUAL COLUMNS x 4 EQUAL ROWS. Preserve source row-major pose order and EACH cell facing, limbs, horse or cart angle, weapon, silhouette and relative anchor. Do not invent or rearrange directions, or substitute repeated idle figures. Same character costume, horse color, metal/wood and palette across cells; blue/cyan is team cloth. Detailed hand-painted steel rivets, silk, leather and hair, warm upper-left light. A true detailed repaint, no enlarged pixels. Every cell contains its source pose.  Preserve low prone/fallen silhouettes ONLY where the FIRST image has them. Other cells must stay upright. Do not copy the style swatch pose to all cells. Preserve source relative footprint and transparent margins. Canvas aspect 352:268, NO external padding or extra rows/columns. Genuine transparent alpha immediately around sprites. No text, labels, grid, watermark, halo, colored backdrop, checkerboard or scene."
+  },
+  {
+    "assetId": "units-034-page-03",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-034-page-03.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-034-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Repaint FIRST image EXACT pose grid for faithful HD 三国赤壁 animation atlas, 车兵 type34, page3. SECOND image is ONE design/material swatch ONLY, never a pose guide. Exactly 4 EQUAL COLUMNS x 4 EQUAL ROWS. Preserve source row-major pose order and EACH cell facing, limbs, horse or cart angle, weapon, silhouette and relative anchor. Do not invent or rearrange directions, or substitute repeated idle figures. Same character costume, horse color, metal/wood and palette across cells; blue/cyan is team cloth. Detailed hand-painted steel rivets, silk, leather and hair, warm upper-left light. A true detailed repaint, no enlarged pixels. Every cell contains its source pose.  Preserve low prone/fallen silhouettes ONLY where the FIRST image has them. Other cells must stay upright. Do not copy the style swatch pose to all cells. Preserve source relative footprint and transparent margins. Canvas aspect 352:268, NO external padding or extra rows/columns. Genuine transparent alpha immediately around sprites. No text, labels, grid, watermark, halo, colored backdrop, checkerboard or scene."
+  },
+  {
+    "assetId": "units-034-page-04",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-034-page-04.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-034-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Repaint FIRST image EXACT pose grid for faithful HD 三国赤壁 animation atlas, 车兵 type34, page4. SECOND image is ONE design/material swatch ONLY, never a pose guide. Exactly 2 EQUAL COLUMNS x 1 EQUAL ROWS. Preserve source row-major pose order and EACH cell facing, limbs, horse or cart angle, weapon, silhouette and relative anchor. Do not invent or rearrange directions, or substitute repeated idle figures. Same character costume, horse color, metal/wood and palette across cells; blue/cyan is team cloth. Detailed hand-painted steel rivets, silk, leather and hair, warm upper-left light. A true detailed repaint, no enlarged pixels. Every cell contains its source pose. The original flat cyan utility-shape cells 1 are utility silhouettes: retain the exact flat cyan shape, do not invent scenery, ponds, rocks or new soldiers. Preserve low prone/fallen silhouettes ONLY where the FIRST image has them. Other cells must stay upright. Do not copy the style swatch pose to all cells. Preserve source relative footprint and transparent margins. Canvas aspect 176:67, NO external padding or extra rows/columns. Genuine transparent alpha immediately around sprites. No text, labels, grid, watermark, halo, colored backdrop, checkerboard or scene."
+  },
+  {
+    "assetId": "units-035-page-01",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-035-page-01.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-035-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Repaint FIRST image EXACT pose grid for faithful HD 三国赤壁 animation atlas, 骑将 type35, page1. SECOND image is ONE design/material swatch ONLY, never a pose guide. Exactly 4 EQUAL COLUMNS x 4 EQUAL ROWS. Preserve source row-major pose order and EACH cell facing, limbs, horse or cart angle, weapon, silhouette and relative anchor. Do not invent or rearrange directions, or substitute repeated idle figures. Same character costume, horse color, metal/wood and palette across cells; blue/cyan is team cloth. Detailed hand-painted steel rivets, silk, leather and hair, warm upper-left light. A true detailed repaint, no enlarged pixels. Every cell contains its source pose.  Preserve low prone/fallen silhouettes ONLY where the FIRST image has them. Other cells must stay upright. Do not copy the style swatch pose to all cells. Preserve source relative footprint and transparent margins. Canvas aspect 288:268, NO external padding or extra rows/columns. Genuine transparent alpha immediately around sprites. No text, labels, grid, watermark, halo, colored backdrop, checkerboard or scene."
+  },
+  {
+    "assetId": "units-035-page-02",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-035-page-02.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-035-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Repaint FIRST image EXACT pose grid for faithful HD 三国赤壁 animation atlas, 骑将 type35, page2. SECOND image is ONE design/material swatch ONLY, never a pose guide. Exactly 4 EQUAL COLUMNS x 4 EQUAL ROWS. Preserve source row-major pose order and EACH cell facing, limbs, horse or cart angle, weapon, silhouette and relative anchor. Do not invent or rearrange directions, or substitute repeated idle figures. Same character costume, horse color, metal/wood and palette across cells; blue/cyan is team cloth. Detailed hand-painted steel rivets, silk, leather and hair, warm upper-left light. A true detailed repaint, no enlarged pixels. Every cell contains its source pose.  Preserve low prone/fallen silhouettes ONLY where the FIRST image has them. Other cells must stay upright. Do not copy the style swatch pose to all cells. Preserve source relative footprint and transparent margins. Canvas aspect 288:268, NO external padding or extra rows/columns. Genuine transparent alpha immediately around sprites. No text, labels, grid, watermark, halo, colored backdrop, checkerboard or scene."
+  },
+  {
+    "assetId": "units-035-page-03",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-035-page-03.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-035-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Repaint FIRST image EXACT pose grid for faithful HD 三国赤壁 animation atlas, 骑将 type35, page3. SECOND image is ONE design/material swatch ONLY, never a pose guide. Exactly 4 EQUAL COLUMNS x 4 EQUAL ROWS. Preserve source row-major pose order and EACH cell facing, limbs, horse or cart angle, weapon, silhouette and relative anchor. Do not invent or rearrange directions, or substitute repeated idle figures. Same character costume, horse color, metal/wood and palette across cells; blue/cyan is team cloth. Detailed hand-painted steel rivets, silk, leather and hair, warm upper-left light. A true detailed repaint, no enlarged pixels. Every cell contains its source pose.  Preserve low prone/fallen silhouettes ONLY where the FIRST image has them. Other cells must stay upright. Do not copy the style swatch pose to all cells. Preserve source relative footprint and transparent margins. Canvas aspect 288:268, NO external padding or extra rows/columns. Genuine transparent alpha immediately around sprites. No text, labels, grid, watermark, halo, colored backdrop, checkerboard or scene."
+  },
+  {
+    "assetId": "units-035-page-04",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-035-page-04.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-035-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Repaint FIRST image EXACT pose grid for faithful HD 三国赤壁 animation atlas, 骑将 type35, page4. SECOND image is ONE design/material swatch ONLY, never a pose guide. Exactly 3 EQUAL COLUMNS x 4 EQUAL ROWS. Preserve source row-major pose order and EACH cell facing, limbs, horse or cart angle, weapon, silhouette and relative anchor. Do not invent or rearrange directions, or substitute repeated idle figures. Same character costume, horse color, metal/wood and palette across cells; blue/cyan is team cloth. Detailed hand-painted steel rivets, silk, leather and hair, warm upper-left light. A true detailed repaint, no enlarged pixels. Every cell contains its source pose.  Preserve low prone/fallen silhouettes ONLY where the FIRST image has them. Other cells must stay upright. Do not copy the style swatch pose to all cells. Preserve source relative footprint and transparent margins. Canvas aspect 216:268, NO external padding or extra rows/columns. Genuine transparent alpha immediately around sprites. No text, labels, grid, watermark, halo, colored backdrop, checkerboard or scene."
+  },
+  {
+    "assetId": "units-035-page-05",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-035-page-05.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-035-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Repaint FIRST image EXACT pose grid for faithful HD 三国赤壁 animation atlas, 骑将 type35, page5. SECOND image is ONE design/material swatch ONLY, never a pose guide. Exactly 3 EQUAL COLUMNS x 4 EQUAL ROWS. Preserve source row-major pose order and EACH cell facing, limbs, horse or cart angle, weapon, silhouette and relative anchor. Do not invent or rearrange directions, or substitute repeated idle figures. Same character costume, horse color, metal/wood and palette across cells; blue/cyan is team cloth. Detailed hand-painted steel rivets, silk, leather and hair, warm upper-left light. A true detailed repaint, no enlarged pixels. Every cell contains its source pose.  Preserve low prone/fallen silhouettes ONLY where the FIRST image has them. Other cells must stay upright. Do not copy the style swatch pose to all cells. Preserve source relative footprint and transparent margins. Canvas aspect 216:268, NO external padding or extra rows/columns. Genuine transparent alpha immediately around sprites. No text, labels, grid, watermark, halo, colored backdrop, checkerboard or scene."
+  },
+  {
+    "assetId": "units-035-page-06",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-035-page-06.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-035-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Repaint FIRST image EXACT pose grid for faithful HD 三国赤壁 animation atlas, 骑将 type35, page6. SECOND image is ONE design/material swatch ONLY, never a pose guide. Exactly 4 EQUAL COLUMNS x 4 EQUAL ROWS. Preserve source row-major pose order and EACH cell facing, limbs, horse or cart angle, weapon, silhouette and relative anchor. Do not invent or rearrange directions, or substitute repeated idle figures. Same character costume, horse color, metal/wood and palette across cells; blue/cyan is team cloth. Detailed hand-painted steel rivets, silk, leather and hair, warm upper-left light. A true detailed repaint, no enlarged pixels. Every cell contains its source pose.  Preserve low prone/fallen silhouettes ONLY where the FIRST image has them. Other cells must stay upright. Do not copy the style swatch pose to all cells. Preserve source relative footprint and transparent margins. Canvas aspect 288:268, NO external padding or extra rows/columns. Genuine transparent alpha immediately around sprites. No text, labels, grid, watermark, halo, colored backdrop, checkerboard or scene."
+  },
+  {
+    "assetId": "units-035-page-07",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-035-page-07.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-035-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Repaint FIRST image EXACT pose grid for faithful HD 三国赤壁 animation atlas, 骑将 type35, page7. SECOND image is ONE design/material swatch ONLY, never a pose guide. Exactly 4 EQUAL COLUMNS x 4 EQUAL ROWS. Preserve source row-major pose order and EACH cell facing, limbs, horse or cart angle, weapon, silhouette and relative anchor. Do not invent or rearrange directions, or substitute repeated idle figures. Same character costume, horse color, metal/wood and palette across cells; blue/cyan is team cloth. Detailed hand-painted steel rivets, silk, leather and hair, warm upper-left light. A true detailed repaint, no enlarged pixels. Every cell contains its source pose.  Preserve low prone/fallen silhouettes ONLY where the FIRST image has them. Other cells must stay upright. Do not copy the style swatch pose to all cells. Preserve source relative footprint and transparent margins. Canvas aspect 288:268, NO external padding or extra rows/columns. Genuine transparent alpha immediately around sprites. No text, labels, grid, watermark, halo, colored backdrop, checkerboard or scene."
+  },
+  {
+    "assetId": "units-035-page-08",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-035-page-08.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-035-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Repaint FIRST image EXACT pose grid for faithful HD 三国赤壁 animation atlas, 骑将 type35, page8. SECOND image is ONE design/material swatch ONLY, never a pose guide. Exactly 3 EQUAL COLUMNS x 4 EQUAL ROWS. Preserve source row-major pose order and EACH cell facing, limbs, horse or cart angle, weapon, silhouette and relative anchor. Do not invent or rearrange directions, or substitute repeated idle figures. Same character costume, horse color, metal/wood and palette across cells; blue/cyan is team cloth. Detailed hand-painted steel rivets, silk, leather and hair, warm upper-left light. A true detailed repaint, no enlarged pixels. Every cell contains its source pose.  Preserve low prone/fallen silhouettes ONLY where the FIRST image has them. Other cells must stay upright. Do not copy the style swatch pose to all cells. Preserve source relative footprint and transparent margins. Canvas aspect 216:268, NO external padding or extra rows/columns. Genuine transparent alpha immediately around sprites. No text, labels, grid, watermark, halo, colored backdrop, checkerboard or scene."
+  },
+  {
+    "assetId": "units-035-page-09",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-035-page-09.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-035-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Repaint FIRST image EXACT pose grid for faithful HD 三国赤壁 animation atlas, 骑将 type35, page9. SECOND image is ONE design/material swatch ONLY, never a pose guide. Exactly 3 EQUAL COLUMNS x 4 EQUAL ROWS. Preserve source row-major pose order and EACH cell facing, limbs, horse or cart angle, weapon, silhouette and relative anchor. Do not invent or rearrange directions, or substitute repeated idle figures. Same character costume, horse color, metal/wood and palette across cells; blue/cyan is team cloth. Detailed hand-painted steel rivets, silk, leather and hair, warm upper-left light. A true detailed repaint, no enlarged pixels. Every cell contains its source pose.  Preserve low prone/fallen silhouettes ONLY where the FIRST image has them. Other cells must stay upright. Do not copy the style swatch pose to all cells. Preserve source relative footprint and transparent margins. Canvas aspect 216:268, NO external padding or extra rows/columns. Genuine transparent alpha immediately around sprites. No text, labels, grid, watermark, halo, colored backdrop, checkerboard or scene."
+  },
+  {
+    "assetId": "units-036-page-01",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-036-page-01.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-036-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Repaint FIRST image EXACT pose grid for faithful HD 三国赤壁 animation atlas, 骑兵 type36, page1. SECOND image is ONE design/material swatch ONLY, never a pose guide. Exactly 4 EQUAL COLUMNS x 4 EQUAL ROWS. Preserve source row-major pose order and EACH cell facing, limbs, horse or cart angle, weapon, silhouette and relative anchor. Do not invent or rearrange directions, or substitute repeated idle figures. Same character costume, horse color, metal/wood and palette across cells; blue/cyan is team cloth. Detailed hand-painted steel rivets, silk, leather and hair, warm upper-left light. A true detailed repaint, no enlarged pixels. Every cell contains its source pose.  Preserve low prone/fallen silhouettes ONLY where the FIRST image has them. Other cells must stay upright. Do not copy the style swatch pose to all cells. Preserve source relative footprint and transparent margins. Canvas aspect 288:216, NO external padding or extra rows/columns. Genuine transparent alpha immediately around sprites. No text, labels, grid, watermark, halo, colored backdrop, checkerboard or scene."
+  },
+  {
+    "assetId": "units-036-page-02",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-036-page-02.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-036-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Repaint FIRST image EXACT pose grid for faithful HD 三国赤壁 animation atlas, 骑兵 type36, page2. SECOND image is ONE design/material swatch ONLY, never a pose guide. Exactly 4 EQUAL COLUMNS x 4 EQUAL ROWS. Preserve source row-major pose order and EACH cell facing, limbs, horse or cart angle, weapon, silhouette and relative anchor. Do not invent or rearrange directions, or substitute repeated idle figures. Same character costume, horse color, metal/wood and palette across cells; blue/cyan is team cloth. Detailed hand-painted steel rivets, silk, leather and hair, warm upper-left light. A true detailed repaint, no enlarged pixels. Every cell contains its source pose.  Preserve low prone/fallen silhouettes ONLY where the FIRST image has them. Other cells must stay upright. Do not copy the style swatch pose to all cells. Preserve source relative footprint and transparent margins. Canvas aspect 288:216, NO external padding or extra rows/columns. Genuine transparent alpha immediately around sprites. No text, labels, grid, watermark, halo, colored backdrop, checkerboard or scene."
+  },
+  {
+    "assetId": "units-036-page-03",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-036-page-03.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-036-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Repaint FIRST image EXACT pose grid for faithful HD 三国赤壁 animation atlas, 骑兵 type36, page3. SECOND image is ONE design/material swatch ONLY, never a pose guide. Exactly 4 EQUAL COLUMNS x 4 EQUAL ROWS. Preserve source row-major pose order and EACH cell facing, limbs, horse or cart angle, weapon, silhouette and relative anchor. Do not invent or rearrange directions, or substitute repeated idle figures. Same character costume, horse color, metal/wood and palette across cells; blue/cyan is team cloth. Detailed hand-painted steel rivets, silk, leather and hair, warm upper-left light. A true detailed repaint, no enlarged pixels. Every cell contains its source pose.  Preserve low prone/fallen silhouettes ONLY where the FIRST image has them. Other cells must stay upright. Do not copy the style swatch pose to all cells. Preserve source relative footprint and transparent margins. Canvas aspect 288:216, NO external padding or extra rows/columns. Genuine transparent alpha immediately around sprites. No text, labels, grid, watermark, halo, colored backdrop, checkerboard or scene."
+  },
+  {
+    "assetId": "units-036-page-04",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-036-page-04.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-036-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Repaint FIRST image EXACT pose grid for faithful HD 三国赤壁 animation atlas, 骑兵 type36, page4. SECOND image is ONE design/material swatch ONLY, never a pose guide. Exactly 6 EQUAL COLUMNS x 4 EQUAL ROWS. Preserve source row-major pose order and EACH cell facing, limbs, horse or cart angle, weapon, silhouette and relative anchor. Do not invent or rearrange directions, or substitute repeated idle figures. Same character costume, horse color, metal/wood and palette across cells; blue/cyan is team cloth. Detailed hand-painted steel rivets, silk, leather and hair, warm upper-left light. A true detailed repaint, no enlarged pixels. Every cell contains its source pose.  Preserve low prone/fallen silhouettes ONLY where the FIRST image has them. Other cells must stay upright. Do not copy the style swatch pose to all cells. Preserve source relative footprint and transparent margins. Canvas aspect 432:216, NO external padding or extra rows/columns. Genuine transparent alpha immediately around sprites. No text, labels, grid, watermark, halo, colored backdrop, checkerboard or scene."
+  },
+  {
+    "assetId": "units-036-page-05",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-036-page-05.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-036-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Repaint FIRST image EXACT pose grid for faithful HD 三国赤壁 animation atlas, 骑兵 type36, page5. SECOND image is ONE design/material swatch ONLY, never a pose guide. Exactly 6 EQUAL COLUMNS x 4 EQUAL ROWS. Preserve source row-major pose order and EACH cell facing, limbs, horse or cart angle, weapon, silhouette and relative anchor. Do not invent or rearrange directions, or substitute repeated idle figures. Same character costume, horse color, metal/wood and palette across cells; blue/cyan is team cloth. Detailed hand-painted steel rivets, silk, leather and hair, warm upper-left light. A true detailed repaint, no enlarged pixels. Every cell contains its source pose.  Preserve low prone/fallen silhouettes ONLY where the FIRST image has them. Other cells must stay upright. Do not copy the style swatch pose to all cells. Preserve source relative footprint and transparent margins. Canvas aspect 432:216, NO external padding or extra rows/columns. Genuine transparent alpha immediately around sprites. No text, labels, grid, watermark, halo, colored backdrop, checkerboard or scene."
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "assetId": "units-033-page-01",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-033-page-01.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-033-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. FIRST IMAGE is the exact 5 columns x4 rows animation POSE GRID, visibly enlarged for clarity. Repaint THAT GRID and preserve ALL 20 cell positions and each original pose/facing exactly. SECOND IMAGE is only ONE character color/material style swatch, not a pose or layout reference. Bow commander of Han-era 三国赤壁 with blue team cape, dark helmet, steel and gold armor, golden bow, same design/material as second image. ROW 1 front-facing south. ROW 2 front-left southwest. ROW 3 left profile west. ROW 4 rear-left northwest. Cells 4,9,14 (zero-based) show the low prone source silhouettes; cell19 is completely transparent. ONLY these three low cells are prone. Every four walking/shooting frames in a row must retain their small source limb variations. Do not substitute rear views for front views; never copy another page layout. Preserve the source foot anchors and relative sprite size in each cell, with transparent margins at every cell edge. Real detailed painted fabric/steel/bronze instead of enlarged pixels, warm upper-left light, no invented scenery. EXACT five equal columns and four equal rows, no extra row or outside padding; preserve the first image canvas aspect. Genuine transparent alpha. No text, labels, grid, colored halo, shadows on opaque rectangles, checkerboard, extra characters, modern objects or firearms."
+  },
+  {
+    "assetId": "units-033-page-02",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-033-page-02.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-033-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. FIRST IMAGE is the exact 5 columns x4 rows animation POSE GRID, visibly enlarged for clarity. Repaint THAT GRID and preserve ALL 20 cell positions and each original pose/facing exactly. SECOND IMAGE is only ONE character color/material style swatch, not a pose or layout reference. Bow commander of Han-era 三国赤壁 with blue team cape, dark helmet, steel and gold armor, golden bow, same design/material as second image. ROW 1 back-facing north. ROW 2 rear-right northeast. ROW 3 right profile east. ROW 4 front-right southeast. All TWENTY figures remain UPRIGHT, including each fifth-column arm-raising gesture. There are NO prone/dead cells and NO empty cells on this page. Every four walking/shooting frames in a row must retain their small source limb variations. Do not substitute rear views for front views; never copy another page layout. Preserve the source foot anchors and relative sprite size in each cell, with transparent margins at every cell edge. Real detailed painted fabric/steel/bronze instead of enlarged pixels, warm upper-left light, no invented scenery. EXACT five equal columns and four equal rows, no extra row or outside padding; preserve the first image canvas aspect. Genuine transparent alpha. No text, labels, grid, colored halo, shadows on opaque rectangles, checkerboard, extra characters, modern objects or firearms."
+  },
+  {
+    "assetId": "units-033-page-03",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-033-page-03.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-033-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. FIRST IMAGE is the exact 5 columns x4 rows animation POSE GRID, visibly enlarged for clarity. Repaint THAT GRID and preserve ALL 20 cell positions and each original pose/facing exactly. SECOND IMAGE is only ONE character color/material style swatch, not a pose or layout reference. Bow commander of Han-era 三国赤壁 with blue team cape, dark helmet, steel and gold armor, golden bow, same design/material as second image. ROW 1 front-facing south. ROW 2 front-left southwest. ROW 3 left profile west. ROW 4 rear-left northwest. All TWENTY figures remain UPRIGHT, including each fifth-column arm-raising gesture. NO prone/dead cells or empty cells on this page. Every four walking/shooting frames in a row must retain their small source limb variations. Do not substitute rear views for front views; never copy another page layout. Preserve the source foot anchors and relative sprite size in each cell, with transparent margins at every cell edge. Real detailed painted fabric/steel/bronze instead of enlarged pixels, warm upper-left light, no invented scenery. EXACT five equal columns and four equal rows, no extra row or outside padding; preserve the first image canvas aspect. Genuine transparent alpha. No text, labels, grid, colored halo, shadows on opaque rectangles, checkerboard, extra characters, modern objects or firearms."
+  }
+]

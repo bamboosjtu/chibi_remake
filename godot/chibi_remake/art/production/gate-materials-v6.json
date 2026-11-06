@@ -1,0 +1,24 @@
+{
+  "version": 6,
+  "date": "2026-10-27",
+  "mode": "built-in image_gen",
+  "asset": "godot/chibi_remake/art/full/buildings/gate-materials-v6.png",
+  "prompt": "Use case: stylized-concept\nAsset type: production texture atlas for a 2D isometric historical Chinese RTS game, based on the supplied screenshot's gray brick fortress and purple-red studded double gate.\nCreate ONE square 2048x2048 opaque material atlas with EXACTLY FOUR equal square tiles in a strict 2 by 2 grid, each tile extending to its quadrant edges. No gutters, labels, borders or perspective. These are FLAT ORTHOGRAPHIC MATERIALS which will be mapped onto actual thick isometric gate geometry in the game, not a scene illustration.\nTOP LEFT quadrant (0,0 to1024,1024): weathered medium-dark neutral gray rectangular brick masonry, neat horizontal staggered courses, small gray mortar joints, approximately 12 brick courses vertically and 5 bricks across per course, occasional subdued warm brick, light aging. Flat evenly lit wall face, restrained contrast, believable hand-painted late-1990s detailed RTS stone texture. No moss clusters.\nTOP RIGHT quadrant (1024,0 to2048,1024): complete CLOSED symmetrical double-leaf purple-red wooden gate, EXACT front elevation, fills entire quadrant edge to edge with NO stone surround and NO surrounding scene. Two equal wooden leaves with a strong narrow dark center seam. Deep wine-magenta boards, 6 columns and 7 rows of small brass-gold round studs PER LEAF in a precise symmetric grid; aged golden narrow bottom strap along each leaf, narrow dark gap between leaves at bottom. Clear readable planks. Door extends to very bottom, no threshold, no step, no ground.\nBOTTOM LEFT quadrant (0,1024 to1024,2048): evenly lit gray stone paving slabs for the flat top of a fortress wall and a simple coping, seen exactly from overhead, regular offset rows of square-ish gray stone pavers matching the top-left masonry in palette, no perspective, no crenels or objects.\nBOTTOM RIGHT quadrant (1024,1024 to2048,2048): recessed inner tunnel masonry, same brick scale as top-left but darker warm gray, subdued ambient light, no painted shadows that imply an arch shape, no doorway, no floor, flat evenly lit wall material.\nAll four quadrant boundaries at exact center axes. No white separators. No illustrative buildings, roofs, steps, elevated bases, scenery, people, text or logos. Preserve tiny tactile brick and wood detail at game sprite scale. Reference screenshot is style and color guidance only.",
+  "design": {
+    "doorWidthChange": "+30%",
+    "passageHeightChange": "52 -> 47 world pixels",
+    "pierWidth": 10,
+    "wallDepth": 34,
+    "lintelHeight": 7,
+    "entrance": "original ground plane, no stairs or raised sill",
+    "scope": "gate masonry, coping, recessed double leaves and immediate joins; baseline curtain wall terrain remains intact"
+  },
+  "validation": {
+    "visual": "four ChibiL1 gate positions, both states",
+    "movement": "both orientations, friendly opening, hostile closure",
+    "release": "passed: packaged resources, native rendering, first chapter, shared core suite, all34 opening worlds, 3 selftests, 2 simulation baselines",
+    "packedVisual": "passed: 4 gates x closed/open; GPU aperture and neighboring wall checks"
+  },
+  "releaseVersion": "20261027_091138_8d69dfff",
+  "packSha256": "2479757FC76DFAEF892BBC5193C0AEA3F28A8357A5EEE4F47E7CDE02EB019652"
+}

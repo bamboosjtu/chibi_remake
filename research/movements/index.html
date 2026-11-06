@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>原版《赤壁》移动与动画操作</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin:0; padding:32px; background:#12141a; color:#e6e6e6; font:15px/1.65 "Segoe UI","Microsoft YaHei",sans-serif; }
+  h1,h2,h3 { font-weight:600; letter-spacing:.02em; }
+  h1 { font-size:27px; margin:0 0 4px; }
+  h2 { margin:38px 0 12px; font-size:19px; color:#ffd27a; }
+  h3 { margin:20px 0 8px; font-size:15px; color:#ffd27a; }
+  code { background:#1d212b; padding:1px 5px; border-radius:4px; color:#a8d5ff; }
+  .sub { color:#9aa0ad; margin-bottom:20px; }
+  .note { background:#1b1f27; border-left:3px solid #ffd27a; padding:10px 14px; border-radius:4px; color:#c9ced8; }
+  .warn { border-left-color:#ff9d6e; }
+  .ok { color:#8fe3a3; } .no { color:#ff9d9d; }
+  .cards { display:flex; gap:12px; flex-wrap:wrap; margin:18px 0; }
+  .stat { background:#181c24; border:1px solid #2a2f3a; border-radius:10px; padding:12px 18px; min-width:130px; }
+  .stat b { display:block; font-size:24px; color:#ffd27a; }
+  .stat span { color:#9aa0ad; font-size:13px; }
+  .grid2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(380px,1fr)); gap:18px; align-items:start; }
+  .panel { background:#181c24; border:1px solid #2a2f3a; border-radius:10px; padding:14px; }
+  .panel img { width:100%; image-rendering:pixelated; background:#0b0d12; }
+  .panel .cap { color:#9aa0ad; font-size:13px; margin-top:8px; }
+  table { border-collapse:collapse; width:100%; margin-top:8px; }
+  th,td { border-bottom:1px solid #262b35; padding:6px 9px; text-align:left; vertical-align:middle; }
+  th { color:#9aa0ad; font-weight:500; font-size:13px; white-space:nowrap; }
+  .scroll { overflow-x:auto; }
+  a { color:#8ec5ff; }
+  .demo { display:flex; gap:26px; flex-wrap:wrap; margin-top:10px; }
+  .demoBox { background:#10131a; border:1px solid #303746; border-radius:8px; padding:12px; min-width:190px; }
+  .sprite { width:64px; height:53px; background-image:url(assets/walk_32_d0_frames.png); background-repeat:no-repeat; image-rendering:pixelated; }
+  .demoBox h3 { margin:0 0 8px; }
+  .meta { color:#9aa0ad; font-size:13px; }
+</style>
+</head>
+<body>
+<h1>原版《赤壁》士兵移动与动画操作</h1>
+<div class="sub">CB.EXE <code>2db7cc10…c5798cb7</code> · DATA.EXP / UNIT.EXP / ANISEQ01/02 · UNIT.LWC / BATTLE.PAL · REA/Ghidra 静态分析</div>
+
+<div class="note warn">
+  <b>口径</b>：原版代码/数据是唯一依据。重制实现只用于对比和后期修复，不作为原版规则。
+</div>
+
+<div class="cards">
+  <div class="stat"><b>8</b><span>移动/朝向方向</span></div>
+  <div class="stat"><b>2×</b><span>更新才推进一帧</span></div>
+  <div class="stat"><b>26</b><span>单位类型帧表</span></div>
+  <div class="stat"><b>5</b><span>样张单位（30/32/34/36/45）</span></div>
+</div>
+
+<div class="note">
+  <b>一句话</b>：原版流畅来自“高频更新 + 格内像素偏移 + 每 2 次更新推进一帧 + turn/walk 分离”，
+  不是某个缓动函数。
+</div>
+
+<h2>1. 主循环与更新频率</h2>
+<div class="grid2">
+  <div class="panel">
+    <h3>原版</h3>
+    <ul>
+      <li><code>FUN_00454280</code> 是战斗主帧，调用 <code>FUN_0045AFE0</code> 更新；<code>FUN_0045B4E0</code> 逐单位分派。</li>
+      <li>主循环等待 <code>DAT_004B8B54 + iVar1</code>；速度设置为 <b>20/30/50/100 ms</b>，<code>DAT_00484BD8==0</code> 时再加 15 ms。</li>
+      <li>不是固定 1/30 s；实际间隔取决于设置和目标机器。</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <h3>重制</h3>
+    <ul>
+      <li><code>SIM_DT = 1/30</code>；位置/方向按 30 Hz 更新。</li>
+      <li><code>SPEED = 110</code> px/s 固定，<code>_spd_mult</code> 只处理加速/减速。</li>
+      <li>行走动画另用 <code>step = int(u.anim * 10 * _spd_mult)</code>：固定 10 帧步/秒。</li>
+    </ul>
+  </div>
+</div>
+
+<h2>2. 位置：格坐标 + 子格像素偏移</h2>
+<div class="panel">
+  <p><code>+0x1A/+0x1C</code> 是格坐标；<code>+0x2C/+0x30</code> 是格内带符号像素偏移。渲染时 <code>FUN_0045A6F0</code> 直接合成：</p>
+  <p style="background:#10131a;padding:10px 14px;border-radius:6px"><code>screen = cell × (44, 22) + pixelOffset</code></p>
+  <p>所以每个更新都可以改变偏移，画面不会先被吸到格心再重画。路径碰撞失败时，<code>+0x3C/+0x3E</code>、<code>+0x40/+0x44</code> 的旧格/旧偏移会回滚。</p>
+</div>
+
+<h2>3. 动画：每 2 次更新一帧</h2>
+<div class="grid2">
+  <div class="panel">
+    <h3>字段</h3>
+    <table>
+      <tr><th>字段</th><th>含义</th></tr>
+      <tr><td><code>+0x14</code></td><td>当前动画帧</td></tr>
+      <tr><td><code>+0x16</code></td><td>显示方向 0–7</td></tr>
+      <tr><td><code>+0x18</code></td><td>路径方向</td></tr>
+      <tr><td><code>+0x22</code></td><td>绝对精灵帧</td></tr>
+      <tr><td><code>+0x6C</code></td><td>更新计数器</td></tr>
+    </table>
+  </div>
+  <div class="panel">
+    <h3>推进规则</h3>
+    <p>如果该类型/方向帧数非 0，且 <code>+0x6C &amp; 1</code> 为真，则：</p>
+    <p><code>frame = (frame + 1) % frameCount[type][dir]</code></p>
+    <p>然后 <code>absFrame = base[type] + frameTable[type][dir][frame]</code>。</p>
+    <p class="meta">30 ms 基础设置、未加 15 ms 限速：2×30 = 60 ms/帧；加限速约 90 ms/帧；最快 20 ms（未加限速）为 40 ms/帧。</p>
+  </div>
+</div>
+<img class="sheet" src="assets/timing_compare.svg" alt="原版与重制时钟对比" style="width:100%;margin-top:12px;background:#0b0d12;border:1px solid #2a2f3a">
+
+<h2>4. 方向与转向</h2>
+<div class="grid2">
+  <div class="panel">
+    <h3>原版：turn / walk 分开</h3>
+    <ul>
+      <li>ANISEQ 每个方向有独立的 <code>turn</code>（4 帧）和 <code>walk</code>（4–18 帧）。</li>
+      <li><code>+0x18</code> 路径方向与 <code>+0x16</code> 显示朝向分开；移动开始/节点切换先走转向。</li>
+      <li>面向目标 <code>FUN_00421390</code> 用实际屏幕向量算 8 方向，不是格坐标差。</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <h3>重制：移动中直接切 walk</h3>
+    <ul>
+      <li><code>battle_view.gd</code>：<code>if moved: clip = "walk"</code>。</li>
+      <li><code>u.dir = round(angle/(PI/4)) &amp; 7</code> 每个移动更新重算。</li>
+      <li>移动中没有 turn 过渡，转向表现为瞬时换行。</li>
+    </ul>
+  </div>
+</div>
+
+<h2>5. 行走帧表（样例单位）</h2>
+<div class="scroll">
+<table>
+  <tr><th>单位</th><th>v8（动作速率）</th><th>walk 帧/方向</th><th>turn 帧/方向</th><th>方向数</th></tr>
+  <tr><td>工人 30</td><td>100</td><td>5</td><td>4</td><td>8</td></tr>
+  <tr><td>步兵 32 / 38</td><td>100</td><td>4</td><td>4</td><td>8</td></tr>
+  <tr><td>骑兵 36 / 37</td><td>100</td><td>4</td><td>4</td><td>8</td></tr>
+  <tr><td>弓兵 45</td><td>30</td><td>5</td><td>4</td><td>8</td></tr>
+  <tr><td>车兵 34</td><td>10</td><td>4</td><td>4</td><td>8</td></tr>
+  <tr><td>大编制 40–44</td><td>100/30</td><td>12–18</td><td>4</td><td>8</td></tr>
+</table>
+</div>
+<p class="meta">完整 26 单位表：<a href="data/movement.csv">movement.csv</a> / <a href="data/movement.json">movement.json</a>。v8 是动作/攻击/修理速率（1000/rate），不是移动 px/s。</p>
+
+<h2>6. 转向/行走素材</h2>
+<div class="grid2">
+  <div class="panel"><h3>步兵 32：8 方向 walk</h3><img src="assets/walk_32_dirs.png" alt="步兵 walk 8 方向"><div class="cap">每行一个方向（0–7），每列一帧；4 帧。</div></div>
+  <div class="panel"><h3>步兵 32：8 方向 turn</h3><img src="assets/turn_32_dirs.png" alt="步兵 turn 8 方向"><div class="cap">turn 4 帧，和 walk 分开；原版转向时使用。</div></div>
+  <div class="panel"><h3>工人 30：8 方向 walk</h3><img src="assets/walk_30_dirs.png" alt="工人 walk 8 方向"><div class="cap">5 帧/方向，说明并非所有单位固定 4 帧。</div></div>
+  <div class="panel"><h3>弓兵 45：8 方向 walk</h3><img src="assets/walk_45_dirs.png" alt="弓兵 walk 8 方向"><div class="cap">5 帧/方向；重制旧固定 10 帧/秒会把节奏拉长。</div></div>
+  <div class="panel"><h3>车兵 34：8 方向 walk</h3><img src="assets/walk_34_dirs.png" alt="车兵 walk 8 方向"><div class="cap">4 帧/方向，体型大，但动画时钟与小人相同。</div></div>
+  <div class="panel"><h3>骑兵 36：8 方向 walk</h3><img src="assets/walk_36_dirs.png" alt="骑兵 walk 8 方向"><div class="cap">4 帧/方向。</div></div>
+</div>
+
+<h2>7. 对照演示：60 ms vs 100 ms</h2>
+<div class="panel">
+  <p>用步兵 32 方向 0 的 4 帧横条演示（<code>assets/walk_32_d0_frames.png</code>）。原版示意按 30 ms 更新 × 2 = 60 ms/帧（未加 15 ms 限速）；重制当前固定 100 ms/帧。</p>
+  <div class="demo">
+    <div class="demoBox"><h3>原版 60 ms/帧</h3><div class="sprite" id="orig"></div><div class="meta">每 2 次 30ms 更新推进（未加15ms限速）</div></div>
+    <div class="demoBox"><h3>重制 100 ms/帧</h3><div class="sprite" id="new"></div><div class="meta">anim×10，固定 10 帧/秒</div></div>
+  </div>
+  <button id="playDemo">播放 / 重播</button>
+  <span class="meta">仅演示节奏，不是原版运行时录屏。</span>
+</div>
+
+<h2>8. 重制僵硬的核心原因</h2>
+<ol>
+  <li><b>动画太慢</b>：walk 固定 10 帧步/秒；原版每 2 次更新一帧。</li>
+  <li><b>更新更粗</b>：固定 30 Hz，原版按 20/30/50/100ms 设置更新。</li>
+  <li><b>无转向过渡</b>：移动中直接切 walk 并按路段角度取整。</li>
+  <li><b>位置层不同</b>：原版格 + 子格像素偏移；重制用格心路点 + 固定 110 px/s。</li>
+  <li><b>v8 误读</b>：v8 是动作/攻击/修理速率，不是移动速度。</li>
+</ol>
+
+<h2>9. 证据</h2>
+<div class="scroll">
+<table>
+  <tr><th>结论</th><th>Evidence</th></tr>
+  <tr><td>主战斗循环 / 更新入口</td><td><code>FUN_00454280</code> · ev_fb31364f…；<code>FUN_0045AFE0</code> · ev_39bb4716…</td></tr>
+  <tr><td>逐单位模式分派</td><td><code>FUN_0045B4E0</code> · ev_90dbf2b0…</td></tr>
+  <tr><td>移动处理器</td><td><code>FUN_0045B910</code> · ev_f459b4ce…</td></tr>
+  <tr><td>格 + 像素偏移合成屏幕矩形</td><td><code>FUN_0045A6F0</code> · ev_2f9ca146…</td></tr>
+  <tr><td>8 方向朝向</td><td><code>FUN_00421390</code> · ev_ce8ce6a8…</td></tr>
+  <tr><td>路径查找</td><td><code>FUN_00441360</code> · ev_4b9385e8…</td></tr>
+  <tr><td>v8 用于动作/修理周期</td><td><code>FUN_0045DD90</code>；攻击 handler 的 <code>1000 / DAT_004AF58F</code></td></tr>
+</table>
+</div>
+
+<h2>10. 文件</h2>
+<ul>
+  <li><a href="README.md">README.md</a> — 完整分析</li>
+  <li><a href="data/movement.json">data/movement.json</a> — 时钟/字段/26 单位帧表/重制差异</li>
+  <li><a href="data/movement.csv">data/movement.csv</a> — 26 单位平表</li>
+  <li><a href="data/assets.json">data/assets.json</a> — 样张索引</li>
+  <li><a href="tools/extract_movements.mjs">tools/extract_movements.mjs</a> — 可重复提取脚本</li>
+</ul>
+
+<script>
+  const frameW = 68; // 64 px sprite + 4 px gap
+  const origin = document.getElementById('orig');
+  const fresh = document.getElementById('new');
+  let timers = [];
+  let frameOrig = 0, frameNew = 0;
+  function setFrame(el, i) { el.style.backgroundPosition = `${-i * frameW}px 0`; }
+  function play() {
+    timers.forEach(clearInterval); timers = [];
+    frameOrig = frameNew = 0; setFrame(origin, 0); setFrame(fresh, 0);
+    timers.push(setInterval(() => { frameOrig = (frameOrig + 1) % 4; setFrame(origin, frameOrig); }, 60));
+    timers.push(setInterval(() => { frameNew = (frameNew + 1) % 4; setFrame(fresh, frameNew); }, 100));
+  }
+  document.getElementById('playDemo').addEventListener('click', play);
+  play();
+</script>
+</body>
+</html>

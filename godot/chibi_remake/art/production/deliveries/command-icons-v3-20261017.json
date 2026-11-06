@@ -1,0 +1,11 @@
+{
+  "assetId": "command-icons-v3",
+  "generator": "built-in image_gen",
+  "texture": "godot/chibi_remake/art/full/ui/cmd-icons-redraw-v3.png",
+  "sourceGeneratedFile": "C:\\Users\\bambo\\.codex\\generated_images\\01a13348-db65-7b23-b66a-63227eb4490d\\exec-11583d0a-ec38-4dd0-a476-6a3366f4f282.png",
+  "sha256": "bb998fb6f264eb8bee11af02e63a49e471f3b371b4c72660a9fcbf536b10d217",
+  "width": 1484,
+  "height": 1060,
+  "prompt": "Use case: style-transfer. Production HD command icon atlas for Chinese historical RTS 三国赤壁. Redraw the reference ALL 35 icons in EXACT seven columns and five equal rows, same row-major ordering and EXACT subject/symbol/color frame in each cell. Each icon fills its square cell from border to border; no outer canvas padding. Sharp painted metallic weapon edges, silk, wood grain, fire, gold ornaments, crisp original colorful square icon borders and dark navy/teal/burgundy backgrounds. Original tiny symbolic magic/formation marks remain the SAME symbols, not generic warriors. Preserve the source layout and contrasts; each original icon must remain independently recognizable. Aim 1792x1280 or larger. Do not add lettering, numbers, watermarks, labels, extra icons, extra rows, modern UI, rounded corners or perspective. This is a true detailed repaint, not enlarged pixel art or a blurred filter. NO screenshot, no game scene, only the 35 precisely fitted square icons.",
+  "status": "generated-awaiting-structure-check"
+}

@@ -1,0 +1,31 @@
+{
+  "assetId": "officer-071",
+  "bytes": 2395198.0,
+  "colorType": 2.0,
+  "generatedAt": "2026-10-13T11:51:07.148Z",
+  "generator": "built-in image_gen",
+  "height": 1254.0,
+  "prompt": "Use case: identity-preserve / style-transfer. Finished high-definition square officer portrait for 三国赤壁 remaster. The reference is the ORIGINAL in-game portrait of 王忠, ID 71. Faithfully repaint THIS individual: preserve exact facial structure, age appearance, expression, head angle, eye direction, skin tone, moustache/beard shape, hairstyle, headdress/helmet shape and colors, armor/robe colors, and visible collar. Do not substitute a generic face or reinterpret the character from folklore. Clean detailed hand-painted classic Chinese strategy-game portrait, crisp metal/fabric/hair, warm subtle upper-left light consistent with source. Fit the full source head and collar into a square portrait with modest side padding, preserve source background tone. A true repaint with new detail, not enlarged pixels or a photographic filter. No text, frame, watermark, modern elements or anime. Preserve the original identity and costume above all else.",
+  "promptFile": "godot/chibi_remake/art/production/officers-prompts-03.json",
+  "sha256": "2010383b7d9370fab3329dea9e0d9e4e4a1506106f8193b19a50733a1e59eec3",
+  "sourceGeneratedFile": "C:\\Users\\bambo\\.codex\\generated_images\\01a13348-db65-7b23-b66a-63227eb4490d\\exec-75089a7e-b4b9-4c0a-827c-00cf0be14461.png",
+  "status": "generated-awaiting-validation",
+  "texture": "godot/chibi_remake/art/full/officers/071-portrait-v2.png",
+  "userAcceptance": {
+    "date": "2026-10-13",
+    "reason": "用户已人工验证高清图，要求直接替换对应素材，不再逐项美术复核。",
+    "reviewer": "user"
+  },
+  "validation": {
+    "structure": "pass",
+    "visual": "pass"
+  },
+  "visualReview": {
+    "reason": "Original face, head angle, age appearance, expression and costume remain recognizable; detailed painterly series replaces source dithering.",
+    "reviewedAt": "2026-10-13T13:43:42.186Z",
+    "reviewedSha256": "2010383b7d9370fab3329dea9e0d9e4e4a1506106f8193b19a50733a1e59eec3",
+    "reviewer": "Codex paired source/candidate contact sheets",
+    "state": "pass"
+  },
+  "width": 1254.0
+}

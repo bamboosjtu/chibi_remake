@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>原版《赤壁》全关卡开场白</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; padding: 32px; background: #12141a; color: #e6e6e6;
+         font: 15px/1.7 "Segoe UI", "Microsoft YaHei", sans-serif; }
+  h1 { font-size: 26px; margin: 0 0 4px; font-weight: 600; }
+  h2 { margin: 42px 0 14px; font-size: 20px; color: #ffd27a; }
+  .sub { color: #9aa0ad; margin-bottom: 22px; }
+  code { background: #1d212b; padding: 1px 5px; border-radius: 4px; color: #a8d5ff; }
+  .cards { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+  .stat { background: #181c24; border: 1px solid #2a2f3a; border-radius: 10px; padding: 12px 18px; min-width: 130px; }
+  .stat b { display: block; font-size: 24px; color: #ffd27a; }
+  .stat span { color: #9aa0ad; font-size: 13px; }
+  .note { background: #1b1f27; border-left: 3px solid #ffd27a; padding: 10px 14px; border-radius: 4px; color: #c9ced8; margin: 14px 0; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 14px; }
+  .level { background: #181c24; border: 1px solid #2a2f3a; border-radius: 10px; padding: 14px 16px; }
+  .level h3 { margin: 0 0 4px; font-size: 16px; color: #ffd27a; }
+  .level .meta { color: #7f8794; font-size: 12px; margin-bottom: 8px; }
+  .level p { margin: 0; }
+  .badge { display: inline-block; padding: 1px 8px; border-radius: 999px; background: #2a3320; color: #b9e36b; font-size: 11px; margin-left: 6px; }
+  a { color: #8ec5ff; }
+  .screenshot { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+  .dialog { background: #2a2118; border: 2px solid #8a6b35; border-radius: 8px; padding: 18px 22px; }
+  .dialog .title { color: #ffd27a; font-size: 20px; letter-spacing: 4px; margin-bottom: 12px; }
+  .dialog .body { color: #e8dcc0; }
+  @media (max-width: 800px) { .screenshot { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<h1>原版《赤壁》全关卡开场白</h1>
+<div class="sub">CB.EXE <code>2db7cc10…c5798cb7</code> · BATTLE.EXP 关卡顺序 · MED 标题 · MISSION.EXT/EDX 任务说明</div>
+
+<div class="cards">
+  <div class="stat"><b>34</b><span>关卡开场白</span></div>
+  <div class="stat"><b>17</b><span>刘备线</span></div>
+  <div class="stat"><b>17</b><span>曹操线</span></div>
+  <div class="stat"><b>36–69</b><span>MISSION.EDX 表项</span></div>
+</div>
+
+<div class="note">
+  开场白存放在 <code>MISSION.EXT</code>（XOR 0x46），由 <code>MISSION.EDX</code> 的 (offset,length) 索引；
+  关卡标题来自 <code>MEDS/&lt;MAP&gt;.MED</code> 偏移 5 的 8 字节 GBK 字段。
+  游戏实际加载的是 EXT；EXP 是旧版/变体（35 条、有错字），本页以 EXT 为准。
+</div>
+
+<h2>截图对照 · 刘备第一关</h2>
+<div class="screenshot">
+  <div class="dialog">
+    <div class="title">任务　二吕进犯</div>
+    <div class="body">曹军距离新野不远，迅速组建一支部队，抵御曹军的进攻。</div>
+    <div class="meta" style="color:#9a8a68;margin-top:14px">用户提供截图（DOSBox）</div>
+  </div>
+  <div class="level">
+    <h3>数据第 1 条 <span class="badge">逐字一致</span></h3>
+    <div class="meta">chibil1 · 第1章 · MISSION.EDX 36</div>
+    <p>曹军距离新野不远，迅速组建一支部队，抵御曹军的进攻。</p>
+  </div>
+</div>
+
+<h2>刘备线 · 17 关</h2>
+<div class="grid" id="liubei"></div>
+
+<h2>曹操线 · 17 关</h2>
+<div class="grid" id="caocao"></div>
+
+<h2>文件</h2>
+<ul>
+  <li><a href="README.md">README.md</a> — 方法、格式、差异、证据与空缺</li>
+  <li><a href="data/startup_texts.json">data/startup_texts.json</a> — 34 关结构化数据</li>
+  <li><a href="data/startup_texts.csv">data/startup_texts.csv</a> — 表格</li>
+  <li><a href="data/startup_texts.txt">data/startup_texts.txt</a> — 纯文本</li>
+  <li><a href="data/mission_ext_entries.json">data/mission_ext_entries.json</a> — MISSION.EXT 71 项</li>
+  <li><a href="assets/screenshot_transcription.md">assets/screenshot_transcription.md</a> — 截图转录</li>
+</ul>
+
+<script>
+const levels = [
+  ["刘备","第1章","二吕进犯","chibil1",36,"曹军距离新野不远，迅速组建一支部队，抵御曹军的进攻。"],
+  ["刘备","第2章","计取樊城","chibil2",37,"利用曹仁轻敌之机，攻克樊城，击败曹仁部。"],
+  ["刘备","第3章","博望用计","chibil3",38,"利用博望坡有利地形，阻击曹军，击败夏侯惇所率曹军。"],
+  ["刘备","第4章","兵临城下","chibil4",39,"击败来犯的曹仁军，守卫新野。"],
+  ["刘备","第5章","坚守樊城","chibil5",40,"击退曹操大军，坚守樊城。"],
+  ["刘备","第6章","投奔襄阳","chibil6",41,"部队进入襄阳城，如果无法进入襄阳，则部队撤往江陵。"],
+  ["刘备","第7章","蔡瑁追击","chibil7a",42,"部队继续撤往江陵，击退追击的蔡瑁军。"],
+  ["刘备","第8章","固守襄阳","chibil7b",43,"坚守襄阳重镇，抵御曹军进攻。"],
+  ["刘备","第9章","长坂救主","chibil8",44,"救回失散的刘禅，回到长坂桥以南。"],
+  ["刘备","第10章","江夏退敌","chibil9",45,"消灭进犯江夏的曹军部队，以确保与孙权的联合作战。"],
+  ["刘备","第11章","三江水战","chibil10",46,"击败曹操水军，摧毁曹军水寨。"],
+  ["刘备","第12章","大战于禁","chibil11",47,"击败曹操水军，摧毁曹军水寨。"],
+  ["刘备","第13章","连环战船","chibil12",48,"击败曹军，抵抗曹军的连锁战船。"],
+  ["刘备","第14章","火烧赤壁","chibil13",49,"在赤壁彻底击败曹操水军。"],
+  ["刘备","第15章","乌林截击","chibil14",50,"截击从乌林退往南郡的曹操。"],
+  ["刘备","第16章","攻略南郡","chibil15",51,"歼灭曹仁军，攻克南郡城，收复荆州。"],
+  ["刘备","第17章","再战赤壁","chibil16",52,"击败昔日的盟友，孙权，完成兴复汉室的愿望。"],
+  ["曹操","第1章","侦察新野","chibic1",53,"侦察刘备军实力，击败关平，周仓。"],
+  ["曹操","第2章","南征准备","chibic2",54,"击败关羽张飞，打开新野的大门。"],
+  ["曹操","第3章","进取博望","chibic3",55,"进攻博望，击败刘备军。"],
+  ["曹操","第4章","南征先锋","chibic4",56,"攻克新野，歼灭刘备军。"],
+  ["曹操","第5章","进攻樊城","chibic5",57,"进攻樊城，歼灭刘备军。"],
+  ["曹操","第6章","襄阳招降","chibic6",58,"歼灭向南逃窜的刘备，以迫降荆州刘表。"],
+  ["曹操","第7章","当阳长坂","chibic7",59,"轻骑追赶刘备，歼灭敌军。"],
+  ["曹操","第8章","南取江陵","chibic8",60,"攻克江陵，掌握荆州的钱粮重地，为进取江南作准备。"],
+  ["曹操","第9章","东征夏口","chibic9",61,"击败江夏的刘备军，以保护大军进攻江南时的侧翼。"],
+  ["曹操","第10章","初识水战","chibic10",62,"击败周瑜所率水军。"],
+  ["曹操","第11章","误斩蔡张","chibic11",63,"击败孙权水军摧毁敌军水寨。"],
+  ["曹操","第12章","连环战船","chibic12",64,"用连锁战船击败孙权军。"],
+  ["曹操","第13章","赤壁水战","chibic13",65,"击败周瑜，黄盖水军，防御从陆上来的刘备军。"],
+  ["曹操","第14章","兵败乌林","chibic14",66,"逃出乌林，撤往南郡。"],
+  ["曹操","第15章","南郡攻防","chibic15",67,"守住南郡城，阻止刘备继续北上。"],
+  ["曹操","第16章","歼灭周瑜","chibic16",68,"彻底歼灭周瑜水军。"],
+  ["曹操","第17章","决战柴桑","chibic17",69,"歼灭孙权刘备联军的最后力量，统一天下。"]
+];
+function card(l) {
+  const [camp, chapter, title, map, edx, text] = l;
+  const badge = map === "chibil1" ? ' <span class="badge">截图一致</span>' : "";
+  return `<div class="level"><h3>${chapter} ${title}${badge}</h3>
+    <div class="meta">${map} · MISSION.EDX ${edx}</div><p>${text}</p></div>`;
+}
+document.getElementById("liubei").innerHTML = levels.filter(l => l[0] === "刘备").map(card).join("");
+document.getElementById("caocao").innerHTML = levels.filter(l => l[0] === "曹操").map(card).join("");
+</script>
+</body>
+</html>

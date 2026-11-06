@@ -1,0 +1,5 @@
+{
+  "baselineCommit": "d2edc49a4e81467ad3f0327cc7f54712485aef0f",
+  "description": "No active expected failures. Former assertions were repaired through canonical state initialization or fixtures aligned with current queue, construction, research and HQ contracts.",
+  "tests": []
+}

@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>原版《赤壁》十阵法与素材</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:32px; background:#12141a; color:#e6e6e6; font:15px/1.65 "Segoe UI","Microsoft YaHei",sans-serif; }
+  h1,h2,h3 { font-weight:600; letter-spacing:.02em; }
+  h1 { font-size:28px; margin:0 0 4px; }
+  h2 { margin:38px 0 12px; font-size:19px; color:#ffd27a; }
+  h3 { margin:20px 0 8px; font-size:15px; color:#ffd27a; }
+  .sub { color:#9aa0ad; margin-bottom:20px; }
+  code { background:#1d212b; padding:1px 5px; border-radius:4px; color:#a8d5ff; }
+  .note { background:#1b1f27; border-left:3px solid #ffd27a; padding:10px 14px; border-radius:4px; color:#c9ced8; }
+  .warn { border-left-color:#ff9d6e; }
+  .cards { display:flex; gap:12px; flex-wrap:wrap; margin:18px 0; }
+  .stat { background:#181c24; border:1px solid #2a2f3a; border-radius:10px; padding:12px 18px; min-width:150px; }
+  .stat b { display:block; font-size:24px; color:#ffd27a; }
+  .stat span { color:#9aa0ad; font-size:13px; }
+  table { border-collapse:collapse; width:100%; margin-top:8px; }
+  th,td { border-bottom:1px solid #262b35; padding:6px 9px; text-align:left; vertical-align:top; }
+  th { color:#9aa0ad; font-weight:500; font-size:13px; white-space:nowrap; }
+  .scroll { overflow-x:auto; }
+  .panel { background:#181c24; border:1px solid #2a2f3a; border-radius:10px; padding:14px; margin-top:10px; }
+  .panel img { width:100%; background:#0b0d12; border:1px solid #2a2f3a; display:block; }
+  .icon { width:48px; height:48px; image-rendering:pixelated; border:1px solid #303746; border-radius:5px; background:#0b0d12; }
+  .grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-top:12px; }
+  .card { background:#181c24; border:1px solid #2a2f3a; border-radius:10px; padding:10px; }
+  .card h3 { margin:0 0 4px; font-size:14px; }
+  .card img { width:100%; border:1px solid #262b35; border-radius:5px; background:#0b0d12; }
+  .meta { color:#9aa0ad; font-size:13px; }
+  .ok { color:#8fe3a3; } .hot { color:#ffd27a; } .bad { color:#ff9d9d; }
+  @media (max-width:1000px){ .grid { grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:800px){ body { padding:18px; } .grid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<h1>原版《赤壁》十阵法与素材</h1>
+<div class="note">等级解锁：0–2 级前三阵，3–4 级前六阵，5 级前八阵，6–9 级十阵。三列九格，第一页一至八阵及右下下一页，第二页九、十阵及右下上一页；无返回条，点击战场退出。掩码与按钮数组核对详见 <a href="README.md#12-一次列阵动作">README</a>。</div>
+<div class="sub">CB.EXE <code>2db7cc10…c5798cb7</code> · REA/Ghidra 静态分析 · 10 阵法 × 15 槽位</div>
+
+<div class="note warn">
+  <b>口径</b>：原版二进制为准。阵法的坐标来自 <code>FUN_00401970</code> 的运行期初始化表；图标是原版 <code>BMP.LWC</code> 素材，布局图是研究用坐标可视化，不是游戏截图。
+</div>
+
+<div class="cards">
+  <div class="stat"><b>10</b><span>阵法 / 16190–16199</span></div>
+  <div class="stat"><b>15</b><span>固定槽位</span></div>
+  <div class="stat"><b>301</b><span>初始化 int（15 + 300）</span></div>
+  <div class="stat"><b>0</b><span>攻防/速度加成</span></div>
+</div>
+
+<h2>1. 启用与执行</h2>
+<div class="panel"><img src="assets/formation_flow.svg" alt="阵法启用与偏移流"></div>
+<div class="grid" style="grid-template-columns:1fr 1fr;">
+  <div class="panel">
+    <h3 style="margin-top:0">命令</h3>
+    <ul>
+      <li>战斗面板 <b>16133「列阵」</b> → 子菜单</li>
+      <li>选择 <b>16190–16199</b></li>
+      <li><code>formationIndex = command − 0x3F3D</code> → 1..10</li>
+      <li>动作 mode = 10</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <h3 style="margin-top:0">落位</h3>
+    <ul>
+      <li><code>FUN_0045F710</code> 调 <code>FUN_00401950</code> → 查表</li>
+      <li>15 个 <code>(x,y)</code> 写入成员 <code>+0x134/+0x138</code></li>
+      <li>目标 = 执行单位当前格 + 偏移</li>
+      <li>之后群移动继续用这些偏移；<b>不旋转</b></li>
+    </ul>
+  </div>
+</div>
+
+<h2>2. 十阵法总表</h2>
+<div class="scroll">
+<table>
+  <tr><th>图标</th><th>#</th><th>指令</th><th>名称</th><th>帧</th><th>范围（格）</th><th>坐标轮廓</th><th>布局</th></tr>
+  <tr><td><img class="icon" src="assets/formation_16190_icon.png" alt=""></td><td>1</td><td>16190</td><td>一字长蛇阵</td><td>113</td><td>15×3</td><td>1 号前探 + 14 横向一线</td><td><a href="assets/formation_16190_layout.svg">SVG</a></td></tr>
+  <tr><td><img class="icon" src="assets/formation_16191_icon.png" alt=""></td><td>2</td><td>16191</td><td>二龙出水阵</td><td>114</td><td>9×13</td><td>左右镜像双列</td><td><a href="assets/formation_16191_layout.svg">SVG</a></td></tr>
+  <tr><td><img class="icon" src="assets/formation_16192_icon.png" alt=""></td><td>3</td><td>16192</td><td>三才天地阵</td><td>115</td><td>11×13</td><td>三向展开</td><td><a href="assets/formation_16192_layout.svg">SVG</a></td></tr>
+  <tr><td><img class="icon" src="assets/formation_16193_icon.png" alt=""></td><td>4</td><td>16193</td><td>四象奇门阵</td><td>116</td><td>7×13</td><td>右偏多列/四组</td><td><a href="assets/formation_16193_layout.svg">SVG</a></td></tr>
+  <tr><td><img class="icon" src="assets/formation_16194_icon.png" alt=""></td><td>5</td><td>16194</td><td>五行梅花阵</td><td>117</td><td>9×15</td><td>五点梅花状</td><td><a href="assets/formation_16194_layout.svg">SVG</a></td></tr>
+  <tr><td><img class="icon" src="assets/formation_16195_icon.png" alt=""></td><td>6</td><td>16195</td><td>六合连环阵</td><td>118</td><td>7×15</td><td>六向/中心对称</td><td><a href="assets/formation_16195_layout.svg">SVG</a></td></tr>
+  <tr><td><img class="icon" src="assets/formation_16196_icon.png" alt=""></td><td>7</td><td>16196</td><td>七星北斗阵</td><td>119</td><td>7×17</td><td>七星斜列/北斗</td><td><a href="assets/formation_16196_layout.svg">SVG</a></td></tr>
+  <tr><td><img class="icon" src="assets/formation_16197_icon.png" alt=""></td><td>8</td><td>16197</td><td>八门金锁阵</td><td>120</td><td>9×17</td><td>八门/双列门形</td><td><a href="assets/formation_16197_layout.svg">SVG</a></td></tr>
+  <tr><td><img class="icon" src="assets/formation_16198_icon.png" alt=""></td><td>9</td><td>16198</td><td>九宫八卦阵</td><td>121</td><td>9×17</td><td>九宫斜向展开（原表）</td><td><a href="assets/formation_16198_layout.svg">SVG</a></td></tr>
+  <tr><td><img class="icon" src="assets/formation_16199_icon.png" alt=""></td><td>10</td><td>16199</td><td>十面埋伏阵</td><td>122</td><td>9×15</td><td>十面三角/口袋</td><td><a href="assets/formation_16199_layout.svg">SVG</a></td></tr>
+</table>
+</div>
+<p class="meta">范围是 15 个槽位的矩形包围盒，不是碰撞/AOE。图标是名称提示，实际坐标以布局 SVG / JSON 为准。</p>
+
+<h2>3. 布局总览</h2>
+<div class="panel"><img src="assets/formation_layouts.svg" alt="十阵法布局总览"></div>
+
+<h2>4. 关键机制</h2>
+<div class="grid" style="grid-template-columns:1fr 1fr;">
+  <div class="panel">
+    <h3 style="margin-top:0">固定坐标</h3>
+    <ul>
+      <li>表长 301 int：<code>[0]=15</code>，之后 10×15 对偏移；</li>
+      <li>访问：<code>local_510 + (index−1)*0x1E + 1</code>；</li>
+      <li>单位：格；x 右、y 原表方向；</li>
+      <li>没有按朝向旋转或按人数重新计算。</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <h3 style="margin-top:0">位置而非属性</h3>
+    <ul>
+      <li>只写成员 <code>+0x134/+0x138</code> 并排队移动；</li>
+      <li>不修改攻防/速度/HP/士气/动画；</li>
+      <li>列阵锚点是执行单位当前格；</li>
+      <li>群移动在鼠标格上复用偏移，阵形保持。</li>
+    </ul>
+  </div>
+</div>
+
+<h2>5. 素材</h2>
+<div class="panel">
+  <img src="assets/formations_sheet.png" alt="原版阵法图标总表">
+  <p class="meta">帧 113–122 为十阵法；帧 124/123 为向上/向下翻页。原始逻辑尺寸 40×40，总表为 3× 放大；单图为 120×120 裁切。</p>
+</div>
+<div class="grid">
+  <div class="card"><h3>一字长蛇</h3><img src="assets/formation_16190_icon.png" alt=""></div>
+  <div class="card"><h3>二龙出水</h3><img src="assets/formation_16191_icon.png" alt=""></div>
+  <div class="card"><h3>三才天地</h3><img src="assets/formation_16192_icon.png" alt=""></div>
+  <div class="card"><h3>四象奇门</h3><img src="assets/formation_16193_icon.png" alt=""></div>
+  <div class="card"><h3>五行梅花</h3><img src="assets/formation_16194_icon.png" alt=""></div>
+  <div class="card"><h3>六合连环</h3><img src="assets/formation_16195_icon.png" alt=""></div>
+  <div class="card"><h3>七星北斗</h3><img src="assets/formation_16196_icon.png" alt=""></div>
+  <div class="card"><h3>八门金锁</h3><img src="assets/formation_16197_icon.png" alt=""></div>
+  <div class="card"><h3>九宫八卦</h3><img src="assets/formation_16198_icon.png" alt=""></div>
+  <div class="card"><h3>十面埋伏</h3><img src="assets/formation_16199_icon.png" alt=""></div>
+</div>
+
+<h2>6. 证据</h2>
+<div class="scroll">
+<table>
+  <tr><th>结论</th><th>函数/地址</th><th>Evidence</th></tr>
+  <tr><td>命令映射 + mode10</td><td><code>FUN_00428A50</code>：0x3F3D &lt; cmd &lt; 0x3F48</td><td>ev_b55dca03…</td></tr>
+  <tr><td>15 槽位 / 301 int 表</td><td><code>FUN_00401970</code></td><td>ev_b9d62eff…</td></tr>
+  <tr><td>index−1</td><td><code>FUN_00401950</code></td><td>ev_70bdf04d…</td></tr>
+  <tr><td>mode10 执行 / 写入偏移</td><td><code>FUN_0045F710</code></td><td>ev_76f98719…</td></tr>
+  <tr><td>mode10 任务分发 / mode2 复用</td><td><code>FUN_0042A8A0</code></td><td>ev_f9eaf993…</td></tr>
+  <tr><td>命令/目标校验路径</td><td><code>FUN_00429480</code></td><td>ev_8b406935…</td></tr>
+  <tr><td>队伍成员最多15</td><td><code>FUN_00424980</code></td><td>ev_a38bf460…</td></tr>
+</table>
+</div>
+
+<h2>7. 文件</h2>
+<ul>
+  <li><a href="README.md">README.md</a> — 完整推导、10 组完整坐标、限制</li>
+  <li><a href="data/formations.json">data/formations.json</a> — 结构化数据</li>
+  <li><a href="data/formations.csv">data/formations.csv</a> — 平表</li>
+  <li><a href="data/assets.json">data/assets.json</a> — 素材索引</li>
+  <li><a href="tools/extract_formations.mjs">tools/extract_formations.mjs</a> — 解析初始化表并生成图</li>
+  <li><a href="tools/crop_formation_icons.py">tools/crop_formation_icons.py</a> — 裁切原版图标</li>
+</ul>
+
+<p class="meta">限制：坐标来自静态还原的 FUN_00401970 初始化；未运行原版逐帧验证。图标是名称提示，坐标才是实际站位。翻页按钮不改变阵法几何。</p>
+</body>
+</html>

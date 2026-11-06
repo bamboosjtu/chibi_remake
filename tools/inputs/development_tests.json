@@ -1,0 +1,421 @@
+{
+  "description": "On-demand architecture, gameplay, media, rendering and performance regressions.",
+  "tests": [
+    {
+      "script": "test_ability_menus",
+      "markers": [
+        "ABILITY MENUS PASS"
+      ]
+    },
+    {
+      "script": "check_runtime_scripts",
+      "markers": [
+        "RUNTIME SCRIPTS PASS"
+      ]
+    },
+    {
+      "script": "test_architecture",
+      "markers": [
+        "ARCH-019 PASS: staggered neighbors, blocked exact target, multi-cell occupancy",
+        "ARCH-017/018 PASS: crash recovery, content revision, no-view full snapshot",
+        "ARCH-018 continuation PASS",
+        "ARCH-018 concurrent PASS: moving, combat, hold, production owner",
+        "ARCH-020/023 PASS: ordered task latches, once-only bridge event, command boundary",
+        "ARCH-020 PASS: missions 14/30 proximity, 19/20/29 orders and experience, 27 event",
+        "ARCH-022 budget selection PASS"
+      ],
+      "args": [
+        "--noview"
+      ]
+    },
+    {
+      "script": "test_transports",
+      "markers": [
+        "TRANSPORT UI PASS actual icon without ground click /16-0 capacity / cargo HP panel / paused hidden passengers",
+        "TRANSPORT BOARD PASS actual order /16 capacity / duplicate-foreign-stale-dying rejected / cargo preserved / selection removed / status ticks / loaded save",
+        "TRANSPORT AI PASS carried units excluded from assault-intercept-rally / focus and threats / manifest remains valid",
+        "TRANSPORT LAND PASS water-layer sailing / mixed selection / occupied coast / pending unload save / retry / partial save /16 unique land cells / cargo retained",
+        "TRANSPORT TECH-HP PASS upgraded hp>maxhp boards / damaged / in-cargo upgrade / inflight HP rejected",
+        "TRANSPORT SNAPSHOT PASS v8 manifest atomic / legacy v7 summary rebuilt / HQ HP sync / passenger death / sink all / ship removed / no resurrection",
+        "TRANSPORT MAP PASS",
+        "TRANSPORT WORLDS PASS 11 naval maps / actual coastline / board / loaded snapshot / unique landing"
+      ],
+      "args": [],
+      "timeout": 190
+    },
+    {
+      "script": "test_projectiles",
+      "markers": [
+        "PROJECTILE ARROW PASS speed16 / no launch damage / fixed flight / moving target locked / launch damage frozen",
+        "PROJECTILE SAVE PASS midflight64 / arrival160 / invalid atomic / legacy clears stale flight",
+        "PROJECTILE STONE PASS speed8 / fixed landing cell / moving target escapes / friendly occupant / B defence / minimum1",
+        "PROJECTILE LIMIT PASS stale target UID / dead shooter / 100 slots / full drops shot and damage / no retry",
+        "PROJECTILE SPEED PASS four speeds x30-144fps / first34 launch / tick40 travel96 / one arrival by50"
+      ],
+      "args": []
+    },
+    {
+      "script": "test_action_lifecycle",
+      "markers": [
+        "SPELL LIFECYCLE PASS dead identity / lost officer / load clears / normal cast"
+      ],
+      "args": []
+    },
+    {
+      "script": "test_construction",
+      "markers": [
+        "CONSTRUCTION REPAIR PASS independent=0 hp=",
+        "CONSTRUCTION PHYSICAL PASS AI site0 without workers / actual walk / fourth-tick2HP / save / leaving stops work",
+        "CONSTRUCTION BLOCKED PASS real sealed navigation / interrupted arrival / no automatic HP / cleared reference",
+        "CONSTRUCTION VALIDITY PASS foreign / attached / non-worker / destroyed site rejected",
+        "CONSTRUCTION PAYMENT PASS worker-team commander required / reachable site / normal cost once / resuming no charge",
+        "AI CONSTRUCTION PASS existing idle team dispatch / busy team waits / reserved site / no combat hijack / granary plan mapping",
+        "CONSTRUCTION COMMANDER PASS commander loss dissolves work authority / members retained / site stops"
+      ],
+      "args": []
+    },
+    {
+      "script": "test_build_feedback",
+      "markers": [
+        "BUILD FEEDBACK PASS exact preview / invalid retry / no preview mutation / crew entry / hidden untargetable / physical work / save inside / blocked exit retry / safe exit"
+      ],
+      "args": []
+    },
+    {
+      "script": "test_chibil1_presentation",
+      "markers": [
+        "PRESENTATION PASS",
+        "PRESENTATION PASS exploration: movement reveals new ground, old ground remembered, deterministic restore"
+      ],
+      "args": []
+    },
+    {
+      "script": "test_visibility_rules",
+      "markers": [
+        "VISIBILITY OVERLAP PASS overlapping sources / remove one / no passenger reveal / incremental movement",
+        "VISIBILITY FARSIGHT PASS fixed10 / expiry memory / snapshot cache rebuilt / larger base radius replaced",
+        "VISIBILITY EXECUTION PASS passenger timers / hold preserves idle / explicit attack / towers both sides / no AI-versus-AI / stationary"
+      ],
+      "args": []
+    },
+    {
+      "script": "test_cmd_paging",
+      "markers": [
+        "CMD-PAGE PASS: 0 actions -> hint only",
+        "CMD-PAGE PASS: 1/6 actions single page",
+        "CMD-PAGE PASS: 7/9/20 paged, all reachable, order stable, round-trip clean",
+        "CMD-PAGE PASS: repeated refresh keeps page",
+        "CMD-PAGE PASS: PageUp/PageDown, digit direct call, fixed back entry",
+        "CMD-PAGE PASS: officer art panel takes over hides footer",
+        "CMD-PAGE PASS: real officer_pick list pages through and closes"
+      ],
+      "args": []
+    },
+    {
+      "script": "test_naval_casualty_save",
+      "markers": [
+        "NAVAL CASUALTY SAVE PASS full8 / flagship loss / partial loss before think / total loss / snapshot roundtrip"
+      ],
+      "args": []
+    },
+    {
+      "script": "test_unload_state",
+      "markers": [
+        "UNLOAD STATE PASS active+phase saved / new move order keeps unloading / identical continuation / malformed snapshots rejected"
+      ],
+      "args": []
+    },
+    {
+      "script": "test_unit_collision",
+      "markers": [
+        "UNIT COLLISION PASS cells=",
+        "UNIT SPAWN PASS cell="
+      ],
+      "args": []
+    },
+    {
+      "script": "test_spatial_rules",
+      "markers": [
+        "SPATIAL RULES PASS separation stays connected / melee respects blockers / multi-cell route body-free / occupied goal stops nearby"
+      ],
+      "args": []
+    },
+    {
+      "script": "test_modular_battle",
+      "markers": [
+        "MODULAR BATTLE PASS"
+      ]
+    },
+    {
+      "script": "test_ai_planning",
+      "markers": [
+        "AI RESEARCH ORDER PASS gates1-4 / behavior2 blocked / ordinary chains / catapult / no guessed naval gate",
+        "AI RESEARCH CLOCK PASS 22think boundary / one normal dispatch / independent HQ / busy skip / cursor snapshot",
+        "AI HQ PASS gate / completed prerequisites / combat members / production lock / funds / own effects only",
+        "AI TRAIN GATES PASS two scheduler gates separated / C1 wealthy slot0 / L1 none / behavior filter",
+        "AI SUPPLY PASS food1500-wood1000-iron1000 / player unchanged / retry normal cost / level100-200 roster"
+      ]
+    },
+    {
+      "script": "test_ai_policy",
+      "markers": [
+        "AI RETREAT PASS per-group / other groups assault / consume old attacker / dead attacker / snapshot migration",
+        "AI WORKERS PASS replenishment enters construction group / gather-repair preserved / recover after wipe"
+      ]
+    },
+    {
+      "script": "test_army_technology",
+      "markers": [
+        "ARMY TECH ISOLATION PASS AI result only / worker-building HP / both towers exempt / dead body unchanged / monotonic completion / new spawn",
+        "ARMY TECH COMBAT PASS two independent AI / ordinary weapons and armour / catapult / ships / transport unarmed / actual attack",
+        "ARMY TECH SAVE PASS per-owner levels and HP / cached bonuses ignored / invalid state atomic / legacy missing field resets AI",
+        "ARMY TECH FACTIONS PASS all four faction IDs, including multi-enemy chapters"
+      ]
+    },
+    {
+      "script": "test_meta_abilities",
+      "markers": [
+        "RESEARCH CATALOG PASS",
+        "META INPUT PASS",
+        "META RULES PASS",
+        "META SAVE PASS",
+        "FORMATION TEAM PASS",
+        "STRATAGEM VISIBILITY PASS",
+        "META BUILD PASS",
+        "META CAMPAIGN PASS"
+      ]
+    },
+    {
+      "script": "test_clock_ui",
+      "markers": [
+        "CLOCK UI PASS settings / four speeds / escape / pause / save-load / end-campaign entry"
+      ]
+    },
+    {
+      "script": "test_texture_states",
+      "markers": [
+        "TEX-STATE PASS"
+      ]
+    },
+    {
+      "script": "test_original_media",
+      "markers": [
+        "ORIGINAL MEDIA BYTES PASS",
+        "ORIGINAL MEDIA PLAYBACK PASS",
+        "ORIGINAL MEDIA LIFECYCLE PASS"
+      ]
+    },
+    {
+      "script": "test_encounter_campaign",
+      "markers": [
+        "ENCOUNTER PASS",
+        "CAMPAIGN ADVANCE PASS"
+      ]
+    },
+    {
+      "script": "test_duel",
+      "markers": [
+        "DUEL VALIDITY PASS",
+        "DUEL ROUND PASS",
+        "DUEL VICTORY PASS",
+        "DUEL CINEMATIC PASS"
+      ]
+    },
+    {
+      "script": "test_resource_frontier",
+      "markers": [
+        "RESOURCE FRONTIER PASS phase=2",
+        "RESOURCE FRONTIER PASS phase=0",
+        "WORKER TEAM ATTACK PASS",
+        "FIRST MISSION ENEMIES PASS",
+        "MINIMAP EXPLORATION PASS"
+      ]
+    },
+    {
+      "script": "test_building_research",
+      "markers": [
+        "RESTORED GATE PASS",
+        "UNIT STATURE PASS",
+        "HOUSE INTERACTION PASS",
+        "BUILDING RESEARCH PASS",
+        "RESEARCHED PRODUCTION PASS",
+        "GATE OCCLUSION PASS"
+      ]
+    },
+    {
+      "script": "test_movement_quality",
+      "markers": [
+        "MOVEMENT QUALITY PASS",
+        "MOVEMENT RESEARCH PASS"
+      ]
+    },
+    {
+      "script": "test_unit_research",
+      "markers": [
+        "UNIT DATA PASS",
+        "CIVILIAN RULES PASS",
+        "UNIT TRANSPORT PASS",
+        "UNIT STRATAGEM PASS",
+        "UNIT COMBAT PASS",
+        "UNIT FIRE PASS",
+        "UNIT RESEARCH PASS"
+      ]
+    },
+    {
+      "script": "test_research_rules",
+      "markers": [
+        "SELECTION RESEARCH PASS",
+        "OFFICER RESEARCH PASS",
+        "STARTUP RESEARCH PASS",
+        "DEAD TEAM SLOT PASS",
+        "TEAM SLOT COMMAND PASS"
+      ]
+    },
+    {
+      "script": "test_input_research",
+      "markers": [
+        "COMMAND RESEARCH PASS",
+        "CURSOR RESEARCH PASS"
+      ]
+    },
+    {
+      "script": "test_resource_input",
+      "markers": [
+        "RESOURCE INPUT PASS phase=0",
+        "RESOURCE INPUT PASS phase=2",
+        "BUILD INPUT PASS",
+        "CONSTRUCTION INPUT PASS"
+      ]
+    },
+    {
+      "script": "test_automatic_gates",
+      "markers": [
+        "GATE ART PASS",
+        "GATE PASS orientation=16",
+        "GATE PASS orientation=17",
+        "GATE RESOURCE PASS"
+      ]
+    },
+    {
+      "script": "test_economy_rules",
+      "markers": [
+        "ECONOMY HARVEST PASS",
+        "ECONOMY UNLOCK PASS chibil1",
+        "ECONOMY UNLOCK PASS chibic1",
+        "ECONOMY HQ PASS"
+      ],
+      "args": [
+        "--noview"
+      ]
+    },
+    {
+      "script": "test_nav_invalidation",
+      "markers": [
+        "NAV-INV PASS: version bumps, own-cell escape, ahead block, clear run",
+        "NAV-INV PASS: blocked mid-march -> repath around, arrives, never enters solid",
+        "NAV-INV PASS: unreachable destination -> gives up, no infinite retry",
+        "NAV-INV PASS: unit standing in a solid cell can still walk out"
+      ],
+      "args": []
+    },
+    {
+      "script": "test_command_replace",
+      "markers": [
+        "COMMAND REPLACE PASS 8 old actions x move-attack / Shift right-click / cargo preserved",
+        "COMMAND SAVE PASS shared site preserved / no refund / gather replacement / new command persists"
+      ],
+      "args": []
+    },
+    {
+      "script": "test_research_jobs",
+      "markers": [
+        "RESEARCH CONCURRENCY PASS two buildings / same-building production lock / cancel selected only / 199tick save",
+        "RESEARCH SNAPSHOT PASS invalid atomic / job references / production conflicts / legacy single-job continuation",
+        "RESEARCH TRANSACTIONS PASS sale200tick / debit start / credit once / cancel75 / AI owner isolated"
+      ],
+      "args": []
+    },
+    {
+      "script": "test_initial_teams",
+      "markers": [
+        "TEAM SNAPSHOT PASS hp=",
+        "INITIAL TEAMS PASS",
+        "TEAM LIMIT PASS one commander plus15 members / extra worker retained / construction role preserved",
+        "TEAM MIGRATION PASS old overfull group releases excess member / UID-HP-cargo retained"
+      ],
+      "args": []
+    },
+    {
+      "script": "test_worker_groups",
+      "markers": [
+        "GROUP PASS independent commander / four original workers / disband / regroup / save-load / repeat",
+        "WORKER SAVE PASS mid-cargo + 40 second continuation / forward resource references",
+        "SOUTH PASS destination="
+      ],
+      "args": []
+    },
+    {
+      "script": "test_ai_slots",
+      "markers": [
+        "AI SLOT PIPELINE PASS C1 threshold / 41tick / completed count / blocked exit retry / duplicate callback / 4arch4inf / partial protection / pending save",
+        "AI SLOT LIFECYCLE PASS no assault refill / partial casualties retained / whole dead reset / disband preserves / cancel75 / building loss / pruned UID",
+        "AI SLOT SAVE PASS atomic malformed / v6 reset / cavalry5 / cat2inf6 / HQ200 gate / AI existing vehicle-dock / player list preserved",
+        "AI NAVAL SLOT PASS empty/records structural / owner-slot / member UID-kind / flagship / pending-token-order / malformed snapshot rejected"
+      ]
+    },
+    {
+      "script": "test_unit_index",
+      "markers": [
+        "UNIT INDEX PASS timing="
+      ],
+      "args": []
+    },
+    {
+      "script": "test_restored_view",
+      "markers": [
+        "RESTORED FOG PASS",
+        "SPRITE DIRECTION PASS"
+      ],
+      "timeout": 120
+    },
+    {
+      "script": "test_worker_visuals",
+      "markers": [
+        "WORKER VISUAL PASS"
+      ],
+      "timeout": 120
+    },
+    {
+      "script": "test_building_panels",
+      "markers": [
+        "BUILDING PANELS PASS"
+      ],
+      "timeout": 120
+    },
+    {
+      "script": "test_component_registry",
+      "markers": [
+        "REGISTRY PASS"
+      ]
+    },
+    {
+      "script": "test_group_focus",
+      "markers": [
+        "GROUP FOCUS PASS"
+      ],
+      "timeout": 120
+    },
+    {
+      "script": "test_user_storage",
+      "markers": [
+        "USER STORAGE PASS"
+      ]
+    },
+    {
+      "script": "test_world_exchange",
+      "markers": [
+        "WORLD EXCHANGE PASS"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>原版《赤壁》计谋与数值</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:32px; background:#12141a; color:#e6e6e6; font:15px/1.65 "Segoe UI","Microsoft YaHei",sans-serif; }
+  h1,h2,h3 { font-weight:600; letter-spacing:.02em; }
+  h1 { font-size:28px; margin:0 0 4px; }
+  h2 { margin:38px 0 12px; font-size:19px; color:#ffd27a; }
+  h3 { margin:20px 0 8px; font-size:15px; color:#ffd27a; }
+  .sub { color:#9aa0ad; margin-bottom:20px; }
+  code { background:#1d212b; padding:1px 5px; border-radius:4px; color:#a8d5ff; }
+  .note { background:#1b1f27; border-left:3px solid #ffd27a; padding:10px 14px; border-radius:4px; color:#c9ced8; }
+  .warn { border-left-color:#ff9d6e; }
+  .cards { display:flex; gap:12px; flex-wrap:wrap; margin:18px 0; }
+  .stat { background:#181c24; border:1px solid #2a2f3a; border-radius:10px; padding:12px 18px; min-width:150px; }
+  .stat b { display:block; font-size:24px; color:#ffd27a; }
+  .stat span { color:#9aa0ad; font-size:13px; }
+  table { border-collapse:collapse; width:100%; margin-top:8px; }
+  th,td { border-bottom:1px solid #262b35; padding:6px 9px; text-align:left; vertical-align:top; }
+  th { color:#9aa0ad; font-weight:500; font-size:13px; white-space:nowrap; }
+  .scroll { overflow-x:auto; }
+  .panel { background:#181c24; border:1px solid #2a2f3a; border-radius:10px; padding:14px; margin-top:10px; }
+  .panel img { width:100%; background:#0b0d12; border:1px solid #2a2f3a; display:block; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .ok { color:#8fe3a3; } .hot { color:#ffd27a; } .bad { color:#ff9d9d; }
+  .meta { color:#9aa0ad; font-size:13px; }
+  ul { margin-top:6px; }
+  @media (max-width:800px){ .grid2 { grid-template-columns:1fr; } body { padding:18px; } }
+</style>
+</head>
+<body>
+<h1>原版《赤壁》计谋与数值</h1>
+<div class="sub">CB.EXE <code>2db7cc10…c5798cb7</code> · REA/Ghidra 静态分析 · 九种计谋、状态、火攻、加减速、远视</div>
+
+<div class="note warn">
+  <b>口径</b>：原版二进制为准；<code>docs/</code> 与重制实现只作差异对照。本文修正了旧研究中的 800 tick、火攻、加速倍率等未确认项。
+</div>
+
+<h2>等级解锁与固定格位订正</h2>
+<p><code>FUN_004289A0</code> 的十级掩码为 <code>0, 1, 0x181, 0x1C1, 0x1C9, 0x1CF, 0x1EF, 0x1FF, 0x1FF, 0x1FF</code>。旧表的 7/63/255/511 属于阵法，不属于计谋。详见 <a href="README.md#13-费用与解锁">费用与解锁</a> 的订正说明。</p>
+<p>三列九格固定为：激励/加速/减速，远视/混乱/滚木，埋伏/恢复/火攻。锁定格留空，图标与主指令同尺寸，无返回条，点击战场退出。2 级仅显示左上激励、下中恢复、右下火攻。</p>
+<div class="cards">
+  <div class="stat"><b>800</b><span>状态持续 / 单位更新</span></div>
+  <div class="stat"><b>×2 / ×0.5</b><span>加速 / 减速移动</span></div>
+  <div class="stat"><b>10 格</b><span>远视：覆盖，不是 +10</span></div>
+  <div class="stat"><b>10 × 24</b><span>火攻单格最大 240 HP</span></div>
+</div>
+
+<h2>1. 九计谋总表</h2>
+<div class="scroll">
+<table>
+  <tr><th>#</th><th>计谋</th><th>谋略</th><th>目标</th><th>状态</th><th>核心效果</th><th>持续</th></tr>
+  <tr><td>0</td><td>激励</td><td>50</td><td>己方队伍</td><td>1</td><td>每 100 全局更新谋略 +5，上限 2×智+15；<b>不直接加士气</b></td><td>800</td></tr>
+  <tr><td>1</td><td>加速</td><td>100</td><td>己方队伍</td><td>2</td><td>移动 <b>×2</b>；攻击 rate <b>×2</b>；不是 ×1.5</td><td>800</td></tr>
+  <tr><td>2</td><td>减速</td><td>100</td><td>敌方队伍</td><td>3</td><td>移动 <b>×0.5</b>；攻击 rate <b>&gt;&gt;1</b>；整数截断</td><td>800</td></tr>
+  <tr><td>3</td><td>远视</td><td>100</td><td>己方队伍</td><td>4</td><td>有效视野 <b>固定 10 格</b>（覆盖）</td><td>800</td></tr>
+  <tr><td>4</td><td>混乱</td><td>200</td><td>敌方队伍</td><td>5</td><td>追加 0x1B 空转任务；不是即时硬控，不随机移动</td><td>800</td></tr>
+  <tr><td>5</td><td>滚木</td><td>100</td><td>己方队伍</td><td>7</td><td>每 30 更新，在视野内取 1 个敌人，武将士气 <b>−50</b>；无 HP 伤害</td><td>800 / 命中提前</td></tr>
+  <tr><td>6</td><td>埋伏</td><td>100</td><td>己方队伍</td><td>6</td><td>仅步兵 32/弓兵 45：射程=视野（5/7），攻击固定 <b>30</b>；无隐身</td><td>800</td></tr>
+  <tr><td>7</td><td>恢复</td><td>10</td><td>己方队伍</td><td>—</td><td>目标队伍主将 <b>+50 HP</b>，封顶；单体</td><td>即时</td></tr>
+  <tr><td>8</td><td>火攻</td><td>100</td><td>地面格</td><td>—</td><td>单格，每 4 更新 10 HP，100 更新，最多 24 次/240 HP</td><td>100</td></tr>
+</table>
+</div>
+<p class="meta">“队伍成员”由 <code>FUN_00424980(1,target,…,15)</code> 直接收集，不是点击点 2 格 AOE。恢复只取主将；火攻取地面格。</p>
+
+<h2>2. 火攻：单格 10 × 24</h2>
+<div class="grid2">
+  <div class="panel">
+    <img src="assets/fire_timeline.svg" alt="火攻时序">
+  </div>
+  <div class="panel">
+    <h3 style="margin-top:0">代码路径</h3>
+    <pre style="white-space:pre-wrap;color:#c9ced8;font-size:13px">FUN_0045F8B0 case 9
+  FUN_00453A80(x, y, 100, 4, 1)
+    effect type 7
+    +0x28 = 10          // 伤害
+    +0x64 = 4           // 伤害间隔
+    +0x6e = 100         // 寿命
+  FUN_00453060 case 7
+    if (timer >= 4) { timer=0; FUN_00453D10(); }
+    counter++; if (counter >= 100) end;</pre>
+    <ul>
+      <li>单格，不是 1.5 格 AOE；</li>
+      <li>固定 10 HP，不经过防御公式；</li>
+      <li>不检查阵营，可烧友军；</li>
+      <li>首击在第 5 次更新，最后一击第 97 次，共 24 次；</li>
+      <li>最大 240 HP，不是 20 DPS × 6 秒。</li>
+    </ul>
+  </div>
+</div>
+
+<h2>3. 加速 / 减速</h2>
+<div class="panel"><img src="assets/speed_compare.svg" alt="加速减速倍率"></div>
+<div class="grid2">
+  <div class="panel">
+    <h3 style="margin-top:0">移动</h3>
+    <ul>
+      <li>普通：每单位更新 1 步；</li>
+      <li>加速：每更新 <b>2 步</b>，即 ×2；</li>
+      <li>减速：只在奇数更新走 1 步，即 ×0.5；</li>
+      <li>状态 2/3 互斥；800 更新；</li>
+      <li>旧文档的“移动 ×1.5”不成立。</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <h3 style="margin-top:0">攻击</h3>
+    <ul>
+      <li><code>period = floor(1000 / rate)</code>；</li>
+      <li>加速：<code>rate *= 2</code>；</li>
+      <li>减速：<code>rate >>= 1</code>；</li>
+      <li>奇数 rate 时减速会截断，实际不是精确 0.5×；</li>
+      <li>只确认攻击/动作；修理倍率未找到状态读取。</li>
+    </ul>
+  </div>
+</div>
+
+<h2>4. 远视：10 格覆盖</h2>
+<div class="grid2">
+  <div class="panel"><img src="assets/farsight_grid.svg" alt="远视 10 格"></div>
+  <div class="panel">
+    <pre style="white-space:pre-wrap;color:#c9ced8;font-size:13px">FUN_00426280(unit+0xC):
+  if (*(char *)(unit + 0x64) == 1)  // 状态4
+      return 10;
+  return DATA.EXP v5;</pre>
+    <ul>
+      <li>有效视野直接变为 <b>10 格</b>；</li>
+      <li>不是基础视野 +10，而是覆盖；</li>
+      <li>目标队伍成员都获得状态4；</li>
+      <li>800 更新后恢复基础视野；</li>
+      <li>揭雾：<code>FUN_004583E0</code> / <code>FUN_00457E60</code>。</li>
+    </ul>
+  </div>
+</div>
+
+<h2>5. 状态计时：800 次单位更新</h2>
+<div class="panel"><img src="assets/status_timeline.svg" alt="800 状态计时"></div>
+<p class="meta">FUN_00443550 置 flag 并清零计时；FUN_0045B4E0 每单位更新把活跃状态计时 +1，<code>799 &lt; timer</code> 时清除。800 是逻辑更新数，不是固定秒数。</p>
+
+<h2>6. 其余计谋要点</h2>
+<div class="scroll">
+<table>
+  <tr><th>计谋</th><th>原版行为</th><th>与 docs/重制的差异</th></tr>
+  <tr><td>激励</td><td>状态1；每 100 全局更新谋略 +5，上限 2×智+15；不直接加士气。</td><td>docs 的“士气 +15”不成立。</td></tr>
+  <tr><td>混乱</td><td>状态5；追加 0x1B 任务，队列轮到后才空转；不立即打断当前动作，不随机移动。</td><td>docs 的“即时暂停并保留进度”过于简化。</td></tr>
+  <tr><td>滚木</td><td>状态7；每 30 更新在施法者视野内取第一个敌人，武将士气 −50；无 HP 伤害；命中清状态。</td><td>docs 的“2 格 40 伤害”完全不符。</td></tr>
+  <tr><td>埋伏</td><td>状态6；仅步兵(32)/弓兵(45) 射程=视野（5/7），攻击固定 30；没有隐身。</td><td>docs 的“不可索敌/不可选中”不成立。</td></tr>
+  <tr><td>恢复</td><td>目标队伍主将 +50 HP，封顶；单体。</td><td>docs 的 +50 正确，但不要做成全队。</td></tr>
+</table>
+</div>
+
+<h2>7. 原版图标</h2>
+<div class="panel">
+  <img src="assets/stratagems_sheet.png" alt="原版九计谋图标">
+  <p class="meta">来自 <code>BMP.LWC</code> 的计谋图标总表（commands 包 3× 提取），帧 98–106 对应 16210–16218。</p>
+</div>
+
+<h2>8. 证据</h2>
+<div class="scroll">
+<table>
+  <tr><th>结论</th><th>函数/地址</th><th>Evidence</th></tr>
+  <tr><td>计谋分派</td><td><code>FUN_0045F8B0</code></td><td>ev_67de12c7…</td></tr>
+  <tr><td>状态写入</td><td><code>FUN_00443550</code></td><td>ev_0a247658…</td></tr>
+  <tr><td>800 更新清除</td><td><code>FUN_0045B4E0</code></td><td>ev_90dbf2b0…</td></tr>
+  <tr><td>激励 +5</td><td><code>FUN_0045B410</code></td><td>ev_4adf2cb5…</td></tr>
+  <tr><td>移动倍率</td><td><code>FUN_0045B910</code></td><td>ev_f459b4ce…</td></tr>
+  <tr><td>攻击 rate</td><td><code>FUN_0045D440 / FUN_0045DD90</code></td><td>ev_ccf1943e… / ev_b5bb4533…</td></tr>
+  <tr><td>远视 10</td><td><code>FUN_00426280</code></td><td>ev_5ba5e8eb…</td></tr>
+  <tr><td>火场</td><td><code>FUN_00453A80 / FUN_00453D10 / FUN_00453060</code></td><td>ev_fc3c4a69… / ev_9b70a319… / ev_a86ab41e…</td></tr>
+  <tr><td>滚木</td><td><code>FUN_004247A0 / FUN_00460020</code></td><td>ev_fe985a29… / ev_2b3a0a26…</td></tr>
+  <tr><td>埋伏</td><td><code>FUN_00424C70 / FUN_00421050 / FUN_00453580</code></td><td>ev_3ea0fda7… / ev_9a099924… / ev_de0356c2…</td></tr>
+</table>
+</div>
+
+<h2>9. 文件</h2>
+<ul>
+  <li><a href="README.md">README.md</a> — 完整推导与限制</li>
+  <li><a href="data/magics.json">data/magics.json</a> — 结构化数据</li>
+  <li><a href="data/magics.csv">data/magics.csv</a> — 平表</li>
+  <li><a href="data/assets.json">data/assets.json</a> — 图索引</li>
+  <li><a href="tools/extract_magics.mjs">tools/extract_magics.mjs</a> — 校验/生成脚本</li>
+</ul>
+
+<p class="meta">限制：800、火攻、倍率来自静态代码；未运行原版逐帧验证。火攻 24 次严格按 timer 初值 0、先判定后自增、100 次寿命推导；若实机相位不同，需检查创建帧是否多执行一次特效更新。</p>
+</body>
+</html>

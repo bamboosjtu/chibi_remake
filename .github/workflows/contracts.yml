@@ -1,0 +1,31 @@
+name: contracts
+
+# Repository contracts that need no engine, no export templates and no LFS art:
+# composition registry, layer boundaries, declared runtime assets and the
+# release-suite shape. `ci.yml` keeps the engine smoke because that one needs a
+# 3.4 GiB build; these checks are pure file inspection and run in seconds, so
+# there is no reason to leave them to a local machine. They ran in ci.yml until
+# 0111288a removed every non-syntax job.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Registry, architecture and repository contracts
+        run: node tools/ci_lightweight.mjs
+      - name: Indexed asset declarations and LFS pointers
+        run: node tools/audit_clone_inputs.mjs --index
+      - name: Rebuildable terrain source declarations
+        run: node tools/terrain_sources.mjs --index

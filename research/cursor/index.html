@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>原版《赤壁》鼠标光标素材与机制</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; padding: 32px; background: #12141a; color: #e6e6e6;
+         font: 15px/1.6 "Segoe UI", "Microsoft YaHei", sans-serif; }
+  h1, h2 { font-weight: 600; letter-spacing: .02em; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  h2 { margin: 40px 0 12px; font-size: 19px; color: #ffd27a; }
+  .sub { color: #9aa0ad; margin-bottom: 24px; }
+  code { background: #1d212b; padding: 1px 5px; border-radius: 4px; color: #a8d5ff; }
+  .sheet { max-width: 100%; image-rendering: pixelated; border: 1px solid #2a2f3a; background: #0b0d12; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 18px; }
+  .card { background: #181c24; border: 1px solid #2a2f3a; border-radius: 10px; padding: 14px 16px; }
+  .card h3 { margin: 0 0 6px; font-size: 15px; color: #ffd27a; }
+  .card .row { color: #9aa0ad; font-size: 13px; }
+  .card img { width: 100%; image-rendering: pixelated; margin-top: 10px; background:
+      repeating-conic-gradient(#1b1f28 0% 25%, #141820 0% 50%) 50% / 16px 16px; border-radius: 6px; }
+  table { border-collapse: collapse; width: 100%; margin-top: 8px; }
+  th, td { border-bottom: 1px solid #262b35; padding: 7px 9px; text-align: left; vertical-align: top; }
+  th { color: #9aa0ad; font-weight: 500; font-size: 13px; }
+  .note { background: #1b1f27; border-left: 3px solid #ffd27a; padding: 10px 14px; border-radius: 4px; color: #c9ced8; }
+  a { color: #8ec5ff; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; background: #232936; color: #9aa0ad; font-size: 12px; margin-right: 6px; }
+</style>
+</head>
+<body>
+<h1>原版《赤壁》鼠标光标</h1>
+<div class="sub">
+  CB.EXE <code>2db7cc10…c5798cb7</code> · RES/MOUSE.LWC · REA/Ghidra 静态分析 · 未运行原版
+</div>
+
+<div class="note">
+  光标是游戏自己绘制的软件光标（<code>SetCursor(NULL)</code>）：3 张 LWC 帧 → 3 个光标对象。
+  bank A = 10 状态 × 4 帧（54×35），bank B = 8 方向箭头（24×24），bank C = 红旗 4 帧（54×32）。
+  主循环 32 ms 一次 tick，每 5 tick 前进一帧（160 ms/帧）。
+  上色：bank A 用 SCORE.PAL（Main Palette，绿/红=友方/敌方），bank C 用 ARROW_T.PAL（SCORE 下会变白旗）。
+</div>
+
+<h2>状态图集（bank A）</h2>
+<p><span class="pill">ARROW_T.PAL 预览</span><span class="pill">行 0–9</span><span class="pill">每行 4 帧</span></p>
+<img class="sheet" src="assets/mouse_states_sheet.png" alt="bank A 状态图集">
+<p class="row">主预览使用 SCORE.PAL（CBGame.set 的 “Main Palette”），绿色/红色护手分别对应友方/敌方。换用 ARROW_T.PAL 时同一批索引整体变米棕色（红旗变米色），形状不变：</p>
+<img class="sheet" src="assets/mouse_states_sheet_arrow_palette.png" alt="ARROW_T.PAL 换色预览">
+
+<h2>状态明细</h2>
+<div class="grid">
+  <div class="card"><h3>行 0 · 红旗指针（默认）</h3><div class="row">空地面 / 视口外 / 进战场预置 · 热点 (1,3)</div><img src="assets/mouse_state_row00.png" alt="row 0"></div>
+  <div class="card"><h3>行 1 · 攻击（基础）</h3><div class="row">攻击命令，未命中变体 · 热点 (26,17)</div><img src="assets/mouse_state_row01.png" alt="row 1"></div>
+  <div class="card"><h3>行 2 · 攻击 / 友方（绿）</h3><div class="row">FUN_004250f0 为真 · 不可攻击 · 热点 (26,17)</div><img src="assets/mouse_state_row02.png" alt="row 2"></div>
+  <div class="card"><h3>行 3 · 攻击 / 敌方（红）</h3><div class="row">FUN_004250f0 为假 · 可攻击 · 热点 (26,17)</div><img src="assets/mouse_state_row03.png" alt="row 3"></div>
+  <div class="card"><h3>行 4 · 运输/采集（基础）</h3><div class="row">运输命令 · 热点 (24,19)</div><img src="assets/mouse_state_row04.png" alt="row 4"></div>
+  <div class="card"><h3>行 5 · 运输/采集变体</h3><div class="row">悬停铁矿 22 / 民居 24/25 · 热点 (24,19)</div><img src="assets/mouse_state_row05.png" alt="row 5"></div>
+  <div class="card"><h3>行 6 · 单位悬停手形</h3><div class="row">默认模式下命中单位（选择光标）· 热点 (26,17)</div><img src="assets/mouse_state_row06.png" alt="row 6"></div>
+  <div class="card"><h3>行 7 · 拖拽/框选</h3><div class="row">DAT_00483400 = 1 · 热点 (26,17)</div><img src="assets/mouse_state_row07.png" alt="row 7"></div>
+  <div class="card"><h3>行 8 · 加入/编组（基础）</h3><div class="row">红旗指针（同 0），未命中可加入单位 · 命令 0x3f11 / 模式 0xF · 热点 (1,3)</div><img src="assets/mouse_state_row08.png" alt="row 8"></div>
+  <div class="card"><h3>行 9 · 加入/编组变体</h3><div class="row">悬停可加入的本方单位 · 青边方框 · 热点 (26,17)</div><img src="assets/mouse_state_row09.png" alt="row 9"></div>
+</div>
+
+<h2>边缘滚动箭头（bank B）</h2>
+<p><span class="pill">24×24</span><span class="pill">NW / N / NE / E / SE / S / SW / W</span><span class="pill">热点在指向边缘的一端</span></p>
+<img class="sheet" src="assets/mouse_edge_arrows.png" alt="8 方向箭头">
+
+<h2>红旗光标（bank C）</h2>
+<p><span class="pill">54×32</span><span class="pill">4 帧</span><span class="pill">离开战场回菜单时切换</span><span class="pill">ARROW_T 上色</span></p>
+<img class="sheet" src="assets/mouse_banner.png" alt="红旗光标">
+
+<h2>触发规则速查</h2>
+<table>
+  <tr><th>输入</th><th>行</th><th>条件</th></tr>
+  <tr><td>默认 · 空地面</td><td>0</td><td>没有单位命中，fallback 到 <code>DAT_004833f4 = 0</code></td></tr>
+  <tr><td>默认 · 悬停单位</td><td>6</td><td>命中任意单位（选择光标）</td></tr>
+  <tr><td>攻击命令</td><td>1 → 2/3</td><td>悬停单位时按 <code>FUN_004250f0</code> 关系判定切变体（绿=友方，红=敌方）</td></tr>
+  <tr><td>运输命令</td><td>4 → 5</td><td>悬停资源类型 <code>0x16/0x18/0x19</code></td></tr>
+  <tr><td>加入命令</td><td>8 → 9</td><td>悬停本方且可解析队长的单位</td></tr>
+  <tr><td>拖拽中</td><td>7</td><td><code>DAT_00483400 != 0</code></td></tr>
+  <tr><td>视口外</td><td>0</td><td>光标不在 <code>DAT_00482ff0..DAT_00482ffc</code></td></tr>
+  <tr><td>贴边</td><td>bank B</td><td>方向 0–7，摄像机还能移动</td></tr>
+</table>
+
+<h2>文件</h2>
+<ul>
+  <li><a href="README.md">README.md</a> — 完整机制、证据 ID、复现步骤、已知空缺</li>
+  <li><a href="data/cursor_states.json">data/cursor_states.json</a> — 状态机 / 命令绑定 / 时序（机器可读）</li>
+  <li><a href="data/mouse_banks.json">data/mouse_banks.json</a> — LWC 帧表、网格、热点</li>
+  <li><a href="assets/original_MOUSE.LWC">assets/original_MOUSE.LWC</a> — 原始资源副本</li>
+</ul>
+</body>
+</html>

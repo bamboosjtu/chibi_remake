@@ -1,0 +1,12 @@
+{
+  "assetId": "left-controls-v4",
+  "generator": "built-in image_gen",
+  "sourceGeneratedFile": "C:/Users/bambo/.codex/generated_images/01a13348-db65-7b23-b66a-63227eb4490d/exec-22b08679-5a96-40cf-ac42-7a9c342d1fd2.png",
+  "texture": "godot/chibi_remake/art/full/ui/left-controls-redraw-v4.png",
+  "width": 1774,
+  "height": 887,
+  "sha256": "634eef455edd7b642d914d8ee905588a1231aade096cf87627f6f2eecfd9b4c1",
+  "promptFile": "godot/chibi_remake/art/production/left-controls-v4-prompt.json",
+  "prompt": "Use case: precise-object-edit / style-transfer. Repaint these EXACT TWO square Chinese RTS UI button icons in two equal columns ONE row, same subjects and silhouette. Left: original gold rounded pin/cup-shaped symbol and tapered stem. Right: simple gold triangular right-pointing arrow. Saturated lacquer red inset background, fine dark red bevel, thin antique gold rectangular outer frame. Crisp carved metallic highlights and red lacquer texture, restrained historical Chinese game art. Same original symbols, not text or invented objects. Exact2:1 canvas fills both square cells without padding, opaque. Aim1024x512 or larger. No extra symbols or text, no screenshot, no rounded UI, no modern aesthetic.",
+  "generatedAt": "2026-10-18T00:42:46.829Z"
+}

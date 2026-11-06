@@ -1,0 +1,1071 @@
+{
+  "schemaVersion": 1,
+  "generated": "2026-10-29",
+  "source": {
+    "file": "CB.EXE",
+    "sha256": "2db7cc102e6fde547ab05d77cfddabc2079f5bc9be9b6b59b17bf435c5798cb7",
+    "decompiled": "_work/ghidra_export/CB.EXE.decompiled.c",
+    "tableFunction": "FUN_00401970",
+    "note": "仅以原版 CB.EXE 静态分析为准；docs/重制实现仅用于差异对照。"
+  },
+  "headline": "十阵法是 10×15 个固定格偏移；列阵后把队伍排到执行单位当前格周围，之后群移动继续使用这些偏移。",
+  "activation": {
+    "firstPageLevelMasks": [7,7,7,63,63,255,511,511,511,511],
+    "secondPageLevelMasks": [0,0,0,0,0,0,259,259,259,259],
+    "logicalLevelMasks": [7,7,7,63,63,255,1023,1023,1023,1023],
+    "pageSlots": [[16190,16191,16192,16193,16194,16195,16196,16197,16201],[16198,16199,null,null,null,null,null,null,16200]],
+    "combatCommand": 16133,
+    "combatCommandName": "列阵",
+    "submenu": "16190–16199",
+    "handler": "FUN_00428A50 中 0x3F3D < command < 0x3F48",
+    "indexFormula": "formationIndex = command - 0x3F3D，得到 1..10",
+    "actionMode": 10,
+    "actionFunction": "FUN_0045F710",
+    "anchor": "执行单位的当前格（unit+0x1A/+0x1C）；没有看到额外的地面点选参数",
+    "execution": "FUN_00401950(unit, formationIndex) → FUN_00401970(unit, formationIndex-1) 写入成员格偏移；FUN_0045F710 再给队伍成员排队移动指令 2",
+    "storage": "成员 unit+0x134 = offsetX，unit+0x138 = offsetY",
+    "moveReuse": "FUN_0042A8A0 的群移动（mode2）会把成员 +0x134/+0x138 加在鼠标目标格上",
+    "orientation": "表坐标固定，无按朝向旋转；x 右、y 原表方向（屏幕向上 = y 负）",
+    "teamCap": 15,
+    "targetClamp": "群移动（FUN_0042A8A0 mode2）：x 夹到 [3, mapW-4]，y 夹到 [3, mapH-3]；列阵本身的目标也是格坐标。",
+    "noStatEffect": "只写位置/移动，不修改攻防、速度、HP、士气或动画速率。"
+  },
+  "table": {
+    "countIndex": "local_510[0] = 0xF（15）",
+    "totalInts": 301,
+    "layout": "10 × (15 × (x,y)) + count",
+    "slotAccess": "local_510 + formationIndex0 * 0x1E + 1",
+    "parseRule": "每 2 个 int 为一个 (x,y)；坐标单位为格"
+  },
+  "formations": [
+    {
+      "index": 1,
+      "command": 16190,
+      "name": "一字长蛇阵",
+      "iconFrame": 113,
+      "iconSheetCell": {
+        "x": 4,
+        "y": 18,
+        "w": 120,
+        "h": 120
+      },
+      "iconFile": "assets/formation_16190_icon.png",
+      "slotCount": 15,
+      "slots": [
+        [
+          0,
+          -4
+        ],
+        [
+          -1,
+          -2
+        ],
+        [
+          1,
+          -2
+        ],
+        [
+          -2,
+          -2
+        ],
+        [
+          2,
+          -2
+        ],
+        [
+          -3,
+          -2
+        ],
+        [
+          3,
+          -2
+        ],
+        [
+          -4,
+          -2
+        ],
+        [
+          4,
+          -2
+        ],
+        [
+          -5,
+          -2
+        ],
+        [
+          5,
+          -2
+        ],
+        [
+          -6,
+          -2
+        ],
+        [
+          6,
+          -2
+        ],
+        [
+          -7,
+          -2
+        ],
+        [
+          7,
+          -2
+        ]
+      ],
+      "bounds": {
+        "minX": -7,
+        "maxX": 7,
+        "minY": -4,
+        "maxY": -2,
+        "width": 15,
+        "height": 3
+      },
+      "uniqueSlots": 15,
+      "leaderSlot": [
+        0,
+        -4
+      ],
+      "shape": {
+        "widthCells": 15,
+        "heightCells": 3,
+        "note": "图标是名称提示，实际队形以本 slots 表为准；坐标单位为格。"
+      }
+    },
+    {
+      "index": 2,
+      "command": 16191,
+      "name": "二龙出水阵",
+      "iconFrame": 114,
+      "iconSheetCell": {
+        "x": 128,
+        "y": 18,
+        "w": 120,
+        "h": 120
+      },
+      "iconFile": "assets/formation_16191_icon.png",
+      "slotCount": 15,
+      "slots": [
+        [
+          0,
+          -6
+        ],
+        [
+          -1,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          -2,
+          2
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          -2,
+          0
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          -3,
+          -2
+        ],
+        [
+          3,
+          -2
+        ],
+        [
+          -3,
+          -4
+        ],
+        [
+          3,
+          -4
+        ],
+        [
+          -4,
+          -6
+        ],
+        [
+          4,
+          -6
+        ],
+        [
+          -4,
+          -8
+        ],
+        [
+          4,
+          -8
+        ]
+      ],
+      "bounds": {
+        "minX": -4,
+        "maxX": 4,
+        "minY": -8,
+        "maxY": 4,
+        "width": 9,
+        "height": 13
+      },
+      "uniqueSlots": 15,
+      "leaderSlot": [
+        0,
+        -6
+      ],
+      "shape": {
+        "widthCells": 9,
+        "heightCells": 13,
+        "note": "图标是名称提示，实际队形以本 slots 表为准；坐标单位为格。"
+      }
+    },
+    {
+      "index": 3,
+      "command": 16192,
+      "name": "三才天地阵",
+      "iconFrame": 115,
+      "iconSheetCell": {
+        "x": 252,
+        "y": 18,
+        "w": 120,
+        "h": 120
+      },
+      "iconFile": "assets/formation_16192_icon.png",
+      "slotCount": 15,
+      "slots": [
+        [
+          0,
+          -6
+        ],
+        [
+          -3,
+          2
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          -2,
+          -6
+        ],
+        [
+          -4,
+          0
+        ],
+        [
+          4,
+          0
+        ],
+        [
+          2,
+          -6
+        ],
+        [
+          -2,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          -4,
+          -6
+        ],
+        [
+          -5,
+          -2
+        ],
+        [
+          5,
+          -2
+        ],
+        [
+          4,
+          -6
+        ],
+        [
+          -1,
+          6
+        ],
+        [
+          1,
+          6
+        ]
+      ],
+      "bounds": {
+        "minX": -5,
+        "maxX": 5,
+        "minY": -6,
+        "maxY": 6,
+        "width": 11,
+        "height": 13
+      },
+      "uniqueSlots": 15,
+      "leaderSlot": [
+        0,
+        -6
+      ],
+      "shape": {
+        "widthCells": 11,
+        "heightCells": 13,
+        "note": "图标是名称提示，实际队形以本 slots 表为准；坐标单位为格。"
+      }
+    },
+    {
+      "index": 4,
+      "command": 16193,
+      "name": "四象奇门阵",
+      "iconFrame": 116,
+      "iconSheetCell": {
+        "x": 376,
+        "y": 18,
+        "w": 120,
+        "h": 120
+      },
+      "iconFile": "assets/formation_16193_icon.png",
+      "slotCount": 15,
+      "slots": [
+        [
+          2,
+          0
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          0,
+          -4
+        ],
+        [
+          2,
+          -4
+        ],
+        [
+          -2,
+          0
+        ],
+        [
+          -2,
+          -4
+        ],
+        [
+          -2,
+          4
+        ],
+        [
+          -2,
+          -8
+        ],
+        [
+          0,
+          -8
+        ],
+        [
+          2,
+          -8
+        ],
+        [
+          4,
+          0
+        ],
+        [
+          4,
+          -4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          4,
+          -8
+        ]
+      ],
+      "bounds": {
+        "minX": -2,
+        "maxX": 4,
+        "minY": -8,
+        "maxY": 4,
+        "width": 7,
+        "height": 13
+      },
+      "uniqueSlots": 15,
+      "leaderSlot": [
+        2,
+        0
+      ],
+      "shape": {
+        "widthCells": 7,
+        "heightCells": 13,
+        "note": "图标是名称提示，实际队形以本 slots 表为准；坐标单位为格。"
+      }
+    },
+    {
+      "index": 5,
+      "command": 16194,
+      "name": "五行梅花阵",
+      "iconFrame": 117,
+      "iconSheetCell": {
+        "x": 500,
+        "y": 18,
+        "w": 120,
+        "h": 120
+      },
+      "iconFile": "assets/formation_16194_icon.png",
+      "slotCount": 15,
+      "slots": [
+        [
+          0,
+          -8
+        ],
+        [
+          -4,
+          -2
+        ],
+        [
+          4,
+          -2
+        ],
+        [
+          -3,
+          6
+        ],
+        [
+          3,
+          6
+        ],
+        [
+          -1,
+          -4
+        ],
+        [
+          -3,
+          2
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          -2,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          1,
+          -4
+        ],
+        [
+          -2,
+          -2
+        ],
+        [
+          2,
+          -2
+        ],
+        [
+          -1,
+          6
+        ],
+        [
+          1,
+          6
+        ]
+      ],
+      "bounds": {
+        "minX": -4,
+        "maxX": 4,
+        "minY": -8,
+        "maxY": 6,
+        "width": 9,
+        "height": 15
+      },
+      "uniqueSlots": 15,
+      "leaderSlot": [
+        0,
+        -8
+      ],
+      "shape": {
+        "widthCells": 9,
+        "heightCells": 15,
+        "note": "图标是名称提示，实际队形以本 slots 表为准；坐标单位为格。"
+      }
+    },
+    {
+      "index": 6,
+      "command": 16195,
+      "name": "六合连环阵",
+      "iconFrame": 118,
+      "iconSheetCell": {
+        "x": 624,
+        "y": 18,
+        "w": 120,
+        "h": 120
+      },
+      "iconFile": "assets/formation_16195_icon.png",
+      "slotCount": 15,
+      "slots": [
+        [
+          0,
+          -6
+        ],
+        [
+          -2,
+          -2
+        ],
+        [
+          2,
+          -2
+        ],
+        [
+          -2,
+          2
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          0,
+          6
+        ],
+        [
+          -3,
+          -2
+        ],
+        [
+          3,
+          -2
+        ],
+        [
+          -3,
+          2
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          0,
+          8
+        ],
+        [
+          0,
+          -2
+        ],
+        [
+          -1,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "bounds": {
+        "minX": -3,
+        "maxX": 3,
+        "minY": -6,
+        "maxY": 8,
+        "width": 7,
+        "height": 15
+      },
+      "uniqueSlots": 15,
+      "leaderSlot": [
+        0,
+        -6
+      ],
+      "shape": {
+        "widthCells": 7,
+        "heightCells": 15,
+        "note": "图标是名称提示，实际队形以本 slots 表为准；坐标单位为格。"
+      }
+    },
+    {
+      "index": 7,
+      "command": 16196,
+      "name": "七星北斗阵",
+      "iconFrame": 119,
+      "iconSheetCell": {
+        "x": 4,
+        "y": 160,
+        "w": 120,
+        "h": 120
+      },
+      "iconFile": "assets/formation_16196_icon.png",
+      "slotCount": 15,
+      "slots": [
+        [
+          0,
+          -4
+        ],
+        [
+          -1,
+          -2
+        ],
+        [
+          -3,
+          2
+        ],
+        [
+          -2,
+          -4
+        ],
+        [
+          -3,
+          -2
+        ],
+        [
+          1,
+          -4
+        ],
+        [
+          2,
+          -6
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          3,
+          -2
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          -1,
+          4
+        ],
+        [
+          -2,
+          6
+        ],
+        [
+          0,
+          -10
+        ]
+      ],
+      "bounds": {
+        "minX": -3,
+        "maxX": 3,
+        "minY": -10,
+        "maxY": 6,
+        "width": 7,
+        "height": 17
+      },
+      "uniqueSlots": 15,
+      "leaderSlot": [
+        0,
+        -4
+      ],
+      "shape": {
+        "widthCells": 7,
+        "heightCells": 17,
+        "note": "图标是名称提示，实际队形以本 slots 表为准；坐标单位为格。"
+      }
+    },
+    {
+      "index": 8,
+      "command": 16197,
+      "name": "八门金锁阵",
+      "iconFrame": 120,
+      "iconSheetCell": {
+        "x": 128,
+        "y": 160,
+        "w": 120,
+        "h": 120
+      },
+      "iconFile": "assets/formation_16197_icon.png",
+      "slotCount": 15,
+      "slots": [
+        [
+          0,
+          -8
+        ],
+        [
+          -1,
+          -6
+        ],
+        [
+          1,
+          -6
+        ],
+        [
+          -2,
+          -4
+        ],
+        [
+          2,
+          -4
+        ],
+        [
+          -1,
+          -2
+        ],
+        [
+          1,
+          -2
+        ],
+        [
+          0,
+          -12
+        ],
+        [
+          -4,
+          -4
+        ],
+        [
+          4,
+          -4
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          -2,
+          -8
+        ],
+        [
+          2,
+          -8
+        ],
+        [
+          -2,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "bounds": {
+        "minX": -4,
+        "maxX": 4,
+        "minY": -12,
+        "maxY": 4,
+        "width": 9,
+        "height": 17
+      },
+      "uniqueSlots": 15,
+      "leaderSlot": [
+        0,
+        -8
+      ],
+      "shape": {
+        "widthCells": 9,
+        "heightCells": 17,
+        "note": "图标是名称提示，实际队形以本 slots 表为准；坐标单位为格。"
+      }
+    },
+    {
+      "index": 9,
+      "command": 16198,
+      "name": "九宫八卦阵",
+      "iconFrame": 121,
+      "iconSheetCell": {
+        "x": 252,
+        "y": 160,
+        "w": 120,
+        "h": 120
+      },
+      "iconFile": "assets/formation_16198_icon.png",
+      "slotCount": 15,
+      "slots": [
+        [
+          2,
+          0
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          -1,
+          -2
+        ],
+        [
+          3,
+          -2
+        ],
+        [
+          -1,
+          6
+        ],
+        [
+          3,
+          6
+        ],
+        [
+          -2,
+          0
+        ],
+        [
+          0,
+          8
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          2,
+          -4
+        ],
+        [
+          -3,
+          2
+        ],
+        [
+          1,
+          10
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          1,
+          -6
+        ]
+      ],
+      "bounds": {
+        "minX": -3,
+        "maxX": 5,
+        "minY": -6,
+        "maxY": 10,
+        "width": 9,
+        "height": 17
+      },
+      "uniqueSlots": 15,
+      "leaderSlot": [
+        2,
+        0
+      ],
+      "shape": {
+        "widthCells": 9,
+        "heightCells": 17,
+        "note": "图标是名称提示，实际队形以本 slots 表为准；坐标单位为格。"
+      }
+    },
+    {
+      "index": 10,
+      "command": 16199,
+      "name": "十面埋伏阵",
+      "iconFrame": 122,
+      "iconSheetCell": {
+        "x": 376,
+        "y": 160,
+        "w": 120,
+        "h": 120
+      },
+      "iconFile": "assets/formation_16199_icon.png",
+      "slotCount": 15,
+      "slots": [
+        [
+          0,
+          -10
+        ],
+        [
+          -1,
+          -8
+        ],
+        [
+          1,
+          -8
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          -2,
+          -8
+        ],
+        [
+          2,
+          -8
+        ],
+        [
+          -1,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          -3,
+          -6
+        ],
+        [
+          3,
+          -6
+        ],
+        [
+          -4,
+          -6
+        ],
+        [
+          4,
+          -6
+        ],
+        [
+          -2,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          0,
+          -4
+        ]
+      ],
+      "bounds": {
+        "minX": -4,
+        "maxX": 4,
+        "minY": -10,
+        "maxY": 4,
+        "width": 9,
+        "height": 15
+      },
+      "uniqueSlots": 15,
+      "leaderSlot": [
+        0,
+        -10
+      ],
+      "shape": {
+        "widthCells": 9,
+        "heightCells": 15,
+        "note": "图标是名称提示，实际队形以本 slots 表为准；坐标单位为格。"
+      }
+    }
+  ],
+  "paging": [
+    {
+      "command": 16200,
+      "name": "向上翻页",
+      "iconFrame": 124,
+      "iconSheetCell": {
+        "x": 500,
+        "y": 160,
+        "w": 120,
+        "h": 120
+      }
+    },
+    {
+      "command": 16201,
+      "name": "向下翻页",
+      "iconFrame": 123,
+      "iconSheetCell": {
+        "x": 624,
+        "y": 160,
+        "w": 120,
+        "h": 120
+      }
+    }
+  ],
+  "docsComparison": [
+    {
+      "topic": "纯队形、无属性加成",
+      "docs": "docs/08-abilities.md §3 已写明纯几何、无攻防/速度加成。",
+      "original": "与本轮一致；FORMATION 代码只写 +0x134/+0x138 和移动目标。",
+      "verdict": "一致"
+    },
+    {
+      "topic": "第一个偏移",
+      "docs": "“第一个偏移通常为队长自身位置”。",
+      "original": "槽位 1 是 FUN_00424980 列表首个成员，但表值不一定是 (0,0)：F1=(0,-4)、F2=(0,-6)…；不要把队长固定留在锚点。",
+      "verdict": "需修正表述"
+    },
+    {
+      "topic": "锚点",
+      "docs": "“队长格 + 偏移”。",
+      "original": "FUN_0045F710 使用执行单位当前格 unit+0x1A/+0x1C 作为锚点；列阵本身未读取额外地面点击。",
+      "verdict": "一致（补充：不是鼠标格）"
+    },
+    {
+      "topic": "边界夹取",
+      "docs": "目标格夹在 [3..rows−4] × [3..cols−3]。",
+      "original": "FUN_0042A8A0 的 mode2 对每个成员做 [3,mapW−4] / [3,mapH−3] 夹取。",
+      "verdict": "方向一致，坐标轴命名需按代码"
+    },
+    {
+      "topic": "朝向",
+      "docs": "未明确写旋转。",
+      "original": "偏移直接相加，无旋转矩阵；阵形固定在世界轴。",
+      "verdict": "补充固定朝向"
+    }
+  ],
+  "files": {
+    "iconSheet": "assets/formations_sheet.png",
+    "icons": [
+      "assets/formation_16190_icon.png",
+      "assets/formation_16191_icon.png",
+      "assets/formation_16192_icon.png",
+      "assets/formation_16193_icon.png",
+      "assets/formation_16194_icon.png",
+      "assets/formation_16195_icon.png",
+      "assets/formation_16196_icon.png",
+      "assets/formation_16197_icon.png",
+      "assets/formation_16198_icon.png",
+      "assets/formation_16199_icon.png"
+    ],
+    "pagingIcons": [
+      "assets/formation_16200_icon.png",
+      "assets/formation_16201_icon.png"
+    ],
+    "layoutOverview": "assets/formation_layouts.svg",
+    "layoutTemplate": "assets/formation_<command>_layout.svg",
+    "flow": "assets/formation_flow.svg",
+    "data": "data/formations.json",
+    "csv": "data/formations.csv"
+  },
+  "evidence": {
+    "command": "ev_b55dca032e42e52d9935eb669412cbc5a309f9aeb72f6d07ff3c11fc663b615d",
+    "table": "ev_b9d62eff38b159376ed67c4b28f62584735767ea9348b4fc60f3144338bb432f",
+    "index": "ev_70bdf04d2d790ef21d6118f7ebb96aed5f19c3913196e4f3906c91a92f5524f2",
+    "action": "ev_76f987192f9acc4fe18be30a30ccb099569c39eaad984aae146c7383c691b00e",
+    "task": "ev_f9eaf9930bb231037016631cc338782cc5c9a4188d30c61e747b273acbf4be00",
+    "target": "ev_8b4069357e0e798b70ff1edf96c165f8e93684ca63cd490ff3183bb6c8e0e0b0",
+    "team": "ev_a38bf4602cb5cb9ef1747106b6330ea4970e476e69ea75187fbc99c809684bf7"
+  }
+}

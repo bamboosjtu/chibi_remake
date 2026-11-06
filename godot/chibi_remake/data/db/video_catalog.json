@@ -1,0 +1,476 @@
+{
+  "source": "tmp/",
+  "mode": "original bytes; no transcoding; native pixels; centered",
+  "files": {
+    "CAO1.AVI": {
+      "path": "res://media/videos/CAO1.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 40.266667,
+      "sha256": "9f6d7f1795ff4f903c0824ec28f8e3d659d929a8588e25fe112d7823a04aaf91",
+      "bytes": 8955882,
+      "codec": "indeo3"
+    },
+    "CAO10.AVI": {
+      "path": "res://media/videos/CAO10.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 31.133333,
+      "sha256": "ed42fbc6f75279f92c21ab7567fd203d936038cc9b1f383aa66c205d463a5502",
+      "bytes": 6253136,
+      "codec": "indeo3"
+    },
+    "CAO11.AVI": {
+      "path": "res://media/videos/CAO11.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 30.666667,
+      "sha256": "b623c10769dd3a936819ef264784b860bcdd62f17a6c6e6a04b8ecff2d935193",
+      "bytes": 5596686,
+      "codec": "indeo3"
+    },
+    "CAO12.AVI": {
+      "path": "res://media/videos/CAO12.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 33.066667,
+      "sha256": "01253cb4680d626c0374d65fc39c186df08ea600570c650e60527811b1493bc5",
+      "bytes": 7005194,
+      "codec": "indeo3"
+    },
+    "CAO13.AVI": {
+      "path": "res://media/videos/CAO13.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 27.666667,
+      "sha256": "09cfbdd76c359166529b41ba010eb8dd102596bcc7e5851bc8220523ff882a63",
+      "bytes": 5455528,
+      "codec": "indeo3"
+    },
+    "CAO14.AVI": {
+      "path": "res://media/videos/CAO14.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 29.933333,
+      "sha256": "faa1cb241dfe211203233324e557ac5abf9f989234e7adbd6c710eb12e20f1d5",
+      "bytes": 6428868,
+      "codec": "indeo3"
+    },
+    "CAO14A.AVI": {
+      "path": "res://media/videos/CAO14A.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 34.466667,
+      "sha256": "813b693d8047eabbe2593a12016b1eab6332b143e014c74aed0f54f493741205",
+      "bytes": 7486944,
+      "codec": "indeo3"
+    },
+    "CAO15.AVI": {
+      "path": "res://media/videos/CAO15.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 33.0,
+      "sha256": "276529a537c713b3fcd3304bda28142d897be02b423ed9d2c91004b26121260c",
+      "bytes": 7255544,
+      "codec": "indeo3"
+    },
+    "CAO15A.AVI": {
+      "path": "res://media/videos/CAO15A.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 32.933333,
+      "sha256": "d095210d79880d3314f41e62db37b4afe70d0546f60531f0fb9a81c23746e5af",
+      "bytes": 7056430,
+      "codec": "indeo3"
+    },
+    "CAO2.AVI": {
+      "path": "res://media/videos/CAO2.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 27.466667,
+      "sha256": "bc97cf8c640d5680a45eb6a0acdd2561ea6b48def653ec9bfd5b1316a5fbfd62",
+      "bytes": 5768078,
+      "codec": "indeo3"
+    },
+    "CAO3.AVI": {
+      "path": "res://media/videos/CAO3.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 31.133333,
+      "sha256": "920d7c25073a29a186918055f601dd442ac7d535fe6c594b07669cd1c4a20fd3",
+      "bytes": 6108760,
+      "codec": "indeo3"
+    },
+    "CAO4.AVI": {
+      "path": "res://media/videos/CAO4.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 27.933333,
+      "sha256": "80d07f9eaf70116e499c7cbdd7c9a3c248c7568c5851040909474d8aaafd73bd",
+      "bytes": 6221864,
+      "codec": "indeo3"
+    },
+    "CAO5.AVI": {
+      "path": "res://media/videos/CAO5.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 32.533333,
+      "sha256": "1640ecfb672995ead1d4cb86d82f3d6c070ef158aef9c463320cba38a1f37c2e",
+      "bytes": 5380646,
+      "codec": "indeo3"
+    },
+    "CAO6.AVI": {
+      "path": "res://media/videos/CAO6.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 33.533333,
+      "sha256": "e7befc965e2ac20e25bd93448d20040eed9c57b0a9899aa121cef7ca1e9d734f",
+      "bytes": 5688252,
+      "codec": "indeo3"
+    },
+    "CAO7.AVI": {
+      "path": "res://media/videos/CAO7.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 26.666667,
+      "sha256": "a2b523edd63d3f974e397f3a4939fb8452f0d22469310f46041d67d3f20de06f",
+      "bytes": 5834298,
+      "codec": "indeo3"
+    },
+    "CAO8.AVI": {
+      "path": "res://media/videos/CAO8.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 28.0,
+      "sha256": "7fca45d228b70a41d607144f663f4bce8e0ea3446062bf9d5a98d77a68531ef3",
+      "bytes": 5772530,
+      "codec": "indeo3"
+    },
+    "CAO9.AVI": {
+      "path": "res://media/videos/CAO9.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 22.133333,
+      "sha256": "d14a925c094ca08a5950cb0a01a00cf870953020af57229e2756fb97c88196ae",
+      "bytes": 4695358,
+      "codec": "indeo3"
+    },
+    "EVENT1.AVI": {
+      "path": "res://media/videos/EVENT1.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 86.6,
+      "sha256": "c26d59debefc56062d8dbff3a6a85769434f4b3ff2477984073557bb20ae20be",
+      "bytes": 17997328,
+      "codec": "indeo3"
+    },
+    "EVENT10.AVI": {
+      "path": "res://media/videos/EVENT10.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 22.6,
+      "sha256": "12b88f0e1fd6aa749eb084d912d2fce4edda0364e8ae07ee4b8de3fd79a972b6",
+      "bytes": 4960892,
+      "codec": "indeo3"
+    },
+    "EVENT11.AVI": {
+      "path": "res://media/videos/EVENT11.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 119.266667,
+      "sha256": "9475e43fc05c9073657b7131f8b74b0aa2445640b6fc6ea73b67c53153d18101",
+      "bytes": 22452424,
+      "codec": "indeo3"
+    },
+    "EVENT2.AVI": {
+      "path": "res://media/videos/EVENT2.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 49.466667,
+      "sha256": "ce7d56402fc2432973b6c895b4e3b5851f14bb76ca2b6822bef381e9cc7f6788",
+      "bytes": 10140868,
+      "codec": "indeo3"
+    },
+    "EVENT3.AVI": {
+      "path": "res://media/videos/EVENT3.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 63.533333,
+      "sha256": "5aa9ab02961cac0ad9170790e03b63c9971708a3ad8447562089bfd44b20e20b",
+      "bytes": 13324308,
+      "codec": "indeo3"
+    },
+    "EVENT5.AVI": {
+      "path": "res://media/videos/EVENT5.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 51.533333,
+      "sha256": "b23f4f52697a4198d280557f28a84823a5a5c17faebe8c201965f7018505b3f2",
+      "bytes": 10964638,
+      "codec": "indeo3"
+    },
+    "EVENT6.AVI": {
+      "path": "res://media/videos/EVENT6.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 77.466667,
+      "sha256": "a3c2ebc61a6b563b03ddb46b46689314c6b061490f9cedb0234df5c310bc547e",
+      "bytes": 15363304,
+      "codec": "indeo3"
+    },
+    "EVENT7.AVI": {
+      "path": "res://media/videos/EVENT7.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 77.066667,
+      "sha256": "39b3a86c5b839d8fbb99975a971dae0ca59db3cf9b8b3f576d9b67a04d02e735",
+      "bytes": 16365904,
+      "codec": "indeo3"
+    },
+    "EVENT8.AVI": {
+      "path": "res://media/videos/EVENT8.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 60.0,
+      "sha256": "5fc23301e5895923425ba819a45c5ed6947b402b86aca6a5c18d29c6133e5ade",
+      "bytes": 11837320,
+      "codec": "indeo3"
+    },
+    "EVENT9.AVI": {
+      "path": "res://media/videos/EVENT9.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 28.733333,
+      "sha256": "89f3f0e14ef84acfb48db0ae2302c4db56ae2f7f7a65ffd72bbe1667773fe34c",
+      "bytes": 6377184,
+      "codec": "indeo3"
+    },
+    "LDAN.AVI": {
+      "path": "res://media/videos/LDAN.AVI",
+      "width": 224,
+      "height": 140,
+      "fps": "15/1",
+      "duration": 132.066667,
+      "sha256": "fae5c5c34b43ff3b080e661c92e475ab9e80e61d329647df3dd340ddfa563acd",
+      "bytes": 16024626,
+      "codec": "indeo3"
+    },
+    "LISHI.AVI": {
+      "path": "res://media/videos/LISHI.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 47.6,
+      "sha256": "2688813cccf41944dc2d1f1cb92d4447d5e6d2eacb3510f23489d5b9bfc8e2bb",
+      "bytes": 10294190,
+      "codec": "indeo3"
+    },
+    "LIU1.AVI": {
+      "path": "res://media/videos/LIU1.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 38.866667,
+      "sha256": "b69152b27cd30137bc019393f30e1605ce214a6524bb9b1d65e74fbcfdd8c8e9",
+      "bytes": 7589252,
+      "codec": "indeo3"
+    },
+    "LIU10.AVI": {
+      "path": "res://media/videos/LIU10.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 32.133333,
+      "sha256": "fdd66295d13d0e339fbc3f0dbb97be4ad4ed8fa34edb43404d56b685047caa00",
+      "bytes": 6276898,
+      "codec": "indeo3"
+    },
+    "LIU11.AVI": {
+      "path": "res://media/videos/LIU11.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 32.6,
+      "sha256": "155f09f087f7328786aff57f74e1ecf2c71cbcca75cbde4da42b933251667ca8",
+      "bytes": 6489172,
+      "codec": "indeo3"
+    },
+    "LIU12.AVI": {
+      "path": "res://media/videos/LIU12.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 32.0,
+      "sha256": "425eb11a78ea2b3dc5061663e729cc2d76609a676aaa2bcbc9006ffc944a3426",
+      "bytes": 6833366,
+      "codec": "indeo3"
+    },
+    "LIU13.AVI": {
+      "path": "res://media/videos/LIU13.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 34.2,
+      "sha256": "526b439756a81f3fbbb618c279d9f6f64e1566530b54553cd60d1311b84a00cb",
+      "bytes": 7555560,
+      "codec": "indeo3"
+    },
+    "LIU14.AVI": {
+      "path": "res://media/videos/LIU14.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 27.2,
+      "sha256": "7f842124db2904e2a30708c3abd8db64120a622512a22161e181340fec2bc7b4",
+      "bytes": 5931978,
+      "codec": "indeo3"
+    },
+    "LIU15.AVI": {
+      "path": "res://media/videos/LIU15.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 33.6,
+      "sha256": "3e377dc05a5b1fbae9870c29611eed3c504a407af2245863dfc3da453cf21033",
+      "bytes": 7143534,
+      "codec": "indeo3"
+    },
+    "LIU16.AVI": {
+      "path": "res://media/videos/LIU16.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 29.0,
+      "sha256": "0f40d3cdd27e29c94edc3ce638f9b947d3158496b0f2ff9633dbb6e9184f5a48",
+      "bytes": 6479768,
+      "codec": "indeo3"
+    },
+    "LIU17.AVI": {
+      "path": "res://media/videos/LIU17.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 28.133333,
+      "sha256": "2a3074947cf55078a97154b375647517eef7032cab8b9aa684b99eb54529defd",
+      "bytes": 6213950,
+      "codec": "indeo3"
+    },
+    "LIU2.AVI": {
+      "path": "res://media/videos/LIU2.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 26.066667,
+      "sha256": "4d0b7bdcb4a903018036ce3e3bb65e2bf6f14c2af316e03453255aeae6c450e2",
+      "bytes": 5479944,
+      "codec": "indeo3"
+    },
+    "LIU3.AVI": {
+      "path": "res://media/videos/LIU3.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 40.533333,
+      "sha256": "a129698e13e88379f5eb7e0a196d3b90fc428502e2e0f94b3a9125d40b8d1a16",
+      "bytes": 8017058,
+      "codec": "indeo3"
+    },
+    "LIU4.AVI": {
+      "path": "res://media/videos/LIU4.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 34.733333,
+      "sha256": "74296a45847240f314ffda6abe3a0e183b9ed5a6aee4a27d6a9a081691ceb52c",
+      "bytes": 7543580,
+      "codec": "indeo3"
+    },
+    "LIU5.AVI": {
+      "path": "res://media/videos/LIU5.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 38.466667,
+      "sha256": "b182b7e92ac998a5b25dc96844c95b05a80aff9140e71fa4e1985217467f00e8",
+      "bytes": 7595796,
+      "codec": "indeo3"
+    },
+    "LIU6.AVI": {
+      "path": "res://media/videos/LIU6.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 36.333333,
+      "sha256": "967551157518a7cd896f1c0d4b21b08d0716e3dd2de6f8c4eace7074d765f989",
+      "bytes": 7143760,
+      "codec": "indeo3"
+    },
+    "LIU7.AVI": {
+      "path": "res://media/videos/LIU7.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 23.6,
+      "sha256": "12191e3b289d21fcf7301101b43e60d602c07f4f14e417ad12e606758b300085",
+      "bytes": 4804070,
+      "codec": "indeo3"
+    },
+    "LIU8.AVI": {
+      "path": "res://media/videos/LIU8.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 23.8,
+      "sha256": "83363b62897593726757edf8590a5eb405a87c753fd1fc13844812231351c67a",
+      "bytes": 4669308,
+      "codec": "indeo3"
+    },
+    "LIU9.AVI": {
+      "path": "res://media/videos/LIU9.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 23.6,
+      "sha256": "1d2a32dc1415ff98fe2b37db7fee656294f3a4d905a40711a4c4e812b4ec5ae0",
+      "bytes": 4692222,
+      "codec": "indeo3"
+    },
+    "START.AVI": {
+      "path": "res://media/videos/START.AVI",
+      "width": 320,
+      "height": 240,
+      "fps": "15/1",
+      "duration": 85.133333,
+      "sha256": "2da325cc64c11cc0bc4d447858bbed86cc83703b3cec7b89666da0587f48e4d9",
+      "bytes": 26857026,
+      "codec": "indeo3"
+    }
+  }
+}

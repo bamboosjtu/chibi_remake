@@ -1,0 +1,20 @@
+[
+  {
+    "assetId": "terrain-06",
+    "reference": "D:/Games/3DMGAME_chibi.CHS.Green/godot/chibi_remake/art/production/references/terrain-06-source.png",
+    "transparent": true,
+    "prompt": "Use case: style-transfer. Production transparent sprite atlas for the faithful HD remake of 1997 Chinese RTS 三国赤壁. Reference is the exact original WALL geometry. Redesign all grey masonry wall pieces as finely hand-painted late Han Chinese fortified city walls, grey stone foundations, individually legible small rectangular bricks, restrained moss in mortar, weathered top stone paving, crisp stair treads and upper-left lighting. EXACTLY seven equal columns and two equal rows, SAME 14 source slots and row-major poses, preserve every corner direction, stairs, blank slot, orthographic 2:1 slopes, outer silhouette and foot anchor. This is a seamless modular wall kit; matching faces must join without gaps or repeated outline bands. Keep true grey stone, no blue/purple tint, no broad blurry paving, no grass-topped sheer cliff, no modern concrete. Enhance fine authentic carved stone detail; crenellation and red/charcoal guard-post details only where the source geometry permits. Match original canvas ratio 308:154, aim at 3072x1536, transparent immediately around each sprite, no ground platform, text, grid, checkerboard, shadow rectangle, caption or watermark. Do not invent a single complete castle; deliver all source tiles in the precise grid."
+  },
+  {
+    "assetId": "terrain-09",
+    "reference": "D:/Games/3DMGAME_chibi.CHS.Green/godot/chibi_remake/art/production/references/terrain-09-source.png",
+    "transparent": true,
+    "prompt": "Use case: style-transfer. Production transparent sprite atlas for the faithful HD remake of 1997 Chinese RTS 三国赤壁. Redesign this exact low city wall, corner, staircase and crenellated battlement kit. EXACTLY thirteen equal columns and two equal rows, SAME 26 source slots, preserve blank cells and every facing, original isometric 2:1 slopes, silhouettes and foot anchors. Small sharply defined grey masonry bricks, neat grey crenellations, warm buff stone walkway, grey and restrained red/charcoal Han guard-post accents where present, finely painted stair treads, subtle moss, matching grey stone faces and upper-left light. Each modular piece must join its neighbors, no thick outline or added platform. Consistent material with tall grey wall kit. Match original canvas ratio 572:100, render at the largest faithful atlas resolution possible with all tiles legible. This is NOT one city panorama: all 26 precise atlas slots required. Genuine transparent alpha outside source shapes, no text, labels, grid, colored backdrop, checkerboard, watermark or cast shadow rectangle."
+  },
+  {
+    "assetId": "hud-ornate-frame-v3",
+    "reference": "C:/Users/bambo/AppData/Local/Temp/codex-clipboard-8c513db1-2923-4e39-8003-b00fc8192e15.png",
+    "transparent": true,
+    "prompt": "Use case: stylized-concept. Asset type: reusable nine-slice UI frame texture for a Chinese Three Kingdoms RTS. The reference image controls ONLY the ornate polished gold carved-dragon border style. Generate ONE large perfectly square frame, ideally 2048x2048. The center 70 percent must be genuinely empty TRANSPARENT; all ornament stays in the outer 15 percent band on each side. Square mitered Chinese key-fret corner knots, sculpted gold dragons and interlocking clouds along the four borders, clear bright gold bevel highlights, deep burnt umber carved recesses, richly worked antique gilt, crisp readable 2D hand-painted detail. Straight inner and outer frame rails, symmetrically balanced corner ornaments. Every middle edge connects seamlessly to both corners, suitable for nine-slicing and stretching separate sides. NO red title oval, NO text or numbers, NO portraits, NO resource icons, NO minimap, NO battlefield, NO internal separators, NO complete UI screenshot. True transparent alpha in the whole center and beyond the square outer contour; no opaque black or checkerboard. This will frame live content independently at multiple aspect ratios; do not bake any content into it."
+  }
+]

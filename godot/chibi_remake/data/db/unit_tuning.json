@@ -1,0 +1,7 @@
+{
+  "statusTicks": 800,
+  "hasteMoveMultiplier": 2.0,
+  "slowMoveMultiplier": 0.5,
+  "farsightCells": 10,
+  "provenance": "Confirmed by research/units and research/magics. Repair action-clock buffs and effect-8 projectile presentation retain remake tuning pending evidence, per user preference."
+}

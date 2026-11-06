@@ -1,0 +1,370 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Chibi runtime content contracts",
+  "$defs": {
+    "unit": {
+      "type": "object",
+      "required": [
+        "name",
+        "hp",
+        "attack",
+        "attackB",
+        "defence",
+        "defenceB",
+        "vision",
+        "range",
+        "f9",
+        "costs",
+        "costStone",
+        "expGain",
+        "moraleGain",
+        "w",
+        "h",
+        "frames",
+        "sheet"
+      ],
+      "properties": {
+        "hp": {
+          "type": "number",
+          "minimum": 0
+        },
+        "attack": {
+          "type": "number",
+          "minimum": 0
+        },
+        "attackB": {
+          "type": "number",
+          "minimum": 0
+        },
+        "defence": {
+          "type": "number",
+          "minimum": 0
+        },
+        "defenceB": {
+          "type": "number",
+          "minimum": 0
+        },
+        "vision": {
+          "type": "number",
+          "minimum": 0
+        },
+        "range": {
+          "type": "number",
+          "minimum": 0
+        },
+        "f9": {
+          "type": "number",
+          "minimum": 0
+        },
+        "costStone": {
+          "type": "number",
+          "minimum": 0
+        },
+        "expGain": {
+          "type": "number",
+          "minimum": 0
+        },
+        "moraleGain": {
+          "type": "number",
+          "minimum": 0
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "w": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "h": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sheet": {
+          "type": "string",
+          "minLength": 1
+        },
+        "costs": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "frames": {
+          "type": "object",
+          "required": [
+            "count",
+            "cols"
+          ],
+          "properties": {
+            "count": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "cols": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    },
+    "catalog": {
+      "type": "object",
+      "required": [
+        "source",
+        "units"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "units": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "$ref": "#/$defs/unit"
+          }
+        }
+      }
+    },
+    "level": {
+      "type": "object",
+      "required": [
+        "map",
+        "rows",
+        "cols",
+        "tileW",
+        "terrainW",
+        "terrainH",
+        "units",
+        "objects",
+        "walkable",
+        "terrainWalkable",
+        "waterWalkable"
+      ],
+      "properties": {
+        "map": {
+          "type": "string",
+          "pattern": "^[cC][hH][iI][bB][iI][cClL][0-9]+[aAbB]?$"
+        },
+        "rows": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "cols": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "tileW": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "terrainW": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "terrainH": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "units": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "$ref": "#/$defs/unit"
+          }
+        },
+        "objects": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "unit",
+              "owner",
+              "px",
+              "py"
+            ],
+            "properties": {
+              "unit": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "owner": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "px": {
+                "type": "number"
+              },
+              "py": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "walkable": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "terrainWalkable": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "waterWalkable": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "canonicalUnit": {
+      "type": "object",
+      "required": [
+        "name",
+        "hp",
+        "attack",
+        "attackB",
+        "defence",
+        "defenceB",
+        "vision",
+        "range",
+        "f9",
+        "costs",
+        "costStone",
+        "expGain",
+        "moraleGain",
+        "w",
+        "h",
+        "frames",
+        "sheet",
+        "category"
+      ],
+      "properties": {
+        "hp": {
+          "type": "number",
+          "minimum": 0
+        },
+        "attack": {
+          "type": "number",
+          "minimum": 0
+        },
+        "attackB": {
+          "type": "number",
+          "minimum": 0
+        },
+        "defence": {
+          "type": "number",
+          "minimum": 0
+        },
+        "defenceB": {
+          "type": "number",
+          "minimum": 0
+        },
+        "vision": {
+          "type": "number",
+          "minimum": 0
+        },
+        "range": {
+          "type": "number",
+          "minimum": 0
+        },
+        "f9": {
+          "type": "number",
+          "minimum": 0
+        },
+        "costStone": {
+          "type": "number",
+          "minimum": 0
+        },
+        "expGain": {
+          "type": "number",
+          "minimum": 0
+        },
+        "moraleGain": {
+          "type": "number",
+          "minimum": 0
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "w": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "h": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sheet": {
+          "type": "string",
+          "minLength": 1
+        },
+        "costs": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "frames": {
+          "type": "object",
+          "required": [
+            "count",
+            "cols"
+          ],
+          "properties": {
+            "count": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "cols": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "category": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "canonicalCatalog": {
+      "type": "object",
+      "required": [
+        "source",
+        "units"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "units": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "$ref": "#/$defs/canonicalUnit"
+          }
+        }
+      }
+    }
+  }
+}

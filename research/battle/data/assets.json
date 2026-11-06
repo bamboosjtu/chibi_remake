@@ -1,0 +1,10 @@
+{
+  "mainBattleButton": "assets/main_menu_battle.png",
+  "mainBattleStates": "assets/main_menu_battle_states.png",
+  "mainMenuItems": "assets/main_menu_items.png",
+  "network": "assets/net_internet.png, assets/net_lan.png, assets/net_modem.png, assets/net_name.png, assets/net_cancel.png",
+  "ipx": "assets/ipx_create.png, assets/ipx_join.png, assets/ipx_watch.png, assets/ipx_cancel.png",
+  "modem": "assets/modem_dial.png, assets/modem_wait.png, assets/modem_cancel.png",
+  "serial": "assets/serial_create.png, assets/serial_join.png, assets/serial_cancel.png",
+  "flow": "assets/battle_mode_flow.svg"
+}

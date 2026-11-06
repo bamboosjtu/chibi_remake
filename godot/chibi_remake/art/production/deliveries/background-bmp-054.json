@@ -1,0 +1,23 @@
+{
+  "assetId": "background-bmp-054",
+  "bytes": 2032508.0,
+  "colorType": 2.0,
+  "generatedAt": "2026-10-13T04:32:59.830Z",
+  "generator": "built-in image_gen",
+  "height": 941.0,
+  "promptFile": null,
+  "sha256": "d4ddd37bd2808aaf5532ff08efc12d27d30868266983206f9b5a2bfce59b7adc",
+  "sourceGeneratedFile": "godot/chibi_remake/art/remaster/menu-study-v1.png",
+  "status": "generated-awaiting-validation",
+  "texture": "godot/chibi_remake/art/full/backgrounds/bmp-054-v1.png",
+  "userAcceptance": {
+    "date": "2026-10-13",
+    "reason": "用户已人工验证高清图，要求直接替换对应素材，不再逐项美术复核。",
+    "reviewer": "user"
+  },
+  "validation": {
+    "structure": "pass",
+    "visual": "pass"
+  },
+  "width": 1672.0
+}

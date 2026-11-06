@@ -1,0 +1,11 @@
+{
+  "assetId": "resource-icons-v3",
+  "generator": "built-in image_gen",
+  "texture": "godot/chibi_remake/art/full/ui/resource-icons-redraw-v3.png",
+  "sourceGeneratedFile": "C:\\Users\\bambo\\.codex\\generated_images\\01a13348-db65-7b23-b66a-63227eb4490d\\exec-f5c2df8b-0711-4461-8930-2c16ff8cfd4c.png",
+  "sha256": "f2e6de2615601aa4634872a73d741fc879a6a54483343e2c0fd96da9386f1c1d",
+  "width": 1254,
+  "height": 1254,
+  "prompt": "Use case: stylized-concept. Four small production transparent resource icons for the Chinese historical RTS 三国赤壁, matching the resource shapes and hand-painted gold/stone/wood palette in the top bar of the reference. EXACT 2 columns x 2 rows, equal square cells, one centered icon per cell, even generous transparent margins, no text, no frames or background. Top left: a worn round dark bronze Chinese coin with square center hole, subtle antique gold edge highlights. Top right: the ORIGINAL yellow tied cylindrical grain-provision bundle, three rounded golden-yellow sections with dark brown ties, lying diagonally down-right; keep its yellow bundle silhouette rather than inventing a sack. Bottom left: a short small stack of two cut reddish-brown timber logs, diagonal down-right, warm wood grain and cut ends. Bottom right: a compact irregular pile of charcoal-grey iron ore, pale mineral flecks, triangular heap silhouette. Crisp richly hand-painted 1990s strategy game asset with upper-left light, realistic restrained volume and clean edges. Transparent alpha immediately around every icon, no opaque tile backdrop, cast shadow rectangle, checkerboard, letters, captions, modern style or extra objects. Canvas ideally 1024x1024.",
+  "status": "generated-awaiting-structure-check"
+}

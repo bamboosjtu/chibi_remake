@@ -1,0 +1,36 @@
+{
+  "description": "Required candidate gate: menu/save slots, core interaction and state continuity; verify_candidate also requires all maps and deterministic baselines.",
+  "tests": [
+    {
+      "script": "test_battle_interaction",
+      "markers": [
+        "INTERACTION PASS",
+        "BUILDING SELECTION PASS",
+        "BUILDING WORK HUD PASS"
+      ]
+    },
+    {
+      "script": "test_m0",
+      "markers": [
+        "M0 MENU PASS",
+        "SAVE SLOTS PASS",
+        "SAVE SLOTS CROSS MAP PASS"
+      ]
+    },
+    {
+      "script": "test_review_contracts",
+      "markers": [
+        "REVIEW CONTRACTS PASS"
+      ]
+    },
+    {
+      "script": "test_save_roundtrip",
+      "markers": [
+        "SAVE ROUNDTRIP PASS"
+      ],
+      "args": [
+        "--noview"
+      ]
+    }
+  ]
+}

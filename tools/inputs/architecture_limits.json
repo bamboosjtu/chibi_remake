@@ -1,0 +1,30 @@
+{
+  "description": "Migrated long functions retain their reviewed size as an incremental budget; new functions over 80 lines require review. Module limits apply to all runtime scripts. `violations` records layer breaches that existed when the rule was added: each entry is <file>::<rule>, new breaches fail, and entries should be removed once the breach is fixed.",
+  "files": {
+    "main.gd": 250,
+    "presentation/battle/battle_view.gd": 500,
+    "menu.gd": 400
+  },
+  "violations": [],
+  "functions": {
+    "app/game.gd::save_game": 92,
+    "testing/battle_selftest.gd::run": 269,
+    "testing/gathering_checks.gd::_selftest_gather": 265,
+    "testing/groups_checks.gd::_selftest_ctrlgroup": 84,
+    "testing/navigation_checks.gd::_selftest_naval": 133,
+    "testing/technology_checks.gd::_selftest_tech": 125,
+    "app/battle/bootstrap.gd::_ready": 159,
+    "app/battle/scene_controller.gd::_battle_input": 84,
+    "app/saves/snapshot_restorer.gd::restore": 131,
+    "app/saves/snapshot_validator.gd::prepare": 226,
+    "presentation/menu/campaign_dialog.gd::_build_campaign_dialog": 98,
+    "presentation/menu/controller.gd::_ready": 220,
+    "presentation/menu/level_dialog.gd::_build_level_dialog": 151,
+    "presentation/battle/components/command_model.gd::_refresh_cmd_panel": 109,
+    "presentation/battle/components/hud_build.gd::_build_right_panel": 95,
+    "presentation/battle/components/hud_input.gd::_input": 117,
+    "presentation/battle/components/hud_layout.gd::_apply_metrics": 140,
+    "simulation/battle/entity_factory.gd::_make_unit": 110,
+    "simulation/battle/unit_actions.gd::_step_unit_inner": 230
+  }
+}

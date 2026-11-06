@@ -1,0 +1,21 @@
+{
+  "assetId": "terrain-09",
+  "bytes": 1721734.0,
+  "colorType": 6.0,
+  "generatedAt": "2026-10-17T14:29:04.186Z",
+  "generator": "built-in image_gen",
+  "height": 725.0,
+  "prompt": "Use case: style-transfer. Production transparent sprite atlas for the faithful HD remake of 1997 Chinese RTS 三国赤壁. Redesign this exact low city wall, corner, staircase and crenellated battlement kit. EXACTLY thirteen equal columns and two equal rows, SAME 26 source slots, preserve blank cells and every facing, original isometric 2:1 slopes, silhouettes and foot anchors. Small sharply defined grey masonry bricks, neat grey crenellations, warm buff stone walkway, grey and restrained red/charcoal Han guard-post accents where present, finely painted stair treads, subtle moss, matching grey stone faces and upper-left light. Each modular piece must join its neighbors, no thick outline or added platform. Consistent material with tall grey wall kit. Match original canvas ratio 572:100, render at the largest faithful atlas resolution possible with all tiles legible. This is NOT one city panorama: all 26 precise atlas slots required. Genuine transparent alpha outside source shapes, no text, labels, grid, colored backdrop, checkerboard, watermark or cast shadow rectangle.",
+  "promptFile": "godot/chibi_remake/art/production/ui-wall-prompts-v3.json",
+  "sha256": "44c8f2414a08ed794b15e5291b7d1fb00bcd1049a256a01999bf8aac5367c386",
+  "sourceGeneratedFile": "C:/Users/bambo/.codex/generated_images/01a13348-db65-7b23-b66a-63227eb4490d/exec-0bb277e0-0736-42c8-94b5-5dd0798e1a92.png",
+  "status": "generated-awaiting-validation",
+  "texture": "godot/chibi_remake/art/full/terrain/09-atlas-v2.png",
+  "validation": {
+    "excludedSourceLabelsOrBlanks": 1,
+    "structure": "pass",
+    "visual": "pending",
+    "visualFrameCount": 25
+  },
+  "width": 2170.0
+}

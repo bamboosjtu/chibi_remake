@@ -1,0 +1,315 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "research/units/tools/extract_units.mjs",
+  "authority": {
+    "rule": "Only original CB.EXE / DATA.EXP / UNIT.EXP / ANISEQ / maps count as evidence. docs/ and remake code are comparison-only.",
+    "originalBinarySha256": "2db7cc102e6fde547ab05d77cfddabc2079f5bc9be9b6b59b17bf435c5798cb7"
+  },
+  "deltas": [
+    {
+      "id": "U-01",
+      "priority": "P0",
+      "status": "open",
+      "title": "工人费用金/粮反了",
+      "original": "工人 30：金400、木50、粮50、铁0；单位运行时字段 v9=铁,v10=粮,v11=木,v12=金。",
+      "remake": "production_units.json 的 30.costs=[50,50,400]；train_types_for 把 costs[0..2] 当金/木/粮，变成金50/粮400。",
+      "fix": "30.costs=[400,50,50], costStone=0；所有生产/AI统一读 canonical 费用。",
+      "evidence": [
+        "SET/DATA.EXP unit 30",
+        "FUN_0041FF30",
+        "FUN_00421B50"
+      ],
+      "remakeRefs": [
+        "godot/chibi_remake/data/db/production_units.json#units.30.costs",
+        "godot/chibi_remake/main.gd:train_types_for"
+      ],
+      "tests": [
+        "生产工人扣金400/木50/粮50/铁0",
+        "资源不足拒绝且不生成"
+      ]
+    },
+    {
+      "id": "U-02",
+      "priority": "P0",
+      "status": "open",
+      "title": "单挑接受公式与汇编不一致",
+      "original": "trunc(((兵力A−体力B)×4/60+1) × 兵力A² × 0.006) >= 兵力B；否则 rand()%5==2（20%）接受。",
+      "remake": "_duel_accept 使用 (体力A−体力B) × 兵力A × 体力A × 0.006。",
+      "fix": "改为 (hp_a−st_b) × hp_a² × 0.006；比较 hp_b；保留20%随机接受。",
+      "evidence": [
+        "FUN_004605E0",
+        "FUN_004266B0",
+        "FUN_00460100",
+        "ev_01871c7465c997f6e507293f5f3d412bade3780b13282fe2f5070c8ccf36f293"
+      ],
+      "remakeRefs": [
+        "godot/chibi_remake/main.gd:_duel_accept"
+      ],
+      "tests": [
+        "固定参数接受/拒绝断言",
+        "拒绝率约20%",
+        "伤害公式不变"
+      ]
+    },
+    {
+      "id": "U-03",
+      "priority": "P0",
+      "status": "open",
+      "title": "运输船下船落点算法不同",
+      "original": "FUN_0045F5F0 调 FUN_00426130：以船体脚点/占地为基准，用落位偏移表+8邻格找可走陆地；不要求玩家点4格内落点，不做1..10圈外扩。",
+      "remake": "_order_unload 要求点击陆地且距船格<=4；transports.landing_cell 从1到10圈外扩。",
+      "fix": "移除点选/4格硬前置；按船体边缘落位表找邻接陆地；找不到保持载员；每4 tick 1人。",
+      "evidence": [
+        "FUN_0045F5F0",
+        "FUN_00426130",
+        "FUN_0045F340",
+        "ev_528137f84963ef12a19477e034e8f11106c0ac9743fb6fab31d16a18e21416d5"
+      ],
+      "remakeRefs": [
+        "godot/chibi_remake/main.gd:_order_unload",
+        "godot/chibi_remake/simulation/systems/transports.gd:landing_cell"
+      ],
+      "tests": [
+        "贴岸自动下人",
+        "远离岸不下人",
+        "落点均为船体邻接陆地",
+        "每4 tick 1人"
+      ]
+    },
+    {
+      "id": "U-04",
+      "priority": "P0",
+      "status": "open",
+      "title": "平民被允许建造",
+      "original": "工人30 class10；平民27/28 class11。建造入口 FUN_00424F40 仅判断 class10，平民不能建造；平民仍可采集。",
+      "remake": "technology.gd:WORKER_UNITS=[30,27,28]；_construction_workers/_valid_build_worker 使用 _is_worker_unit，平民可建造。",
+      "fix": "建造资格单独用 unit==30；采集/运输/修理保留 _is_worker_unit；不要顺带断言平民修理。",
+      "evidence": [
+        "FUN_00424F40",
+        "ev_6f4130432c2b2b58c05a5b84993dd9f81c32202aa1940d2144da2260634f5c3a"
+      ],
+      "remakeRefs": [
+        "godot/chibi_remake/simulation/systems/technology.gd:WORKER_UNITS",
+        "godot/chibi_remake/main.gd:_construction_workers",
+        "godot/chibi_remake/main.gd:_valid_build_worker"
+      ],
+      "tests": [
+        "平民不能开工/加进度",
+        "工人能建造",
+        "平民仍能采集交付"
+      ]
+    },
+    {
+      "id": "U-05",
+      "priority": "P0",
+      "status": "open",
+      "title": "500/1000 档生产行缺失",
+      "original": "FUN_0046C710 由建筑/大本营状态写 DAT_004b8d29；FUN_00426E40 将 0/1/2/>2 映射为 1/3/7/0xF 行掩码。DATA.EXP 定义 500 档 40/41/42 与 1000 档 43/44。",
+      "remake": "PRODUCE_BY_BUILDING 的步兵/弓兵/骑兵数组只有100/200两行；500/1000 永远不会出现。",
+      "fix": "保留 player_tech.level 门控；补齐40/41/42/43/44并按 0→100、1→100/200、2→100/200/500、3→100/200/500/1000 验收。",
+      "evidence": [
+        "FUN_0046C710",
+        "ev_38a27e6d4c74dea218690bd951af972ed908aa4d78b7a6305b8e06ef35228ac0",
+        "FUN_00426E40",
+        "ev_c65228d1d7798fa656ed6f397fb559125cf33d2ec221c4aeab4a8c1197b7e3d1",
+        "DATA.EXP units 40/41/42/43/44"
+      ],
+      "remakeRefs": [
+        "godot/chibi_remake/main.gd:PRODUCE_BY_BUILDING",
+        "godot/chibi_remake/main.gd:train_types_for"
+      ],
+      "tests": [
+        "等级0只有100",
+        "等级1有100/200",
+        "等级2有100/200/500",
+        "等级3有100/200/500/1000",
+        "扣费正确"
+      ]
+    },
+    {
+      "id": "U-06",
+      "priority": "P1",
+      "status": "open",
+      "title": "车兵/水军玩家生产链被移除",
+      "original": "车兵所8/9生产34；船坞20生产46/47/48/49；对应建造菜单/生产面板0x116E8、0x1174C存在。",
+      "remake": "PRODUCE_BY_BUILDING 注释掉8/9/20；_build_build_types不含8/9/20；仅AI可用34/46/47。",
+      "fix": "恢复玩家可建/可生产入口，连同建筑前置和菜单掩码一起验收。",
+      "evidence": [
+        "FUN_00426E40 production panels 0x116E8/0x1174C",
+        "research/buildings/README.md"
+      ],
+      "remakeRefs": [
+        "godot/chibi_remake/main.gd:PRODUCE_BY_BUILDING",
+        "godot/chibi_remake/main.gd:_build_build_types"
+      ],
+      "tests": [
+        "玩家可建车兵所/船坞（前置满足时）",
+        "34/46/47/48/49可生产",
+        "费用正确"
+      ]
+    },
+    {
+      "id": "U-07",
+      "priority": "P1",
+      "status": "open",
+      "title": "生产数据缺项/费用顺序不一致",
+      "original": "完整生产链30/32/34/36/37/38/39/40/41/42/43/44/45/46/47/48/49；费用字段金/木/粮/铁。",
+      "remake": "production_units.json 缺40–44、46–49；map_data.units.costs 部分为[粮,木,金]，train_types_for 按[金,木,粮]读。",
+      "fix": "以 data/units.json 为canonical补齐；costStone=iron；禁止直接猜 map_data.costs 位置。",
+      "evidence": [
+        "SET/DATA.EXP units 27..52",
+        "research/units/data/units.json"
+      ],
+      "remakeRefs": [
+        "godot/chibi_remake/data/db/production_units.json",
+        "godot/chibi_remake/main.gd:train_types_for",
+        "godot/chibi_remake/main.gd:ai_unit_cost"
+      ],
+      "tests": [
+        "17个生产单位费用全量对比0差异",
+        "AI/玩家同cap"
+      ]
+    },
+    {
+      "id": "U-08",
+      "priority": "P2",
+      "status": "open",
+      "title": "显示名与原版DATA.EXP不同",
+      "original": "34=车兵；46/48=水兵；49=连船。",
+      "remake": "部分UI/docs使用投石车/快船/战船。",
+      "fix": "显示原名，或同时标注原名；不得把别名写入DATA.EXP字段。",
+      "evidence": [
+        "SET/DATA.EXP units 34/46/48/49"
+      ],
+      "remakeRefs": [
+        "docs/07-units-officers.md",
+        "godot UI labels"
+      ],
+      "tests": [
+        "单位信息面板显示原名/别名并列"
+      ]
+    },
+    {
+      "id": "U-09",
+      "priority": "P1",
+      "status": "open",
+      "title": "上船距离按80px而非1格邻接",
+      "original": "FUN_0045F340 上船分支调用 FUN_00424C70(...,1)；该参数是格半径，目标船必须位于上船单位占地邻格（1格）。",
+      "remake": "_order_board / _attach_to_ship 用 GATHER_REACH=80px 寻路与判定。",
+      "fix": "上船执行时按1格邻接/占地边缘校验；不要把80px资源交互距离复用到上船。",
+      "evidence": [
+        "FUN_0045F340",
+        "FUN_00424C70",
+        "ev_3ea0fda78ace29ad6a807fedfbd2e6ebd295dcb4c48a3f831cf7822e797029b7"
+      ],
+      "remakeRefs": [
+        "godot/chibi_remake/main.gd:_order_board",
+        "godot/chibi_remake/main.gd:_attach_to_ship",
+        "godot/chibi_remake/main.gd:GATHER_REACH"
+      ],
+      "tests": [
+        "隔1格可上船",
+        "隔2格/80px外不能直接上船",
+        "船体边缘相邻格判定"
+      ]
+    },
+    {
+      "id": "U-10",
+      "priority": "P1",
+      "status": "open",
+      "title": "计谋目标模型/效果表按重制设计",
+      "original": "FUN_0045F8B0 取点击目标后用 FUN_00424980 收集目标所属队伍，最多15；状态1/2/3/5/6/7由状态旗标实现；恢复+50；无800 tick证据。",
+      "remake": "按点击点2格内最多15支；800 tick；激励士气+15；加速×1.5、减速×0.5；滚木40伤害；火攻20/s×6s。",
+      "fix": "先按原版目标队伍模型与状态旗标重写；未确认的倍率/伤害保留测试占位，不要继续把docs数值当原版。",
+      "evidence": [
+        "FUN_0045F8B0",
+        "FUN_00424980",
+        "ev_a38bf4602cb5cb9ef1747106b6330ea4970e476e69ea75187fbc99c809684bf7",
+        "FUN_0045B410",
+        "FUN_0045FFF0",
+        "FUN_00460020"
+      ],
+      "remakeRefs": [
+        "godot/chibi_remake/main.gd:_jimou_cast_at",
+        "godot/chibi_remake/main.gd:JIMOU_LV_MASK"
+      ],
+      "tests": [
+        "目标队伍成员最多15",
+        "状态1激励恢复谋略+5/100tick",
+        "恢复+50",
+        "不把2格范围当原版"
+      ]
+    }
+  ],
+  "corrections": [
+    {
+      "id": "A-01",
+      "title": "撤回“生产档位来自关卡 init[0]”的推断",
+      "wrong": "上一轮把地图 scenario.sides[].init[0] 当成生产档，并推导出 32 张地图的 500 档开放表。",
+      "corrected": "后续追踪 FUN_0046C710：DAT_004b8d29 由建筑/大本营状态写入；FUN_00426E40 再把 0/1/2/>2 映射为 1/3/7/0xF 行。scenario init[0] 是行为档，不是本生产档。",
+      "evidence": [
+        "FUN_0046C710",
+        "ev_38a27e6d4c74dea218690bd951af972ed908aa4d78b7a6305b8e06ef35228ac0"
+      ]
+    },
+    {
+      "id": "A-02",
+      "title": "DATA.EXP v13=20 不是生产周期",
+      "wrong": "旧稿/重制把 v13=20 或 docs 的固定周期当成训练时间来源。",
+      "corrected": "FUN_0045CC50 在训练开始时把 +0x8E 设为 FUN_004254D0(owner,type)（单位最大 HP），计时到 +0x8E 完成；v13（DAT_004AF5A0）只被 sscanf 写入，后续没有任何读取。",
+      "evidence": [
+        "FUN_0045CC50",
+        "FUN_00446380",
+        "FUN_004254D0"
+      ]
+    },
+    {
+      "id": "A-03",
+      "title": "士气不直接参与战斗/行动",
+      "wrong": "旧稿把士气写成可能影响伤害/行动，按 docs 保留为待验证。",
+      "corrected": "士气字段 +0x173 只在击杀、大旗、任务事件中写入；读取仅见 UI 函数 FUN_00426260。伤害、移动、索敌路径未读取该字段。",
+      "evidence": [
+        "FUN_00422A20",
+        "FUN_004045A0",
+        "FUN_00426260"
+      ]
+    }
+  ],
+  "noChange": [
+    "运输容量16、下船每4 tick 1人（落点算法见U-03）",
+    "武将20、实体200、队伍成员15、满编16",
+    "修理+16 HP、四资源各−16（FUN_00421DC0）",
+    "武将开局索引1–33级0→5（FUN_0042B790）",
+    "武将攻防/官职/品级/单挑体力/经验阈值/伤害公式",
+    "九计谋费用表50/100/100/100/200/100/100/10/100；阵法301项",
+    "工人/平民采集：载重200、装载100 tick、每4 tick轮询；交付+1经验",
+    "平民可修理、不能建造（class11；FUN_00424F40 仅class10用于建造）",
+    "训练周期=单位最大HP（FUN_0045CC50；不是v13）",
+    "工地/生产/研究取消退款75%（FUN_00420070，0x4B）",
+    "士气只影响UI/任务，不直接参与伤害或行动（字段+0x173）"
+  ],
+  "unverified": [
+    "计谋效果的具体倍率/持续时间（费用、状态旗标、恢复+50、滚木士气−50已确认；800 tick/火攻20×6秒未确认）",
+    "平民AI选择细节（平民可修理、不能建造已确认）",
+    "云梯50/51原始设计用途（34关无放置，仅放置阻挡）",
+    "FUN_0046C710 的“建筑/大本营等级”字段完整语义，以及1000档在具体关卡升级路径中的实际可达性"
+  ],
+  "originalProductionTiers": [
+    {
+      "level": 0,
+      "rows": "100"
+    },
+    {
+      "level": 1,
+      "rows": "100/200"
+    },
+    {
+      "level": 2,
+      "rows": "100/200/500"
+    },
+    {
+      "level": 3,
+      "rows": "100/200/500/1000"
+    }
+  ]
+}

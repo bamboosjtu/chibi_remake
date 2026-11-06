@@ -1,0 +1,86 @@
+{
+  "version": "20261027_160705_04593f90",
+  "commit": "04593f90e3c59a4c90ec33539046cbbd21150a87",
+  "dirty": true,
+  "validated": true,
+  "packSha256": "744C14F29DAE43C871E89773F10FE0738B3F0B31AC2182F50CF4FAB59001EEAD",
+  "exeSha256": "72F5CE72C5F54FEFCADB743596EAB2A552E73058601F1E29F5C871E683595A6D",
+  "sources": [
+    "research/cursor/README.md",
+    "research/commands/README.md"
+  ],
+  "assets": {
+    "checkedSha256": 36466,
+    "addedInputSheets": 119,
+    "modifiedExisting": [
+      "gate_terrain/manifest.json"
+    ],
+    "existingTexturesUnchanged": true
+  },
+  "gates": {
+    "adjustedEntries": 31,
+    "maps": 16,
+    "eastSouthDrop": -19,
+    "westNorthDrop": 25,
+    "allFourCapturedBothStates": true,
+    "gpuCutoutAndNeighborPixelsPassed": true
+  },
+  "input": {
+    "cursorBanks": [
+      "A",
+      "B",
+      "C"
+    ],
+    "animationFrameMs": 160,
+    "commandRegistry": 117,
+    "distinctCommandFrames": 116,
+    "coreCommands": 18,
+    "logicalPanelSlots": 15,
+    "factionQueueSlots": 64,
+    "pendingSaveSnapshotPassed": true
+  },
+  "validation": {
+    "coreScripts": 6,
+    "openingWorlds": 34,
+    "selftest": [
+      {
+        "summary": "SELFTEST: 76 passed, 0 failed, 1 skipped\r",
+        "sha256": "357486922B38374ACE1503B7EE3FB90F2D09C3494182621DDD12C540753643B1",
+        "map": "chibic1",
+        "log": "selftest-chibic1.log"
+      },
+      {
+        "summary": "SELFTEST: 76 passed, 0 failed, 1 skipped\r",
+        "sha256": "58AD3A7070AD040429B0E0618435DACAA3A48C15E2DD42AF960889D69CD5D175",
+        "map": "chibil1",
+        "log": "selftest-chibil1.log"
+      },
+      {
+        "summary": "SELFTEST: 88 passed, 0 failed, 0 skipped\r",
+        "sha256": "E189541FC809AE6533737E4083D5A3B94AC353B82940890CBCFBC81FF444EB18",
+        "map": "chibic17",
+        "log": "selftest-chibic17.log"
+      }
+    ],
+    "simtest": [
+      {
+        "map": "chibic1",
+        "log": "simtest-chibic1-15s.log",
+        "sha256": "E6C90E09E0D3704E73359808BA2E01FC064EB66B5EE80F2CF766874589980F2C",
+        "tick": 450,
+        "digest": "7186788536868653733",
+        "seconds": 15
+      },
+      {
+        "map": "chibic1",
+        "log": "simtest-chibic1-60s.log",
+        "sha256": "BA8DA5C08BF37D597695155C0E43C64C066D5CB89A7987C4224E89EE905E8780",
+        "tick": 1800,
+        "digest": "132225415249217697",
+        "seconds": 60
+      }
+    ],
+    "launcherExit": 0
+  },
+  "evidence": "release/versions/20261027_160705_04593f90/evidence/input-v8"
+}

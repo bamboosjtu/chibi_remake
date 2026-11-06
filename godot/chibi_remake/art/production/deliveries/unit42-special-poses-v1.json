@@ -1,0 +1,12 @@
+{
+  "assetId": "unit42-special-poses-v1",
+  "generator": "built-in image_gen",
+  "sourceGeneratedFile": "C:/Users/bambo/.codex/generated_images/01a13348-db65-7b23-b66a-63227eb4490d/exec-a5d5c905-bbd6-4b5f-9503-2f034ea22ff2.png",
+  "texture": "godot/chibi_remake/art/full/units/042/special-poses-v1.png",
+  "width": 2113,
+  "height": 744,
+  "sha256": "052b40b266a20e70734cc4e4919a788a2f1e287db779b43c4e851c42a4d77b82",
+  "promptFile": "godot/chibi_remake/art/production/unit42-special-poses-v1-prompt.json",
+  "prompt": "Use case: precise-object-edit / style-transfer. Finished transparent HD two-cell animation supplement for 三国赤壁 archers type42. FIRST IMAGE is exact pose and placement reference: TWO equal cells side by side, ONE row. EACH cell contains EXACTLY FOUR archers in a diamond: top/back, left, right and bottom/front. Preserve EACH source soldier facing, hand/bow posture and exact spatial arrangement. Left cell four upright archers have original ready/release pose. Right cell four upright archers have original arm/bow-raised pose; match the source, do not invent direction. SECOND IMAGE is only the approved clothing/weapon/material style swatch; do not copy its pose or group count. Same gold helmets, gold bows, bronze/steel armor, cyan blue team cloth, quivers as source. True crisp hand-painted metal rivets, fabric folds and leather with upper-left light, no enlarged pixels. All eight soldiers are UPRIGHT, no dead or prone figures, no missing group. Preserve relative group footprint and transparent margins. Exact reference aspect176:62, no extra cells/rows, no outer padding, no text, labels, numbers, grid, opaque shadows, scene or checkerboard. Genuine transparent alpha.",
+  "generatedAt": "2026-10-18T01:01:10.522Z"
+}

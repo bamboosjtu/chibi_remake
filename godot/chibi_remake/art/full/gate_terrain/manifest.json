@@ -1,0 +1,1181 @@
+{
+  "maps": {
+    "chibic15": [
+      {
+        "cell": [
+          41,
+          180
+        ],
+        "connectorTiles": 5,
+        "coveredPixels": 204240,
+        "foundationDrop": 3.0,
+        "platformTiles": 16,
+        "position": [
+          1738.0,
+          1903.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic15-41-180-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic15-41-180.png"
+      }
+    ],
+    "chibic17": [
+      {
+        "cell": [
+          83,
+          198
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          3608.0,
+          2090.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic17-83-198-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic17-83-198.png"
+      },
+      {
+        "cell": [
+          105,
+          154
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218128,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          4532.0,
+          1606.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic17-105-154-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic17-105-154.png"
+      },
+      {
+        "cell": [
+          104,
+          196
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          4488.0,
+          2068.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic17-104-196-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic17-104-196.png"
+      },
+      {
+        "cell": [
+          67,
+          55
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218032,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          2926.0,
+          517.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic17-67-55-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic17-67-55.png"
+      },
+      {
+        "cell": [
+          87,
+          53
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218128,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          3762.0,
+          495.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic17-87-53-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic17-87-53.png"
+      },
+      {
+        "cell": [
+          65,
+          97
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          2838.0,
+          979.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic17-65-97-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic17-65-97.png"
+      }
+    ],
+    "chibic3": [
+      {
+        "cell": [
+          94,
+          289
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218128,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          4070.0,
+          3091.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic3-94-289-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic3-94-289.png"
+      },
+      {
+        "cell": [
+          75,
+          285
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218032,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          3278.0,
+          3047.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic3-75-285-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic3-75-285.png"
+      }
+    ],
+    "chibic4": [
+      {
+        "cell": [
+          59,
+          234
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218032,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          2552.0,
+          2486.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic4-59-234-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic4-59-234.png"
+      },
+      {
+        "cell": [
+          80,
+          231
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218128,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          3454.0,
+          2453.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic4-80-231-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic4-80-231.png"
+      },
+      {
+        "cell": [
+          58,
+          279
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          2530.0,
+          2981.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic4-58-279-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic4-58-279.png"
+      },
+      {
+        "cell": [
+          79,
+          277
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          3410.0,
+          2959.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic4-79-277-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic4-79-277.png"
+      }
+    ],
+    "chibic5": [
+      {
+        "cell": [
+          87,
+          210
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218128,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          3740.0,
+          2222.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic5-87-210-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic5-87-210.png"
+      },
+      {
+        "cell": [
+          66,
+          210
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218032,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          2860.0,
+          2222.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic5-66-210-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic5-66-210.png"
+      },
+      {
+        "cell": [
+          87,
+          253
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          3762.0,
+          2695.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic5-87-253-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic5-87-253.png"
+      },
+      {
+        "cell": [
+          67,
+          256
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          2904.0,
+          2728.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic5-67-256-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic5-67-256.png"
+      }
+    ],
+    "chibic6": [
+      {
+        "cell": [
+          57,
+          255
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          2486.0,
+          2717.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic6-57-255-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic6-57-255.png"
+      },
+      {
+        "cell": [
+          83,
+          203
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218128,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          3586.0,
+          2145.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic6-83-203-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic6-83-203.png"
+      },
+      {
+        "cell": [
+          58,
+          206
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218032,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          2508.0,
+          2178.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic6-58-206-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic6-58-206.png"
+      },
+      {
+        "cell": [
+          83,
+          257
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          3586.0,
+          2739.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic6-83-257-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic6-83-257.png"
+      }
+    ],
+    "chibic8": [
+      {
+        "cell": [
+          11,
+          69
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218032,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          462.0,
+          671.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic8-11-69-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic8-11-69.png"
+      },
+      {
+        "cell": [
+          37,
+          120
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          1540.0,
+          1232.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic8-37-120-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic8-37-120.png"
+      },
+      {
+        "cell": [
+          14,
+          120
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          572.0,
+          1232.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic8-14-120-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic8-14-120.png"
+      },
+      {
+        "cell": [
+          34,
+          70
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215616,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          1408.0,
+          682.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibic8-34-70-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibic8-34-70.png"
+      }
+    ],
+    "chibil1": [
+      {
+        "cell": [
+          13,
+          173
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218032,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          550.0,
+          1815.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil1-13-173-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil1-13-173.png"
+      },
+      {
+        "cell": [
+          32,
+          175
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218128,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          1342.0,
+          1837.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil1-32-175-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil1-32-175.png"
+      },
+      {
+        "cell": [
+          33,
+          213
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          1386.0,
+          2255.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil1-33-213-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil1-33-213.png"
+      },
+      {
+        "cell": [
+          13,
+          214
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          528.0,
+          2266.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil1-13-214-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil1-13-214.png"
+      }
+    ],
+    "chibil11": [
+      {
+        "cell": [
+          87,
+          116
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          3740.0,
+          1188.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil11-87-116-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil11-87-116.png"
+      },
+      {
+        "cell": [
+          64,
+          71
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218032,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          2794.0,
+          693.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil11-64-71-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil11-64-71.png"
+      },
+      {
+        "cell": [
+          87,
+          70
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218128,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          3740.0,
+          682.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil11-87-70-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil11-87-70.png"
+      },
+      {
+        "cell": [
+          65,
+          116
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          2816.0,
+          1188.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil11-65-116-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil11-65-116.png"
+      }
+    ],
+    "chibil15": [
+      {
+        "cell": [
+          43,
+          222
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          1804.0,
+          2354.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil15-43-222-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil15-43-222.png"
+      },
+      {
+        "cell": [
+          20,
+          177
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218032,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          858.0,
+          1859.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil15-20-177-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil15-20-177.png"
+      },
+      {
+        "cell": [
+          41,
+          179
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218128,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          1738.0,
+          1881.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil15-41-179-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil15-41-179.png"
+      }
+    ],
+    "chibil16": [
+      {
+        "cell": [
+          87,
+          116
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          3740.0,
+          1188.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil16-87-116-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil16-87-116.png"
+      },
+      {
+        "cell": [
+          64,
+          71
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218032,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          2794.0,
+          693.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil16-64-71-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil16-64-71.png"
+      },
+      {
+        "cell": [
+          87,
+          71
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218128,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          3762.0,
+          693.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil16-87-71-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil16-87-71.png"
+      },
+      {
+        "cell": [
+          65,
+          117
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          2838.0,
+          1199.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil16-65-117-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil16-65-117.png"
+      }
+    ],
+    "chibil2": [
+      {
+        "cell": [
+          61,
+          37
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 208720,
+        "foundationDrop": 25.0,
+        "platformTiles": 14,
+        "position": [
+          2662.0,
+          319.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil2-61-37-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil2-61-37.png"
+      },
+      {
+        "cell": [
+          79,
+          75
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 207136,
+        "foundationDrop": -19.0,
+        "platformTiles": 14,
+        "position": [
+          3410.0,
+          737.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil2-79-75-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil2-79-75.png"
+      },
+      {
+        "cell": [
+          62,
+          74
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          2684.0,
+          726.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil2-62-74-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil2-62-74.png"
+      },
+      {
+        "cell": [
+          78,
+          37
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218128,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          3366.0,
+          319.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil2-78-37-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil2-78-37.png"
+      }
+    ],
+    "chibil3": [
+      {
+        "cell": [
+          14,
+          236
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218032,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          572.0,
+          2508.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil3-14-236-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil3-14-236.png"
+      },
+      {
+        "cell": [
+          33,
+          235
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218128,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          1386.0,
+          2497.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil3-33-235-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil3-33-235.png"
+      },
+      {
+        "cell": [
+          13,
+          280
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          528.0,
+          2992.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil3-13-280-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil3-13-280.png"
+      },
+      {
+        "cell": [
+          32,
+          277
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          1342.0,
+          2959.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil3-32-277-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil3-32-277.png"
+      }
+    ],
+    "chibil4": [
+      {
+        "cell": [
+          58,
+          202
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          2464.0,
+          2134.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil4-58-202-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil4-58-202.png"
+      },
+      {
+        "cell": [
+          60,
+          152
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218128,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          2552.0,
+          1584.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil4-60-152-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil4-60-152.png"
+      },
+      {
+        "cell": [
+          35,
+          152
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218032,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          1496.0,
+          1584.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil4-35-152-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil4-35-152.png"
+      },
+      {
+        "cell": [
+          34,
+          204
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          1452.0,
+          2156.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil4-34-204-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil4-34-204.png"
+      }
+    ],
+    "chibil5": [
+      {
+        "cell": [
+          77,
+          301
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          3366.0,
+          3223.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil5-77-301-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil5-77-301.png"
+      },
+      {
+        "cell": [
+          78,
+          249
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218032,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          3410.0,
+          2651.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil5-78-249-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil5-78-249.png"
+      },
+      {
+        "cell": [
+          96,
+          235
+        ],
+        "connectorTiles": 5,
+        "coveredPixels": 170864,
+        "foundationDrop": 25.0,
+        "platformTiles": 8,
+        "position": [
+          4180.0,
+          2519.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil5-96-235-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil5-96-235.png"
+      }
+    ],
+    "chibil6": [
+      {
+        "cell": [
+          57,
+          152
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218032,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          2464.0,
+          1584.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil6-57-152-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil6-57-152.png"
+      },
+      {
+        "cell": [
+          57,
+          203
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          2486.0,
+          2145.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil6-57-203-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil6-57-203.png"
+      },
+      {
+        "cell": [
+          81,
+          202
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          3476.0,
+          2134.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil6-81-202-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil6-81-202.png"
+      },
+      {
+        "cell": [
+          80,
+          153
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218128,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          3454.0,
+          1595.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil6-80-153-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil6-80-153.png"
+      }
+    ],
+    "chibil7b": [
+      {
+        "cell": [
+          57,
+          152
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218032,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          2464.0,
+          1584.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil7b-57-152-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil7b-57-152.png"
+      },
+      {
+        "cell": [
+          80,
+          153
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218128,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          3454.0,
+          1595.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil7b-80-153-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil7b-80-153.png"
+      },
+      {
+        "cell": [
+          81,
+          202
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          3476.0,
+          2134.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil7b-81-202-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil7b-81-202.png"
+      },
+      {
+        "cell": [
+          57,
+          203
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          2486.0,
+          2145.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil7b-57-203-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil7b-57-203.png"
+      }
+    ],
+    "chibil9": [
+      {
+        "cell": [
+          64,
+          95
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218032,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          2794.0,
+          957.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil9-64-95-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil9-64-95.png"
+      },
+      {
+        "cell": [
+          83,
+          132
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          3564.0,
+          1364.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil9-83-132-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil9-83-132.png"
+      },
+      {
+        "cell": [
+          63,
+          135
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 215712,
+        "foundationDrop": -19.0,
+        "platformTiles": 16,
+        "position": [
+          2750.0,
+          1397.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil9-63-135-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil9-63-135.png"
+      },
+      {
+        "cell": [
+          84,
+          94
+        ],
+        "connectorTiles": 6,
+        "coveredPixels": 218128,
+        "foundationDrop": 25.0,
+        "platformTiles": 16,
+        "position": [
+          3608.0,
+          946.0
+        ],
+        "roadTexture": "res://art/full/gate_terrain/chibil9-84-94-road.png",
+        "scale": 4,
+        "texture": "res://art/full/gate_terrain/chibil9-84-94.png"
+      }
+    ]
+  },
+  "schemaVersion": 1,
+  "source": "gate platform components only; baseline MED layers and original geometry masks"
+}

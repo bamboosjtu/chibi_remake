@@ -1,0 +1,33 @@
+{
+  "description": "Lightweight GitHub gate: no LFS assets, no export templates, first-map simulation and runtime script compilation.",
+  "tests": [
+    {
+      "script": "check_runtime_scripts",
+      "markers": [
+        "RUNTIME SCRIPTS PASS"
+      ],
+      "timeout": 120
+    },
+    {
+      "script": "test_architecture",
+      "markers": [
+        "ARCH-019 PASS",
+        "ARCH-017/018 PASS",
+        "ARCH-022 budget selection PASS"
+      ],
+      "args": [
+        "--noview"
+      ],
+      "timeout": 120
+    },
+    {
+      "script": "dump_composition",
+      "markers": [
+        "COMPOSITION PASS"
+      ],
+      "args": [
+        "--noview"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+// Register hand-painted runtime additions without losing the source, exact prompt or hash.
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import {assertUnpublishedTarget} from '../lib/catalog_io.mjs';
+const [assetId,source,target,promptFile,metadataFile]=process.argv.slice(2);
+if(!assetId||!source||!target||!promptFile)throw new Error('assetId source target promptFile [metadataFile]');
+const data=fs.readFileSync(source),metadata=metadataFile?JSON.parse(fs.readFileSync(metadataFile)):{};
+if(data.subarray(1,4).toString()!=='PNG')throw new Error('PNG required');
+assertUnpublishedTarget({assetId,target},data);
+fs.mkdirSync(path.dirname(target),{recursive:true});fs.copyFileSync(source,target);
+const jobs=JSON.parse(fs.readFileSync(promptFile,'utf8').replace(/^\uFEFF/,''));
+const job=jobs.find(x=>x.assetId===assetId);
+if(!job?.prompt)throw new Error('Exact prompt missing');
+const entry={assetId,generator:'built-in image_gen',sourceGeneratedFile:source,texture:target,width:data.readUInt32BE(16),height:data.readUInt32BE(20),sha256:crypto.createHash('sha256').update(data).digest('hex'),promptFile,prompt:job.prompt,generatedAt:new Date().toISOString(),...metadata};
+fs.writeFileSync(`godot/chibi_remake/art/production/deliveries/${assetId}.json`,JSON.stringify(entry,null,2));
+const file='godot/chibi_remake/art/full/manifest.json',m=JSON.parse(fs.readFileSync(file));
+m.runtimeAssets??={};m.runtimeAssets[assetId]={texture:'res://'+target.replace(/^godot\/chibi_remake\//,''),...metadata};
+fs.writeFileSync(file,JSON.stringify(m,null,2));
+console.log(JSON.stringify({assetId,path:target,sha256:entry.sha256}));

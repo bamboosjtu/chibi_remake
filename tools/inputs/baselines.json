@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 2,
+  "engine": "4.7.2.stable",
+  "updatedAt": "2026-10-28",
+  "note": "2026-10-28：资源采空后恢复通行和闲置部队局部接战改变60秒战场状态；默认与144fps重复运行均为6824854474555246543。15秒摘要未变。",
+  "selftest": {
+    "maps": [
+      "chibic1",
+      "chibil1",
+      "chibic17"
+    ]
+  },
+  "simtest": [
+    {
+      "map": "chibic1",
+      "seconds": 15,
+      "tick": 450,
+      "digest": "5724146327678163799",
+      "subsystems": {
+        "ai": "3cf4dfbfe75e710d52f322a5a2df9ad69003f433ae209aaa225f051a1dd98dfb",
+        "combat": "24fd6ae68c1cf10c7d055fe4584ec622e82fa2d1911aec6bdba38e2ff4c5139e",
+        "economy": "216e2a94bac4281f7f66e07fd54a96688f4fcde0bdffc6e6c77a9710e8d86291",
+        "scenario": "67d9273e3bda883e0d9f876027bac9ee7d18ffec1461e78353a66e41df9f1ce4",
+        "total": "446883ba7d4a7a1e2c18d718b1b0bc14fad83566a62228f37f33bf28a5fed83e",
+        "world": "3d1065d0c08149c506a083859838385cebec21bb9a3989d0af6ba6c006a9814e"
+      }
+    },
+    {
+      "map": "chibic1",
+      "seconds": 60,
+      "tick": 1800,
+      "digest": "6824854474555246543",
+      "subsystems": {
+        "ai": "59da5bc09c0fe005c144ac4e314e722c66e5f183f5050656834b6efb4d8f928d",
+        "combat": "a3e8a297d6b4c30eede677276f370ab855adb47e13ac01f972c9a4815e28f67b",
+        "economy": "216e2a94bac4281f7f66e07fd54a96688f4fcde0bdffc6e6c77a9710e8d86291",
+        "scenario": "67d9273e3bda883e0d9f876027bac9ee7d18ffec1461e78353a66e41df9f1ce4",
+        "total": "c971c9ad19b3d100f2dd1d15dbca12c420d5c2dd59e66418ee225aabd06d2f5e",
+        "world": "bc170b43ee1ad91d6511ba360b4becd105117410733d368230fbf809a95eea91"
+      }
+    }
+  ]
+}

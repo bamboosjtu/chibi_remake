@@ -1,0 +1,14 @@
+# Only the declared runtime assets are added; references remain ignored.
+source/terrain/**/*.png filter=lfs diff=lfs merge=lfs -text
+godot/chibi_remake/art/full/**/*.png filter=lfs diff=lfs merge=lfs -text
+godot/chibi_remake/art/full/**/*.jpg filter=lfs diff=lfs merge=lfs -text
+godot/chibi_remake/art/full/**/*.jpeg filter=lfs diff=lfs merge=lfs -text
+godot/chibi_remake/art/full/**/*.svg -text
+godot/chibi_remake/assets/*.png filter=lfs diff=lfs merge=lfs -text
+godot/chibi_remake/assets/*.ico filter=lfs diff=lfs merge=lfs -text
+godot/chibi_remake/assets/fonts/*.otf filter=lfs diff=lfs merge=lfs -text
+godot/chibi_remake/media/**/*.wav filter=lfs diff=lfs merge=lfs -text
+godot/chibi_remake/media/**/*.ogg filter=lfs diff=lfs merge=lfs -text
+godot/chibi_remake/media/**/*.AVI filter=lfs diff=lfs merge=lfs -text
+godot/chibi_remake/media/**/*.avi filter=lfs diff=lfs merge=lfs -text
+godot/chibi_remake/addons/ffmpegplayer/win64/*.dll filter=lfs diff=lfs merge=lfs -text

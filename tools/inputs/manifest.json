@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "note": "源码与最小运行素材仓库。运行/标准构建的二进制素材使用 Git LFS；参考图、整图烘焙源、额外母版和过程稿仅本地保存。素材白名单与哈希：tools/inputs/runtime_assets.sha256；日常构建使用 -SkipData。",
+  "inputs": [
+    {
+      "id": "godot",
+      "kind": "engine",
+      "path": "Godot_v4.7.2-stable_win64_console.exe",
+      "role": "provide",
+      "hint": "仓库根目录的 Godot 4.7.2 控制台版引擎（编辑器/导出/自检共用）。"
+    },
+    {
+      "id": "templates",
+      "kind": "export-templates",
+      "path": "_work/art-v1-build/roaming/Godot/export_templates/4.7.2.stable",
+      "requireFile": "windows_release_x86_64.exe",
+      "role": "provide-or-env",
+      "hint": "Godot Windows x86_64 导出模板；也可用 CHIBI_GODOT_TEMPLATES 指向模板目录。"
+    },
+    {
+      "id": "iso",
+      "kind": "original-package",
+      "path": "_work/iso",
+      "requireAny": [
+        "MEDS/*.MED",
+        "BMP/**"
+      ],
+      "role": "provide",
+      "hint": "原版《三国赤壁》文件（MED/BMP/SET/EXP/AVI…）。不可再生——新工作区须自备原版游戏或既有解包。"
+    },
+    {
+      "id": "dec",
+      "kind": "disassembly-extract",
+      "path": "_work/dec",
+      "requireAny": [
+        "anim_clips.json",
+        "battle_parsed.json",
+        "UNIT.EXP.txt"
+      ],
+      "role": "restore-or-provide",
+      "hashFile": "tools/inputs/dec.sha256",
+      "hint": "历史数据表快照（约 95 个 txt/json），仅用于重复导出关卡数据。恢复途径：与 dec.sha256 对应的外部工件副本；--hashes 子命令可为现有文件生成快照。"
+    },
+    {
+      "id": "hd",
+      "kind": "hd-sources",
+      "path": "_work/hd",
+      "requireAnyDir": [
+        "terrain4",
+        "sprites4_rgba"
+      ],
+      "role": "provide",
+      "hint": "HD 源图（本地批次产物）；仅重新导出地图时需要，-SkipData 可跳过。"
+    },
+    {
+      "id": "art-masters",
+      "kind": "runtime-art",
+      "path": "godot/chibi_remake/art/full",
+      "requireAnyDir": [
+        "units",
+        "terrain_chunks",
+        "officers"
+      ],
+      "role": "in-repo",
+      "hashFile": "tools/inputs/runtime_assets.sha256",
+      "hint": "运行素材随 Git LFS 获取，先执行 git lfs pull，再用 node tools/runtime_assets.mjs --check 校验。标准 -SkipData 构建不需要 art/full/maps 整图、地形生产母版或参考图；原生 DLL、字体、图标与媒体也随最小运行集版本管理。"
+    },
+    {
+      "id": "art-contract",
+      "kind": "art-contract",
+      "path": "godot/chibi_remake/art/production",
+      "requireAny": [
+        "catalog.json",
+        "coverage.json"
+      ],
+      "role": "in-repo",
+      "hint": "JSON 素材契约和交付记录随源码维护；references/ 仅本地保存，只有重新绘制/装配素材时才需要。"
+    }
+  ],
+  "build": {
+    "entry": "tools/build_release.ps1",
+    "skipData": "tools/build_release.ps1 -SkipData（使用已版本管理的关卡和运行素材；无需本地 iso/dec/hd 或生产参考图）",
+    "full": "tools/build_release.ps1（完整重建：逐图导出→打包发布）"
+  }
+}

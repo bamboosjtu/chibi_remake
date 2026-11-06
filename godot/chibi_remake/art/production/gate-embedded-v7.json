@@ -1,0 +1,22 @@
+{
+  "version": "20261027_135316_bb3f52f4",
+  "fixes": {
+    "harvesting": "friendly closed gates now remain eligible resource-edge destinations; hostile gates and terrain remain blocked",
+    "saving": "probe user profile locations, stable per-user fallback, migrate valid previous saves, preserve atomic readback/backup",
+    "gate": "closed purple double leaves, shaded recess, small lintel and modest piers; idle units outside doorway no longer hold it open"
+  },
+  "unchangedWalls": {
+    "pass": true,
+    "files": 35851,
+    "baseline": "bb3f52f",
+    "scope": "terrain/, terrain_chunks/, gate_terrain/"
+  },
+  "checks": [
+    "4 workers, at least 2 grain deliveries each, save/load and resume",
+    "friendly-gate resource approach then actual 200 cargo; hostile rejected",
+    "actual writable-storage atomic save/readback/backup",
+    "4 gates x 2 states from PCK, GPU aperture checks",
+    "packed release suite, native rendering, selftests and simulation baselines"
+  ],
+  "packSha256": "1177B7C919B039707F6B9C4144645BE71FF4A7B24A2DC0048F3B7289CFA1F95F"
+}

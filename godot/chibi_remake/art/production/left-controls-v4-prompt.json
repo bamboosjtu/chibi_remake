@@ -1,0 +1,9 @@
+[
+  {
+    "assetId": "left-controls-v4",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/left-controls-source.png"
+    ],
+    "prompt": "Use case: precise-object-edit / style-transfer. Repaint these EXACT TWO square Chinese RTS UI button icons in two equal columns ONE row, same subjects and silhouette. Left: original gold rounded pin/cup-shaped symbol and tapered stem. Right: simple gold triangular right-pointing arrow. Saturated lacquer red inset background, fine dark red bevel, thin antique gold rectangular outer frame. Crisp carved metallic highlights and red lacquer texture, restrained historical Chinese game art. Same original symbols, not text or invented objects. Exact2:1 canvas fills both square cells without padding, opaque. Aim1024x512 or larger. No extra symbols or text, no screenshot, no rounded UI, no modern aesthetic."
+  }
+]

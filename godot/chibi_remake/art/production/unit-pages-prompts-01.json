@@ -1,0 +1,114 @@
+[
+  {
+    "assetId": "units-027-page-00",
+    "category": "unit-pages",
+    "reference": "D:\\Games\\3DMGAME_chibi.CHS.Green\\docs\\art\\full-remaster\\references\\units-027-page-00-source.png",
+    "transparent": true,
+    "prompt": "Use case: style-transfer. Finished transparent full animation sprite atlas of 男平民, type 27, for 三国赤壁 HD redraw. Repaint ALL reference visual cells with EXACTLY 4 equal columns and 8 equal rows, keeping same row-major ordering, cell poses, directions, world silhouette, proportions and bottom anchors. 32 source cells; unused cells and dimension-label cards remain fully transparent. Preserve original bright gold, wood, grey stone, red, blue/cyan palette. Blue/cyan cloth or panels are designated team color; introduce no unrelated blue. Fully redraw crisp hand-painted material details with upper-left light, consistent character identity/equipment in every pose. Preserve construction/ruin stages or movement/attack/death shapes exactly; do not replace them with repeated idle sprites. Keep reference canvas aspect 192:208; at least fourfold source resolution if possible. No text/grid/watermark/background rectangle/checkerboard. Genuine transparent alpha surrounding each separate sprite. "
+  },
+  {
+    "assetId": "units-027-page-01",
+    "category": "unit-pages",
+    "reference": "D:\\Games\\3DMGAME_chibi.CHS.Green\\docs\\art\\full-remaster\\references\\units-027-page-01-source.png",
+    "transparent": true,
+    "prompt": "Use case: style-transfer. Finished transparent full animation sprite atlas of 男平民, type 27, for 三国赤壁 HD redraw. Repaint ALL reference visual cells with EXACTLY 4 equal columns and 2 equal rows, keeping same row-major ordering, cell poses, directions, world silhouette, proportions and bottom anchors. 8 source cells; unused cells and dimension-label cards remain fully transparent. Preserve original bright gold, wood, grey stone, red, blue/cyan palette. Blue/cyan cloth or panels are designated team color; introduce no unrelated blue. Fully redraw crisp hand-painted material details with upper-left light, consistent character identity/equipment in every pose. Preserve construction/ruin stages or movement/attack/death shapes exactly; do not replace them with repeated idle sprites. Keep reference canvas aspect 192:52; at least fourfold source resolution if possible. No text/grid/watermark/background rectangle/checkerboard. Genuine transparent alpha surrounding each separate sprite. "
+  },
+  {
+    "assetId": "units-028-page-00",
+    "category": "unit-pages",
+    "reference": "D:\\Games\\3DMGAME_chibi.CHS.Green\\docs\\art\\full-remaster\\references\\units-028-page-00-source.png",
+    "transparent": true,
+    "prompt": "Use case: style-transfer. Finished transparent full animation sprite atlas of 女平民, type 28, for 三国赤壁 HD redraw. Repaint ALL reference visual cells with EXACTLY 4 equal columns and 8 equal rows, keeping same row-major ordering, cell poses, directions, world silhouette, proportions and bottom anchors. 32 source cells; unused cells and dimension-label cards remain fully transparent. Preserve original bright gold, wood, grey stone, red, blue/cyan palette. Blue/cyan cloth or panels are designated team color; introduce no unrelated blue. Fully redraw crisp hand-painted material details with upper-left light, consistent character identity/equipment in every pose. Preserve construction/ruin stages or movement/attack/death shapes exactly; do not replace them with repeated idle sprites. Keep reference canvas aspect 192:208; at least fourfold source resolution if possible. No text/grid/watermark/background rectangle/checkerboard. Genuine transparent alpha surrounding each separate sprite. "
+  },
+  {
+    "assetId": "units-028-page-01",
+    "category": "unit-pages",
+    "reference": "D:\\Games\\3DMGAME_chibi.CHS.Green\\docs\\art\\full-remaster\\references\\units-028-page-01-source.png",
+    "transparent": true,
+    "prompt": "Use case: style-transfer. Finished transparent full animation sprite atlas of 女平民, type 28, for 三国赤壁 HD redraw. Repaint ALL reference visual cells with EXACTLY 4 equal columns and 2 equal rows, keeping same row-major ordering, cell poses, directions, world silhouette, proportions and bottom anchors. 8 source cells; unused cells and dimension-label cards remain fully transparent. Preserve original bright gold, wood, grey stone, red, blue/cyan palette. Blue/cyan cloth or panels are designated team color; introduce no unrelated blue. Fully redraw crisp hand-painted material details with upper-left light, consistent character identity/equipment in every pose. Preserve construction/ruin stages or movement/attack/death shapes exactly; do not replace them with repeated idle sprites. Keep reference canvas aspect 192:52; at least fourfold source resolution if possible. No text/grid/watermark/background rectangle/checkerboard. Genuine transparent alpha surrounding each separate sprite. "
+  },
+  {
+    "assetId": "units-029-page-00",
+    "category": "unit-pages",
+    "reference": "D:\\Games\\3DMGAME_chibi.CHS.Green\\docs\\art\\full-remaster\\references\\units-029-page-00-source.png",
+    "transparent": true,
+    "prompt": "Use case: style-transfer. Finished transparent full animation sprite atlas of 文将, type 29, for 三国赤壁 HD redraw. Repaint ALL reference visual cells with EXACTLY 4 equal columns and 8 equal rows, keeping same row-major ordering, cell poses, directions, world silhouette, proportions and bottom anchors. 32 source cells; unused cells and dimension-label cards remain fully transparent. Preserve original bright gold, wood, grey stone, red, blue/cyan palette. Blue/cyan cloth or panels are designated team color; introduce no unrelated blue. Fully redraw crisp hand-painted material details with upper-left light, consistent character identity/equipment in every pose. Preserve construction/ruin stages or movement/attack/death shapes exactly; do not replace them with repeated idle sprites. Keep reference canvas aspect 192:304; at least fourfold source resolution if possible. No text/grid/watermark/background rectangle/checkerboard. Genuine transparent alpha surrounding each separate sprite. "
+  },
+  {
+    "assetId": "units-029-page-01",
+    "category": "unit-pages",
+    "reference": "D:\\Games\\3DMGAME_chibi.CHS.Green\\docs\\art\\full-remaster\\references\\units-029-page-01-source.png",
+    "transparent": true,
+    "prompt": "Use case: style-transfer. Finished transparent full animation sprite atlas of 文将, type 29, for 三国赤壁 HD redraw. Repaint ALL reference visual cells with EXACTLY 4 equal columns and 8 equal rows, keeping same row-major ordering, cell poses, directions, world silhouette, proportions and bottom anchors. 32 source cells; unused cells and dimension-label cards remain fully transparent. Preserve original bright gold, wood, grey stone, red, blue/cyan palette. Blue/cyan cloth or panels are designated team color; introduce no unrelated blue. Fully redraw crisp hand-painted material details with upper-left light, consistent character identity/equipment in every pose. Preserve construction/ruin stages or movement/attack/death shapes exactly; do not replace them with repeated idle sprites. Keep reference canvas aspect 192:304; at least fourfold source resolution if possible. No text/grid/watermark/background rectangle/checkerboard. Genuine transparent alpha surrounding each separate sprite. "
+  },
+  {
+    "assetId": "units-029-page-02",
+    "category": "unit-pages",
+    "reference": "D:\\Games\\3DMGAME_chibi.CHS.Green\\docs\\art\\full-remaster\\references\\units-029-page-02-source.png",
+    "transparent": true,
+    "prompt": "Use case: style-transfer. Finished transparent full animation sprite atlas of 文将, type 29, for 三国赤壁 HD redraw. Repaint ALL reference visual cells with EXACTLY 4 equal columns and 6 equal rows, keeping same row-major ordering, cell poses, directions, world silhouette, proportions and bottom anchors. 21 source cells; unused cells and dimension-label cards remain fully transparent. Preserve original bright gold, wood, grey stone, red, blue/cyan palette. Blue/cyan cloth or panels are designated team color; introduce no unrelated blue. Fully redraw crisp hand-painted material details with upper-left light, consistent character identity/equipment in every pose. Preserve construction/ruin stages or movement/attack/death shapes exactly; do not replace them with repeated idle sprites. Keep reference canvas aspect 192:228; at least fourfold source resolution if possible. No text/grid/watermark/background rectangle/checkerboard. Genuine transparent alpha surrounding each separate sprite. "
+  },
+  {
+    "assetId": "units-030-page-00",
+    "category": "unit-pages",
+    "reference": "D:\\Games\\3DMGAME_chibi.CHS.Green\\docs\\art\\full-remaster\\references\\units-030-page-00-source.png",
+    "transparent": true,
+    "prompt": "Use case: style-transfer. Finished transparent full animation sprite atlas of 工人, type 30, for 三国赤壁 HD redraw. Repaint ALL reference visual cells with EXACTLY 4 equal columns and 8 equal rows, keeping same row-major ordering, cell poses, directions, world silhouette, proportions and bottom anchors. 32 source cells; unused cells and dimension-label cards remain fully transparent. Preserve original bright gold, wood, grey stone, red, blue/cyan palette. Blue/cyan cloth or panels are designated team color; introduce no unrelated blue. Fully redraw crisp hand-painted material details with upper-left light, consistent character identity/equipment in every pose. Preserve construction/ruin stages or movement/attack/death shapes exactly; do not replace them with repeated idle sprites. Keep reference canvas aspect 288:392; at least fourfold source resolution if possible. No text/grid/watermark/background rectangle/checkerboard. Genuine transparent alpha surrounding each separate sprite. "
+  },
+  {
+    "assetId": "units-030-page-01",
+    "category": "unit-pages",
+    "reference": "D:\\Games\\3DMGAME_chibi.CHS.Green\\docs\\art\\full-remaster\\references\\units-030-page-01-source.png",
+    "transparent": true,
+    "prompt": "Use case: style-transfer. Finished transparent full animation sprite atlas of 工人, type 30, for 三国赤壁 HD redraw. Repaint ALL reference visual cells with EXACTLY 4 equal columns and 8 equal rows, keeping same row-major ordering, cell poses, directions, world silhouette, proportions and bottom anchors. 32 source cells; unused cells and dimension-label cards remain fully transparent. Preserve original bright gold, wood, grey stone, red, blue/cyan palette. Blue/cyan cloth or panels are designated team color; introduce no unrelated blue. Fully redraw crisp hand-painted material details with upper-left light, consistent character identity/equipment in every pose. Preserve construction/ruin stages or movement/attack/death shapes exactly; do not replace them with repeated idle sprites. Keep reference canvas aspect 288:392; at least fourfold source resolution if possible. No text/grid/watermark/background rectangle/checkerboard. Genuine transparent alpha surrounding each separate sprite. "
+  },
+  {
+    "assetId": "units-030-page-02",
+    "category": "unit-pages",
+    "reference": "D:\\Games\\3DMGAME_chibi.CHS.Green\\docs\\art\\full-remaster\\references\\units-030-page-02-source.png",
+    "transparent": true,
+    "prompt": "Use case: style-transfer. Finished transparent full animation sprite atlas of 工人, type 30, for 三国赤壁 HD redraw. Repaint ALL reference visual cells with EXACTLY 4 equal columns and 8 equal rows, keeping same row-major ordering, cell poses, directions, world silhouette, proportions and bottom anchors. 32 source cells; unused cells and dimension-label cards remain fully transparent. Preserve original bright gold, wood, grey stone, red, blue/cyan palette. Blue/cyan cloth or panels are designated team color; introduce no unrelated blue. Fully redraw crisp hand-painted material details with upper-left light, consistent character identity/equipment in every pose. Preserve construction/ruin stages or movement/attack/death shapes exactly; do not replace them with repeated idle sprites. Keep reference canvas aspect 288:392; at least fourfold source resolution if possible. No text/grid/watermark/background rectangle/checkerboard. Genuine transparent alpha surrounding each separate sprite. "
+  },
+  {
+    "assetId": "units-030-page-03",
+    "category": "unit-pages",
+    "reference": "D:\\Games\\3DMGAME_chibi.CHS.Green\\docs\\art\\full-remaster\\references\\units-030-page-03-source.png",
+    "transparent": true,
+    "prompt": "Use case: style-transfer. Finished transparent full animation sprite atlas of 工人, type 30, for 三国赤壁 HD redraw. Repaint ALL reference visual cells with EXACTLY 4 equal columns and 8 equal rows, keeping same row-major ordering, cell poses, directions, world silhouette, proportions and bottom anchors. 32 source cells; unused cells and dimension-label cards remain fully transparent. Preserve original bright gold, wood, grey stone, red, blue/cyan palette. Blue/cyan cloth or panels are designated team color; introduce no unrelated blue. Fully redraw crisp hand-painted material details with upper-left light, consistent character identity/equipment in every pose. Preserve construction/ruin stages or movement/attack/death shapes exactly; do not replace them with repeated idle sprites. Keep reference canvas aspect 288:392; at least fourfold source resolution if possible. No text/grid/watermark/background rectangle/checkerboard. Genuine transparent alpha surrounding each separate sprite. "
+  },
+  {
+    "assetId": "units-030-page-04",
+    "category": "unit-pages",
+    "reference": "D:\\Games\\3DMGAME_chibi.CHS.Green\\docs\\art\\full-remaster\\references\\units-030-page-04-source.png",
+    "transparent": true,
+    "prompt": "Use case: style-transfer. Finished transparent full animation sprite atlas of 工人, type 30, for 三国赤壁 HD redraw. Repaint ALL reference visual cells with EXACTLY 4 equal columns and 4 equal rows, keeping same row-major ordering, cell poses, directions, world silhouette, proportions and bottom anchors. 16 source cells; unused cells and dimension-label cards remain fully transparent. Preserve original bright gold, wood, grey stone, red, blue/cyan palette. Blue/cyan cloth or panels are designated team color; introduce no unrelated blue. Fully redraw crisp hand-painted material details with upper-left light, consistent character identity/equipment in every pose. Preserve construction/ruin stages or movement/attack/death shapes exactly; do not replace them with repeated idle sprites. Keep reference canvas aspect 288:196; at least fourfold source resolution if possible. No text/grid/watermark/background rectangle/checkerboard. Genuine transparent alpha surrounding each separate sprite. "
+  },
+  {
+    "assetId": "units-031-page-00",
+    "category": "unit-pages",
+    "reference": "D:\\Games\\3DMGAME_chibi.CHS.Green\\docs\\art\\full-remaster\\references\\units-031-page-00-source.png",
+    "transparent": true,
+    "prompt": "Use case: style-transfer. Finished transparent full animation sprite atlas of 步将, type 31, for 三国赤壁 HD redraw. Repaint ALL reference visual cells with EXACTLY 4 equal columns and 8 equal rows, keeping same row-major ordering, cell poses, directions, world silhouette, proportions and bottom anchors. 32 source cells; unused cells and dimension-label cards remain fully transparent. Preserve original bright gold, wood, grey stone, red, blue/cyan palette. Blue/cyan cloth or panels are designated team color; introduce no unrelated blue. Fully redraw crisp hand-painted material details with upper-left light, consistent character identity/equipment in every pose. Preserve construction/ruin stages or movement/attack/death shapes exactly; do not replace them with repeated idle sprites. Keep reference canvas aspect 192:384; at least fourfold source resolution if possible. No text/grid/watermark/background rectangle/checkerboard. Genuine transparent alpha surrounding each separate sprite. "
+  },
+  {
+    "assetId": "units-031-page-01",
+    "category": "unit-pages",
+    "reference": "D:\\Games\\3DMGAME_chibi.CHS.Green\\docs\\art\\full-remaster\\references\\units-031-page-01-source.png",
+    "transparent": true,
+    "prompt": "Use case: style-transfer. Finished transparent full animation sprite atlas of 步将, type 31, for 三国赤壁 HD redraw. Repaint ALL reference visual cells with EXACTLY 4 equal columns and 8 equal rows, keeping same row-major ordering, cell poses, directions, world silhouette, proportions and bottom anchors. 32 source cells; unused cells and dimension-label cards remain fully transparent. Preserve original bright gold, wood, grey stone, red, blue/cyan palette. Blue/cyan cloth or panels are designated team color; introduce no unrelated blue. Fully redraw crisp hand-painted material details with upper-left light, consistent character identity/equipment in every pose. Preserve construction/ruin stages or movement/attack/death shapes exactly; do not replace them with repeated idle sprites. Keep reference canvas aspect 192:384; at least fourfold source resolution if possible. No text/grid/watermark/background rectangle/checkerboard. Genuine transparent alpha surrounding each separate sprite. "
+  },
+  {
+    "assetId": "units-031-page-02",
+    "category": "unit-pages",
+    "reference": "D:\\Games\\3DMGAME_chibi.CHS.Green\\docs\\art\\full-remaster\\references\\units-031-page-02-source.png",
+    "transparent": true,
+    "prompt": "Use case: style-transfer. Finished transparent full animation sprite atlas of 步将, type 31, for 三国赤壁 HD redraw. Repaint ALL reference visual cells with EXACTLY 4 equal columns and 8 equal rows, keeping same row-major ordering, cell poses, directions, world silhouette, proportions and bottom anchors. 32 source cells; unused cells and dimension-label cards remain fully transparent. Preserve original bright gold, wood, grey stone, red, blue/cyan palette. Blue/cyan cloth or panels are designated team color; introduce no unrelated blue. Fully redraw crisp hand-painted material details with upper-left light, consistent character identity/equipment in every pose. Preserve construction/ruin stages or movement/attack/death shapes exactly; do not replace them with repeated idle sprites. Keep reference canvas aspect 192:384; at least fourfold source resolution if possible. No text/grid/watermark/background rectangle/checkerboard. Genuine transparent alpha surrounding each separate sprite. "
+  },
+  {
+    "assetId": "units-031-page-03",
+    "category": "unit-pages",
+    "reference": "D:\\Games\\3DMGAME_chibi.CHS.Green\\docs\\art\\full-remaster\\references\\units-031-page-03-source.png",
+    "transparent": true,
+    "prompt": "Use case: style-transfer. Finished transparent full animation sprite atlas of 步将, type 31, for 三国赤壁 HD redraw. Repaint ALL reference visual cells with EXACTLY 4 equal columns and 2 equal rows, keeping same row-major ordering, cell poses, directions, world silhouette, proportions and bottom anchors. 6 source cells; unused cells and dimension-label cards remain fully transparent. Preserve original bright gold, wood, grey stone, red, blue/cyan palette. Blue/cyan cloth or panels are designated team color; introduce no unrelated blue. Fully redraw crisp hand-painted material details with upper-left light, consistent character identity/equipment in every pose. Preserve construction/ruin stages or movement/attack/death shapes exactly; do not replace them with repeated idle sprites. Keep reference canvas aspect 192:96; at least fourfold source resolution if possible. No text/grid/watermark/background rectangle/checkerboard. Genuine transparent alpha surrounding each separate sprite. "
+  }
+]

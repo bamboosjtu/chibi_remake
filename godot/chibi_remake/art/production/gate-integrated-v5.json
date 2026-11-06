@@ -1,0 +1,20 @@
+{
+  "version": 5,
+  "wallBaseline": "53c77c654e2dd2c48bdaa57e2ba75dbcfc959d0f",
+  "design": "Original gray masonry and team-tinted purple-red doors. Ground-level passage without entrance stairs, raised platform or sill. Gate crown registered to the existing wall height.",
+  "sourceTexture": "res://art/full/buildings/017-atlas-v1.png",
+  "terrain": "Local overlays remove the gate platform and straighten immediate connectors only. The aperture reveals original map ground at its original world coordinates. Original atlases and baked chunks are retained.",
+  "buildTool": "tools/gd/build_gate_terrain.gd",
+  "coverage": {"maps": 18, "gates": 67},
+  "validation": {
+    "originalTerrainDefinitionsUnchanged": true,
+    "baselineTerrainAndChibiL1FilesHashed": 691,
+    "movementBothOrientations": "passed",
+    "friendlyOpeningAndHostileClosure": "passed",
+    "fourChibiL1OpeningsBothStates": "rendered and inspected",
+    "gpuApertureAndAdjacentWallCheck": "passed",
+    "otherMaps": "patch generation and resource existence checked; not individually visually reviewed"
+  },
+  "screenshots": "_work/gate-v5/final/",
+  "release": "Project updated; standalone executable not repackaged."
+}

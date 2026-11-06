@@ -1,0 +1,1388 @@
+{
+  "schemaVersion": 1,
+  "generated": "2026-10-28",
+  "source": {
+    "binary": {
+      "name": "CB.EXE",
+      "sha256": "2db7cc102e6fde547ab05d77cfddabc2079f5bc9be9b6b59b17bf435c5798cb7"
+    },
+    "data": {
+      "file": "SET/DATA.EXP",
+      "sha256": "62ca7e17f505df823e4f63fd8ebe72d02726306e01f6f5db524e34625062a654"
+    },
+    "unit": {
+      "file": "SET/UNIT.EXP",
+      "sha256": "b62bc566d03e5fb0e28b80ea455d0bf26b7a30d7021d712dda73081e2957ab5f"
+    },
+    "sprites": {
+      "file": "BMP/UNIT.LWC",
+      "palette": "RES/BATTLE.PAL",
+      "sha256": "cbfa3ef092d6c16346c0e203f825bb163e0d1935937d5fe6f7ccd7578fd01d15"
+    },
+    "animation": {
+      "files": [
+        "SET/ANISEQ01.EXP",
+        "SET/ANISEQ02.EXP"
+      ],
+      "sha256": [
+        "52e8fdbdc409698b8e719efe1fadb99c099cea7e84bf7bfacedb2e233cadf6e2",
+        "7edf074123462cf0fb1594ab3ec22314a4d352f9814a98df492c75e711de9b34"
+      ]
+    }
+  },
+  "headline": "原版平滑来自：高频率更新 + 格内像素偏移 + 每2次更新推进一帧 + turn/walk 分离；不是单个缓动函数。",
+  "original": {
+    "loop": {
+      "caller": "FUN_00454280",
+      "update": "FUN_0045AFE0",
+      "perUnitDispatch": "FUN_0045B4E0",
+      "evidence": "ev_fb31364f… / ev_39bb4716… / ev_90dbf2b0…",
+      "baseIntervalsMs": [
+        20,
+        30,
+        50,
+        100
+      ],
+      "limiterMs": 15,
+      "note": "main loop uses DAT_004B8B54 speed setting; if DAT_00484BD8==0 adds 15ms. Update interval is configurable, not the remake's fixed 1/30 s."
+    },
+    "position": {
+      "cell": "+0x1A (x) / +0x1C (y), ushort cell coordinates",
+      "pixelOffset": "+0x2C (x) / +0x30 (y), signed pixel offsets inside the cell",
+      "screenRect": "FUN_0045A6F0: cell×44/22 + offset; renderer never waits for a cell-center snap",
+      "evidence": "ev_2f9ca146…"
+    },
+    "moveHandler": {
+      "function": "FUN_0045B910",
+      "evidence": "ev_f459b4ce…",
+      "fields": {
+        "pathDirection": "+0x18",
+        "facingDirection": "+0x16",
+        "animationFrame": "+0x14",
+        "frameNumber": "+0x22",
+        "pathIndex": "+0x130",
+        "pathBytes": "+0xB0…+0x12F",
+        "pixelOffset": "+0x2C/+0x30",
+        "tickCounter": "+0x6C",
+        "moveState": "+0x38"
+      },
+      "note": "One update updates the subcell offset/cell and advances the path; animation is a separate 2-update clock."
+    },
+    "animation": {
+      "advanceRule": "if ((+0x6C & 1) != 0) frame = (frame + 1) % frameCount[type][dir]",
+      "everyUpdates": 2,
+      "frameTable": "DAT_0052F10C[type][dir][frame] + DAT_0052F108[type] = absolute sprite frame",
+      "countingTable": "DAT_0052F048[type][dir]",
+      "directions": 8,
+      "clips": [
+        "turn",
+        "walk",
+        "die",
+        "act1",
+        "act2",
+        "act3"
+      ],
+      "note": "Animation frame period is derived from update cadence, not from DATA.EXP v8 speed. At a 30ms base setting without the 15ms limiter: 2×30=60ms/frame; with limiter ~90ms/frame; at fastest 20ms without limiter: 40ms/frame."
+    },
+    "facing": {
+      "function": "FUN_00421390",
+      "evidence": "ev_ce8ce6a8…",
+      "method": "normalized screen-space vector → 8-sector angle; used when a unit must face a target",
+      "sectors": 8,
+      "note": "Path movement carries a path direction separate from facing; turn frames exist for direction changes."
+    },
+    "path": {
+      "function": "FUN_00441360",
+      "evidence": "ev_4b9385e8…",
+      "pathField": "+0xB0 block, index +0x130",
+      "specialDirectionBytes": [
+        8,
+        9,
+        13
+      ],
+      "note": "A* path is copied into the unit; the move handler consumes direction bytes and subcell offsets."
+    },
+    "v8": {
+      "field": "DATA.EXP v8 (unit type table)",
+      "finding": "v8 is used by action/repair/attack timing as 1000/rate; FUN_0045B910 movement does not reference v8.",
+      "actionEvidence": "FUN_0045DD90 (repair) / attack handlers use 1000 / DAT_004AF58F",
+      "warning": "Do not treat v8 as px/s movement speed without a runtime test; docs' '速度' label conflates action rate and movement."
+    }
+  },
+  "units": [
+    {
+      "id": 27,
+      "name": "男平民",
+      "category": "civilian",
+      "v8": 0,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "dieFramesByDir": [
+        5
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 4,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 28,
+      "name": "女平民",
+      "category": "civilian",
+      "v8": 0,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "dieFramesByDir": [
+        5
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 4,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 29,
+      "name": "文将",
+      "category": "hero",
+      "v8": 100,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "dieFramesByDir": [
+        6
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 5,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 30,
+      "name": "工人",
+      "category": "worker",
+      "v8": 100,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "dieFramesByDir": [
+        5
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 5,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 31,
+      "name": "步将",
+      "category": "hero",
+      "v8": 100,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ],
+      "dieFramesByDir": [
+        7
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 6,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 32,
+      "name": "步兵",
+      "category": "infantry",
+      "v8": 100,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "dieFramesByDir": [
+        5
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 4,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 33,
+      "name": "弓将",
+      "category": "hero",
+      "v8": 30,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "dieFramesByDir": [
+        7
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 5,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 34,
+      "name": "车兵",
+      "category": "siege",
+      "v8": 10,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "dieFramesByDir": [
+        4
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 4,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 35,
+      "name": "骑将",
+      "category": "hero",
+      "v8": 100,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "dieFramesByDir": [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 4,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 36,
+      "name": "骑兵",
+      "category": "cavalry",
+      "v8": 100,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "dieFramesByDir": [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 4,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 37,
+      "name": "骑兵",
+      "category": "cavalry",
+      "v8": 100,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "dieFramesByDir": [
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 4,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 38,
+      "name": "步兵",
+      "category": "infantry",
+      "v8": 100,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "dieFramesByDir": [
+        17
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 4,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 39,
+      "name": "弓兵",
+      "category": "archer",
+      "v8": 30,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ],
+      "dieFramesByDir": [
+        15
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 6,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 40,
+      "name": "骑兵",
+      "category": "cavalry",
+      "v8": 100,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        8,
+        12,
+        8,
+        12,
+        8,
+        12,
+        8,
+        12
+      ],
+      "dieFramesByDir": [
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 12,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 41,
+      "name": "步兵",
+      "category": "infantry",
+      "v8": 100,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        8,
+        12,
+        8,
+        12,
+        8,
+        12,
+        8,
+        12
+      ],
+      "dieFramesByDir": [
+        16
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 12,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 42,
+      "name": "弓兵",
+      "category": "archer",
+      "v8": 30,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        9,
+        13,
+        9,
+        13,
+        9,
+        13,
+        9,
+        13
+      ],
+      "dieFramesByDir": [
+        16
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 13,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 43,
+      "name": "步兵",
+      "category": "infantry",
+      "v8": 100,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        16,
+        16,
+        8,
+        16,
+        16,
+        16,
+        8,
+        16
+      ],
+      "dieFramesByDir": [
+        17
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 16,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 44,
+      "name": "弓兵",
+      "category": "archer",
+      "v8": 30,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        18,
+        18,
+        9,
+        18,
+        18,
+        18,
+        9,
+        18
+      ],
+      "dieFramesByDir": [
+        16
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 18,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 45,
+      "name": "弓兵",
+      "category": "archer",
+      "v8": 30,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "dieFramesByDir": [
+        5
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 5,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 46,
+      "name": "水兵",
+      "category": "ship",
+      "v8": 30,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "dieFramesByDir": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 4,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 47,
+      "name": "运输船",
+      "category": "transport",
+      "v8": 0,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "dieFramesByDir": [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 4,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 48,
+      "name": "水兵",
+      "category": "ship",
+      "v8": 30,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "dieFramesByDir": [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 4,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 49,
+      "name": "连船",
+      "category": "ship",
+      "v8": 30,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "dieFramesByDir": [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 4,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 50,
+      "name": "短云梯",
+      "category": "ladder",
+      "v8": 0,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "dieFramesByDir": [
+        1
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 4,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 51,
+      "name": "长云梯",
+      "category": "ladder",
+      "v8": 0,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "dieFramesByDir": [
+        1
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 4,
+      "turnFrameCount": 4
+    },
+    {
+      "id": 52,
+      "name": "旗舰",
+      "category": "flagship",
+      "v8": 30,
+      "v8Meaning": "DATA.EXP v8: action/attack/repair rate; 1000/rate ticks; not movement speed",
+      "turnFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "walkFramesByDir": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "dieFramesByDir": [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ],
+      "directionCount": 8,
+      "walkFrameCount": 4,
+      "turnFrameCount": 4
+    }
+  ],
+  "sampleAssets": {
+    "30": {
+      "name": "工人",
+      "walk": {
+        "file": "walk_30_dirs.png",
+        "width": 400,
+        "height": 456,
+        "directions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "framesPerDirection": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ]
+      },
+      "turn": {
+        "file": "turn_30_dirs.png",
+        "width": 320,
+        "height": 456,
+        "directions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "framesPerDirection": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ]
+      },
+      "single": {
+        "file": "walk_30_d0_frames.png",
+        "width": 376,
+        "height": 57,
+        "dir": 0,
+        "frames": [
+          336,
+          337,
+          338,
+          363,
+          364
+        ]
+      }
+    },
+    "32": {
+      "name": "步兵",
+      "walk": {
+        "file": "walk_32_dirs.png",
+        "width": 288,
+        "height": 424,
+        "directions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "framesPerDirection": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ]
+      },
+      "turn": {
+        "file": "turn_32_dirs.png",
+        "width": 288,
+        "height": 424,
+        "directions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "framesPerDirection": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ]
+      },
+      "single": {
+        "file": "walk_32_d0_frames.png",
+        "width": 268,
+        "height": 53,
+        "dir": 0,
+        "frames": [
+          489,
+          490,
+          491,
+          492
+        ]
+      }
+    },
+    "34": {
+      "name": "车兵",
+      "walk": {
+        "file": "walk_34_dirs.png",
+        "width": 384,
+        "height": 600,
+        "directions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "framesPerDirection": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ]
+      },
+      "turn": {
+        "file": "turn_34_dirs.png",
+        "width": 384,
+        "height": 600,
+        "directions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "framesPerDirection": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ]
+      },
+      "single": {
+        "file": "walk_34_d0_frames.png",
+        "width": 364,
+        "height": 75,
+        "dir": 0,
+        "frames": [
+          710,
+          711,
+          712,
+          713
+        ]
+      }
+    },
+    "36": {
+      "name": "骑兵",
+      "walk": {
+        "file": "walk_36_dirs.png",
+        "width": 320,
+        "height": 496,
+        "directions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "framesPerDirection": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ]
+      },
+      "turn": {
+        "file": "turn_36_dirs.png",
+        "width": 320,
+        "height": 496,
+        "directions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "framesPerDirection": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ]
+      },
+      "single": {
+        "file": "walk_36_d0_frames.png",
+        "width": 300,
+        "height": 62,
+        "dir": 0,
+        "frames": [
+          954,
+          955,
+          956,
+          957
+        ]
+      }
+    },
+    "45": {
+      "name": "弓兵",
+      "walk": {
+        "file": "walk_45_dirs.png",
+        "width": 320,
+        "height": 384,
+        "directions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "framesPerDirection": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ]
+      },
+      "turn": {
+        "file": "turn_45_dirs.png",
+        "width": 256,
+        "height": 384,
+        "directions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "framesPerDirection": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ]
+      },
+      "single": {
+        "file": "walk_45_d0_frames.png",
+        "width": 296,
+        "height": 48,
+        "dir": 0,
+        "frames": [
+          2243,
+          2244,
+          2245,
+          2246,
+          2247
+        ]
+      }
+    }
+  },
+  "remake": {
+    "simDt": "SIM_DT = 1/30 s (30 Hz)",
+    "movement": "SPEED=110 px/s fixed; _spd_mult only haste/slow",
+    "direction": "u.dir = round(angle/(PI/4)) & 7 every movement update",
+    "animation": "battle_view: if moved: step = int(u.anim * 10 * _spd_mult); clip='walk'; idle/attack uses turn/action clips",
+    "frameSec": "frame_sec = max(0.05, (1000/rate)*0.02); walk overrides it with 10 steps/s",
+    "stiffness": [
+      "位置更新 30Hz，原版按设置 20/30/50/100ms 更新（并可能加15ms限速）。",
+      "行走动画固定 10 帧步/秒 → 100ms/帧；原版每2次更新推进一帧，30ms基础设置在未加15ms限速时约60ms/帧，加限速约90ms/帧。",
+      "重制移动中直接切 walk，转向按当前段角度瞬时取整，没有原版 turn 过渡的独立时间。",
+      "重制用固定 SPEED=110 与格子中心路点；原版保存格坐标+子格像素偏移，由 FUN_0045A6F0 直接合成屏幕矩形。"
+    ]
+  },
+  "diagnosis": [
+    "先修动画时钟：行走帧必须按原版更新循环的2次更新推进，而不是固定 10 帧步/秒。",
+    "再修转向：移动方向变化需要经过 turn 帧/过渡，不要在同一 tick 直接切 walk 方向。",
+    "位置层保留连续像素坐标，但不要把每个格心当唯一采样点；原版有子格 offset。",
+    "v8 不是移动速度；不要把 DATA.EXP 速率直接乘到移动位移上。"
+  ],
+  "unknowns": [
+    "原版默认游戏速度设置（20/30/50/100ms）及 DAT_00484BD8 的机器相关限速，需要在目标环境/配置中确认。",
+    "路径节点到像素 offset 的精确步长（+0x2C/+0x30 与方向表的比例）仍需逐帧轨迹验证。",
+    "turn/walk 过渡的具体帧选择由 +0x38 状态和 clip 表共同决定，尚未做运行时逐帧截图。"
+  ]
+}

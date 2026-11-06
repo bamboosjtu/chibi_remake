@@ -1,0 +1,17 @@
+{
+  "useCase": "stylized-concept",
+  "reference": "references/gate-design-reference-20261026.png",
+  "asset": "two-by-two transparent sprite atlas, closed/open for two mirrored isometric wall directions",
+  "requirements": [
+    "gateway is integrated into a thick continuous grey masonry wall",
+    "walkway and crenellations continue across the lintel",
+    "short modular wall ends only",
+    "cyan-blue doors for runtime faction tint, brass studs and bottom plates",
+    "identical exterior geometry and ground anchor in open/closed pairs",
+    "no labels, grid lines, ground backdrop or freestanding arch"
+  ],
+  "mode": "built-in image_gen",
+  "selectedOutput": "godot/chibi_remake/art/full/buildings/gate-wall-v3.png",
+  "integration": "Only the door aperture quadrilateral is sampled by gate_module.gd. Generated exterior masonry, piers, crenellations and wall stubs are excluded. Existing terrain is clipped at the same opening.",
+  "prompt": "Use case: stylized-concept. Production transparent sprite atlas for an isometric RTS gate based on the supplied grey stone gate reference. Two-by-two sheet: top row closed/open ascending-right wall, bottom row closed/open mirrored ascending-left wall. Grey hand-painted stone, 2:1 orthographic projection, upper-left lighting, continuous crenellated walkway over the lintel, tapered piers and short modular wall ends. Cyan-blue wooden doors for runtime faction tint, brass studs and bottom plates. Open door leaves fold inward within the opening. Identical exterior geometry and ground anchors in open/closed pairs. True transparent background; no ground backdrop, labels, grids, towers, roofs or detached doors."
+}

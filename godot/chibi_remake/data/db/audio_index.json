@@ -1,0 +1,751 @@
+{
+    "source":  "SET/WAVE.EXP (XOR-0x22, 12 BGM + 110 SFX)",
+    "count":  122,
+    "ending_music":  "res://media/music/vend.ogg",
+    "entries":  [
+                    {
+                        "id":  0,
+                        "name":  "Record01.WAV",
+                        "kind":  "music",
+                        "file":  "res://media/sfx/record01.wav",
+                        "music":  "res://media/music/record01.ogg"
+                    },
+                    {
+                        "id":  1,
+                        "name":  "Record02.WAV",
+                        "kind":  "music",
+                        "file":  "res://media/sfx/record02.wav",
+                        "music":  "res://media/music/record02.ogg"
+                    },
+                    {
+                        "id":  2,
+                        "name":  "Record03.WAV",
+                        "kind":  "music",
+                        "file":  "res://media/sfx/record03.wav",
+                        "music":  "res://media/music/record03.ogg"
+                    },
+                    {
+                        "id":  3,
+                        "name":  "Record04.WAV",
+                        "kind":  "music",
+                        "file":  "res://media/sfx/record04.wav",
+                        "music":  "res://media/music/record04.ogg"
+                    },
+                    {
+                        "id":  4,
+                        "name":  "Record05.WAV",
+                        "kind":  "music",
+                        "file":  "res://media/sfx/record05.wav",
+                        "music":  "res://media/music/record05.ogg"
+                    },
+                    {
+                        "id":  5,
+                        "name":  "Record06.WAV",
+                        "kind":  "music",
+                        "file":  "res://media/sfx/record06.wav",
+                        "music":  "res://media/music/record06.ogg"
+                    },
+                    {
+                        "id":  6,
+                        "name":  "Record07.WAV",
+                        "kind":  "music",
+                        "file":  "res://media/sfx/record07.wav",
+                        "music":  "res://media/music/record07.ogg"
+                    },
+                    {
+                        "id":  7,
+                        "name":  "Record08.WAV",
+                        "kind":  "music",
+                        "file":  "res://media/sfx/record08.wav",
+                        "music":  "res://media/music/record08.ogg"
+                    },
+                    {
+                        "id":  8,
+                        "name":  "Record09.WAV",
+                        "kind":  "music",
+                        "file":  "res://media/sfx/record09.wav",
+                        "music":  "res://media/music/record09.ogg"
+                    },
+                    {
+                        "id":  9,
+                        "name":  "RECORD10.WAV",
+                        "kind":  "music",
+                        "file":  "res://media/sfx/record10.wav",
+                        "music":  "res://media/music/record10.ogg"
+                    },
+                    {
+                        "id":  10,
+                        "name":  "RECORD13.WAV",
+                        "kind":  "music",
+                        "file":  "res://media/sfx/record13.wav",
+                        "music":  "res://media/music/record13.ogg"
+                    },
+                    {
+                        "id":  11,
+                        "name":  "Start.WAV",
+                        "kind":  "music",
+                        "file":  "res://media/sfx/start.wav",
+                        "music":  "res://media/music/start.ogg"
+                    },
+                    {
+                        "id":  12,
+                        "name":  "arrow01.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/arrow01.wav"
+                    },
+                    {
+                        "id":  13,
+                        "name":  "arrow02.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/arrow02.wav"
+                    },
+                    {
+                        "id":  14,
+                        "name":  "arrow03.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/arrow03.wav"
+                    },
+                    {
+                        "id":  15,
+                        "name":  "arrow04.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/arrow04.wav"
+                    },
+                    {
+                        "id":  16,
+                        "name":  "arrow05.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/arrow05.wav"
+                    },
+                    {
+                        "id":  17,
+                        "name":  "arrow06.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/arrow06.wav"
+                    },
+                    {
+                        "id":  18,
+                        "name":  "arrow07.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/arrow07.wav"
+                    },
+                    {
+                        "id":  19,
+                        "name":  "bfire02.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/bfire02.wav"
+                    },
+                    {
+                        "id":  20,
+                        "name":  "boating.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/boating.wav"
+                    },
+                    {
+                        "id":  21,
+                        "name":  "fight01.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/fight01.wav"
+                    },
+                    {
+                        "id":  22,
+                        "name":  "fight02.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/fight02.wav"
+                    },
+                    {
+                        "id":  23,
+                        "name":  "fight03.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/fight03.wav"
+                    },
+                    {
+                        "id":  24,
+                        "name":  "fight04.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/fight04.wav"
+                    },
+                    {
+                        "id":  25,
+                        "name":  "fight05.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/fight05.wav"
+                    },
+                    {
+                        "id":  26,
+                        "name":  "fight06.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/fight06.wav"
+                    },
+                    {
+                        "id":  27,
+                        "name":  "gstone01.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/gstone01.wav"
+                    },
+                    {
+                        "id":  28,
+                        "name":  "hitbody4.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/hitbody4.wav"
+                    },
+                    {
+                        "id":  29,
+                        "name":  "hores11.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/hores11.wav"
+                    },
+                    {
+                        "id":  30,
+                        "name":  "horse14.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/horse14.wav"
+                    },
+                    {
+                        "id":  31,
+                        "name":  "horse4.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/horse4.wav"
+                    },
+                    {
+                        "id":  32,
+                        "name":  "horse5.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/horse5.wav"
+                    },
+                    {
+                        "id":  33,
+                        "name":  "horses01.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/horses01.wav"
+                    },
+                    {
+                        "id":  34,
+                        "name":  "horses02.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/horses02.wav"
+                    },
+                    {
+                        "id":  35,
+                        "name":  "horses03.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/horses03.wav"
+                    },
+                    {
+                        "id":  36,
+                        "name":  "obreak04.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/obreak04.wav"
+                    },
+                    {
+                        "id":  37,
+                        "name":  "pmove01.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/pmove01.wav"
+                    },
+                    {
+                        "id":  38,
+                        "name":  "pmove02.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/pmove02.wav"
+                    },
+                    {
+                        "id":  39,
+                        "name":  "rstone01.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/rstone01.wav"
+                    },
+                    {
+                        "id":  40,
+                        "name":  "woodcut2.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/woodcut2.wav"
+                    },
+                    {
+                        "id":  41,
+                        "name":  "woodcut3.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/woodcut3.wav"
+                    },
+                    {
+                        "id":  42,
+                        "name":  "XB1a.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xb1a.wav"
+                    },
+                    {
+                        "id":  43,
+                        "name":  "XB1b.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xb1b.wav"
+                    },
+                    {
+                        "id":  44,
+                        "name":  "XB1c.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xb1c.wav"
+                    },
+                    {
+                        "id":  45,
+                        "name":  "XB1d.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xb1d.wav"
+                    },
+                    {
+                        "id":  46,
+                        "name":  "XB2a.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xb2a.wav"
+                    },
+                    {
+                        "id":  47,
+                        "name":  "XB2b.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xb2b.wav"
+                    },
+                    {
+                        "id":  48,
+                        "name":  "XB2c.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xb2c.wav"
+                    },
+                    {
+                        "id":  49,
+                        "name":  "XB2d.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xb2d.wav"
+                    },
+                    {
+                        "id":  50,
+                        "name":  "XB3a.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xb3a.wav"
+                    },
+                    {
+                        "id":  51,
+                        "name":  "XB3b.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xb3b.wav"
+                    },
+                    {
+                        "id":  52,
+                        "name":  "XB3c.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xb3c.wav"
+                    },
+                    {
+                        "id":  53,
+                        "name":  "XB3d.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xb3d.wav"
+                    },
+                    {
+                        "id":  54,
+                        "name":  "XB4a.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xb4a.wav"
+                    },
+                    {
+                        "id":  55,
+                        "name":  "XB4b.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xb4b.wav"
+                    },
+                    {
+                        "id":  56,
+                        "name":  "XB4c.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xb4c.wav"
+                    },
+                    {
+                        "id":  57,
+                        "name":  "XB4d.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xb4d.wav"
+                    },
+                    {
+                        "id":  58,
+                        "name":  "XB5a.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xb5a.wav"
+                    },
+                    {
+                        "id":  59,
+                        "name":  "XB5b.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xb5b.wav"
+                    },
+                    {
+                        "id":  60,
+                        "name":  "XB5c.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xb5c.wav"
+                    },
+                    {
+                        "id":  61,
+                        "name":  "XB5d.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xb5d.wav"
+                    },
+                    {
+                        "id":  62,
+                        "name":  "XG1a.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg1a.wav"
+                    },
+                    {
+                        "id":  63,
+                        "name":  "XG1b.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg1b.wav"
+                    },
+                    {
+                        "id":  64,
+                        "name":  "XG1c.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg1c.wav"
+                    },
+                    {
+                        "id":  65,
+                        "name":  "XG1d.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg1d.wav"
+                    },
+                    {
+                        "id":  66,
+                        "name":  "XG1e.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg1e.wav"
+                    },
+                    {
+                        "id":  67,
+                        "name":  "XG1f.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg1f.wav"
+                    },
+                    {
+                        "id":  68,
+                        "name":  "XG1g.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg1g.wav"
+                    },
+                    {
+                        "id":  69,
+                        "name":  "XG2a.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg2a.wav"
+                    },
+                    {
+                        "id":  70,
+                        "name":  "XG2b.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg2b.wav"
+                    },
+                    {
+                        "id":  71,
+                        "name":  "XG2c.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg2c.wav"
+                    },
+                    {
+                        "id":  72,
+                        "name":  "XG2d.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg2d.wav"
+                    },
+                    {
+                        "id":  73,
+                        "name":  "XG2e.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg2e.wav"
+                    },
+                    {
+                        "id":  74,
+                        "name":  "XG2f.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg2f.wav"
+                    },
+                    {
+                        "id":  75,
+                        "name":  "XG2g.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg2g.wav"
+                    },
+                    {
+                        "id":  76,
+                        "name":  "XG3a.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg3a.wav"
+                    },
+                    {
+                        "id":  77,
+                        "name":  "XG3b.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg3b.wav"
+                    },
+                    {
+                        "id":  78,
+                        "name":  "XG3c.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg3c.wav"
+                    },
+                    {
+                        "id":  79,
+                        "name":  "XG3d.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg3d.wav"
+                    },
+                    {
+                        "id":  80,
+                        "name":  "XG3e.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg3e.wav"
+                    },
+                    {
+                        "id":  81,
+                        "name":  "XG3f.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg3f.wav"
+                    },
+                    {
+                        "id":  82,
+                        "name":  "XG3g.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg3g.wav"
+                    },
+                    {
+                        "id":  83,
+                        "name":  "XG4a.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg4a.wav"
+                    },
+                    {
+                        "id":  84,
+                        "name":  "XG4b.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg4b.wav"
+                    },
+                    {
+                        "id":  85,
+                        "name":  "XG4c.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg4c.wav"
+                    },
+                    {
+                        "id":  86,
+                        "name":  "XG4d.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg4d.wav"
+                    },
+                    {
+                        "id":  87,
+                        "name":  "XG4e.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg4e.wav"
+                    },
+                    {
+                        "id":  88,
+                        "name":  "XG4f.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg4f.wav"
+                    },
+                    {
+                        "id":  89,
+                        "name":  "XG4g.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xg4g.wav"
+                    },
+                    {
+                        "id":  90,
+                        "name":  "XRa.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xra.wav"
+                    },
+                    {
+                        "id":  91,
+                        "name":  "XRb.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xrb.wav"
+                    },
+                    {
+                        "id":  92,
+                        "name":  "XRc.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xrc.wav"
+                    },
+                    {
+                        "id":  93,
+                        "name":  "XRd.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xrd.wav"
+                    },
+                    {
+                        "id":  94,
+                        "name":  "XRe.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xre.wav"
+                    },
+                    {
+                        "id":  95,
+                        "name":  "XRf.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xrf.wav"
+                    },
+                    {
+                        "id":  96,
+                        "name":  "XRg.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xrg.wav"
+                    },
+                    {
+                        "id":  97,
+                        "name":  "XRh.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xrh.wav"
+                    },
+                    {
+                        "id":  98,
+                        "name":  "XRi.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xri.wav"
+                    },
+                    {
+                        "id":  99,
+                        "name":  "XRj.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/xrj.wav"
+                    },
+                    {
+                        "id":  100,
+                        "name":  "arrows.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/arrows.wav"
+                    },
+                    {
+                        "id":  101,
+                        "name":  "boating1.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/boating1.wav"
+                    },
+                    {
+                        "id":  102,
+                        "name":  "boatrune.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/boatrune.wav"
+                    },
+                    {
+                        "id":  103,
+                        "name":  "click.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/click.wav"
+                    },
+                    {
+                        "id":  104,
+                        "name":  "cut.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/cut.wav"
+                    },
+                    {
+                        "id":  105,
+                        "name":  "died1.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/died1.wav"
+                    },
+                    {
+                        "id":  106,
+                        "name":  "died2.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/died2.wav"
+                    },
+                    {
+                        "id":  107,
+                        "name":  "died3.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/died3.wav"
+                    },
+                    {
+                        "id":  108,
+                        "name":  "fail.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/fail.wav"
+                    },
+                    {
+                        "id":  109,
+                        "name":  "hitiron.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/hitiron.wav"
+                    },
+                    {
+                        "id":  110,
+                        "name":  "money.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/money.wav"
+                    },
+                    {
+                        "id":  111,
+                        "name":  "noselect.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/noselect.wav"
+                    },
+                    {
+                        "id":  112,
+                        "name":  "place.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/place.wav"
+                    },
+                    {
+                        "id":  113,
+                        "name":  "repair.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/repair.wav"
+                    },
+                    {
+                        "id":  114,
+                        "name":  "rice.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/rice.wav"
+                    },
+                    {
+                        "id":  115,
+                        "name":  "shipyard.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/shipyard.wav"
+                    },
+                    {
+                        "id":  116,
+                        "name":  "special.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/special.wav"
+                    },
+                    {
+                        "id":  117,
+                        "name":  "throw.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/throw.wav"
+                    },
+                    {
+                        "id":  118,
+                        "name":  "victory.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/victory.wav"
+                    },
+                    {
+                        "id":  119,
+                        "name":  "wounded1.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/wounded1.wav"
+                    },
+                    {
+                        "id":  120,
+                        "name":  "wounded2.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/wounded2.wav"
+                    },
+                    {
+                        "id":  121,
+                        "name":  "wounded3.WAV",
+                        "kind":  "sfx",
+                        "file":  "res://media/sfx/wounded3.wav"
+                    }
+                ]
+}

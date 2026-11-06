@@ -1,0 +1,25 @@
+{
+  "assetId": "buildings-025",
+  "bytes": 1402224.0,
+  "colorType": 6.0,
+  "generatedAt": "2026-10-13T05:05:49.778Z",
+  "generator": "built-in image_gen",
+  "height": 887.0,
+  "promptFile": "godot/chibi_remake/art/production/generation-jobs.json",
+  "sha256": "52b72927e40bd0ece3b129a57c12a048d772f43b890181e8ff113263f67868f6",
+  "sourceGeneratedFile": "C:\\Users\\bambo\\.codex\\generated_images\\01a13348-db65-7b23-b66a-63227eb4490d\\exec-8c75f835-7e5a-418f-9e70-8dff5ebcc82f.png",
+  "status": "generated-awaiting-validation",
+  "texture": "godot/chibi_remake/art/full/buildings/025-atlas-v1.png",
+  "userAcceptance": {
+    "date": "2026-10-13",
+    "reason": "用户已人工验证高清图，要求直接替换对应素材，不再逐项美术复核。",
+    "reviewer": "user"
+  },
+  "validation": {
+    "excludedSourceLabelsOrBlanks": 0,
+    "structure": "pass",
+    "visual": "pass",
+    "visualFrameCount": 2
+  },
+  "width": 1774.0
+}

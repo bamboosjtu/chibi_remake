@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>原版《赤壁》指令机制与素材</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; padding: 32px; background: #12141a; color: #e6e6e6;
+         font: 15px/1.65 "Segoe UI", "Microsoft YaHei", sans-serif; }
+  h1, h2 { font-weight: 600; letter-spacing: .02em; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  h2 { margin: 40px 0 12px; font-size: 19px; color: #ffd27a; }
+  h3 { margin: 22px 0 8px; font-size: 15px; color: #ffd27a; }
+  .sub { color: #9aa0ad; margin-bottom: 24px; }
+  code { background: #1d212b; padding: 1px 5px; border-radius: 4px; color: #a8d5ff; }
+  img.sheet { max-width: 100%; image-rendering: pixelated; border: 1px solid #2a2f3a; background: #0b0d12; }
+  .cards { display: flex; gap: 12px; flex-wrap: wrap; }
+  .stat { background: #181c24; border: 1px solid #2a2f3a; border-radius: 10px; padding: 12px 18px; min-width: 120px; }
+  .stat b { display: block; font-size: 24px; color: #ffd27a; }
+  .stat span { color: #9aa0ad; font-size: 13px; }
+  table { border-collapse: collapse; width: 100%; margin-top: 8px; }
+  th, td { border-bottom: 1px solid #262b35; padding: 6px 9px; text-align: left; vertical-align: middle; }
+  th { color: #9aa0ad; font-weight: 500; font-size: 13px; }
+  td.icon { width: 48px; }
+  td.icon img { width: 40px; height: 40px; image-rendering: pixelated; display: block;
+                background: repeating-conic-gradient(#1b1f28 0% 25%, #141820 0% 50%) 50% / 12px 12px; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 18px; align-items: start; }
+  .panel { background: #181c24; border: 1px solid #2a2f3a; border-radius: 10px; padding: 14px; }
+  .panel img { width: 100%; image-rendering: pixelated; }
+  .panel .cap { color: #9aa0ad; font-size: 13px; margin-top: 8px; }
+  .flow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+  .flow div { background: #1b202a; border: 1px solid #303746; border-radius: 8px; padding: 8px 12px; font-size: 13px; }
+  .flow i { color: #ffd27a; font-style: normal; }
+  .note { background: #1b1f27; border-left: 3px solid #ffd27a; padding: 10px 14px; border-radius: 4px; color: #c9ced8; }
+  a { color: #8ec5ff; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; background: #232936; color: #9aa0ad; font-size: 12px; margin-right: 6px; }
+  .slot { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
+  .slot div { background: #1b202a; border: 1px solid #303746; border-radius: 6px; padding: 8px; font-size: 13px; }
+  .slot div b { color: #ffd27a; margin-right: 4px; }
+</style>
+</head>
+<body>
+<h1>原版《赤壁》指令机制与素材</h1>
+<div class="sub">CB.EXE <code>2db7cc10…c5798cb7</code> · INTERFAC.EXP 注册表 · PROMPT 名称 · BMP.LWC 图标 · REA/Ghidra 静态分析</div>
+
+<div class="cards">
+  <div class="stat"><b>117</b><span>注册表条目</span></div>
+  <div class="stat"><b>17</b><span>面板指令 (+取消)</span></div>
+  <div class="stat"><b>3×3</b><span>九格面板</span></div>
+  <div class="stat"><b>3</b><span>图标状态</span></div>
+  <div class="stat"><b>9</b><span>热键 Q/W/E/A/S/D/Z/X/C</span></div>
+</div>
+
+<div class="note" style="margin-top:20px">
+  指令不是硬编码的 9 个按钮：<code>INTERFAC.EXP</code> 登记 117 条「图标帧 + 指令 ID」，
+  面板按选中对象选择模板：未编组 4 项、工人成员 3 项、战斗成员 4 项、工人队 8 项、战斗队 9 项、运输船 1–2 项、多选 3–4 项，
+  再用位掩码启用/禁用槽位。点击/热键统一走
+  <code>PostMessage(WM_COMMAND)</code> → 命令块 → 势力 64 槽任务表 → 模式分派。
+</div>
+
+<h2>核心指令</h2>
+<table>
+  <tr><th></th><th>ID</th><th>名称</th><th>模式</th><th>面板 / 热键</th><th>图标帧</th></tr>
+  <tr><td class="icon"><img src="assets/icon_16025.png" alt="取消"></td><td>16025</td><td>取消</td><td>0x16/17/18</td><td>子菜单</td><td>170</td></tr>
+  <tr><td class="icon"><img src="assets/icon_16130.png" alt="移动"></td><td>16130</td><td>移动</td><td>2</td><td>战斗 1/Q · 工人 1/Q</td><td>154</td></tr>
+  <tr><td class="icon"><img src="assets/icon_16131.png" alt="攻击"></td><td>16131</td><td>攻击</td><td>1</td><td>战斗 2/W · 工人 2/W</td><td>155</td></tr>
+  <tr><td class="icon"><img src="assets/icon_16132.png" alt="警戒"></td><td>16132</td><td>警戒</td><td>3</td><td>战斗 3/E</td><td>156</td></tr>
+  <tr><td class="icon"><img src="assets/icon_16133.png" alt="列阵"></td><td>16133</td><td>列阵</td><td>菜单 → 16190–16199</td><td>战斗 4/A</td><td>157</td></tr>
+  <tr><td class="icon"><img src="assets/icon_16134.png" alt="休息"></td><td>16134</td><td>休息</td><td>4</td><td>战斗 6/D · 工人 6/D</td><td>158</td></tr>
+  <tr><td class="icon"><img src="assets/icon_16135.png" alt="计谋"></td><td>16135</td><td>计谋</td><td>菜单 → 16210–16218</td><td>战斗 5/S</td><td>159</td></tr>
+  <tr><td class="icon"><img src="assets/icon_16136.png" alt="解散"></td><td>16136</td><td>解散</td><td>6</td><td>战斗 7/Z · 工人 7/Z</td><td>160</td></tr>
+  <tr><td class="icon"><img src="assets/icon_16137.png" alt="单挑"></td><td>16137</td><td>单挑</td><td>0x0B</td><td>战斗 9/C</td><td>161</td></tr>
+  <tr><td class="icon"><img src="assets/icon_16138.png" alt="运输"></td><td>16138</td><td>运输</td><td>7</td><td>工人 3/E</td><td>162</td></tr>
+  <tr><td class="icon"><img src="assets/icon_16139.png" alt="建造"></td><td>16139</td><td>建造</td><td>菜单 0x111de</td><td>工人 4/A</td><td>163</td></tr>
+  <tr><td class="icon"><img src="assets/icon_16140.png" alt="建造"></td><td>16140</td><td>建造</td><td>菜单 0x11210</td><td>建筑侧，不在 3×3</td><td>163</td></tr>
+  <tr><td class="icon"><img src="assets/icon_16141.png" alt="修理"></td><td>16141</td><td>修理</td><td>9</td><td>工人 5/S</td><td>164</td></tr>
+  <tr><td class="icon"><img src="assets/icon_16142.png" alt="上船"></td><td>16142</td><td>上船</td><td>0x0C</td><td>战斗 8/X · 工人 8/X</td><td>165</td></tr>
+  <tr><td class="icon"><img src="assets/icon_16143.png" alt="下船"></td><td>16143</td><td>下船</td><td>0x0D</td><td>装员船第 9 格 / C</td><td>166</td></tr>
+  <tr><td class="icon"><img src="assets/icon_16144.png" alt="组建"></td><td>16144</td><td>组建</td><td>0x0E</td><td>不在 3×3</td><td>167</td></tr>
+  <tr><td class="icon"><img src="assets/icon_16145.png" alt="加入"></td><td>16145</td><td>加入</td><td>0x0F</td><td>不在 3×3</td><td>168</td></tr>
+  <tr><td class="icon"><img src="assets/icon_16146.png" alt="返回/采集"></td><td>16146</td><td>返回/采集</td><td>0x19</td><td>不在 3×3</td><td>169</td></tr>
+</table>
+
+<h2>3×3 面板重建</h2>
+<div class="grid2">
+  <div class="panel"><h3>战斗队伍</h3><img src="assets/panel_combat_mock.png" alt="战斗面板">
+    <div class="cap">Q 移动 · W 攻击 · E 警戒 · A 列阵 · S 计谋 · D 休息 · Z 解散 · X 上船 · C 单挑</div></div>
+  <div class="panel"><h3>工人队伍</h3><img src="assets/panel_worker_mock.png" alt="工人面板">
+    <div class="cap">Q 移动 · W 攻击 · E 运输 · A 建造 · S 修理 · D 休息 · Z 解散 · X 上船 · 第 9 格空</div></div>
+</div>
+<div class="note" style="margin-top:12px">模板来自两张 640×480 真机截图逐格比对（既有研究）；本轮代码旁证了“9 按钮 + 掩码”模型，但没有再导出 17→9 布局表。</div>
+
+<h2>选择对象 → 面板</h2>
+<table>
+  <tr><th>选中对象</th><th>判定</th><th>面板 ID</th><th>槽数 / 掩码</th><th>行动</th></tr>
+  <tr><td>无选择</td><td>—</td><td><code>0x11171</code></td><td>0</td><td>—</td></tr>
+  <tr><td><b>单个武将 · 带工人</b></td><td><code>FUN_00424F30</code>（category 12）</td><td><code>0x111D4</code> / <code>0x11206</code></td><td>8 / <code>0xFFFF</code></td><td>移动 攻击 运输 建造 修理 休息 解散 上船</td></tr>
+  <tr><td><b>单个武将 · 带士兵</b></td><td>category 9/13 或其它</td><td><code>0x11238</code></td><td>9 / <code>0xFFFF</code></td><td>移动 攻击 警戒 列阵 计谋 休息 解散 上船 单挑</td></tr>
+  <tr><td><b>单个工人成员</b>（有将，点成员）</td><td>category 10、leader ≠ <code>0xFFFF</code></td><td><code>0x11300</code></td><td>3 / <code>0x07</code></td><td>移动 / 解散 / 上船（+返回）</td></tr>
+  <tr><td><b>单个战斗成员</b>（有将，点成员）</td><td>category 3/7/8/11、leader ≠ <code>0xFFFF</code></td><td><code>0x1129C</code></td><td>4 / <code>0x0F</code></td><td>移动 / 组建 / 加入 / 上船（后两项待核）</td></tr>
+  <tr><td><b>未编组单位</b></td><td>leader slot <code>+0x150 == 0xFFFF</code></td><td><code>0x1129C</code></td><td>4 / <code>0x0F</code></td><td>移动 / 组建 / 加入 / 上船</td></tr>
+  <tr><td>多选 · 工人队/工人成员</td><td><code>local_354</code></td><td><code>0x11300</code></td><td>3 / <code>0x07</code></td><td>移动 / 解散 / 上船（+返回）</td></tr>
+  <tr><td>多选 · 战斗队/战斗成员</td><td><code>local_358</code> / <code>local_34C</code></td><td><code>0x1129C</code></td><td>4 / <code>0x0F</code></td><td>移动 / 组建 / 加入 / 上船（+返回）</td></tr>
+  <tr><td>单个运输船</td><td>type 47 <code>FUN_00425060</code></td><td><code>0x11364</code></td><td>1–2 / <code>0x3</code> / <code>0x1</code></td><td>移动 + 下船（载员时）</td></tr>
+  <tr><td>建筑</td><td>选中建筑</td><td><code>0x11210</code> / <code>0x111DE</code></td><td>菜单</td><td>建造/生产/研究</td></tr>
+</table>
+<p class="meta">三层：<b>将本体/队伍级</b>（工人 8 / 战斗 9）→ <b>成员/个体级</b>（工人 3：移动/解散/上船；战斗 4：移动/组建/加入/上船）→ <b>未编组/预备级</b>（4：移动/组建/加入/上船）。<b>点将</b>和<b>点成员</b>是两套面板。</p>
+
+<div class="grid2" style="margin-top:14px">
+  <div class="panel"><h3>未编组单位 · 4 项</h3><img src="assets/panel_ungrouped_worker_mock.png" alt="未编组面板">
+    <div class="cap"><code>0x1129C</code> mask <code>0x0F</code>：移动 154 · 组建 167 · 加入 168 · 上船 165。没有攻击/运输/建造/修理/解散/休息。</div></div>
+  <div class="panel"><h3>工人成员（有将）· 3 项</h3><img src="assets/panel_worker_member_mock.png" alt="工人成员面板">
+    <div class="cap"><code>0x11300</code> mask <code>0x07</code>：移动 154 · 解散 160 · 上船 165；载货时 +返回 169。运输/建造/修理不在成员面板上。</div></div>
+  <div class="panel"><h3>工人队 / 带工武将 · 8 项</h3><img src="assets/panel_worker_mock.png" alt="工人面板">
+    <div class="cap"><code>0x111D4</code>：移动 154 · 攻击 155 · 运输 162 · 建造 163 · 修理 164 · 休息 158 · 解散 160 · 上船 165；第 9 格空。</div></div>
+  <div class="panel"><h3>战斗队 / 带兵武将 · 9 项</h3><img src="assets/panel_combat_mock.png" alt="战斗面板">
+    <div class="cap"><code>0x11238</code>：移动 154 · 攻击 155 · 警戒 156 · 列阵 157 · 计谋 159 · 休息 158 · 解散 160 · 上船 165 · 单挑 161。<br><b>用户截图（赵云带士兵）</b>即此面板。</div></div>
+  <div class="panel"><h3>运输船 · 1–2 项</h3><img src="assets/panel_transport_mock.png" alt="运输船面板">
+    <div class="cap"><code>0x11364</code>：移动 154 + 下船 166（载员时 mask <code>0x3</code>；空船 <code>0x1</code>）。</div></div>
+</div>
+
+<h3>面板槽位（代码确认）</h3>
+<table>
+  <tr><th>面板</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th></tr>
+  <tr><td><code>0x111D4</code> 工人</td><td>移动</td><td>攻击</td><td>运输</td><td>建造 16139</td><td>修理</td><td>休息</td><td>解散</td><td>上船</td><td>—</td></tr>
+  <tr><td><code>0x11206</code> 工人变体</td><td>移动</td><td>攻击</td><td>运输</td><td>建造 16140</td><td>修理</td><td>休息</td><td>解散</td><td>上船</td><td>—</td></tr>
+  <tr><td><code>0x11238</code> 战斗</td><td>移动</td><td>攻击</td><td>警戒</td><td>列阵</td><td>计谋</td><td>休息</td><td>解散</td><td>上船</td><td>单挑</td></tr>
+  <tr><td><code>0x1129C</code> 未编组/战斗成员</td><td>移动</td><td>组建</td><td>加入</td><td>上船</td><td>返回*</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+  <tr><td><code>0x11300</code> 工人成员/多选工人</td><td>移动</td><td>解散</td><td>上船</td><td>返回*</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+  <tr><td><code>0x11364</code> 运输船</td><td>移动</td><td>下船</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+</table>
+<p class="meta">来源：<code>FUN_00411400</code> 0x4183EB–0x418D4D 的按钮表与面板数组；共享按钮 <code>EDX=0x4A2308</code> 移动、<code>ESI=0x4937D8</code> 攻击、<code>EDI=0x493488</code> 休息、<code>EBX=0x494920</code> 解散、<code>EAX=0x495700</code> 上船。<br>* 载货槽由 mask <code>0x10</code>/<code>0x0F</code> 启用，<code>0x4A1D90</code> 推断为 16146 返回；<code>0x49B1B0</code> / <code>0x4A1D90</code> 的指令按全局按钮表 16130–16146 的顺序推断。</p>
+
+<h2>工人 vs 士兵：指令 / 图标</h2>
+<table>
+  <tr><th>指令</th><th>未编组工人</th><th>工人成员（有将）</th><th>工人队（点将）</th><th>战斗队（有将）</th><th>运输船</th></tr>
+  <tr><td>移动 16130</td><td>✓ 154</td><td>✓ 154</td><td>✓ 154</td><td>✓ 154</td><td>✓ 154</td></tr>
+  <tr><td>攻击 16131</td><td>✗</td><td>✗</td><td>✓ 155</td><td>✓ 155</td><td>✗</td></tr>
+  <tr><td>警戒 16132</td><td>✗</td><td>✗</td><td>✗</td><td>✓ 156</td><td>✗</td></tr>
+  <tr><td>列阵 16133</td><td>✗</td><td>✗</td><td>✗</td><td>✓ 157</td><td>✗</td></tr>
+  <tr><td>休息 16134</td><td>✗</td><td>✗</td><td>✓ 158</td><td>✓ 158</td><td>✗</td></tr>
+  <tr><td>计谋 16135</td><td>✗</td><td>✗</td><td>✗</td><td>✓ 159</td><td>✗</td></tr>
+  <tr><td>解散 16136</td><td>✗</td><td>✓ 160</td><td>✓ 160</td><td>✓ 160</td><td>✗</td></tr>
+  <tr><td>单挑 16137</td><td>✗</td><td>✗</td><td>✗</td><td>✓ 161</td><td>✗</td></tr>
+  <tr><td>运输 16138</td><td>✗</td><td>✗</td><td>✓ 162</td><td>✗</td><td>✗</td></tr>
+  <tr><td>建造 16139</td><td>✗</td><td>✗</td><td>✓ 163</td><td>✗</td><td>✗</td></tr>
+  <tr><td>修理 16141</td><td>✗</td><td>✗</td><td>✓ 164</td><td>✗</td><td>✗</td></tr>
+  <tr><td>上船 16142</td><td>✓ 165</td><td>✓ 165</td><td>✓ 165</td><td>✓ 165</td><td>✗</td></tr>
+  <tr><td>下船 16143</td><td>✗</td><td>✗</td><td>✗</td><td>✗</td><td>✓ 166</td></tr>
+  <tr><td>组建 16144</td><td>✓ 167</td><td>✗</td><td>✗</td><td>✗</td><td>✗</td></tr>
+  <tr><td>加入 16145</td><td>✓ 168</td><td>✗</td><td>✗</td><td>✗</td><td>✗</td></tr>
+  <tr><td>返回 16146</td><td>✗</td><td>✓ 169（载货）</td><td>✓（运输链）</td><td>✗</td><td>✗</td></tr>
+</table>
+<p class="meta">工人专属 162/163/164；战斗专属 156/157/159/161；未编组专属 167/168；共享 154/155/158/160/165。<br>“工人成员”= 点有将工人队的成员，只有移动/解散/上船；完整 8 项在“点将本体”的工人队面板上。</p>
+
+<h2>完整链路</h2>
+<div class="flow">
+  <div>鼠标移动 <code>0x4042b0</code> → 状态 2（悬停）+ 提示</div><i>→</i>
+  <div>按下 <code>0x404080</code> → 状态 1 + Click.wav</div><i>→</i>
+  <div>抬起 <code>0x404200</code> → 发命令</div><i>→</i>
+  <div><code>0x403f40</code> PostMessage(WM_COMMAND, 指令ID)</div><i>→</i>
+  <div><code>0x428a50</code> 组装模式/参数</div><i>→</i>
+  <div><code>0x42a8a0</code> 8 dword 命令块 → 势力 64 槽任务表</div><i>→</i>
+  <div><code>0x42ae10</code> 每帧泵</div><i>→</i>
+  <div><code>0x45b4e0</code> 模式分派</div>
+</div>
+<p class="sub">热键 <code>0x40de80</code> 直接走 <code>0x403f40</code>；数字键编队走 <code>0x40e1f0</code>，不属于指令面板。</p>
+
+<h2>图标状态</h2>
+<p><span class="pill">40×40</span><span class="pill">40×120 = 3 行</span><span class="pill">normal / pressed / hover</span><span class="pill">状态 3 = 禁用（图外/空槽）</span></p>
+<img class="sheet" src="assets/core_commands_sheet.png" alt="核心指令三状态">
+
+<h2>子菜单素材</h2>
+<h3>十阵法 + 翻页（113–124 / 16190–16201）</h3>
+<img class="sheet" src="assets/formations_sheet.png" alt="阵法">
+<h3>九计谋（98–106 / 16210–16218）</h3>
+<img class="sheet" src="assets/stratagems_sheet.png" alt="计谋">
+<h3>建造菜单（57–89 / 16150–16187）</h3>
+<img class="sheet" src="assets/build_menu_sheet.png" alt="建造菜单">
+<h3>生产 / 研究（90–153 等）</h3>
+<img class="sheet" src="assets/production_sheet.png" alt="生产研究">
+
+<h2>文件</h2>
+<ul>
+  <li><a href="README.md">README.md</a> — 完整机制、字段、证据 ID、复现步骤、已知空缺</li>
+  <li><a href="data/commands.json">data/commands.json</a> — 核心指令 / 模板 / 热键 / 注册表</li>
+  <li><a href="data/panel_variants.json">data/panel_variants.json</a> — 选中对象 → 面板/槽数/掩码/命令/图标</li>
+  <li><a href="data/registry.json">data/registry.json</a> — 117 条注册表</li>
+  <li><a href="data/prompt_strings.json">data/prompt_strings.json</a> — PROMPT 全 159 项</li>
+</ul>
+</body>
+</html>

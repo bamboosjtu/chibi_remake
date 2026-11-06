@@ -1,0 +1,666 @@
+{
+  "schemaVersion": 1,
+  "generated": "2026-10-31",
+  "source": {
+    "binary": {
+      "name": "CB.EXE",
+      "sha256": "2db7cc102e6fde547ab05d77cfddabc2079f5bc9be9b6b59b17bf435c5798cb7"
+    },
+    "productionExtract": "research/buildings/data/production.json（COST.EXP 行 0–22 的既有提取）",
+    "decompiled": "_work/ghidra_export/CB.EXE.decompiled.c",
+    "data": {
+      "binary": {
+        "name": "CB.EXE",
+        "sha256": "2db7cc102e6fde547ab05d77cfddabc2079f5bc9be9b6b59b17bf435c5798cb7"
+      },
+      "data": {
+        "file": "SET/DATA.EXP",
+        "xor": "0x22",
+        "sha256": "62ca7e17f505df823e4f63fd8ebe72d02726306e01f6f5db524e34625062a654"
+      },
+      "unit": {
+        "file": "SET/UNIT.EXP",
+        "xor": "0x22",
+        "sha256": "b62bc566d03e5fb0e28b80ea455d0bf26b7a30d7021d712dda73081e2957ab5f"
+      },
+      "sprites": {
+        "file": "BMP/UNIT.LWC",
+        "palette": "RES/BATTLE.PAL",
+        "sha256": "cbfa3ef092d6c16346c0e203f825bb163e0d1935937d5fe6f7ccd7578fd01d15"
+      },
+      "icons": {
+        "file": "BMP/BMP.LWC",
+        "palette": "RES/SCORE.PAL",
+        "sha256": "9ffa1ff78a51fb54d2970bb9b99daa07b19ca3822d20eff65df9d6f50e32db97"
+      },
+      "interface": {
+        "file": "SET/INTERFAC.EXP",
+        "xor": "0x22",
+        "sha256": "9e499af35ad29d7b87ca754e4db94e144d78eeb886f73749b35f33140f10e402"
+      }
+    },
+    "note": "本轮没有重新从原始 ISO 读取 COST.EXP；费用/加成行来自既有提取，代码侧已核对字段/等级/生效路径。"
+  },
+  "headline": "原版科技 = 17 项升级 + 6 项出售操作；升级研究 200 tick，面板按前置科技逐级开放。",
+  "system": {
+    "durationTicks": 200,
+    "cancelRefundPercent": 75,
+    "parallel": "不同建筑可并行；同一建筑同一时间只一项",
+    "repeat": "同一势力同一科技不能重复派发；完成后只取当前等级",
+    "completionFunction": "FUN_0045ECD0 → 200 tick → FUN_00422330",
+    "cancelFunction": "FUN_0045F0B0 / 0x45df60；FUN_00420070 退 75%",
+    "techCaseCount": 23,
+    "upgradeCount": 17,
+    "saleCount": 6,
+    "tierMap": {
+      "0": "类型 32/36/45/46",
+      "1": "类型 37/38/39/48",
+      "2": "类型 40/41/42",
+      "3": "类型 43/44"
+    },
+    "statFields": {
+      "attackA": "DAT_004b8d10..13（兵器）",
+      "attackB": "DAT_004b8d14..17（弓术）；投石 8d20；舰船 8d21/22",
+      "defenseA": "DAT_004b8d18..1b（甲胄）；舰船 8d23",
+      "defenseB": "DAT_004b8d1c..1f（甲胄）；舰船 8d23/24",
+      "hqLevel": "DAT_004b8d29",
+      "hqMaxHpBonus": "DAT_004b8d0c",
+      "bowLevel": "DAT_004b8d2a",
+      "weaponLevel": "DAT_004b8d2b",
+      "armorLevel": "DAT_004b8d2c",
+      "catapultLevel": "DAT_004b8d2d",
+      "fastShipLevel": "DAT_004b8d2e",
+      "warShipLevel": "DAT_004b8d2f",
+      "armorShipLevel": "DAT_004b8d30"
+    }
+  },
+  "branches": [
+    {
+      "id": "hq",
+      "name": "大本营",
+      "building": "帅帐",
+      "icon": "assets/branch_hq.png",
+      "levels": [
+        {
+          "internalLevel": 1,
+          "prompt": "大本营升一级",
+          "cost": {
+            "gold": 2000,
+            "wood": 1000,
+            "iron": 700
+          },
+          "requirements": "campaign gate > 1；木材场+武器库条件（源码检查两个 100 标志）",
+          "effect": "DAT_004b8d29=1；所有既有普通单位当前 HP +400；最大 HP 加成 DAT_004b8d0c；开放 100/200 档生产",
+          "commands": [
+            16031,
+            16034
+          ],
+          "frame": 126
+        },
+        {
+          "internalLevel": 2,
+          "prompt": "大本营升二级",
+          "cost": {
+            "gold": 3000,
+            "wood": 2000,
+            "iron": 1000
+          },
+          "requirements": "campaign gate > 2；木材场+武器库条件（源码检查两个 100 标志）",
+          "effect": "DAT_004b8d29=2；再 +400 当前 HP；开放 500 档生产",
+          "commands": [
+            16032,
+            16035
+          ],
+          "frame": 127
+        },
+        {
+          "internalLevel": 3,
+          "prompt": "大本营升三级",
+          "cost": {
+            "gold": 5000,
+            "wood": 3000,
+            "iron": 2000
+          },
+          "requirements": "campaign gate > 3；弓术>1 且 兵器>1",
+          "effect": "DAT_004b8d29=3；再 +400 当前 HP；开放 1000 档生产",
+          "commands": [
+            16033,
+            16036
+          ],
+          "frame": 128
+        }
+      ],
+      "note": "原版提示为升一级/二级/三级；内部 DAT_004b8d29 也写 1/2/3。docs 以显示等级称作升二级/三级/四级。"
+    },
+    {
+      "id": "bow",
+      "name": "弓术",
+      "building": "木材场",
+      "icon": "assets/branch_wood.png",
+      "levels": [
+        {
+          "level": 1,
+          "prompt": "弓箭升一级",
+          "cost": {
+            "gold": 800,
+            "wood": 400,
+            "iron": 0,
+            "food": 0
+          },
+          "bonusTiers": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "effect": "攻击 B +当前档位值；只取当前等级，不叠加",
+          "commands": [
+            16040
+          ],
+          "frame": 110
+        },
+        {
+          "level": 2,
+          "prompt": "弓箭升二级",
+          "cost": {
+            "gold": 1500,
+            "wood": 400,
+            "iron": 100,
+            "food": 0
+          },
+          "bonusTiers": [
+            4,
+            6,
+            8,
+            10
+          ],
+          "effect": "攻击 B +当前档位值；只取当前等级，不叠加",
+          "commands": [
+            16041
+          ],
+          "frame": 111
+        },
+        {
+          "level": 3,
+          "prompt": "弓箭升三级",
+          "cost": {
+            "gold": 2000,
+            "wood": 800,
+            "iron": 500,
+            "food": 0
+          },
+          "bonusTiers": [
+            6,
+            9,
+            12,
+            15
+          ],
+          "effect": "攻击 B +当前档位值；只取当前等级，不叠加",
+          "commands": [
+            16042
+          ],
+          "frame": 112
+        }
+      ],
+      "note": "攻击 B，四档类型见 tier map。"
+    },
+    {
+      "id": "weapon",
+      "name": "兵器",
+      "building": "武器库",
+      "icon": "assets/branch_weapon.png",
+      "levels": [
+        {
+          "level": 1,
+          "prompt": "兵器升一级",
+          "cost": {
+            "gold": 800,
+            "wood": 0,
+            "iron": 100,
+            "food": 0
+          },
+          "bonusTiers": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "effect": "攻击 A +当前档位值；只取当前等级，不叠加",
+          "commands": [
+            16050
+          ],
+          "frame": 148
+        },
+        {
+          "level": 2,
+          "prompt": "兵器升二级",
+          "cost": {
+            "gold": 2000,
+            "wood": 600,
+            "iron": 300,
+            "food": 0
+          },
+          "bonusTiers": [
+            6,
+            8,
+            10,
+            12
+          ],
+          "effect": "攻击 A +当前档位值；只取当前等级，不叠加",
+          "commands": [
+            16051
+          ],
+          "frame": 149
+        },
+        {
+          "level": 3,
+          "prompt": "兵器升三级",
+          "cost": {
+            "gold": 3000,
+            "wood": 1000,
+            "iron": 500,
+            "food": 0
+          },
+          "bonusTiers": [
+            9,
+            12,
+            15,
+            18
+          ],
+          "effect": "攻击 A +当前档位值；只取当前等级，不叠加",
+          "commands": [
+            16052
+          ],
+          "frame": 150
+        }
+      ],
+      "note": "攻击 A。"
+    },
+    {
+      "id": "armor",
+      "name": "甲胄",
+      "building": "武器库",
+      "icon": "assets/branch_weapon.png",
+      "levels": [
+        {
+          "level": 1,
+          "prompt": "盔甲升一级",
+          "cost": {
+            "gold": 600,
+            "wood": 300,
+            "iron": 100,
+            "food": 0
+          },
+          "bonusTiers": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "effect": "防御 A/B 同时 +当前档位值；只取当前等级，不叠加",
+          "commands": [
+            16053
+          ],
+          "frame": 151
+        },
+        {
+          "level": 2,
+          "prompt": "盔甲升二级",
+          "cost": {
+            "gold": 1200,
+            "wood": 600,
+            "iron": 200,
+            "food": 0
+          },
+          "bonusTiers": [
+            4,
+            6,
+            8,
+            10
+          ],
+          "effect": "防御 A/B 同时 +当前档位值；只取当前等级，不叠加",
+          "commands": [
+            16054
+          ],
+          "frame": 152
+        },
+        {
+          "level": 3,
+          "prompt": "盔甲升三级",
+          "cost": {
+            "gold": 1600,
+            "wood": 900,
+            "iron": 300,
+            "food": 0
+          },
+          "bonusTiers": [
+            6,
+            9,
+            12,
+            15
+          ],
+          "effect": "防御 A/B 同时 +当前档位值；只取当前等级，不叠加",
+          "commands": [
+            16055
+          ],
+          "frame": 153
+        }
+      ],
+      "note": "防御 A/B 同时加成。"
+    },
+    {
+      "id": "catapult",
+      "name": "投石车",
+      "building": "车兵所",
+      "icon": "assets/branch_vehicle.png",
+      "levels": [
+        {
+          "level": 1,
+          "prompt": "投石车升一级",
+          "cost": {
+            "gold": 1500,
+            "wood": 500,
+            "iron": 400,
+            "food": 0
+          },
+          "attackB": 10,
+          "effect": "投石车攻击 B +10",
+          "commands": [
+            16111
+          ],
+          "frame": 146
+        },
+        {
+          "level": 2,
+          "prompt": "投石车升二级",
+          "cost": {
+            "gold": 3000,
+            "wood": 1000,
+            "iron": 800,
+            "food": 0
+          },
+          "attackB": 20,
+          "effect": "投石车攻击 B +20",
+          "commands": [
+            16112
+          ],
+          "frame": 147
+        }
+      ],
+      "note": "仅投石车攻击 B。"
+    },
+    {
+      "id": "navy",
+      "name": "水军",
+      "building": "船坞",
+      "icon": "assets/branch_dock.png",
+      "levels": [
+        {
+          "line": "快船升级",
+          "prompt": "快船升级",
+          "command": 16124,
+          "frame": 141,
+          "level": 1,
+          "effect": "快船攻击 B +6",
+          "cost": {
+            "gold": 700,
+            "wood": 400,
+            "iron": 400,
+            "food": 0
+          },
+          "bonusValues": [
+            6,
+            0,
+            0,
+            0
+          ],
+          "requirements": "船坞；前置舰种研究/等级见面板掩码"
+        },
+        {
+          "line": "战船升级",
+          "prompt": "战船升级",
+          "command": 16125,
+          "frame": 142,
+          "level": 2,
+          "effect": "战船攻击 B +15",
+          "cost": {
+            "gold": 1500,
+            "wood": 1000,
+            "iron": 800,
+            "food": 0
+          },
+          "bonusValues": [
+            15,
+            0,
+            0,
+            0
+          ],
+          "requirements": "船坞；前置舰种研究/等级见面板掩码"
+        },
+        {
+          "line": "装甲升级",
+          "prompt": "装甲升级",
+          "command": 16126,
+          "frame": 143,
+          "level": 3,
+          "effect": "舰船防御 A +6 / B +10",
+          "cost": {
+            "gold": 800,
+            "wood": 500,
+            "iron": 500,
+            "food": 0
+          },
+          "bonusValues": [
+            6,
+            10,
+            0,
+            0
+          ],
+          "requirements": "船坞；前置舰种研究/等级见面板掩码"
+        }
+      ],
+      "note": "快船/战船/装甲三条独立升级。"
+    }
+  ],
+  "sales": [
+    {
+      "caseIndex": 12,
+      "command": 16060,
+      "frame": 132,
+      "label": "出售木材1000",
+      "goldGain": 500,
+      "cost": {
+        "gold": 0,
+        "wood": 1000,
+        "iron": 0,
+        "food": 0
+      },
+      "effect": "获得 500 金；扣除 1000 木材"
+    },
+    {
+      "caseIndex": 13,
+      "command": 16061,
+      "frame": 133,
+      "label": "出售铁1000",
+      "goldGain": 800,
+      "cost": {
+        "gold": 0,
+        "wood": 0,
+        "iron": 1000,
+        "food": 0
+      },
+      "effect": "获得 800 金；扣除 1000 铁"
+    },
+    {
+      "caseIndex": 14,
+      "command": 16062,
+      "frame": 134,
+      "label": "出售粮食1000",
+      "goldGain": 1000,
+      "cost": {
+        "gold": 0,
+        "wood": 0,
+        "iron": 0,
+        "food": 1000
+      },
+      "effect": "获得 1000 金；扣除 1000 粮食"
+    },
+    {
+      "caseIndex": 15,
+      "command": 16063,
+      "frame": 135,
+      "label": "出售木材5000",
+      "goldGain": 2500,
+      "cost": {
+        "gold": 0,
+        "wood": 5000,
+        "iron": 0,
+        "food": 0
+      },
+      "effect": "获得 2500 金；扣除 5000 木材"
+    },
+    {
+      "caseIndex": 16,
+      "command": 16064,
+      "frame": 136,
+      "label": "出售铁5000",
+      "goldGain": 4000,
+      "cost": {
+        "gold": 0,
+        "wood": 0,
+        "iron": 5000,
+        "food": 0
+      },
+      "effect": "获得 4000 金；扣除 5000 铁"
+    },
+    {
+      "caseIndex": 17,
+      "command": 16065,
+      "frame": 137,
+      "label": "出售粮食5000",
+      "goldGain": 5000,
+      "cost": {
+        "gold": 0,
+        "wood": 0,
+        "iron": 0,
+        "food": 5000
+      },
+      "effect": "获得 5000 金；扣除 5000 粮食"
+    }
+  ],
+  "hqProductionUnlock": {
+    "0": "100 档",
+    "1": "100/200 档",
+    "2": "100/200/500 档",
+    "3": "100/200/500/1000 档",
+    "note": "兵种线不同：骑兵只到 500；步兵/弓兵到 1000；车兵/水军走各自面板。"
+  },
+  "prerequisites": {
+    "sequential": "同一线必须逐级研究；面板只开放下一等级。",
+    "hq": [
+      "一级：campaign gate >1；两个建筑/状态标志 ==100（docs 名称：木材场、武器库）",
+      "二级：campaign gate >2；两个建筑/状态标志 ==100",
+      "三级：campaign gate >3；弓术 >1 且 兵器 >1"
+    ],
+    "bow": "木材场已建成/状态 ==100；campaign gate >当前等级；前一级已完成",
+    "weaponArmor": "武器库已建成/状态 ==100；campaign gate >当前等级；同线前一级已完成",
+    "catapult": "车兵所；HQ 等级/面板掩码满足；前一级已完成",
+    "navy": "船坞；HQ 等级/面板掩码满足；快船/战船/装甲各自独立"
+  },
+  "evidence": {
+    "researchDispatch": "FUN_00428A50 0x3EA7..0x3EFF / 0x3EEE 特殊分支",
+    "researchAction": "FUN_0045ECD0（200 tick）",
+    "techEffects": "FUN_00422330 case 0..0x16",
+    "panelMasks": "FUN_00426E40",
+    "costCheck": "FUN_0041FF30",
+    "refund": "FUN_00420070",
+    "attackA": "FUN_004255C0",
+    "attackB": "FUN_00425800",
+    "defenseA": "FUN_00425B50",
+    "defenseB": "FUN_00425E40",
+    "hqUpgrade": "FUN_00422330 case 0/1/2",
+    "costExtract": "research/buildings/data/production.json",
+    "ids": {
+      "panelMasks": "ev_c65228d1d7798fa656ed6f397fb559125cf33d2ec221c4aeab4a8c1197b7e3d1",
+      "costCheck": "ev_a84eba1b8ca277d986d40068387aa445c9aaa3a46339d9ca92d9923b9121cc48"
+    }
+  },
+  "docsDeltas": [
+    {
+      "topic": "23 项",
+      "docs": "23 项科技",
+      "original": "FUN_00422330 的 23 个 case = 17 项升级 + 6 项出售；出售不是战斗科技。",
+      "action": "文档/界面可称23项操作，但不要把出售算进科技加成。"
+    },
+    {
+      "topic": "大本营等级",
+      "docs": "升二级/三级/四级",
+      "original": "提示文字为升一级/二级/三级；内部 DAT_004b8d29=1/2/3。",
+      "action": "以原版提示和字段为准，文档的显示等级整体偏移1。"
+    },
+    {
+      "topic": "研究费用",
+      "docs": "见 docs 05",
+      "original": "production.json 的 COST 行与代码等级一致；弓/兵器/甲胄等四档加成逐列生效。",
+      "action": "沿用费用行，勿把多级相加。"
+    },
+    {
+      "topic": "研究持续时间",
+      "docs": "200 tick",
+      "original": "FUN_0045ECD0 在 199 < counter 时完成。",
+      "action": "一致。"
+    },
+    {
+      "topic": "取消退款",
+      "docs": "75%",
+      "original": "FUN_00420070 退 75%。",
+      "action": "一致。"
+    },
+    {
+      "topic": "加成对象",
+      "docs": "普通单位；武将/建筑/工人例外",
+      "original": "FUN_004255C0 等按类型档位读取；英雄走独立公式。",
+      "action": "不要把科技加成套到武将/建筑。"
+    }
+  ],
+  "assets": {
+    "productionSheet": "assets/production_sheet.png",
+    "icons": "assets/tech_<command>_<stem>.png",
+    "iconList": [
+      "assets/tech_16031_hq_up_1_a.png",
+      "assets/tech_16032_hq_up_2_a.png",
+      "assets/tech_16033_hq_up_3_a.png",
+      "assets/tech_16034_hq_up_1_b.png",
+      "assets/tech_16035_hq_up_2_b.png",
+      "assets/tech_16036_hq_up_3_b.png",
+      "assets/tech_16040_bow_1.png",
+      "assets/tech_16041_bow_2.png",
+      "assets/tech_16042_bow_3.png",
+      "assets/tech_16050_weapon_1.png",
+      "assets/tech_16051_weapon_2.png",
+      "assets/tech_16052_weapon_3.png",
+      "assets/tech_16053_armor_1.png",
+      "assets/tech_16054_armor_2.png",
+      "assets/tech_16055_armor_3.png",
+      "assets/tech_16060_sell_wood_1000.png",
+      "assets/tech_16061_sell_iron_1000.png",
+      "assets/tech_16062_sell_food_1000.png",
+      "assets/tech_16063_sell_wood_5000.png",
+      "assets/tech_16064_sell_iron_5000.png",
+      "assets/tech_16065_sell_food_5000.png",
+      "assets/tech_16111_catapult_1.png",
+      "assets/tech_16112_catapult_2.png",
+      "assets/tech_16124_navy_fast.png",
+      "assets/tech_16125_navy_war.png",
+      "assets/tech_16126_navy_armor.png"
+    ],
+    "branches": [
+      "assets/branch_hq.png",
+      "assets/branch_wood.png",
+      "assets/branch_weapon.png",
+      "assets/branch_vehicle.png",
+      "assets/branch_dock.png"
+    ],
+    "tree": "assets/tech_tree.svg"
+  }
+}

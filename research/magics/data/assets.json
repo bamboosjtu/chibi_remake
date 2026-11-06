@@ -1,0 +1,7 @@
+{
+  "iconSheet": "assets/stratagems_sheet.png",
+  "statusTimeline": "assets/status_timeline.svg",
+  "speedCompare": "assets/speed_compare.svg",
+  "fireTimeline": "assets/fire_timeline.svg",
+  "farsightGrid": "assets/farsight_grid.svg"
+}

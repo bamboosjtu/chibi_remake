@@ -1,0 +1,21 @@
+{
+  "assetId": "terrain-06",
+  "bytes": 3222411.0,
+  "colorType": 6.0,
+  "generatedAt": "2026-10-17T14:29:04.085Z",
+  "generator": "built-in image_gen",
+  "height": 887.0,
+  "prompt": "Use case: style-transfer. Production transparent sprite atlas for the faithful HD remake of 1997 Chinese RTS 三国赤壁. Reference is the exact original WALL geometry. Redesign all grey masonry wall pieces as finely hand-painted late Han Chinese fortified city walls, grey stone foundations, individually legible small rectangular bricks, restrained moss in mortar, weathered top stone paving, crisp stair treads and upper-left lighting. EXACTLY seven equal columns and two equal rows, SAME 14 source slots and row-major poses, preserve every corner direction, stairs, blank slot, orthographic 2:1 slopes, outer silhouette and foot anchor. This is a seamless modular wall kit; matching faces must join without gaps or repeated outline bands. Keep true grey stone, no blue/purple tint, no broad blurry paving, no grass-topped sheer cliff, no modern concrete. Enhance fine authentic carved stone detail; crenellation and red/charcoal guard-post details only where the source geometry permits. Match original canvas ratio 308:154, aim at 3072x1536, transparent immediately around each sprite, no ground platform, text, grid, checkerboard, shadow rectangle, caption or watermark. Do not invent a single complete castle; deliver all source tiles in the precise grid.",
+  "promptFile": "godot/chibi_remake/art/production/ui-wall-prompts-v3.json",
+  "sha256": "fce8d1da3e251ec1a1dd71228b72df6bd1023a659ab7096c75660a51044b821a",
+  "sourceGeneratedFile": "C:/Users/bambo/.codex/generated_images/01a13348-db65-7b23-b66a-63227eb4490d/exec-50f3db09-87f4-4887-a052-95b37f0cf0db.png",
+  "status": "generated-awaiting-validation",
+  "texture": "godot/chibi_remake/art/full/terrain/06-atlas-v2.png",
+  "validation": {
+    "excludedSourceLabelsOrBlanks": 1,
+    "structure": "pass",
+    "visual": "pending",
+    "visualFrameCount": 13
+  },
+  "width": 1774.0
+}

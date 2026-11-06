@@ -1,0 +1,429 @@
+{
+  "schemaVersion": 1,
+  "types": [
+    {
+      "id": 0,
+      "name": "帅帐",
+      "category": "building",
+      "killXp": 150,
+      "morale": 4,
+      "hp": 2400
+    },
+    {
+      "id": 1,
+      "name": "帅帐",
+      "category": "building",
+      "killXp": 150,
+      "morale": 4,
+      "hp": 2400
+    },
+    {
+      "id": 2,
+      "name": "武器库",
+      "category": "building",
+      "killXp": 40,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 3,
+      "name": "武器库",
+      "category": "building",
+      "killXp": 40,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 4,
+      "name": "木材场",
+      "category": "building",
+      "killXp": 40,
+      "morale": 2,
+      "hp": 1200
+    },
+    {
+      "id": 5,
+      "name": "木材场",
+      "category": "building",
+      "killXp": 40,
+      "morale": 2,
+      "hp": 1200
+    },
+    {
+      "id": 6,
+      "name": "骑兵所",
+      "category": "building",
+      "killXp": 80,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 7,
+      "name": "骑兵所",
+      "category": "building",
+      "killXp": 80,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 8,
+      "name": "车兵所",
+      "category": "building",
+      "killXp": 60,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 9,
+      "name": "车兵所",
+      "category": "building",
+      "killXp": 60,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 10,
+      "name": "粮仓",
+      "category": "building",
+      "killXp": 15,
+      "morale": 1,
+      "hp": 800
+    },
+    {
+      "id": 11,
+      "name": "粮仓",
+      "category": "building",
+      "killXp": 15,
+      "morale": 1,
+      "hp": 800
+    },
+    {
+      "id": 12,
+      "name": "步兵所",
+      "category": "building",
+      "killXp": 50,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 13,
+      "name": "步兵所",
+      "category": "building",
+      "killXp": 50,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 14,
+      "name": "弓兵所",
+      "category": "building",
+      "killXp": 50,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 15,
+      "name": "弓兵所",
+      "category": "building",
+      "killXp": 50,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 16,
+      "name": "城门",
+      "category": "building",
+      "killXp": 30,
+      "morale": 2,
+      "hp": 1400
+    },
+    {
+      "id": 17,
+      "name": "城门",
+      "category": "building",
+      "killXp": 30,
+      "morale": 2,
+      "hp": 1400
+    },
+    {
+      "id": 18,
+      "name": "箭楼",
+      "category": "building",
+      "killXp": 40,
+      "morale": 1,
+      "hp": 350
+    },
+    {
+      "id": 19,
+      "name": "箭楼",
+      "category": "building",
+      "killXp": 40,
+      "morale": 1,
+      "hp": 350
+    },
+    {
+      "id": 20,
+      "name": "船坞",
+      "category": "building",
+      "killXp": 80,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 21,
+      "name": "特殊",
+      "category": "building",
+      "killXp": 80,
+      "morale": 2,
+      "hp": 200
+    },
+    {
+      "id": 22,
+      "name": "铁矿",
+      "category": "building",
+      "killXp": 0,
+      "morale": 0,
+      "hp": 10000
+    },
+    {
+      "id": 23,
+      "name": "钱庄",
+      "category": "building",
+      "killXp": 40,
+      "morale": 2,
+      "hp": 1600
+    },
+    {
+      "id": 24,
+      "name": "民居",
+      "category": "building",
+      "killXp": 40,
+      "morale": 1,
+      "hp": 800
+    },
+    {
+      "id": 25,
+      "name": "民居",
+      "category": "building",
+      "killXp": 40,
+      "morale": 1,
+      "hp": 800
+    },
+    {
+      "id": 26,
+      "name": "大旗",
+      "category": "building",
+      "killXp": 50,
+      "morale": 2,
+      "hp": 1000
+    },
+    {
+      "id": 27,
+      "name": "男平民",
+      "category": "unit",
+      "killXp": 0,
+      "morale": 0,
+      "hp": 100
+    },
+    {
+      "id": 28,
+      "name": "女平民",
+      "category": "unit",
+      "killXp": 0,
+      "morale": 0,
+      "hp": 100
+    },
+    {
+      "id": 29,
+      "name": "文将",
+      "category": "unit",
+      "killXp": 10,
+      "morale": 3,
+      "hp": 500
+    },
+    {
+      "id": 30,
+      "name": "工人",
+      "category": "unit",
+      "killXp": 1,
+      "morale": 1,
+      "hp": 100
+    },
+    {
+      "id": 31,
+      "name": "步将",
+      "category": "unit",
+      "killXp": 10,
+      "morale": 3,
+      "hp": 500
+    },
+    {
+      "id": 32,
+      "name": "步兵",
+      "category": "unit",
+      "killXp": 2,
+      "morale": 1,
+      "hp": 100
+    },
+    {
+      "id": 33,
+      "name": "弓将",
+      "category": "unit",
+      "killXp": 10,
+      "morale": 3,
+      "hp": 500
+    },
+    {
+      "id": 34,
+      "name": "车兵",
+      "category": "unit",
+      "killXp": 15,
+      "morale": 2,
+      "hp": 100
+    },
+    {
+      "id": 35,
+      "name": "骑将",
+      "category": "unit",
+      "killXp": 10,
+      "morale": 3,
+      "hp": 500
+    },
+    {
+      "id": 36,
+      "name": "骑兵",
+      "category": "unit",
+      "killXp": 5,
+      "morale": 1,
+      "hp": 100
+    },
+    {
+      "id": 37,
+      "name": "骑兵",
+      "category": "unit",
+      "killXp": 10,
+      "morale": 2,
+      "hp": 200
+    },
+    {
+      "id": 38,
+      "name": "步兵",
+      "category": "unit",
+      "killXp": 4,
+      "morale": 2,
+      "hp": 200
+    },
+    {
+      "id": 39,
+      "name": "弓兵",
+      "category": "unit",
+      "killXp": 4,
+      "morale": 2,
+      "hp": 200
+    },
+    {
+      "id": 40,
+      "name": "骑兵",
+      "category": "unit",
+      "killXp": 25,
+      "morale": 4,
+      "hp": 500
+    },
+    {
+      "id": 41,
+      "name": "步兵",
+      "category": "unit",
+      "killXp": 8,
+      "morale": 3,
+      "hp": 500
+    },
+    {
+      "id": 42,
+      "name": "弓兵",
+      "category": "unit",
+      "killXp": 8,
+      "morale": 3,
+      "hp": 500
+    },
+    {
+      "id": 43,
+      "name": "步兵",
+      "category": "unit",
+      "killXp": 20,
+      "morale": 4,
+      "hp": 1000
+    },
+    {
+      "id": 44,
+      "name": "弓兵",
+      "category": "unit",
+      "killXp": 20,
+      "morale": 4,
+      "hp": 1000
+    },
+    {
+      "id": 45,
+      "name": "弓兵",
+      "category": "unit",
+      "killXp": 2,
+      "morale": 1,
+      "hp": 100
+    },
+    {
+      "id": 46,
+      "name": "水兵",
+      "category": "unit",
+      "killXp": 10,
+      "morale": 1,
+      "hp": 200
+    },
+    {
+      "id": 47,
+      "name": "运输船",
+      "category": "unit",
+      "killXp": 20,
+      "morale": 2,
+      "hp": 100
+    },
+    {
+      "id": 48,
+      "name": "水兵",
+      "category": "unit",
+      "killXp": 25,
+      "morale": 2,
+      "hp": 1000
+    },
+    {
+      "id": 49,
+      "name": "连船",
+      "category": "unit",
+      "killXp": 50,
+      "morale": 4,
+      "hp": 2000
+    },
+    {
+      "id": 50,
+      "name": "短云梯",
+      "category": "unit",
+      "killXp": 20,
+      "morale": 2,
+      "hp": 100
+    },
+    {
+      "id": 51,
+      "name": "长云梯",
+      "category": "unit",
+      "killXp": 30,
+      "morale": 2,
+      "hp": 200
+    },
+    {
+      "id": 48,
+      "name": "旗舰",
+      "category": "unit",
+      "killXp": 10,
+      "morale": 3,
+      "hp": 1000
+    }
+  ]
+}

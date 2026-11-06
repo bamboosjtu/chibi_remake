@@ -1,0 +1,21 @@
+{
+  "assetId": "terrain-09",
+  "bytes": 1332497.0,
+  "colorType": 6.0,
+  "generatedAt": "2026-10-17T23:56:26.368Z",
+  "generator": "built-in image_gen",
+  "height": 724.0,
+  "prompt": "Use case: precise-object-edit. Repaint this EXACT thirteen columns by two rows tile atlas for 三国赤壁. Each cell is a 44x50 continuous wall-walk slice. EXACTLY26 positions, row2 col3 EMPTY. Reproduce each source silhouette, edge, height, direction, straight wall/corner/stair geometry and flat cut-away face. Fine grey stone bricks, understated warm grey walk slabs, small battlements; existing tiny post accents may be charcoal and dark red. NEVER add towers or roofs, big freestanding cubes, battlements in source plain cells, extra thickness or scenery. Neighboring slices must join into one continuous wall with regular small brick courses, not separate miniature castles. Keep source alpha cutouts and source canvas ratio572:100, no outer padding. HD detailed hand-painted masonry with restrained light from upper left, same dark grey palette. Genuine transparency. No labels, text, grid, background or black rectangles.",
+  "promptFile": "godot/chibi_remake/art/production/wall-ui-final-prompts.json",
+  "sha256": "66c348376dc8229f532c9658f24ab8caa66ac1f15279fd2fb13eca4c4e0b2d59",
+  "sourceGeneratedFile": "C:/Users/bambo/.codex/generated_images/01a13348-db65-7b23-b66a-63227eb4490d/exec-14a7e771-2c9c-4a6e-b9b7-4f71ad7b3aa7.png",
+  "status": "generated-awaiting-validation",
+  "texture": "godot/chibi_remake/art/full/terrain/09-atlas-v3.png",
+  "validation": {
+    "excludedSourceLabelsOrBlanks": 1,
+    "structure": "pass",
+    "visual": "pending",
+    "visualFrameCount": 25
+  },
+  "width": 2171.0
+}
