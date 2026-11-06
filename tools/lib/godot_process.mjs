@@ -9,7 +9,9 @@ export async function runGodot({engine, args, directory, name, markers = [], tim
   fs.mkdirSync(profile, {recursive: true});
   const started = Date.now();
   const child = spawn(engine, args, {windowsHide: true, env: {...process.env,
-    APPDATA: profile, LOCALAPPDATA: profile, ...env}});
+    APPDATA: profile, LOCALAPPDATA: profile,
+    XDG_DATA_HOME: path.join(profile, 'data'), XDG_CACHE_HOME: path.join(profile, 'cache'),
+    XDG_CONFIG_HOME: path.join(profile, 'config'), ...env}});
   let output = '', timedOut = false, stopping = false, errorTimer;
   const stop = () => {
     if (stopping || !child.pid) return;

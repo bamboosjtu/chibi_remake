@@ -200,12 +200,23 @@ func _run() -> void:
 	assert(battle.rules.tick() == 0 and battle.task_events.size() == 1)
 	battle.units = actual_units
 	print("ARCH-020 PASS: missions 14/30 proximity, 19/20/29 orders and experience, 27 event")
-	var stream = load("res://presentation/battle/terrain_stream.gd").new(battle, "chibil8")
+	# Budget arithmetic must work in a clean checkout without baked terrain.
+	# A synthetic map avoids loading gate patches or requiring LFS textures.
+	var stream = load("res://presentation/battle/terrain_stream.gd").new(battle, "__budget_fixture__")
+	for i in range(100):
+		stream.chunks.append({"rect":[i*256,0,256,256],"lods":{
+			"4":{"bytes":1024*1024*4},
+			"2":{"bytes":512*512*4},
+			"1":{"bytes":256*256*4},
+		}})
 	var all := []
 	for i in range(stream.chunks.size()):
 		all.append(i)
 	assert(stream.estimate(all, 4) > stream.budget)
 	assert(stream.estimate(all.slice(0, 10), 4) <= stream.budget)
+	assert(stream.estimate(all, 4) == 100*1024*1024*4)
+	assert(stream.estimate(all, 2) <= stream.resident_limit())
+	assert(stream.estimate(all, 1)*4 == stream.estimate(all, 2))
 	stream.free()
 	print("ARCH-022 budget selection PASS")
 	battle.free()
