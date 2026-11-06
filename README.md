@@ -6,8 +6,6 @@
 
 ## 下载
 
-**v0.1.0 预发布（2026-10-31）**：[GitHub Releases 发布页面](https://github.com/bamboosjtu/chibi_remake/releases/tag/v0.1.0)
-
 [![《三国赤壁 · 高清重制》v0.1.0 宣传海报](docs/assets/poster.jpg)](https://github.com/bamboosjtu/chibi_remake/releases/tag/v0.1.0)
 
 当前为预发布版本；下载包、更新说明与问题反馈见发布页面。发布资产按 900 MiB 分卷，下载后运行 `join-release.ps1` 合并分卷并校验 SHA256，再启动 `ChibiRTS.exe`。
