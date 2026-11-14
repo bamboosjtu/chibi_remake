@@ -1,4 +1,7 @@
 extends RefCounted
+var view_microseconds := 0
+var hud_microseconds := 0
+var interpolation_microseconds := 0
 ## scene controller: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
@@ -275,7 +278,9 @@ func _process(delta: float) -> void:
 	if not battle.map_data.has("terrainW"):
 		return
 	# 表现层：相机与鼠标反馈用真实 delta（与模拟解耦）
+	var view_begin:=Time.get_ticks_usec()
 	_view_frame(delta)
+	view_microseconds+=Time.get_ticks_usec()-view_begin
 	# 模拟层：固定步长推进（ARCH-010）
 	battle.sim_acc = battle.sim_acc + delta if battle.game_end == 0 else 0.0
 	var steps := 0
@@ -304,8 +309,14 @@ func _process(delta: float) -> void:
 			scene.feedback_until = Time.get_ticks_msec() + 2500
 		elif battle.feedback_text != "" and Time.get_ticks_msec() > scene.feedback_until:
 			battle.feedback_text = ""
+		var hud_begin:=Time.get_ticks_usec()
 		_view_hud()
-	if scene.view!=null:scene.view.interpolate_motion(clampf(battle.sim_acc/period,0.0,1.0))
+		hud_microseconds+=Time.get_ticks_usec()-hud_begin
+	if scene.view!=null:
+		scene.view.flush_visuals(true)
+		var interpolate_begin:=Time.get_ticks_usec()
+		scene.view.interpolate_motion(clampf(battle.sim_acc/period,0.0,1.0))
+		interpolation_microseconds+=Time.get_ticks_usec()-interpolate_begin
 
 func _view_frame(delta: float) -> void:
 	_edge_scroll(delta)              # 相机滚屏（转发到 battle_view）

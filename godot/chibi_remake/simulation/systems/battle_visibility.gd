@@ -48,6 +48,19 @@ func _reveal(cells: PackedInt32Array, change: int) -> bool:
 			explored[index] = 1; changed = true
 	return changed
 
+## Both footprints are sorted by row-major index. Shared cells keep their
+## reveal count, avoiding a full remove/add and transient fog invalidations.
+func _replace(previous: PackedInt32Array, next: PackedInt32Array) -> bool:
+	var removed:=PackedInt32Array();var added:=PackedInt32Array();var a:=0;var b:=0
+	while a<previous.size() and b<next.size():
+		if previous[a]==next[b]:a+=1;b+=1
+		elif previous[a]<next[b]:removed.append(previous[a]);a+=1
+		else:added.append(next[b]);b+=1
+	while a<previous.size():removed.append(previous[a]);a+=1
+	while b<next.size():added.append(next[b]);b+=1
+	var changed:=_reveal(removed,-1)
+	return _reveal(added,1) or changed
+
 func update(units: Array, player: int) -> void:
 	var active := {}
 	var changed := false
@@ -62,9 +75,8 @@ func update(units: Array, player: int) -> void:
 		var vision := effective_vision(unit)
 		var old: Dictionary = _sources.get(key, {})
 		if not old.is_empty() and old.position == position and old.vision == vision: continue
-		if not old.is_empty(): changed = _reveal(old.cells, -1) or changed
 		var cells := _cells(position, vision)
-		changed = _reveal(cells, 1) or changed
+		changed = _replace(old.get("cells",PackedInt32Array()),cells) or changed
 		_sources[key] = {"position":position,"vision":vision,"cells":cells}
 	for key in _sources.keys():
 		if active.has(key): continue

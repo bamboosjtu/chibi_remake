@@ -23,11 +23,14 @@ export async function runGodot({engine, args, directory, name, markers = [], tim
     else child.kill();
   };
   const log = path.join(directory, name + '.log');
+  fs.writeFileSync(log, "");
   const append = chunk => {
     output += chunk;
-    fs.writeFileSync(log, output);
+    fs.appendFileSync(log, chunk);
     if (isEngineFailure(output) && !errorTimer) errorTimer = setTimeout(stop, 25);
   };
+  child.stdout.setEncoding('utf8');
+  child.stderr.setEncoding('utf8');
   child.stdout.on('data', append);
   child.stderr.on('data', append);
   const timer = setTimeout(() => {

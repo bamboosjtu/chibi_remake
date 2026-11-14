@@ -3,6 +3,7 @@ extends RefCounted
 const STATUS_FIELDS := {1:"inspired_t",2:"haste_t",3:"slow_t",4:"farsight_t",5:"confused_t",6:"ambush_t",7:"rolling_t"}
 const CONFUSION := 0x1B
 const ROLLING := 0x1C
+const ACTIVE_TASKS := [CONFUSION,ROLLING]
 static var tuning:Dictionary={}
 const Access = preload("res://simulation/ports/stratagem_rules_access.gd")
 var host: Access
@@ -41,14 +42,16 @@ static func set_status(unit:Dictionary, state:int) -> void:
 		if int(unit.get("effect_task",0))!=task and task not in unit.effect_tasks:unit.effect_tasks.append(task)
 
 static func active(unit:Dictionary) -> bool:
-	return int(unit.get("effect_task",0)) in [CONFUSION,ROLLING]
+	return int(unit.get("effect_task",0)) in ACTIVE_TASKS
 
 static func task_alive(unit:Dictionary, task:int) -> bool:
 	return int(unit.get("confused_t" if task==CONFUSION else "rolling_t",0))>0
 
 static func begin_update(unit:Dictionary) -> void:
+	var pending=unit.get("effect_tasks")
+	if int(unit.get("effect_task",0))==0 and (pending==null or pending.is_empty()):return
 	if active(unit) and not task_alive(unit,int(unit.effect_task)):unit.effect_task=0
-	var pending:Array=unit.get("effect_tasks",[])
+	if pending==null:pending=[]
 	while not active(unit) and str(unit.get("state",""))=="idle" and not pending.is_empty() \
 			and not bool(unit.get("attached",false)) and int(unit.get("site_inside_uid",-1))<0:
 		var task:int=int(pending.pop_front())
@@ -56,7 +59,7 @@ static func begin_update(unit:Dictionary) -> void:
 	unit.effect_tasks=pending
 
 func step_effects(unit:Dictionary) -> void:
-	if int(unit.get("rolling_t",0))<=0:unit.rolling_ticks=0
+	if int(unit.get("rolling_t",0))<=0 and int(unit.get("rolling_ticks",0))!=0:unit.rolling_ticks=0
 	if int(unit.get("effect_task",0))!=ROLLING or not task_alive(unit,ROLLING) or not eligible(unit,int(unit.owner)):return
 	unit.rolling_ticks=int(unit.get("rolling_ticks",0))+1
 	if int(unit.rolling_ticks)<30:return

@@ -12,8 +12,9 @@ func _init(data: UIState, node: Node2D) -> void:
 
 func update_panel() -> void:
 	var sel: Array = _ui.host.selected
-	if panel_kind()!="combat":_ui.art_sub=""
-	if panel_kind()!="worker":_ui.build_menu=false
+	var kind:=panel_kind()
+	if kind!="combat":_ui.art_sub=""
+	if kind!="worker":_ui.build_menu=false
 	ports._refresh_metrics()
 	ports._refresh_banner()
 	ports._refresh_sel_frame()
@@ -262,6 +263,7 @@ func cmd_box_ready() -> bool:
 	return _ui.cmd_hint != null and _ui.cmd_buttons.size() > 0
 
 func _refresh_hotkeys() -> void:
+	var groups: Array=_ui.host.commands.military.control_group_summaries()
 	var b: Dictionary = ports._selected_building()
 	var tts: Array = _ui.host.commands.economy.train_types_for(int(b.unit)) if not b.is_empty() else []
 	for i in range(_ui.hot_buttons.size()):
@@ -274,8 +276,8 @@ func _refresh_hotkeys() -> void:
 		# 编队优先：原版左缘 1..10 就是编队热键（main 已实现 Ctrl+数字 编入 / 数字 呼出）。
 		# **组为空时才回退到生产热键** —— 与 main 的按键回退规则完全一致，
 		# 否则同一个数字键在 HUD 上和键盘上会有两种含义。
-		var gsz: int = int(_ui.host.commands.military.control_group_size(i + 1))
-		var working_site: Dictionary = _ui.host.commands.military.control_group_work_site(i + 1)
+		var gsz: int = int(groups[i].count)
+		var working_site: String=str(groups[i].workSiteName)
 		var work_badge: Label = e.work_badge
 		work_badge.visible = not working_site.is_empty()
 		work_badge.position = Vector2(14, 12) * _ui.ui_scale
@@ -285,7 +287,7 @@ func _refresh_hotkeys() -> void:
 			act = ports._act_group.bind(i + 1)
 			usable = true
 			tip = "呼出编队 %d（%d 个单位）· Ctrl+%d 把当前选择编入" % [i + 1, gsz, i + 1]
-			if not working_site.is_empty(): tip += "\n正在建造%s（队伍在建筑内）" % str(working_site.name)
+			if not working_site.is_empty(): tip += "\n正在建造%s（队伍在建筑内）" % working_site
 		elif i < tts.size():
 			var tt: Dictionary = tts[i]
 			if b.is_empty():

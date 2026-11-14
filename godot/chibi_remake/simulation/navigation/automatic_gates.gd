@@ -4,19 +4,25 @@ extends RefCounted
 ## column; state is derived from positions so snapshot restores are deterministic.
 
 func update(nav, units: Array) -> void:
+	if nav.gates.is_empty():return
+	var rx: float=nav.tile_w*2.5;var ry: float=nav.tile_hh*8.0
+	var buckets: Dictionary={}
+	for unit: Dictionary in units:
+		if bool(unit.is_building) or not bool(unit.alive) or float(unit.get("die_t",-1))>=0 or bool(unit.get("attached",false)) or int(unit.get("site_inside_uid",-1))>=0:continue
+		var key:=Vector3i(int(unit.owner),floori(float(unit.ax)/rx),floori(float(unit.ay)/ry))
+		if not buckets.has(key):buckets[key]=[]
+		(buckets[key] as Array).append(unit)
 	for gate in nav.gates.duplicate():
 		if not bool(gate.alive) or float(gate.get("die_t", -1.0)) >= 0.0:
 			nav.remove_gate(gate)
 			continue
 		var opened := false
 		if not bool(gate.get("site", false)):
-			var rx: float = nav.tile_w * 2.5
-			var ry: float = nav.tile_hh * 8.0
-			for unit in units:
-				if bool(unit.is_building) or not bool(unit.alive) or float(unit.get("die_t", -1.0)) >= 0.0:
-					continue
-				if int(unit.owner) != int(gate.owner) or bool(unit.get("attached", false)) or int(unit.get("site_inside_uid", -1)) >= 0:
-					continue
+			var nearby: Array=[]
+			for x in range(floori((float(gate.ax)-rx)/rx),floori((float(gate.ax)+rx)/rx)+1):
+				for y in range(floori((float(gate.ay)-ry)/ry),floori((float(gate.ay)+ry)/ry)+1):
+					nearby.append_array(buckets.get(Vector3i(int(gate.owner),x,y),[]))
+			for unit: Dictionary in nearby:
 				var dx: float = (float(unit.ax) - float(gate.ax)) / rx
 				var dy: float = (float(unit.ay) - float(gate.ay)) / ry
 				var in_mouth: bool = absf(float(unit.ax)-float(gate.ax)) <= nav.tile_w*0.65 and absf(float(unit.ay)-float(gate.ay)) <= nav.tile_hh*2

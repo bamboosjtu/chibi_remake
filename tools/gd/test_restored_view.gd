@@ -49,6 +49,7 @@ func restored_mask() -> void:
 	battle.visibility.setup(Vector2(battle.map_data.terrainW,battle.map_data.terrainH))
 	battle.visibility.update(battle.units,battle.player_owner)
 	battle.view.fog_sprite._process(0)
+	if DisplayServer.get_name()!="headless":await RenderingServer.frame_post_draw
 	assert(mask_alpha(visible)==1.0)
 	battle.cam.position=visible;battle.view.clamp_camera()
 	for child in battle.view.get_children():
@@ -61,6 +62,7 @@ func restored_mask() -> void:
 	assert(battle.saver.apply_snapshot(saved))
 	assert(not is_same(previous,battle.visibility) and is_same(battle.view.fog_sprite.visibility,battle.visibility))
 	battle.view.fog_sprite._process(0)
+	if DisplayServer.get_name()!="headless":await RenderingServer.frame_post_draw
 	assert(is_zero_approx(mask_alpha(visible)),"loaded army must clear the real rendered mask")
 	assert(is_equal_approx(mask_alpha(remembered),165.0/255.0),"explored fog must remain translucent")
 	assert(mask_alpha(unknown)==1.0,"unexplored terrain must remain opaque")

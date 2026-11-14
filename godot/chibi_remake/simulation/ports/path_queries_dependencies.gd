@@ -46,7 +46,17 @@ func _refresh_gate_points() -> void:
 	if provider == null: return
 	provider._refresh_gate_points()
 
-const CONTRACTS := {"grid": ["_grid", "_id", "_in_bounds", "_refresh_gate_points", "anchor_of", "cell_of_px", "is_solid", "near_walkable", "neighbors"]}
+func open_route_gates(owner: int, layer: int) -> Array:
+	var provider = _require(_provider_grid, "grid")
+	if provider == null: return []
+	return provider.open_route_gates(owner,layer)
+
+func close_route_gates(ids: Array) -> void:
+	var provider = _require(_provider_grid, "grid")
+	if provider == null: return
+	provider.close_route_gates(ids)
+
+const CONTRACTS := {"grid": ["open_route_gates", "close_route_gates", "_grid", "_id", "_in_bounds", "_refresh_gate_points", "anchor_of", "cell_of_px", "is_solid", "near_walkable", "neighbors"]}
 var _provider_grid: WeakRef
 
 func connect_services(services: Dictionary) -> Array:

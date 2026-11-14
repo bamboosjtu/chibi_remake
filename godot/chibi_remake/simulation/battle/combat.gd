@@ -5,6 +5,7 @@ const Config = preload("res://simulation/battle_config.gd")
 const Dependencies = preload("res://simulation/ports/combat_dependencies.gd")
 var battle: State
 var ports := Dependencies.new()
+var _contact_cache: Dictionary={}
 
 func _init(data: State) -> void:
 	battle = data
@@ -27,13 +28,12 @@ func _apply_hit(target: Dictionary, damage: float, source_uid: int) -> void:
 	if battle.cheat_invulnerable and int(target.owner) == battle.player_owner: return
 	target.hp -= damage; target["last_attacker_uid"] = source_uid
 	if target.hp < 1:
-		var sources := battle.units.filter(func(unit):return int(unit.uid)==source_uid)
-		_kill(target,sources[0] if not sources.is_empty() else {})
+		_kill(target,ports.unit_by_uid(source_uid))
 
 func _projectile_arrived(effect: Dictionary) -> void:
 	if effect.kind in ["arrow","ambush"]:
-		var targets := battle.units.filter(func(unit):return int(unit.uid)==int(effect.targetUid))
-		if not targets.is_empty(): _apply_hit(targets[0],float(effect.damage),int(effect.sourceUid))
+		var target := ports.unit_by_uid(int(effect.targetUid))
+		if not target.is_empty(): _apply_hit(target,float(effect.damage),int(effect.sourceUid))
 	else:
 		var cell := Vector2i(int(effect.a),int(effect.b))
 		for target in battle.units:
@@ -79,27 +79,24 @@ func _nearest_enemy(u: Dictionary, max_d: float) -> Dictionary:
 	return best
 
 func _melee_line_clear(a: Dictionary, b: Dictionary) -> bool:
+	var from := Vector2(float(a.ax), float(a.ay));var to := Vector2(float(b.ax), float(b.ay))
+	var layer := ports._nav_layer(a);var version: int=battle.nav.version
+	var uid:=int(a.uid);var key: Array=[int(b.uid),from,to,int(a.unit),int(b.unit),layer,version]
+	var previous: Dictionary=_contact_cache.get(uid,{})
+	if previous.get("key",[])==key:return bool(previous.clear)
 	var ignore := {}
 	for raw in ports._footprint_cells(a): ignore[raw] = true
 	for raw in ports._footprint_cells(b): ignore[raw] = true
-	var layer := ports._nav_layer(a)
-	var from := Vector2(float(a.ax), float(a.ay))
-	var to := Vector2(float(b.ax), float(b.ay))
-	var count := maxi(1, int(ceil(from.distance_to(to) / (battle.tile_hh * 0.25))))
-	for i in range(count + 1):
-		var p := from.lerp(to, float(i) / count)
-		var c := battle.nav.cell_of_px(p.x, p.y)
-		if ignore.has(c):
-			continue
-		if battle.nav.is_solid(c, layer):
-			return false
-	return true
+	var clear: bool=battle.nav.contact_clear(from,to,ignore,layer)
+	_contact_cache[uid]={"key":key,"clear":clear}
+	return clear
 
 func officer_rank_name(off: Dictionary) -> String:
 	return str(preload("res://simulation/systems/officer_progression.gd").cell(off).rank)
 
 func _kill(u: Dictionary, by: Dictionary = {}) -> void:
 	if u.die_t >= 0 or not u.alive: return
+	_contact_cache.erase(int(u.uid))
 	if by.is_empty():
 		for attacker in battle.units:
 			if int(attacker.uid)==int(u.get("last_attacker_uid",-1)):by=attacker;break

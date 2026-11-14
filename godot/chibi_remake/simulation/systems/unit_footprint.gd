@@ -2,6 +2,9 @@ extends RefCounted
 ## CONF-20 单位占格形状。偏移直接加在锚点格上；按锚点格 y 的奇偶选表。
 ## 档 0=1 格、1=4 格、2=9 格、3=16 格；档 N 取前 N*N 项。
 
+const SINGLE := [Vector2i.ZERO]
+static var _offsets: Dictionary={}
+
 const EVEN := [
 	Vector2i(0, 0), Vector2i(-1, -1), Vector2i(0, -1), Vector2i(0, -2),
 	Vector2i(-1, -2), Vector2i(-1, -3), Vector2i(1, -2), Vector2i(0, -3),
@@ -34,10 +37,12 @@ static func class_of(unit_id: int) -> int:
 static func offsets(cls: int, anchor_y: int) -> Array:
 	var side := int(cls) + 1
 	var count := side * side
-	if count <= 1:
-		return [Vector2i.ZERO]
-	var table: Array = ODD if (anchor_y & 1) == 1 else EVEN
-	return table.slice(0, mini(count, table.size()))
+	if count <= 1:return SINGLE
+	var key:=Vector2i(mini(count,16),anchor_y&1)
+	if not _offsets.has(key):
+		var table: Array=ODD if key.y==1 else EVEN
+		var result:=table.slice(0,key.x);result.make_read_only();_offsets[key]=result
+	return _offsets[key]
 
 static func shape(unit_id: int, anchor: Vector2i) -> Array:
 	var cls := class_of(unit_id)

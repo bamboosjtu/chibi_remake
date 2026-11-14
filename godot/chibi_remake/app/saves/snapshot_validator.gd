@@ -22,7 +22,7 @@ func _valid_control_fields(simulation: Dictionary) -> bool:
 
 func _compatible_rules(simulation: Dictionary) -> bool:
 	if simulation.has("rulesRevision"):
-		if simulation.rulesRevision != preload("res://app/saves/rules_identity.gd").current():
+		if simulation.rulesRevision != preload("res://app/saves/rules_identity.gd").current() and not preload("res://app/saves/rules_identity.gd").approved_migration(str(simulation.rulesRevision)):
 			compatibility_error="存档使用的规则版本与当前不同，未配置迁移；当前战场和存档均保留。";return false
 		if simulation.get("rulesPolicy","") != "legacy-adopts-current; fingerprinted-requires-match": return false
 	if str(simulation.get("contentRevision", "")) != content_revision.call():
@@ -66,6 +66,7 @@ func prepare(d: Dictionary, arr: Array) -> Dictionary:
 			if not point is Array or point.size() != 2:
 				return {}
 		if not _valid_destination(rec.simulation.get("repathTo")): return {}
+		if rec.simulation.has("route_failures") and (not _valid_integer.call(rec.simulation.route_failures) or float(rec.simulation.route_failures)>3): return {}
 		if rec.simulation.has("blocked_n") and not _valid_integer.call(rec.simulation.blocked_n): return {}
 		ids[uid] = rec
 	# ---- REQ-002：世界修改前**完整**校验（地形键/编组/资源/武将池/训练队列/采集引用/新字段类型） ----

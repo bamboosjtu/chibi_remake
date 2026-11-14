@@ -12,8 +12,9 @@ func _init(data: State) -> void:
 func _group_units(n: int) -> Array:
 	var out: Array = []
 	var ids: Array = battle.control_groups.get(n, [])
+	if ids.is_empty():return out
 	for u in battle.units:
-		if u.alive and u.die_t<0 and int(u.owner)==battle.player_owner and not bool(u.get("attached",false)) and int(u.uid) in ids:
+		if int(u.uid) in ids and u.alive and u.die_t<0 and int(u.owner)==battle.player_owner and not bool(u.get("attached",false)):
 			out.append(u)
 	return out
 
@@ -74,6 +75,7 @@ func _cmd_watch() -> void:
 		ports._feedback("没有可警戒的部队")
 
 func _cancel_unit_command(u: Dictionary) -> void:
+	u["route_failures"]=0
 	battle.construction.leave(u)
 	u["site_follow_uid"] = -1
 	preload("res://simulation/systems/action_clock.gd").reset(u)
@@ -219,3 +221,28 @@ func stop_selected() -> void:
 		count += 1
 	if count > 0:
 		ports._feedback("停止")
+
+## HUD query: one world pass for all ten slots, with value-only records. Empty
+## slots and unrelated units do not trigger twenty repeated eligibility scans.
+func control_group_summaries() -> Array:
+	var result: Array=[];var memberships: Dictionary={}
+	for slot in range(1,11):
+		result.append({"count":0,"workSiteName":""})
+		for raw in battle.control_groups.get(slot,[]):
+			var uid:=int(raw)
+			if not memberships.has(uid):memberships[uid]={}
+			memberships[uid][slot-1]=true
+	if not memberships.is_empty():
+		for unit: Dictionary in battle.units:
+			var uid:=int(unit.uid)
+			if not memberships.has(uid) or not unit.alive or unit.die_t>=0 or int(unit.owner)!=battle.player_owner or bool(unit.get("attached",false)):continue
+			var site_id:=int(unit.get("site_inside_uid",-1))
+			if site_id<0:site_id=int(unit.get("site_follow_uid",-1))
+			var site: Dictionary=battle.construction.site_for(site_id) if site_id>=0 else {}
+			var site_name: String=str(site.name) if battle.construction.active(site) else ""
+			for index in memberships[uid]:
+				result[index].count+=1
+				if result[index].workSiteName=="":result[index].workSiteName=site_name
+	for item in result:item.make_read_only()
+	result.make_read_only()
+	return result

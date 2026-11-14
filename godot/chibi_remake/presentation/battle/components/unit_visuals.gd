@@ -6,6 +6,31 @@ var _ui: UIState
 var surface: Node2D
 var ports = preload("res://presentation/battle/components/ports/unit_visuals_dependencies.gd").new()
 const Textures = preload("res://presentation/battle/runtime_textures.gd")
+var pending_visuals := {}
+var _world_dirty := false
+var sync_calls := 0
+var sync_microseconds := 0
+
+func queue_visual(unit: Dictionary) -> void:
+	pending_visuals[int(unit.uid)]=true
+
+func queue_world_visuals() -> void:
+	_world_dirty=true
+
+func flush_visuals(interpolating := false) -> void:
+	if not _world_dirty and pending_visuals.is_empty():return
+	var begin:=Time.get_ticks_usec()
+	# Resolve UIDs against the current world: queued old-world dictionaries must
+	# never survive a load/rollback and overwrite the new presentation.
+	var context:=_visual_context();context["interpolating"]=interpolating
+	for unit in _ui.host.units:
+		if _world_dirty or pending_visuals.has(int(unit.uid)):
+			update_visual(unit,context);place_unit(unit);sync_calls+=1
+	pending_visuals.clear();_world_dirty=false
+	sync_microseconds+=Time.get_ticks_usec()-begin
+
+func performance_counters() -> Dictionary:
+	return {"syncCalls":sync_calls,"syncMicroseconds":sync_microseconds}
 
 const FRAME_TICKS = preload("res://simulation/definitions/action_visual.gd").FRAME_TICKS # Presentation sampling; simulation owns gait state.
 
@@ -98,18 +123,20 @@ func capture_motion() -> void:
 			_ui._gait_previous[int(unit.uid)]=float(unit.get("walk_tick",0))
 
 func interpolate_motion(alpha: float) -> void:
+	var tile_width: float=_ui.host.tile_w;var half_height: float=_ui.host.tile_hh
 	for unit in _ui.host.units:
 		if bool(unit.is_building) or not unit.alive:continue
-		if unit_nodes(unit).get("spr")==null or not unit_nodes(unit).spr.visible:continue
+		var nodes:=unit_nodes(unit)
+		if nodes.get("spr")==null or not nodes.spr.visible:continue
 		var current:=Vector2(float(unit.ax),float(unit.ay))
 		var previous: Vector2=_ui._motion_previous.get(int(unit.uid),current)
 		# Embarking, unloading and explicit relocation must snap, not slide through walls.
-		var point:=previous.lerp(current,alpha) if previous.distance_squared_to(current)<_ui.host.tile_w*_ui.host.tile_w else current
-		if unit_nodes(unit).get("spr")!=null:
-			unit_nodes(unit).spr.position=point-Vector2(float(unit.w)*0.5,float(unit.h));unit_nodes(unit).spr.z_index=int(point.y)
-		if unit_nodes(unit).get("diamond")!=null:
-			unit_nodes(unit).diamond.position=point-Vector2(0,float(_ui.host.tile_hh));unit_nodes(unit).diamond.z_index=int(point.y)-1
-		if unit_nodes(unit).get("hbar")!=null:unit_nodes(unit).hbar.position=point-Vector2(11,float(unit.h)+9)
+		var point:=previous.lerp(current,alpha) if previous.distance_squared_to(current)<tile_width*tile_width else current
+		if nodes.get("spr")!=null:
+			nodes.spr.position=point-Vector2(float(unit.w)*0.5,float(unit.h));nodes.spr.z_index=int(point.y)
+		if nodes.get("diamond")!=null:
+			nodes.diamond.position=point-Vector2(0,half_height);nodes.diamond.z_index=int(point.y)-1
+		if nodes.get("hbar")!=null:nodes.hbar.position=point-Vector2(11,float(unit.h)+9)
 		if float(unit.get("die_t",-1)) < 0 and bool(unit.get("moved",false)):
 			var now:float=float(unit.get("walk_tick",0))
 			var before:float=_ui._gait_previous.get(int(unit.uid),now)
@@ -139,30 +166,43 @@ func set_unit_attached(u: Dictionary, attached: bool) -> void:
 	if hb != null and attached:
 		hb.visible = false
 
-func update_visual(u: Dictionary) -> void:
+func _visual_context() -> Dictionary:
+	var selected: Dictionary={}
+	for unit in _ui.host.selected:selected[int(unit.uid)]=true
+	var camera=_ui.host.cam;var area:=Rect2();var has_camera: bool=camera!=null
+	if has_camera:
+		var size: Vector2=surface.get_viewport_rect().size/camera.zoom
+		area=Rect2(camera.position-size*0.5,size).grow(128)
+	return {"selected":selected,"player":int(_ui.host.player_owner),"buildings":bool(_ui.host.show_buildings),"units":bool(_ui.host.show_units),"sides":_ui.host.sec_visible,"visibility":_ui.host.visibility,"camera":has_camera,"area":area,"halfHeight":float(_ui.host.tile_hh)}
+
+func update_visual(u: Dictionary, context: Dictionary={}) -> void:
+	if context.is_empty():context=_visual_context()
+	var nodes:=unit_nodes(u)
 	var vis: bool
 	if bool(u.is_building):
-		vis = bool(_ui.host.show_buildings) and bool(_ui.host.sec_visible.get(u.owner, true))
+		vis = context.buildings and bool(context.sides.get(u.owner,true))
 	else:
-		vis = bool(_ui.host.show_units) and bool(_ui.host.sec_visible.get(u.owner, true))
+		vis = context.units and bool(context.sides.get(u.owner,true))
 		# 装载中的单位（模式 0xC）不在图上：由运输船携带，不画精灵/选中框/血条。
 		if bool(u.get("attached", false)) or int(u.get("site_inside_uid", -1)) >= 0:
 			vis = false
-	if int(u.owner) != int(_ui.host.player_owner):
-		vis = vis and _ui.host.visibility.is_visible(Vector2(u.ax, u.ay))
-	if vis and not bool(u.is_building) and _ui.host.cam!=null:
-		var size: Vector2=surface.get_viewport_rect().size/_ui.host.cam.zoom
-		var area:=Rect2(_ui.host.cam.position-size*0.5,size).grow(128)
-		vis=area.has_point(Vector2(float(u.ax),float(u.ay)-float(u.h)*0.5))
-	var sel: Array = _ui.host.selected
-	var spr = unit_nodes(u).get("spr", null)
+	if int(u.owner)!=int(context.player):
+		vis=vis and context.visibility.is_visible(Vector2(u.ax,u.ay))
+	if vis and not bool(u.is_building) and context.camera:
+		vis=(context.area as Rect2).has_point(Vector2(float(u.ax),float(u.ay)-float(u.h)*0.5))
+	if not vis:
+		for key in ["spr","diamond","hbar"]:
+			if nodes.get(key)!=null:nodes[key].visible=false
+		return # Invisible geometry/poses are sampled when the unit becomes visible.
+
+	var spr = nodes.get("spr", null)
 	if spr != null:
 		spr.visible = vis
 		spr.z_index = int(u.ay)          # 按底边排序：单位与建筑统一
-	var dia = unit_nodes(u).get("diamond", null)
+	var dia = nodes.get("diamond", null)
 	if dia != null:
-		dia.visible = vis and (u in sel)
-		dia.position = Vector2(float(u.ax), float(u.ay) - float(_ui.host.tile_hh))
+		dia.visible = vis and context.selected.has(int(u.uid))
+		dia.position = Vector2(float(u.ax), float(u.ay) - float(context.halfHeight))
 		dia.z_index=int(u.ay)-1
 		if bool(u.is_building):
 			dia.z_index=int(u.ay)-1 # Ground outline is occluded by the building itself.
@@ -174,7 +214,7 @@ func update_visual(u: Dictionary) -> void:
 				if not outline.is_empty():outline.append(outline[0])
 				dia.points=outline;dia.set_meta("footprint",cells.duplicate())
 	if not bool(u.is_building) and not vis:
-		if unit_nodes(u).get("hbar")!=null:unit_nodes(u).hbar.visible=false
+		if nodes.get("hbar")!=null:nodes.hbar.visible=false
 		return # Fogged/offscreen units must not load unseen HD animation pages.
 	if float(u.get("die_t",-1)) >= 0:
 		var rule = preload("res://simulation/definitions/death_visual.gd")
@@ -182,26 +222,26 @@ func update_visual(u: Dictionary) -> void:
 		if frame >= 0: set_frame(u,frame)
 		else: hide_unit(u)
 		fade_unit(u,rule.alpha(u,float(u.die_t)))
-		if unit_nodes(u).get("hbar") != null: unit_nodes(u).hbar.hide()
-		if unit_nodes(u).get("diamond") != null: unit_nodes(u).diamond.hide()
+		if nodes.get("hbar") != null: nodes.hbar.hide()
+		if nodes.get("diamond") != null: nodes.diamond.hide()
 		return
 	if bool(u.is_building):
 		set_frame(u, (1 if bool(u.get("gate_open", false)) else 0) if int(u.unit) in [16, 17] and not bool(u.get("site", false)) else int(u.get("build_frame", 0)))
-		if unit_nodes(u).has("gate_module"):
-			unit_nodes(u).skin.visible = false
-			unit_nodes(u).gate_module.visible = not bool(u.get("site",false))
-			unit_nodes(u).gate_module.update_open(bool(u.get("gate_open",false)))
-			unit_nodes(u).gate_interior.visible = bool(u.get("gate_open",false)) and not bool(u.get("site",false))
-	else:
+		if nodes.has("gate_module"):
+			nodes.skin.visible = false
+			nodes.gate_module.visible = not bool(u.get("site",false))
+			nodes.gate_module.update_open(bool(u.get("gate_open",false)))
+			nodes.gate_interior.visible = bool(u.get("gate_open",false)) and not bool(u.get("site",false))
+	elif not bool(u.get("moved",false)) or not bool(context.get("interpolating",false)):
 		_apply_mobile_pose(u)
 	var hurt: bool = float(u.hp) < float(u.maxhp) - 0.5
-	var bar = unit_nodes(u).get("hbar", null)
+	var bar = nodes.get("hbar", null)
 	if bar != null:
 		bar.visible = vis and hurt
 		if hurt:
 			bar.position = Vector2(float(u.ax) - 11, float(u.ay) - float(u.h) - 9)
 			var r: float = clampf(float(u.hp) / float(u.maxhp), 0.0, 1.0)
-			var fill = unit_nodes(u).get("hfill", null)
+			var fill = nodes.get("hfill", null)
 			if fill != null:
 				fill.size = Vector2(20.0 * r, 2)
 				fill.color = Color(1.0 - r * 0.8, r * 0.9 + 0.1, 0.15)
@@ -232,20 +272,21 @@ func _apply_mobile_pose(u: Dictionary, gait_tick := -1.0) -> void:
 	set_frame(u,frame if frame>=0 else 0)
 
 func set_frame(u: Dictionary, f: int) -> void:
+	var nodes:=unit_nodes(u)
 	if f < 0 or int(u.count) <= 0:
 		return
 	f = f % int(u.count)               # R8：夹取，避免 count<8 时取到填充格
-	if unit_nodes(u).has("frame") and int(unit_nodes(u).frame)==f:return
-	var spr = unit_nodes(u).get("spr", null)
-	var skin: Sprite2D = unit_nodes(u).get("skin", null)
+	if nodes.has("frame") and int(nodes.frame)==f:return
+	var spr = nodes.get("spr", null)
+	var skin: Sprite2D = nodes.get("skin", null)
 	if skin != null:
 		# 完整图集逐帧切换；早期单帧重绘仍只覆盖完成态。
 		var use_skin: bool = bool(_ui.host.remaster_art.update_skin(skin, f, bool(u.is_building), float(u.die_t)))
 		if spr != null:
 			spr.self_modulate = Color(1, 1, 1, 0 if use_skin else 1)
 			if not use_skin and spr.texture == null:
-				spr.texture = _sheet(str(unit_nodes(u).source_sheet))
-	unit_nodes(u)["frame"] = f
+				spr.texture = _sheet(str(nodes.source_sheet))
+	nodes["frame"] = f
 	if spr != null:
 		spr.region_rect = ViewMath.frame_rect(u, f)
 

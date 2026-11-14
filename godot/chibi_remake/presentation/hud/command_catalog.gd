@@ -63,6 +63,8 @@ func icon(frame: int, _state := 0) -> Texture2D:
 		return textures[key]
 	var cell := frame-98 if frame>=98 and frame<=106 else (frame-104 if frame>=113 and frame<=122 else (frame-135 if frame>=154 and frame<=169 else -1))
 	if cell<0:return null
+	var icon_key: String="painted%d" % frame
+	if textures.has(icon_key):return textures[icon_key]
 	if not textures.has("hd"):textures.hd=Textures.load_texture("res://art/full/ui/cmd-icons-redraw-v3.png",ResourceLoader.CACHE_MODE_REUSE,"formal")
 	# Painted cells have measured separators, rather than a perfectly uniform grid.
 	var xs := [0,212,430,644,862,1080,1294,1484]
@@ -73,6 +75,7 @@ func icon(frame: int, _state := 0) -> Texture2D:
 	atlas.atlas = textures.hd
 	atlas.region = Rect2(xs[col],ys[row],xs[col+1]-xs[col],ys[row+1]-ys[row])
 	atlas.filter_clip = true
+	textures[icon_key]=atlas
 	return atlas
 
 func configure(specs: Array) -> Dictionary:

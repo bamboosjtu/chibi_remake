@@ -114,7 +114,10 @@ func _set(key: StringName, value) -> bool:
 
 func _on_visual(action: String, arguments: Array) -> void:
 	if scene.view == null: return
+	if state.effects.simulating and action in ["place_unit","fade_unit","hide_unit","update_visual","set_frame"]:
+		scene.view.queue_visual(arguments[0]);return
 	match action:
+		"world_dirty": scene.view.queue_world_visuals()
 		"feedback": scene.feedback_until = 0
 		"impact": scene.view.projectile_view.impact(arguments[0])
 		"place_unit": scene.view.place_unit(arguments[0])

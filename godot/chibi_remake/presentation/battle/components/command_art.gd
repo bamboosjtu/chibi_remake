@@ -12,6 +12,10 @@ const CMD_HOT_NAMES = preload("res://simulation/battle_config.gd").JIMOU_NAMES
 const CMD_FORM_NAMES = preload("res://simulation/battle_config.gd").FORM_NAMES
 
 const CMD_PAGE := 6
+var _refresh_selection: Dictionary={}
+var _refreshing := false
+var _refresh_jimou: Array=[]
+var _refresh_formations: Array=[]
 
 func _init(data: UIState, node: Node2D) -> void:
 	_ui = data
@@ -83,6 +87,9 @@ func _set_art_state(index: int, state: int) -> void:
 	var button: TextureRect=entry.btn
 	if bool(button.get_meta("cmd_disabled",false)): return
 	var frame := int(button.get_meta("source_frame",0))
+	var visual_key:=Vector2i(frame,state)
+	if button.get_meta("visual_key",Vector2i(-1,-1))==visual_key:return
+	button.set_meta("visual_key",visual_key)
 	if frame>0:button.texture=_ui.command_catalog.icon(frame,state)
 	button.modulate=[Color.WHITE,Color(0.68,0.68,0.68),Color(1.18,1.12,1.04)][clampi(state,0,2)]
 	button.set_meta("visual_state",state)
@@ -99,7 +106,7 @@ func _add_art_button(cell: int, name: String, sub: String, act: Callable) -> voi
 	_ui.art_actions.append(act)
 
 func _panel_specs() -> Array:
-	var selection: Dictionary=_ui.host.selection_description()
+	var selection: Dictionary=_selection_description()
 	var specs:=[]
 	for id in selection.ids:
 		var spec: Dictionary=_ui.command_catalog.spec(int(id))
@@ -107,7 +114,17 @@ func _panel_specs() -> Array:
 		specs.append(spec)
 	return specs
 
+func _selection_description() -> Dictionary:
+	return _refresh_selection if _refreshing else _ui.host.selection_description()
+
+func _panel_kind() -> String:
+	return str(_refresh_selection.kind) if _refreshing else ports.panel_kind()
+
 func _unlocked_indices(formation: bool) -> Array:
+	if _refreshing:return _refresh_formations if formation else _refresh_jimou
+	return _compute_unlocked_indices(formation)
+
+func _compute_unlocked_indices(formation: bool) -> Array:
 	var level := -1
 	for unit in _ui.host.selected:
 		if not bool(unit.get("alive", false)) or float(unit.get("die_t", -1)) >= 0.0:
@@ -136,7 +153,7 @@ func _formation_page(next: bool) -> void:
 	_refresh_cmd_art()
 
 func _apply_panel_type() -> void:
-	var kind := ports.panel_kind()
+	var kind := _panel_kind()
 	var specs: Array = _panel_specs()
 	# 签名 = 分型 + 第 8/9 格命令 + 下船可用性（载员变化时也要换图）。
 	var sig := kind + "|" + JSON.stringify(specs)
@@ -145,6 +162,7 @@ func _apply_panel_type() -> void:
 	_ui._panel_sig = sig
 	for i in range(9):
 		var tr: TextureRect = _ui.art_buttons[i].btn
+		tr.set_meta("visual_key",Vector2i(-1,-1))
 		if i >= specs.size():
 			tr.texture = null
 			tr.set_meta("cmd_name", "")
@@ -222,7 +240,7 @@ func _layout_cmd_art() -> void:
 func _art_visible(sub: String) -> bool:
 	if _ui.art_panel == null:
 		return false
-	if ports.panel_kind() == "" or _ui.officer_pick or _ui.build_menu:
+	if _panel_kind() == "" or _ui.officer_pick or _ui.build_menu:
 		return false
 	if sub == "":
 		return _ui.art_sub == ""
@@ -233,11 +251,20 @@ func _art_visible(sub: String) -> bool:
 	return _ui.art_sub == sub
 
 func art_panel_active() -> bool:
-	return _ui.art_panel != null and not _ui.officer_pick and not _ui.build_menu and ports.panel_kind() != ""
+	return _ui.art_panel != null and not _ui.officer_pick and not _ui.build_menu and _panel_kind() != ""
 
 func _refresh_cmd_art() -> void:
 	if _ui.art_panel == null and not ResourceLoader.exists("res://art/full/ui/cmd-icons-redraw-v3.png"):
 		return
+	# One synchronous refresh observes one selection. Never retain world objects
+	# or cache across input events, loads, command changes, or simulation ticks.
+	_refresh_selection=_ui.host.selection_description()
+	_refresh_jimou=_compute_unlocked_indices(false);_refresh_formations=_compute_unlocked_indices(true)
+	_refreshing=true
+	_refresh_cmd_art_core()
+	_refreshing=false;_refresh_selection={};_refresh_jimou=[];_refresh_formations=[]
+
+func _refresh_cmd_art_core() -> void:
 	if _ui.art_sub == "form_more" and not _unlocked_indices(true).has(9): _ui.art_sub = "form"
 	_layout_cmd_art()
 	if _ui.art_panel == null:

@@ -1,4 +1,15 @@
 extends Node2D
+
+func queue_world_visuals() -> void:
+	_components["unit_visuals"].queue_world_visuals()
+func queue_visual(unit: Dictionary) -> void:
+	_components["unit_visuals"].queue_visual(unit)
+func flush_visuals(interpolating := false) -> void:
+	_components["unit_visuals"].flush_visuals(interpolating)
+func performance_counters() -> Dictionary:
+	var counters: Dictionary=_components["unit_visuals"].performance_counters()
+	counters["fogMicroseconds"]=_ui.fog_sprite.upload_microseconds if _ui.fog_sprite!=null else 0
+	return counters
 ## Composition root; presentation components own their specific behavior.
 const GRID_FALLBACK := 8
 
@@ -221,6 +232,7 @@ func _on_panel_slot(i: int) -> void:
 func _open_build_menu() -> void:
 	_components["command_art"]._open_build_menu()
 func _process(_delta: float) -> void:
+	flush_visuals()
 	_components["hud_input"]._process(_delta)
 func draw_hover_at(mp: Vector2) -> void:
 	_components["hud_input"].draw_hover_at(mp)

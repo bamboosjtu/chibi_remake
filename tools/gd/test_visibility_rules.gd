@@ -12,6 +12,7 @@ func source(uid: int, vision := 4) -> Dictionary:
 	return {"uid":uid,"alive":true,"die_t":-1,"owner":1,"unit":30,"is_building":false,"attached":false,"ax":1000.0,"ay":600.0,"vision":vision,"farsight_t":0}
 
 func run() -> void:
+	equivalence()
 	var fog := Visibility.new()
 	fog.setup(Vector2(2200,1200))
 	var first := source(1)
@@ -92,3 +93,21 @@ func run() -> void:
 	assert(tower.state == "attack" and is_same(tower.target,hero))
 	print("VISIBILITY EXECUTION PASS passenger timers / hold preserves idle / explicit attack / towers both sides / no AI-versus-AI / stationary")
 	done = true; b.queue_free(); await process_frame; quit(0)
+
+func equivalence() -> void:
+	var incremental:=Visibility.new();var reference:=Visibility.new()
+	incremental.setup(Vector2(660,440));reference.setup(Vector2(660,440))
+	var rng:=RandomNumberGenerator.new();rng.seed=55891;var units: Array=[]
+	for uid in range(8):units.append(source(uid,2+uid%3))
+	for tick in range(40):
+		for unit in units:
+			unit.ax=rng.randf_range(0,659);unit.ay=rng.randf_range(0,439);unit.attached=rng.randi_range(0,5)==0
+			unit.farsight_t=1 if rng.randi_range(0,7)==0 else 0
+		incremental.update(units,1)
+		reference.current.fill(0);reference.reveals.fill(0)
+		for unit in units:
+			if unit.attached:continue
+			var position:=Vector2(floorf(float(unit.ax)/11)*11,floorf(float(unit.ay)/5.5)*5.5)
+			reference._reveal(reference._cells(position,Visibility.effective_vision(unit)),1)
+		assert(incremental.current==reference.current and incremental.reveals==reference.reveals and incremental.explored==reference.explored,"Incremental visibility differs from a full rebuild")
+	print("VISIBILITY DIFFERENCE PASS 40 randomized full-rebuild comparisons / overlaps / movement / passengers / radius changes")

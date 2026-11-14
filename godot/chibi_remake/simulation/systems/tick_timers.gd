@@ -34,4 +34,5 @@ static func restore(state: Dictionary, version: int, unit: Dictionary) -> void:
 
 static func step_statuses(unit: Dictionary) -> void:
 	for key in STATUS_KEYS:
-		unit[key] = maxi(0, int(unit.get(key, 0)) - 1)
+		var remaining:=int(unit.get(key,0))
+		if remaining>0:unit[key]=remaining-1

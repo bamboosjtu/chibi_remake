@@ -5,5 +5,13 @@
   "legacyScenarioHashes": [
     "45277ab8dc9f0d772a33f1f0efcde0c0dff280b12a04c4c9f6ca4a6161f00450",
     "a3e1bb66e50f933f7c5ed0df1dd48b9bbf52a48e48f3371dce661042b5624baf"
-  ]
+  ],
+  "migrations": {
+    "1c3c47acacf7a896b58cb171597ba81f8ee434fac389f9873122acd9a3252676": {
+      "target": "2d3e26d8866d9ef8f321789d7122fcf90b48e3e25a8bbfa3fed55a5f28a6a7fc",
+      "policy": "realtime-navigation-v1",
+      "sourceCommit": "d483478",
+      "description": "Keep saved state and timers; default missing route_failures to zero; adopt grid traversal and bounded attack repathing."
+    }
+  }
 }

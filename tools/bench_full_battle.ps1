@@ -6,6 +6,7 @@ param(
     [switch]$Stress,
     [string]$Map = "chibic17",
     [string]$Output = "",
+    [string]$ReleasePack = "",
     [int]$MaxSeconds = 1800
 )
 # Full-battle benchmark gate. The microbench in test_unit_index only covers the
@@ -25,7 +26,24 @@ $engine = Resolve-ChibiEngine $root
 if ($LASTEXITCODE -ne 0) { throw 'Unreviewed benchmark engine' }
 $output = if ($Output) { [IO.Path]::GetFullPath($Output) } else { Join-Path $root ('_work/bench/full-battle-' + (Get-Date -Format 'yyyyMMdd-HHmmss') + '.json') }
 New-Item -ItemType Directory -Force (Split-Path $output -Parent) | Out-Null
-$arguments = '--path godot/chibi_remake --script "' + (Join-Path $root 'tools/gd/bench_full_battle.gd') + '" -- --no-intro --save-test-id=full-battle-bench --bench-map=' + $Map + ' --bench-units=' + $Units + ' --bench-engage=' + $Engage + ' --bench-ticks=' + $Ticks + ' --bench-frames=' + $Frames + ' --bench-output=' + $output
+$arguments = '--path godot/chibi_remake --script "' + (Join-Path $root 'tools/gd/bench_full_battle.gd') + '" -- --no-intro --save-test-id=full-battle-bench --bench-map=' + $Map + ' --bench-units=' + $Units + ' --bench-engage=' + $Engage + ' --bench-ticks=' + $Ticks + ' --bench-frames=' + $Frames + ' --bench-output="' + $output + '"'
+if ($ReleasePack) {
+    $packPath=[IO.Path]::GetFullPath($ReleasePack)
+    if (!(Test-Path -LiteralPath $packPath -PathType Leaf)) { throw ('Missing release PCK: '+$packPath) }
+    $template=Join-Path $root '_work/build/roaming/Godot/export_templates/4.7.2.stable/windows_release_x86_64.exe'
+    & node tools/verify_engine.mjs --platform win32_release --engine $template
+    if ($LASTEXITCODE -ne 0) { throw 'Unreviewed release template' }
+    $nativeDirectory=Join-Path (Split-Path $output -Parent) ('native-bench-'+[Guid]::NewGuid().ToString('N'))
+    New-Item -ItemType Directory -Force $nativeDirectory | Out-Null
+    $engine=Join-Path $nativeDirectory 'ChibiBench.exe'
+    Copy-Item -LiteralPath $template -Destination $engine
+    Copy-Item -LiteralPath $packPath -Destination (Join-Path $nativeDirectory 'ChibiBench.pck')
+    $sidecars=Join-Path (Split-Path $packPath -Parent) 'addons'
+    if (!(Test-Path -LiteralPath $sidecars -PathType Container)) { throw 'Release PCK requires its exported addons sidecar directory' }
+    Copy-Item -LiteralPath $sidecars -Destination (Join-Path $nativeDirectory 'addons') -Recurse
+    foreach ($dll in @(Get-ChildItem -LiteralPath (Split-Path $packPath -Parent) -Filter '*.dll' -File)) { Copy-Item -LiteralPath $dll.FullName -Destination (Join-Path $nativeDirectory $dll.Name) }
+    $arguments='-- --full-battle-bench --no-intro --save-test-id=full-battle-bench --bench-map='+$Map+' --bench-units='+$Units+' --bench-engage='+$Engage+' --bench-ticks='+$Ticks+' --bench-frames='+$Frames+' --bench-output="'+$output+'"'
+}
 $start = [Diagnostics.ProcessStartInfo]::new($engine, $arguments)
 $start.UseShellExecute = $false
 $start.RedirectStandardOutput = $true
@@ -51,7 +69,9 @@ while (!$process.HasExited) {
 try {
     foreach ($candidate in @(Get-Process -Id $process.Id -ErrorAction SilentlyContinue)) { $peak = [Math]::Max($peak, $candidate.PeakWorkingSet64) }
 } catch { }
-[IO.File]::WriteAllText($output+'.log',($stdoutTask.Result+$stderrTask.Result),(New-Object System.Text.UTF8Encoding $false))
+$engineOutput=$stdoutTask.Result+$stderrTask.Result
+[IO.File]::WriteAllText($output+'.log',$engineOutput,(New-Object System.Text.UTF8Encoding $false))
+if ($engineOutput -match 'SCRIPT ERROR:|Parse Error:|ERROR: Error calling|Corrupted header|Couldn.t load project data|Couldn.t save project.binary|GDExtension dynamic library not found|Can.t open dynamic library') { throw ('Benchmark engine errors; log: '+$output+'.log') }
 if ($timedOut -or $process.ExitCode -ne 0 -or !(Test-Path -LiteralPath $output)) { throw ('Benchmark process failed: ' + $process.ExitCode + '; log: ' + $output+'.log') }
 $report = Get-Content -Raw -Encoding UTF8 $output | ConvertFrom-Json
 $report | Add-Member -NotePropertyName peakWorkingSetBytes -NotePropertyValue $peak -Force
@@ -66,6 +86,7 @@ if ([double]$report.ticksPerSecond -lt 0.95*[double]$report.targetTicksPerSecond
 if ([double]$report.simAccumulatorEnd -gt [Math]::Max(0.2,[double]$report.simAccumulatorBegin+0.1)) { $failures += ('Simulation backlog '+$report.simAccumulatorEnd+'s') }
 if ([double]$report.commandLatencyP95Ms -gt 100.0) { $failures += ('Command latency '+$report.commandLatencyP95Ms+'ms > 100ms') }
 if ([double]$report.unitsMeasured -lt [double]$report.unitsTarget) { $failures += ('units ' + $report.unitsMeasured + '/' + $report.unitsTarget) }
+if ([double]$report.logicP95Ms -gt [double]$report.realtimeLogicBudgetMs) { $failures += ('Realtime tick P95 '+$report.logicP95Ms+'ms > '+$report.realtimeLogicBudgetMs+'ms') }
 if ([double]$report.logicP95Ms -gt $p95Budget) { $failures += ('P95 ' + [math]::Round([double]$report.logicP95Ms, 1) + 'ms > ' + $p95Budget + 'ms') }
 if ([double]$report.fps -lt $fpsFloor) { $failures += ('FPS ' + [math]::Round([double]$report.fps, 1) + ' < ' + $fpsFloor) }
 if ($peak -gt $workingSetBudget) { $failures += ('working set ' + [math]::Round($peak / 1GB, 2) + 'GiB > ' + [math]::Round($workingSetBudget / 1GB, 2) + 'GiB') }

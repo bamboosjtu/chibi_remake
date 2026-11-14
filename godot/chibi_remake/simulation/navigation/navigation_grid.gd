@@ -3,6 +3,9 @@ extends RefCounted
 const GridState = preload("res://simulation/navigation/navigation_state.gd")
 var _grid_state: GridState
 var ports = preload("res://simulation/ports/navigation_grid_dependencies.gd").new()
+var _route_cache_version := -1
+var _route_gate_cache: Dictionary={}
+
 const UnitFootprint = preload("res://simulation/systems/unit_footprint.gd")
 
 func _init(data: GridState) -> void:
@@ -326,6 +329,7 @@ func remove_gate(gate: Dictionary) -> void:
 	_grid_state.version += 1
 
 func _refresh_gate_points() -> void:
+	_route_gate_cache.clear()
 	for id in _grid_state.gate_cells:
 		var closed: bool = _land_terrain_blocked(int(id)) or int(_grid_state.occupancy.get(id, 0)) > 0 or _grid_state.blocked_cells.has(id)
 		for gate in _grid_state.gate_cells[id]:
@@ -333,6 +337,7 @@ func _refresh_gate_points() -> void:
 			var friendly_order: bool = _grid_state._planning_gates and _grid_state._route_owner >= 0 and int(gate.owner) == _grid_state._route_owner
 			if bool(gate.get("site", false)) or (not bool(gate.get("gate_open", false)) and not friendly_order):
 				closed = true
+		if _grid_state.astar.is_point_disabled(int(id))==closed:continue
 		_grid_state.astar.set_point_disabled(int(id), closed)
 		# 城门开闭会改变整块身体的合法性：把受影响锚点标脏，下次查询前刷新。
 		if not _grid_state._shape_graphs.is_empty():
@@ -354,3 +359,22 @@ func rebuild_buildings(units: Array) -> void:
 			var cells := building_footprint(int(u.unit), Vector2(u.ax, u.ay), float(u.w))
 			u["occupied_cells"] = cells
 			occupy(cells, 1)
+
+## A query temporarily opens only the friendly gate points that actually differ
+## from live collision. Cache the set by topology revision, then restore exactly
+## those native flags; other owners and blocked terrain never change.
+func open_route_gates(owner: int, layer: int) -> Array:
+	if layer!=0 or owner<0:return []
+	if _route_cache_version!=_grid_state.version:
+		_route_gate_cache.clear();_route_cache_version=_grid_state.version
+	if not _route_gate_cache.has(owner):
+		var ids: Array=[]
+		for id in _grid_state.gate_cells:
+			if _grid_state.astar.is_point_disabled(int(id)) and not is_solid_for_order(_cell_of_id(int(id)),owner):ids.append(id)
+		_route_gate_cache[owner]=ids
+	var changed: Array=_route_gate_cache[owner]
+	for id in changed:_grid_state.astar.set_point_disabled(int(id),false)
+	return changed
+
+func close_route_gates(ids: Array) -> void:
+	for id in ids:_grid_state.astar.set_point_disabled(int(id),true)

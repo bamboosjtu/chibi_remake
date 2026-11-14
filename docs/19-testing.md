@@ -220,6 +220,8 @@ node tools/run_regressions.mjs --selftests --baselines --maps --suite tools/inpu
 ```powershell
 pwsh -NoProfile -File tools/bench_full_battle.ps1            # 200 机动单位、60 支交战
 pwsh -NoProfile -File tools/bench_full_battle.ps1 -Stress    # 660 机动单位（约 800 个对象）、240 支交战
+# 同一个驱动也可在正式 release 模板 + 导出 PCK 中运行（保留 PCK 旁的 addons/DLL）：
+pwsh -NoProfile -File tools/bench_full_battle.ps1 -ReleasePack "D:/path/to/candidate/ChibiRTS.pck"
 ```
 
 脚本输出逻辑每 tick 完整 `_sim_step` 的 P50/P95/P99/最大值、实际窗口 FPS、进程峰值工作集、Godot 视频内存和静态内存峰值，任一项越界即失败；`--bench-output` 或 `_work/bench/` 保留 JSON。参考机为 Intel i7-8700（6 核 12 线程，3.2 GHz）、64 GB 内存、NVIDIA Quadro P4000 8 GB、Windows 11、1920×1080、GL Compatibility。
@@ -233,10 +235,18 @@ pwsh -NoProfile -File tools/bench_full_battle.ps1 -Stress    # 660 机动单位�
 
 报告同时记录帧时间分位数、实际完成 tick/s、目标 tick/s、`sim_acc` 首尾与峰值、相对墙钟的模拟落后量，以及游戏内指令队列响应 P95。该响应只覆盖游戏队列，不包含操作系统输入投递。进程内存只统计本次启动的引擎 PID。
 
-相对回归预算与实时体验分开判断：P95 仍使用 500/1200 ms；同时要求实际 tick/s 达目标的 95%、无持续积压、指令队列 P95≤100 ms，并保留 60/30 FPS 下限。较小的 `sim_acc` 不能替代实际吞吐检查，因为上游帧时钟也可能限制传入的时间步长。只有完整工作负载和所有门槛通过，才能作为发布依据；测得数据保留在报告中，不以暂停后的高 FPS 代替运行性能。
+相对回归预算与实时体验分开判断：相对 P95 仍保留 500/1200 ms；另以当前逻辑周期为实时 P95 上限（最快档 30 ms），同时要求实际 tick/s 达目标的 95%、无持续积压、指令队列 P95≤100 ms，并保留 60/30 FPS 下限。较小的 `sim_acc` 不能替代实际吞吐检查，因为上游帧时钟也可能限制传入的时间步长。只有完整工作负载和所有门槛通过，才能作为发布依据；测得数据保留在报告中，不以暂停后的高 FPS 代替运行性能。
 
 `tools/test_terrain_dedup.mjs` 检查重复内容合并、不同内容保留、引用图一致、源输入溯源与越界路径在修改前拒绝；候选包另验证全部重写后的地形资源可加载。历史失败清单只保留尚未解决且已验证的条目，不将修复项继续豁免。
 
 验收显示环境固定为 1920×1080。`--selftest`、`--native-save` 自动使用独立验收命名空间；不带标识也不写玩家槽位。`--save-test-id` 仅接受字母、数字、下划线与连字符，拒绝任意目录参数。
 
 CI 的续跑矩阵分别检查 chibic1、chibil1、chibic10、chibic17：保留原整数与分段基线，额外以完整快照检查 0/31/120/450/900/1800 tick 六个采样点的恢复和 AI 续跑。包含 15 秒、60 秒点，覆盖资源阻挡、探索、编组、载员、计时与堵路状态。每图独立进程，功能性看门狗为 600 秒；既有每 tick 性能预算保持不变。
+
+基准协议 v2 在创建战场后立即停止自动处理，等待显示初始化，再填充部队、设置持续交战血量并推进固定的预热与测量 tick。它避免启动 30 帧期间因机器速度不同而改变初始世界。源码入口 `tools/gd/bench_full_battle.gd` 与发行入口 `--full-battle-bench` 共用 `testing/full_battle_benchmark.gd`；报告标明 `protocolVersion`、`engineBuild`、规则指纹及实际单位数。发布模板模式校验模板哈希，使用独立副本与存档目录，不切换发行版本。
+
+新增诊断包括 `pathCallsPerTick`、`pathMsPerTick`、搜索/平滑分项、`updateVisualMsPerFrame` 和 `fogUpdateMsPerFrame`。后两者是 CPU 提交时间，实际帧时间仍包含 GPU 合成。渲染模式将视野的两张 R8 位图上传后在小型视口中合成 RGBA 雾层，大地图与小地图继续共享同一张三档透明度纹理；无渲染测试保留 CPU 参考路径。`test_restored_view` 另在实际窗口中读取合成纹理，验证暂停读档后的透明度。
+
+`test_realtime_queries` 覆盖网格边界归属、密集参考射线、失败重寻路冷却及恢复、五次追帧一次表现同步、旧对象排除、重试状态存读及明确批准的 v8 规则迁移。`test_visibility_rules` 以完整重建对照 40 轮随机移动、重叠、载员及视野半径变化，核对可见计数与探索记忆。
+
+2026-11-14—15 的实测和剩余阻断见 [实时性能整改记录](../research/realtime-performance-20261114.md)。

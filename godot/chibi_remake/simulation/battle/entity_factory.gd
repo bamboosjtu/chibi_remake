@@ -102,7 +102,7 @@ func _make_unit(ob: Dictionary, is_map_object: bool) -> Dictionary:
 		"tail_value": tail_v,   # 移动部队为统辖武将编号；建筑/资源尾字段另行解释。
 		"ax": ax, "ay": ay, "hp": hp, "maxhp": hp, "base_maxhp": hp, "alive": true,
 		"last_attacker_uid":-1,"action_wait":0,"action_phase":0,"action_started":false,"action_kind":"","action_target_uid":-1,
-		"state": "idle", "target": null, "cool": 0.0, "repath": 0.0,
+		"state": "idle", "target": null, "cool": 0.0, "repath": 0.0, "route_failures":0,
 		"path": [], "pi": 0,
 		"anim": 0.0, "dir": 0, "moved": false, "die_t": -1.0,
 	}

@@ -44,3 +44,11 @@ static func fingerprint(records: Dictionary) -> String:
 static func legacy_scenario_hashes() -> Array:
 	var data = JSON.parse_string(FileAccess.get_file_as_string("res://data/db/rules_contract.json"))
 	return data.get("legacyScenarioHashes",[]) if data is Dictionary else []
+
+## Explicitly reviewed transitions only. Pin both fingerprints so this approval
+## cannot silently apply to later balance or scenario changes.
+static func approved_migration(previous: String) -> bool:
+	var contract=JSON.parse_string(FileAccess.get_file_as_string("res://data/db/rules_contract.json"))
+	if not contract is Dictionary:return false
+	var migration=contract.get("migrations",{}).get(previous,{})
+	return migration is Dictionary and migration.get("target","")==current() and migration.get("policy","")=="realtime-navigation-v1"

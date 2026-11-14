@@ -2,6 +2,7 @@ extends RefCounted
 ## research/movements: shared two-update gait clock, independent screen facing.
 ## These fields only choose poses. Path direction, travel and combat stay authoritative.
 const FIELDS := ["walk_tick", "move_facing", "turn_tick", "move_started", "move_turning"]
+const STATIONARY_ACTIONS := ["attack","repair"]
 const FRAME_TICKS = preload("res://simulation/definitions/action_visual.gd").FRAME_TICKS
 
 static func ensure(u: Dictionary) -> void:
@@ -19,9 +20,10 @@ static func step(u: Dictionary) -> void:
 			or preload("res://simulation/systems/stratagem_rules.gd").active(u): return
 	var moving := bool(u.get("moved", false))
 	var desired := int(u.get("dir", 0)) & 7
+	if not moving and int(u.move_facing)==desired and not bool(u.move_started) and not bool(u.move_turning) and int(u.turn_tick)==0:return
 	if moving: u.walk_tick = int(u.walk_tick) + 1
 	# Preserve attack/repair timing and facing while actually performing the action.
-	if not moving and str(u.get("state", "")) in ["attack", "repair"]:
+	if not moving and str(u.get("state", "")) in STATIONARY_ACTIONS:
 		u.move_facing = desired; u.move_turning = false; u.turn_tick = 0
 	elif int(u.move_facing) != desired:
 		u.move_turning = true; u.turn_tick = int(u.turn_tick) + 1

@@ -434,6 +434,15 @@
       "markers": [
         "BENCHMARK GUARD PASS"
       ]
+    },
+    {
+      "script": "test_realtime_queries",
+      "markers": [
+        "REALTIME RAYS PASS",
+        "REALTIME RETRIES PASS",
+        "REALTIME VISUALS PASS"
+      ],
+      "timeout": 120
     }
   ]
 }

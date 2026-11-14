@@ -7,7 +7,10 @@ static func require_provider(reference: WeakRef, provider: String) -> Object:
 	return target
 
 func _require(reference: WeakRef, provider: String) -> Object:
-	return require_provider(reference, provider)
+	var target: Object = reference.get_ref() if reference != null else null
+	if target == null:
+		preload("res://composition_contract.gd").abort_if_broken("expired port", [{"provider":provider,"method":"provider lifetime"}])
+	return target
 
 func validate_services(services: Dictionary, contracts: Dictionary) -> Array:
 	var missing: Array = []

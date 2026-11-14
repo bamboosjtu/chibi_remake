@@ -108,3 +108,8 @@ func _refresh_gate_points() -> void:
 	grid._refresh_gate_points()
 func rebuild_buildings(units: Array) -> void:
 	grid.rebuild_buildings(units)
+
+func contact_clear(a: Vector2,b: Vector2,ignore: Dictionary,layer: int) -> bool:
+	return paths.contact_clear(a,b,ignore,layer)
+func performance_counters() -> Dictionary:
+	return paths.metrics.duplicate()

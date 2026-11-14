@@ -42,7 +42,7 @@ func _unit_placement_free(anchor: Vector2i, unit_id: int, layer := 0, exclude_ui
 	if provider == null: return false
 	return provider._unit_placement_free(anchor, unit_id, layer, exclude_uid)
 
-const CONTRACTS := {"abilities": ["_spd_mult"], "battle_simulation": ["_feedback", "_place_unit"], "command_groups": ["_cancel_unit_command", "_nav_layer"], "interaction_paths": ["_footprint_cells"], "spatial_index": ["_unit_cell", "_unit_placement_free"]}
+const CONTRACTS := {"abilities": ["_spd_mult"], "battle_simulation": ["_feedback", "_place_unit"], "command_groups": ["_cancel_unit_command", "_nav_layer"], "interaction_paths": ["_footprint_cells"], "spatial_index": ["nearby_units", "_unit_cell", "_unit_placement_free"]}
 var _provider_abilities: WeakRef
 var _provider_battle_simulation: WeakRef
 var _provider_command_groups: WeakRef
@@ -67,3 +67,7 @@ func disconnect_services() -> void:
 	_provider_command_groups = null
 	_provider_interaction_paths = null
 	_provider_spatial_index = null
+func nearby_units(first: Vector2i, second: Vector2i, radius: int, layer: int) -> Array:
+	var provider=_require(_provider_spatial_index,"spatial_index")
+	if provider==null:return []
+	return provider.nearby_units(first,second,radius,layer)

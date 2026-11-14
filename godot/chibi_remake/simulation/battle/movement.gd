@@ -23,7 +23,7 @@ func _path_to(u: Dictionary, target_px: Vector2, exact: bool) -> Array:
 	var start_cell := ports._unit_cell(u)
 	var target_cell := battle.nav.cell_of_px(target_px.x, target_px.y)
 	var avoid: Array = []
-	for other in battle.units:
+	for other in ports.nearby_units(start_cell,target_cell,12,layer):
 		if other == null or not bool(other.get("alive", false)) or float(other.get("die_t", -1)) >= 0.0: continue
 		if bool(other.get("is_building", false)) or bool(other.get("attached", false)) or int(other.get("site_inside_uid", -1)) >= 0: continue
 		if int(other.get("uid", -1)) == int(u.get("uid", -1)): continue

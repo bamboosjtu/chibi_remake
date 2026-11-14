@@ -67,7 +67,7 @@ func _unassign_officer(u: Dictionary) -> void:
 	if provider == null: return
 	provider._unassign_officer(u)
 
-const CONTRACTS := {"abilities": ["_reset_jimou"], "battle_simulation": ["_fade_unit", "_finish_death", "_set_frame"], "command_groups": ["_commander_for", "_nav_layer"], "interaction_paths": ["_footprint_cells"], "movement": ["_cell_of_px"], "officer_teams": ["_grant_officer_exp", "_unassign_officer"], "spatial_index": ["_index_ensure_current", "_index_forget", "_target_forget"]}
+const CONTRACTS := {"abilities": ["_reset_jimou"], "battle_simulation": ["_fade_unit", "_finish_death", "_set_frame"], "command_groups": ["_commander_for", "_nav_layer"], "interaction_paths": ["_footprint_cells"], "movement": ["_cell_of_px"], "officer_teams": ["_grant_officer_exp", "_unassign_officer"], "spatial_index": ["unit_by_uid", "_index_ensure_current", "_index_forget", "_target_forget"]}
 var _provider_abilities: WeakRef
 var _provider_battle_simulation: WeakRef
 var _provider_command_groups: WeakRef
@@ -98,3 +98,8 @@ func disconnect_services() -> void:
 	_provider_movement = null
 	_provider_officer_teams = null
 	_provider_spatial_index = null
+
+func unit_by_uid(uid: int) -> Dictionary:
+	var provider = _require(_provider_spatial_index, "spatial_index")
+	if provider == null: return {}
+	return provider.unit_by_uid(uid)

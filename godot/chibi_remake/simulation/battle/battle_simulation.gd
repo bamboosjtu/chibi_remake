@@ -4,6 +4,7 @@ const State = preload("res://simulation/battle_state.gd")
 const Dependencies = preload("res://simulation/ports/battle_simulation_dependencies.gd")
 var battle: State
 var ports := Dependencies.new()
+var tick_microseconds := 0
 
 func _init(data: State) -> void:
 	battle = data
@@ -63,6 +64,8 @@ func _update_gates() -> void:
 
 func _sim_step(dt: float) -> void:
 	if battle.game_end != 0: return
+	var tick_begin:=Time.get_ticks_usec()
+	if battle.effects!=null:battle.effects.simulating=true
 	if battle.effects != null:battle.effects.visual("capture_motion", [])
 	battle.visibility.update(battle.units, battle.player_owner)
 	battle.sim_tick += 1
@@ -81,7 +84,6 @@ func _sim_step(dt: float) -> void:
 			continue
 		if not u.is_building or int(u.unit) in [18,19]:
 			ports._step_unit(u, dt)
-		_update_visual(u)
 	battle.fire_fields.step() # Effects follow unit updates; damage always uses current cell occupants.
 	ports._process_sites(dt)
 	ports._process_officer_recovery()
@@ -89,6 +91,10 @@ func _sim_step(dt: float) -> void:
 	_prune_dead()
 	battle.visibility.update(battle.units, battle.player_owner)
 	ports._check_end()
+	if battle.effects!=null:
+		battle.effects.simulating=false
+		battle.effects.visual("world_dirty")
+	tick_microseconds+=Time.get_ticks_usec()-tick_begin
 
 func _state_digest() -> int:
 	var h := 1469598103934665603

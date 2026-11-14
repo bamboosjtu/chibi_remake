@@ -139,10 +139,7 @@ func _edge_interaction_path_core(u: Dictionary, o: Dictionary, reserved := {}, m
 		var point := battle.nav.anchor_of(c.x, c.y)
 		if max_body >= 0.0 and _dist_to_obj({"ax": point.x, "ay": point.y}, o) > max_body: continue
 		var path := ports._path_to(u, point, true)
-		if path.is_empty():
-			# 森林/资源密集区单位避让会把唯一通道挖空；采集路径退回普通 A*，
-			# 最终落点仍由 _follow 的叠格检查与分离逻辑兜底。
-			path = battle.nav.find_path(origin, point, true, ports._nav_layer(u), int(u.get("owner", 0)), int(u.get("unit", -1)))
+
 		if not path.is_empty(): return path
 	return []
 

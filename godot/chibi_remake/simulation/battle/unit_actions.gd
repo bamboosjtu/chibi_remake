@@ -10,7 +10,6 @@ func _init(data: State) -> void:
 	battle = data
 
 func _step_unit(u: Dictionary, delta: float) -> void:
-	if not bool(u.is_building): preload("res://simulation/systems/locomotion.gd").ensure(u)
 	battle.stratagems.begin_update(u)
 	_step_unit_inner(u, delta)
 	ports._separate_unit(u)
@@ -39,7 +38,7 @@ func _step_unit_inner(u: Dictionary, delta: float) -> void:
 	if battle.stratagems.active(u):
 		u.anim += delta
 		return
-	if battle.construction.step(u): return
+	if (int(u.get("site_inside_uid",-1))>=0 or int(u.get("site_follow_uid",-1))>=0) and battle.construction.step(u): return
 	# 下船按每 4 拍一名推进；船接到新命令也不打断在舱载员的卸载。
 	if int(u.get("unit", -1)) == Config.TRANSPORT_UNIT and (bool(u.get("unload_active", false)) or str(u.get("state", "")) == "unload"):
 		u.unload_t = int(u.get("unload_t", 0)) + 1
@@ -52,7 +51,7 @@ func _step_unit_inner(u: Dictionary, delta: float) -> void:
 	if u.state == "attack" and not preload("res://simulation/systems/combat_rules.gd").can_attack(u):
 		ports._cancel_unit_command(u)
 	# 遭遇接战不受战略 AI 的出兵科技/金钱条件限制；忙碌与原地待命单位保留命令。
-	preload("res://simulation/systems/engagement.gd").step(battle, u, ports._nearest_enemy)
+	if u.state=="idle":preload("res://simulation/systems/engagement.gd").step(battle, u, ports._nearest_enemy)
 	# 箭楼独立守卫，AI之间不互相射击。
 	var tower := bool(u.is_building) and int(u.unit) in [18,19]
 	if tower and u.state == "idle" and not bool(u.get("site", false)) and int(u.get("confused_t", 0)) <= 0:
@@ -78,7 +77,8 @@ func _step_unit_inner(u: Dictionary, delta: float) -> void:
 			ports._cancel_unit_command(u)
 		else:
 			var offset := Vector2(t.ax-u.ax,t.ay-u.ay)
-			var reach: float = preload("res://simulation/systems/combat_rules.gd").effective_range(u)*battle.tile_w
+			var attack_range: float=preload("res://simulation/systems/combat_rules.gd").effective_range(u)
+			var reach: float = attack_range*battle.tile_w
 			u.dir = int(round(offset.angle()/(PI/4.0))) & 7
 			var strike := preload("res://simulation/systems/action_clock.gd").step(u,"attack",int(t.uid),tower)
 			var in_reach := offset.length_squared() <= reach*reach
@@ -86,11 +86,13 @@ func _step_unit_inner(u: Dictionary, delta: float) -> void:
 			# 仍应视为贴脸可攻击（否则会被前面的单位卡在 66px 外）。
 			# R06：放宽到两格时必须同时确认中间没有墙/不可通行地形/封闭建筑，
 			# 否则会“隔墙扣血”。远程越墙仍走独立规则（不在此补偿内）。
-			if preload("res://simulation/systems/combat_rules.gd").effective_range(u) <= 1:
-				var uc := ports._unit_cell(u)
-				var tc := ports._unit_cell(t)
-				in_reach = (in_reach or maxi(absi(uc.x - tc.x), absi(uc.y - tc.y)) <= 2) and ports._melee_line_clear(u, t)
+			if attack_range <= 1:
+				if not in_reach:
+					var uc := ports._unit_cell(u);var tc := ports._unit_cell(t)
+					in_reach=maxi(absi(uc.x-tc.x),absi(uc.y-tc.y))<=2
+				in_reach=in_reach and ports._melee_line_clear(u,t)
 			if in_reach:
+				u.route_failures=0
 				u.path = []; u.pi = 0
 				if strike:
 					ports._fire_attack(u,t)
@@ -99,15 +101,18 @@ func _step_unit_inner(u: Dictionary, delta: float) -> void:
 			else:
 				if strike: preload("res://simulation/systems/action_clock.gd").reset(u) # 击发时射程失效，重发同一攻击重新等待。
 				u.repath -= delta
-				if u.path.is_empty() or u.repath <= 0:
-					u.repath = 0.8
+				if u.repath <= 0:
 					# 近战不能把“敌方占格”当终点（不叠格会停在两格外），
 					# 改寻到目标占格旁的落脚格；远程仍寻到目标本身。
-					if preload("res://simulation/systems/combat_rules.gd").effective_range(u) <= 1:
+					if attack_range <= 1:
 						u.path = ports._edge_interaction_path(u, t)
 					else:
 						u.path = ports._path_to(u,Vector2(t.ax,t.ay),false)
 					u.pi = 0
+					u.route_failures=mini(3,int(u.get("route_failures",0))+1) if u.path.is_empty() else 0
+					# Stable UID phases spread synchronized retry bursts without using
+					# wall time or RNG; the remaining delay is saved with the order.
+					u.repath=0.8*pow(2.0,maxi(0,int(u.route_failures)-1))+(int(u.uid)%11)*Config.SIM_DT
 				ports._follow(u,delta)
 
 	elif u.state == "move":

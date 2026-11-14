@@ -152,6 +152,9 @@ func _sunk(bg: Color, rim: Color, rim_px: int, radius: int, pad: Vector4) -> Sty
 func _build_styles() -> void:
 	_components["menu_styles"]._build_styles()
 func _ready() -> void:
+	if "--full-battle-bench" in OS.get_cmdline_user_args():
+		get_tree().root.add_child.call_deferred(preload("res://testing/full_battle_benchmark.gd").new())
+		queue_free();return
 	# An ambiguous composition dispatches calls to the wrong component; never
 	# build the menu on top of that. Contract rejection also runs in exported builds.
 	if contract_abort(): return

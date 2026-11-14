@@ -5,6 +5,8 @@ const Config = preload("res://simulation/battle_config.gd")
 const Dependencies = preload("res://simulation/ports/spatial_index_dependencies.gd")
 var battle: State
 var ports := Dependencies.new()
+const TRANSIT_STATES := ["move","gather","deliver","join","build","repair","board","unload"]
+const CLOSE_WORK_STATES := ["gather","deliver","build"]
 
 func _init(data: State) -> void:
 	battle = data
@@ -13,10 +15,14 @@ func _unit_cell(u: Dictionary) -> Vector2i:
 	return battle.nav.cell_of_px(float(u.ax), float(u.ay))
 
 func _unit_overlaps_other(u: Dictionary) -> bool:
-	for raw in ports._footprint_cells(u):
-		var c: Vector2i = raw
-		if not _cell_unit(c, int(u.get("uid", -1)), ports._nav_layer(u)).is_empty():
-			return true
+	_index_ensure_current()
+	var uid:=int(u.uid);var layer:=int(battle._cell_index_layer.get(uid,-1))
+	if layer<0 or int(battle._index_unit_id.get(uid,-1))!=int(u.unit):layer=ports._nav_layer(u)
+	var table: Dictionary=battle._cell_index.get(layer,{})
+	var cells: Array=[_unit_cell(u)] if preload("res://simulation/systems/unit_footprint.gd").class_of(int(u.unit))==0 else ports._footprint_cells(u)
+	for cell in cells:
+		var bucket=table.get(cell)
+		if bucket!=null and (bucket.size()>1 or not bucket.has(uid)):return true
 	return false
 
 func _cell_unit(cell: Vector2i, exclude_uid := -1, layer := -1) -> Dictionary:
@@ -38,6 +44,17 @@ func _cell_unit_in(layer: int, cell: Vector2i, exclude_uid: int) -> Dictionary:
 		if int(uid) == exclude_uid: continue
 		return bucket[uid]
 	return {}
+
+func nearby_units(first: Vector2i, second: Vector2i, radius: int, layer: int) -> Array:
+	_index_ensure_current()
+	var table: Dictionary=battle._cell_index.get(layer,{})
+	var found := {}
+	for center in [first,second]:
+		for x in range(maxi(0,center.x-radius),mini(int(battle.map_data.rows),center.x+radius+1)):
+			for y in range(maxi(0,center.y-radius),mini(int(battle.map_data.cols),center.y+radius+1)):
+				var bucket: Dictionary=table.get(Vector2i(x,y),{})
+				for uid in bucket:found[uid]=bucket[uid]
+	return found.values()
 
 func _index_eligible(u: Dictionary) -> bool:
 	if u == null: return false
@@ -152,11 +169,12 @@ func _rebuild_unit_index() -> void:
 		_target_sync(u)
 
 func _unit_placement_free(anchor: Vector2i, unit_id: int, layer := 0, exclude_uid := -1) -> bool:
+	_index_ensure_current()
 	for raw in preload("res://simulation/systems/unit_footprint.gd").shape(unit_id, anchor):
 		var c: Vector2i = raw
 		if c.x < 0 or c.y < 0 or c.x >= int(battle.map_data.rows) or c.y >= int(battle.map_data.cols): return false
 		if battle.nav.is_solid(c, layer): return false
-		if not _cell_unit(c, exclude_uid, layer).is_empty(): return false
+		if not (_cell_unit_in(layer,c,exclude_uid) if layer>=0 else _cell_unit(c,exclude_uid,layer)).is_empty(): return false
 	return true
 
 func _free_unit_cell(cell: Vector2i, layer := 0, exclude_uid := -1, unit_id := -1, max_radius := 12) -> Vector2i:
@@ -176,11 +194,11 @@ func _separate_unit(u: Dictionary) -> void:
 	var st := str(u.get("state", ""))
 	# 采集/运货到达目标后仍不能叠格；路线尚未走完时允许穿过拥挤中间格，
 	# 否则后处理会每帧把工人推回原点，形成“有路径但永远到不了”的死循环。
-	if st in ["move", "gather", "deliver", "join", "build", "repair", "board", "unload"] and not (u.get("path", []) as Array).is_empty(): return
+	if st in TRANSIT_STATES and not (u.get("path", []) as Array).is_empty(): return
 	if not _unit_overlaps_other(u): return
 	var cell := _unit_cell(u)
 	# 采集/运货/施工只在相邻一格内让位；否则会被推到很远，反而走不回目标。
-	var near_only := st in ["gather", "deliver", "build"]
+	var near_only := st in CLOSE_WORK_STATES
 	# R05：让位格必须与当前格**连通**。直接使用 _free_unit_cell 会在完全被墙围住时
 	# 把单位瞬移到墙外（评审夹具：一圈封锁后位移约 90.7px，实际无路可走）。
 	var free := _connected_separation_cell(u, cell, near_only)
@@ -224,3 +242,15 @@ func _connected_separation_cell(u: Dictionary, cell: Vector2i, near_only: bool) 
 					continue
 				return c
 	return Vector2i(-1, -1)
+
+## Projectile arrivals and kill rewards resolve one UID, not a filtered copy of
+## the whole army. Neutral, dying and attached records retain the legacy lookup.
+func unit_by_uid(uid: int) -> Dictionary:
+	_index_ensure_current()
+	var owner=battle._target_owner.get(uid)
+	if owner!=null:
+		var found: Dictionary=battle._targets[int(owner)].get(uid,{})
+		if not found.is_empty() and int(found.uid)==uid:return found
+	for unit: Dictionary in battle.units:
+		if int(unit.uid)==uid:return unit
+	return {}
