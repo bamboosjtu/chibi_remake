@@ -62,7 +62,13 @@ func _check_end() -> void:
 	battle.cnt_enemy_buildings = enemy_buildings
 	if battle.game_end != 0:
 		return
-	if _objective_eval() == 1:
+	var policy: Dictionary = battle.rules.defeat_policy(str(battle.map_id)) if battle.rules != null else {"mode":"economy"}
+	if int(policy.get("requiredOfficer",0))>0 and not _required_officer_alive(int(policy.requiredOfficer)):
+		battle.game_end=2;ports._show_end(2);return
+	var outcome := _objective_eval()
+	if outcome == 2:
+		battle.game_end=2;ports._show_end(2);return
+	if outcome == 1:
 		# 专属出口与通用歼灭胜利分开：objective_done + task_latches 是脚本达成的证据。
 		battle.game_end = 1
 		ports._show_end(1)
@@ -74,10 +80,16 @@ func _check_end() -> void:
 		ports._show_end(1)
 		print("VICTORY")
 	# 失败 = (资源1 == 0 或 我军机动单位 == 0) 且 我军建筑 == 0
-	elif (battle.gold <= 0.0 or int(mine.units) == 0) and int(mine.buildings) == 0:
+	elif int(mine.buildings)==0 and (int(mine.units)==0 or (str(policy.mode)=="economy" and battle.gold<=0.0)):
 		battle.game_end = 2
 		ports._show_end(2)
 		print("DEFEAT")
+
+func _required_officer_alive(officer: int) -> bool:
+	for unit in battle.units:
+		if int(unit.owner)==battle.player_owner and unit.alive and unit.die_t<0 and int(unit.get("officer",{}).get("index",-1))+1==officer:
+			return true
+	return false
 
 func _unit_name(unit_id: int) -> String:
 	return str(battle.map_data.units.get(str(unit_id), {}).get("name", "unit %d" % unit_id))

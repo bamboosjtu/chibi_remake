@@ -46,16 +46,14 @@ func _install(live: Node2D, candidate: RefCounted) -> bool:
 func apply_legacy(live: Node2D, old: Dictionary, records: Array, version: int) -> bool:
 	var game: Node = live.get_node("/root/Game")
 	if not Fields.omissions(live.state).is_empty(): return false
-	var seed: Dictionary = game.snapshot(live.units, live.commands.world._resources(), live.saver.save_extra())
-	seed.map = str(live.map_id)
 	var validator = preload("res://app/saves/snapshot_validator.gd").new(live, live.saver.content_revision, live.saver._valid_cost, live.saver._valid_integer)
-	var plan: Dictionary = validator.prepare(seed,seed.units)
-	if plan.is_empty(): return false
-	var candidate = preload("res://app/saves/candidate_world.gd").new()
-	if not candidate.prepare(live.state,live.world.definition) or not candidate.saver.restore_candidate(seed,seed.units,plan):
-		candidate.dispose(); return false
+	var candidate = preload("res://app/saves/legacy_seed.gd").create(live)
+	if candidate==null: return false
 	if not candidate.saver.restore_legacy(old,records,version):
 		candidate.dispose(); return false
+	candidate.state.nav.set_resources(candidate.state.decor_targets)
+	candidate.state.nav.rebuild_buildings(candidate.state.units)
+	candidate.state.visibility.update(candidate.state.units,candidate.state.player_owner)
 	var resources := {"gold":candidate.state.gold,"wood":candidate.state.wood,"food":candidate.state.food,"stone":candidate.state.stone}
 	var normalized: Dictionary = game.snapshot(candidate.state.units,resources,candidate.saver.save_extra())
 	normalized.map = str(live.map_id)

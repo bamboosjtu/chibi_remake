@@ -18,7 +18,7 @@ if(write) {
   if((i+1)%10000===0)console.log('Runtime assets hashed: '+(i+1)+'/'+expected.length);
  }
  fs.writeFileSync(SNAPSHOT,lines.join('\n')+'\n');
- const rules=fs.readFileSync('.gitignore','utf8').replace(/\n?# BEGIN RUNTIME ASSETS[\s\S]*?# END RUNTIME ASSETS\n?/,'').trimEnd();
+ const rules=fs.readFileSync('.gitignore','utf8').replaceAll('\r\n','\n').replaceAll('\r','').replace(/\n?# BEGIN RUNTIME ASSETS[\s\S]*?# END RUNTIME ASSETS\n?/,'').trimEnd();
  fs.writeFileSync('.gitignore',rules+'\n\n'+ignoreAllowlist(expected)+'\n');
  console.log('RUNTIME ASSETS WRITE files='+expected.length+' GiB='+(bytes/2**30).toFixed(3));
 } else {

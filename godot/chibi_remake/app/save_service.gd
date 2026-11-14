@@ -17,6 +17,7 @@ extends RefCounted
 
 var host: Object
 var last_load_error := ""
+var _content_revision_cache := ""
 const ActionClock = preload("res://simulation/systems/action_clock.gd")
 const TickTimers = preload("res://simulation/systems/tick_timers.gd")
 const TechnologyState = preload("res://simulation/systems/technology_state.gd")
@@ -61,24 +62,32 @@ func _apply_snapshot(d: Dictionary) -> bool:
 	return preload("res://app/saves/world_transaction.gd").new().apply_legacy(host,d,arr,ver)
 
 func restore_legacy(d: Dictionary, arr: Array, ver: int) -> bool:
+	var resources=d.get("resources")
+	if resources is Dictionary:
+		for key in ["gold","wood","food","stone"]:
+			if not resources.has(key):continue
+			var value=resources[key]
+			if not (value is int or value is float) or not is_finite(float(value)) or float(value)<0:return false
 	var applied := 0
 	if ver >= 3:
 		applied = _apply_v3(d, arr)
 	else:
 		applied = _apply_legacy(d, arr, ver)
-	_restore_resources(d)
 	if applied == 0:
 		push_warning("load save: %d 条记录一条都没能应用（存档与当前关卡不匹配？）" % arr.size())
+		return false
+	_restore_resources(d)
 	host.commands.world._rebuild_unit_index()
 	if applied > 0:
 		host.auto_control = false # v1-v3 have no delegation flag.
+		for unit in host.units: host.next_uid=maxi(int(host.next_uid),int(unit.uid)+1)
 	return applied > 0
 
 func _apply_v4(d: Dictionary, arr: Array) -> bool:
 	var validator = preload("res://app/saves/snapshot_validator.gd").new(host, content_revision, _valid_cost, _valid_integer)
 	var plan: Dictionary = validator.prepare(d, arr)
 	if plan.is_empty():
-		last_load_error = "存档内容版本、字段或对象引用不兼容；当前战场已保留。"
+		last_load_error = validator.compatibility_error if not validator.compatibility_error.is_empty() else "存档内容版本、字段或对象引用不兼容；当前战场已保留。"
 		return false
 	var transaction = preload("res://app/saves/world_transaction.gd").new()
 	return transaction.apply(host, d, arr, plan)
@@ -88,17 +97,36 @@ func restore_candidate(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 	return restorer.restore(d, arr, plan)
 
 func content_revision() -> String:
+	if _content_revision_cache.is_empty():
+		var data: Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://data/%s.json" % str(host.map_id)))
+		preload("res://simulation/systems/unit_rules.gd").apply_definitions(data)
+		preload("res://simulation/systems/building_rules.gd").apply_definitions(data)
+		var projection:=_map_projection(data,true)
+		_content_revision_cache=("battle-content-v3:"+preload("res://app/saves/rules_identity.gd").catalog_hash(JSON.stringify(projection))).sha256_text()
+	return _content_revision_cache
+
+func legacy_content_compatible(previous: String) -> bool:
+	for hash in preload("res://app/saves/rules_identity.gd").legacy_scenario_hashes():
+		if previous == _map_revision(str(hash)): return true
+	return false
+
+func _map_revision(scenario_hash: String) -> String:
 	var f := FileAccess.open("res://data/%s.json" % str(host.map_id), FileAccess.READ)
 	var data: Dictionary = JSON.parse_string(f.get_as_text())
+	var simulation:=_map_projection(data,false)
+	return ("battle-content-v2:one-based-officers:med-groups:" + JSON.stringify(simulation) + scenario_hash).sha256_text()
+
+func _map_projection(data: Dictionary, modern: bool) -> Dictionary:
 	var simulation := {}
-	for key in ["rows", "cols", "tileW", "terrainW", "terrainH", "walkable", "terrainWalkable", "scenario", "navigation", "units", "objects"]:
-		simulation[key] = data.get(key)
+	var fields: Array=["rows", "cols", "tileW", "terrainW", "terrainH", "walkable", "terrainWalkable", "scenario", "navigation", "units", "objects"]
+	if modern:fields.append_array(["waterWalkable","decor"])
+	for key in fields:simulation[key]=data.get(key)
 	for entry in simulation.units.values():
 		entry.erase("sheet")
 		entry.erase("sheetK")
 	for entry in simulation.objects:
 		entry.erase("sheet")
-	return ("battle-content-v2:one-based-officers:med-groups:" + JSON.stringify(simulation) + FileAccess.get_sha256("res://data/db/scenario_rules.json")).sha256_text()
+	return simulation
 
 func _numeric_keys(value: Dictionary) -> Dictionary:
 	var result := {}
@@ -113,6 +141,8 @@ func _apply_legacy(d: Dictionary, arr: Array, ver: int) -> int:
 func _apply_unit_record(u: Dictionary, rec: Dictionary) -> void:
 	u.ax = float(rec.get("x", u.ax))
 	u.ay = float(rec.get("y", u.ay))
+	var cell: Vector2i=host.nav.cell_of_px(u.ax,u.ay)
+	u.A=cell.x;u.B=cell.y
 	var dying := float(rec.get("dieT",-1.0)) >= 0.0
 	var recorded_alive := bool(rec.get("alive",true))
 	var recorded_hp := float(rec.get("hp",u.maxhp))
@@ -193,7 +223,7 @@ func save_extra(reconcile := true) -> Dictionary:
 		var target: Dictionary = host.decor_cells[key]
 		if int(target.unit) in [100,102,104]: decor[key] = {"stock": float(target.get("stock", 0))}
 	var extra := {"nextUid": int(host.next_uid), "trainings": host.trainings, "gameEnd": int(host.game_end), "simulation": {
-		"rngState": str(host.simulation_rng.state), "contentRevision": content_revision(), "tick": host.sim_tick, "accumulator": host.sim_acc, "speedIndex": host.clock.speed_index,
+		"rngState": str(host.simulation_rng.state), "contentRevision": content_revision(), "rulesRevision":preload("res://app/saves/rules_identity.gd").current(), "rulesPolicy":"legacy-adopts-current; fingerprinted-requires-match", "tick": host.sim_tick, "accumulator": host.sim_acc, "speedIndex": host.clock.speed_index,
 		"explored": host.visibility.snapshot(), "projectiles":host.projectiles.snapshot(), "fireFields":host.fire_fields.snapshot(), "decorResources": decor,
 		"aiResources": host.ai_res, "groups": host.control_groups,
 		"taskLatches": host.task_latches, "officerProgress": host.officer_progress, "terrainChanges": host.terrain_changes, "taskEvents": host.task_events, "objectiveDone": host.objective_done,

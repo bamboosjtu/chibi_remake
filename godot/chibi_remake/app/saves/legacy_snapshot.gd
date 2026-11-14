@@ -9,6 +9,26 @@ func _init(battle: Object, record: Callable, trainings: Callable) -> void:
 	_apply_unit_record = record
 	_restore_trainings = trainings
 
+static func _valid_uid(value) -> bool:
+	return (value is int or value is float) and is_finite(float(value)) and float(value)==floorf(float(value)) and float(value)>=0
+
+static func _valid_record(record) -> bool:
+	if not record is Dictionary or not _valid_uid(record.get("uid")): return false
+	for key in ["x","y","hp"]:
+		var value=record.get(key)
+		if not (value is int or value is float) or not is_finite(float(value)): return false
+	for key in ["unit","owner"]:
+		if not _valid_uid(record.get(key)): return false
+	if int(record.unit)>52 or int(record.owner)>4:return false
+	if record.has("dieT") and (not (record.dieT is int or record.dieT is float) or not is_finite(float(record.dieT))):return false
+	for key in ["officerIndex","mapIndex"]:
+		if record.has(key):
+			var value=record[key]
+			if not (value is int or value is float) or not is_finite(float(value)) or float(value)!=floorf(float(value)) or float(value)<-1:return false
+	for key in ["alive","mapObject"]:
+		if record.has(key) and not record[key] is bool and record[key] not in [0,1]:return false
+	return true
+
 func _apply_v3(d: Dictionary, arr: Array) -> int:
 	var by_uid := {}
 	var by_map_index := {}
@@ -20,10 +40,12 @@ func _apply_v3(d: Dictionary, arr: Array) -> int:
 	# 快照里"点名"过的地图对象（无论死活）—— 没被点名的就是已经阵亡并被清理的
 	var mentioned := {}
 	for rec in arr:
-		if rec is Dictionary and bool(rec.get("mapObject", false)):
-			mentioned[int(rec.get("uid", -1))] = true
+		if not _valid_record(rec): return 0
+		if mentioned.has(int(rec.uid)): return 0
+		mentioned[int(rec.uid)]=true
 
 	var applied := 0
+	var applied_entities: Array=[]
 	var respawned := 0
 	var skipped := 0
 	var max_uid := -1
@@ -43,14 +65,17 @@ func _apply_v3(d: Dictionary, arr: Array) -> int:
 			if not cand.is_empty() and int(cand.unit) == unit_id and int(cand.owner) == owner:
 				target = cand
 		if target.is_empty():
-			if host.commands.world._spawn_unit(unit_id, owner, float(rec.get("x", 0.0)), float(rec.get("y", 0.0))):
+			if host.commands.world._spawn_unit(unit_id, owner, float(rec.get("x", 0.0)), float(rec.get("y", 0.0)),true):
 				target = host.units[host.units.size() - 1]
 				respawned += 1
 			else:
 				skipped += 1
 				continue
 		if host.view != null: host.view.rekey_unit(target, uid)
+		if applied_entities.any(func(unit):return is_same(unit,target)): return 0
+		applied_entities.append(target)
 		target["uid"] = uid                      # ARCH-002：身份写回
+		target.map_object=is_map;target["map_index"]=int(rec.get("mapIndex",-1))
 		max_uid = maxi(max_uid, uid)
 		_apply_unit_record.call(target, rec)
 		applied += 1
@@ -62,7 +87,7 @@ func _apply_v3(d: Dictionary, arr: Array) -> int:
 	var i: int = host.units.size() - 1
 	while i >= 0:
 		var u: Dictionary = host.units[i]
-		if bool(u.get("map_object", false)) and not mentioned.has(int(u.uid)):
+		if not applied_entities.any(func(unit):return is_same(unit,u)):
 			host.commands.world._free_unit_at(i)
 			removed += 1
 		i -= 1
@@ -72,7 +97,7 @@ func _apply_v3(d: Dictionary, arr: Array) -> int:
 	host.game_end = int(d.get("gameEnd", 0))
 	print("save v3 applied: %d/%d units (%d respawned, %d skipped), %d stale map objects removed, nextUid=%d, trainings=%d" % [
 		applied, arr.size(), respawned, skipped, removed, int(host.next_uid), host.trainings.size()])
-	return applied
+	return applied if skipped==0 else 0
 
 ## v1/v2：数组记录。没有 mapObject/mapIndex，无法做快照语义，按旧行为尽力恢复。
 
@@ -94,6 +119,7 @@ func _apply_legacy(d: Dictionary, arr: Array, ver: int) -> int:
 		if ver < 2 or rec.size() < 9:
 			if rec.size() >= 4 and ri < host.units.size() and bool(host.units[ri].get("map_object", false)):
 				_apply_unit_record.call(host.units[ri], {
+					"officerIndex":int(host.units[ri].get("officer",{}).get("index",-1)),
 					"alive": int(rec[0]) != 0, "x": float(rec[1]), "y": float(rec[2]),
 					"hp": float(rec[3]), "dieT": -1.0, "state": "idle",
 				})
@@ -121,6 +147,7 @@ func _apply_legacy(d: Dictionary, arr: Array, ver: int) -> int:
 				skipped += 1
 				continue
 		_apply_unit_record.call(target, {
+			"officerIndex":int(target.get("officer",{}).get("index",-1)),
 			"alive": int(rec[1]) != 0, "x": float(rec[2]), "y": float(rec[3]),
 			"hp": float(rec[4]), "dieT": -1.0, "state": "idle",
 		})

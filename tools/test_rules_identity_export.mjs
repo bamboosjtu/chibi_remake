@@ -1,0 +1,22 @@
+import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {runGodot} from './lib/godot_process.mjs';
+const args=process.argv.slice(2),option=(key,fallback)=>args.includes(key)?args[args.indexOf(key)+1]:fallback;
+const engine=path.resolve(option('--engine','Godot_v4.7.2-stable_win64.exe')),directory=path.resolve(option('--output','_work/rules-identity-export'));
+fs.mkdirSync(directory,{recursive:true});const project=fs.mkdtempSync(path.join(directory,'project-'));
+fs.mkdirSync(path.join(project,'app/saves'),{recursive:true});fs.mkdirSync(path.join(project,'data/db'),{recursive:true});
+fs.copyFileSync('godot/chibi_remake/app/saves/rules_identity.gd',path.join(project,'app/saves/rules_identity.gd'));
+for(const file of fs.readdirSync('godot/chibi_remake/data/db').filter(f=>f.endsWith('.json')))fs.copyFileSync('godot/chibi_remake/data/db/'+file,path.join(project,'data/db',file));
+fs.writeFileSync(path.join(project,'project.godot'),'config_version=5\n[application]\nrun/main_scene="res://main.tscn"\n[rendering]\nrenderer/rendering_method="gl_compatibility"\n');
+fs.writeFileSync(path.join(project,'main.tscn'),'[gd_scene load_steps=2 format=3]\n[ext_resource type="Script" path="res://main.gd" id="1"]\n[node name="Identity" type="Node"]\nscript=ExtResource("1")\n');
+fs.writeFileSync(path.join(project,'main.gd'),'extends Node\nfunc _ready() -> void:\n print("RULES IDENTITY ",preload("res://app/saves/rules_identity.gd").current())\n get_tree().quit()\n');
+fs.writeFileSync(path.join(project,'export_presets.cfg'),'[preset.0]\nname="Identity"\nplatform="Windows Desktop"\nrunnable=true\nexport_filter="all_resources"\ninclude_filter="*.json"\nexclude_filter=""\nscript_export_mode=2\n[preset.0.options]\nbinary_format/embed_pck=false\n');
+const probe=path.join(directory,'source_probe.gd');fs.writeFileSync(probe,'extends SceneTree\nfunc _initialize() -> void:\n print("RULES IDENTITY ",load("res://app/saves/rules_identity.gd").current())\n quit()\n');
+const results=[],temporary=path.join(directory,'temp');fs.mkdirSync(temporary,{recursive:true});
+async function run(name,args,markers=[]){const r=await runGodot({engine,directory,name,args,markers,timeout:120,env:{TEMP:temporary,TMP:temporary}});const {output,...record}=r;results.push(record);fs.writeFileSync(path.join(directory,'results.json'),JSON.stringify(results,null,2));assert(r.ok,r.output);return output;}
+const source=await run('source',['--headless','--path',path.resolve('godot/chibi_remake'),'--script',probe,'--','--save-test-id=rules-export'],['RULES IDENTITY ']);
+await run('import',['--headless','--editor','--import','--path',project]);const pack=path.join(directory,'identity.pck');
+await run('export',['--headless','--path',project,'--export-pack','Identity',pack]);
+assert(fs.existsSync(pack),'Export did not produce a resource pack');
+const exported=await run('compiled',['--headless','--main-pack',pack],['RULES IDENTITY ']);
+const value=text=>text.match(/RULES IDENTITY ([a-f0-9]{64})/)?.[1];assert(value(source));assert.equal(value(exported),value(source),'Source/compiled-export rule identities differ');
+fs.writeFileSync(path.join(directory,'identity.json'),JSON.stringify({identity:value(source),sourceMatchesCompiled:true},null,2));
+console.log('RULES EXPORT IDENTITY PASS source / compiled script paths / canonical JSON / identical fingerprint');

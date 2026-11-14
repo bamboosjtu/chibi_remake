@@ -236,21 +236,9 @@ func _place_building(owner: int, building_type: int, near_px: Vector2, as_site :
 				if not battle.nav.can_place(cells):
 					continue
 				# R04：建筑选址必须检查移动单位的**整块**占格，不能只看锚点。
-				var cell_set := {}
-				for raw in cells:
-					cell_set[raw] = true
 				var occupied := false
-				for existing in battle.units:
-					if not bool(existing.get("alive", false)) or float(existing.get("die_t", -1)) >= 0.0:
-						continue
-					if bool(existing.get("is_building", false)) or int(existing.get("site_inside_uid", -1)) >= 0:
-						continue            # 建筑已在 nav 占用中（can_place 已判）
-					for footprint_cell in ports._footprint_cells(existing):
-						if cell_set.has(footprint_cell):
-							occupied = true
-							break
-					if occupied:
-						break
+				for footprint_cell in cells:
+					if not ports._cell_unit(footprint_cell,-1,0).is_empty(): occupied=true;break
 				if occupied:
 					continue
 				if not access_workers.is_empty():

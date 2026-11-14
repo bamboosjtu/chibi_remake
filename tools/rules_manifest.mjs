@@ -1,0 +1,9 @@
+import fs from 'node:fs';import path from 'node:path';import crypto from 'node:crypto';
+const root='godot/chibi_remake',target=root+'/data/db/rules_manifest.json';
+const walk=dir=>fs.readdirSync(dir,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name,'en')).flatMap(e=>e.isDirectory()?walk(dir+'/'+e.name):e.name.endsWith('.gd')?[dir+'/'+e.name]:[]);
+const files=[...walk(root+'/simulation'),root+'/app/battle/bootstrap.gd'].sort();
+const manifest={schemaVersion:1,files:Object.fromEntries(files.map(file=>['res://'+path.relative(root,file).replaceAll('\\','/'),crypto.createHash('sha256').update(fs.readFileSync(file,'utf8').replace(/^\uFEFF/,'').replaceAll('\r\n','\n')).digest('hex')]))};
+const text=JSON.stringify(manifest,null,2)+'\n';
+if(process.argv.includes('--write'))fs.writeFileSync(target,text);
+else if(!fs.existsSync(target)||fs.readFileSync(target,'utf8')!==text)throw Error('Effective simulation rules changed; review and run node tools/rules_manifest.mjs --write');
+console.log('RULES MANIFEST PASS '+files.length+' simulation sources / stable exported identity');

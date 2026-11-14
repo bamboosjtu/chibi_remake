@@ -173,6 +173,8 @@ func _run() -> void:
 	for mission in [14, 30]:
 		battle.scenario_mission = mission
 		battle.task_latches = {}; battle.task_events = []; battle.objective_done = false
+		leader.owner = (2 if battle.player_owner!=2 else 3) if mission==14 else battle.player_owner
+		for unit in [leader,one,two,three]: unit.status_173=70
 		for other in [one, two, three]:
 			other.owner = battle.player_owner if mission == 14 else 2
 			if int(other.owner) == int(battle.player_owner) and mission == 30:
@@ -181,7 +183,8 @@ func _run() -> void:
 		assert(battle.rules.tick() == 0 and battle.task_events.size() == 2)
 		assert(battle.rules.tick() == 1 and battle.task_events.size() == 3)
 		assert(battle.rules.tick() == 1 and battle.task_events.size() == 3)
-		assert(int(leader.status_173) == (110 if mission == 14 else 70))
+		assert(int(leader.status_173) == (70 if mission == 14 else 30))
+		assert(int(one.status_173) == (110 if mission == 14 else 70))
 	for entry in [[19, 50, 60], [20, 63, 241], [29, 54, 171]]:
 		battle.scenario_mission = int(entry[0])
 		battle.task_latches = {}; battle.task_events = []; battle.objective_done = false

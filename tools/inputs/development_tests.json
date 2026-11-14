@@ -428,6 +428,12 @@
       "markers": [
         "NAVIGATION TOPOLOGY PASS"
       ]
+    },
+    {
+      "script": "test_benchmark_guard",
+      "markers": [
+        "BENCHMARK GUARD PASS"
+      ]
     }
   ]
 }

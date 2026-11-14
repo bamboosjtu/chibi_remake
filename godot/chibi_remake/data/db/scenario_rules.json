@@ -154,7 +154,8 @@
             "officer": 60,
             "otherOfficer": 34,
             "otherSide": "player",
-            "radius": 10
+            "radius": 10,
+            "side": "enemy"
           },
           "effects": [
             {
@@ -176,7 +177,8 @@
             "officer": 60,
             "otherOfficer": 35,
             "otherSide": "player",
-            "radius": 10
+            "radius": 10,
+            "side": "enemy"
           },
           "effects": [
             {
@@ -198,7 +200,8 @@
             "officer": 60,
             "otherOfficer": 36,
             "otherSide": "player",
-            "radius": 10
+            "radius": 10,
+            "side": "enemy"
           },
           "effects": [
             {
@@ -218,9 +221,10 @@
               29,
               34,
               52
-            ]
+            ],
+            "side": "enemy"
           },
-          "win": true
+          "lose": true
         }
       ]
     },
@@ -429,5 +433,29 @@
         }
       ]
     }
-  }
+  },
+  "campaignModes": {
+    "chibic3": {
+      "mode": "army"
+    },
+    "chibic7": {
+      "mode": "army"
+    },
+    "chibic14": {
+      "mode": "escort",
+      "requiredOfficer": 60
+    },
+    "chibil6": {
+      "mode": "escort",
+      "requiredOfficer": 40
+    },
+    "chibil8": {
+      "mode": "escort",
+      "requiredOfficer": 34
+    },
+    "chibil14": {
+      "mode": "intercept"
+    }
+  },
+  "defaultDefeatMode": "economy"
 }

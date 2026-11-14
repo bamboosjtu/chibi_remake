@@ -79,6 +79,39 @@
         "--noview"
       ],
       "timeout": 240
+    },
+    {
+      "script": "test_campaign_integrity",
+      "markers": [
+        "CAMPAIGN FIRST TICK PASS",
+        "L14 REAL CHAPTER PASS",
+        "CAMPAIGN OBJECTIVES PASS"
+      ],
+      "args": [
+        "--noview"
+      ],
+      "timeout": 600
+    },
+    {
+      "script": "test_legacy_isolation",
+      "markers": [
+        "LEGACY ISOLATION PASS",
+        "RULES IDENTITY PASS"
+      ],
+      "args": [
+        "--noview"
+      ],
+      "timeout": 240
+    },
+    {
+      "script": "test_contact_and_occupancy",
+      "markers": [
+        "CONTACT PASS",
+        "OCCUPANCY PASS"
+      ],
+      "args": [
+        "--noview"
+      ]
     }
   ]
 }

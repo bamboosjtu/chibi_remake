@@ -231,12 +231,14 @@
 
 ## 6. 内容哈希
 
-存档保存 `contentRevision`，用于判断关卡内容是否变化。计算范围：
+存档将关卡定义与规则版本分开标识：
 
-- 包含：`rows`、`cols`、`tileW`、`terrainW`、`terrainH`、`walkable`、`terrainWalkable`、`scenario`、`navigation`、`units`、`objects`，以及 `scenario_rules.json` 的哈希。
-- 排除：`units[*].sheet`、`units[*].sheetK`、`objects[*].sheet`。
+- `contentRevision`：关卡有效定义的规范哈希，覆盖尺寸、通行网格、水层、资源布置、导航、参战方、有效单位定义与地图对象；排除图集路径与显示倍率。字典键序及文本换行不影响标识。
+- `rulesRevision`：引擎代码版本、全部模拟脚本与开局装配脚本、完整规则数据的规范哈希。脚本以 UTF-8/LF 规范化；JSON 按语义与排序后的键计算，排除仅负责声明与迁移的清单。
+- `rules_manifest.json`：编译导出后的脚本身份声明。编辑模拟代码后须执行 `node tools/rules_manifest.mjs --write`；构建与轻量门禁检查声明是否与代码一致。
+- `rules_contract.json`、`registry_compatibility.json`：明确的旧内容迁移依据，不作为正在运行的战斗规则。添加兼容记录不会改变当前规则版本。
 
-因此替换外观或打包路径不会使存档失效；改地形、通行、对象、战役参数或任务规则会使旧档失效（除非命中兼容表）。
+无规则指纹的旧档采用已声明的迁移策略；新档要求规则版本匹配。规则版本与存档结构版本独立，不因增加指纹字段提升 v8 格式号。替换纹理、打包路径或文本格式不会改变模拟版本；规则或关卡定义变化须迁移或拒收。
 
 ## 7. 数据校验
 

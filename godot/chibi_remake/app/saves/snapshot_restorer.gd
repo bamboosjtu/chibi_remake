@@ -20,6 +20,9 @@ func restore(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 	var ids: Dictionary = plan.ids
 	var speed: int = int(plan.speed)
 	var decor_snapshot: Dictionary = plan.decor
+	# Unit factories must see snapshot technology, never the live world's levels.
+	host.player_tech=simulation.get("playerTech",{}).duplicate(true)
+	host.army_tech=_numeric_keys.call(simulation.get("armyTech",{})).duplicate(true)
 	# ---- 校验通过：开始交换世界 ----
 	# R07：待确认的施法/单挑引用属于旧世界，恢复后不能保留为可执行状态。
 	host.commands.military._reset_jimou()
@@ -46,15 +49,7 @@ func restore(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 		u.map_object = bool(rec.get("mapObject", false))
 		u["map_index"] = int(rec.get("mapIndex", -1))
 		var state: Dictionary = rec.simulation
-		u.maxhp = float(state.get("maxhp", u.maxhp))
-		_apply_unit_record.call(u, rec)
-		for key in preload("res://app/saves/snapshot_fields.gd").restore_fields():
-			if state.get(key) != null:
-				# `stock`/`stock_max` 只存在于资源物件（地图对象）—— 读档时单位是新建的普通单位，
-				# 没有该键（typeof = TYPE_NIL）；type_convert(x, TYPE_NIL) 会把它变成 null，
-				# 之后采集结算 float(null) 直接报错。这里按"原值写回"处理。
-				var want := typeof(u.get(key))
-				u[key] = state[key] if want == TYPE_NIL else type_convert(state[key], want)
+		_restore_scalars(u,rec,state,not simulation.has("rulesRevision"))
 		u.path = []
 		for point in state.get("path", []):
 			u.path.append(Vector2(float(point[0]), float(point[1])))
@@ -144,6 +139,17 @@ func restore(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 			if host.game_end != 0: host.view.show_end(host.game_end)
 		host.view.projectile_view.impacts.clear()
 	return true
+
+func _restore_scalars(unit: Dictionary, record: Dictionary, state: Dictionary, adopt_rules: bool) -> void:
+	if not adopt_rules: unit.maxhp=float(state.get("maxhp",unit.maxhp))
+	_apply_unit_record.call(unit,record)
+	for key in preload("res://app/saves/snapshot_fields.gd").restore_fields():
+		# Legacy archives adopt current base/max HP rules while retaining saved
+		# actual HP. The applied tech-HP marker still prevents double bonuses.
+		if adopt_rules and key in ["base_maxhp","maxhp"]: continue
+		if state.get(key)!=null:
+			var want:=typeof(unit.get(key))
+			unit[key]=state[key] if want==TYPE_NIL else type_convert(state[key],want)
 
 func _restore_clock(simulation: Dictionary, speed: int) -> void:
 	host.clock.set_speed(int(speed))

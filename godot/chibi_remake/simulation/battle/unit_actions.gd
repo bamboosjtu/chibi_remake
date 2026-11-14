@@ -86,10 +86,10 @@ func _step_unit_inner(u: Dictionary, delta: float) -> void:
 			# 仍应视为贴脸可攻击（否则会被前面的单位卡在 66px 外）。
 			# R06：放宽到两格时必须同时确认中间没有墙/不可通行地形/封闭建筑，
 			# 否则会“隔墙扣血”。远程越墙仍走独立规则（不在此补偿内）。
-			if not in_reach and preload("res://simulation/systems/combat_rules.gd").effective_range(u) <= 1:
+			if preload("res://simulation/systems/combat_rules.gd").effective_range(u) <= 1:
 				var uc := ports._unit_cell(u)
 				var tc := ports._unit_cell(t)
-				in_reach = maxi(absi(uc.x - tc.x), absi(uc.y - tc.y)) <= 2 and ports._melee_line_clear(u, t)
+				in_reach = (in_reach or maxi(absi(uc.x - tc.x), absi(uc.y - tc.y)) <= 2) and ports._melee_line_clear(u, t)
 			if in_reach:
 				u.path = []; u.pi = 0
 				if strike:

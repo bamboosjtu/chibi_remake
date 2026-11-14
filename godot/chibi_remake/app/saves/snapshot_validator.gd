@@ -4,6 +4,7 @@ var host: Node2D
 var content_revision: Callable
 var _valid_cost: Callable
 var _valid_integer: Callable
+var compatibility_error := ""
 const ActionClock = preload("res://simulation/systems/action_clock.gd")
 const TickTimers = preload("res://simulation/systems/tick_timers.gd")
 const TechnologyState = preload("res://simulation/systems/technology_state.gd")
@@ -19,21 +20,32 @@ func _valid_control_fields(simulation: Dictionary) -> bool:
 	if simulation.has("rngState") and (not simulation.rngState is String or not str(simulation.rngState).is_valid_int()):return false
 	return true
 
+func _compatible_rules(simulation: Dictionary) -> bool:
+	if simulation.has("rulesRevision"):
+		if simulation.rulesRevision != preload("res://app/saves/rules_identity.gd").current():
+			compatibility_error="存档使用的规则版本与当前不同，未配置迁移；当前战场和存档均保留。";return false
+		if simulation.get("rulesPolicy","") != "legacy-adopts-current; fingerprinted-requires-match": return false
+	if str(simulation.get("contentRevision", "")) != content_revision.call():
+		var compatible: bool = not simulation.has("rulesRevision") and host.saver.legacy_content_compatible(str(simulation.get("contentRevision","")))
+		var registry := FileAccess.open("res://data/db/registry_compatibility.json", FileAccess.READ)
+		if registry != null:
+			var contract = JSON.parse_string(registry.get_as_text())
+			var previous := str(simulation.get("contentRevision", ""))
+			if contract is Dictionary and previous!="" and str(contract.get("previous",{}).get(host.map_id,""))==previous:
+				var target:=str(contract.get("current",{}).get(host.map_id,""))
+				var approved: bool=target==content_revision.call() or (not simulation.has("rulesRevision") and host.saver.legacy_content_compatible(target))
+				compatible=compatible or approved
+		if not compatible:
+			push_warning("存档内容版本与关卡不匹配")
+			return false
+	return true
+
 func prepare(d: Dictionary, arr: Array) -> Dictionary:
 	if not d.get("simulation", {}) is Dictionary or not _valid_cost.call(d.get("resources", {})):
 		return {}
 	var simulation: Dictionary = d.get("simulation", {})
 	if not _valid_control_fields(simulation): return {}
-	if str(simulation.get("contentRevision", "")) != content_revision.call():
-		var compatible := false
-		var registry := FileAccess.open("res://data/db/registry_compatibility.json", FileAccess.READ)
-		if registry != null:
-			var contract = JSON.parse_string(registry.get_as_text())
-			var previous := str(simulation.get("contentRevision", ""))
-			compatible = previous != "" and contract is Dictionary and str(contract.get("previous", {}).get(host.map_id, "")) == previous and str(contract.get("current", {}).get(host.map_id, "")) == content_revision.call()
-		if not compatible:
-			push_warning("存档内容版本与关卡不匹配")
-			return {}
+	if not _compatible_rules(simulation): return {}
 	var ids := {}
 	if not host.visibility.valid_snapshot(simulation.get("explored", "")):
 		return {}

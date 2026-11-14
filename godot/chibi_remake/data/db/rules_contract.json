@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "legacyPolicy": "adopt-current",
+  "fingerprintedPolicy": "require-exact-match",
+  "legacyScenarioHashes": [
+    "45277ab8dc9f0d772a33f1f0efcde0c0dff280b12a04c4c9f6ca4a6161f00450",
+    "a3e1bb66e50f933f7c5ed0df1dd48b9bbf52a48e48f3371dce661042b5624baf"
+  ]
+}

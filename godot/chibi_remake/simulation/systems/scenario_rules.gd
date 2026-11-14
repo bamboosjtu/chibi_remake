@@ -2,13 +2,24 @@ extends RefCounted
 const Access = preload("res://simulation/ports/scenario_rules_access.gd")
 var host: Access
 var missions := {}
+var campaign_modes := {}
+var default_defeat_mode := "economy"
 func _init(h: Object) -> void:
 	host = h.simulation_access("scenario_rules") if h.has_method("simulation_access") else h
 	var f := FileAccess.open("res://data/db/scenario_rules.json", FileAccess.READ)
 	if f != null:
-		missions = JSON.parse_string(f.get_as_text()).get("missions", {})
+		var data: Dictionary = JSON.parse_string(f.get_as_text())
+		missions = data.get("missions", {})
+		campaign_modes = data.get("campaignModes", {})
+		default_defeat_mode = str(data.get("defaultDefeatMode","economy"))
+
+func defeat_policy(map_id: String) -> Dictionary:
+	return campaign_modes.get(map_id,{"mode":default_defeat_mode}).duplicate(true)
 
 func tick() -> int:
+	for stage in missions.get(str(host.scenario_mission), {}).get("stages", []):
+		if host.task_latches.get("%d/%s" % [int(host.scenario_mission),str(stage.id)],false):
+			if bool(stage.get("lose",false)): return 2
 	for stage in missions.get(str(host.scenario_mission), {}).get("stages", []):
 		var key := "%d/%s" % [int(host.scenario_mission), str(stage.id)]
 		if host.task_latches.get(key, false):
@@ -21,6 +32,7 @@ func tick() -> int:
 		host.task_latches[key] = true
 		for effect in stage.get("effects", []):
 			apply_effect(effect)
+		if bool(stage.get("lose",false)): return 2
 		if bool(stage.get("win", false)):
 			host.objective_done = true
 			return 1

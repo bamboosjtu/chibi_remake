@@ -150,8 +150,7 @@ func _ready() -> void:
 	# ARCH-012：导出的 exe 是 GUI 子系统，父进程拿不到 stdout，
 	# 所以冒烟测试把结论写进文件，构建脚本检查文件而不是控制台输出。
 	if "--smoketest" in args:
-		ports._write_smoke(true, "loaded")
-		node.get_tree().quit()
+		_run_smoke()
 		return
 	for argument in args:
 		if argument.begins_with("--native-save="):
@@ -183,6 +182,13 @@ func _initialize_session() -> void:
 		if scene.view != null:scene.view.update_panel())
 	node.get_window().title = "三国赤壁 · 高清重制"
 	node.get_tree().set_auto_accept_quit(false)
+
+func _run_smoke() -> void:
+	var before: int=battle.sim_tick
+	node.commands.world._sim_step(Config.SIM_DT)
+	var valid: bool=battle.sim_tick==before+1 and battle.game_end==0
+	ports._write_smoke(valid,"initialized and advanced one live tick" if valid else "initial simulation ended or did not advance")
+	node.get_tree().quit(0 if valid else 1)
 
 func _apply_scenario() -> void:
 	var sc = battle.map_data.get("scenario", null)
@@ -251,33 +257,9 @@ func _build_build_types() -> void:
 	print("build types: ", battle.build_types)
 
 func _load_officers() -> void:
-	var f := FileAccess.open("res://data/db/officers.json", FileAccess.READ)
-	if f == null:
-		push_warning("data/db/officers.json 缺失 —— 武将不会参与战斗")
-		return
-	var d = JSON.parse_string(f.get_as_text())
-	f.close()
-	if not (d is Dictionary) or not d.has("blocks"):
-		push_warning("data/db/officers.json 解析失败")
-		return
-	for blk in d.blocks:
-		battle._officer_pool[int(blk.get("faction", 0)) - 1] = blk.get("officers", [])
-	var n := 0
-	for arr in battle._officer_pool:
-		n += (arr as Array).size()
-	# OPENING-FORCES：档次0保留默认；正档次转换为等级，前33将的零等级默认5。
-	for side in battle.scenario_sides:
-		var roster: Array = side.get("roster", [])
-		var ranks: Array = side.get("ranks", [])
-		for i in range(mini(roster.size(), ranks.size())):
-			var officer := ports._officer_by_index(int(roster[i]) - 1)
-			if not officer.is_empty() and int(ranks[i]) > 0:
-				officer.level = clampi(int(ranks[i]) - 1, 0, 9)
-	for block in battle._officer_pool:
-		for officer in block:
-			if int(officer.index) < 33 and int(officer.get("level", 0)) == 0: officer.level = 5
-	battle._officer_initial_state = ports._officer_pool_state()
-	print("officers loaded: %d in %d blocks" % [n, battle._officer_pool.size()])
+	battle._officer_pool=preload("res://simulation/definitions/opening_officers.gd").pool(battle.scenario_sides)
+	battle._officer_initial_state=ports._officer_pool_state()
+	print("officers loaded: 117 in %d blocks" % battle._officer_pool.size())
 
 func _assign_officers() -> void:
 	var by_owner := {}

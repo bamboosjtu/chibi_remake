@@ -1,5 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import {spawnSync} from 'node:child_process';
+const rulesCheck=spawnSync(process.execPath,['tools/rules_manifest.mjs','--check'],{encoding:'utf8'});
+if(rulesCheck.status!==0)throw Error(rulesCheck.stderr||rulesCheck.stdout);
 const source='godot/chibi_remake';
 const stage=process.argv[2];
 const terrainArg=process.argv.indexOf('--terrain-root');

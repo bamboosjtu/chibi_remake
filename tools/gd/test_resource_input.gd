@@ -152,6 +152,8 @@ func run() -> void:
 	var file := FileAccess.open("res://data/db/registry_compatibility.json", FileAccess.READ)
 	var contract: Dictionary = JSON.parse_string(file.get_as_text())
 	snapshot.simulation.contentRevision = contract.previous.chibil1
+	# The prior release predates the independent rules fingerprint fields.
+	snapshot.simulation.erase("rulesRevision");snapshot.simulation.erase("rulesPolicy")
 	assert(battle.saver.apply_snapshot(snapshot))
 	snapshot.simulation.contentRevision = "unknown"
 	assert(not battle.saver.apply_snapshot(snapshot))
