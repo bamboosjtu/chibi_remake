@@ -18,7 +18,6 @@ const INPUTS := [
 	"scenario_sides",
 	"game_end",
 	"feedback_text",
-	"feedback_until",
 	"_officer_initial_state",
 	"map_data",
 	"map_id",

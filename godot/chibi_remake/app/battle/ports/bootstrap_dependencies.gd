@@ -101,7 +101,7 @@ func _write_smoke(ok: bool, why: String) -> void:
 	if provider == null: return
 	provider._write_smoke(ok, why)
 
-const CONTRACTS := {"battle_simulation": ["_update_gates"], "campaign": ["_show_end"], "command_groups": ["_group_assign"], "entity_factory": ["_attach_officer", "_make_unit", "_sheet_ref_for", "_spawn_unit"], "harvest_orders": ["_build_decor_targets"], "movement": ["_resolve_navigation_overlaps"], "officer_pool": ["_officer_by_index", "_officer_pool_state"], "scene_controller": ["_apply_save", "_build_terrain", "_build_ui", "_demo", "_fatal", "_screenshot", "_setup_camera", "_write_smoke"], "spatial_index": ["_rebuild_unit_index"]}
+const CONTRACTS := {"battle_simulation": ["_update_gates"], "campaign": ["_show_end"], "command_groups": ["_group_assign"], "entity_factory": ["_attach_officer", "_make_unit", "_sheet_ref_for", "_spawn_unit"], "harvest_orders": ["_build_decor_targets"], "movement": ["_resolve_navigation_overlaps"], "officer_pool": ["_officer_by_index", "_officer_pool_state"], "scene_controller": ["_apply_save", "_build_terrain", "_build_ui", "_demo", "_fatal", "_screenshot", "_setup_camera", "_write_smoke", "_schedule_failed_load_return"], "spatial_index": ["_rebuild_unit_index"]}
 var _provider_battle_simulation: WeakRef
 var _provider_campaign: WeakRef
 var _provider_command_groups: WeakRef
@@ -138,3 +138,8 @@ func disconnect_services() -> void:
 	_provider_officer_pool = null
 	_provider_scene_controller = null
 	_provider_spatial_index = null
+
+func _schedule_failed_load_return() -> void:
+	var provider = _require(_provider_scene_controller, "scene_controller")
+	if provider == null: return
+	provider._schedule_failed_load_return()

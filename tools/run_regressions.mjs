@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import crypto from 'node:crypto';
 import path from 'node:path';
 import {runGodot} from './lib/godot_process.mjs';
 import {matchesKnownFailure} from './lib/regression_result.mjs';
@@ -39,6 +40,9 @@ if (args.includes('--maps')) for (const file of fs.readdirSync(project + '/data'
 if (!jobs.length) throw new Error('Specify --suite <json>, --selftests, --baselines or --maps');
 const results = [];
 for (const job of jobs) {
+	// Portable markers override APPDATA; every regression also needs a save
+	// namespace so testing an installed EXE/PCK cannot touch player slots.
+	job.args.push('--save-test-id=regression-'+crypto.randomUUID());
   const result = await runGodot({engine, directory, ...job});
   if (!result.ok && job.expectedFailure && !result.timedOut) {
     result.knownFailure = matchesKnownFailure(result.output, job.expectedFailure);

@@ -2,6 +2,8 @@ import {spawn} from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
+export const isEngineFailure = output => /SCRIPT ERROR:|Parse Error:|SELFTEST RESULT: FAIL|ERROR: (?:Error calling (?:deferred method|from signal)|Corrupted header|(?:Error: )?Couldn't load project data|Couldn't save project\.binary)/.test(output);
+
 /** Run one isolated engine process. Drain both pipes while enforcing a deadline. */
 export async function runGodot({engine, args, directory, name, markers = [], timeout = 120, env = {}}) {
   fs.mkdirSync(directory, {recursive: true});
@@ -24,7 +26,7 @@ export async function runGodot({engine, args, directory, name, markers = [], tim
   const append = chunk => {
     output += chunk;
     fs.writeFileSync(log, output);
-    if (/SCRIPT ERROR:|Parse Error:/.test(output) && !errorTimer) errorTimer = setTimeout(stop, 25);
+    if (isEngineFailure(output) && !errorTimer) errorTimer = setTimeout(stop, 25);
   };
   child.stdout.on('data', append);
   child.stderr.on('data', append);
@@ -37,6 +39,6 @@ export async function runGodot({engine, args, directory, name, markers = [], tim
   }).finally(() => { clearTimeout(timer); clearTimeout(errorTimer); });
   fs.writeFileSync(log, output);
   const missing = markers.filter(marker => !output.includes(marker));
-  const ok = !timedOut && code === 0 && !/SCRIPT ERROR:|Parse Error:|SELFTEST RESULT: FAIL/.test(output) && !missing.length;
+  const ok = !timedOut && code === 0 && !isEngineFailure(output) && !missing.length;
   return {name, ok, code, timedOut, missing, seconds: (Date.now() - started) / 1000, log, output};
 }

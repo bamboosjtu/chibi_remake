@@ -21,6 +21,7 @@ func ai_owners() -> Array:
 	return out
 
 func _ai_res_of(owner: int) -> Dictionary:
+	if owner <= 0 or owner == battle.player_owner or owner not in ai_owners(): return {}
 	if not battle.ai_res.has(owner):
 		var sd := ports._ai_side(owner)
 		var r: Array = sd.get("resources", [])

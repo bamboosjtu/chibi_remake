@@ -422,6 +422,12 @@
       "markers": [
         "PRESENTATION DIAGNOSTICS PASS"
       ]
+    },
+    {
+      "script": "test_navigation_topology",
+      "markers": [
+        "NAVIGATION TOPOLOGY PASS"
+      ]
     }
   ]
 }

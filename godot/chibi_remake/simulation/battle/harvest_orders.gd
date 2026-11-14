@@ -106,7 +106,6 @@ func _begin_gather(worker: Dictionary, obj: Dictionary, path: Array) -> void:
 	worker.path = path if worker.state == "gather" else []
 	worker.pi = 0
 	worker.target = null
-	worker["stuck_t"] = 0.0
 
 func _order_gather(target_obj: Dictionary) -> int:
 	if not target_obj.get("alive", false) or _yield_of(int(target_obj.get("unit", -1))) == "": return 0

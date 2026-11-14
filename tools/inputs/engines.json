@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "version": "4.7.2.stable.official.ed1daf0bf",
+  "provenance": "Reference executables used for the existing accepted 4.7.2 simulation baselines; hashes pin those exact bytes, without attestation.",
+  "sha256": {
+    "win32": "ab1824f85bfd8e0e4128182c000c4003a3e042245b2967848d089b2a04b22424",
+    "linux": "8d106cbe6144c2dc7e881d61d2429c1a8a76e6b22ef48bd5e48dcf934953f71e",
+    "win32_release": "d34d36f3be1a6c49c56525ae86469b92e4f417ddf0b43cf00dd80c385c4b0562"
+  }
+}

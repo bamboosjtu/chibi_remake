@@ -59,6 +59,7 @@ func restore(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 		for point in state.get("path", []):
 			u.path.append(Vector2(float(point[0]), float(point[1])))
 		u.pi = int(state.get("pi", 0))
+		if state.has("repathTo"): u["repath_to"] = Vector2(state.repathTo[0],state.repathTo[1])
 		TickTimers.restore(state, int(d.v), u)
 		host.stratagems.restore(state,u)
 		ActionClock.restore(state,u)
@@ -123,7 +124,8 @@ func restore(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 		}
 	if host.ai != null:
 		host.ai.restore(simulation.get("ai", {}))
-	host.nav.setup(host.map_data)
+	# rebuild_buildings performs the terrain reset and preserves resource cells.
+	host.nav.set_resources(host.decor_targets)
 	host.nav.rebuild_buildings(host.units)
 	# R02：读档重建的占地必须与新建一致；旧档若把单位留在建筑占地里，这里按重建后的
 	# 真实阻挡把它们挪到最近可走格，避免“合法工人被包进帅帐”。

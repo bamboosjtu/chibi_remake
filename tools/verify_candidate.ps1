@@ -24,12 +24,18 @@ $artifacts=@(Get-ChildItem -LiteralPath $candidate -File -Recurse | Where-Object
 try {
     & node (Join-Path $PSScriptRoot 'run_regressions.mjs') --engine $Executable --native --maps --output (Join-Path $output 'maps')
     if ($LASTEXITCODE -ne 0) { throw "Candidate map loading failed: $output" }
-    Copy-Item -LiteralPath (Join-Path $projectRoot 'Godot_v4.7.2-stable_win64.exe') -Destination $engine
+    . (Join-Path $PSScriptRoot 'engine_environment.ps1')
+    $sourceEngine=Resolve-ChibiEngine $projectRoot
+    & node (Join-Path $PSScriptRoot 'verify_engine.mjs') --engine $sourceEngine
+    if ($LASTEXITCODE -ne 0) { throw 'Candidate debug engine integrity check failed' }
+    Copy-Item -LiteralPath $sourceEngine -Destination $engine
     # Assertions enabled; native DLLs resolve beside this owned temporary engine.
     & node (Join-Path $PSScriptRoot 'run_regressions.mjs') --engine $engine --pack $pack --suite (Join-Path $PSScriptRoot 'inputs/release_tests.json') --baselines --output (Join-Path $output 'regressions')
     if ($LASTEXITCODE -ne 0) { throw "Candidate smoke failed: $output" }
     & node (Join-Path $PSScriptRoot 'verify_native_save.mjs') --exe $Executable --output (Join-Path $output 'native')
     if ($LASTEXITCODE -ne 0) { throw "Native EXE save/restart acceptance failed: $output" }
+    & node (Join-Path $PSScriptRoot 'test_native_isolation.mjs') --exe $Executable --output (Join-Path $output 'native/isolation')
+    if ($LASTEXITCODE -ne 0) { throw "Exported test-entry isolation failed: $output" }
     . (Join-Path $PSScriptRoot 'candidate_verification.ps1')
     $results=@(Read-CandidateResults $output)
     $evidence=[ordered]@{

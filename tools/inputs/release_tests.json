@@ -31,6 +31,44 @@
       "args": [
         "--noview"
       ]
+    },
+    {
+      "script": "test_restore_safety",
+      "markers": [
+        "RESTORE SAFETY PASS"
+      ],
+      "args": [
+        "--noview"
+      ],
+      "timeout": 100
+    },
+    {
+      "script": "test_acceptance_isolation",
+      "markers": [
+        "ACCEPTANCE ISOLATION PASS"
+      ]
+    },
+    {
+      "script": "test_duel_save",
+      "markers": [
+        "DUEL SAVE PASS"
+      ]
+    },
+    {
+      "script": "test_slot_metadata",
+      "markers": [
+        "SLOT METADATA PASS"
+      ]
+    },
+    {
+      "script": "test_continuation_coverage",
+      "markers": [
+        "CONTINUATION COVERAGE PASS"
+      ],
+      "args": [
+        "--noview"
+      ],
+      "timeout": 240
     }
   ]
 }

@@ -5,7 +5,8 @@ function Read-CandidateResults([string]$Directory) {
     $maps=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $Directory 'maps/results.json')))
     $regressions=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $Directory 'regressions/results.json')))
     $native=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $Directory 'native/results.json')))
-    return @($maps)+@($regressions)+@($native)
+    $isolation=ConvertFrom-Json -InputObject ([IO.File]::ReadAllText((Join-Path $Directory 'native/isolation/results.json')))
+    return @($maps)+@($regressions)+@($native)+@($isolation)
 }
 
 function Assert-CandidateVerification([string]$Directory, $Build) {
@@ -22,6 +23,7 @@ function Assert-CandidateVerification([string]$Directory, $Build) {
     $expected+=@(Get-ChildItem -LiteralPath (Join-Path $sourceRoot 'godot/chibi_remake/data') -File -Filter 'chibi*.json' | ForEach-Object { 'load-'+$_.BaseName })
     $expected+=@((Get-Content -Raw -Encoding UTF8 $baselinePath | ConvertFrom-Json).simtest | ForEach-Object { 'sim-'+$_.map+'-'+$_.seconds })
     $expected+=@('native-save-green-write','native-save-green-read','native-save-system-write','native-save-system-read')
+    $expected+=@('native-isolation-write','native-isolation-selftest','native-isolation-reject-dir','native-isolation-reject-id')
     $actual=@($evidence.results | ForEach-Object { $_.name })
     if ($actual.Count -ne $expected.Count -or @(Compare-Object ($expected | Sort-Object) ($actual | Sort-Object)).Count -gt 0) { throw 'Candidate verification coverage is incomplete' }
     foreach ($result in $evidence.results) {

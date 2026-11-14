@@ -21,6 +21,10 @@ func take_duel(ticket: int) -> Dictionary:
 	var record: Dictionary = _duels.get(ticket,{})
 	_duels.erase(ticket)
 	return record
+func pending_duels() -> Array:
+	return _duels.keys()
+func duel_snapshot() -> Dictionary:
+	return _duels.duplicate(true)
 func duel(outcome: String, onm: String, enm: String, ticket: int) -> bool:
 	if duel_requested.get_connections().is_empty(): return false
 	duel_requested.emit(outcome,onm,enm,ticket)

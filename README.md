@@ -59,7 +59,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\release.ps1 -Mode re
 
 `release.ps1` 的 `preview` 只安装到本机 `release/versions`，完成后双击 `release\ChibiRTS.exe` 试玩；`release` 额外调用 `package_release.ps1` 生成上传用分卷。底层仍由 `tools/build_release.ps1` 完成暂存、地形编译、导入、导出、**全地图载入、候选包冒烟与确定性基线**、构建清单和不可变发布；`-SkipBuild` 只重新打印或分卷当前版本。发布会拒绝无证据、覆盖不全或产物已变化的候选。机器验收覆盖载入、核心交互及确定性，画面与玩法验收仍由人工完成。绿色发行物默认显式使用本地 `userdata`；`-NoPublish` 生成并验证候选，`-NoOriginalMedia` 可排除原作音视频。逐步操作见 [release.md](release.md)。
 
-仓库版本管理源码、关卡 JSON、规则、配置，以及运行和标准构建需要的最小素材集。当前运行图集、地形分块、UI、字体、图标、音视频和解码 DLL 使用 Git LFS；参考图、烘焙整图、额外生产母版和过程稿仅本地保存。新克隆先获取 LFS 素材，再安装引擎和导出模板：
+仓库版本管理源码、关卡 JSON、规则、配置，以及运行和标准构建需要的最小素材集。当前运行图集、UI、字体、图标、音视频和解码 DLL 使用 Git LFS；参考图、烘焙整图、额外生产母版和过程稿仅本地保存。新克隆先获取 LFS 素材，再安装引擎和导出模板：
 
 ```powershell
 git lfs install
@@ -111,7 +111,7 @@ $env:APPDATA = (Resolve-Path "_work\godot_appdata").Path
 
 - 自检通过输出 `SELFTEST RESULT: PASS` 且退出码 0。
 - 摘要与 `tools/inputs/baselines.json` 比较；修改模拟或通行数据后必须显式更新基线。
-- GitHub Actions 运行两个工作流：`contracts` 执行 `tools/ci_lightweight.mjs`（注册表、分层、素材白名单、发布套件形状，不需要引擎或 LFS），`ci` 运行 `tools/syntax_check.mjs`、PowerShell 语法解析，以及不依赖 LFS 的 Godot 轻量门禁（`check_runtime_scripts` 编译运行脚本，`test_architecture --noview` 加载第一关并验证核心模拟）；完整回归、构建、分卷和发布都在本地执行，入口见[测试与验收](docs/19-testing.md)与[构建发布](docs/18-build-release.md)。
+- GitHub Actions 运行两个工作流：`contracts` 执行资源/LFS 输入与地形源清单审计、历史地形清单检查以及 `tools/ci_lightweight.mjs`（注册表、分层、素材白名单、发布套件形状，不需要引擎或 LFS），`ci` 运行 `tools/syntax_check.mjs`、PowerShell 语法解析，以及不依赖 LFS 的 Godot 轻量门禁（`check_runtime_scripts` 编译运行脚本，`test_architecture --noview` 加载第一关并验证核心模拟）；完整发布回归、构建、分卷和发布都在本地执行，入口见[测试与验收](docs/19-testing.md)与[构建发布](docs/18-build-release.md)。
 
 ## 目录
 
@@ -134,4 +134,6 @@ pwsh -NoProfile -File tools/cleanup_project.ps1            # 预览
 pwsh -NoProfile -File tools/cleanup_project.ps1 -Execute   # 执行
 ```
 
-清理范围、安全校验与必留清单见[构建与发布](docs/18-build-release.md#9-清理)。
+清理范围、安全校验与必留清单见[构建与发布](docs/18-build-release.md)。
+
+CI 的续跑矩阵分别检查 chibic1、chibil1、chibic10、chibic17：保留原整数与分段基线，额外以完整快照检查 0/31/120/450/900/1800 tick 六个采样点的恢复和 AI 续跑。包含 15 秒、60 秒点，覆盖资源阻挡、探索、编组、载员、计时与堵路状态。每图独立进程，功能性看门狗为 600 秒；既有每 tick 性能预算保持不变。

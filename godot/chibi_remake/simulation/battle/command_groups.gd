@@ -89,7 +89,6 @@ func _cancel_unit_command(u: Dictionary) -> void:
 	u["cool"] = 0.0
 	u["repath"] = 0.0
 	u["blocked_n"] = 0
-	u["stuck_t"] = 0.0
 	u["anim"] = 0.0
 	u["hold"] = false
 	u.erase("repath_to")
@@ -122,7 +121,7 @@ func _is_hero_unit(u: Dictionary) -> bool:
 	return int(u.get("unit", -1)) in Config.HERO_UNITS
 
 func _construction_workers(commander: Dictionary) -> Array:
-	if commander.is_empty() or not battle.units.has(commander) or not commander.alive or commander.die_t >= 0 or commander.get("attached", false) or not _is_hero_unit(commander) or commander.get("officer", {}).is_empty(): return []
+	if commander.is_empty() or not battle.units.any(func(candidate): return is_same(candidate,commander)) or not commander.alive or commander.die_t >= 0 or commander.get("attached", false) or not _is_hero_unit(commander) or commander.get("officer", {}).is_empty(): return []
 	var index := int(commander.officer.index)
 	var members: Array = battle.units.filter(func(u): return u.alive and u.die_t < 0 and not u.is_building and int(u.owner) == int(commander.owner) and int(u.get("group_officer", -1)) == index and u != commander)
 	if members.is_empty() or members.size() > Config.TEAM_MAX_MEMBERS or not members.all(func(u): return ports._is_worker_unit(u)): return []
@@ -193,10 +192,13 @@ func _commander_for(u: Dictionary) -> Dictionary:
 
 func _command_units() -> Array:
 	var result: Array=battle.selected.duplicate()
+	var seen := {}
+	for unit in result: seen[int(unit.uid)] = true
 	for leader in battle.selected:
 		if leader.get("officer",{}).is_empty():continue
 		for member in battle.units:
-			if member.alive and member.die_t<0 and int(member.owner)==int(leader.owner) and int(member.get("group_officer",-1))==int(leader.officer.index) and member not in result:result.append(member)
+			if member.alive and member.die_t<0 and int(member.owner)==int(leader.owner) and int(member.get("group_officer",-1))==int(leader.officer.index) and not seen.has(int(member.uid)):
+				result.append(member); seen[int(member.uid)] = true
 	return result
 
 func _return_selected_cargo() -> void:

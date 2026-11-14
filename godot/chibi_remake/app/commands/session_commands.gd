@@ -1,6 +1,6 @@
 extends "res://named_port.gd"
 ## session: explicit commands, validated once at the composition boundary.
-const CONTRACTS := {"scene_controller": ["_apply_save", "_save_extra", "_save_game", "_screenshot", "_sheet", "_view_hud", "focus_group", "_notification", "_unhandled_input", "_process"], "cheat_controller": ["_cheat_adjacent_level", "_set_cheat_input", "handle_cheat_input"], "cheat_rules": ["_step_auto_control"], "bootstrap": ["_ready"], "duel_controller": ["_present_duel"]}
+const CONTRACTS := {"scene_controller": ["_apply_save", "_save_extra", "_save_game", "_screenshot", "_sheet", "_view_hud", "focus_group", "_notification", "_unhandled_input", "_process", "load_slot"], "cheat_controller": ["_cheat_adjacent_level", "_set_cheat_input", "handle_cheat_input"], "cheat_rules": ["_step_auto_control"], "bootstrap": ["_ready"], "duel_controller": ["_present_duel"]}
 var _provider_scene_controller: WeakRef
 var _provider_cheat_controller: WeakRef
 var _provider_cheat_rules: WeakRef
@@ -103,3 +103,8 @@ func present_duel(outcome: String, onm: String, enm: String, ticket: int) -> voi
 	var provider = _require(_provider_duel_controller, "duel_controller")
 	if provider == null: return
 	provider._present_duel(outcome, onm, enm, ticket)
+
+func load_slot(slot: int) -> Dictionary:
+	var provider = _require(_provider_scene_controller, "scene_controller")
+	if provider == null: return {"ok":false,"error":"存档服务已释放。"}
+	return provider.load_slot(slot)

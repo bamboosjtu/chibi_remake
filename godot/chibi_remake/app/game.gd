@@ -9,12 +9,15 @@ var current_map := "chibic1"
 var pending_load := false
 var pending_load_slot := 0
 var startup_map_consumed := false
+var startup_load_consumed := false
 var startup_video_seen := false
 ## 读档失败时由 main 写入；主菜单显示后清空。不能静默开新局再覆盖原档。
 var last_load_error := ""
 ## 测试钩子：让下一次 save_game 必然失败，用于验证“保存失败不丢旧档”的 UI 路径。
 var force_save_failure := false
 var last_save_error := {}
+var startup_valid := false
+var _slot_metadata := {}
 
 var storage = preload("res://app/user_storage.gd").new()
 var SAVE_PATH := "user://save.json"
@@ -23,27 +26,19 @@ const SAVE_SLOTS := 20
 const Store = preload("res://app/json_store.gd")
 
 func _ready() -> void:
-	SAVE_PATH = storage.resolve_path()
-	var acceptance_run := false
-	for argument in OS.get_cmdline_user_args():
-		if argument.begins_with("--save-test-id="):
-			acceptance_run = true
-			var test_id: String = argument.substr(15)
-			if test_id != test_id.validate_filename(): get_tree().quit(1); return
-			SAVE_PATH = SAVE_PATH.get_base_dir().path_join("acceptance-"+test_id).path_join("save.json")
-			storage.current_path = SAVE_PATH
-			storage.pinned = true
-		if argument.begins_with("--save-test-dir="):
-			SAVE_PATH = argument.substr(16).path_join("save.json")
-			storage.current_path = SAVE_PATH
-			storage.pinned = true
+	var acceptance := preload("res://app/acceptance_storage.gd").configure(storage, OS.get_cmdline_user_args())
+	if not acceptance.valid:
+		push_error(acceptance.error); get_tree().quit(1); return
+	SAVE_PATH = acceptance.path
+	var acceptance_run: bool = acceptance.testing
+	startup_valid = true
 	print("SAVE LOCATION ",SAVE_PATH)
 	# 干净环境/CI 的自托管 APPDATA 下 user:// 目录可能还不存在；先建目录再写 boot/save。
-	DirAccess.make_dir_recursive_absolute(OS.get_user_data_dir())
-	if not acceptance_run and not Array(OS.get_cmdline_user_args()).any(func(arg): return arg.begins_with("--save-test-dir=")): _migrate_legacy_userdata()
+	DirAccess.make_dir_recursive_absolute(SAVE_PATH.get_base_dir() if acceptance_run else OS.get_user_data_dir())
+	if not acceptance_run: _migrate_legacy_userdata()
 	_install_cjk_font()
 	if DisplayServer.get_name() != "headless": add_child(preload("res://presentation/hud/software_cursor.gd").new())
-	var f := FileAccess.open("user://boot.log", FileAccess.WRITE)
+	var f := FileAccess.open(SAVE_PATH.get_base_dir().path_join("boot.log") if acceptance_run else "user://boot.log", FileAccess.WRITE)
 	if f != null:
 		f.store_string("boot %s\nargs=%s\n" % [Time.get_datetime_string_from_system(), str(OS.get_cmdline_user_args())])
 		f.close()
@@ -98,6 +93,9 @@ func _install_cjk_font() -> void:
 ## @return 是否真的落盘成功（调用方应当据此提示玩家，而不是假定成功）
 func save_game(units: Array, resources: Dictionary = {}, extra: Dictionary = {}, slot := 0) -> bool:
 	last_save_error = {}
+	if int(extra.get("pendingDuels",0)) > 0:
+		last_save_error = {"stage":"unsettled duel; use session save command","code":ERR_BUSY}
+		return false
 	var path := save_slot_path(slot)
 	if path.is_empty():
 		last_save_error={"stage":"invalid slot","code":ERR_INVALID_PARAMETER};return false
@@ -114,6 +112,9 @@ func save_game(units: Array, resources: Dictionary = {}, extra: Dictionary = {},
 
 func snapshot(units: Array, resources: Dictionary, extra: Dictionary) -> Dictionary:
 	var recs := []
+	var by_uid := {}
+	for unit in units: by_uid[int(unit.uid)] = unit
+	var contains_ref := func(value): return value is Dictionary and is_same(by_uid.get(int(value.get("uid",-1))),value)
 	for u in units:
 		var simulation := {}
 		for field in ["rolling_t","rolling_ticks","ambush_t","effect_task","effect_tasks"]:
@@ -121,24 +122,25 @@ func snapshot(units: Array, resources: Dictionary, extra: Dictionary) -> Diction
 		for field in preload("res://simulation/systems/locomotion.gd").FIELDS:
 			if u.has(field): simulation[field] = u[field]
 		for key in preload("res://app/saves/snapshot_fields.gd").UNIT_FIELDS:
-			simulation[key] = u.get(key)
+			simulation[key] = int(u.get(key,0)) if key == "blocked_n" else u.get(key)
 		simulation["targetUid"] = int(u.target.get("uid", -1)) if u.get("target") is Dictionary else -1
 		# REQ-001：采集目标用**稳定引用**（单位 uid / 饰物格），不裸存对象。
 		var gobj = u.get("gather_obj", null)
 		if gobj is Dictionary and not (gobj as Dictionary).is_empty():
 			if bool((gobj as Dictionary).get("decor", false)):
 				simulation["gatherRef"] = {"kind": "decor", "cell": str((gobj as Dictionary).get("cell", ""))}
-			elif not units.has(gobj):
+			elif not contains_ref.call(gobj):
 				# 采尽的矿/民居可在工人返程中被清理；保留转采所需的种类和原位置。
 				simulation["gatherRef"] = {"kind":"spent", "unit":int(gobj.unit), "x":float(gobj.ax), "y":float(gobj.ay)}
 			else:
 				simulation["gatherRef"] = {"kind": "unit", "uid": int((gobj as Dictionary).get("uid", -1))}
 		for field in ["build_target", "repair_target", "board_target"]:
 			var reference = u.get(field)
-			simulation[field + "Uid"] = int(reference.uid) if reference is Dictionary and not reference.is_empty() and units.has(reference) else -1
+			simulation[field + "Uid"] = int(reference.uid) if reference is Dictionary and not reference.is_empty() and contains_ref.call(reference) else -1
 		simulation["path"] = []
 		for point in u.get("path", []):
 			simulation.path.append([point.x, point.y])
+		if u.get("repath_to") is Vector2: simulation["repathTo"] = [u.repath_to.x,u.repath_to.y]
 		recs.append({
 			"simulation": simulation,
 			"uid": int(u.get("uid", -1)),
@@ -153,20 +155,7 @@ func snapshot(units: Array, resources: Dictionary, extra: Dictionary) -> Diction
 			"state": str(u.get("state", "idle")),
 			"officerIndex": int((u.get("officer", {}) as Dictionary).get("index", -1)),
 		})
-	var trains := []
-	for tr in extra.get("trainings", []):
-		var rec: Dictionary = tr
-		var b: Dictionary = rec.get("b", {})
-		trains.append({
-			"buildingUid": int(b.get("uid", -1)),
-			"unit": int(rec.get("unit", -1)),
-			"t": float(rec.get("t", 0.0)),
-			"ticks": bool(rec.get("ticks", false)),
-			"owner": int(rec.get("owner", b.get("owner", -1))),
-			"cost": rec.get("cost", {}),
-		})
-		for field in ["aiSlot","aiToken","navalSlot","navalToken"]:
-			if rec.has(field): trains.back()[field]=rec[field]
+	var trains := snapshot_trainings(extra.get("trainings", []))
 	var payload := {
 		"v": SAVE_VERSION,
 		"simulation": extra.get("simulation", {}),
@@ -190,6 +179,23 @@ func snapshot(units: Array, resources: Dictionary, extra: Dictionary) -> Diction
 	payload = JSON.parse_string(JSON.stringify(_json_safe(payload), "", true, true))
 	payload["checksum"] = save_checksum(payload)
 	return payload
+
+static func snapshot_trainings(trainings: Array) -> Array:
+	var trains := []
+	for tr in trainings:
+		var rec: Dictionary = tr
+		var b: Dictionary = rec.get("b", {})
+		trains.append({
+			"buildingUid": int(b.get("uid", -1)),
+			"unit": int(rec.get("unit", -1)),
+			"t": float(rec.get("t", 0.0)),
+			"ticks": bool(rec.get("ticks", false)),
+			"owner": int(rec.get("owner", b.get("owner", -1))),
+			"cost": rec.get("cost", {}),
+		})
+		for field in ["aiSlot","aiToken","navalSlot","navalToken"]:
+			if rec.has(field): trains.back()[field]=rec[field]
+	return trains
 
 ## 存档前把非有限浮点归一，避免 JSON/校验和失败（长时间战斗的 NAN/INF 也能存）。
 static func _json_safe(value):
@@ -263,12 +269,14 @@ static func verify_save_checksum(d: Dictionary) -> bool:
 ## 先写临时文件并**校验可解析**，再替换正式档 —— 任一步失败都保留前一份有效存档。
 func _atomic_write(path: String, text: String) -> bool:
 	var ok := storage.commit(path, text, verify_save_checksum)
-	if ok: SAVE_PATH = storage.current_path
+	if ok:
+		SAVE_PATH = storage.current_path
+		_slot_metadata.clear()
 	return ok
 
 func has_save() -> bool:
 	for slot in range(SAVE_SLOTS+1):
-		if not load_save(slot).is_empty():return true
+		if _slot_info(slot).valid: return true
 	return false
 
 func load_save(slot := 0) -> Dictionary:
@@ -283,10 +291,20 @@ func save_slot_path(slot: int) -> String:
 func save_slots() -> Array:
 	var out := []
 	for slot in range(SAVE_SLOTS+1):
-		var path := save_slot_path(slot)
-		var data := load_save(slot)
-		out.append({"slot":slot,"valid":not data.is_empty(),"occupied":FileAccess.file_exists(path) or FileAccess.file_exists(path+".bak"),"name":str(data.get("saveName","")),"map":str(data.get("map","")),"savedAt":str(data.get("savedAt",""))})
+		out.append(_slot_info(slot).duplicate())
 	return out
+
+func _slot_info(slot: int) -> Dictionary:
+	var path := save_slot_path(slot)
+	var signature := []
+	for file in [path,path+".bak"]:
+		var reader := FileAccess.open(file, FileAccess.READ)
+		signature.append([FileAccess.get_modified_time(file),reader.get_length()] if reader != null else [-1,0])
+	if _slot_metadata.has(path) and _slot_metadata[path].signature == signature: return _slot_metadata[path].info
+	var data := load_save(slot)
+	var info := {"slot":slot,"valid":not data.is_empty(),"occupied":signature[0][0]!=-1 or signature[1][0]!=-1,"name":str(data.get("saveName","")),"map":str(data.get("map","")),"savedAt":str(data.get("savedAt",""))}
+	_slot_metadata[path] = {"signature":signature,"info":info}
+	return info
 
 static func campaign_caption(id: String) -> String:
 	var campaign := "刘备战役" if id.begins_with("chibil") else "曹操战役"

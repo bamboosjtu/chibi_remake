@@ -13,12 +13,12 @@ var ai: RefCounted:
 
 func _get(key: StringName):
 	if key in state.PROXY_FIELDS: return state.get(key)
-	push_error("Unknown snapshot state property: " + str(key))
+	preload("res://property_contract.gd").reject(self,key)
 	return null
 
 func _set(key: StringName, value) -> bool:
 	if key not in state.PROXY_FIELDS:
-		push_error("Unknown snapshot state property: " + str(key))
+		preload("res://property_contract.gd").reject(self,key)
 		return false
 	state.set(key, value)
 	return true

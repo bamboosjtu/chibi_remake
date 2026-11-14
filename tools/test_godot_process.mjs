@@ -8,6 +8,10 @@ assert.ok((await run('success', 'console.log("PASS")', {markers: ['PASS']})).ok)
 assert.equal((await run('exit', 'process.exit(2)')).ok, false);
 assert.equal((await run('missing-marker', 'console.log("other")', {markers: ['PASS']})).ok, false);
 assert.equal((await run('script-error', 'console.error("SCRIPT ERROR: test");setInterval(()=>{},1000)')).ok, false);
+for (const message of ['ERROR: Error calling deferred method: Method not found.', 'ERROR: Error calling from signal: missing method', "ERROR: Couldn't save project.binary", 'SELFTEST RESULT: FAIL']) {
+  assert.equal((await run('fatal-'+message.slice(0,20).replace(/\W/g,'_'), 'console.error('+JSON.stringify(message)+');console.log("PASS")', {markers:['PASS']})).ok,false,message);
+}
+assert.ok((await run('known-nonfatal','console.error("ERROR: Failed to read the root certificate store.");console.log("PASS")',{markers:['PASS']})).ok);
 const environment = await run('profile-env', 'console.log(JSON.stringify({APPDATA:process.env.APPDATA,LOCALAPPDATA:process.env.LOCALAPPDATA,XDG_DATA_HOME:process.env.XDG_DATA_HOME,XDG_CACHE_HOME:process.env.XDG_CACHE_HOME,XDG_CONFIG_HOME:process.env.XDG_CONFIG_HOME}))');
 assert.ok(environment.ok);
 const profile = path.resolve('_work/process-runner-tests/profile-env-profile');

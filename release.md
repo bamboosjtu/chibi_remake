@@ -143,6 +143,7 @@ release/
     ├── LICENSE
     ├── NOTICE.md
     ├── release-info.json        提交、构建时间、发布时间及产物哈希
+    ├── verification.json        候选逐项验收证据
     └── build-manifest.json      构建清单（日志不随包）
 ```
 

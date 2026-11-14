@@ -105,6 +105,6 @@ func _battle() -> Node2D:
 	return null
 
 func _video_playing() -> bool:
-	for player in get_tree().root.find_children("*","VideoStreamPlayer",true,false):
+	for player in get_tree().get_nodes_in_group("presentation_video_players"):
 		if player.is_playing(): return true
 	return false

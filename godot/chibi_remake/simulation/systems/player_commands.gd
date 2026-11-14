@@ -66,7 +66,7 @@ func pump() -> int:
 		if not same_pending: _restore_pending(pending_before)
 		# First-selected modes restrict execution, without shrinking the user's selection.
 		var unchanged_actors: bool=host.selected.map(func(u):return int(u.uid)) == batch.uids
-		if not same_selection or unchanged_actors: host.selected = selected_before.filter(func(u):return host.units.has(u) and bool(u.alive))
+		if not same_selection or unchanged_actors: host.selected = selected_before.filter(func(u):return host.units.any(func(candidate): return is_same(candidate,u)) and bool(u.alive))
 		count += 1
 	executing = false
 	if count > 0: commands_applied.emit()

@@ -11,6 +11,8 @@ import shutil
 import subprocess
 import urllib.request
 import zipfile
+import tempfile
+import uuid
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
@@ -31,20 +33,44 @@ def source_tree(key, folder):
     item = LOCK[key]
     target = WORK / folder
     if target.exists():
-        return
-    repository = item["repository"].replace("https://github.com/", "")
-    archive = download("https://codeload.github.com/" + repository + "/zip/" + item["commit"], WORK / (key + ".zip"))
-    with zipfile.ZipFile(archive) as package:
-        if package.comment.decode() != item["commit"]:
-            raise RuntimeError("Unexpected source revision")
-        unpack = WORK / (key + "-unpack")
-        unpack.mkdir(exist_ok=True)
-        for name in package.namelist():
-            if not (unpack / name).resolve().is_relative_to(unpack.resolve()):
-                raise RuntimeError("Unsafe archive member")
-        package.extractall(unpack)
-        source = unpack / package.namelist()[0].split("/")[0]
-        shutil.copytree(source, target)
+        if (target / ".git").is_dir():
+            verify_source(target, item["commit"])
+            return
+        # Preserve unverified legacy ZIP trees rather than trusting their comment.
+        legacy = WORK / (folder + ".legacy-" + uuid.uuid4().hex)
+        if not target.resolve().is_relative_to(WORK.resolve()) or legacy.parent.resolve() != WORK.resolve():
+            raise RuntimeError("Unsafe legacy source cache")
+        target.rename(legacy)
+        print("Preserved unverified source cache: " + str(legacy))
+    stage = Path(tempfile.mkdtemp(prefix=key + "-", dir=WORK))
+    # Git checks the commit/tree/blob object hashes; HTTPS ZIP comments do not.
+    git(stage, "init", "--quiet")
+    git(stage, "remote", "add", "origin", item["repository"])
+    git(stage, "-c", "fetch.fsckObjects=true", "fetch", "--depth=1", "origin", item["commit"])
+    git(stage, "-c", "core.autocrlf=false", "checkout", "--detach", "FETCH_HEAD")
+    git(stage, "submodule", "update", "--init", "--recursive", "--depth=1")
+    verify_source(stage, item["commit"])
+    stage.rename(target)
+
+
+def git(directory, *arguments):
+    return subprocess.check_output(["git", "-C", str(directory), *arguments], stderr=subprocess.STDOUT, text=True).strip()
+
+
+def verify_source(directory, commit):
+    if git(directory, "rev-parse", "HEAD") != commit:
+        raise RuntimeError("Unexpected source commit: " + str(directory))
+    git(directory, "fsck", "--full", "--no-dangling")
+    if git(directory, "status", "--porcelain", "--untracked-files=no"):
+        raise RuntimeError("Modified dependency sources: " + str(directory))
+    for record in git(directory, "ls-files", "--stage").splitlines():
+        metadata, name = record.split("\t", 1)
+        mode, expected, _ = metadata.split()
+        if mode == "160000":
+            submodule = (directory / name).resolve()
+            if not submodule.is_relative_to(directory.resolve()):
+                raise RuntimeError("Unsafe source submodule")
+            verify_source(submodule, expected)
 
 
 def main():

@@ -1,6 +1,6 @@
 extends "res://named_port.gd"
 ## military: explicit commands, validated once at the composition boundary.
-const CONTRACTS := {"officer_pool": ["_officer_by_index", "_officer_pool_state", "_restore_officer_pool", "available_officers", "officer_in_use", "officers_for_selection"], "abilities": ["_duel_accept", "_duel_at", "_duel_begin", "_formation_target_cell", "_jimou_begin", "_jimou_cast_at", "_reset_jimou", "_resolve_duel", "_set_formation", "_spd_mult", "_stamina_of"], "command_groups": ["_cancel_unit_command", "_cmd_begin", "_cmd_disband", "_cmd_rest", "_cmd_watch", "_command_units", "_commander_for", "_construction_workers", "_enforce_team_limits", "_group_assign", "_group_recall", "_is_hero_unit", "_is_naval", "_nav_layer", "_return_selected_cargo", "_selected_construction_workers", "control_group_leader", "control_group_size", "control_group_work_site", "stop_selected"], "officer_teams": ["_assign_officer_to", "_form_hero_unit", "_grant_officer_exp", "_order_disband", "_order_form_up", "_order_join", "_process_officer_recovery", "_unassign_officer"], "combat": ["_apply_hit", "_clip_dir", "_clip_frame", "_damage", "_die_step", "_fire_attack", "_kill", "_nearest_enemy", "officer_rank_name"], "ai_orders": ["_l1_target", "_nearest_enemy_threat", "ai_focus_unit", "ai_order_assault", "ai_order_intercept", "ai_order_rally"]}
+const CONTRACTS := {"officer_pool": ["_officer_by_index", "_officer_pool_state", "_restore_officer_pool", "available_officers", "officer_in_use", "officers_for_selection"], "abilities": ["_duel_accept", "_duel_at", "_duel_begin", "_formation_target_cell", "_jimou_begin", "_jimou_cast_at", "_reset_jimou", "_resolve_duel", "_set_formation", "_spd_mult", "_stamina_of", "_settle_pending_duels"], "command_groups": ["_cancel_unit_command", "_cmd_begin", "_cmd_disband", "_cmd_rest", "_cmd_watch", "_command_units", "_commander_for", "_construction_workers", "_enforce_team_limits", "_group_assign", "_group_recall", "_is_hero_unit", "_is_naval", "_nav_layer", "_return_selected_cargo", "_selected_construction_workers", "control_group_leader", "control_group_size", "control_group_work_site", "stop_selected"], "officer_teams": ["_assign_officer_to", "_form_hero_unit", "_grant_officer_exp", "_order_disband", "_order_form_up", "_order_join", "_process_officer_recovery", "_unassign_officer"], "combat": ["_apply_hit", "_clip_dir", "_clip_frame", "_damage", "_die_step", "_fire_attack", "_kill", "_nearest_enemy", "officer_rank_name"], "ai_orders": ["_l1_target", "_nearest_enemy_threat", "ai_focus_unit", "ai_order_assault", "ai_order_intercept", "ai_order_rally"]}
 var _provider_officer_pool: WeakRef
 var _provider_abilities: WeakRef
 var _provider_command_groups: WeakRef
@@ -324,3 +324,8 @@ func disconnect_services() -> void:
 	_provider_officer_teams = null
 	_provider_combat = null
 	_provider_ai_orders = null
+
+func _settle_pending_duels() -> void:
+	var provider = _require(_provider_abilities, "abilities")
+	if provider == null: return
+	provider._settle_pending_duels()

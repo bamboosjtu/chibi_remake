@@ -252,13 +252,14 @@ func _shape_graph(layer: int, cls: int) -> AStar2D:
 	for a in range(rows):
 		for b in range(cols):
 			var c := Vector2i(a, b)
-			g.add_point(ports._id(c), ports.anchor_of(a, b))
-	for a in range(rows):
-		for b in range(cols):
-			var c2 := Vector2i(a, b)
-			for neighbor in ports.neighbors(c2):
-				if not g.are_points_connected(ports._id(c2), ports._id(neighbor)):
-					g.connect_points(ports._id(c2), ports._id(neighbor))
+			var id := ports._id(c)
+			g.add_point(id, _grid_state.astar.get_point_position(id))
+	# Reuse the exact connection order created by Grid.setup. Geometry is shared;
+	# only each footprint's disabled flags differ. This preserves A* tie breaking
+	# without repeating millions of weak-port calls on every restored world.
+	var edges: PackedInt64Array = _grid_state.topology_edges
+	for edge in range(0,edges.size(),2):
+		g.connect_points(edges[edge],edges[edge+1])
 	for a in range(rows):
 		for b in range(cols):
 			var anchor := Vector2i(a, b)

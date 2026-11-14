@@ -282,3 +282,6 @@ func _resolve_duel(ticket: int) -> void:
 		if int(unit.uid) == int(record.target): target = unit
 	if caster.is_empty() or target.is_empty(): return
 	_finish_duel(caster,target,float(record.hp_a),float(record.hp_b),int(record.dmg_a),int(record.dmg_b),str(record.onm),str(record.enm))
+
+func _settle_pending_duels() -> void:
+	for ticket in battle.effects.pending_duels(): _resolve_duel(int(ticket))

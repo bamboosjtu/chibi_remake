@@ -14,10 +14,15 @@ if ($LASTEXITCODE -ne 0) { throw 'Stub compile failed' }
 [IO.File]::WriteAllText((Join-Path $candidate 'ChibiRTS.pck'),'fixture-pack')
 try { & (Join-Path $PSScriptRoot 'publish_release.ps1') -Executable $exe -ReleaseRoot $release; throw 'Missing build manifest accepted' }
 catch { if ($_.Exception.Message -notmatch 'no build manifest') { throw } }
-$nativeDirectory=Join-Path $candidate 'addons/test'
-New-Item -ItemType Directory -Force $nativeDirectory | Out-Null
-$nativeFile=Join-Path $nativeDirectory 'decoder.dll'
-[IO.File]::WriteAllText($nativeFile,'native-fixture')
+. (Join-Path $PSScriptRoot 'native_dependencies.ps1')
+$requiredNative=@(Get-RequiredNativeNames $root)
+foreach ($name in $requiredNative) { [IO.File]::WriteAllText((Join-Path $candidate $name),'native-fixture') }
+$nativeFile=Join-Path $candidate 'FFmpegPlayer.dll'
+$heldNative=Join-Path $fixture 'held-native'
+Move-Item -LiteralPath $nativeFile -Destination $heldNative
+try { & (Join-Path $PSScriptRoot 'write_build_manifest.ps1') -Executable $exe; throw 'Missing native DLL accepted' }
+catch { if ($_.Exception.Message -notmatch 'Missing required native dependency') { throw } }
+Move-Item -LiteralPath $heldNative -Destination $nativeFile
 $head=(& git -C $root rev-parse HEAD 2>$null)
 & (Join-Path $PSScriptRoot 'write_build_manifest.ps1') -Executable $exe
 $build=Get-Content -Raw (Join-Path $candidate 'build-manifest.json') | ConvertFrom-Json
@@ -34,7 +39,7 @@ $baselinePath=Join-Path $PSScriptRoot 'inputs/baselines.json'
 $names=@((Get-Content -Raw -Encoding UTF8 $suitePath | ConvertFrom-Json).tests | ForEach-Object { $_.script })
 $names+=@(Get-ChildItem -LiteralPath (Join-Path $root 'godot/chibi_remake/data') -Filter 'chibi*.json' -File | ForEach-Object { 'load-'+$_.BaseName })
 $names+=@((Get-Content -Raw -Encoding UTF8 $baselinePath | ConvertFrom-Json).simtest | ForEach-Object { 'sim-'+$_.map+'-'+$_.seconds })
-$names+=@('native-save-green-write','native-save-green-read','native-save-system-write','native-save-system-read')
+$names+=@('native-save-green-write','native-save-green-read','native-save-system-write','native-save-system-read','native-isolation-write','native-isolation-selftest','native-isolation-reject-dir','native-isolation-reject-id')
 $evidence=@{
     schemaVersion=1
     suiteSha256=(Get-FileHash -LiteralPath $suitePath).Hash
@@ -47,10 +52,11 @@ $evidence=@{
 $evidencePath=Join-Path $candidate 'verification.json'
 . (Join-Path $PSScriptRoot 'candidate_verification.ps1')
 $resultFixture=Join-Path $fixture 'results'
-New-Item -ItemType Directory -Force (Join-Path $resultFixture 'maps'),(Join-Path $resultFixture 'regressions'),(Join-Path $resultFixture 'native') | Out-Null
+New-Item -ItemType Directory -Force (Join-Path $resultFixture 'maps'),(Join-Path $resultFixture 'regressions'),(Join-Path $resultFixture 'native'),(Join-Path $resultFixture 'native/isolation') | Out-Null
 [IO.File]::WriteAllText((Join-Path $resultFixture 'maps/results.json'),(ConvertTo-Json -InputObject @($evidence.results | Where-Object { $_.name -like 'load-*' }) -Depth 6))
 [IO.File]::WriteAllText((Join-Path $resultFixture 'regressions/results.json'),(ConvertTo-Json -InputObject @($evidence.results | Where-Object { $_.name -notlike 'load-*' -and $_.name -notlike 'native-*' }) -Depth 6))
-[IO.File]::WriteAllText((Join-Path $resultFixture 'native/results.json'),(ConvertTo-Json -InputObject @($evidence.results | Where-Object { $_.name -like 'native-*' }) -Depth 6))
+[IO.File]::WriteAllText((Join-Path $resultFixture 'native/results.json'),(ConvertTo-Json -InputObject @($evidence.results | Where-Object { $_.name -like 'native-*' -and $_.name -notlike 'native-isolation-*' }) -Depth 6))
+[IO.File]::WriteAllText((Join-Path $resultFixture 'native/isolation/results.json'),(ConvertTo-Json -InputObject @($evidence.results | Where-Object { $_.name -like 'native-isolation-*' }) -Depth 6))
 $evidence.results=@(Read-CandidateResults $resultFixture)
 if ($evidence.results.Count -ne $names.Count -or !$evidence.results[0].name) { throw 'JSON result arrays must flatten under PowerShell 5.1 and 7' }
 function Write-FixtureEvidence { [IO.File]::WriteAllText($evidencePath,($evidence | ConvertTo-Json -Depth 8),(New-Object System.Text.UTF8Encoding $false)) }
@@ -81,7 +87,7 @@ if ((Get-FileHash -LiteralPath (Join-Path $release 'current.json')).Hash -ne $be
 $pointer=Get-Content -Raw (Join-Path $release 'current.json') | ConvertFrom-Json
 $publishedInfo=Get-Content -Raw (Join-Path (Join-Path $release $pointer.directory) 'release-info.json') | ConvertFrom-Json
 if ($publishedInfo.verification -ne 'candidate-smoke' -or $publishedInfo.verifiedMaps.Count -ne 34 -or $publishedInfo.verifiedBaselines.Count -ne 2) { throw 'Publish must preserve machine verification coverage' }
-$copied=Join-Path (Join-Path $release $pointer.directory) 'addons/test/decoder.dll'
+$copied=Join-Path (Join-Path $release $pointer.directory) 'FFmpegPlayer.dll'
 if (!(Test-Path -LiteralPath $copied) -or (Get-FileHash -LiteralPath $copied).Hash -ne (Get-FileHash -LiteralPath $nativeFile).Hash) { throw 'Native dependency was not published intact' }
 $versionRoot=Join-Path $release $pointer.directory
 if (Test-Path -LiteralPath (Join-Path $versionRoot 'docs')) { throw 'Release must not ship docs' }
@@ -140,6 +146,11 @@ foreach ($relative in @('LICENSE','NOTICE.md')) {
 
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'publish_release.ps1') -Destination $changedTools
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'candidate_verification.ps1') -Destination $changedTools
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'native_dependencies.ps1') -Destination $changedTools
+$declarationTarget=Join-Path $fixture 'godot/chibi_remake/addons/ffmpegplayer'
+New-Item -ItemType Directory -Force $declarationTarget | Out-Null
+Copy-Item -LiteralPath (Join-Path $root 'godot/chibi_remake/addons/ffmpegplayer/FFmpegPlayer.gdextension') -Destination $declarationTarget
+
 New-Item -ItemType Directory -Force (Join-Path $changedTools 'inputs'),(Join-Path $fixture 'godot/chibi_remake/data') | Out-Null
 Copy-Item -LiteralPath $suitePath,$baselinePath -Destination (Join-Path $changedTools 'inputs')
 Get-ChildItem -LiteralPath (Join-Path $root 'godot/chibi_remake/data') -Filter 'chibi*.json' -File | ForEach-Object { New-Item -ItemType File -Path (Join-Path $fixture ('godot/chibi_remake/data/'+$_.Name)) | Out-Null }

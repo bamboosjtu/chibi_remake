@@ -18,20 +18,16 @@ func _init(data: State, services: SceneServices, surface: Node2D) -> void:
 	node = surface
 
 func _ready() -> void:
-	battle.command_rules=preload("res://simulation/systems/command_rules.gd").new(node)
-	battle.player_commands = preload("res://simulation/systems/player_commands.gd").new(node)
-	var command_pump := preload("res://app/command_pump.gd").new(node)
-	node.add_child(command_pump)
-	battle.player_commands.commands_applied.connect(func():
-		if scene.view != null:scene.view.update_panel())
-	node.get_window().title = "三国赤壁 · 高清重制"
-	node.get_tree().set_auto_accept_quit(false)
+	if not Game.startup_valid:
+		node.set_process(false); return
+	_initialize_session()
 	battle.map_id = Game.current_map
 	var args := OS.get_cmdline_user_args()
 	var want_view := true
 	for a in args:
-		if a.begins_with("--map="):
+		if a.begins_with("--map=") and scene.requested_map.is_empty() and not Game.startup_map_consumed:
 			battle.map_id = a.substr(6).to_lower()
+			Game.startup_map_consumed = true
 		elif a.begins_with("--simtest="):
 			battle.simtest_seconds = maxf(0.1, float(a.substr(10)))
 			# ARCH-013 验收：模拟必须能**没有任何渲染节点**地跑完 → 默认不建表现层
@@ -46,8 +42,10 @@ func _ready() -> void:
 		# 自动化模式：_edge_scroll 会因鼠标停在窗口边缘而持续平移相机，
 		# 导致同一条命令每次截到不同位置。测试模式下直接关掉。
 		battle.cli_mode = true
-	if "--load" in args:
+	if "--load" in args and not Game.startup_load_consumed:
 		Game.pending_load = true    # 供自动化验证读档路径（等价于点菜单的「读取进度」）
+		Game.startup_load_consumed = true
+	if not scene.requested_map.is_empty(): battle.map_id = scene.requested_map
 
 	var f := FileAccess.open("res://data/%s.json" % battle.map_id, FileAccess.READ)
 	if f == null:
@@ -122,14 +120,16 @@ func _ready() -> void:
 	if Game.pending_load:
 		if not ports._apply_save():
 			Game.pending_load = false
-			Game.last_load_error = "存档无法恢复：内容版本不匹配或文件已损坏。原档已保留，请回到主菜单重新选择。"
-			node.call_deferred("_return_to_menu_after_load_failure")
+			Game.pending_load_slot = 0
+			Game.last_load_error = scene.saver.last_load_error + " 原档已保留，请重新选择。"
+			ports._schedule_failed_load_return()
 			return
 		Game.pending_load = false
 		Game.pending_load_slot = 0
 	# AI was initialized before snapshot restore. # ARCH-006：AI 逻辑在 ai.gd，main 只提供状态访问
 	ports._build_ui()
 	ports._setup_camera()
+	scene.ready_to_save = true
 	if scene.view != null:
 		scene.view.completion = preload("res://presentation/hud/battle_completion.gd").new(scene.view.host)
 		scene.view.add_child(scene.view.completion)
@@ -173,6 +173,16 @@ func _ready() -> void:
 		await node.get_tree().create_timer(1.2).timeout
 		await ports._screenshot()
 		node.get_tree().quit()
+
+func _initialize_session() -> void:
+	battle.command_rules=preload("res://simulation/systems/command_rules.gd").new(node)
+	battle.player_commands = preload("res://simulation/systems/player_commands.gd").new(node)
+	var command_pump := preload("res://app/command_pump.gd").new(node)
+	node.add_child(command_pump)
+	battle.player_commands.commands_applied.connect(func():
+		if scene.view != null:scene.view.update_panel())
+	node.get_window().title = "三国赤壁 · 高清重制"
+	node.get_tree().set_auto_accept_quit(false)
 
 func _apply_scenario() -> void:
 	var sc = battle.map_data.get("scenario", null)

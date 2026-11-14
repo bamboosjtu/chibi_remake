@@ -51,6 +51,7 @@ if (!$Tag) { $Tag = $version }
 $packageDir = Join-Path $root 'dist/package'
 & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'package_release.ps1') -VersionDirectory $versionDir -OutputDirectory $packageDir -PartMiB $PartMiB -Tag $Tag
 if ($LASTEXITCODE -ne 0) { throw ('Packaging failed with exit code ' + $LASTEXITCODE) }
+Copy-Item -LiteralPath (Join-Path $packageDir 'release-body.md') -Destination (Join-Path $root 'dist/release-body.md') -Force
 $assets = @(Get-ChildItem -LiteralPath $packageDir -File)
 $largest = ($assets | Measure-Object Length -Maximum).Maximum
 Write-Output ('MODE release')

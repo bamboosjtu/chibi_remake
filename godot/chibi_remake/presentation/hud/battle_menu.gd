@@ -181,24 +181,12 @@ func _slot_confirmed(slot: int, title: String) -> void:
 		status.text="保存成功 · 记录 %02d" % slot
 		status.tooltip_text="存档位置："+ProjectSettings.globalize_path(Game.save_slot_path(slot))
 		buttons[0].disabled=not Game.has_save();return
-	var data: Dictionary=Game.load_save(slot)
-	var map_id:=str(data.get("map",""))
-	if data.is_empty() or not FileAccess.file_exists("res://data/%s.json" % map_id):
-		slots_dialog.show_error("所选进度无法读取，原有记录已保留。");return
-	if map_id!=str(host.map_id):
-		Game.current_map=map_id;Game.pending_load=true;Game.pending_load_slot=slot
-		get_tree().paused=false;get_tree().change_scene_to_file("res://main.tscn");return
-	var selection := []
-	for unit in host.selected: selection.append(int(unit.uid))
-	if host.saver.apply_snapshot(data):
-		var by_uid := {}
-		for unit in host.units: by_uid[int(unit.uid)] = unit
-		for uid in selection:
-			if by_uid.has(uid): host.selected.append(by_uid[uid])
+	var result: Dictionary = host.commands.session.load_slot(slot)
+	if not result.ok:
+		slots_dialog.show_error(str(result.error)); return
+	if not result.cross_map:
 		close()
 		host.view.update_panel()
-	else:
-		slots_dialog.show_error("进度与当前关卡内容不匹配，原有记录已保留。")
 
 func return_to_menu() -> void:
 	if not host.commands.session._save_game():

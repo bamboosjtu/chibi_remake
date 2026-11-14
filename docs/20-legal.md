@@ -9,19 +9,23 @@
 | `godot/chibi_remake/**/*.gd`、`tools/**`、`docs/**` | 本项目作者编写 | 按根目录 `LICENSE`（非商业社区 MOD） | 随仓库分发，保留 LICENSE/NOTICE |
 | `art/full/**` 重绘头像、建筑、兵种、UI、地形 | 社区重绘与图像生成后人工筛选 | 新绘制部分按 `LICENSE`；因参考原作轮廓与人物形象，存在演绎权风险 | 保留来源记录；不单独售卖 |
 | `data/chibi*.json` | 由发行素材转换 | 原作数据的演绎/转换，未获权利人授权 | 仅随非商业 MOD 分发；提示用户自备原作 |
-| `media/videos/*.AVI` | 原作原始过场 | 原作媒体，未获授权 | **公开分发建议排除**；提供 `-NoOriginalMedia` 构建 |
+| `media/videos/*.AVI` | 原作原始过场 | 原作媒体，未获授权 | 默认随包分发；提供 `-NoOriginalMedia` 排除选项，许可边界不变 |
 | `godot/chibi_remake/art/production/references/**` | 原作截图/位图提取 | 仅作绘制参考 | 不随发布包分发 |
 | 字体 `NotoSansCJKsc-Regular.otf` | Noto CJK | SIL OFL 1.1 | 随包分发，附 `OFL.txt` |
+| `docs/*.pptx`、`docs/assets/**` | 项目讲解、素材示例及重绘宣传图 | 混合项目内容与引用素材；不授予引用素材权利 | 随仓库保留来源记录，不进入运行包 |
+| `data/db/**`、`research/**` | 数据整理与机制研究 | 项目整理部分与原作引用分别保留权利归属 | 数据库随运行包、研究资料随仓库 |
+| FFmpeg / AVI 扩展 | 组件源码与共享库 | LGPL v3+ / MIT，见组件声明 | 随包附完整声明与源码获取信息 |
+| MSVC 运行库 | Visual Studio 可再分发组件 | 微软组件条款 | 按对应可再分发条款保留组件 |
 | Godot 引擎 | Godot Foundation | MIT | 按其许可证分发 |
 
 ## 2. 分发方式
 
 - 默认发布包是**非商业社区 MOD**：不得出售、不得付费下载、不得广告分成。
-- 发布包只含运行文件、原生依赖、许可证/声明与构建元数据；仓库 `docs/`、测试日志与验证证据不随包分发。
+- 发布包只含运行文件、原生依赖、许可证/声明与构建元数据；仓库 `docs/`、测试日志不随包分发；逐项验收元数据随包保留。
 - 面向公众的构建建议：
 
 ```powershell
-tools/build_release.ps1 -SkipData -NoOriginalMedia
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/build_release.ps1 -SkipData -NoOriginalMedia
 ```
 
 - 下载页需明确：非官方、非商业、需自备原作。
@@ -46,7 +50,7 @@ tools/build_release.ps1 -SkipData -NoOriginalMedia
 | 选项 | 影响 |
 |---|---|
 | `-NoOriginalMedia` | 排除原作视频、音乐、音效；声音使用原创程序音调（非对照规则语音），关卡数据仍保留 |
-| 默认构建 | 含过场视频，仅适合自用或非公开分发 |
+| 默认构建 | 包含过场、音乐、音效与关卡数据；按既定社区 MOD 范围分发 |
 | 素材母版 | 不进入发布包，仅用于构建 |
 
 许可与分发边界不因构建选项而改变；选项只控制打包内容。
@@ -54,6 +58,6 @@ tools/build_release.ps1 -SkipData -NoOriginalMedia
 ## 6. 验收要点
 
 - 发布包包含 `LICENSE`、`NOTICE.md`；不包含 `docs/`、测试日志或验证证据。
-- 公开构建不含原作过场视频。
+- 默认构建保留原作素材；显式选择 `-NoOriginalMedia` 时核实音视频已排除。
 - 素材交付记录保留来源与提示词，可追溯。
 - 字体附带 OFL 许可证。

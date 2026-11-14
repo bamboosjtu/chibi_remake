@@ -99,7 +99,7 @@ func _wire_world() -> void:
 func _get(key: StringName):
 	if _state_fields.has(key): return state.get(key)
 	if _scene_fields.has(key): return scene.get(key)
-	push_error("Unknown main.gd state property: " + str(key))
+	preload("res://property_contract.gd").reject(self,key)
 	return null
 
 func _set(key: StringName, value) -> bool:
@@ -109,12 +109,13 @@ func _set(key: StringName, value) -> bool:
 		return true
 	if _state_fields.has(key): state.set(key, value); return true
 	if _scene_fields.has(key): scene.set(key, value); return true
-	push_error("Unknown main.gd state property: " + str(key))
+	preload("res://property_contract.gd").reject(self,key)
 	return false
 
 func _on_visual(action: String, arguments: Array) -> void:
 	if scene.view == null: return
 	match action:
+		"feedback": scene.feedback_until = 0
 		"impact": scene.view.projectile_view.impact(arguments[0])
 		"place_unit": scene.view.place_unit(arguments[0])
 		"fade_unit": scene.view.fade_unit(arguments[0],arguments[1])

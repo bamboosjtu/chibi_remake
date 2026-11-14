@@ -14,7 +14,7 @@
 | 本地 CI | `tools/ci_windows.ps1` | 默认文档、素材清单、架构与最小冒烟；`-FullRegression` 扩展到完整回归 |
 | 托管契约 | `.github/workflows/contracts.yml` | `tools/ci_lightweight.mjs`：注册表、分层、素材白名单与发布套件形状 |
 
-GitHub Actions 分两个工作流：`contracts` 运行不依赖引擎与 LFS 的静态契约（注册表、分层、素材白名单）；`ci` 运行 `tools/syntax_check.mjs`（JS/JSON）、PowerShell 语法解析，以及不依赖 LFS 的 Godot 轻量门禁（`check_runtime_scripts.gd` 编译全部运行脚本，`test_architecture.gd --noview` 加载第一关数据并验证核心模拟）。完整回归、引擎模板测试与构建发布仍在本地执行。
+GitHub Actions 分两个工作流：`contracts` 运行资源/LFS 索引审计、地形源清单与历史分块声明检查，以及不依赖引擎与 LFS 工作文件的静态契约（注册表、分层、素材白名单）；`ci` 运行 `tools/syntax_check.mjs`（JS/JSON）、PowerShell 语法解析，以及不依赖 LFS 的 Godot 轻量门禁（`check_runtime_scripts.gd` 编译全部运行脚本，`test_architecture.gd --noview` 加载第一关数据并验证核心模拟）。完整回归、引擎模板测试与构建发布仍在本地执行。
 
 ## 2. 引擎自检
 
@@ -232,3 +232,7 @@ pwsh -NoProfile -File tools/bench_full_battle.ps1 -Stress    # 660 机动单位�
 当前参考机基线：标准 P50 122–167 ms、P95 240–420 ms（受寻路峰值影响）、548–859 FPS、0.46–0.48 GiB 工作集、0.63–0.64 GiB 显存；压力 P50 477.8 ms、P95 773.1 ms、318 FPS、0.48 GiB 工作集、0.65 GiB 显存。完整战场 P95 高于 30 Hz 的 33.3 ms 逻辑预算，因此微基准负责 800 单位的索引预算，完整基准按内容规模设定回归上限；两者都不通过放宽阈值规避失败。
 
 `tools/test_terrain_dedup.mjs` 检查重复内容合并、不同内容保留、引用图一致、源输入溯源与越界路径在修改前拒绝；候选包另验证全部重写后的地形资源可加载。历史失败清单只保留尚未解决且已验证的条目，不将修复项继续豁免。
+
+验收显示环境固定为 1920×1080。`--selftest`、`--native-save` 自动使用独立验收命名空间；不带标识也不写玩家槽位。`--save-test-id` 仅接受字母、数字、下划线与连字符，拒绝任意目录参数。
+
+CI 的续跑矩阵分别检查 chibic1、chibil1、chibic10、chibic17：保留原整数与分段基线，额外以完整快照检查 0/31/120/450/900/1800 tick 六个采样点的恢复和 AI 续跑。包含 15 秒、60 秒点，覆盖资源阻挡、探索、编组、载员、计时与堵路状态。每图独立进程，功能性看门狗为 600 秒；既有每 tick 性能预算保持不变。

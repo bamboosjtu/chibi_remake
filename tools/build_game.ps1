@@ -13,7 +13,12 @@ try {
     $sourceDirty=@(& git -C $BuildRoot status --porcelain 2>$null).Count -gt 0
     Initialize-BuildEnvironment
     if ($NoOriginalMedia) { $env:CHIBI_NO_ORIGINAL_MEDIA='1' } else { Remove-Item Env:CHIBI_NO_ORIGINAL_MEDIA -ErrorAction SilentlyContinue }
-    $godot=Join-Path $BuildRoot 'Godot_v4.7.2-stable_win64_console.exe'
+    . (Join-Path $PSScriptRoot 'engine_environment.ps1')
+    $godot=Resolve-ChibiEngine $BuildRoot
+    & node tools/verify_engine.mjs --engine $godot
+    if ($LASTEXITCODE -ne 0) { throw 'Engine integrity check failed' }
+    & node tools/verify_engine.mjs --platform win32_release --engine (Join-Path $BuildRoot '_work/build/roaming/Godot/export_templates/4.7.2.stable/windows_release_x86_64.exe')
+    if ($LASTEXITCODE -ne 0) { throw 'Export template integrity check failed' }
     if (!$SkipData) {
         $meds=Join-Path $BuildRoot '_work/iso/MEDS'
         if (!(Test-Path -LiteralPath $meds)) { throw '缺少 _work/iso/MEDS；请补齐原版文件，或显式使用 -SkipData 复用现有 data/*.json' }
@@ -26,7 +31,7 @@ try {
         $sourceDirty=$sourceDirty -or @(& git -C $BuildRoot status --porcelain 2>$null).Count -gt 0
     }
     $id=(Get-Date -Format 'yyyyMMdd_HHmmss')+'_'+[Guid]::NewGuid().ToString('N').Substring(0,8)
-    & node tools/build_terrain.mjs
+    & node tools/build_terrain.mjs --engine $godot
     if ($LASTEXITCODE -ne 0) { throw "Terrain source rebuild failed" }
 	& node tools/runtime_assets.mjs --check --hash
 	if ($LASTEXITCODE -ne 0) { throw 'Declared runtime asset check failed' }
@@ -41,12 +46,12 @@ try {
     foreach ($file in $inputs.files) { if (!(Test-Path -LiteralPath (Join-Path $stage $file))) { throw ('Missing staged resource: '+$file) } }
     $log=Join-Path $BuildRoot ('_work/build/import-'+$id+'.log')
     # A new staging checkout must import its declared resources, even when old caches exist.
-    & $godot --headless --path $stage --import *> $log
+    & node (Join-Path $PSScriptRoot 'godot_cli.mjs') $godot --headless --path $stage --import *> $log
     if ($LASTEXITCODE -ne 0) { throw 'Stage import failed' }
     $candidate=Join-Path $BuildRoot ('_work/build/candidate-'+$id)
     New-Item -ItemType Directory -Force $candidate | Out-Null
     $exe=Join-Path $candidate 'ChibiRTS.exe'
-    & $godot --headless --path $stage --export-release 'Windows HD Art' $exe *> (Join-Path $candidate 'export.log')
+    & node (Join-Path $PSScriptRoot 'godot_cli.mjs') $godot --headless --path $stage --export-release 'Windows HD Art' $exe *> (Join-Path $candidate 'export.log')
     if ($LASTEXITCODE -ne 0) { throw 'Export failed' }
     [IO.File]::WriteAllText((Join-Path $candidate 'portable.txt'), 'userdata', (New-Object System.Text.UTF8Encoding $false))
     # Launch the candidate before it can be published. A build that exports but
@@ -56,8 +61,7 @@ try {
         $verification='skipped'; $verificationNote='-SkipVerify'
         Write-Warning 'Candidate was not launched (-SkipVerify); the manifest records verification=skipped'
     } else {
-        $verifyEngine=Join-Path $BuildRoot 'Godot_v4.7.2-stable_win64.exe'
-        if (!(Test-Path -LiteralPath $verifyEngine)) { throw '缺少 Godot_v4.7.2-stable_win64.exe；候选包验收需要它（确需跳过请显式加 -SkipVerify）' }
+        # The same reviewed engine resolved above is used by candidate verification.
         & (Join-Path $PSScriptRoot 'verify_candidate.ps1') -Executable $exe -StageDirectory $stage
         if ($LASTEXITCODE -ne 0) { throw ('Candidate verification failed: exit ' + $LASTEXITCODE) }
         $verification='candidate-smoke'

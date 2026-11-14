@@ -117,7 +117,7 @@ func _assign_build_worker(worker: Dictionary, site: Dictionary) -> bool:
 	return true
 
 func _valid_build_worker(worker: Dictionary, site: Dictionary) -> bool:
-	if not battle.units.has(worker) or not battle.units.has(site): return false
+	if not battle.units.any(func(candidate): return is_same(candidate,worker)) or not battle.units.any(func(candidate): return is_same(candidate,site)): return false
 	if not bool(worker.get("alive", false)) or float(worker.get("die_t", -1)) >= 0 or bool(worker.get("attached", false)) or not preload("res://simulation/systems/unit_rules.gd").can_build(worker) or bool(worker.get("is_building", false)): return false
 	if worker not in ports._construction_workers(ports._commander_for(worker)): return false
 	return bool(site.get("alive", false)) and float(site.get("die_t", -1)) < 0 and bool(site.get("is_building", false)) and bool(site.get("site", false)) and int(worker.get("owner", -1)) == int(site.get("owner", -2))

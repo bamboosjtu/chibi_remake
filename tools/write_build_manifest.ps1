@@ -14,6 +14,8 @@ $Executable=[IO.Path]::GetFullPath($Executable)
 $candidate=Split-Path $Executable -Parent
 $pack=[IO.Path]::ChangeExtension($Executable,'.pck')
 if (!(Test-Path -LiteralPath $Executable) -or !(Test-Path -LiteralPath $pack)) { throw 'EXE/PCK pair is incomplete' }
+. (Join-Path $PSScriptRoot 'native_dependencies.ps1')
+Assert-NativeDependencies $candidate $projectRoot
 if (!$SourceCommit) {
     # Read the full one-line result. Select-Object -First 1 can terminate git
     # early under Windows PowerShell 5.1 and leave LASTEXITCODE=-1.

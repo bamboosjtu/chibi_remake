@@ -12,6 +12,34 @@ permissions:
   contents: read
 
 jobs:
+  continuation:
+    # Per-map CPU-only transactions; no LFS art or export templates required.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        map: [chibic1, chibil1, chibic10, chibic17]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install reviewed Godot bytes
+        run: |
+          curl -fsSL --retry 3 -o "$RUNNER_TEMP/godot.zip" \
+            https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip
+          mkdir -p "$RUNNER_TEMP/godot"
+          unzip -p "$RUNNER_TEMP/godot.zip" Godot_v4.7.2-stable_linux.x86_64 > "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+          node tools/verify_engine.mjs --platform linux --engine "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+          chmod +x "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+      - name: Complete state and AI continuation
+        run: node tools/test_continuation_coverage.mjs --engine "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --map "${{ matrix.map }}" --output _work/ci-continuation
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: continuation-${{ matrix.map }}
+          path: _work/ci-continuation
   syntax:
     runs-on: ubuntu-latest
     steps:
@@ -53,7 +81,9 @@ jobs:
         run: |
           curl -fsSL --retry 3 -o "$RUNNER_TEMP/godot.zip" \
             https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip
-          unzip -q "$RUNNER_TEMP/godot.zip" -d "$RUNNER_TEMP/godot"
+          mkdir -p "$RUNNER_TEMP/godot"
+          unzip -p "$RUNNER_TEMP/godot.zip" Godot_v4.7.2-stable_linux.x86_64 > "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+          node tools/verify_engine.mjs --platform linux --engine "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
           chmod +x "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
           echo "GODOT_ENGINE=$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" >> "$GITHUB_ENV"
       - name: Godot script compile and first-map smoke

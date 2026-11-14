@@ -18,6 +18,8 @@ $verificationNote=if ($build.PSObject.Properties.Name -contains 'verificationNot
 if ($verification -ne 'candidate-smoke') {
     throw ('Refusing to publish without candidate verification: ' + $verification)
 }
+. (Join-Path $PSScriptRoot 'native_dependencies.ps1')
+Assert-NativeDependencies $candidate $projectRoot
 $checks=@(
     [pscustomobject]@{ Path=$Executable; Key='exeSha256' },
     [pscustomobject]@{ Path=$pack; Key='packSha256' }

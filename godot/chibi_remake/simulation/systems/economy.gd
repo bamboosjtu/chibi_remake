@@ -9,9 +9,10 @@ func balance(owner: int) -> Dictionary:
 func write(owner: int, value: Dictionary) -> void:
 	if owner == host.player_owner:
 		for kind in KINDS: host.set(kind, float(value.get(kind, 0)))
-	else: host.ai_res[owner] = value
+	elif not balance(owner).is_empty(): host.ai_res[owner] = value
 func can_pay(owner: int, cost: Dictionary) -> bool:
 	var res := balance(owner)
+	if res.is_empty(): return false
 	for kind in KINDS:
 		var amount := float(cost.get(kind, 0))
 		if not is_finite(amount) or amount < 0 or float(res.get(kind, 0)) < amount: return false

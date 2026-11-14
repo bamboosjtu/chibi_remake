@@ -10,7 +10,7 @@ func _init(data: State) -> void:
 
 func _feedback(msg: String) -> void:
 	battle.feedback_text = msg
-	battle.feedback_until = Time.get_ticks_msec() + 2500
+	battle.effects.visual("feedback")
 
 func _resources() -> Dictionary:
 	return {"gold": battle.gold, "wood": battle.wood, "food": battle.food, "stone": battle.stone}

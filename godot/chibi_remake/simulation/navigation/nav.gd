@@ -14,12 +14,12 @@ func _init() -> void:
 
 func _get(key: StringName):
 	if _fields.has(key): return state.get(key)
-	push_error("Unknown simulation/navigation/nav.gd state property: " + str(key))
+	preload("res://property_contract.gd").reject(self,key)
 	return null
 
 func _set(key: StringName, value) -> bool:
 	if _fields.has(key): state.set(key, value); return true
-	push_error("Unknown simulation/navigation/nav.gd state property: " + str(key))
+	preload("res://property_contract.gd").reject(self,key)
 	return false
 
 func setup(md: Dictionary) -> void:

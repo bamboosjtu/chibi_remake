@@ -9,6 +9,7 @@ function Initialize-BuildEnvironment {
     if ($env:CHIBI_GODOT_TEMPLATES) { $sources += $env:CHIBI_GODOT_TEMPLATES }
     $sources += (Join-Path $SavedBuildEnvironment.APPDATA ('Godot/export_templates/'+$templateName))
     $sources += (Join-Path $BuildRoot ('_work/art-v1-build/roaming/Godot/export_templates/'+$templateName))
+    $sources += $destination
     $found=$false
     foreach ($candidate in $sources) {
         if (Test-Path -LiteralPath (Join-Path $candidate 'windows_release_x86_64.exe')) {
@@ -16,7 +17,7 @@ function Initialize-BuildEnvironment {
             # Both presets target Windows x86_64; skip ~1.7 GiB of other templates.
             foreach ($name in @('windows_release_x86_64.exe','windows_debug_x86_64.exe','windows_release_x86_64_console.exe','windows_debug_x86_64_console.exe','version.txt','icudt_godot.dat')) {
                 $source=Join-Path $candidate $name
-                if (Test-Path -LiteralPath $source) { Copy-Item -LiteralPath $source -Destination $destination -Force }
+                if ((Test-Path -LiteralPath $source) -and [IO.Path]::GetFullPath($source) -ne [IO.Path]::GetFullPath((Join-Path $destination $name))) { Copy-Item -LiteralPath $source -Destination $destination -Force }
             }
             $found=$true; break
         }

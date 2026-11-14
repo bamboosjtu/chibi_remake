@@ -127,12 +127,12 @@ func _build_step(owner: int) -> void:
 
 func _get(key: StringName):
 	if _fields.has(key): return _ai_state.get(key)
-	push_error("Unknown AI state property: " + str(key))
+	preload("res://property_contract.gd").reject(self,key)
 	return null
 
 func _set(key: StringName, value) -> bool:
 	if _fields.has(key): _ai_state.set(key, value); return true
-	push_error("Unknown AI state property: " + str(key))
+	preload("res://property_contract.gd").reject(self,key)
 	return false
 
 static func available_slots(behavior: int, gate: int, level: int, human_level: int, human_gold: float, mission: int) -> Array:

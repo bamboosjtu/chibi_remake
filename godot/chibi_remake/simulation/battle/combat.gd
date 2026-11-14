@@ -153,22 +153,12 @@ func _kill(u: Dictionary, by: Dictionary = {}) -> void:
 
 func _die_step(u: Dictionary, delta: float) -> void:
 	u.die_t += delta
-	var step: int = int(u.die_t / 0.08)
-	var dirFrames := _clip_dir(u, "die", int(u.dir) & 7)
-	if dirFrames.is_empty():
-		var span: int = maxi(1, int(u.count) / maxi(1, int(u.grid)))
-		var f0: int = maxi(0, int(u.count) - mini(8, span * maxi(1, int(u.grid))))
-		var f: int = f0 + mini(7, step)
-		if f >= int(u.count):
-			ports._finish_death(u)
-			return
-		ports._set_frame(u, f)
-		ports._fade_unit(u, maxf(0.0, 1.0 - u.die_t * 0.55))
-		return
-	if step >= dirFrames.size():
-		ports._finish_death(u)
-		return
-	ports._set_frame(u, int(dirFrames[step]))
+	var rule = preload("res://simulation/definitions/death_visual.gd")
+	var frame: int = rule.frame(u,float(u.die_t))
+	if frame < 0:
+		ports._finish_death(u); return
+	ports._set_frame(u,frame)
+	ports._fade_unit(u,rule.alpha(u,float(u.die_t)))
 
 func _clip_dir(u: Dictionary, clip: String, dir: int) -> Array:
 	return preload("res://simulation/systems/animation_rules.gd").clip_dir(u, clip, dir)

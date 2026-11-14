@@ -17,23 +17,17 @@ func _install(live: Node2D, candidate: RefCounted) -> bool:
 	if force_view_failure:
 		candidate.dispose(); return false
 	var view = live.view
-	var old_nodes: Dictionary = view._ui._nodes_by_uid if view != null else {}
-	var old_motion: Dictionary = view._ui._motion_previous if view != null else {}
-	var old_gait: Dictionary = view._ui._gait_previous if view != null else {}
+	var presentation: Dictionary = view.stage_world_nodes() if view != null else {}
 	var previous: RefCounted = live.exchange_world(candidate.world)
 	if view != null:
-		view._ui._nodes_by_uid = {}
 		for unit in live.units:
 			var sheet: String = str(live.sheet_by_unit.get("%d_%d" % [int(unit.unit), int(unit.owner)], ""))
 			view.attach_unit(unit, {"sheet":sheet,"unit":unit.unit,"owner":unit.owner}, int(unit.w),int(unit.h),float(unit.k))
-		if force_view_failure_after_attach or not _complete_nodes(view, live.units):
-			_free_nodes(view._ui._nodes_by_uid)
+		if force_view_failure_after_attach or not view.world_nodes_complete(live.units):
 			live.exchange_world(previous)
-			view._ui._nodes_by_uid = old_nodes
-			view._ui._motion_previous = old_motion
-			view._ui._gait_previous = old_gait
+			view.rollback_world_nodes(presentation)
 			candidate.dispose(); return false
-		_free_nodes(old_nodes)
+		view.commit_world_nodes(presentation)
 		view.capture_motion()
 		if view.event_view != null: view.event_view.restore_history()
 		for unit in live.units: view.update_visual(unit)
@@ -48,21 +42,6 @@ func _install(live: Node2D, candidate: RefCounted) -> bool:
 	candidate.saver = null
 	previous.dispose()
 	return true
-
-func _complete_nodes(view: Node2D, units: Array) -> bool:
-	for unit in units:
-		var record: Dictionary = view.unit_nodes(unit)
-		if record.get("spr") == null or not is_instance_valid(record.spr): return false
-		for key in ["diamond", "hbar"]:
-			if record.get(key) == null or not is_instance_valid(record[key]): return false
-		if record.spr.texture == null and (record.get("skin") == null or record.skin.texture == null): return false
-	return true
-
-func _free_nodes(records: Dictionary) -> void:
-	for record in records.values():
-		for key in ["spr", "diamond", "hbar"]:
-			var node = record.get(key)
-			if node != null and is_instance_valid(node): node.queue_free()
 
 func apply_legacy(live: Node2D, old: Dictionary, records: Array, version: int) -> bool:
 	var game: Node = live.get_node("/root/Game")

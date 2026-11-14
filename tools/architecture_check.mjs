@@ -1,7 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const root = 'godot/chibi_remake';
+const args=process.argv.slice(2);
+const root = (args.includes('--root')?args[args.indexOf('--root')+1]:'godot/chibi_remake').replaceAll('\\','/');
 const limits = JSON.parse(fs.readFileSync('tools/inputs/architecture_limits.json', 'utf8'));
 const files = directory => fs.readdirSync(directory, {withFileTypes: true}).flatMap(entry => {
   if (entry.name.startsWith('.') || ['art', 'media', 'assets', 'addons', 'data'].includes(entry.name)) return [];
@@ -17,7 +18,8 @@ const dependencies = (file, seen = new Set()) => {
   const full = path.join(root,file);
   if (!fs.existsSync(full)) return seen;
   const source = fs.readFileSync(full,'utf8');
-  for (const match of source.matchAll(/(?:preload|load)\("res:\/\/([^"\n]+\.gd)"\)/g)) dependencies(match[1],seen);
+  const code=source.replace(/("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|#[^\r\n]*/g,(all,string)=>string??'');
+  for (const match of code.matchAll(/(?:preload|load)\(\s*(['"])res:\/\/([^'"\n]+\.gd)\1\s*\)/g)) dependencies(match[2],seen);
   return seen;
 };
 let failures = 0, reviews = 0, waivedHits = 0;
@@ -29,7 +31,7 @@ const waive = (key, message) => {
 for (const file of files(root)) {
   const relative = path.posix.relative(root, file);
   const source = fs.readFileSync(file, 'utf8');
-  const code = source.split('\n').map(line => line.replace(/#.*/, '')).join('\n');
+  const code = source.replace(/("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|#[^\r\n]*/g,(all,string)=>string??'');
   const count = source.trimEnd().split('\n').length;
   const budget = limits.files[relative] ?? 600;
   if (count > budget) fail(`${relative}: ${count} lines exceeds ${budget}`);
@@ -48,7 +50,9 @@ for (const file of files(root)) {
     // `rngState` for a snapshot stays allowed.
     waive(`${relative}::gameplay-rng`, `${relative}: gameplay randomness rolled outside simulation`);
   }
-  if (relative.startsWith('presentation/') && /preload\("res:\/\/simulation\/systems\//.test(code)) {
+  if(relative.startsWith('app/') && /\bview\._ui\b/.test(code))fail(`${relative}: app reaches private presentation state`);
+  if(relative.startsWith('presentation/') && /\.saver\.apply_snapshot\(|\.selected\.(?:append|clear|erase)\(/.test(code))fail(`${relative}: presentation bypasses session commands`);
+  if (relative.startsWith('presentation/') && /(?:preload|load)\(\s*['"]res:\/\/simulation\/systems\//.test(code)) {
     waive(`${relative}::direct-system`, `${relative}: presentation imports a simulation system instead of a port`);
   }
   if (relative.startsWith('presentation/')) {

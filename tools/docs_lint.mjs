@@ -20,6 +20,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {headingAnchors} from './lib/markdown_anchors.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DOCS = path.join(ROOT, 'docs');
@@ -95,16 +96,25 @@ for (const file of mdFiles) {
   let m;
   while ((m = re.exec(text))) {
     let target = m[1];
-    if (/^[a-z]+:/i.test(target) || target.startsWith('#')) continue;
-    target = target.split('#')[0];
-    if (!target) continue;
+    if (/^[a-z]+:/i.test(target)) continue;
+    const [filePart,fragment]=target.split('#');
+    target=filePart;
     let decoded = target;
     try { decoded = decodeURIComponent(target); } catch { /* keep raw */ }
-    const resolved = path.resolve(path.dirname(file), decoded);
+    const resolved = target ? path.resolve(path.dirname(file), decoded) : file;
     if (!fs.existsSync(resolved)) {
       brokenLinks.push(path.relative(ROOT, file).replaceAll('\\', '/') + ' -> ' + target);
+    } else if(fragment && resolved.endsWith('.md')) {
+      let anchor=fragment;try{anchor=decodeURIComponent(fragment);}catch{}
+      if(!headingAnchors(fs.readFileSync(resolved,'utf8')).has(anchor))brokenLinks.push(path.relative(ROOT,file).replaceAll('\\','/')+' -> '+filePart+'#'+fragment+' (missing heading)');
     }
   }
+}
+
+for(const file of specFiles){
+ const chapters=new Set();for(const match of fs.readFileSync(file,'utf8').matchAll(/^## (\d+)\. /gm)){
+  if(chapters.has(match[1]))brokenLinks.push(path.relative(ROOT,file)+': duplicate chapter '+match[1]);chapters.add(match[1]);
+ }
 }
 
 // ---- 检查 3：附录完整度 ----

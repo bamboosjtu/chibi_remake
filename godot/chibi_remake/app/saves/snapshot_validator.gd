@@ -53,6 +53,8 @@ func prepare(d: Dictionary, arr: Array) -> Dictionary:
 		for point in rec.simulation.get("path", []):
 			if not point is Array or point.size() != 2:
 				return {}
+		if not _valid_destination(rec.simulation.get("repathTo")): return {}
+		if rec.simulation.has("blocked_n") and not _valid_integer.call(rec.simulation.blocked_n): return {}
 		ids[uid] = rec
 	# ---- REQ-002：世界修改前**完整**校验（地形键/编组/资源/武将池/训练队列/采集引用/新字段类型） ----
 	var rows_n := int(host.map_data.rows)
@@ -247,3 +249,10 @@ func _valid_officer_state(value) -> bool:
 		if not _valid_integer.call(value.get(key, 0)): return false
 	if value.has("hasExp") and not value.hasExp is bool: return false
 	return bool(value.get("hasExp", true)) or int(value.get("exp", 0)) == 0
+
+func _valid_destination(destination) -> bool:
+	if destination == null: return true
+	if not destination is Array or destination.size() != 2: return false
+	for coordinate in destination:
+		if not (coordinate is int or coordinate is float) or not is_finite(float(coordinate)): return false
+	return true

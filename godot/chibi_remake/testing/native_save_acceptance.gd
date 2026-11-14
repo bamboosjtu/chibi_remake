@@ -4,8 +4,7 @@ func run(battle: Node2D, phase: String) -> void:
 	var tree: SceneTree = battle.get_tree()
 	var game: Node = battle.get_node("/root/Game")
 	if phase == "diagnose":
-		var roots: Array = preload("res://app/user_storage.gd").directories()
-		roots.append(OS.get_executable_path().get_base_dir())
+		var roots: Array = [game.SAVE_PATH.get_base_dir()]
 		for directory in roots:
 			var created := DirAccess.make_dir_recursive_absolute(directory)
 			var path: String = directory.path_join("native-write-probe-%d.tmp" % OS.get_process_id())

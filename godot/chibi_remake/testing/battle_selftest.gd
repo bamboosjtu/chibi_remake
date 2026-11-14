@@ -89,28 +89,7 @@ func run() -> void:
 		self._check(host.view.unit_nodes(bldg).hbar != null, "建筑有血条节点（B4）")
 		self._check(int(bldg.grid) > 0 and int(bldg.count) > 0, "建筑图集有网格与帧数")
 		host.selected.clear()
-	# B1 断言：选中**能生产**的建筑后生产按钮 必须真的排队生产
-	# （原版只有帅帐/兵营/船坞产兵；粮仓/城门/箭楼没有生产项，那就跳过这条）。
-	var train_bldg: Dictionary = {}
-	for u in host.units:
-		if bool(u.is_building) and int(u.owner) == host.player_owner and bool(u.alive) and not bool(u.get("site", false)):
-			if not host.commands.economy.train_types_for(int(u.unit)).is_empty():
-				train_bldg = u
-				break
-	if train_bldg.is_empty():
-		self._skip("生产按钮 生产（B1）：本图我方没有可生产的建筑")
-	var before_train = host.trainings.size()
-	host.selected = [train_bldg] if not train_bldg.is_empty() else []
-	if not host.commands.economy._train_list_for_selection().is_empty():host.commands.economy._start_train(host.commands.economy._train_list_for_selection()[0])
-	await host.get_tree().process_frame
-	# process_frame is emitted before node processing; allow the queued command's frame pump to run.
-	await host.get_tree().process_frame
-	print("SELFTEST train: queued %d -> %d (生产按钮 生效=%s)" % [before_train, host.trainings.size(), str(host.trainings.size() > before_train)])
-	if bldg.is_empty():
-		self._skip("生产按钮 生产（B1）：本图我方没有建筑，前提不成立")
-	else:
-		self._check(host.trainings.size() > before_train, "选中建筑后生产按钮 真的排队生产（B1）")
-	host.selected.clear()
+	await _selftest_production()
 	# 武将 + 真实伤害公式断言（FUN_0041fe90）
 	var sample: Dictionary = {}
 	for u in host.units:
@@ -314,3 +293,31 @@ func run() -> void:
 	await host.commands.session._screenshot()
 	self._selftest_summary()      # 按失败数决定退出码（不再是永远退出 0）
 	return
+
+func _selftest_production() -> void:
+	# B1 断言：选中**能生产**的建筑后生产按钮 必须真的排队生产
+	# （原版只有帅帐/兵营/船坞产兵；粮仓/城门/箭楼没有生产项，那就跳过这条）。
+	var train_bldg: Dictionary = {}
+	for u in host.units:
+		if bool(u.is_building) and int(u.owner) == host.player_owner and bool(u.alive) and not bool(u.get("site", false)):
+			if not host.commands.economy.train_types_for(int(u.unit)).is_empty():
+				train_bldg = u
+				break
+	if train_bldg.is_empty():
+		self._skip("生产按钮 生产（B1）：本图我方没有可生产的建筑")
+	var before_train = host.trainings.size()
+	host.selected = [train_bldg] if not train_bldg.is_empty() else []
+	if not train_bldg.is_empty():
+		host.view.update_panel()
+		var button: Button = host.view.hot_buttons[0].btn
+		self._check(not button.disabled,"生产按钮可用")
+		if not button.disabled: button.pressed.emit()
+	await host.get_tree().process_frame
+	# process_frame is emitted before node processing; allow the queued command's frame pump to run.
+	await host.get_tree().process_frame
+	print("SELFTEST train: queued %d -> %d (生产按钮 生效=%s)" % [before_train, host.trainings.size(), str(host.trainings.size() > before_train)])
+	if train_bldg.is_empty():
+		self._skip("生产按钮 生产（B1）：本图我方没有建筑，前提不成立")
+	else:
+		self._check(host.trainings.size() > before_train, "选中建筑后生产按钮 真的排队生产（B1）")
+	host.selected.clear()

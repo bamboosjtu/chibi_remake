@@ -3,6 +3,12 @@ extends Node2D
 const GRID_FALLBACK := 8
 
 var _ui = preload("res://presentation/battle/components/battle_view_state.gd").new()
+var _world_nodes := preload("res://presentation/battle/world_nodes.gd").new(_ui)
+
+func stage_world_nodes() -> Dictionary: return _world_nodes.begin()
+func rollback_world_nodes(token: Dictionary) -> void: _world_nodes.rollback(token)
+func commit_world_nodes(token: Dictionary) -> void: _world_nodes.commit(token)
+func world_nodes_complete(units: Array) -> bool: return _world_nodes.complete(units)
 var _components: Dictionary = {}
 var _fields: Dictionary = {}
 var _api_missing: Array = []
@@ -120,12 +126,12 @@ func contract_abort() -> bool:
 
 func _get(key: StringName):
 	if _fields.has(key): return _ui.get(key)
-	push_error("Unknown presentation/battle/battle_view.gd state property: " + str(key))
+	preload("res://property_contract.gd").reject(self,key)
 	return null
 
 func _set(key: StringName, value) -> bool:
 	if _fields.has(key): _ui.set(key, value); return true
-	push_error("Unknown presentation/battle/battle_view.gd state property: " + str(key))
+	preload("res://property_contract.gd").reject(self,key)
 	return false
 
 func maybe_play_intro(md: Dictionary) -> void:
@@ -408,30 +414,11 @@ static func screenshot(node: Node) -> void:
 # ------------------------------------------------- unit nodes & frames (A/B) ----
 
 static func frame_rect(u: Dictionary, f: int) -> Rect2:
-	var k: float = float(u.get("k", 1.0))
-	var w: float = float(u.w)
-	var h: float = float(u.h)
-	var grid: int = maxi(1, int(u.get("grid", GRID_FALLBACK)))
-	return Rect2((f % grid) * w * k, (f / grid) * h * k, w * k, h * k)
-
-## 某剪辑某朝向的帧序列（无数据返回空数组）。静态：死亡时序在 main._die_step 里要用它，
-## 而模拟必须能没有 view 实例地跑完。
-
+	return preload("res://presentation/battle/view_math.gd").frame_rect(u,f)
 static func clip_dir(u: Dictionary, clip: String, dir: int) -> Array:
-	var clips = u.get("clips", null)
-	if not (clips is Dictionary) or not clips.has(clip):
-		return []
-	var d = clips[clip]
-	if not (d is Array) or d.is_empty():
-		return []
-	var list = d[dir % d.size()]
-	return list if list is Array else []
-
-## 取一帧；无数据返回 -1（调用方回退）
-
+	return preload("res://presentation/battle/view_math.gd").clip_dir(u,clip,dir)
 static func clip_frame(u: Dictionary, clip: String, dir: int, step: int) -> int:
-	var list: Array = clip_dir(u, clip, dir)
-	return -1 if list.is_empty() else int(list[step % list.size()])
+	return preload("res://presentation/battle/view_math.gd").clip_frame(u,clip,dir,step)
 
 # ------------------------------------------------- selection marquee (E) ----
 

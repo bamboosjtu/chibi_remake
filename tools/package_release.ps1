@@ -14,7 +14,7 @@ if (!$VersionDirectory) {
     $pointer = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'release/current.json') | ConvertFrom-Json
     $VersionDirectory = Join-Path $root ('release/' + $pointer.directory)
 }
-$VersionDirectory = [IO.Path]::GetFullPath($VersionDirectory)
+$VersionDirectory = [IO.Path]::GetFullPath($VersionDirectory).TrimEnd("\","/")
 if (!(Test-Path -LiteralPath $VersionDirectory)) { throw ('Missing version directory: ' + $VersionDirectory) }
 $versionName = Split-Path $VersionDirectory -Leaf
 if (!$Tag) { $Tag = $versionName }
@@ -65,76 +65,42 @@ function Split-LargeFile([string]$Source, [string]$TargetBase, [int64]$Limit) {
     } finally { $input.Dispose() }
 }
 
+$fileMap = @()
 $sums = New-Object System.Collections.Generic.List[string]
 $parts = New-Object System.Collections.Generic.List[object]
 $files = @(Get-ChildItem -LiteralPath $VersionDirectory -Recurse -File | Sort-Object FullName)
 foreach ($file in $files) {
     $relative = $file.FullName.Substring($VersionDirectory.Length + 1)
     $flat = ($relative -replace '[\\/]', '-')
+    if ($flat -in @('release-files.json','join-release.ps1','join-release.cmd','SHA256SUMS.txt','release-body.md')) { throw ('Reserved release asset name: '+$flat) }
     $target = Join-Path $OutputDirectory $flat
     if (Test-Path -LiteralPath $target) { throw ('Duplicate release asset name: ' + $flat) }
     $hash = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash
+    $partRecords=@()
     if ($file.Length -gt $limit) {
         Split-LargeFile $file.FullName $target $limit
         $made = @(Get-ChildItem -LiteralPath $OutputDirectory -Filter ($flat + '.part*') | Sort-Object Name)
-        foreach ($part in $made) { $parts.Add($part) | Out-Null }
+        foreach ($part in $made) { $parts.Add($part) | Out-Null; $partRecords+=@{name=$part.Name;bytes=$part.Length;sha256=(Get-FileHash -LiteralPath $part.FullName -Algorithm SHA256).Hash} }
     } else {
         Copy-Item -LiteralPath $file.FullName -Destination $target
     }
+    $fileMap+=@{relative=$relative.Replace("\","/");asset=$flat;bytes=$file.Length;sha256=$hash;parts=@($partRecords)}
     $sums.Add(($hash + '  ' + $flat))
 }
 if ($sums.Count -ne $files.Count) { throw 'Hash count does not match packaged file count' }
-Write-Utf8NoBom (Join-Path $OutputDirectory 'SHA256SUMS.txt') (($sums -join "`n") + "`n")
 
-$joinScript = @'
-param([string]$Directory = $PSScriptRoot)
-$ErrorActionPreference = 'Stop'
-Set-Location -LiteralPath $Directory
-$groups = @{}
-Get-ChildItem -LiteralPath $Directory -File | Where-Object { $_.Name -match '^(.*)\.part(\d+)$' } | ForEach-Object {
-    $base = $Matches[1]
-    if (!$groups.ContainsKey($base)) { $groups[$base] = New-Object System.Collections.ArrayList }
-    [void]$groups[$base].Add($_)
-}
-foreach ($base in $groups.Keys) {
-    $target = Join-Path $Directory $base
-    $output = [IO.File]::Create($target)
-    try {
-        foreach ($part in ($groups[$base] | Sort-Object Name)) {
-            $input = [IO.File]::OpenRead($part.FullName)
-            try { $input.CopyTo($output) } finally { $input.Dispose() }
-        }
-    } finally { $output.Dispose() }
-    foreach ($part in $groups[$base]) { Remove-Item -LiteralPath $part.FullName -Force }
-}
-$failures = New-Object System.Collections.Generic.List[string]
-foreach ($line in (Get-Content -LiteralPath (Join-Path $Directory 'SHA256SUMS.txt'))) {
-    if ($line -match '^([0-9A-Fa-f]{64})\s+\*?(.+)$') {
-        $expected = $Matches[1].ToUpperInvariant()
-        $name = $Matches[2].Trim()
-        $path = Join-Path $Directory $name
-        if (!(Test-Path -LiteralPath $path)) { $failures.Add('missing ' + $name); continue }
-        $actual = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash
-        if ($actual -ne $expected) { $failures.Add('hash ' + $name) }
-    }
-}
-if ($failures.Count -gt 0) { throw ('Verification failed: ' + ($failures -join '; ')) }
-Write-Host 'Joined and verified. Run ChibiRTS.exe.'
-'@
-Write-Utf8NoBom (Join-Path $OutputDirectory 'join-release.ps1') $joinScript
-
+Write-Utf8NoBom (Join-Path $OutputDirectory 'release-files.json') ((@{schemaVersion=1;files=@($fileMap)} | ConvertTo-Json -Depth 8)+"`n")
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'join_release.ps1') -Destination (Join-Path $OutputDirectory 'join-release.ps1')
 $joinCmd = @'
 @echo off
-setlocal enabledelayedexpansion
-cd /d "%~dp0"
-for %%F in (*.part001) do (
-  set "base=%%~nF"
-  copy /b "!base!.part*" "!base!" >nul
-  del "!base!.part*" >nul
-)
-echo Joined. Run join-release.ps1 once to verify hashes before starting ChibiRTS.exe.
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0join-release.ps1" %*
+exit /b %errorlevel%
 '@
 Write-Utf8NoBom (Join-Path $OutputDirectory 'join-release.cmd') $joinCmd
+foreach ($name in @('release-files.json','join-release.ps1','join-release.cmd')) { $sums.Add((Get-FileHash -LiteralPath (Join-Path $OutputDirectory $name)).Hash+'  '+$name) }
+Write-Utf8NoBom (Join-Path $OutputDirectory 'SHA256SUMS.txt') (($sums -join "`n") + "`n")
+$checksumListHash=(Get-FileHash -LiteralPath (Join-Path $OutputDirectory 'SHA256SUMS.txt')).Hash
+
 
 $totalBytes = ($files | Measure-Object Length -Sum).Sum
 $info = Get-Content -Raw -Encoding UTF8 (Join-Path $VersionDirectory 'release-info.json') | ConvertFrom-Json
@@ -145,6 +111,7 @@ $body = @"
 预发布版本 ${versionName}，由本地发布脚本生成。
 
 - 提交：$commit
+- SHA256SUMS.txt 的 SHA-256：$checksumListHash
 - 单文件上限：$PartMiB MiB；超过上限的文件拆成 `.partNNN` 分卷。
 - 文件数：$($files.Count)，原始体积：$([math]::Round($totalBytes / 1GB, 2)) GiB。
 
@@ -162,7 +129,7 @@ $body = @"
 
 非官方、非商业社区 MOD；需自备原作《三国赤壁》（1997）。许可与致谢见 `LICENSE`、`NOTICE.md`。
 "@
-Write-Utf8NoBom (Join-Path (Split-Path $OutputDirectory -Parent) 'release-body.md') $body
+Write-Utf8NoBom (Join-Path $OutputDirectory 'release-body.md') $body
 
 $large = @(Get-ChildItem -LiteralPath $OutputDirectory -Recurse -File | Where-Object { $_.Length -ge 1GB })
 if ($large.Count -gt 0) { throw ('Release asset exceeds 1 GiB: ' + $large[0].Name) }

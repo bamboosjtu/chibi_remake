@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "ai": {
+    "think": {
+      "function": "FUN_00472320",
+      "periodUpdates": 41,
+      "rule": "DAT_00485648[side] < 0x28 时自增；达到 0x28 时归零并调用 FUN_00472230",
+      "evidence": "0x00472320"
+    },
+    "attack": {
+      "function": "FUN_00471600",
+      "thresholdDefault": 70,
+      "thresholdLowPlayerUnits": 6,
+      "lowPlayerRule": "进攻检查达到当前阈值时，若玩家可见实体计数 DAT_004b8d38[player] <6，则把阈值改为6；下一轮才使用6，首轮计数不追溯",
+      "waitRule": "AI 大本营等级 < AI 的 init[1] 门槛，且（玩家大本营等级 < 玩家 init[1] 门槛−1 或 玩家金 <15000）→ 本次不进攻；missionId=0x0e（chibil14）走特殊分支绕过等待",
+      "waitVariables": "AI HQ = DAT_004b8d29[AI]；AI gate = DAT_005d1e00[missionId]（当前 AI 的 DAT_004b8cc0 按关卡号槽写入）；玩家 HQ = DAT_004b8d29[player]；玩家 gate = DAT_004b8cc0[player]；玩家金 = DAT_004b8d08[player]",
+      "targetFunction": "FUN_00464B40 / FUN_00464C90",
+      "targetRule": "按玩家单位槽顺序扫描，返回第一个符合类型/状态的目标；不是空间最近邻；槽号来自运行时创建/存活顺序",
+      "targetScope": "只扫描玩家方 DAT_004b8cac；AI 之间不攻击",
+      "action": "给空闲、可攻击的 AI 单位排队攻击命令（command local_14=1, sub=2）",
+      "heroTargetRule": "英雄/首领类 AI 单位先走 FUN_00464B40：玩家类型6特殊目标→类型7特殊目标→1000",
+      "unitTargetRule": "普通 AI 单位走 FUN_00464C90(4)：排除玩家类型0/2/4/5，按槽顺序取第一个 HP>0 的单位",
+      "mission14Special": "chibil14（missionId=0x0e）：FUN_00471600 的 param_2==0x0e 分支绕过等待门槛；普通 AI 单位目标改用 FUN_0046A850（优先玩家类型9且单位类型值0x23/0x24/0x26，再按槽顺序找地图上半部的类型9）",
+      "evidence": "0x00471600 / 0x00464B40 / 0x00464C90 / 0x0046A850"
+    },
+    "intercept": {
+      "function": "FUN_00471FD0",
+      "warmupCalls": 30,
+      "countRule": "全局 DAT_004856ac 从 0 自增；达到 0x1e 后不再复位，此后每个 AI 思考都检查（不是每 31 次循环）",
+      "radius": "±0x5a = ±90 像素（代码直接比较单位/建筑像素坐标）",
+      "rule": "检查帅帐（DAT_005af2a4，类型0/1）槽位；取首个带目标的我方单位，然后把帅帐 ±90 像素内的 AI 普通单位排入攻击；属于大本营周边拦截/自动攻击",
+      "evidence": "0x00471FD0"
+    },
+    "retreat": {
+      "function": "FUN_00471B30",
+      "periodAiThoughts": 42,
+      "countRule": "DAT_00485658[side] > 0x28 时归零并执行（每 42 次 AI 思考）",
+      "rule": "若该 AI 存在撤退目标 DAT_005d1ec8[side]，把带目标的单位排入 command 9（撤退/回城点）",
+      "evidence": "0x00471B30"
+    },
+    "production": {
+      "functions": [
+        "FUN_0046AFF0",
+        "FUN_0046E4B0",
+        "FUN_00470570",
+        "FUN_00472180"
+      ],
+      "economy": "每次 AI 思考把 DAT_004b8d08[AI] 覆盖为 20000；因此 AI 的补兵/建造不受玩家经济限制",
+      "planPeriod": "DAT_004856b0[side] < 0x15 时自增；达到 0x15 后归零并执行建造/研究计划（每 22 次 AI 思考）",
+      "note": "训练档位由 init[0] 决定，建造/科技门槛由 init[1] 参与；这些是进攻波次的后勤来源，但不是进攻计时器本身。",
+      "evidence": "0x0046AFF0 / 0x0046E4B0 / 0x00470570 / 0x00472180"
+    },
+    "behaviorTier": {
+      "source": "scenario.sides[].init[0]",
+      "values": [
+        "0",
+        "1",
+        "2"
+      ],
+      "semantics": {
+        "0": "FUN_0046A4E0 + FUN_0046A510 训练路径",
+        "1": "FUN_0046A760 + FUN_0046A790 训练路径；FUN_00471600 另有针对四组特殊目标的过滤分支",
+        "2": "FUN_0046AF00 训练路径（关卡唯一档位 2 的 AI 见 FUN_0046AFF0）"
+      },
+      "note": "原版 init[0] 主要影响训练/建造行为档位；进攻计时在 FUN_00471600 中独立，不能把档位当作攻击性数值。",
+      "evidence": "FUN_0046AFF0 / FUN_00472230 / FUN_00471600"
+    },
+    "gate": {
+      "source": "scenario.sides[].init[1]",
+      "note": "关卡科技门槛。AI 的 init[1] 与玩家方 init[1] 都参与 FUN_00471600 的等待条件；init[2] 为信息面板变体标志，当前界面不区分。"
+    }
+  },
+  "source": {
+    "originalBinary": "CB.EXE (2db7cc102e6fde547ab05d77cfddabc2079f5bc9be9b6b59b17bf435c5798cb7)",
+    "mapData": "godot/chibi_remake/data/*.json（由原版 MEDS/*.MED 转换；对象 A/B、px/py 保留）",
+    "mapConversionNote": "object pos = 44A+22(B&1)+22-w/2, 11B+22-h; terrain/object positions are original render model",
+    "medHashes": {
+      "chibil1": "b00a7ea3ca5460819b9a123ac4bc2c0fa5e408ff0e0383641ac84c4f94e1b224",
+      "chibil2": "fef8a360e48a7f67029613c3b4abfcea06d3f18be78a9e4edac6d528c3364604",
+      "chibil3": "403d558e9bae5003a19da6131a4baf0f6c5217ae1a8444dd1f9f3518627a581d",
+      "chibil4": "3f970a79736f242c1ceaf1abca586e1660195479050d37244c4383f26d278510",
+      "chibil5": "5df32e0c019ab23316c0d30e09921913c3517d0ec39c12d3820c3f54c8af1478",
+      "chibil6": "d03aa435c7738d92928b8cc3fd3e28dde97fa1901598876363bee9a8ca1bffe8",
+      "chibil7a": "32b05fe9a40b2122d54e69f813238b3c24895a10c5f2d0aa5986b89e9310fa20",
+      "chibil7b": "1f93388bcb1e3922efbeb4cee50549547b603dc2e63e4c37d44fb3e53852f2c4",
+      "chibil8": "38d243e52e792131949ca8a3fc60c45a94a9dd13b626f5583238908e0a3be4d9",
+      "chibil9": "e8a3f955da579f02568f0282e4b597573c25b5647e1837c4e49f8d1735695cbc",
+      "chibil10": "52a633f73500193bd23c202c63c7aa9919df25c350da18929407e1df7262fe3a",
+      "chibil11": "2c4c8572d0991c9c0da413a28e7d7b4a7427dddef3943e4f5c7ace955a00eff4",
+      "chibil12": "688fee90d7057f5815c8f103a767360201825e5b5d80952903cb375298464a23",
+      "chibil13": "7730b9d65c04ecb0f42b899df162c11c5d6b675d1592265c68bb5bdddf35e72a",
+      "chibil14": "d60365a08d253324cdbefeca6df2d96c9029f80e7f0666e19cf4ebf5e83b60bc",
+      "chibil15": "f43179af6ddefe79379750ca2ec708217096f56935feaf5b405ae90c10279251",
+      "chibil16": "028ac88b638a6a6327ca17f555ce899ff9027d26ca7951c336eddb1e4818dce7",
+      "chibic1": "3f062115569fe15f78978cf4201ecb2ebfc3f9275c9ebc8d60d057c399c342db",
+      "chibic2": "a1f767e175ccc6389eda716c616f856fcec0c499cbdbabc1b65b62c33b3ac39a",
+      "chibic3": "afd32e6d5005b76b60b618a96ae5653fa1266cc7e8f5e4c3dddfc13d33835a9c",
+      "chibic4": "c31aa56a3e38efb15a618e09365b60960d4ce1cb9920af4f826572ac73d71df0",
+      "chibic5": "643c6ed5e73370b60f737c62fae4b0db8c89c2a5fa0c8aec127aa783ea235254",
+      "chibic6": "a9d1766b3f58522adf0b4296cf48de22346d583501ce8a5cf79d24f81577bdfb",
+      "chibic7": "f02f065495d8142cfa12db72b5bd13517dd26ab348ea3128463e1fe8ca6dc662",
+      "chibic8": "a5e554a4d5a78689016c9abc38738b267a623ae503c781c89b24891c78426fa1",
+      "chibic9": "06a958326aa71fe42eaeac1164a3067e46318ef09bcad543d87dcfa8a33b1e34",
+      "chibic10": "0ab39179145bc6a3000083080d986b502862712fe6eaf0a7df75d6a60ecdf31c",
+      "chibic11": "ee7cd2553e265368e2d44b151ac04162b777c0175d3d8dc060321c639d698c86",
+      "chibic12": "6e5bf190722bce0eb4b0719644b58c2253d70905ff094f5bb3f2fc42483a2ef6",
+      "chibic13": "0b72ceab6c8596fd24dfe01965ba9b146b07a875bcff6f5bd52a11067eb211a4",
+      "chibic14": "7b68aa600785a51bdbe6af6ae4597602d8cb6c37ab45f1b3a4e60ff587d8f25c",
+      "chibic15": "43db309f58572bfea58879790e1047aea8049e284c0cb13c052a62e1803755e0",
+      "chibic16": "ee12a45543c47d5d7b5092761cb930399efa63cdd6ccab4311ff9d19ae9eef5f",
+      "chibic17": "80fd3487b8765dee21277a9d03e1b2ede26cac242d339f9e76c9c94d10ec2450"
+    },
+    "aiCode": [
+      "FUN_0045AFE0",
+      "FUN_00472320",
+      "FUN_00472230",
+      "FUN_00471600",
+      "FUN_00464B40",
+      "FUN_00464C90",
+      "FUN_0046A850",
+      "FUN_00471FD0",
+      "FUN_00471B30",
+      "FUN_00472180",
+      "FUN_0046AFF0",
+      "FUN_0046E4B0",
+      "FUN_00470570"
+    ],
+    "aiScope": "静态 Ghidra 反编译；未运行原版逐帧观察"
+  }
+}

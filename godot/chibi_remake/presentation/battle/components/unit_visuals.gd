@@ -176,6 +176,15 @@ func update_visual(u: Dictionary) -> void:
 	if not bool(u.is_building) and not vis:
 		if unit_nodes(u).get("hbar")!=null:unit_nodes(u).hbar.visible=false
 		return # Fogged/offscreen units must not load unseen HD animation pages.
+	if float(u.get("die_t",-1)) >= 0:
+		var rule = preload("res://simulation/definitions/death_visual.gd")
+		var frame: int = rule.frame(u,float(u.die_t))
+		if frame >= 0: set_frame(u,frame)
+		else: hide_unit(u)
+		fade_unit(u,rule.alpha(u,float(u.die_t)))
+		if unit_nodes(u).get("hbar") != null: unit_nodes(u).hbar.hide()
+		if unit_nodes(u).get("diamond") != null: unit_nodes(u).diamond.hide()
+		return
 	if bool(u.is_building):
 		set_frame(u, (1 if bool(u.get("gate_open", false)) else 0) if int(u.unit) in [16, 17] and not bool(u.get("site", false)) else int(u.get("build_frame", 0)))
 		if unit_nodes(u).has("gate_module"):

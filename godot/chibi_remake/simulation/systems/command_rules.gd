@@ -22,7 +22,7 @@ func selected_leader(selected:Array) -> Dictionary:
 	if leaders.size()!=1:return {}
 	var leader:Dictionary=leaders[0]
 	var index:int=int(leader.officer.index)
-	return leader if selected.all(func(u):return u==leader or (int(u.owner)==int(leader.owner) and int(u.get("group_officer",-1))==index)) else {}
+	return leader if selected.all(func(u):return is_same(u,leader) or (int(u.owner)==int(leader.owner) and int(u.get("group_officer",-1))==index)) else {}
 
 func describe() -> Dictionary:
 	var selected: Array=host.selected.filter(func(u):return u.alive and u.die_t<0 and int(u.owner)==host.player_owner and not bool(u.get("attached",false)))

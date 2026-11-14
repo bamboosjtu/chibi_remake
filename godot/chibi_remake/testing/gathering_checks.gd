@@ -51,8 +51,7 @@ func _selftest_gather() -> void:
 		host.selected.clear()
 		host.selected.append(rw)
 		# 点在资源点的**身体中心**（与 _resource_at 的判定同口径）
-		var click = Vector2(float(rnode.ax), float(rnode.ay) - float(rnode.h) * 0.5)
-		host.commands.orders._order_at(click)
+		if not _order_resource(rw,rnode): return
 		var gobj = rw.get("gather_obj", null)
 		var gobj_uid: int = int((gobj as Dictionary).get("uid", -1)) if gobj is Dictionary else -1
 		print("SELFTEST 采集点击: 右键资源点 → state=%s obj=%s path=%d  (资源 uid=%d 种类=%s)" % [
@@ -62,10 +61,10 @@ func _selftest_gather() -> void:
 			# 本图工人**走不到任何资源点**（栅栏/水面全围住）—— 前提不成立，
 			# 不是产品缺陷。_order_gather 会拒绝而不是假装接受（已单独验证）。
 			suite._skip("采集：本图工人走不到任何资源点（前提不成立）")
-			suite._check(true, "不可达时 _order_gather 拒绝而不是假装接受")
+			suite._check(str(rw.state) != "gather" and rw.path.is_empty(), "拒绝采集时不遗留虚假路径")
 			host.selected.clear()
 			return
-		suite._check(true, "右键资源点即进入采集（不需要先组建）")
+		suite._check(gobj is Dictionary and not gobj.is_empty() and host.commands.economy._yield_of(int(gobj.unit)) != "", "右键资源点取得有效的采集目标")
 		suite._check(int(rw.get("unit", -1)) == 30, "工人（id30）本身就能采集，不必先变成将单位")
 		# 真的走一段：路径必须能到，否则永远采不到
 		# ⚠️ 判"到了"必须用**到边缘**的距离（_dist_to_obj），不能用脚点距离 ——
@@ -93,7 +92,7 @@ func _selftest_gather() -> void:
 				str(rw.get("state", "?")), int(rw.get("pi", -1)), (rw.get("path", []) as Array).size(),
 				str(bool(rw.get("moved", false))), int(rw.get("blocked_n", 0)), float(rw.get("repath", 0.0))])
 		if arrived:
-			suite._check(true, "工人能真的走到资源点（路径可达）")
+			suite._check(is_same(rw.gather_obj,goal), "工人到达后仍持有同一采集目标")
 		else:
 			# 个别地图的出生点被建筑/栅栏围住，首段路径永远被判定为堵。
 			# 这是地图几何前提不成立，不是采集/运输逻辑失败：跳到资源旁继续验证装卸。
@@ -239,7 +238,7 @@ func _selftest_gather() -> void:
 		kind, int(actual.get("uid", -1)), str(w.get("state", "?")), carry, r0, r1])
 	suite._check(is_equal_approx(carry, host.CARRY_CAPACITY), "装满一担（carry == CARRY_CAPACITY）")
 	if str(w.get("state", "")) == "deliver":
-		suite._check(true, "装满后转入 deliver（运输）状态")
+		suite._check(not str(w.carry_kind).is_empty() and carry > 0, "运输状态持有资源类型与货物")
 	else:
 		suite._skip("装满后未进入 deliver（本图资源/路径边界，跳过状态断言）")
 	suite._check(is_equal_approx(r1, r0), "**装货时资源不入库**（货在工人身上）")
@@ -274,3 +273,24 @@ func _selftest_gather() -> void:
 	suite._check(is_equal_approx(float(w.get("carry", 0.0)), 0.0), "卸货后身上货清零")
 	suite._check(str(w.get("state", "")) == "gather", "卸完回到 gather（继续采）")
 	host.selected.clear()
+
+func _ensure_worker_team(worker: Dictionary) -> bool:
+	var commander: Dictionary = host.commands.military._commander_for(worker)
+	if not commander.is_empty():
+		host.selected = [commander]; return true
+	var available: Array = host.commands.military.available_officers(host.player_owner)
+	if available.is_empty():
+		suite._skip("采集夹具缺少可用指挥官"); return false
+	host.selected = [worker]
+	host.commands.military._order_form_up(int(available[0].index))
+	commander = host.commands.military._commander_for(worker)
+	var valid: bool = not commander.is_empty()
+	host.selected = [commander] if valid else []
+	suite._check(valid,"采集夹具建立有效工人队")
+	return valid
+
+func _order_resource(worker: Dictionary, source: Dictionary) -> bool:
+	host.commands.military._cancel_unit_command(worker)
+	if not _ensure_worker_team(worker): return false
+	host.commands.orders._order_context(Vector2(float(source.ax),float(source.ay)-float(source.h)*0.5))
+	return true

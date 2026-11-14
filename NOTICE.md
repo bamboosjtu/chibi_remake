@@ -11,12 +11,14 @@
 
 - 致敬 **1994 年中央电视台 / 中国电视剧制作中心版《三国演义》** 及其全体演职人员。
 - 本 MOD 的人物头像、角色气质与部分美术方向，参考了该剧塑造的经典形象；这是社区致敬，不表示该剧出品方参与、授权或背书本项目。
-- 剧中人物、剧照、音乐、台词等权利归各自权利人所有；本 MOD 不包含该剧的影像或音轨。
+- 剧中人物、剧照、音乐、台词等权利归各自权利人所有；本项目不对随原作媒体提供的视听内容授予新的权利，具体来源以素材清单及原始发行物为准。
 
 ## 第三方组件
 
 - **Godot Engine 4.7.2** — MIT License，https://godotengine.org
 - **Noto Sans CJK SC Regular** — SIL Open Font License 1.1，版权归 Google / Adobe 及 Noto 贡献者；许可证全文见 `godot/chibi_remake/assets/fonts/OFL.txt`。
+- **原生 AVI 解码扩展 / FFmpeg 6.1.2** — LGPL v3 或更新版本的共享库及 MIT 组件，来源、许可证全文、构建配置、对应源码获取方式见发布包 `licenses/ffmpeg/`（仓库 `godot/chibi_remake/addons/ffmpegplayer/NOTICE.txt`）。ABI 兼容的共享库可替换；项目修改源码与构建方法见 `tools/native/avi_decoder/`。
+- **Microsoft Visual C++ 运行库** — `msvcp140.dll`、`vcruntime140.dll`、`vcruntime140_1.dll` 按微软随 Visual Studio 提供的可再分发条款分发，未由本 MOD 许可重新授权。
 - 其余 Python/Node 构建工具按其各自许可证使用，未随发布包分发。
 
 ## 社区与工具

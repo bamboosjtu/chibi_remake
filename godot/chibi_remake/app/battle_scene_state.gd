@@ -1,5 +1,5 @@
 extends RefCounted
-const PROXY_FIELDS := ["saver", "cam", "bgm", "sfx", "remaster_art", "view", "cheat_input_open", "hover_text", "show_units", "show_buildings", "hud_acc", "show_debug"]
+const PROXY_FIELDS := ["saver", "cam", "bgm", "sfx", "remaster_art", "view", "cheat_input_open", "hover_text", "show_units", "show_buildings", "hud_acc", "show_debug", "ready_to_save", "load_staging", "requested_map", "feedback_until", "feedback_observed"]
 ## Scene-owned services and nodes. No simulation rules.
 const RemasterArt = preload("res://presentation/battle/art_catalog.gd")
 
@@ -32,3 +32,11 @@ var show_buildings := true
 var hud_acc := 0.0
 
 var show_debug := false          # ARCH-011：工程信息默认不显示给玩家（F3 切换）
+
+var ready_to_save := false
+
+var load_staging := false
+var requested_map := ""
+
+var feedback_until := 0
+var feedback_observed := ""

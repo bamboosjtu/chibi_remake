@@ -27,7 +27,7 @@ func _ready() -> void:
 	layer=20;process_mode=Node.PROCESS_MODE_ALWAYS
 	backdrop=ColorRect.new();backdrop.color=Color.BLACK
 	backdrop.mouse_filter=Control.MOUSE_FILTER_IGNORE;add_child(backdrop);backdrop.hide()
-	player=VideoStreamPlayer.new();player.expand=false
+	player=VideoStreamPlayer.new();player.add_to_group("presentation_video_players");player.expand=false
 	player.mouse_filter=Control.MOUSE_FILTER_IGNORE;player.texture_filter=CanvasItem.TEXTURE_FILTER_NEAREST
 	add_child(player);player.finished.connect(_finish_media);player.hide()
 	text=Label.new();text.position=Vector2(40,110);text.mouse_filter=Control.MOUSE_FILTER_IGNORE;add_child(text)

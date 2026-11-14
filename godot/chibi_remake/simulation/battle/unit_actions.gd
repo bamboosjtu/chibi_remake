@@ -63,7 +63,7 @@ func _step_unit_inner(u: Dictionary, delta: float) -> void:
 	if u.state == "idle" and not bool(u.get("hold", false)) and not (u.get("officer", {}) as Dictionary).is_empty():
 		var leader_idx := int(u.officer.get("index", -1))
 		for member in battle.units:
-			if member == u or not bool(member.get("alive", false)) or float(member.get("die_t", -1)) >= 0.0: continue
+			if is_same(member, u) or not bool(member.get("alive", false)) or float(member.get("die_t", -1)) >= 0.0: continue
 			if int(member.get("group_officer", -1)) != leader_idx: continue
 			if str(member.get("state", "")) in ["move", "gather", "deliver", "build", "repair", "attack"]:
 				var follow_to := Vector2(float(member.ax), float(member.ay))

@@ -17,6 +17,7 @@ func setup(md: Dictionary) -> void:
 	var rows := int(_grid_state.map_data.rows)
 	var cols := int(_grid_state.map_data.cols)
 	_grid_state.astar.clear()
+	var topology_edges := PackedInt64Array()
 	_grid_state.water_astar.clear()
 	_grid_state.occupancy.clear()
 	_grid_state.gates.clear()
@@ -37,8 +38,11 @@ func setup(md: Dictionary) -> void:
 			for neighbor in neighbors(c):
 				if not _grid_state.astar.are_points_connected(_id(c), _id(neighbor)):
 					_grid_state.astar.connect_points(_id(c), _id(neighbor))
+					topology_edges.append(_id(c))
+					topology_edges.append(_id(neighbor))
 				if not _grid_state.water_astar.are_points_connected(_id(c), _id(neighbor)):
 					_grid_state.water_astar.connect_points(_id(c), _id(neighbor))
+	_grid_state.topology_edges = topology_edges
 	var walk: Array = _grid_state.map_data.get("terrainWalkable", _grid_state.map_data.walkable)
 	for i in range(walk.size()):
 		if int(walk[i]) == 0:

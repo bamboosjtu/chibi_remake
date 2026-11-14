@@ -130,12 +130,12 @@ func _init() -> void:
 
 func _get(key: StringName):
 	if _fields.has(key): return _ui.get(key)
-	push_error("Unknown menu.gd state property: " + str(key))
+	preload("res://property_contract.gd").reject(self,key)
 	return null
 
 func _set(key: StringName, value) -> bool:
 	if _fields.has(key): _ui.set(key, value); return true
-	push_error("Unknown menu.gd state property: " + str(key))
+	preload("res://property_contract.gd").reject(self,key)
 	return false
 
 func contract_abort() -> bool:

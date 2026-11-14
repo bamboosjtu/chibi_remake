@@ -76,8 +76,12 @@ func _save_extra() -> Dictionary:
 	return scene.saver.save_extra()
 
 func _save_game(slot := 0, title := "") -> bool:
+	if not scene.ready_to_save:
+		Game.last_save_error = {"stage":"battle not initialized", "code":ERR_UNCONFIGURED}
+		return false
 	# Dispatch before taking any snapshot, so costs and production belong to the same battle.
 	if battle.player_commands != null: battle.player_commands.pump()
+	node.commands.military._settle_pending_duels()
 	var extra := _save_extra()
 	extra.saveName=title
 	return Game.save_game(battle.units,ports._resources(),extra,slot)
@@ -86,10 +90,49 @@ func _return_to_menu_after_load_failure() -> void:
 	if node.is_inside_tree():
 		node.get_tree().change_scene_to_file("res://menu.tscn")
 
+func _schedule_failed_load_return() -> void:
+	scene.ready_to_save = false
+	node.set_process(false)
+	node.set_process_unhandled_input(false)
+	if not scene.load_staging: _return_to_menu_after_load_failure.call_deferred()
+
+func load_slot(slot: int) -> Dictionary:
+	var data: Dictionary = Game.load_save(slot)
+	var map_id := str(data.get("map",""))
+	if data.is_empty() or not FileAccess.file_exists("res://data/%s.json" % map_id): return {"ok":false,"error":"所选进度无法读取，原有记录已保留。"}
+	if map_id != str(battle.map_id): return _load_other_map(slot,map_id)
+	var selection: Array = battle.selected.map(func(unit): return int(unit.uid))
+	if not scene.saver.apply_snapshot(data): return {"ok":false,"error":scene.saver.last_load_error}
+	for unit in battle.units:
+		if int(unit.uid) in selection: battle.selected.append(unit)
+	return {"ok":true,"cross_map":false}
+
+func _load_other_map(slot: int, map_id: String) -> Dictionary:
+	var tree: SceneTree = node.get_tree()
+	var previous := [Game.current_map,Game.pending_load,Game.pending_load_slot,Game.last_load_error,tree.paused]
+	var candidate = load("res://main.tscn").instantiate()
+	candidate.scene.load_staging = true; candidate.scene.requested_map = map_id
+	Game.current_map = map_id; Game.pending_load = true; Game.pending_load_slot = slot
+	tree.root.add_child(candidate)
+	if not candidate.scene.ready_to_save:
+		var error := str(Game.last_load_error)
+		candidate.free()
+		Game.current_map = previous[0]; Game.pending_load = previous[1]; Game.pending_load_slot = previous[2]; Game.last_load_error = previous[3]; tree.paused = previous[4]
+		return {"ok":false,"error":error if not error.is_empty() else "目标战场无法恢复；当前战场已保留。"}
+	candidate.scene.load_staging = false
+	scene.ready_to_save = false
+	node.set_process(false); node.set_process_unhandled_input(false)
+	if battle.player_commands != null: battle.player_commands.clear()
+	battle.effects.invalidate()
+	if scene.view != null and scene.view.event_view != null: scene.view.event_view.restore_history()
+	tree.current_scene = candidate; tree.paused = false
+	node.queue_free()
+	return {"ok":true,"cross_map":true}
+
 func _notification(what: int) -> void:
 	if what != Node.NOTIFICATION_WM_CLOSE_REQUEST:
 		return
-	if scene.saver != null and battle.map_data.has("terrainW") and battle.game_end == 0 and not battle.units.is_empty():
+	if scene.ready_to_save and scene.saver != null:
 		if scene.view != null and scene.view.battle_menu != null:
 			scene.view.battle_menu.open()
 			scene.view.battle_menu.quit_game()
@@ -253,12 +296,13 @@ func _process(delta: float) -> void:
 	scene.hud_acc += delta
 	if scene.hud_acc >= 1.0 / Config.HUD_HZ:      # R1：文字刷新限频
 		scene.hud_acc = 0.0
-		if battle.feedback_text != "" and battle.feedback_until == 0:
+		if battle.feedback_text != "" and (scene.feedback_until == 0 or scene.feedback_observed != battle.feedback_text):
+			scene.feedback_observed = battle.feedback_text
 			# 旧实现：只有 _feedback() 设过 feedback_until 的提示才活得过下一帧；
 			# 直接赋值（"没有走得到的资源点"/"没有资源点"/"组建完成" 等）会在这里被
 			# **立刻清掉** —— 用户实测"点击采集无反应"（提示其实赋了值，只是从未显示）。
-			battle.feedback_until = Time.get_ticks_msec() + 2500
-		elif battle.feedback_text != "" and Time.get_ticks_msec() > battle.feedback_until:
+			scene.feedback_until = Time.get_ticks_msec() + 2500
+		elif battle.feedback_text != "" and Time.get_ticks_msec() > scene.feedback_until:
 			battle.feedback_text = ""
 		_view_hud()
 	if scene.view!=null:scene.view.interpolate_motion(clampf(battle.sim_acc/period,0.0,1.0))
