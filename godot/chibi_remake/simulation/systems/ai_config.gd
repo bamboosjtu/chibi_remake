@@ -3,7 +3,8 @@ extends RefCounted
 const THINK_PERIOD := 41          # DAT_00485648[owner] -> 0x28
 const BUILD_PLAN_PERIOD := 22     # DAT_004856b0[owner] -> 0x15
 const BUILD_STATE_PERIOD := 11    # CONF-16：档位0/1施工状态机每11帧
-const INTERCEPT_PERIOD := 30      # DAT_004856ac -> 0x1e
+const INTERCEPT_PERIOD := 30      # Shared saturating warmup; check on subsequent calls.
+const RETREAT_PERIOD := 42        # DAT_00485658[side], FUN_00471B30
 const ASSAULT_PERIOD := 70        # u_FFFFF_00485668[owner] -> 'F'
 const ASSAULT_PERIOD_URGENT := 6  # 人类单位 < 6 时
 const AI_MONEY := 20000.0         # DAT_004b8d08[owner] = 20000

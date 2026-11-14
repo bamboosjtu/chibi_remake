@@ -1,7 +1,7 @@
 extends SceneTree
 ## R09/R10/R11 AI 回归：
 ##   · 敌对关系只认玩家方（多 AI 不互攻）；
-##   · 撤退按群维护、消费历史攻击者、其他群照常进攻；
+##   · 按42次思考及明确撤退点调度，不根据历史攻击者凭空撤退；
 ##   · 补工必须进入施工编组，且不抢采集/修理工人。
 var sim: Node2D
 var template: Dictionary
@@ -81,51 +81,40 @@ func run() -> void:
 	sim.commands.military.ai_order_assault(1)
 	assert(str(ai1.state) == "idle" and ai1.target == null, "R09: 多 AI 地图不得互攻")
 
-	# ---- R10：撤退按群、消费历史攻击者、其他群照常进攻 ----
+	# Research correction: a historical attacker is not a retreat destination.
 	blank()
 	var a_leader := officer(make(10, 1, 31, Vector2i(10, 10)), 0)
 	var a_member := make(11, 1, 32, Vector2i(10, 12))
 	a_member.group_officer = 0
-	var b_leader := officer(make(20, 1, 31, Vector2i(20, 20)), 1)
 	var b_member := make(21, 1, 32, Vector2i(20, 22))
-	b_member.group_officer = 1
 	var attacker := make(30, 3, 32, Vector2i(35, 10))
-	install([a_leader, a_member, b_leader, b_member, attacker])
+	install([a_leader,a_member,b_member,attacker])
 	a_leader.last_attacker_uid = int(attacker.uid)
-	var first: Dictionary = brain._retreat_step(1)
-	assert(first.has(0) and not first.has(1), "R10: 只有受击群撤退 %s" % str(first))
-	assert(a_leader.state == "move" and a_member.state == "move", "R10: 受击群向锚点收拢")
-	assert(b_leader.state == "idle" and b_member.state == "idle", "R10: 未被攻击的群不撤退")
-	assert(int(a_leader.last_attacker_uid) == -1 and int(a_member.last_attacker_uid) == -1, "R10: 触发后必须消费历史攻击记录")
-	# 其他群仍能接受进攻命令。
-	sim.commands.military.ai_order_assault(1, first.keys())
-	assert(str(b_leader.state) == "attack" and str(b_member.state) == "attack", "R10: 撤退不应阻断其他群进攻")
-	# 撤退恢复只看锚点命令结束，且同一历史攻击不能再次触发。
-	a_leader.state = "idle"; a_member.state = "idle"
-	assert(brain._retreat_step(1).is_empty(), "R10: 锚点空闲即恢复")
-	assert(brain._retreat_step(1).is_empty() and a_leader.state == "idle", "R10: 恢复后不应因旧伤再次撤退")
-	# 新伤害才再次触发；攻击者死亡/离场后不触发。
-	a_leader.last_attacker_uid = int(attacker.uid)
-	assert(brain._retreat_step(1).has(0), "R10: 新命中应再次撤退")
-	a_leader.state = "idle"; a_member.state = "idle"
-	brain._retreat_step(1)
-	a_leader.last_attacker_uid = int(attacker.uid)
-	sim.commands.military._kill(attacker)
-	assert(brain._retreat_step(1).is_empty(), "R10: 攻击者死亡后不撤退")
-	# 快照：新格式按群保存并通过校验；旧格式 int 迁移不假装仍在撤退。
-	a_leader.state = "idle"; a_member.state = "idle"
-	a_leader.last_attacker_uid = -1
-	brain._retreat[1] = {0: 1}
-	var snap: Dictionary = brain.snapshot()
-	assert(brain.valid_snapshot(snap, {}, [], 100), "R10: 新撤退结构应通过快照校验")
+	for thought in range(42): assert(brain._retreat_step(1).is_empty())
+	assert(a_leader.state == "idle", "No explicit retreat point: damage history must not invent a retreat")
+	var destination: Vector2 = sim.nav.anchor_of(4,4)
+	assert(brain.set_retreat_point(1,destination))
+	a_leader.target=attacker; a_leader.state="attack"
+	a_member.target=attacker; a_member.state="attack"
+	for thought in range(41): brain._retreat_step(1)
+	assert(a_leader.state=="attack" and a_member.state=="attack")
+	var snap: Dictionary=brain.snapshot()
+	assert(brain.valid_snapshot(snap,{},[],100))
 	brain.restore(snap)
-	assert(brain._retreat.get(1, {}).has(0), "R10: 撤退群号应可恢复")
-	var legacy: Dictionary = snap.duplicate(true)
-	legacy.retreat = {1: 1}
-	assert(brain.valid_snapshot(legacy, {}, [], 100), "R10: 旧撤退字段应可迁移")
+	brain._retreat_step(1)
+	assert(a_leader.state=="move" and a_member.state=="move", "42nd thought returns targeted units to the explicit destination")
+	assert(b_member.state=="idle", "Untargeted units must retain their orders")
+	assert(a_leader.path.back()==destination and a_member.path.back()==destination)
+	assert(brain.snapshot().retreatClock[1]==0)
+	var invalid: Dictionary=snap.duplicate(true)
+	invalid.retreatPoints={1:["bad",1]}
+	assert(not brain.valid_snapshot(invalid,{},[],100))
+	var legacy: Dictionary=snap.duplicate(true)
+	legacy.erase("retreatClock");legacy.erase("retreatPoints");legacy.retreat={1:1}
+	assert(brain.valid_snapshot(legacy,{},[],100))
 	brain.restore(legacy)
-	assert(brain._retreat.get(1, {}) is Dictionary and brain._retreat[1].is_empty(), "R10: 旧 int 不定位群")
-	print("AI RETREAT PASS per-group / other groups assault / consume old attacker / dead attacker / snapshot migration")
+	assert(brain.snapshot().retreatClock.is_empty() and brain.snapshot().retreatPoints.is_empty())
+	print("AI RETREAT PASS 42-thought clock / explicit point / targeted units / no invented retreat / snapshot migration")
 
 	# ---- R11：补工进入施工编组，且不抢采集/修理 ----
 	blank()

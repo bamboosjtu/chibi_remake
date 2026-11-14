@@ -3,6 +3,7 @@ extends RefCounted
 const State = preload("res://simulation/battle_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
 const Dependencies = preload("res://simulation/ports/ai_orders_dependencies.gd")
+const Targets = preload("res://simulation/systems/ai_targets.gd")
 var battle: State
 var ports := Dependencies.new()
 
@@ -30,35 +31,8 @@ func ai_order_rally(owner: int, skip_groups: Array = []) -> void:
 			u.pi = 0
 
 func ai_order_assault_l1(owner: int, skip_groups: Array = []) -> void:
-	var target: Dictionary = _l1_target(battle.player_owner)
-	if target.is_empty():
-		return
-	var groups: Array = []
-	for u in battle.units:
-		if int(u.get("owner", -1)) != owner or bool(u.get("is_building", false)) or not bool(u.get("alive", false)) or float(u.get("die_t", -1)) >= 0.0:
-			continue
-		if (u.get("officer", {}) as Dictionary).is_empty():
-			continue
-		var idx := int(u.officer.index)
-		if skip_groups.has(idx): continue
-		var group: Array = [u]
-		for m in battle.units:
-			if m != u and int(m.get("owner", -1)) == owner and int(m.get("group_officer", -1)) == idx and bool(m.get("alive", false)) and float(m.get("die_t", -1)) < 0.0:
-				group.append(m)
-		var idle := group.all(func(m): return str(m.get("state", "")) in ["idle", "hold"] and not bool(m.get("attached", false)))
-		if idle:
-			groups.append(group)
-	if groups.is_empty():
-		return
-	var chosen: Array = groups[0]
-	for u in chosen:
-		ports._cancel_unit_command(u)
-		u.state = "attack"
-		u.target = target
-		u.path = []
-		u.pi = 0
-		u.repath = 0.0
-	print("AI L1 进攻：owner %d 群 %s → 槽位目标 %s(%d)" % [owner, str(chosen[0].officer.get("name", "?")), str(target.get("name", "?")), int(target.get("uid", -1))])
+	# Kept for older command clients; all maps now use the same confirmed policy.
+	ai_order_assault(owner,skip_groups)
 
 func _l1_target(player: int) -> Dictionary:
 	for u in battle.units:
@@ -78,6 +52,7 @@ func ai_order_assault(owner: int, skip_groups: Array = []) -> void:
 	for u in battle.units:
 		if int(u.owner) != owner or u.is_building or not u.alive or u.die_t >= 0.0:
 			continue
+		if not Targets.ordinary_attacker(u) and (u.get("officer",{}) as Dictionary).is_empty(): continue
 		if skip_groups.has(ports.ai_group_of(u)): continue
 		if ports._working_construction_team(u) or ports._ai_forming(u) or bool(u.get("attached",false)): continue
 		if u.state == "attack" or u.state == "move":
@@ -86,9 +61,10 @@ func ai_order_assault(owner: int, skip_groups: Array = []) -> void:
 	for u in battle.units:
 		if int(u.owner) != owner or u.is_building or not u.alive or u.die_t >= 0.0 or not preload("res://simulation/systems/combat_rules.gd").can_attack(u):
 			continue
+		if not Targets.ordinary_attacker(u) and (u.get("officer",{}) as Dictionary).is_empty(): continue
 		if skip_groups.has(ports.ai_group_of(u)): continue   # R10：撤退中的群不进攻
 		if ports._working_construction_team(u) or ports._ai_forming(u) or bool(u.get("attached",false)): continue
-		var e := _nearest_enemy_threat(u)
+		var e := Targets.select(battle.units,u,battle.player_owner,battle.scenario_mission,int(battle.map_data.cols))
 		if not e.is_empty():
 			ports._cancel_unit_command(u)
 			u.state = "attack"
@@ -101,7 +77,15 @@ func ai_order_assault(owner: int, skip_groups: Array = []) -> void:
 		print("AI 进攻：owner %d 投入 %d 个单位" % [owner, sent])
 
 func ai_order_intercept(owner: int, focus: Dictionary, radius: float, skip_groups: Array = []) -> void:
-	var fp := Vector2(focus.ax, focus.ay)
+	# The focus supplies an existing combat target, not an omniscient map query.
+	var target = focus.get("target")
+	if not target is Dictionary or not Targets.available(target,battle.player_owner): return
+	var headquarters: Dictionary = {}
+	for unit in battle.units:
+		if int(unit.owner) == owner and int(unit.unit) in [0,1] and unit.alive and unit.die_t < 0 and not bool(unit.get("site",false)):
+			headquarters = unit; break
+	if headquarters.is_empty(): return
+	var fp := Vector2(headquarters.ax,headquarters.ay)
 	for u in battle.units:
 		if int(u.owner) != owner or u.is_building or not u.alive or u.die_t >= 0.0 or not preload("res://simulation/systems/combat_rules.gd").can_attack(u):
 			continue
@@ -109,17 +93,17 @@ func ai_order_intercept(owner: int, focus: Dictionary, radius: float, skip_group
 		if ports._working_construction_team(u) or ports._ai_forming(u) or bool(u.get("attached",false)): continue
 		if u.state == "attack":
 			continue
-		if Vector2(u.ax, u.ay).distance_to(fp) > radius * 8.0:
-			continue                       # ±90 单位 ≈ 90px，按等距格换算放宽
-		var e := _nearest_enemy_threat(u)
-		if not e.is_empty():
-			ports._cancel_unit_command(u)
-			u.state = "attack"
-			u.target = e
+		if not Targets.ordinary_attacker(u): continue
+		if absf(float(u.ax)-fp.x) > radius or absf(float(u.ay)-fp.y) > radius: continue
+		ports._cancel_unit_command(u)
+		u.state = "attack"
+		u.target = target
 
 func ai_focus_unit(owner: int) -> Dictionary:
 	for u in battle.units:
-		if int(u.owner) == owner and not u.is_building and u.alive and u.die_t<0 and not bool(u.get("attached",false)):
+		if int(u.owner) == owner and not u.is_building and u.alive and u.die_t<0 and not bool(u.get("attached",false)) and int(u.get("site_inside_uid",-1)) < 0:
+			var target = u.get("target")
+			if not target is Dictionary or not Targets.available(target,battle.player_owner): continue
 			return u
 	return {}
 

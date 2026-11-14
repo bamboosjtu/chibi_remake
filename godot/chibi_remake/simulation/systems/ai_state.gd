@@ -1,5 +1,5 @@
 extends RefCounted
-const PROXY_FIELDS := ["host", "_think", "_plan", "_build_clock", "_assault", "_assault_period", "_intercept", "_research_cursor", "_retreat", "plan", "slots", "naval"]
+const PROXY_FIELDS := ["host", "_think", "_plan", "_build_clock", "_assault", "_assault_period", "_intercept", "_research_cursor", "_retreat", "_retreat_clock", "_retreat_points", "plan", "slots", "naval"]
 ## AI counters, plans and training slots.
 const Settings = preload("res://simulation/systems/ai_config.gd")
 const THINK_PERIOD = Settings.THINK_PERIOD
@@ -38,6 +38,8 @@ var _intercept := {}              # owner -> 计数
 var _research_cursor := {}         # 各势力研究系轮转，存档后不重置顺序。
 
 var _retreat := {}                 # owner -> 1：群撤退中
+var _retreat_clock := {}           # owner -> 0..41 AI thoughts
+var _retreat_points := {}          # owner -> [world x, world y], only explicit destinations
 
 var plan := {}                     # owner -> 当前建造计划项（0 = 无）
 

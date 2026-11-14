@@ -73,7 +73,7 @@ SIMTEST: 15.0s tick=450 digest=<FNV-1a>
 | 编组与指令 | `test_worker_groups`、`test_team_lifecycle`、`test_command_replace`、`test_cmd_paging`、`test_battle_interaction` |
 | 研究规则集成 | `test_research_rules`：三层指令、34 关开场白、1170 组武将属性、奖励/晋升边界、存读档 |
 | 移动质量 | `test_movement_quality`：完整步长、避墙/避资源的直线路径、显示插值、动画节拍、队伍独立落点 |
-| AI | `test_ai_planning`、`test_ai_policy`、`test_ai_slots`、`test_l1_assault` |
+| AI | `test_ai_planning`、`test_ai_policy`、`test_ai_slots`、`test_l1_assault`、`test_ai_research` |
 | 水战与载员 | `test_transports`、`test_unload_state`、`test_naval_casualty_save` |
 | 战斗与弹体 | `test_projectiles`、`test_action_clock`、`test_action_lifecycle`、`test_duel`、`test_visibility_rules` |
 | 导航与占格 | `test_spatial_rules`、`test_unit_footprint`、`test_unit_collision`、`test_unit_index`、`test_nav_invalidation`、`test_automatic_gates` |

@@ -74,6 +74,7 @@
     "originalBinary": "CB.EXE (2db7cc102e6fde547ab05d77cfddabc2079f5bc9be9b6b59b17bf435c5798cb7)",
     "mapData": "godot/chibi_remake/data/*.json（由原版 MEDS/*.MED 转换；对象 A/B、px/py 保留）",
     "mapConversionNote": "object pos = 44A+22(B&1)+22-w/2, 11B+22-h; terrain/object positions are original render model",
+    "placementNote": "A/B 是地图对象锚点/首成员生成锚点，不是必然的最终可见格。武将本体在首成员锚点生成；若与单位/地形占格冲突，会通过空格检索让位；最终站位应取运行时坐标。",
     "medHashes": {
       "chibil1": "b00a7ea3ca5460819b9a123ac4bc2c0fa5e408ff0e0383641ac84c4f94e1b224",
       "chibil2": "fef8a360e48a7f67029613c3b4abfcea06d3f18be78a9e4edac6d528c3364604",

@@ -159,7 +159,7 @@
     {
       "script": "test_ai_policy",
       "markers": [
-        "AI RETREAT PASS per-group / other groups assault / consume old attacker / dead attacker / snapshot migration",
+        "AI RETREAT PASS 42-thought clock / explicit point / targeted units / no invented retreat / snapshot migration",
         "AI WORKERS PASS replenishment enters construction group / gather-repair preserved / recover after wipe"
       ]
     },

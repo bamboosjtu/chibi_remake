@@ -324,10 +324,11 @@ func _assign_officers() -> void:
 			var hero_type := int(initial.get("heroType", -1))
 			if hero_type < 0: continue
 			# FUN_0045d810 → FUN_00442e40 另申请将领槽；保留四名工人。
-			if ports._spawn_unit(hero_type, owner, float(soldier.ax), float(soldier.ay), true):
+			# The first member supplies the spawn anchor, not an occupied final cell.
+			# Normal placement checks the whole footprint and registers the chosen cell.
+			if ports._spawn_unit(hero_type, owner, float(soldier.ax), float(soldier.ay)):
 				var hero: Dictionary = battle.units.back()
 				ports._attach_officer(hero, initial.duplicate())
-				hero.A = soldier.A; hero.B = soldier.B
 				formed[officer_id] = true
 		var member_counts := {}
 		for soldier in us:

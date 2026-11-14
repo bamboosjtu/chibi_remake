@@ -33,12 +33,12 @@ func _init(h: Object) -> void:
 	_ai_state.naval = preload("res://simulation/systems/ai_naval_slots.gd").new(_ai_state.host)
 
 func snapshot() -> Dictionary:
-	return {"think": _ai_state._think.duplicate(), "planClock": _ai_state._plan.duplicate(), "buildClock": _ai_state._build_clock.duplicate(), "assault": _ai_state._assault.duplicate(), "assaultPeriod": _ai_state._assault_period.duplicate(), "intercept": _ai_state._intercept.duplicate(), "plan": _ai_state.plan.duplicate(), "researchCursor":_ai_state._research_cursor.duplicate(), "retreat":_ai_state._retreat.duplicate(true), "trainingSlots":_ai_state.slots.snapshot(), "navalSlots":_ai_state.naval.snapshot()}
+	return {"think": _ai_state._think.duplicate(), "planClock": _ai_state._plan.duplicate(), "buildClock": _ai_state._build_clock.duplicate(), "assault": _ai_state._assault.duplicate(), "assaultPeriod": _ai_state._assault_period.duplicate(), "intercept": _ai_state._intercept.duplicate(), "plan": _ai_state.plan.duplicate(), "researchCursor":_ai_state._research_cursor.duplicate(), "retreat":_ai_state._retreat.duplicate(true), "retreatClock":_ai_state._retreat_clock.duplicate(), "retreatPoints":_ai_state._retreat_points.duplicate(true), "trainingSlots":_ai_state.slots.snapshot(), "navalSlots":_ai_state.naval.snapshot()}
 
 func restore(value: Dictionary) -> void:
 	_ai_state.slots.restore(value.get("trainingSlots",{}))
 	_ai_state.naval.restore(value.get("navalSlots",{}))
-	for pair in [["think", _ai_state._think], ["planClock", _ai_state._plan], ["buildClock", _ai_state._build_clock], ["assault", _ai_state._assault], ["assaultPeriod", _ai_state._assault_period], ["intercept", _ai_state._intercept], ["plan", _ai_state.plan], ["researchCursor",_ai_state._research_cursor]]:
+	for pair in [["think", _ai_state._think], ["planClock", _ai_state._plan], ["buildClock", _ai_state._build_clock], ["assault", _ai_state._assault], ["assaultPeriod", _ai_state._assault_period], ["intercept", _ai_state._intercept], ["plan", _ai_state.plan], ["researchCursor",_ai_state._research_cursor], ["retreatClock",_ai_state._retreat_clock]]:
 		var table: Dictionary = pair[1]
 		table.clear()
 		for key in value.get(pair[0], {}):
@@ -57,9 +57,12 @@ func restore(value: Dictionary) -> void:
 			elif _ai_state.slots.integer(entry) and int(entry) != 0:
 				groups = {}          # 旧档迁移：不知道是哪个群，不假装仍在撤退
 			_ai_state._retreat[int(key)] = groups
+	_ai_state._retreat_points.clear()
+	for key in value.get("retreatPoints",{}): _ai_state._retreat_points[int(key)] = value.retreatPoints[key].duplicate()
 
 func valid_snapshot(value: Variant, ids: Dictionary, orders: Array, next_uid: int) -> bool:
 	if not value is Dictionary: return false
+	if not _valid_retreat(value): return false
 	for field in ["think","planClock","buildClock","assault","assaultPeriod","intercept","plan","researchCursor","retreat"]:
 		if not value.get(field,{}) is Dictionary: return false
 		for key in value.get(field,{}):
@@ -74,6 +77,23 @@ func valid_snapshot(value: Variant, ids: Dictionary, orders: Array, next_uid: in
 	if not _ai_state.slots.valid_snapshot(value.get("trainingSlots",{}),ids,orders,next_uid): return false
 	# R16：水军槽与陆军槽对等校验，坏档不能进入恢复/调度。
 	return _ai_state.naval.valid_snapshot(value.get("navalSlots",{}),ids,orders,next_uid)
+
+func _valid_retreat(value: Dictionary) -> bool:
+	if not value.get("retreatClock",{}) is Dictionary or not value.get("retreatPoints",{}) is Dictionary: return false
+	for key in value.get("retreatClock",{}):
+		var count = value.retreatClock[key]
+		if not str(key).is_valid_int() or not _ai_state.slots.integer(count) or int(count)<0 or int(count)>=Settings.RETREAT_PERIOD: return false
+	for key in value.get("retreatPoints",{}):
+		var point = value.retreatPoints[key]
+		if not str(key).is_valid_int() or not point is Array or point.size()!=2: return false
+		for axis in point:
+			if not (axis is int or axis is float) or not is_finite(float(axis)) or float(axis)<0: return false
+	return true
+
+func set_retreat_point(owner: int, point: Vector2) -> bool:
+	if owner not in _ai_state.host.ai_owners() or not point.is_finite() or point.x<0 or point.y<0: return false
+	_ai_state._retreat_points[owner] = [point.x,point.y]
+	return true
 
 ## 每逻辑 tick 调一次（由 main.gd::_sim_step 驱动）
 

@@ -45,11 +45,13 @@ func run() -> void:
 				assert(members.size() == expected_count, str(chapter.id)+" full membership of "+str(officer.name))
 				for type in officer.troops:
 					assert(members.filter(func(u): return int(u.unit) == int(type)).size() == int(officer.troops[type]))
-				assert(Vector2(leader.ax,leader.ay).is_equal_approx(Vector2(members[0].ax,members[0].ay)), "Commander starts at first subordinate")
+				var cell: Vector2i = battle.nav.cell_of_px(leader.ax,leader.ay)
+				assert(cell==Vector2i(int(leader.A),int(leader.B)), "Final commander cell must match its actual world position")
+				assert(battle.commands.world._unit_placement_free(cell,int(leader.unit),battle.commands.military._nav_layer(leader),int(leader.uid)), str(chapter.id)+" commander must occupy a legal, unshared footprint")
 				if expected_count == 15: full_teams += 1
 			assert(leaders.size() == expected_leaders)
 		print("OPENING CHAPTER PASS ",chapter.id)
 		battle.free()
 	assert(sides == 73 and full_teams == 18)
-	print("OPENING WORLD PASS 34 maps /73 sides /18 full15-member teams / first-subordinate position / resources / rank-defaults / roster-only absent")
+	print("OPENING WORLD PASS 34 maps /73 sides /18 full15-member teams / collision-free commander placement / resources / rank-defaults / roster-only absent")
 	done = true; quit()

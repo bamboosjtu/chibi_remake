@@ -52,27 +52,20 @@ func _think_once(owner: int) -> void:
 	# 1) AI 每轮把金钱补满（原版 DAT_004b8d08[owner] = 20000）
 	_ai_state.host.ai_set_gold(owner, AI_MONEY)
 
-	# 2) 建造/训练计划：每 22 轮刷新一次，其余轮次推进状态机
+	# FUN_00472230: training precedes the 22-thought building/research refresh.
+	_slot_train(owner)
+	_ai_state.naval.step(owner, naval_slots(_ai_state.host.ai_behavior(owner), _ai_state.host.ai_tech_gate(owner)))
+	_train(owner)
 	_ai_state._plan[owner] = int(_ai_state._plan.get(owner, 0)) + 1
 	if int(_ai_state._plan[owner]) >= BUILD_PLAN_PERIOD:
 		_ai_state._plan[owner] = 0
 		_refresh_plan(owner)
 		_research_plan(owner)
-	_slot_train(owner)
-	_ai_state.naval.step(owner, naval_slots(_ai_state.host.ai_behavior(owner), _ai_state.host.ai_tech_gate(owner)))
-	_train(owner)
-
-	# 3) 撤退按**群**处理：只有正在撤退的群跳过进攻/集结，其他群照常决策。
-	var retreating := _retreat_step(owner)
-	var skip: Array = retreating.keys()
-	# 4) 进攻 / 拦截 / 归队
+	var skip := _active_retreats(owner).keys()
 	_ai_state._assault[owner] = int(_ai_state._assault.get(owner, 0)) + 1
-	_ai_state._intercept[owner] = int(_ai_state._intercept.get(owner, 0)) + 1
-	if int(_ai_state._intercept[owner]) >= INTERCEPT_PERIOD:
-		_ai_state._intercept[owner] = 0
-		_intercept_near(owner, skip)
 	_assault_maybe(owner, skip)
-	_rally(owner, skip)
+	skip = _retreat_step(owner).keys()
+	_intercept_near(owner, skip)
 
 ## 训练：科技闸通过才造；买不起就送资源（原版在 FUN_00471c60 里直接加钱加粮）
 
@@ -130,30 +123,40 @@ func _research_plan(owner: int) -> bool:
 
 func _assault_maybe(owner: int, skip_groups: Array = []) -> void:
 	var human_units: int = int(_ai_state.host.ai_force_units(_ai_state.host.player_owner))
-	# 玩家 <6 后阈值永久改为6；计数达到阈值后的**下一次**思考才检查（71/7周期）。
-	if human_units < HUMAN_WEAK_UNITS:
-		_ai_state._assault_period[owner] = ASSAULT_PERIOD_URGENT
 	var period := int(_ai_state._assault_period.get(owner, ASSAULT_PERIOD))
 	if int(_ai_state._assault[owner]) <= period:
 		return
 	_ai_state._assault[owner] = 0
+	# FUN_00471600 changes the NEXT cycle only after this cycle expires.
+	if human_units < HUMAN_WEAK_UNITS:
+		_ai_state._assault_period[owner] = ASSAULT_PERIOD_URGENT
 	# 原版：自身等级 < 关卡科技闸，且（人类等级 < 闸-1 或 人类金钱 < 15000）→ 按兵不动
 	var gate: int = int(_ai_state.host.ai_tech_gate(owner))
-	var my_lvl: int = int(_ai_state.host.ai_level(owner))
-	var human_lvl: int = int(_ai_state.host.ai_level(_ai_state.host.player_owner))
+	var my_lvl := _hq_level(owner)
+	var human_lvl := _hq_level(int(_ai_state.host.player_owner))
+	var human_gate: int = int(_ai_state.host.ai_tech_gate(_ai_state.host.player_owner))
 	var human_gold: float = float(_ai_state.host.ai_gold(_ai_state.host.player_owner))
-	if human_units >= HUMAN_WEAK_UNITS and my_lvl < gate and (human_lvl < gate - 1 or human_gold < HUMAN_GOLD_FOR_ASSAULT):
+	if int(_ai_state.host.scenario_mission) != 14 and my_lvl < gate and (human_lvl < human_gate - 1 or human_gold < HUMAN_GOLD_FOR_ASSAULT):
 		return
-	if _ai_state.host.map_id == "chibil1":
-		_ai_state.host.ai_order_assault_l1(owner, skip_groups)
-	else:
-		_ai_state.host.ai_order_assault(owner, skip_groups)
+	_ai_state.host.ai_order_assault(owner, skip_groups)
+
+func _hq_level(owner: int) -> int:
+	# DAT_004b8d29 starts at 1 even for an expedition without an HQ (L1).
+	# Production/upgrade indices remain zero-based everywhere else.
+	return int(_ai_state.host.ai_level(owner)) + 1
 
 ## 局部拦截（FUN_00471fd0）：把焦点单位周围 ±90 内的部队叫去拦截
 
 func _intercept_near(owner: int, skip_groups: Array = []) -> void:
-	# 原版拦截以本方建筑坐标为中心；L1 电脑没有建筑，不拦截。
-	if _ai_state.host.ai_production_building(owner).is_empty():
+	# DAT_004856ac is one shared, saturating warmup counter, not a per-side period.
+	# Key 0 is reserved (neutral is never an AI); old per-owner clocks migrate once.
+	if not _ai_state._intercept.has(0):
+		var previous := 0
+		for count in _ai_state._intercept.values(): previous = maxi(previous,int(count))
+		_ai_state._intercept.clear()
+		_ai_state._intercept[0] = clampi(previous,0,INTERCEPT_PERIOD)
+	if int(_ai_state._intercept[0]) < INTERCEPT_PERIOD:
+		_ai_state._intercept[0] += 1
 		return
 	var focus: Dictionary = _ai_state.host.ai_focus_unit(owner)
 	if focus.is_empty() or skip_groups.has(int(_ai_state.host.ai_group_of(focus))):
@@ -294,48 +297,40 @@ func _officer_groups(owner: int) -> Dictionary:
 			groups[group].append(u)
 	return groups
 
-## CONF-09：**按群**处理撤退——锚点有存活攻击者 → 该群向锚点 (−20,−20) 收拢；
-## 锚点命令结束（模式 0）才恢复。历史攻击者记录在触发时消费，旧伤不会反复触发。
-## 返回仍在撤退中的群号 -> 1，供进攻/拦截/集结跳过这些群。
+## FUN_00471B30: 42 thoughts, explicit destination, targeted units only.
+## Legacy in-flight retreat groups still finish their restored commands.
 
 func _retreat_step(owner: int) -> Dictionary:
+	var active := _active_retreats(owner)
+	var count := int(_ai_state._retreat_clock.get(owner,0)) + 1
+	_ai_state._retreat_clock[owner] = count % C.RETREAT_PERIOD
+	if count < C.RETREAT_PERIOD or not _ai_state._retreat_points.has(owner): return active
+	var point: Array = _ai_state._retreat_points[owner]
+	var destination := Vector2(float(point[0]),float(point[1]))
+	for unit in _ai_state.host.units:
+		if int(unit.owner)!=owner or unit.is_building or not unit.alive or unit.die_t>=0 or bool(unit.get("attached",false)): continue
+		if int(unit.get("site_inside_uid",-1))>=0 or not unit.get("target") is Dictionary: continue
+		var path: Array = _ai_state.host._path_to(unit,destination,true)
+		if path.is_empty(): continue
+		_ai_state.host._cancel_unit_command(unit)
+		unit.state = "move"; unit.path = path; unit.pi = 0
+		var group: int = _ai_state.host.ai_group_of(unit)
+		if group>=0: active[group] = 1
+	if not active.is_empty(): _ai_state._retreat[owner] = active
+	return active
+
+func _active_retreats(owner: int) -> Dictionary:
 	var groups := _officer_groups(owner)
 	var had = _ai_state._retreat.get(owner, {})
 	if not had is Dictionary:
 		had = {}                      # 旧档迁移：int 只表示“曾在撤退”，无法定位群
 	_ai_state._retreat[owner] = had
-	var active := {}
-	for group in groups:
-		var idx := int(group)
-		var members: Array = groups[group]
-		if members.is_empty(): continue
-		var anchor: Dictionary = members[0]
-		if had.has(idx):
-			# 恢复只看锚点命令是否结束；不依赖原先的受击目标。
-			if str(anchor.get("state", "")) == "idle":
-				had.erase(idx)
-			else:
-				active[idx] = 1
-			continue
-		if _living_attacker(anchor, owner).is_empty():
-			continue
-		had[idx] = 1
-		active[idx] = 1
-		var target := Vector2(maxf(2.0, float(anchor.ax) - 20.0), maxf(2.0, float(anchor.ay) - 20.0))
-		for m in members:
-			_ai_state.host._cancel_unit_command(m)
-			m.state = "move"
-			m.path = _ai_state.host._path_to(m, target, true)
-			m.pi = 0
-			# 消费这次受击记录：没有新伤害就不能在恢复后再次触发。
-			m["last_attacker_uid"] = -1
-	# 群主阵亡/解散后清理失效的撤退项。
 	for idx in had.keys():
-		if not groups.has(idx):
+		if not groups.has(idx) or (groups[idx] as Array).all(func(unit): return str(unit.state)=="idle"):
 			had.erase(idx)
 	if had.is_empty():
 		_ai_state._retreat.erase(owner)
-	return active
+	return had
 
 func _living_attacker(anchor: Dictionary, owner: int) -> Dictionary:
 	var aid := int(anchor.get("last_attacker_uid", -1))
