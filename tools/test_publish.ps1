@@ -150,6 +150,9 @@ Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'native_dependencies.ps1') -Dest
 $declarationTarget=Join-Path $fixture 'godot/chibi_remake/addons/ffmpegplayer'
 New-Item -ItemType Directory -Force $declarationTarget | Out-Null
 Copy-Item -LiteralPath (Join-Path $root 'godot/chibi_remake/addons/ffmpegplayer/FFmpegPlayer.gdextension') -Destination $declarationTarget
+$mathDeclarationTarget=Join-Path $fixture 'godot/chibi_remake/simulation/native'
+New-Item -ItemType Directory -Force $mathDeclarationTarget | Out-Null
+Copy-Item -LiteralPath (Join-Path $root 'godot/chibi_remake/simulation/native/sim_math.gdextension') -Destination $mathDeclarationTarget
 
 New-Item -ItemType Directory -Force (Join-Path $changedTools 'inputs'),(Join-Path $fixture 'godot/chibi_remake/data') | Out-Null
 Copy-Item -LiteralPath $suitePath,$baselinePath -Destination (Join-Path $changedTools 'inputs')

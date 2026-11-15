@@ -1,6 +1,7 @@
 extends RefCounted
 ## research/movements: shared two-update gait clock, independent screen facing.
 ## These fields only choose poses. Path direction, travel and combat stay authoritative.
+const Kernel=preload("res://simulation/native/math_kernel.gd")
 const FIELDS := ["walk_tick", "move_facing", "turn_tick", "move_started", "move_turning"]
 const STATIONARY_ACTIONS := ["attack","repair"]
 const FRAME_TICKS = preload("res://simulation/definitions/action_visual.gd").FRAME_TICKS
@@ -14,6 +15,11 @@ static func ensure(u: Dictionary) -> void:
 	if not u.has("move_turning"): u.move_turning = false
 
 static func step(u: Dictionary) -> void:
+	var kernel:=Kernel.get_kernel()
+	if kernel!=null:kernel.step_locomotion(u);return
+	step_script(u)
+
+static func step_script(u: Dictionary) -> void:
 	if bool(u.get("is_building", false)): return
 	ensure(u)
 	if bool(u.get("attached", false)) or int(u.get("site_inside_uid", -1)) >= 0 \

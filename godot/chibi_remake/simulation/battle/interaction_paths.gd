@@ -63,7 +63,7 @@ func _footprint_cells(o: Dictionary) -> Array:
 	var occupied: Array = o.get("occupied_cells", [])
 	if not occupied.is_empty():
 		return occupied
-	var c := battle.nav.cell_of_px(float(o.ax), float(o.ay))
+	var c := ports._unit_cell(o)
 	if bool(o.get("decor", false)):
 		return [c]
 	if not bool(o.get("is_building", false)):

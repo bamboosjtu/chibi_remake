@@ -8,6 +8,7 @@ const MAX_PLAYERS := 8
 var _players: Array = []
 var _next := 0
 var _entries := {}          # 小写文件名 -> 路径
+var _banks: Dictionary = {} # 固定文件名分组；避免每次击发重扫、排序完整索引。
 var _cache := {}            # 路径 -> AudioStreamWAV
 var _initialized := false
 var _ids := {}
@@ -26,6 +27,7 @@ func _ready() -> void:
 	_initialized = true
 
 func _load_index() -> void:
+	_banks.clear()
 	var f := FileAccess.open(INDEX_PATH, FileAccess.READ)
 	if f == null: return
 	var data = JSON.parse_string(f.get_as_text())
@@ -119,9 +121,12 @@ func play_attack(unit: Dictionary) -> void:
 	play(names[_rng.randi() % names.size()], -7.0)
 
 func _bank_files(prefix: String) -> Array:
+	if _banks.has(prefix): return _banks[prefix]
 	var out: Array = []
 	for key in _entries:
 		if str(key).begins_with(prefix) and str(key).ends_with(".wav"):
 			out.append(str(key))
 	out.sort()
+	out.make_read_only()
+	_banks[prefix] = out
 	return out

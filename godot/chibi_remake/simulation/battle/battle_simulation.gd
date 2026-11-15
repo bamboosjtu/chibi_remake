@@ -5,6 +5,10 @@ const Dependencies = preload("res://simulation/ports/battle_simulation_dependenc
 var battle: State
 var ports := Dependencies.new()
 var tick_microseconds := 0
+var profile_enabled := false
+var profile: Dictionary={}
+var native_unit_profile: Dictionary={}
+var native_unit_port: Object
 
 func _init(data: State) -> void:
 	battle = data
@@ -65,18 +69,60 @@ func _update_gates() -> void:
 func _sim_step(dt: float) -> void:
 	if battle.game_end != 0: return
 	var tick_begin:=Time.get_ticks_usec()
+	var phase:=tick_begin
 	if battle.effects!=null:battle.effects.simulating=true
 	if battle.effects != null:battle.effects.visual("capture_motion", [])
 	battle.visibility.update(battle.units, battle.player_owner)
+	if profile_enabled:phase=_profile_time("visibilityBegin",phase)
 	battle.sim_tick += 1
 	ports._step_auto_control()
 	battle.projectiles.step() # 本tick新击发的弹体从下一个逻辑tick推进。
+	if profile_enabled:phase=_profile_time("projectiles",phase)
 	if battle.ai != null:
 		battle.ai.tick()
+	if profile_enabled:phase=_profile_time("ai",phase)
 	ports._process_trainings(dt)
 	ports._process_tech(dt)
 	_update_gates()
-	for u in battle.units:
+	if profile_enabled:phase=_profile_time("production",phase)
+	_step_units(dt)
+	if profile_enabled:phase=_profile_time("units",phase)
+	battle.fire_fields.step() # Effects follow unit updates; damage always uses current cell occupants.
+	ports._process_sites(dt)
+	ports._process_officer_recovery()
+	if profile_enabled:phase=_profile_time("effectsSitesRecovery",phase)
+	battle.transports.reconcile()
+	if profile_enabled:phase=_profile_time("transports",phase)
+	_prune_dead()
+	battle.visibility.update(battle.units, battle.player_owner)
+	if profile_enabled:phase=_profile_time("visibilityEnd",phase)
+	ports._check_end()
+	if battle.effects!=null:
+		battle.effects.simulating=false
+		battle.effects.visual("world_dirty")
+	if profile_enabled:_profile_time("settlement",phase)
+	tick_microseconds+=Time.get_ticks_usec()-tick_begin
+
+
+func connect_native() -> void:
+	disconnect_native()
+	var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel(true)
+	if kernel==null:return
+	var abort:=preload("res://composition_contract.gd").abort_if_broken.bind("native unit commands",[{"provider":"native unit commands","method":"provider lifetime"}])
+	native_unit_port=kernel.make_unit_port(ports._fire_attack,ports._repath_attack,ports._follow,ports._separate_unit,ports._step_unit,ports._die_step,battle.nav.native_query_context,abort)
+
+func disconnect_native() -> void:
+	if native_unit_port!=null:native_unit_port.release_commands()
+	native_unit_port=null
+
+func _step_units(dt: float) -> void:
+	var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel()
+	if kernel!=null and native_unit_port!=null:
+		var counters: Dictionary=kernel.step_units(battle.units,dt,battle.nav.native_query_context(),battle._target_owner,battle._targets,battle._cell_index,battle._index_units_ref,battle._index_units_size,native_unit_port,profile_enabled)
+		if profile_enabled:
+			for key in counters:native_unit_profile[key]=int(native_unit_profile.get(key,0))+int(counters[key])
+		return
+	for u: Dictionary in battle.units:
 		if not u.alive:
 			continue
 		if u.die_t >= 0.0:
@@ -84,17 +130,6 @@ func _sim_step(dt: float) -> void:
 			continue
 		if not u.is_building or int(u.unit) in [18,19]:
 			ports._step_unit(u, dt)
-	battle.fire_fields.step() # Effects follow unit updates; damage always uses current cell occupants.
-	ports._process_sites(dt)
-	ports._process_officer_recovery()
-	battle.transports.reconcile()
-	_prune_dead()
-	battle.visibility.update(battle.units, battle.player_owner)
-	ports._check_end()
-	if battle.effects!=null:
-		battle.effects.simulating=false
-		battle.effects.visual("world_dirty")
-	tick_microseconds+=Time.get_ticks_usec()-tick_begin
 
 func _state_digest() -> int:
 	var h := 1469598103934665603
@@ -133,3 +168,6 @@ func _update_visual(u: Dictionary) -> void:
 
 func _set_frame(u: Dictionary, f: int) -> void:
 	battle.effects.visual("set_frame", [u, f])
+
+func _profile_time(key: String, at: int) -> int:
+	var now:=Time.get_ticks_usec();profile[key]=int(profile.get(key,0))+now-at;return now

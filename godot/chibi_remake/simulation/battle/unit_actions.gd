@@ -5,18 +5,44 @@ const Config = preload("res://simulation/battle_config.gd")
 const Dependencies = preload("res://simulation/ports/unit_actions_dependencies.gd")
 var battle: State
 var ports := Dependencies.new()
+var profile_enabled := false
+var profile: Dictionary={}
 
 func _init(data: State) -> void:
 	battle = data
 
 func _step_unit(u: Dictionary, delta: float) -> void:
-	battle.stratagems.begin_update(u)
+	if profile_enabled:
+		_step_unit_profiled(u,delta);return
+	var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel()
+	if kernel!=null and _try_native_attack(u,delta,kernel):return
+	preload("res://simulation/systems/stratagem_rules.gd").begin_update(u)
 	_step_unit_inner(u, delta)
 	ports._separate_unit(u)
 	battle.stratagems.step_effects(u)
-	preload("res://simulation/systems/locomotion.gd").step(u)
-	# FUN_0045B4E0 expires flags at the END of the 800th unit update.
-	preload("res://simulation/systems/tick_timers.gd").step_statuses(u)
+	if kernel!=null:kernel.finish_unit(u)
+	else:
+		preload("res://simulation/systems/locomotion.gd").step_script(u)
+		preload("res://simulation/systems/tick_timers.gd").step_statuses_script(u)
+
+func _step_unit_profiled(u: Dictionary, delta: float) -> void:
+	var at:=Time.get_ticks_usec()
+	var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel()
+	if kernel!=null and _try_native_attack(u,delta,kernel):
+		_profile_time("nativeAttack",at);profile["units"]=int(profile.get("units",0))+1;return
+	preload("res://simulation/systems/stratagem_rules.gd").begin_update(u);at=_profile_time("beginStatus",at)
+	_step_unit_inner(u,delta);var end:=Time.get_ticks_usec()
+	var key: String="kind%d" % int(u.unit);profile[key]=int(profile.get(key,0))+end-at
+	at=_profile_time("action",at)
+	ports._separate_unit(u);at=_profile_time("separation",at)
+	battle.stratagems.step_effects(u);at=_profile_time("effects",at)
+	preload("res://simulation/systems/locomotion.gd").step(u);at=_profile_time("locomotion",at)
+	preload("res://simulation/systems/tick_timers.gd").step_statuses(u);_profile_time("timers",at)
+	profile["units"]=int(profile.get("units",0))+1
+
+func _profile_time(key: String, at: int) -> int:
+	var now:=Time.get_ticks_usec();profile[key]=int(profile.get(key,0))+now-at;return now
+
 
 func _step_legacy_burn(u: Dictionary, delta: float) -> bool:
 	# Legacy saves may still contain the former unit-following burn; new casts use fire_fields.
@@ -30,12 +56,13 @@ func _step_legacy_burn(u: Dictionary, delta: float) -> bool:
 	return false
 
 func _step_unit_inner(u: Dictionary, delta: float) -> void:
+	var phase:=Time.get_ticks_usec() if profile_enabled else 0
 	u.moved = false
 	if bool(u.get("attached", false)):
 		return
 	if _step_legacy_burn(u, delta): return
 	# Confusion/rolling idle tasks wait behind the running order, without clearing it.
-	if battle.stratagems.active(u):
+	if preload("res://simulation/systems/stratagem_rules.gd").active(u):
 		u.anim += delta
 		return
 	if (int(u.get("site_inside_uid",-1))>=0 or int(u.get("site_follow_uid",-1))>=0) and battle.construction.step(u): return
@@ -71,50 +98,9 @@ func _step_unit_inner(u: Dictionary, delta: float) -> void:
 					u.path = ports._path_to(u, follow_to, true)
 					u.pi = 0
 					break
+	if profile_enabled:phase=_profile_time("prepare",phase)
 	if u.state == "attack":
-		var t = u.target
-		if not (t is Dictionary) or not t.alive or t.die_t >= 0 or t.get("attached",false) or not ports._contains_unit(t):
-			ports._cancel_unit_command(u)
-		else:
-			var offset := Vector2(t.ax-u.ax,t.ay-u.ay)
-			var attack_range: float=preload("res://simulation/systems/combat_rules.gd").effective_range(u)
-			var reach: float = attack_range*battle.tile_w
-			u.dir = int(round(offset.angle()/(PI/4.0))) & 7
-			var strike := preload("res://simulation/systems/action_clock.gd").step(u,"attack",int(t.uid),tower)
-			var in_reach := offset.length_squared() <= reach*reach
-			# 近战按**近距离格**判定：不叠格后，等距邻格/斜邻格的脚点距离可到 66px，
-			# 仍应视为贴脸可攻击（否则会被前面的单位卡在 66px 外）。
-			# R06：放宽到两格时必须同时确认中间没有墙/不可通行地形/封闭建筑，
-			# 否则会“隔墙扣血”。远程越墙仍走独立规则（不在此补偿内）。
-			if attack_range <= 1:
-				if not in_reach:
-					var uc := ports._unit_cell(u);var tc := ports._unit_cell(t)
-					in_reach=maxi(absi(uc.x-tc.x),absi(uc.y-tc.y))<=2
-				in_reach=in_reach and ports._melee_line_clear(u,t)
-			if in_reach:
-				u.route_failures=0
-				u.path = []; u.pi = 0
-				if strike:
-					ports._fire_attack(u,t)
-			elif tower:
-				ports._cancel_unit_command(u)
-			else:
-				if strike: preload("res://simulation/systems/action_clock.gd").reset(u) # 击发时射程失效，重发同一攻击重新等待。
-				u.repath -= delta
-				if u.repath <= 0:
-					# 近战不能把“敌方占格”当终点（不叠格会停在两格外），
-					# 改寻到目标占格旁的落脚格；远程仍寻到目标本身。
-					if attack_range <= 1:
-						u.path = ports._edge_interaction_path(u, t)
-					else:
-						u.path = ports._path_to(u,Vector2(t.ax,t.ay),false)
-					u.pi = 0
-					u.route_failures=mini(3,int(u.get("route_failures",0))+1) if u.path.is_empty() else 0
-					# Stable UID phases spread synchronized retry bursts without using
-					# wall time or RNG; the remaining delay is saved with the order.
-					u.repath=0.8*pow(2.0,maxi(0,int(u.route_failures)-1))+(int(u.uid)%11)*Config.SIM_DT
-				ports._follow(u,delta)
-
+		_step_attack(u,delta,tower)
 	elif u.state == "move":
 		# REQ-003：行军被新占地截断 → 按**新世界**重寻路（A* 已反映新占地）。
 		# 绕得开就继续走向原目的地；绕不开（目的地不可达）才弃单转 idle。
@@ -259,3 +245,75 @@ func _step_unit_inner(u: Dictionary, delta: float) -> void:
 			battle.construction.enter(u, bt)
 	# 闲置部队的局部索敌由 engagement 调度，行动仍走统一攻击/寻路分支。
 	u.anim += delta
+
+func _step_attack(u: Dictionary,delta: float,tower: bool) -> void:
+	var phase:=Time.get_ticks_usec() if profile_enabled else 0
+	var raw_target = u.target
+	if not (raw_target is Dictionary) or not raw_target.alive or raw_target.die_t >= 0 or raw_target.get("attached",false) or not ports._contains_unit(raw_target):
+		ports._cancel_unit_command(u)
+	else:
+		if profile_enabled:phase=_profile_time("validTarget",phase)
+		var t: Dictionary=raw_target
+		var attack_range: float=preload("res://simulation/systems/combat_rules.gd").effective_range(u)
+		var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel()
+		var prepared: int
+		if kernel!=null:prepared=kernel.prepare_combat(u,t,attack_range,battle.tile_w,tower,battle.nav.native_query_context())
+		else:prepared=preload("res://simulation/systems/action_clock.gd").prepare_attack_script(u,t,attack_range,battle.tile_w,tower)
+		var strike: bool=(prepared&1)!=0
+		if profile_enabled:phase=_profile_time("clock",phase)
+		var in_reach: bool=(prepared&2)!=0
+		# 近战按**近距离格**判定：不叠格后，等距邻格/斜邻格的脚点距离可到 66px，
+		# 仍应视为贴脸可攻击（否则会被前面的单位卡在 66px 外）。
+		# R06：放宽到两格时必须同时确认中间没有墙/不可通行地形/封闭建筑，
+		# 否则会“隔墙扣血”。远程越墙仍走独立规则（不在此补偿内）。
+		if attack_range <= 1 and kernel==null:
+			if not in_reach:
+				var uc := ports._unit_cell(u);var tc := ports._unit_cell(t)
+				in_reach=maxi(absi(uc.x-tc.x),absi(uc.y-tc.y))<=2
+			in_reach=in_reach and ports._melee_line_clear(u,t)
+		if profile_enabled:phase=_profile_time("contact",phase)
+		if in_reach:
+			u.route_failures=0
+			u.path = []; u.pi = 0
+			if strike:
+				ports._fire_attack(u,t)
+		elif tower:
+			ports._cancel_unit_command(u)
+		else:
+			if strike: preload("res://simulation/systems/action_clock.gd").reset(u) # 击发时射程失效，重发同一攻击重新等待。
+			u.repath -= delta
+			if u.repath <= 0:
+				_repath_attack(u,t,attack_range)
+			ports._follow(u,delta)
+
+	if profile_enabled:phase=_profile_time("hitOrFollow",phase)
+
+func _repath_attack(u: Dictionary,t: Dictionary,attack_range: float) -> void:
+	# 近战不能把“敌方占格”当终点（不叠格会停在两格外），
+	# 改寻到目标占格旁的落脚格；远程仍寻到目标本身。
+	if attack_range <= 1:
+		u.path = ports._edge_interaction_path(u, t)
+	else:
+		u.path = ports._path_to(u,Vector2(t.ax,t.ay),false)
+	u.pi = 0
+	u.route_failures=mini(3,int(u.get("route_failures",0))+1) if u.path.is_empty() else 0
+	# Stable UID phases spread synchronized retry bursts without using
+	# wall time or RNG; the remaining delay is saved with the order.
+	u.repath=0.8*pow(2.0,maxi(0,int(u.route_failures)-1))+(int(u.uid)%11)*Config.SIM_DT
+
+func _try_native_attack(u: Dictionary,delta: float,kernel: Object) -> bool:
+	if u.state!="attack" or bool(u.is_building):return false
+	var at:=Time.get_ticks_usec() if profile_enabled else 0
+	var result: int=kernel.attack_fast(u,delta,battle.nav.native_query_context(),battle._target_owner,battle._targets,battle.units,battle._index_units_ref,battle._index_units_size)
+	if profile_enabled:at=_profile_time("nativePrepare",at)
+	if result<0:return false
+	if result&1:ports._fire_attack(u,u.target)
+	if result&2:_repath_attack(u,u.target,float(u.atk_range))
+	if result&4:ports._follow(u,delta)
+	u.anim+=delta
+	if profile_enabled:at=_profile_time("nativeApply",at)
+	if kernel.finish_or_separate(u,battle._cell_index,battle.nav.native_query_context()):
+		ports._separate_unit(u)
+		kernel.finish_plain_attack(u)
+	if profile_enabled:_profile_time("nativeFinalize",at)
+	return true

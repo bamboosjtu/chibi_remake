@@ -17,3 +17,4 @@ godot/chibi_remake/addons/ffmpegplayer/win64/*.dll filter=lfs diff=lfs merge=lfs
 
 # PowerShell 脚本统一使用 LF
 *.ps1 text eol=lf
+godot/chibi_remake/simulation/native/bin/*.dll filter=lfs diff=lfs merge=lfs -text

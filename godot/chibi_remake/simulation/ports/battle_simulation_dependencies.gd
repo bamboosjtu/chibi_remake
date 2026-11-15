@@ -67,11 +67,33 @@ func _step_auto_control() -> void:
 	if provider == null: return
 	provider._step_auto_control()
 
-const CONTRACTS := {"campaign": ["_check_end"], "cheat_rules": ["_step_auto_control"], "combat": ["_die_step"], "construction_orders": ["_process_sites"], "officer_teams": ["_process_officer_recovery", "_unassign_officer"], "production": ["_process_trainings"], "spatial_index": ["_index_forget", "_index_sync", "_target_forget", "_target_sync"], "technology": ["_process_tech"], "unit_actions": ["_step_unit"]}
+
+func _fire_attack(a: Dictionary, b: Dictionary) -> void:
+	var provider = _require(_provider_combat, "combat")
+	if provider == null: return
+	provider._fire_attack(a, b)
+
+func _follow(u: Dictionary, delta: float) -> void:
+	var provider = _require(_provider_movement, "movement")
+	if provider == null: return
+	provider._follow(u, delta)
+
+func _separate_unit(u: Dictionary) -> void:
+	var provider = _require(_provider_spatial_index, "spatial_index")
+	if provider == null: return
+	provider._separate_unit(u)
+
+func _repath_attack(u: Dictionary, target: Dictionary, attack_range: float) -> void:
+	var provider = _require(_provider_unit_actions, "unit_actions")
+	if provider == null: return
+	provider._repath_attack(u, target, attack_range)
+
+const CONTRACTS := {"campaign": ["_check_end"], "cheat_rules": ["_step_auto_control"], "combat": ["_die_step", "_fire_attack"], "construction_orders": ["_process_sites"], "officer_teams": ["_process_officer_recovery", "_unassign_officer"], "production": ["_process_trainings"], "movement": ["_follow"], "spatial_index": ["_separate_unit", "_index_forget", "_index_sync", "_target_forget", "_target_sync"], "technology": ["_process_tech"], "unit_actions": ["_step_unit", "_repath_attack"]}
 var _provider_campaign: WeakRef
 var _provider_cheat_rules: WeakRef
 var _provider_combat: WeakRef
 var _provider_construction_orders: WeakRef
+var _provider_movement: WeakRef
 var _provider_officer_teams: WeakRef
 var _provider_production: WeakRef
 var _provider_spatial_index: WeakRef
@@ -84,6 +106,7 @@ func connect_services(services: Dictionary) -> Array:
 	_provider_cheat_rules = weakref(services["cheat_rules"]) if services.get("cheat_rules") != null else null
 	_provider_combat = weakref(services["combat"]) if services.get("combat") != null else null
 	_provider_construction_orders = weakref(services["construction_orders"]) if services.get("construction_orders") != null else null
+	_provider_movement = weakref(services["movement"]) if services.get("movement") != null else null
 	_provider_officer_teams = weakref(services["officer_teams"]) if services.get("officer_teams") != null else null
 	_provider_production = weakref(services["production"]) if services.get("production") != null else null
 	_provider_spatial_index = weakref(services["spatial_index"]) if services.get("spatial_index") != null else null
@@ -99,6 +122,7 @@ func disconnect_services() -> void:
 	_provider_cheat_rules = null
 	_provider_combat = null
 	_provider_construction_orders = null
+	_provider_movement = null
 	_provider_officer_teams = null
 	_provider_production = null
 	_provider_spatial_index = null

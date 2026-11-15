@@ -31,6 +31,11 @@ if (@(Get-ChildItem -LiteralPath $candidate -File -Recurse -Filter '*.dll').Coun
         Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $target $_.Name) -Force
     }
 }
+if (Test-Path -LiteralPath (Join-Path $candidate 'ChibiSimulationMath.dll')) {
+    $target=Join-Path $candidate 'licenses/simulation-math'
+    New-Item -ItemType Directory -Force $target | Out-Null
+    Copy-Item -LiteralPath (Join-Path $projectRoot 'godot/chibi_remake/simulation/native/LICENSE-godot-cpp.txt') -Destination (Join-Path $target 'LICENSE-godot-cpp.txt') -Force
+}
 $nativeFiles=@(Get-ChildItem -LiteralPath $candidate -File -Recurse | Where-Object {
     $_.Extension -eq '.dll' -or $_.Name -eq 'portable.txt' -or $_.FullName.StartsWith((Join-Path $candidate 'licenses')+[IO.Path]::DirectorySeparatorChar)
 } | ForEach-Object {

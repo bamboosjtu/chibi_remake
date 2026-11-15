@@ -14,6 +14,7 @@ func apply(live: Node2D, snapshot: Dictionary, records: Array, plan: Dictionary)
 	return _install(live,candidate)
 
 func _install(live: Node2D, candidate: RefCounted) -> bool:
+	if live.view!=null and DisplayServer.get_name()!="headless":candidate.state.nav.warm_runtime_shapes()
 	if force_view_failure:
 		candidate.dispose(); return false
 	var view = live.view

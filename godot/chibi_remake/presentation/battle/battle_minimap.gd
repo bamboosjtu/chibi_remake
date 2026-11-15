@@ -9,6 +9,11 @@ var overlay: Control
 var fog_material: ShaderMaterial
 var map_texture: ImageTexture
 var world_rect:=Rect2()
+var gpu_markers := DisplayServer.get_name()!="headless" and "--cpu-minimap" not in OS.get_cmdline_user_args()
+var marker_mesh: MultiMeshInstance2D
+var camera_overlay: Control
+var marker_capacity := 0
+var marker_data := PackedFloat32Array()
 
 func _init(h: Node2D,v: Node2D) -> void:
 	host=h;view=v;mouse_filter=Control.MOUSE_FILTER_IGNORE
@@ -43,6 +48,12 @@ void fragment() {
 	terrain.material=fog_material;add_child(terrain)
 	overlay=Control.new();overlay.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	overlay.draw.connect(_draw_overlay);add_child(overlay)
+	marker_mesh=MultiMeshInstance2D.new()
+	var mesh:=QuadMesh.new();mesh.size=Vector2.ONE
+	var instances:=MultiMesh.new();instances.transform_format=MultiMesh.TRANSFORM_2D;instances.use_colors=true;instances.mesh=mesh
+	marker_mesh.multimesh=instances;overlay.add_child(marker_mesh)
+	camera_overlay=Control.new();camera_overlay.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	camera_overlay.draw.connect(_draw_camera);overlay.add_child(camera_overlay)
 
 func _draw() -> void:
 	if terrain==null:return
@@ -62,18 +73,48 @@ func _draw_overlay() -> void:
 	if world_rect.size.x<=0:return
 	var k:=world_rect.size.x/float(host.map_data.terrainW)
 	var off:=world_rect.position
+	# Resolve the guarded read model once for this synchronous draw, not per dot.
+	var player:=int(host.player_owner)
+	var vision=host.visibility
+	var scale: float=view.ui_scale
+	var count:=0
+	marker_mesh.visible=gpu_markers
+	if gpu_markers:_reserve_markers(host.units.size())
 	overlay.draw_rect(world_rect,Color(0.45,0.4,0.3),false,1.0)
-	for unit in host.units:
+	for unit: Dictionary in host.units:
 		if not bool(unit.alive) or float(unit.die_t)>=0:continue
 		if bool(unit.get("attached",false)) or int(unit.get("site_inside_uid",-1))>=0:continue
 		var owner:=int(unit.owner)
-		if owner!=int(host.player_owner) and not host.visibility.is_visible(Vector2(unit.ax,unit.ay)):continue
+		if owner!=player and not vision.is_visible(Vector2(unit.ax,unit.ay)):continue
 		var color:=Color(0.55,0.55,0.55)
-		if owner==int(host.player_owner):color=Color(0.3,1.0,0.35)
+		if owner==player:color=Color(0.3,1.0,0.35)
 		elif owner!=0:color=Color(1.0,0.3,0.25)
 		var point:=off+Vector2(float(unit.ax),float(unit.ay))*k
-		var d:float=(4.0 if bool(unit.is_building) else 2.5)*view.ui_scale
-		overlay.draw_rect(Rect2(point-Vector2.ONE*d*0.5,Vector2.ONE*d),color,true)
+		var d:float=(4.0 if bool(unit.is_building) else 2.5)*scale
+		if gpu_markers:
+			# One transform/color buffer upload; no GPU result is read by simulation.
+			var index:=count*12
+			marker_data[index]=d;marker_data[index+3]=point.x
+			marker_data[index+5]=d;marker_data[index+7]=point.y
+			marker_data[index+8]=color.r;marker_data[index+9]=color.g;marker_data[index+10]=color.b;marker_data[index+11]=color.a
+			count+=1
+		else:overlay.draw_rect(Rect2(point-Vector2.ONE*d*0.5,Vector2.ONE*d),color,true)
+	if gpu_markers:
+		marker_mesh.multimesh.buffer=marker_data
+		marker_mesh.multimesh.visible_instance_count=count
+	camera_overlay.queue_redraw()
+
+func _reserve_markers(count: int) -> void:
+	if count<=marker_capacity:return
+	marker_capacity=maxi(64,marker_capacity)
+	while marker_capacity<count:marker_capacity*=2
+	marker_mesh.multimesh.instance_count=marker_capacity
+	marker_data.resize(marker_capacity*12);marker_data.fill(0)
+
+func _draw_camera() -> void:
+	if world_rect.size.x<=0:return
+	var k:=world_rect.size.x/float(host.map_data.terrainW)
+	var off:=world_rect.position
 	if view.cam!=null:
 		var rect:Rect2=Metrics.visible_world_rect(view.cam.position,view.battle_rect(),get_viewport_rect().size,view.cam.zoom)
-		overlay.draw_rect(Rect2(off+rect.position*k,rect.size*k),Color(1,1,1,0.85),false,1.0)
+		camera_overlay.draw_rect(Rect2(off+rect.position*k,rect.size*k),Color(1,1,1,0.85),false,1.0)

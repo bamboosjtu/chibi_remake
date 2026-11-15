@@ -25,7 +25,11 @@ func flush_visuals(interpolating := false) -> void:
 	var context:=_visual_context();context["interpolating"]=interpolating
 	for unit in _ui.host.units:
 		if _world_dirty or pending_visuals.has(int(unit.uid)):
-			update_visual(unit,context);place_unit(unit);sync_calls+=1
+			update_visual(unit,context)
+			# The following interpolation pass writes the final mobile transform.
+			# Avoid dirtying that subtree at the current position first.
+			if not interpolating or bool(unit.is_building):place_unit(unit)
+			sync_calls+=1
 	pending_visuals.clear();_world_dirty=false
 	sync_microseconds+=Time.get_ticks_usec()-begin
 
@@ -47,6 +51,7 @@ func _sheet(p: String) -> Texture2D:
 	return _ui.sheet_tex[p]
 
 func attach_unit(u: Dictionary, ob: Dictionary, w: int, h: int, k: float) -> void:
+	unit_nodes(u).erase("health_ratio");unit_nodes(u).erase("draw_visible")
 	var ax: float = float(u.ax)
 	var ay: float = float(u.ay)
 	var spr := Sprite2D.new()
@@ -108,19 +113,26 @@ func free_unit(u: Dictionary) -> void:
 
 ## 位移同步（main._follow 每步调用）
 	_ui._nodes_by_uid.erase(int(u.uid))
+	_ui._motion_previous.erase(int(u.uid));_ui._gait_previous.erase(int(u.uid))
 
 func place_unit(u: Dictionary) -> void:
 	var s = unit_nodes(u).get("spr", null)
 	if s != null:
-		s.position = Vector2(float(u.ax) - float(u.w) * 0.5, float(u.ay) - float(u.h))
+		var point:=Vector2(float(u.ax) - float(u.w) * 0.5, float(u.ay) - float(u.h))
+		if s.position!=point:s.position=point
 
 func capture_motion() -> void:
-	_ui._motion_previous.clear()
-	_ui._gait_previous.clear()
-	for unit in _ui.host.units:
-		if not bool(unit.is_building):
-			_ui._motion_previous[int(unit.uid)]=Vector2(float(unit.ax),float(unit.ay))
-			_ui._gait_previous[int(unit.uid)]=float(unit.get("walk_tick",0))
+	for unit: Dictionary in _ui.host.units:
+		var uid:=int(unit.uid)
+		var nodes: Dictionary=_ui._nodes_by_uid.get(int(unit.uid),{})
+		# Hidden units have no interpolated pixels; first reveal starts at the
+		# current position, just as a newly attached/restored visual does.
+		if not bool(unit.is_building) and nodes.get("spr")!=null and nodes.spr.visible:
+			var point:=Vector2(float(unit.ax),float(unit.ay));var gait:=float(unit.get("walk_tick",0))
+			if _ui._motion_previous.get(uid)!=point:_ui._motion_previous[uid]=point
+			if _ui._gait_previous.get(uid)!=gait:_ui._gait_previous[uid]=gait
+		else:
+			_ui._motion_previous.erase(uid);_ui._gait_previous.erase(uid)
 
 func interpolate_motion(alpha: float) -> void:
 	var tile_width: float=_ui.host.tile_w;var half_height: float=_ui.host.tile_hh
@@ -133,10 +145,16 @@ func interpolate_motion(alpha: float) -> void:
 		# Embarking, unloading and explicit relocation must snap, not slide through walls.
 		var point:=previous.lerp(current,alpha) if previous.distance_squared_to(current)<tile_width*tile_width else current
 		if nodes.get("spr")!=null:
-			nodes.spr.position=point-Vector2(float(unit.w)*0.5,float(unit.h));nodes.spr.z_index=int(point.y)
+			var sprite_point:=point-Vector2(float(unit.w)*0.5,float(unit.h))
+			if nodes.spr.position!=sprite_point:nodes.spr.position=sprite_point
+			if nodes.spr.z_index!=int(point.y):nodes.spr.z_index=int(point.y)
 		if nodes.get("diamond")!=null:
-			nodes.diamond.position=point-Vector2(0,half_height);nodes.diamond.z_index=int(point.y)-1
-		if nodes.get("hbar")!=null:nodes.hbar.position=point-Vector2(11,float(unit.h)+9)
+			var diamond_point:=point-Vector2(0,half_height)
+			if nodes.diamond.position!=diamond_point:nodes.diamond.position=diamond_point
+			if nodes.diamond.z_index!=int(point.y)-1:nodes.diamond.z_index=int(point.y)-1
+		if nodes.get("hbar")!=null:
+			var bar_point:=point-Vector2(11,float(unit.h)+9)
+			if nodes.hbar.position!=bar_point:nodes.hbar.position=bar_point
 		if float(unit.get("die_t",-1)) < 0 and bool(unit.get("moved",false)):
 			var now:float=float(unit.get("walk_tick",0))
 			var before:float=_ui._gait_previous.get(int(unit.uid),now)
@@ -156,6 +174,7 @@ func fade_unit(u: Dictionary, alpha: float) -> void:
 		s.modulate = Color(1, 1, 1, alpha)
 
 func set_unit_attached(u: Dictionary, attached: bool) -> void:
+	unit_nodes(u).erase("draw_visible")
 	var s = unit_nodes(u).get("spr", null)
 	if s != null:
 		s.visible = not attached
@@ -191,24 +210,28 @@ func update_visual(u: Dictionary, context: Dictionary={}) -> void:
 	if vis and not bool(u.is_building) and context.camera:
 		vis=(context.area as Rect2).has_point(Vector2(float(u.ax),float(u.ay)-float(u.h)*0.5))
 	if not vis:
-		for key in ["spr","diamond","hbar"]:
-			if nodes.get(key)!=null:nodes[key].visible=false
+		if bool(nodes.get("draw_visible",true)):
+			for key in ["spr","diamond","hbar"]:
+				if nodes.get(key)!=null:nodes[key].visible=false
+		nodes["draw_visible"]=false
 		return # Invisible geometry/poses are sampled when the unit becomes visible.
+	nodes["draw_visible"]=true
 
 	var spr = nodes.get("spr", null)
 	if spr != null:
 		spr.visible = vis
-		spr.z_index = int(u.ay)          # 按底边排序：单位与建筑统一
+		if spr.z_index!=int(u.ay):spr.z_index=int(u.ay) # 按底边排序：单位与建筑统一
 	var dia = nodes.get("diamond", null)
 	if dia != null:
 		dia.visible = vis and context.selected.has(int(u.uid))
-		dia.position = Vector2(float(u.ax), float(u.ay) - float(context.halfHeight))
-		dia.z_index=int(u.ay)-1
+		var outline_point:=Vector2(float(u.ax), float(u.ay) - float(context.halfHeight))
+		if not bool(u.is_building) and dia.position!=outline_point:dia.position=outline_point
+		if dia.z_index!=int(u.ay)-1:dia.z_index=int(u.ay)-1
 		if bool(u.is_building):
 			dia.z_index=int(u.ay)-1 # Ground outline is occluded by the building itself.
 			var cells: Array=u.get("occupied_cells",[])
 			if cells.is_empty():cells=_ui.host.nav.building_footprint(int(u.unit),Vector2(u.ax,u.ay),float(u.w))
-			dia.position=Vector2.ZERO
+			if dia.position!=Vector2.ZERO:dia.position=Vector2.ZERO
 			if cells!=dia.get_meta("footprint",[]):
 				var outline: PackedVector2Array=_ui.host.nav.footprint_outline(cells)
 				if not outline.is_empty():outline.append(outline[0])
@@ -239,36 +262,45 @@ func update_visual(u: Dictionary, context: Dictionary={}) -> void:
 	if bar != null:
 		bar.visible = vis and hurt
 		if hurt:
-			bar.position = Vector2(float(u.ax) - 11, float(u.ay) - float(u.h) - 9)
+			var bar_point:=Vector2(float(u.ax) - 11, float(u.ay) - float(u.h) - 9)
+			if not context.get("interpolating",false) or bool(u.is_building):
+				if bar.position!=bar_point:bar.position=bar_point
 			var r: float = clampf(float(u.hp) / float(u.maxhp), 0.0, 1.0)
 			var fill = nodes.get("hfill", null)
-			if fill != null:
+			if fill != null and nodes.get("health_ratio")!=r:
 				fill.size = Vector2(20.0 * r, 2)
 				fill.color = Color(1.0 - r * 0.8, r * 0.9 + 0.1, 0.15)
+				nodes["health_ratio"]=r
 
+const POSE_CLIPS := ["turn","act1","act2","act3","walk"]
+const CARRY_POSE_CLIPS := {"wood":1,"stone":2,"gold":2,"food":3}
 func mobile_pose(u: Dictionary, gait_tick := -1.0) -> Dictionary:
+	var pose:=_pose_components(u,gait_tick)
+	return {"clip":POSE_CLIPS[pose.x],"direction":pose.y,"step":pose.z}
+
+func _pose_components(u: Dictionary, gait_tick: float) -> Vector3i:
 	var moving := bool(u.get("moved",false))
 	var action := not moving and str(u.state) in ["attack","repair"]
 	var carrying := int(u.unit)==30 and float(u.get("carry",0))>0 and not action
 	var direction := ViewMath.sprite_direction(int(u.get("move_facing",u.dir)))
 	# Historical clip labels are misleading: turn is the gait row; walk is the
 	# combat action row (the general visibly swings his weapon in those frames).
-	var clip := "turn"
+	var clip := 0
 	var step := 0
 	if moving:
 		step = floori((float(u.get("walk_tick", 0)) if gait_tick<0 else gait_tick)/FRAME_TICKS)
 	if carrying:
-		clip={"wood":"act1","stone":"act2","gold":"act2","food":"act3"}.get(str(u.get("carry_kind","")),"act2")
+		clip=int(CARRY_POSE_CLIPS.get(str(u.get("carry_kind","")),2))
 		if not moving:step=0
 	if action:
-		clip=_ui.host.ActionClock.clip_name(u);step=int(u.get("action_phase",0));direction=ViewMath.sprite_direction(int(u.dir))
-	return {"clip":clip,"direction":direction,"step":step}
+		clip=4;step=int(u.get("action_phase",0));direction=ViewMath.sprite_direction(int(u.dir))
+	return Vector3i(clip,direction,step)
 
 func _apply_mobile_pose(u: Dictionary, gait_tick := -1.0) -> void:
-	var pose:=mobile_pose(u,gait_tick)
-	var frame:=ViewMath.clip_frame(u,str(pose.clip),int(pose.direction),int(pose.step))
-	if frame<0:frame=ViewMath.clip_frame(u,"turn",int(pose.direction),0)
-	if frame<0:frame=ViewMath.clip_frame(u,"walk",int(pose.direction),0)
+	var pose:=_pose_components(u,gait_tick)
+	var frame:=ViewMath.clip_frame(u,str(POSE_CLIPS[pose.x]),pose.y,pose.z)
+	if frame<0:frame=ViewMath.clip_frame(u,"turn",pose.y,0)
+	if frame<0:frame=ViewMath.clip_frame(u,"walk",pose.y,0)
 	set_frame(u,frame if frame>=0 else 0)
 
 func set_frame(u: Dictionary, f: int) -> void:

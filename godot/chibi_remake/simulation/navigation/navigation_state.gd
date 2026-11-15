@@ -1,5 +1,5 @@
 extends RefCounted
-const PROXY_FIELDS := ["tile_w", "tile_hw", "tile_hh", "map_data", "astar", "water_astar", "has_water", "occupancy", "version", "gates", "gate_cells", "blocked_cells", "resource_cells", "_route_owner", "_planning_gates", "_shape_graphs", "_shape_pending", "topology_edges"]
+const PROXY_FIELDS := ["tile_w", "tile_hw", "tile_hh", "map_data", "astar", "water_astar", "has_water", "occupancy", "version", "gates", "gate_cells", "blocked_cells", "resource_cells", "_route_owner", "_planning_gates", "_shape_graphs", "_shape_pending", "topology_edges", "geometry_revision"]
 ## Shared navigation grids and occupancy.
 const UnitFootprint = preload("res://simulation/systems/unit_footprint.gd")
 
@@ -49,3 +49,5 @@ var _shape_pending := {}
 ## 取瓦片尺寸并建立 A* 网格。main.gd 在 _ready 里调一次。
 
 var topology_edges := PackedInt64Array()
+
+var geometry_revision := 0

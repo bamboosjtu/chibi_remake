@@ -67,7 +67,7 @@ for(const [host,files,variable] of [['main',['simulation/battle_world.gd','main.
  const actual={};for(const file of files)for(const m of read(file).matchAll(new RegExp(variable+'\\["([^"]+)"\\] = preload\\("res://([^"]+)"\\)','g')))actual[m[1]]=m[2];
  assert.deepEqual(actual,manifest.hosts[host],host+': factory services differ from composition manifest');
 }
-const nav={};for(const m of read('simulation/navigation/nav.gd').matchAll(/^var (grid|paths) = preload\("res:\/\/([^\"]+)"\)/gm))nav[m[1]]=m[2];
+const nav={};for(const m of read('simulation/navigation/nav.gd').matchAll(/^var (grid|paths) :?= preload\("res:\/\/([^\"]+)"\)/gm))nav[m[1]]=m[2];
 assert.deepEqual(nav,manifest.hosts.nav,'nav: factory services differ from composition manifest');
 for(const file of ['simulation/battle_state.gd','app/battle_scene_state.gd','presentation/menu/menu_state.gd','presentation/battle/components/battle_view_state.gd','simulation/navigation/navigation_state.gd','simulation/systems/ai_state.gd']){
  const source=read(file),declared=JSON.parse(source.match(/^const PROXY_FIELDS := (.+)$/m)?.[1]??'null');

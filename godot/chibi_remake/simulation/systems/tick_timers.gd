@@ -5,7 +5,7 @@ const REST_PERIOD = preload("res://simulation/battle_config.gd").REST_TICKS
 const BUILD_PERIOD = preload("res://simulation/battle_config.gd").BUILD_STEP_TICKS
 const STATUS_DURATION := 800
 const LEGACY_TICK_SECONDS := 1.0 / 30.0
-const STATUS_KEYS := ["inspired_t", "haste_t", "slow_t", "farsight_t", "confused_t", "ambush_t", "rolling_t"]
+const STATUS_KEYS = preload("res://simulation/definitions/status_fields.gd").KEYS
 const ELAPSED_PERIODS := {"rest_t": REST_PERIOD, "build_t": BUILD_PERIOD,"rolling_ticks":30}
 
 static func valid_snapshot(state: Dictionary, version: int) -> bool:
@@ -33,6 +33,11 @@ static func restore(state: Dictionary, version: int, unit: Dictionary) -> void:
 		unit[key] = clampi(ticks, 0, limit)
 
 static func step_statuses(unit: Dictionary) -> void:
+	var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel()
+	if kernel!=null:kernel.step_timers(unit);return
+	step_statuses_script(unit)
+
+static func step_statuses_script(unit: Dictionary) -> void:
 	for key in STATUS_KEYS:
 		var remaining:=int(unit.get(key,0))
 		if remaining>0:unit[key]=remaining-1

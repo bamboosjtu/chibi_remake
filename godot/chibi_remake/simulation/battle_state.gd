@@ -196,15 +196,15 @@ var cnt_enemy := 0
 
 var tile_w: float:
 	get:
-		return nav.tile_w
+		return nav.state.tile_w
 
 var tile_hw: float:
 	get:
-		return nav.tile_hw
+		return nav.state.tile_hw
 
 var tile_hh: float:
 	get:
-		return nav.tile_hh
+		return nav.state.tile_hh
 # ARCH-007 / #5：本关规则来源。prototype = 未在 BATTLE.EXP 中找到，必须显式标注，
 # 不能把原型规则冒充成原版规则。
 

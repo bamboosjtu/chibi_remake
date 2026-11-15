@@ -196,8 +196,10 @@ func _layout_status_labels(vp: Vector2, s: float) -> void:
 	var footer_height := maxf(1.0, vp.y - footer_top)
 	var x := 28.0 * s
 	var width := maxf(100.0, vp.x - 180.0 * s)
-	_ui.info.add_theme_font_size_override("font_size", maxi(9, int(12.0 * s)))
-	_ui.status_sub.add_theme_font_size_override("font_size", maxi(8, int(9.0 * s)))
+	if _ui.info.get_theme_font_size("font_size") != maxi(9, int(12.0 * s)):
+		_ui.info.add_theme_font_size_override("font_size", maxi(9, int(12.0 * s)))
+	if _ui.status_sub.get_theme_font_size("font_size") != maxi(8, int(9.0 * s)):
+		_ui.status_sub.add_theme_font_size_override("font_size", maxi(8, int(9.0 * s)))
 	var info_min_height := maxf(1.0, _ui.info.get_combined_minimum_size().y)
 	var info_height := minf(maxf(15.0 * s, info_min_height), footer_height)
 	var info_y: float = footer_top + (footer_height - info_height) * 0.5
@@ -211,7 +213,8 @@ func _layout_status_labels(vp: Vector2, s: float) -> void:
 		_ui.status_sub.size = Vector2(width, debug_height)
 		info_y = footer_top + pad + debug_height + gap
 	else:
-		_ui.status_sub.add_theme_font_size_override("font_size", maxi(8, int(9.0 * s)))
+		if _ui.status_sub.get_theme_font_size("font_size") != maxi(8, int(9.0 * s)):
+			_ui.status_sub.add_theme_font_size_override("font_size", maxi(8, int(9.0 * s)))
 	_ui.info.position = Vector2(x, info_y)
 	_ui.info.size = Vector2(width, info_height)
 

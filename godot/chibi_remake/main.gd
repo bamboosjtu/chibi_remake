@@ -92,6 +92,7 @@ func _wire_world() -> void:
 	access.merge(commands.port_objects())
 	var report := preload("res://composition_contract.gd").wire(_modules, "main", access)
 	_api_missing = report.missing
+	if _api_missing.is_empty():_modules.battle_simulation.connect_native()
 	if not state.effects.visual_requested.is_connected(_on_visual): state.effects.visual_requested.connect(_on_visual)
 	if not state.effects.sound_requested.is_connected(_on_sound): state.effects.sound_requested.connect(_on_sound)
 	if not state.effects.duel_requested.is_connected(_on_duel): state.effects.duel_requested.connect(_on_duel)

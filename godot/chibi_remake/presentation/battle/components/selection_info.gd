@@ -310,7 +310,8 @@ func _sel_state_text() -> String:
 	return ",".join(parts) if parts.size() > 0 else "-"
 
 func update_hover() -> void:
-	var hu: Dictionary = _ui.host.commands.orders._hover_unit(surface.get_global_mouse_position())
 	_ui.host.hover_text = ""
-	if _ui.host.show_debug and not hu.is_empty():
+	if not _ui.host.show_debug:return
+	var hu: Dictionary = _ui.host.commands.orders._hover_unit(surface.get_global_mouse_position())
+	if not hu.is_empty():
 		_ui.host.hover_text = "%s  hp %.0f/%.0f  owner %d" % [str(hu.name), float(hu.hp), float(hu.maxhp), int(hu.owner)]

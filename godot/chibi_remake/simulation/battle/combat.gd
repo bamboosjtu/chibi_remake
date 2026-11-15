@@ -79,16 +79,19 @@ func _nearest_enemy(u: Dictionary, max_d: float) -> Dictionary:
 	return best
 
 func _melee_line_clear(a: Dictionary, b: Dictionary) -> bool:
-	var from := Vector2(float(a.ax), float(a.ay));var to := Vector2(float(b.ax), float(b.ay))
-	var layer := ports._nav_layer(a);var version: int=battle.nav.version
-	var uid:=int(a.uid);var key: Array=[int(b.uid),from,to,int(a.unit),int(b.unit),layer,version]
-	var previous: Dictionary=_contact_cache.get(uid,{})
-	if previous.get("key",[])==key:return bool(previous.clear)
-	var ignore := {}
-	for raw in ports._footprint_cells(a): ignore[raw] = true
-	for raw in ports._footprint_cells(b): ignore[raw] = true
-	var clear: bool=battle.nav.contact_clear(from,to,ignore,layer)
-	_contact_cache[uid]={"key":key,"clear":clear}
+	var from:=Vector2(float(a.ax),float(a.ay));var to:=Vector2(float(b.ax),float(b.ay))
+	var positions:=PackedFloat64Array([float(a.ax),float(a.ay),float(b.ax),float(b.ay)])
+	var identity:=Vector3i(int(b.uid),int(a.unit),int(b.unit))
+	var version: int=battle.nav.version;var uid:=int(a.uid)
+	var previous=_contact_cache.get(uid)
+	# Layer is a function of type and this navigation revision. Resolve the
+	# port and endpoint footprints only on a cache miss, never on a stable hit.
+	if previous!=null and previous.version==version and previous.identity==identity and previous.positions==positions:return bool(previous.clear)
+	var ignore: Dictionary={}
+	for cell in ports._footprint_cells(a):ignore[cell]=true
+	for cell in ports._footprint_cells(b):ignore[cell]=true
+	var clear: bool=battle.nav.contact_clear(from,to,ignore,ports._nav_layer(a))
+	_contact_cache[uid]={"positions":positions,"identity":identity,"version":version,"clear":clear}
 	return clear
 
 func officer_rank_name(off: Dictionary) -> String:

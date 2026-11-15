@@ -5,6 +5,8 @@ const Config = preload("res://simulation/battle_config.gd")
 const Dependencies = preload("res://simulation/ports/spatial_index_dependencies.gd")
 var battle: State
 var ports := Dependencies.new()
+var _position_cells: Dictionary={}
+var _geometry_revision := -1
 const TRANSIT_STATES := ["move","gather","deliver","join","build","repair","board","unload"]
 const CLOSE_WORK_STATES := ["gather","deliver","build"]
 
@@ -12,15 +14,31 @@ func _init(data: State) -> void:
 	battle = data
 
 func _unit_cell(u: Dictionary) -> Vector2i:
-	return battle.nav.cell_of_px(float(u.ax), float(u.ay))
+	var uid:=int(u.get("uid",-1))
+	if uid<0:return battle.nav.cell_of_px(float(u.ax),float(u.ay))
+	if _geometry_revision!=battle.nav.state.geometry_revision:
+		_position_cells.clear();_geometry_revision=battle.nav.state.geometry_revision
+	var px:=float(u.ax);var py:=float(u.ay);var previous=_position_cells.get(uid)
+	if previous!=null and previous.x==px and previous.y==py:return previous.cell
+	var cell:=battle.nav.cell_of_px(px,py)
+	_position_cells[uid]={"x":px,"y":py,"cell":cell}
+	return cell
 
 func _unit_overlaps_other(u: Dictionary) -> bool:
+	_index_ensure_current()
+	var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel()
+	if kernel!=null:return kernel.overlaps(u,battle._cell_index,battle.nav.native_query_context())
+	return _unit_overlaps_other_script(u)
+
+func _unit_overlaps_other_script(u: Dictionary) -> bool:
 	_index_ensure_current()
 	var uid:=int(u.uid);var layer:=int(battle._cell_index_layer.get(uid,-1))
 	if layer<0 or int(battle._index_unit_id.get(uid,-1))!=int(u.unit):layer=ports._nav_layer(u)
 	var table: Dictionary=battle._cell_index.get(layer,{})
-	var cells: Array=[_unit_cell(u)] if preload("res://simulation/systems/unit_footprint.gd").class_of(int(u.unit))==0 else ports._footprint_cells(u)
-	for cell in cells:
+	if preload("res://simulation/systems/unit_footprint.gd").class_of(int(u.unit))==0:
+		var single=table.get(_unit_cell(u))
+		return single!=null and (single.size()>1 or not single.has(uid))
+	for cell in ports._footprint_cells(u):
 		var bucket=table.get(cell)
 		if bucket!=null and (bucket.size()>1 or not bucket.has(uid)):return true
 	return false
@@ -63,6 +81,7 @@ func _index_eligible(u: Dictionary) -> bool:
 
 func _index_forget(u: Dictionary) -> void:
 	var uid := int(u.get("uid", -1))
+	if not _index_eligible(u):_position_cells.erase(uid)
 	if not battle._cell_index_cells.has(uid): return
 	var layer := int(battle._cell_index_layer.get(uid, 0))
 	var table: Dictionary = battle._cell_index.get(layer, {})
@@ -154,6 +173,7 @@ func _contains_unit(unit: Dictionary) -> bool:
 	return battle.units.any(func(other): return is_same(other, unit))
 
 func _rebuild_unit_index() -> void:
+	_position_cells.clear()
 	battle._index_units_ref = battle.units
 	battle._index_units_size = battle.units.size()
 	battle._cell_index.clear()
@@ -170,11 +190,16 @@ func _rebuild_unit_index() -> void:
 
 func _unit_placement_free(anchor: Vector2i, unit_id: int, layer := 0, exclude_uid := -1) -> bool:
 	_index_ensure_current()
-	for raw in preload("res://simulation/systems/unit_footprint.gd").shape(unit_id, anchor):
-		var c: Vector2i = raw
-		if c.x < 0 or c.y < 0 or c.x >= int(battle.map_data.rows) or c.y >= int(battle.map_data.cols): return false
-		if battle.nav.is_solid(c, layer): return false
-		if not (_cell_unit_in(layer,c,exclude_uid) if layer>=0 else _cell_unit(c,exclude_uid,layer)).is_empty(): return false
+	var cls:=preload("res://simulation/systems/unit_footprint.gd").class_of(unit_id)
+	if not battle.nav._anchor_fits(anchor,layer,cls):return false
+	var table: Dictionary=battle._cell_index.get(layer,{})
+	for offset in preload("res://simulation/systems/unit_footprint.gd").offsets(cls,anchor.y):
+		var cell: Vector2i=anchor+offset
+		if layer<0:
+			if not _cell_unit(cell,exclude_uid,layer).is_empty():return false
+		else:
+			var bucket=table.get(cell)
+			if bucket!=null and (bucket.size()>1 or not bucket.has(exclude_uid)):return false
 	return true
 
 func _free_unit_cell(cell: Vector2i, layer := 0, exclude_uid := -1, unit_id := -1, max_radius := 12) -> Vector2i:
@@ -187,7 +212,7 @@ func _free_unit_cell(cell: Vector2i, layer := 0, exclude_uid := -1, unit_id := -
 	return Vector2i(-1, -1)
 
 func _separate_unit(u: Dictionary) -> void:
-	if battle.stratagems.active(u):return
+	if preload("res://simulation/systems/stratagem_rules.gd").active(u):return
 	if int(u.get("site_inside_uid", -1)) >= 0: return
 	if not bool(u.get("alive", false)) or float(u.get("die_t", -1)) >= 0.0: return
 	if bool(u.get("is_building", false)) or bool(u.get("attached", false)): return
@@ -215,11 +240,24 @@ func _separate_unit(u: Dictionary) -> void:
 	ports._place_unit(u)
 
 func _connected_separation_cell(u: Dictionary, cell: Vector2i, near_only: bool) -> Vector2i:
+	var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel()
+	if kernel!=null:
+		var cursor:=0;var context:=battle.nav.native_query_context()
+		while true:
+			var candidate: Vector4i=kernel.separation_candidate(u,battle._cell_index,context,near_only,cursor)
+			if candidate.x<0:return Vector2i(-1,-1)
+			cursor=candidate.w
+			var result:=Vector2i(candidate.x,candidate.y)
+			if candidate.z<=1 or not battle.nav.find_path(Vector2(u.ax,u.ay),battle.nav.anchor_of(result.x,result.y),true,ports._nav_layer(u),int(u.owner),int(u.unit)).is_empty():return result
+	return _connected_separation_cell_script(u,cell,near_only)
+
+func _connected_separation_cell_script(u: Dictionary, cell: Vector2i, near_only: bool) -> Vector2i:
 	var layer := ports._nav_layer(u)
 	var uid := int(u.get("uid", -1))
 	var unit_id := int(u.get("unit", -1))
 	var origin := Vector2(float(u.ax), float(u.ay))
 	var max_radius := 1 if near_only else 12
+	var unit_cls := preload("res://simulation/systems/unit_footprint.gd").class_of(unit_id)
 	for r in range(1, max_radius + 1):
 		# 同一圈内按固定扫描顺序，保证结果与帧率无关。
 		for dx in range(-r, r + 1):
@@ -232,7 +270,6 @@ func _connected_separation_cell(u: Dictionary, cell: Vector2i, near_only: bool) 
 					continue
 				var p := battle.nav.anchor_of(c.x, c.y)
 				# 相邻格用视线校验（便宜，多格单位按整块扫掠）；更远的格必须真的有路。
-				var unit_cls := preload("res://simulation/systems/unit_footprint.gd").class_of(unit_id)
 				if unit_cls > 0:
 					if not battle.nav.body_segment_clear_from(origin, p, layer, unit_cls):
 						continue

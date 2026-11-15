@@ -235,7 +235,8 @@ func _layout_cmd_art() -> void:
 	if _ui.art_tip != null:
 		# 原版将命令名显示在左下状态栏；避免悬停提示盖住武将属性。
 		_ui.art_tip.position = _ui.info.position
-		_ui.art_tip.add_theme_font_size_override("font_size", maxi(9, int(12 * s)))
+		if _ui.art_tip.get_theme_font_size("font_size") != maxi(9, int(12 * s)):
+			_ui.art_tip.add_theme_font_size_override("font_size", maxi(9, int(12 * s)))
 
 func _art_visible(sub: String) -> bool:
 	if _ui.art_panel == null:

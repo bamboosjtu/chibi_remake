@@ -243,10 +243,46 @@ pwsh -NoProfile -File tools/bench_full_battle.ps1 -ReleasePack "D:/path/to/candi
 
 CI 的续跑矩阵分别检查 chibic1、chibil1、chibic10、chibic17：保留原整数与分段基线，额外以完整快照检查 0/31/120/450/900/1800 tick 六个采样点的恢复和 AI 续跑。包含 15 秒、60 秒点，覆盖资源阻挡、探索、编组、载员、计时与堵路状态。每图独立进程，功能性看门狗为 600 秒；既有每 tick 性能预算保持不变。
 
-基准协议 v2 在创建战场后立即停止自动处理，等待显示初始化，再填充部队、设置持续交战血量并推进固定的预热与测量 tick。它避免启动 30 帧期间因机器速度不同而改变初始世界。源码入口 `tools/gd/bench_full_battle.gd` 与发行入口 `--full-battle-bench` 共用 `testing/full_battle_benchmark.gd`；报告标明 `protocolVersion`、`engineBuild`、规则指纹及实际单位数。发布模板模式校验模板哈希，使用独立副本与存档目录，不切换发行版本。
+基准协议 v4 在创建战场后立即停止自动处理，等待显示初始化，再填充部队、设置持续交战血量并推进固定的预热与测量 tick。它避免启动 30 帧期间因机器速度不同而改变初始世界。源码入口 `tools/gd/bench_full_battle.gd` 与发行入口 `--full-battle-bench` 共用 `testing/full_battle_benchmark.gd`；报告标明 `protocolVersion`、`engineBuild`、规则指纹及实际单位数。发布模板模式校验模板哈希，使用独立副本与存档目录，不切换发行版本。
 
 新增诊断包括 `pathCallsPerTick`、`pathMsPerTick`、搜索/平滑分项、`updateVisualMsPerFrame` 和 `fogUpdateMsPerFrame`。后两者是 CPU 提交时间，实际帧时间仍包含 GPU 合成。渲染模式将视野的两张 R8 位图上传后在小型视口中合成 RGBA 雾层，大地图与小地图继续共享同一张三档透明度纹理；无渲染测试保留 CPU 参考路径。`test_restored_view` 另在实际窗口中读取合成纹理，验证暂停读档后的透明度。
 
 `test_realtime_queries` 覆盖网格边界归属、密集参考射线、失败重寻路冷却及恢复、五次追帧一次表现同步、旧对象排除、重试状态存读及明确批准的 v8 规则迁移。`test_visibility_rules` 以完整重建对照 40 轮随机移动、重叠、载员及视野半径变化，核对可见计数与探索记忆。
 
 实时性能整改的实测与剩余阻断见 [实时性能整改记录](../research/realtime-performance-20261114.md)。
+
+
+### 压力场景与后端对照
+
+```powershell
+pwsh -NoProfile -File tools/bench_full_battle.ps1 -ReleasePack <候选目录>/ChibiRTS.pck
+pwsh -NoProfile -File tools/bench_full_battle.ps1 -ReleasePack <候选目录>/ChibiRTS.pck -Stress
+pwsh -NoProfile -File tools/bench_full_battle.ps1 -ReleasePack <候选目录>/ChibiRTS.pck -CapacityStress
+# 源码或带分段计时的运行仅作诊断，不计为发行验收：
+pwsh -NoProfile -File tools/bench_full_battle.ps1 -DeveloperSource -Stress -ProfileUnits
+```
+
+原有 `-Stress` 继续运行 660/240，不改变旧工作负载及预算。`-CapacityStress` 按真实关卡参战方补足每方 200 实体槽；建筑、工人及武将本体计入同一上限。chibic17 的三方满员为 460 个机动单位、240 个初始交战单位；报告逐方记录实体、建筑与武将数。该用例和添加第四方的历史 660 用例分别报告，互不替代。
+
+协议 v4 记录计算后端、分段计时开关、人口分布、导航预热以及引擎/PCK 哈希。已发布目录只有根 DLL 时照常运行，不要求额外 addons 目录。验收仍要求真实模拟持续推进、最快档 tick P95 ≤30 ms、tick 吞吐 ≥95%、命令队列延迟 P95 ≤100 ms，以及标准/压力 FPS ≥60/30；不丢欠账、不降低频率、不更新确定性基线来消除差异。
+
+`test_pressure_contracts` 校验坐标与接触缓存的精度、失效、剖析一致性及两种人口工作负载。`test_native_math`、`test_native_geometry` 和 `test_native_world` 分别对照 2,000 个状态夹具、16,000 次攻击更新、160 轮完整视野更新、800 个接触/占格夹具、100 个有序分离选择，以及 660 单位的六个完整世界采样点。无原生后端时保留脚本执行；Windows 的原生数学测试必须实际加载 DLL。
+
+新候选验证强制连续三轮正式 PCK 标准场景全部通过，并把结果写入 `verification.json` 的 `standardPerformance`。`test_benchmark_evidence.ps1` 验证缺轮、暂停、调试构建、慢时钟、低分辨率、剖析运行及缺失/非有限指标均被拒绝。这个标准门禁不单独认证压力实时性，压力结果仍需独立查看。当前结果见[压力实时性整改记录](../research/pressure-performance-20261115.md)。
+
+
+### GPU 绘制对照
+
+`test_gpu_minimap.gd` 需要实际渲染窗口，不能使用 `--headless`。它冻结 660 单位场景，以相同的单位次序分别运行 CPU 标记绘制和 GPU 实例绘制，比较完整小地图图像、相机框和模拟快照；像素差不能超过一个颜色量化级。
+
+```powershell
+Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/test_gpu_minimap.gd -- --no-intro --save-test-id=gpu-minimap
+# 同一 PCK 的对照运行，均保留原性能门槛：
+pwsh -NoProfile -File tools/bench_full_battle.ps1 -ReleasePack <候选目录>/ChibiRTS.pck -Stress -CpuMinimap
+pwsh -NoProfile -File tools/bench_full_battle.ps1 -ReleasePack <候选目录>/ChibiRTS.pck -Stress -RenderingMethod mobile
+```
+
+`-CpuMinimap` 与渲染后端覆盖用于 A/B，报告 `acceptanceRun=false`；正式验收使用项目默认配置。报告注明实际渲染方法、驱动、小地图后端、批量单位执行和实际窗口绘制调用数。重复轮次可指定同一 `-RunnerDirectory`，每次重新验证 EXE、PCK 与全部原生依赖哈希，避免反复复制大型 PCK；不复用不完整或内容变化的目录。APPDATA 与保存槽仍然逐轮隔离。
+
+
+协议 v4 将 FPS 测量起点固定在预热 60 + 逻辑采样 300 = 360 tick。随后 30 个渲染预热帧保持自动模拟关闭，并比较完整快照摘要；确认状态未变化后，才开启正常逐帧处理并测量 FPS、真实 tick 吞吐和命令延迟。手动逻辑采样的渲染帧同步显示模型，防止新增单位长期保留初始化可见性。报告包含 `frameInitialTick`、`frameInitialStateChecksum`、`renderWarmupPreservedSimulation`；候选门禁核对固定起点。历史 v2/v3 的 FPS 数字保留，但不与 v4 结果当作同一初始状态直接比较。

@@ -1,8 +1,8 @@
 extends RefCounted
 ## research/units + research/magics: team targeting, flags and queued idle actions.
 const STATUS_FIELDS := {1:"inspired_t",2:"haste_t",3:"slow_t",4:"farsight_t",5:"confused_t",6:"ambush_t",7:"rolling_t"}
-const CONFUSION := 0x1B
-const ROLLING := 0x1C
+const CONFUSION = preload("res://simulation/definitions/status_fields.gd").CONFUSION
+const ROLLING = preload("res://simulation/definitions/status_fields.gd").ROLLING
 const ACTIVE_TASKS := [CONFUSION,ROLLING]
 static var tuning:Dictionary={}
 const Access = preload("res://simulation/ports/stratagem_rules_access.gd")
@@ -48,6 +48,11 @@ static func task_alive(unit:Dictionary, task:int) -> bool:
 	return int(unit.get("confused_t" if task==CONFUSION else "rolling_t",0))>0
 
 static func begin_update(unit:Dictionary) -> void:
+	var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel()
+	if kernel!=null:kernel.begin_status(unit);return
+	begin_update_script(unit)
+
+static func begin_update_script(unit:Dictionary) -> void:
 	var pending=unit.get("effect_tasks")
 	if int(unit.get("effect_task",0))==0 and (pending==null or pending.is_empty()):return
 	if active(unit) and not task_alive(unit,int(unit.effect_task)):unit.effect_task=0

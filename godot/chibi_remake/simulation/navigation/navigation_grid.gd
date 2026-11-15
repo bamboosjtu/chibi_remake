@@ -12,6 +12,7 @@ func _init(data: GridState) -> void:
 	_grid_state = data
 
 func setup(md: Dictionary) -> void:
+	_grid_state.geometry_revision+=1
 	_grid_state.version += 1                   # 整图重建（开局/读档 rebuild_buildings）也是一次阻挡变更
 	_grid_state.map_data = md
 	_grid_state.tile_w = float(_grid_state.map_data.get("tileW", 44))

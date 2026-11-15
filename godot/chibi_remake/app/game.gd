@@ -373,3 +373,6 @@ func advance_campaign(map_id: String) -> bool:
 	pending_load_slot = 0
 	get_tree().paused = false
 	return get_tree().change_scene_to_file("res://main.tscn") == OK
+
+func _exit_tree() -> void:
+	preload("res://simulation/native/math_kernel.gd").shutdown()

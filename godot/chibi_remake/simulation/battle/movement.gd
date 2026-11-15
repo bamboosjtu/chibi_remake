@@ -68,7 +68,8 @@ func _follow(u: Dictionary, delta: float) -> bool:
 	var layer := ports._nav_layer(u)
 	var unit_cls := preload("res://simulation/systems/unit_footprint.gd").class_of(int(u.get("unit", -1)))
 	var position:=Vector2(float(u.ax),float(u.ay))
-	var probe:=position.move_toward(cur_wp,Config.SPEED*ports._spd_mult(u)*delta)
+	var travel: float=Config.SPEED*ports._spd_mult(u)*delta
+	var probe:=position.move_toward(cur_wp,travel)
 	var segment_ok := battle.nav.segment_clear_from(position, probe, layer) if unit_cls <= 0 \
 			else battle.nav.body_segment_clear_from(position, probe, layer, unit_cls)
 	if not segment_ok:
@@ -85,7 +86,7 @@ func _follow(u: Dictionary, delta: float) -> bool:
 			if u.state == "move" and int(u["blocked_n"]) <= 2:
 				u["repath_to"] = dest    # 停下并请求重寻路；连续 3 次被堵（见下）才弃单
 			return false
-	var remaining: float=Config.SPEED*ports._spd_mult(u)*delta
+	var remaining: float=travel
 	# Spend the complete tick distance, including across short/duplicate waypoints.
 	# The old 6px early arrival discarded distance and paused at every grid corner.
 	while not u.path.is_empty() and remaining>0.00001:

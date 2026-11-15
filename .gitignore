@@ -1392,4 +1392,5 @@ Desktop.ini
 !/godot/chibi_remake/media/videos/LIU9.AVI.uid
 !/godot/chibi_remake/media/videos/START.AVI
 !/godot/chibi_remake/media/videos/START.AVI.uid
+!/godot/chibi_remake/simulation/native/bin/ChibiSimulationMath.dll
 # END RUNTIME ASSETS

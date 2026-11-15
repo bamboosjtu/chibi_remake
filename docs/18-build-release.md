@@ -22,7 +22,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\build_release.ps1 -S
 | `-SkipImport` | 仅为旧调用保留；新暂存工程仍会导入资源 |
 | `-SkipVerify` | 跳过候选冒烟；清单记 `verification=skipped`，只允许与 `-NoPublish` 一起使用；未验证候选不可发布 |
 
-`build_release.ps1` 转发到 `build_game.ps1`。导出成功后构建会**启动候选包**运行全部地图加载、`release_tests.json` 的四项冒烟及两档确定性基线（`verify_candidate.ps1`），通过后才写清单并进入发布；失败则整次构建失败。这一层只证明"包能载入关卡并跑通核心交互"，画面与玩法验收仍由人工完成。
+`build_release.ps1` 转发到 `build_game.ps1`。导出成功后构建会**启动候选包**运行全部地图加载、`release_tests.json` 的发布回归、两档确定性基线及连续三轮正式 PCK 标准性能（`verify_candidate.ps1`），通过后才写清单并进入发布；失败则整次构建失败。这一层只证明"包能载入关卡并跑通核心交互"，画面与玩法验收仍由人工完成。
 
 ## 3. 构建职责
 
@@ -31,7 +31,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\build_release.ps1 -S
 3. `stage_release.mjs` 创建独立暂存工程与 `release_inputs.json`。
 4. `build_terrain.mjs` 验证 `source/terrain` 的版本化源输入，并按源内容、地图、烘焙器及编码参数重建或命中 `_work/terrain`；`dedupe_terrain.mjs` 合并同内容分块并重写引用。
 5. 导入资源，按 `Windows HD Art` 导出独立 EXE/PCK、配套原生库和显式绿色存储配置。
-6. 先用实际 EXE 加载全部地图，再用启用断言的临时引擎挂载同一 PCK，运行四项冒烟、确定性基线，以及真实 EXE 的绿色/系统模式保存与重启读取，写出绑定 EXE/PCK/DLL/存储配置哈希的 `verification.json`。
+6. 先用实际 EXE 加载全部地图，再用启用断言的临时引擎挂载同一 PCK，运行发布回归、确定性基线、连续三轮标准性能，以及真实 EXE 的绿色/系统模式保存与重启读取，写出绑定 EXE/PCK/DLL/存储配置哈希的 `verification.json`。
 7. `write_build_manifest.ps1` 补齐原生库声明文件并生成 `build-manifest.json`。
 8. 按参数保留候选，或调用 `publish_release.ps1` 安装正式版本。
 
@@ -114,3 +114,12 @@ gh release upload v0.1.1 dist/package/* --clobber
 `contracts` 运行 `compare_terrain_rebuild.mjs --declarations` 检查历史清单完整性和源输入身份，不宣称已生成地形。正式构建在烘焙后运行不带该参数的比较，逐个验证 35,664 个分块及几何；新克隆不再依赖本机历史 `_work` 目录。修改地图源或编码参数需要单独评审其预期变化。
 
 `tools/ci_windows.ps1` 固定执行打包目录安全、发布/回滚/锁及候选锁恢复测试。含非 ASCII 的 PowerShell 脚本使用带 BOM 的 UTF-8，CI 同时检查语法和 Windows PowerShell 5.1 编码兼容性。候选验证使用操作系统独占文件句柄，进程异常结束后自动释放；临时调试引擎采用唯一文件名，旧临时文件不会被误认成正在运行的验证，也不纳入发行哈希清单。
+
+
+## 8. 原生模拟计算库
+
+普通构建使用 LFS 中已校验的 `simulation/native/bin/ChibiSimulationMath.dll`，不要求玩家或日常构建机安装 C++ 编译器。修改原生算法时，先用 MSVC 2019 x64 与 CMake 运行 `python tools/native/sim_math/build.py`；依赖归档及 SHA-256 固定在 `dependency-lock.json`，生成目录位于 `_work/sim-math`。随后重新生成规则与资源清单，运行后端对照及未修改的确定性基线。详细步骤见[原生后端构建说明](../tools/native/sim_math/README.md)。
+
+暂存清单包含该库及 Godot C++ MIT 许可证。Godot 将库复制到发行 EXE/PCK 旁，原生依赖检查同时读取媒体和模拟库声明，缺库或额外库均拒绝；许可证复制到 `licenses/simulation-math/`，跟随产物哈希清单。源码身份与 DLL 中嵌入的指纹不一致时记录错误并保留脚本回退，不能把回退运行报告为原生性能结果。
+
+候选性能门禁默认使用经过哈希校验的正式导出模板，支持发行目录的根 DLL 布局。新候选的机器验收必须有连续三轮通过的标准性能证据；任一轮失败即停止生成通过证据。它不降低既有功能验收要求，也不更改 `dirty=false` 的发布要求。压力实时性结果独立记录。

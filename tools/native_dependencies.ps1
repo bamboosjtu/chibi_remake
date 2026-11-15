@@ -1,7 +1,9 @@
 function Get-RequiredNativeNames([string]$SourceRoot) {
-    $declaration=Join-Path $SourceRoot 'godot/chibi_remake/addons/ffmpegplayer/FFmpegPlayer.gdextension'
-    if (!(Test-Path -LiteralPath $declaration)) { throw ('Missing native dependency declaration: '+$declaration) }
-    $names=@([regex]::Matches([IO.File]::ReadAllText($declaration),'res://addons/ffmpegplayer/win64/([^"\s/]+\.dll)') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+    $names=@(foreach ($relative in @('addons/ffmpegplayer/FFmpegPlayer.gdextension','simulation/native/sim_math.gdextension')) {
+        $declaration=Join-Path $SourceRoot ('godot/chibi_remake/'+$relative)
+        if (!(Test-Path -LiteralPath $declaration)) { throw ('Missing native dependency declaration: '+$declaration) }
+        [regex]::Matches([IO.File]::ReadAllText($declaration),'res://[^"\s]+/([^"\s/]+\.dll)') | ForEach-Object { $_.Groups[1].Value }
+    }) | Sort-Object -Unique
     if ($names.Count -eq 0) { throw 'Native dependency declaration is empty' }
     return $names
 }

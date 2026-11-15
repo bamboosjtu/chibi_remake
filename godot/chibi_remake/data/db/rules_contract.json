@@ -8,10 +8,16 @@
   ],
   "migrations": {
     "1c3c47acacf7a896b58cb171597ba81f8ee434fac389f9873122acd9a3252676": {
-      "target": "2d3e26d8866d9ef8f321789d7122fcf90b48e3e25a8bbfa3fed55a5f28a6a7fc",
+      "target": "f9634e5c4bd01f214f81f529305570acc6e3550dec159515d93bae178d123d1f",
       "policy": "realtime-navigation-v1",
       "sourceCommit": "d483478",
       "description": "Keep saved state and timers; default missing route_failures to zero; adopt grid traversal and bounded attack repathing."
+    },
+    "2d3e26d8866d9ef8f321789d7122fcf90b48e3e25a8bbfa3fed55a5f28a6a7fc": {
+      "target": "f9634e5c4bd01f214f81f529305570acc6e3550dec159515d93bae178d123d1f",
+      "policy": "realtime-navigation-v1",
+      "sourceCommit": "05d3a2e",
+      "description": "Equivalent ordered math, geometry, visibility and status execution; source/native differential validation; derived caches rebuild on world/navigation changes."
     }
   }
 }

@@ -1,8 +1,33 @@
 extends RefCounted
 ## Stable navigation API backed by grid and path-query components.
-var state = preload("res://simulation/navigation/navigation_state.gd").new()
-var grid = preload("res://simulation/navigation/navigation_grid.gd").new(state)
-var paths = preload("res://simulation/navigation/path_queries.gd").new(state)
+var state := preload("res://simulation/navigation/navigation_state.gd").new()
+var grid := preload("res://simulation/navigation/navigation_grid.gd").new(state)
+var paths := preload("res://simulation/navigation/path_queries.gd").new(state)
+var tile_w: float:
+	get: return state.tile_w
+	set(value):
+		state.tile_w=value;state.geometry_revision+=1;state.version+=1
+var tile_hw: float:
+	get: return state.tile_hw
+	set(value):
+		state.tile_hw=value;state.geometry_revision+=1;state.version+=1
+var tile_hh: float:
+	get: return state.tile_hh
+	set(value):
+		state.tile_hh=value;state.geometry_revision+=1;state.version+=1
+var has_water: bool:
+	get: return state.has_water
+	set(value): state.has_water=value
+var version: int:
+	get: return state.version
+	set(value): state.version=value
+var map_data: Dictionary:
+	get: return state.map_data
+	set(value):
+		state.map_data=value;state.geometry_revision+=1;state.version+=1
+
+var _native_context: Dictionary={}
+var _native_context_version := -1
 var _fields: Dictionary = {}
 var _api_missing: Array = []
 
@@ -113,3 +138,29 @@ func contact_clear(a: Vector2,b: Vector2,ignore: Dictionary,layer: int) -> bool:
 	return paths.contact_clear(a,b,ignore,layer)
 func performance_counters() -> Dictionary:
 	return paths.metrics.duplicate()
+
+## Materialize possible mobile footprints during world preparation, rather than
+## stopping a live battle when the first cavalry/ship order needs a new graph.
+func warm_runtime_shapes() -> void:
+	var prepared: Dictionary={}
+	for key in state.map_data.get("units",{}):
+		var uid:=int(key)
+		if uid<27:continue
+		var cls:=preload("res://simulation/systems/unit_footprint.gd").class_of(uid)
+		if cls==0:continue
+		var water: bool=uid in preload("res://simulation/battle_config.gd").NAVAL_UNITS
+		if water and not state.has_water:continue
+		var layer:=1 if water else 0;var shape:=Vector2i(layer,cls)
+		if prepared.has(shape):continue
+		paths._grid_for(layer,cls);paths._shape_apply_dirty(layer,cls);prepared[shape]=true
+
+func native_query_context() -> Dictionary:
+	if _native_context_version!=state.version:
+		_native_context={"w":state.tile_w,"rows":int(state.map_data.rows),"cols":int(state.map_data.cols),"terrainW":float(state.map_data.terrainW),"terrainH":float(state.map_data.terrainH),"version":state.version,"land":state.astar,"water":state.water_astar,"hasWater":state.has_water,"occupancy":state.occupancy}
+		var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel()
+		if kernel!=null:_native_context["nativeQuery"]=kernel.make_query(_native_context)
+		_native_context.make_read_only();_native_context_version=state.version
+	return _native_context
+
+func release_runtime_queries() -> void:
+	_native_context={};_native_context_version=-1

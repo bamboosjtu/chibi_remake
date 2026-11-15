@@ -443,6 +443,46 @@
         "REALTIME VISUALS PASS"
       ],
       "timeout": 120
+    },
+    {
+      "script": "test_pressure_contracts",
+      "markers": [
+        "PRESSURE CONTRACTS PASS"
+      ],
+      "args": [
+        "--noview"
+      ],
+      "timeout": 180
+    },
+    {
+      "script": "test_native_math",
+      "markers": [
+        "NATIVE MATH"
+      ],
+      "args": [
+        "--noview"
+      ],
+      "timeout": 240
+    },
+    {
+      "script": "test_native_geometry",
+      "markers": [
+        "NATIVE GEOMETRY"
+      ],
+      "args": [
+        "--noview"
+      ],
+      "timeout": 240
+    },
+    {
+      "script": "test_native_world",
+      "markers": [
+        "NATIVE WORLD"
+      ],
+      "args": [
+        "--noview"
+      ],
+      "timeout": 240
     }
   ]
 }

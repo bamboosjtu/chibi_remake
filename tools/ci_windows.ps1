@@ -27,7 +27,7 @@ node tools/verify_engine.mjs --engine $godot
 if ($LASTEXITCODE -ne 0) { throw 'Engine integrity check failed' }
 if (!(Test-Path $godot)) { throw '缺少 Godot 引擎：Godot_v4.7.2-stable_win64_console.exe' }
 
-foreach ($test in @('test_package_safety.ps1','test_package_join.ps1','test_publish.ps1','test_candidate_lock.ps1')) {
+foreach ($test in @('test_package_safety.ps1','test_package_join.ps1','test_publish.ps1','test_candidate_lock.ps1','test_benchmark_evidence.ps1')) {
     & (Join-Path $PSScriptRoot $test)
     if (!$?) { throw ('Windows tool regression failed: '+$test) }
 }

@@ -199,7 +199,7 @@ func _apply_cmd_page() -> void:
 		btn.icon = sp.get("icon", null)
 		btn.expand_icon = true
 		_ui.command_catalog.decorate_sale(btn, bool(sp.get("sale", false)))
-		btn.add_theme_constant_override("icon_max_width", int(28 * _ui.ui_scale))
+		var icon_width := int(28 * _ui.ui_scale)
 		var production := bool(sp.get("production", false))
 		var progress_badge := btn.get_node_or_null("ProductionProgress") as Label
 		if progress_badge != null: progress_badge.hide()
@@ -209,7 +209,7 @@ func _apply_cmd_page() -> void:
 			ports._place_left(btn, slot.position.x, slot.position.y, slot.size.x, slot.size.y)
 			btn.text = ""
 			btn.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			btn.add_theme_constant_override("icon_max_width", int(slot.size.x - 4 * _ui.ui_scale))
+			icon_width = int(slot.size.x - 4 * _ui.ui_scale)
 			if icon_command and str(sp.get("badge", "")) != "":
 				if progress_badge == null:
 					progress_badge = ports._mk_label(btn, 9, _ui.c_gold, HORIZONTAL_ALIGNMENT_CENTER)
@@ -217,17 +217,20 @@ func _apply_cmd_page() -> void:
 				progress_badge.text = str(sp.badge)
 				progress_badge.position = Vector2(0, slot.size.y - 12 * _ui.ui_scale)
 				progress_badge.size = Vector2(slot.size.x, 12 * _ui.ui_scale)
-				progress_badge.add_theme_font_size_override("font_size", maxi(8, int(9 * _ui.ui_scale)))
+				if progress_badge.get_theme_font_size("font_size") != maxi(8, int(9 * _ui.ui_scale)):
+					progress_badge.add_theme_font_size_override("font_size", maxi(8, int(9 * _ui.ui_scale)))
 				progress_badge.show()
 			if production:
-				btn.add_theme_color_override("icon_disabled_color", Color.WHITE)
+				if btn.get_theme_color("icon_disabled_color") != Color.WHITE:
+					btn.add_theme_color_override("icon_disabled_color", Color.WHITE)
 				if progress_badge == null:
 					progress_badge = ports._mk_label(btn, 9, _ui.c_gold, HORIZONTAL_ALIGNMENT_CENTER)
 					progress_badge.name = "ProductionProgress"
 				progress_badge.text = str(sp.get("progress_label", ""))
 				progress_badge.position = Vector2(0, slot.size.y - 12 * _ui.ui_scale)
 				progress_badge.size = Vector2(slot.size.x, 12 * _ui.ui_scale)
-				progress_badge.add_theme_font_size_override("font_size", maxi(8, int(9 * _ui.ui_scale)))
+				if progress_badge.get_theme_font_size("font_size") != maxi(8, int(9 * _ui.ui_scale)):
+					progress_badge.add_theme_font_size_override("font_size", maxi(8, int(9 * _ui.ui_scale)))
 				progress_badge.show()
 		else:
 			var vp := surface.get_viewport_rect().size
@@ -235,6 +238,8 @@ func _apply_cmd_page() -> void:
 			var x := vp.x - 138 * s
 			ports._place_left(btn, x + (i % 2) * 67 * s, vp.y - 153.5 * s + (i / 2) * 28 * s, 65 * s, 26 * s)
 			btn.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		if btn.get_theme_constant("icon_max_width") != icon_width:
+			btn.add_theme_constant_override("icon_max_width", icon_width)
 		btn.disabled = not bool(sp.enabled)
 		btn.set_meta("build_hint", str(sp.get("hover", sp.tip if _ui.build_menu or icon_command else "")))
 		btn.tooltip_text = "" if _ui.build_menu or icon_command else str(sp.tip)
@@ -281,7 +286,8 @@ func _refresh_hotkeys() -> void:
 		var work_badge: Label = e.work_badge
 		work_badge.visible = not working_site.is_empty()
 		work_badge.position = Vector2(14, 12) * _ui.ui_scale
-		work_badge.add_theme_font_size_override("font_size", maxi(8, int(7 * _ui.ui_scale)))
+		if work_badge.get_theme_font_size("font_size") != maxi(8, int(7 * _ui.ui_scale)):
+			work_badge.add_theme_font_size_override("font_size", maxi(8, int(7 * _ui.ui_scale)))
 		# 选中建筑且该格有生产项时，1/2 优先生产；无建筑时才让编队占位。
 		if gsz > 0 and (not working_site.is_empty() or b.is_empty() or i >= tts.size()):
 			act = ports._act_group.bind(i + 1)

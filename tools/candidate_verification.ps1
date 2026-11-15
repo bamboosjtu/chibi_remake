@@ -1,3 +1,15 @@
+﻿function Assert-StandardPerformanceEvidence($evidence) {
+    if ($evidence.performanceContract -ne 'release-standard-3-runs-v1' -or @($evidence.standardPerformance).Count -ne 3) { throw 'Incomplete standard performance evidence' }
+    foreach ($run in $evidence.standardPerformance) {
+        foreach ($metric in @('fps','logicP95Ms','realtimeLogicBudgetMs','ticksPerSecond','targetTicksPerSecond','commandLatencyP95Ms')) {
+            if ($run.PSObject.Properties.Name -notcontains $metric -or $null -eq $run.$metric -or [double]::IsNaN([double]$run.$metric) -or [double]::IsInfinity([double]$run.$metric)) { throw ('Missing or nonfinite performance metric: '+$metric) }
+        }
+        if ($run.protocolVersion -ne 4 -or $run.renderWarmupPreservedSimulation -ne $true -or $run.frameInitialTick -ne 360 -or $run.profilingEnabled -ne $false -or $run.pausedAtEnd -ne $false -or $run.gameEnd -ne 0 -or $run.simulationTicksAdvanced -le 0 -or $run.unitsMeasured -lt 200 -or $run.engaged -lt 60 -or $run.viewport.Count -ne 2 -or $run.viewport[0] -ne 1920 -or $run.viewport[1] -ne 1080 -or $run.realtimeLogicBudgetMs -gt 30.000001 -or $run.targetTicksPerSecond -lt 33.3333) { throw 'Invalid standard benchmark workload' }
+        if ($run.engineBuild -ne 'release' -or $run.qualityPassed -ne $true -or $run.acceptanceRun -ne $true -or $run.validWorkload -ne $true -or $run.unitsTarget -ne 200 -or $run.engagedTarget -ne 60 -or $run.fps -lt 60 -or $run.logicP95Ms -gt $run.realtimeLogicBudgetMs -or $run.ticksPerSecond -lt 0.95*$run.targetTicksPerSecond -or $run.commandLatencyP95Ms -gt 100) { throw 'Failed standard performance evidence' }
+    }
+
+}
+
 # Shared by verification, publication and final release packaging.
 function Read-CandidateResults([string]$Directory) {
     # Windows PowerShell 5.1 emits a JSON array as one pipeline object.
@@ -29,6 +41,7 @@ function Assert-CandidateVerification([string]$Directory, $Build) {
     foreach ($result in $evidence.results) {
         if ($result.ok -isnot [bool] -or $result.ok -ne $true -or ($result.code -isnot [int] -and $result.code -isnot [long]) -or $result.code -ne 0 -or $result.timedOut -isnot [bool] -or $result.timedOut -ne $false -or @($result.missing).Count -gt 0) { throw ('Candidate verification failed: '+$result.name) }
     }
+    if ($evidence.PSObject.Properties.Name -contains 'performanceContract') { Assert-StandardPerformanceEvidence $evidence }
     $files=@(Get-ChildItem -LiteralPath $Directory -File -Recurse | Where-Object { ($_.Extension -in @('.exe','.pck','.dll') -or $_.Name -eq 'portable.txt') -and $_.Name -notlike '_validation-engine*.exe' })
     if ($files.Count -ne @($evidence.artifacts).Count) { throw 'Candidate verification artifact set changed' }
     foreach ($file in $files) {

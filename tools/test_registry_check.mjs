@@ -3,6 +3,8 @@ const parent=path.resolve('_work/registry-fixtures');fs.mkdirSync(parent,{recurs
 function copy(dir,rel=''){for(const e of fs.readdirSync(dir,{withFileTypes:true})){if(e.name.startsWith('.')||['art','assets','media','data','addons'].includes(e.name))continue;const r=path.join(rel,e.name);if(e.isDirectory())copy(path.join(dir,e.name),r);else if(e.name.endsWith('.gd')){fs.mkdirSync(path.dirname(path.join(fixture,r)),{recursive:true});fs.writeFileSync(path.join(fixture,r),fs.readFileSync(path.join(dir,e.name),'utf8').replaceAll('\r\n','\n'));}}}
 const run=()=>spawnSync(process.execPath,['tools/registry_check.mjs','--root',fixture],{encoding:'utf8'});
 try{copy('godot/chibi_remake');assert.equal(run().status,0);
+ const navFile=path.join(fixture,'simulation/navigation/nav.gd'),navSource=fs.readFileSync(navFile,'utf8');
+ fs.writeFileSync(navFile,navSource.replace('var grid :=','var grid =').replace('var paths :=','var paths ='));assert.equal(run().status,0,'typed and untyped navigation factories');fs.writeFileSync(navFile,navSource);
  const port=path.join(fixture,'simulation/ports/technology_dependencies.gd'),source=fs.readFileSync(port,'utf8');
  for(const guard of ['if provider == null:\n\t\treturn','if provider == null: # safe teardown\n\n\t\t# no dereference\n\t\treturn','if  provider==null:\n        return']){
   fs.writeFileSync(port,source.replace('if provider == null: return',guard));assert.equal(run().status,0,guard);

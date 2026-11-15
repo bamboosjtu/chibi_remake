@@ -36,12 +36,22 @@ try {
     if ($LASTEXITCODE -ne 0) { throw "Native EXE save/restart acceptance failed: $output" }
     & node (Join-Path $PSScriptRoot 'test_native_isolation.mjs') --exe $Executable --output (Join-Path $output 'native/isolation')
     if ($LASTEXITCODE -ne 0) { throw "Exported test-entry isolation failed: $output" }
+    $standardPerformance=@()
+    $hostShell=(Get-Process -Id $PID).Path
+    foreach ($round in 1..3) {
+        $performancePath=Join-Path $output ('performance/standard-'+$round+'.json')
+        & $hostShell -NoProfile -File (Join-Path $PSScriptRoot 'bench_full_battle.ps1') -ReleasePack $pack -RunnerDirectory (Join-Path $output 'performance/runner') -Output $performancePath
+        if ($LASTEXITCODE -ne 0) { throw ('Candidate release performance failed in round '+$round+': '+$performancePath) }
+        $standardPerformance+=Get-Content -Raw -LiteralPath $performancePath | ConvertFrom-Json
+    }
     . (Join-Path $PSScriptRoot 'candidate_verification.ps1')
     $results=@(Read-CandidateResults $output)
     $evidence=[ordered]@{
         schemaVersion=1; verifiedAt=(Get-Date).ToUniversalTime().ToString('o')
         suiteSha256=(Get-FileHash -LiteralPath (Join-Path $PSScriptRoot 'inputs/release_tests.json')).Hash
         baselineSha256=(Get-FileHash -LiteralPath (Join-Path $PSScriptRoot 'inputs/baselines.json')).Hash
+        performanceContract="release-standard-3-runs-v1"; standardPerformance=@($standardPerformance)
+        stressRealtime="not-certified-by-standard-gate"
         artifacts=$artifacts
         results=@($results | Select-Object name,ok,code,timedOut,missing)
     }

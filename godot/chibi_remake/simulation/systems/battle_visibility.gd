@@ -62,6 +62,14 @@ func _replace(previous: PackedInt32Array, next: PackedInt32Array) -> bool:
 	return _reveal(added,1) or changed
 
 func update(units: Array, player: int) -> void:
+	var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel()
+	if kernel==null:
+		update_script(units,player);return
+	var result: Array=kernel.update_visibility(units,player,width,height,CELL,current,explored,reveals,_sources,full_reveal,float(preload("res://simulation/systems/stratagem_rules.gd").config().farsightCells))
+	current=result[1];explored=result[2];reveals=result[3]
+	if result[0]:revision+=1
+
+func update_script(units: Array, player: int) -> void:
 	var active := {}
 	var changed := false
 	for i in range(units.size()):

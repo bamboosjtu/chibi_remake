@@ -115,6 +115,7 @@ func _ready() -> void:
 	battle.rules = preload("res://simulation/systems/scenario_rules.gd").new(node)
 	battle.terrain_base = battle.map_data.get("terrainWalkable", battle.map_data.walkable).duplicate()
 	battle.ai = preload("res://simulation/systems/ai.gd").new(node)
+	if scene.view!=null and DisplayServer.get_name()!="headless":battle.nav.warm_runtime_shapes()
 	scene.saver = SaveSvc.new(node)  # ARCH-006：存档编排在 save_service.gd（与 ai.gd 同样的鸭子类型宿主）
 	var had_pending_load := bool(Game.pending_load)
 	if Game.pending_load:

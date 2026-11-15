@@ -49,14 +49,22 @@ func _init() -> void:
 	_modules["world_orders"] = preload("res://simulation/battle/world_orders.gd").new(state)
 
 func connect_services(label: String) -> Dictionary:
-	return preload("res://composition_contract.gd").wire(_modules, label, _access)
+	var report: Dictionary=preload("res://composition_contract.gd").wire(_modules, label, _access)
+	if report.missing.is_empty():_modules.battle_simulation.connect_native()
+	return report
 
 func simulation_access(domain: String) -> RefCounted:
 	return _access[domain]
 
 func dispose() -> void:
+	if _modules.has("battle_simulation"):_modules.battle_simulation.disconnect_native()
+	state.nav.release_runtime_queries()
 	state.effects.invalidate()
 	if state.player_commands != null: state.player_commands.clear()
+	# Dictionary targets can form cycles even after the world owner is released.
+	for unit in state.units:
+		for field in ["target","gather_obj","build_target","repair_target","board_target"]:
+			if unit.get(field) is Dictionary:unit[field]=null
 	for service in _modules.values(): service.ports.disconnect_services()
 	for access in _access.values(): access.disconnect_services()
 	_modules.clear()

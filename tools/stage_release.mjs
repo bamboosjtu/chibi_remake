@@ -32,6 +32,7 @@ function walkScripts(dir, prefix) {
   }
 }
 walkScripts(source, '');
+add('simulation/native/bin/ChibiSimulationMath.dll');add('simulation/native/LICENSE-godot-cpp.txt');
 const full=JSON.parse(fs.readFileSync(source+'/art/full/manifest.json'));
 add('art/full/manifest.json');add('art/full/team_palette.json');add('art/full/team_color.gdshader');add('art/full/gate_apertures.gdshader');add('art/full/gate_wood.gdshader');
 for(const entry of Object.values(full.runtimeAssets||{}))if(entry.texture)add(entry.texture);

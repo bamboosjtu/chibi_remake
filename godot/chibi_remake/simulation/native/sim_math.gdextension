@@ -1,0 +1,5 @@
+[configuration]
+entry_symbol = "sim_math_init"
+compatibility_minimum = "4.1"
+[libraries]
+windows.x86_64 = "res://simulation/native/bin/ChibiSimulationMath.dll"
