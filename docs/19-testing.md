@@ -249,4 +249,4 @@ CI 的续跑矩阵分别检查 chibic1、chibil1、chibic10、chibic17：保留�
 
 `test_realtime_queries` 覆盖网格边界归属、密集参考射线、失败重寻路冷却及恢复、五次追帧一次表现同步、旧对象排除、重试状态存读及明确批准的 v8 规则迁移。`test_visibility_rules` 以完整重建对照 40 轮随机移动、重叠、载员及视野半径变化，核对可见计数与探索记忆。
 
-2026-11-14—15 的实测和剩余阻断见 [实时性能整改记录](../research/realtime-performance-20261114.md)。
+实时性能整改的实测与剩余阻断见 [实时性能整改记录](../research/realtime-performance-20261114.md)。

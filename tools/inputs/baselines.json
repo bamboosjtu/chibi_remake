@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "engine": "4.7.2.stable",
-  "updatedAt": "2026-10-28",
-  "note": "2026-10-28：资源采空后恢复通行和闲置部队局部接战改变60秒战场状态；默认与144fps重复运行均为6824854474555246543。15秒摘要未变。",
+  "updatedAt": "2026-11-15",
+  "note": "2026-11-15：实时性修复调整 AI tick 相位、寻路采样与近战/可见性/城门更新顺序，15 秒 ai、60 秒 ai/combat/world 摘要随确定性行为变化；economy/scenario 未变，世界摘要同步更新。",
   "selftest": {
     "maps": [
       "chibic1",
@@ -15,28 +15,28 @@
       "map": "chibic1",
       "seconds": 15,
       "tick": 450,
-      "digest": "5724146327678163799",
+      "digest": "953901439071641629",
       "subsystems": {
-        "ai": "3cf4dfbfe75e710d52f322a5a2df9ad69003f433ae209aaa225f051a1dd98dfb",
+        "ai": "05e6be05043bfd607946127473e3d5a63937a930d7a161eada2b8a2d3f62f912",
         "combat": "24fd6ae68c1cf10c7d055fe4584ec622e82fa2d1911aec6bdba38e2ff4c5139e",
         "economy": "216e2a94bac4281f7f66e07fd54a96688f4fcde0bdffc6e6c77a9710e8d86291",
         "scenario": "67d9273e3bda883e0d9f876027bac9ee7d18ffec1461e78353a66e41df9f1ce4",
-        "total": "446883ba7d4a7a1e2c18d718b1b0bc14fad83566a62228f37f33bf28a5fed83e",
-        "world": "3d1065d0c08149c506a083859838385cebec21bb9a3989d0af6ba6c006a9814e"
+        "total": "766cd1b011b7360834d835d02bb198b333f6c05f7e8864af97e8f4ae27ba355d",
+        "world": "4392aeb41da6665d15029558e9aa56658b976967cb8abf25d55fae10527c1d7d"
       }
     },
     {
       "map": "chibic1",
       "seconds": 60,
       "tick": 1800,
-      "digest": "6824854474555246543",
+      "digest": "8631791175089160207",
       "subsystems": {
-        "ai": "59da5bc09c0fe005c144ac4e314e722c66e5f183f5050656834b6efb4d8f928d",
-        "combat": "a3e8a297d6b4c30eede677276f370ab855adb47e13ac01f972c9a4815e28f67b",
+        "ai": "43faded902a1d1e87fafe1e125ec26ac18672c53f102911888f9230f6547c50d",
+        "combat": "a4cc762cd4744ddce0823fb5d46198e286eb72081a592c6bd79d998c58b57a6a",
         "economy": "216e2a94bac4281f7f66e07fd54a96688f4fcde0bdffc6e6c77a9710e8d86291",
         "scenario": "67d9273e3bda883e0d9f876027bac9ee7d18ffec1461e78353a66e41df9f1ce4",
-        "total": "c971c9ad19b3d100f2dd1d15dbca12c420d5c2dd59e66418ee225aabd06d2f5e",
-        "world": "bc170b43ee1ad91d6511ba360b4becd105117410733d368230fbf809a95eea91"
+        "total": "2592526defc533e3dbc2ebce47f83f10afe2f93ca29b5a59dad472b0f35e2026",
+        "world": "5ebb172932e58140b12468e3910059a8f98d3f802abefa903a74f984d00eb4f8"
       }
     }
   ]
