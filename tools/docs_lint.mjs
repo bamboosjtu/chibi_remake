@@ -16,10 +16,12 @@
  * 用法：
  *   node tools/docs_lint.mjs        # 输出明细；任一检查有命中则退出码 1
  *   node tools/docs_lint.mjs -q     # 只输出计数
+ *   node tools/docs_lint.mjs --index # 链接目标还必须在 Git 索引中，不能依赖本机报告
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {execFileSync} from 'node:child_process';
 import {headingAnchors} from './lib/markdown_anchors.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -47,6 +49,19 @@ const REQUIRED = [
 ];
 
 const quiet = process.argv.includes('-q');
+// CI checks a clean checkout. Existing local reports must not mask missing
+// repository inputs when running the same gate before a push.
+const indexed = process.argv.includes('--index');
+const versioned = new Set();
+if (indexed) {
+  const files = execFileSync('git', ['ls-files', '--cached', '-z'], {cwd: ROOT, encoding: 'utf8'}).split('\0').filter(Boolean);
+  for (const file of files) {
+    versioned.add(file);
+    let parent = path.posix.dirname(file);
+    while (parent !== '.') { versioned.add(parent); parent = path.posix.dirname(parent); }
+  }
+  if (files.length) versioned.add('');
+}
 const purity = [];
 const brokenLinks = [];
 const appendix = [];
@@ -104,6 +119,8 @@ for (const file of mdFiles) {
     const resolved = target ? path.resolve(path.dirname(file), decoded) : file;
     if (!fs.existsSync(resolved)) {
       brokenLinks.push(path.relative(ROOT, file).replaceAll('\\', '/') + ' -> ' + target);
+    } else if (indexed && !versioned.has(path.relative(ROOT, resolved).replaceAll('\\', '/'))) {
+      brokenLinks.push(path.relative(ROOT, file).replaceAll('\\', '/') + ' -> ' + target + ' (not versioned; absent from clean checkout)');
     } else if(fragment && resolved.endsWith('.md')) {
       let anchor=fragment;try{anchor=decodeURIComponent(fragment);}catch{}
       if(!headingAnchors(fs.readFileSync(resolved,'utf8')).has(anchor))brokenLinks.push(path.relative(ROOT,file).replaceAll('\\','/')+' -> '+filePart+'#'+fragment+' (missing heading)');

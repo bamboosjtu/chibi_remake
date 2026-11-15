@@ -249,7 +249,7 @@ CI 的续跑矩阵分别检查 chibic1、chibil1、chibic10、chibic17：保留�
 
 `test_realtime_queries` 覆盖网格边界归属、密集参考射线、失败重寻路冷却及恢复、五次追帧一次表现同步、旧对象排除、重试状态存读及明确批准的 v8 规则迁移。`test_visibility_rules` 以完整重建对照 40 轮随机移动、重叠、载员及视野半径变化，核对可见计数与探索记忆。
 
-实时性能整改的实测与剩余阻断见 [实时性能整改记录](../research/realtime-performance-20261114.md)。
+完整战场实测结果由 `bench_full_battle.ps1` 输出的 JSON 报告保存，报告路径可通过 `-Output` 指定。验收应核对全部轮次的 `qualityPassed` 与 `validationFailures`，不能只引用通过轮次。
 
 
 ### 压力场景与后端对照
@@ -268,7 +268,7 @@ pwsh -NoProfile -File tools/bench_full_battle.ps1 -DeveloperSource -Stress -Prof
 
 `test_pressure_contracts` 校验坐标与接触缓存的精度、失效、剖析一致性及两种人口工作负载。`test_native_math`、`test_native_geometry` 和 `test_native_world` 分别对照 2,000 个状态夹具、16,000 次攻击更新、160 轮完整视野更新、800 个接触/占格夹具、100 个有序分离选择，以及 660 单位的六个完整世界采样点。无原生后端时保留脚本执行；Windows 的原生数学测试必须实际加载 DLL。
 
-新候选验证强制连续三轮正式 PCK 标准场景全部通过，并把结果写入 `verification.json` 的 `standardPerformance`。`test_benchmark_evidence.ps1` 验证缺轮、暂停、调试构建、慢时钟、低分辨率、剖析运行及缺失/非有限指标均被拒绝。这个标准门禁不单独认证压力实时性，压力结果仍需独立查看。当前结果见[压力实时性整改记录](../research/pressure-performance-20261115.md)。
+新候选验证强制连续三轮正式 PCK 标准场景全部通过，并把结果写入 `verification.json` 的 `standardPerformance`。`test_benchmark_evidence.ps1` 验证缺轮、暂停、调试构建、慢时钟、低分辨率、剖析运行及缺失/非有限指标均被拒绝。这个标准门禁不单独认证压力实时性，压力结果仍需独立查看对应的 JSON 报告。
 
 
 ### GPU 绘制对照
