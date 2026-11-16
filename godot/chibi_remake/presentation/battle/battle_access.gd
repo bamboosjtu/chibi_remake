@@ -82,10 +82,72 @@ func camera_tile_geometry() -> Vector3:
 	var data = preload("res://named_port.gd").require_provider(_data, "camera tile geometry")
 	return Vector3(float(data.tile_w),float(data.tile_hw),float(data.tile_hh)) if data != null else Vector3.ZERO
 
-var decor_cells:
-	get:
-		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
-		return data.decor_cells if data != null else null
+func construction_preview_key(point: Vector2) -> Array:
+	var data = preload("res://named_port.gd").require_provider(_data, "construction preview")
+	if data == null or commands.orders.cmd_pending_kind() != "build": return []
+	var bid := int(data.cmd_pending_data.get("unit", -1))
+	var meta: Dictionary = data.map_data.units.get(str(bid), {})
+	var selected := []
+	for unit in data.selected: selected.append(int(unit.uid))
+	selected.make_read_only()
+	# Values only. A replacement world can have identical ticks, UIDs and nav versions.
+	var result := [data.world.get_instance_id(), data.nav.get_instance_id(), bid,
+		data.nav.cell_of_px(point.x,point.y), data.sim_tick, data.nav.version, data.units.size(), selected,
+		data.gold, data.wood, data.food, data.stone, data.game_end, data.player_owner, data.cheat_build_any,
+		meta.get("w",0), meta.get("h",0), meta.get("sheetK",data.map_data.get("spriteK",1))]
+	result.make_read_only()
+	return result
+
+func construction_preview_at(point: Vector2) -> Dictionary:
+	var data = preload("res://named_port.gd").require_provider(_data, "construction preview")
+	if data == null or commands.orders.cmd_pending_kind() != "build": return {}
+	var query: Dictionary = commands.economy.build_placement_at(point, data.cmd_pending_data)
+	if query.is_empty(): return {}
+	var meta: Dictionary = data.map_data.units.get(str(int(query.unit)), {})
+	# Packed arrays remain mutable through a read-only Dictionary. Expose frozen value arrays.
+	var result := {"valid":bool(query.valid),"unit":int(query.unit),"anchor":Vector2(query.anchor),
+		"reason":str(query.reason),"cells":query.cells.duplicate(),"outline":Array(query.outline),
+		"unit_size":Vector2(float(meta.get("w",0)),float(meta.get("h",0))),
+		"sprite_k":float(meta.get("sheetK",data.map_data.get("spriteK",1)))}
+	result["cell_polygons"] = _preview_cell_polygons(data.nav, result.cells)
+	# Whitelist bounded values and freeze owned containers; no deep copy of domain records.
+	preload("res://simulation/definitions/frozen_data.gd").freeze(result)
+	return result
+
+func _preview_cell_polygons(navigation: Object, cells: Array) -> Array:
+	var result := []
+	var hw: float = navigation.tile_hw
+	var hh: float = navigation.tile_hh
+	for cell in cells:
+		var point: Vector2 = navigation.anchor_of(cell.x,cell.y)
+		var corners := [point+Vector2(0,-hh),point+Vector2(hw,0),point+Vector2(0,hh),point+Vector2(-hw,0)]
+		corners.append(corners[0])
+		result.append(corners)
+	return result
+
+func resource_layer_key(viewport: Rect2) -> Array:
+	var data = preload("res://named_port.gd").require_provider(_data, "resource layer")
+	if data == null: return []
+	# Geometry, not blocker version: unrelated gates must not rescan static decor.
+	var result := [data.world.get_instance_id(),data.nav.get_instance_id(),data.resource_revision,
+		data.nav.geometry_revision,viewport]
+	result.make_read_only()
+	return result
+
+func resource_layer_projection(viewport: Rect2) -> Array:
+	var data = preload("res://named_port.gd").require_provider(_data, "resource layer")
+	if data == null: return []
+	var result := []
+	var decor: Array = data.map_data.get("decor", [])
+	for index in range(decor.size()):
+		var cell: Array = decor[index]
+		var anchor: Vector2 = data.nav.anchor_of(int(cell[0]),int(cell[1]))
+		if not viewport.intersects(Rect2(anchor-Vector2(22,60),Vector2(44,60))): continue
+		var source: Dictionary = data.decor_cells.get("%d_%d" % [int(cell[0]),int(cell[1])], {})
+		result.append({"index":index,"anchor":anchor,"phase":int(source.get("phase",cell[2]))})
+	# Only visible scalar/vector descriptors; no retained decor, source dictionary or nav.
+	preload("res://simulation/definitions/frozen_data.gd").freeze(result)
+	return result
 
 var ev_count:
 	get: return _scene.ev_count

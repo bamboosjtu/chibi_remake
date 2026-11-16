@@ -41,7 +41,8 @@ for (const file of files(root)) {
   const code = source.replace(/("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|#[^\r\n]*/g,(all,string)=>string??'');
   const count = source.trimEnd().split('\n').length;
   if (relative !== 'simulation/battle_world.gd' && /\bworld\.(?:_modules|_access)\b|\bworld\.(?:get|set)\(\s*['"]_(?:modules|access)['"]/.test(code)) fail(`${relative}: accesses private BattleWorld collections`);
-  if (relative === 'presentation/battle/components/camera_controller.gd' && /\bhost\.(?:units|selected|map_data|nav)\b/.test(code)) fail(`${relative}: camera bypasses value read model`);
+  if (['presentation/battle/components/camera_controller.gd','presentation/battle/build_preview.gd','presentation/battle/battle_resources.gd'].includes(relative) && /\bhost\.(?:units|selected|map_data|nav|decor_cells)\b|\bhost(?:\.(?:get|get\.bind)\(\s*|\[\s*)['"](?:units|selected|map_data|nav|decor_cells)['"]/.test(code)) fail(`${relative}: bypasses value read model`);
+  if (relative === 'presentation/battle/battle_access.gd' && /\b(?:data|state)\.(?:units|selected|map_data|decor_cells)\.duplicate\(\s*true\s*\)/.test(code)) fail(`${relative}: deep-copies world data at the read boundary`);
   const budget = limits.files[relative] ?? 600;
   if (count > budget) fail(`${relative}: ${count} lines exceeds ${budget}`);
   if (relative.startsWith('simulation/')) {

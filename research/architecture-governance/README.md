@@ -151,3 +151,7 @@ Game 的后续拆分边界为 SnapshotCodec、SaveRepository、SlotCatalog、Cam
 ## 6. P3 后续工作
 
 依次评估资源片采集 A*、AI 建筑/工人索引、被堵单位重寻路预算、构建发布工具清理和发布证据的 harness 哈希绑定。需要正式工作负载的前后性能证据；本轮不更改性能预算，不用确定性基线更新消除差异，也不把源码回归当正式 EXE/性能验收。
+
+后续读模型盘点、建造预览迁移和验收记录见 `battle-access.md`、`read-model-acceptance.json`。
+
+资源层后续迁移及独立验收记录见 `battle-resources.md`、`resources-acceptance.json`。

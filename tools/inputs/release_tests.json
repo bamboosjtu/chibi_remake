@@ -170,6 +170,20 @@
       "args": [
         "--noview"
       ]
+    },
+    {
+      "script": "test_build_preview_read_model",
+      "markers": [
+        "BUILD PREVIEW READ MODEL PASS"
+      ],
+      "timeout": 150
+    },
+    {
+      "script": "test_resource_layer_read_model",
+      "markers": [
+        "RESOURCE READ MODEL PASS"
+      ],
+      "timeout": 180
     }
   ]
 }

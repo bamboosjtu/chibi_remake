@@ -16,6 +16,19 @@ try{
  write('app/private.gd','extends RefCounted\n');
  write('presentation/battle/components/camera_controller.gd','extends RefCounted\nfunc bad(host):\n\treturn host.units\n');assert.notEqual(run().status,0);
  write('presentation/battle/components/camera_controller.gd','extends RefCounted\n');
+ for(const read of ['host.units','host.selected','host.map_data','host.nav',"host.get('nav')",'host["units"]']){
+  write('presentation/battle/build_preview.gd','extends RefCounted\nfunc bad(host):\n\treturn '+read+'\n');assert.notEqual(run().status,0);
+ }
+ write('presentation/battle/build_preview.gd','extends RefCounted\n');
+ for(const read of ['host.map_data','host.nav','host.decor_cells',"host.get('decor_cells')",'host["map_data"]']){
+  write('presentation/battle/battle_resources.gd','extends RefCounted\nfunc bad(host):\n\treturn '+read+'\n');assert.notEqual(run().status,0);
+ }
+ write('presentation/battle/battle_resources.gd','extends RefCounted\n');
+
+ for(const field of ['units','selected','map_data','decor_cells']){
+  write('presentation/battle/battle_access.gd','extends RefCounted\nfunc bad(data):\n\treturn data.'+field+'.duplicate(true)\n');assert.notEqual(run().status,0);
+ }
+ write('presentation/battle/battle_access.gd','extends RefCounted\n');
  write('presentation/test.gd','extends RefCounted\nfunc bad(host):\n\thost.saver.apply_snapshot({})\n');assert.notEqual(run().status,0);
  write('presentation/test.gd','extends RefCounted\n');
  const limits={files:{'simulation/test.gd':600},functions:{},violations:[],reviews:{}};

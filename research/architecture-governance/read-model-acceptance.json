@@ -1,0 +1,523 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-16",
+  "timezone": "Asia/Shanghai",
+  "baseCommit": "0b61510b799af22e6526b32fae62055458ef94dd",
+  "scope": "BattleAccess inventory and construction-preview value projection; local source acceptance",
+  "sourceContext": {
+    "normalizedTextSha256": "b10ef8bc155956809a4f4caf89fb7d3d30c08e28a36a2f15100f6a7935925fbd",
+    "fileCount": 995
+  },
+  "engine": {
+    "version": "4.7.2.stable.official.ed1daf0bf",
+    "sha256": "ab1824f85bfd8e0e4128182c000c4003a3e042245b2967848d089b2a04b22424"
+  },
+  "simulationRulesAndBaselinesUnchanged": true,
+  "inventory": {
+    "before": 49,
+    "after": 40,
+    "consumerCountBefore": 12,
+    "consumerCountAfter": 11,
+    "battleAccessSites": 38,
+    "sceneFacadeSites": 2,
+    "source": "tools/inputs/battle_access_inventory.json",
+    "limits": "Literal host properties and lookups; aliases, dynamic keys and command-returned dictionaries are outside the scan. Host conventions are manually reviewed, not inferred receiver types."
+  },
+  "checks": {
+    "static": {
+      "passed": 31,
+      "total": 31,
+      "results": [
+        {
+          "name": "architecture/architecture_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.393
+        },
+        {
+          "name": "architecture/test_architecture_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 1.449
+        },
+        {
+          "name": "architecture/port_inventory",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.163
+        },
+        {
+          "name": "architecture/battle_access_inventory",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.099
+        },
+        {
+          "name": "architecture/test_battle_access_inventory",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.084
+        },
+        {
+          "name": "registry/registry_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.192
+        },
+        {
+          "name": "registry/test_registry_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 6.462
+        },
+        {
+          "name": "data/unit_schema_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.088
+        },
+        {
+          "name": "data/rules_manifest",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.106
+        },
+        {
+          "name": "data/data_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 3.765
+        },
+        {
+          "name": "data/test_scenario_generator",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.092
+        },
+        {
+          "name": "data/test_map_export_navigation",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.106
+        },
+        {
+          "name": "data/test_opening_forces",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.439
+        },
+        {
+          "name": "docs/docs_lint",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.438
+        },
+        {
+          "name": "docs/test_docs_lint",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 2.614
+        },
+        {
+          "name": "docs/test_markdown_anchors",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.072
+        },
+        {
+          "name": "repository/syntax_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 8.664
+        },
+        {
+          "name": "repository/suite_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.071
+        },
+        {
+          "name": "repository/test_suite_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.077
+        },
+        {
+          "name": "repository/test_repository_policy",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 3.95
+        },
+        {
+          "name": "repository/test_ci_checks",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.071
+        },
+        {
+          "name": "tooling/test_engine_integrity",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.141
+        },
+        {
+          "name": "tooling/test_bootstrap",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 1.061
+        },
+        {
+          "name": "tooling/powershell_encoding",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.126
+        },
+        {
+          "name": "tooling/test_powershell_encoding",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.078
+        },
+        {
+          "name": "tooling/test_godot_process",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 1.515
+        },
+        {
+          "name": "tooling/test_regression_result",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.067
+        },
+        {
+          "name": "tooling/test_terrain_dedup",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.102
+        },
+        {
+          "name": "tooling/test_terrain_equivalence",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 1.774
+        },
+        {
+          "name": "tooling/test_runtime_assets",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.298
+        },
+        {
+          "name": "tooling/terrain-declarations",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.538
+        }
+      ]
+    },
+    "release": {
+      "passed": 20,
+      "total": 20,
+      "source": "_work/read-model/release-final/results.json",
+      "results": [
+        {
+          "name": "test_battle_interaction",
+          "ok": true,
+          "seconds": 6.972,
+          "log": "_work/read-model/release-final/test_battle_interaction.log",
+          "logSha256": "08fe0465fb725b48854e3fdf505e9bc18487c2058efa53b19e4cc1f97c63d77d"
+        },
+        {
+          "name": "test_m0",
+          "ok": true,
+          "seconds": 26.864,
+          "log": "_work/read-model/release-final/test_m0.log",
+          "logSha256": "974f904d3aceb0f50b4a3083579980aa834bacfd2399431b1a0f95e2e1baa698"
+        },
+        {
+          "name": "test_review_contracts",
+          "ok": true,
+          "seconds": 7.243,
+          "log": "_work/read-model/release-final/test_review_contracts.log",
+          "logSha256": "8129a92bd5bbc2468b3a42169b97389e73444d66a59761f20f06d44d848e1a69"
+        },
+        {
+          "name": "test_save_roundtrip",
+          "ok": true,
+          "seconds": 18.261,
+          "log": "_work/read-model/release-final/test_save_roundtrip.log",
+          "logSha256": "43934656b9f005e94dae707cde91a1cb9f65c211bc1da5139065680472fedfce"
+        },
+        {
+          "name": "test_save_validity",
+          "ok": true,
+          "seconds": 25.86,
+          "log": "_work/read-model/release-final/test_save_validity.log",
+          "logSha256": "0904cac757a22551e4929f108094f2e0e75c1e57fdb8b17e159559a38ab3a479"
+        },
+        {
+          "name": "test_unit_schema",
+          "ok": true,
+          "seconds": 42.995,
+          "log": "_work/read-model/release-final/test_unit_schema.log",
+          "logSha256": "a2e6ac5c68d4b6c9d4cdb6af967c573fcef6ae44f8025238498f08a24cac830a"
+        },
+        {
+          "name": "test_restore_safety",
+          "ok": true,
+          "seconds": 14.376,
+          "log": "_work/read-model/release-final/test_restore_safety.log",
+          "logSha256": "e16112531b7f86df9a154c19b1a670012e77418b7fe84d4197156ca868c9b75b"
+        },
+        {
+          "name": "test_acceptance_isolation",
+          "ok": true,
+          "seconds": 0.402,
+          "log": "_work/read-model/release-final/test_acceptance_isolation.log",
+          "logSha256": "eca7d67f24d200ea8ed990a3524a1bc556e9710eb266238d2c94549d7a01ce5c"
+        },
+        {
+          "name": "test_duel_save",
+          "ok": true,
+          "seconds": 6.616,
+          "log": "_work/read-model/release-final/test_duel_save.log",
+          "logSha256": "8830914da7699f572beca84f2e7e4fb182272c0b58b8b94cda5c99efb1db5be3"
+        },
+        {
+          "name": "test_slot_metadata",
+          "ok": true,
+          "seconds": 0.62,
+          "log": "_work/read-model/release-final/test_slot_metadata.log",
+          "logSha256": "281a0f58d26c5ef6a340e7152d56c23b2b412b76f2d7ca229e76195a5fb93226"
+        },
+        {
+          "name": "test_continuation_coverage",
+          "ok": true,
+          "seconds": 26.686,
+          "log": "_work/read-model/release-final/test_continuation_coverage.log",
+          "logSha256": "635f72196ecf78357c23ca6de1c3520fd0620e90f7823fea5373321edd2589e6"
+        },
+        {
+          "name": "test_ai_research",
+          "ok": true,
+          "seconds": 9.936,
+          "log": "_work/read-model/release-final/test_ai_research.log",
+          "logSha256": "d140219839293c3b85b617da716ee56ca20950adb209c70a2582780dbcde3a5b"
+        },
+        {
+          "name": "test_campaign_integrity",
+          "ok": true,
+          "seconds": 92.735,
+          "log": "_work/read-model/release-final/test_campaign_integrity.log",
+          "logSha256": "5d85f33272f013cda3a81b9bda0fba129e2675c0c759380320e834a904e70b1c"
+        },
+        {
+          "name": "test_legacy_isolation",
+          "ok": true,
+          "seconds": 24.566,
+          "log": "_work/read-model/release-final/test_legacy_isolation.log",
+          "logSha256": "84090e51ada691ea856619b59bb6c82c5df17f85eee7a3c19ff4d6f48e7cfa4c"
+        },
+        {
+          "name": "test_contact_and_occupancy",
+          "ok": true,
+          "seconds": 4.475,
+          "log": "_work/read-model/release-final/test_contact_and_occupancy.log",
+          "logSha256": "cd53c2641a3fb2ae501d2c5f5d218b24db64107691155bac834a43f08adf0db0"
+        },
+        {
+          "name": "test_rules_scope",
+          "ok": true,
+          "seconds": 0.497,
+          "log": "_work/read-model/release-final/test_rules_scope.log",
+          "logSha256": "a606c2b734e3a25790ecb43c697aa220ec6268bcfc235aea63576a14842a0ae9"
+        },
+        {
+          "name": "test_camera_read_model",
+          "ok": true,
+          "seconds": 0.515,
+          "log": "_work/read-model/release-final/test_camera_read_model.log",
+          "logSha256": "a1ece956252aeebc86122dd2fdcd7968a2b5415eeb5ee6dd63f264a01fda7e8d"
+        },
+        {
+          "name": "test_app_services",
+          "ok": true,
+          "seconds": 0.867,
+          "log": "_work/read-model/release-final/test_app_services.log",
+          "logSha256": "a0299a0a0a7b8b6007d143949be6611d70daafe46e2e6e6408783a5b650ff0df"
+        },
+        {
+          "name": "test_snapshot_stages",
+          "ok": true,
+          "seconds": 7.255,
+          "log": "_work/read-model/release-final/test_snapshot_stages.log",
+          "logSha256": "52488ae4e0d28d41e6afa158bfe34654bb0e8626bed6909f384364829dcba88e"
+        },
+        {
+          "name": "test_build_preview_read_model",
+          "ok": true,
+          "seconds": 7.626,
+          "log": "_work/read-model/release-final/test_build_preview_read_model.log",
+          "logSha256": "d8a70130998ca0bb35227a6ffe0dafe56b1388d07f393922632a6fa3da536fbb"
+        }
+      ]
+    },
+    "relatedViews": {
+      "passed": 6,
+      "total": 6,
+      "source": "_work/read-model/view-final/results.json",
+      "results": [
+        {
+          "name": "test_build_feedback",
+          "ok": true,
+          "seconds": 7.055,
+          "log": "_work/read-model/view-final/test_build_feedback.log",
+          "logSha256": "c4381fe917ca957ff98a830e085558d1b441e87d093f492a409edb9d2aee2553"
+        },
+        {
+          "name": "test_restored_view",
+          "ok": true,
+          "seconds": 8.356,
+          "log": "_work/read-model/view-final/test_restored_view.log",
+          "logSha256": "de3d3daaa8183ccd748d7f54ddf6832e31a0f2c64b20861b956997ee0d52be5f"
+        },
+        {
+          "name": "test_building_panels",
+          "ok": true,
+          "seconds": 4.557,
+          "log": "_work/read-model/view-final/test_building_panels.log",
+          "logSha256": "4d294dba656d198fadcc5e4058267201e1933db0b3f906d3fb0de20b27abcec5"
+        },
+        {
+          "name": "test_world_exchange",
+          "ok": true,
+          "seconds": 7.983,
+          "log": "_work/read-model/view-final/test_world_exchange.log",
+          "logSha256": "a8a6a563191c59355f3c9236d6558bc091db6db541f593435baf609072f73e64"
+        },
+        {
+          "name": "test_hud_metrics",
+          "ok": true,
+          "seconds": 4.472,
+          "log": "_work/read-model/view-final/test_hud_metrics.log",
+          "logSha256": "0d5e88832f23bf6b39641ac5f94c3f4872726c33557fb709bcea62176a4ae419"
+        },
+        {
+          "name": "test_worker_feedback",
+          "ok": true,
+          "seconds": 8.637,
+          "log": "_work/read-model/view-final/test_worker_feedback.log",
+          "logSha256": "c7fa69200ee0b072318372f49c1cb0ade1e5fc9378e598cbdd1f77bfaca52be9"
+        }
+      ]
+    },
+    "focused": {
+      "passed": 1,
+      "total": 1,
+      "source": "_work/read-model/focused-final/results.json",
+      "results": [
+        {
+          "name": "test_build_preview_read_model",
+          "ok": true,
+          "seconds": 9.39,
+          "log": "_work/read-model/focused-final/test_build_preview_read_model.log",
+          "logSha256": "83d5e8aaba412f5aee668dfc9003e6f7a20e4569b5a53bb28fc4652e413a9559"
+        }
+      ]
+    },
+    "ci": {
+      "passed": 5,
+      "total": 5,
+      "source": "_work/read-model/ci-final/results.json",
+      "results": [
+        {
+          "name": "check_runtime_scripts",
+          "ok": true,
+          "seconds": 2.41,
+          "log": "_work/read-model/ci-final/check_runtime_scripts.log",
+          "logSha256": "0505ac505cc71a0520d728c2c97a627c076369604644c8ae056e31668c58db0c"
+        },
+        {
+          "name": "test_architecture",
+          "ok": true,
+          "seconds": 13.642,
+          "log": "_work/read-model/ci-final/test_architecture.log",
+          "logSha256": "afe7ddf4399a5eef9e2fb98170b7c75f6c453cd4a974aa3c39e62678bbf0d2a1"
+        },
+        {
+          "name": "dump_composition",
+          "ok": true,
+          "seconds": 3.598,
+          "log": "_work/read-model/ci-final/dump_composition.log",
+          "logSha256": "4cd82f29bdbb06eaa6e9b8d7ed4fe5012f23930e9f73ec84d0f95d467c609a11"
+        },
+        {
+          "name": "test_presentation_diagnostics",
+          "ok": true,
+          "seconds": 2.074,
+          "log": "_work/read-model/ci-final/test_presentation_diagnostics.log",
+          "logSha256": "9ae026c9d17fdbf9f2f0f4d8cdace6d07463c47160d92d59d675249c620e4708"
+        },
+        {
+          "name": "test_camera_read_model",
+          "ok": true,
+          "seconds": 0.493,
+          "log": "_work/read-model/ci-final/test_camera_read_model.log",
+          "logSha256": "6d16ff6289a826c87b5c64d458da1097d89a5b0057c4116807dcd71928d683b8"
+        }
+      ]
+    },
+    "expiredOwner": "Twelve invalid-composition/expired-owner cases passed, including both preview queries; process exit 1 without SCRIPT ERROR",
+    "architectureGuard": "Migrated consumers reject four legacy properties/literal lookups; world-field deep copies rejected; current positive and negative checks passed"
+  },
+  "coverage": [
+    "Fixed nine-field projection; recursively read-only value containers; mutable Packed arrays excluded from public result",
+    "Three paused frames / sixty repeated updates reuse the identical projection and do not increase rebuild count",
+    "Read queries leave the full persisted continuation digest unchanged",
+    "Resource, selection, navigation and inactive-context invalidation",
+    "Failed staged world replacement rolls back to the original cached projection",
+    "Successful restore re-arms build before an inactive frame; every non-identity cache value is forced equal, but a new world/nav identity rebuilds the projection",
+    "Existing BattleAccess instance reads replacement-world camera bounds",
+    "Retained old projections do not retain old worlds, navigation or closed battle state"
+  ],
+  "costModel": "No deep copy of units, selected or map_data. Scalar/UID key per active update; bounded whitelisted geometry on cache miss; component-owned Packed rendering buffers rebuilt only on miss.",
+  "cacheContract": "Normal unit changes advance simulation tick; structural/geometry changes advance nav.version. Not a generic tracker for arbitrary direct dictionary writes.",
+  "resolvedFinding": "A read-only Dictionary does not make PackedVector2Array immutable. Replaced public packed collections with frozen plain value arrays, then converted to private rendering buffers on cache misses.",
+  "notCertified": [
+    "Hosted CI was not triggered",
+    "No formal EXE/GPU-pixel or performance-budget certification",
+    "Remaining mutable getters and command-returned dictionaries were not all migrated"
+  ]
+}

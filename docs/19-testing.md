@@ -299,3 +299,13 @@ pwsh -NoProfile -File tools/bench_full_battle.ps1 -ReleasePack <候选目录>/Ch
 源码发布回归使用 `runtime_assets.mjs --check --hash --versioned-only` 检查已提交资源；该模式不要求生成地形缓存，也不认证完整 staging 图。正式构建继续使用完整的 `--check --hash`，生成地形后再验收。
 
 `test_save_validity` 以正确 checksum 覆盖 v8 缺整组资源、缺任一资源键、缺队列及队列错误类型，并核对拒绝后资源/生产队列和世界身份不变。`test_unit_schema` 的 record 组走完整候选恢复；`test_snapshot_stages` 分别破坏七个校验阶段并检查拒绝的原子性。`test_app_services` 覆盖服务独立性、写入保护和槽缓存失效；`test_camera_read_model` 验证值投影不返回可变世界引用。
+
+
+`test_build_preview_read_model` 检查投影的递归只读容器和固定字段集、复制值隔离、跨三个暂停帧的缓存复用、资源/选择/导航失效、失败交换回滚、所有非身份缓存值相同的世界替换，以及旧世界/导航的释放。测试也以真实读档核对相机读模型仍读取当前世界。过期 owner 的预览 key/model 两种查询另由进程级契约负向测试覆盖，必须非零退出且无 SCRIPT ERROR。
+
+`battle_access_inventory.mjs` 的默认模式校验清单新鲜度，`--write` 更新人工复审用的字面量使用位置。迁移后的相机和建造预览组件有禁止回退到四类借用属性的门禁；读边界也禁止直接深拷贝这些整组世界字段。正则检查不代替别名和动态表达式的审查。
+
+
+`test_resource_layer_read_model` 验证固定三字段的递归只读可见投影、跨三个暂停帧的 60 次缓存复用、视口进出、同阶段几何重定位、普通阻挡版本不触发重扫，以及 0→1、2→3、4→5 的资源耗尽与空矿跳过。它还实际读取临时世界后回滚、注入读档失败回滚、强制全部非身份缓存值相等后加载新世界，并在保留旧投影时检查旧世界/导航和关闭战场状态的释放。资源键和资源投影的过期 owner 查询由进程级负向测试覆盖。
+
+借用清单 schemaVersion 2 将 decor_cells 纳入扫描。相机、建造预览、资源层都有禁止回退到借用入口的门禁，资源层另覆盖该资源字典；已有逐帧深拷贝世界数据的禁止规则扩展到 decor_cells。

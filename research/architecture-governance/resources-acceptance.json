@@ -1,0 +1,569 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-16",
+  "timezone": "Asia/Shanghai",
+  "baseCommit": "0b61510b799af22e6526b32fae62055458ef94dd",
+  "startingWorktree": "Retained the preceding uncommitted build-preview migration; this record isolates the resource-layer follow-up",
+  "scope": "Local source acceptance for battle_resources read-model migration",
+  "sourceContext": {
+    "normalizedTextSha256": "a7f21d351c2765348b7deea122319ce4561ae3c29ed9067c99fe433271916db0",
+    "fileCount": 996
+  },
+  "engine": {
+    "version": "4.7.2.stable.official.ed1daf0bf",
+    "sha256": "ab1824f85bfd8e0e4128182c000c4003a3e042245b2967848d089b2a04b22424"
+  },
+  "simulationRulesAndBaselinesUnchanged": true,
+  "checks": {
+    "static": {
+      "passed": 31,
+      "total": 31,
+      "results": [
+        {
+          "name": "architecture/architecture_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.395
+        },
+        {
+          "name": "architecture/test_architecture_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 2.334
+        },
+        {
+          "name": "architecture/port_inventory",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.242
+        },
+        {
+          "name": "architecture/battle_access_inventory",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.106
+        },
+        {
+          "name": "architecture/test_battle_access_inventory",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.085
+        },
+        {
+          "name": "registry/registry_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.203
+        },
+        {
+          "name": "registry/test_registry_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 7.491
+        },
+        {
+          "name": "data/unit_schema_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.085
+        },
+        {
+          "name": "data/rules_manifest",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.115
+        },
+        {
+          "name": "data/data_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 3.946
+        },
+        {
+          "name": "data/test_scenario_generator",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.108
+        },
+        {
+          "name": "data/test_map_export_navigation",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.08
+        },
+        {
+          "name": "data/test_opening_forces",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.496
+        },
+        {
+          "name": "docs/docs_lint",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.494
+        },
+        {
+          "name": "docs/test_docs_lint",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 4.317
+        },
+        {
+          "name": "docs/test_markdown_anchors",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.096
+        },
+        {
+          "name": "repository/syntax_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 11.741
+        },
+        {
+          "name": "repository/suite_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.108
+        },
+        {
+          "name": "repository/test_suite_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.096
+        },
+        {
+          "name": "repository/test_repository_policy",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 3.988
+        },
+        {
+          "name": "repository/test_ci_checks",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.07
+        },
+        {
+          "name": "tooling/test_engine_integrity",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.158
+        },
+        {
+          "name": "tooling/test_bootstrap",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 1.186
+        },
+        {
+          "name": "tooling/powershell_encoding",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.133
+        },
+        {
+          "name": "tooling/test_powershell_encoding",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.074
+        },
+        {
+          "name": "tooling/test_godot_process",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 1.701
+        },
+        {
+          "name": "tooling/test_regression_result",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.073
+        },
+        {
+          "name": "tooling/test_terrain_dedup",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.109
+        },
+        {
+          "name": "tooling/test_terrain_equivalence",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 1.7
+        },
+        {
+          "name": "tooling/test_runtime_assets",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.296
+        },
+        {
+          "name": "tooling/terrain-declarations",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.591
+        }
+      ]
+    },
+    "release": {
+      "passed": 21,
+      "total": 21,
+      "source": "_work/resources/release-final/results.json",
+      "results": [
+        {
+          "name": "test_battle_interaction",
+          "ok": true,
+          "seconds": 7.066,
+          "log": "_work/resources/release-final/test_battle_interaction.log",
+          "logSha256": "a2416d534a8e317f03b46fb500ab2560daa68e40730cd3acf685fdb01a06a42f"
+        },
+        {
+          "name": "test_m0",
+          "ok": true,
+          "seconds": 26.696,
+          "log": "_work/resources/release-final/test_m0.log",
+          "logSha256": "670f0372ac62f70ac2c70bbe185de48f265cc0046234894cc79f9d1e347a3422"
+        },
+        {
+          "name": "test_review_contracts",
+          "ok": true,
+          "seconds": 6.587,
+          "log": "_work/resources/release-final/test_review_contracts.log",
+          "logSha256": "defce6b163eef28efea51cd25b93ca6826ff5857395e37c8339dbff45f8b4745"
+        },
+        {
+          "name": "test_save_roundtrip",
+          "ok": true,
+          "seconds": 17.474,
+          "log": "_work/resources/release-final/test_save_roundtrip.log",
+          "logSha256": "ae344b69f3b96495cb0fc402b2dcf89d487af23f03cf364e6383609cf4fe69de"
+        },
+        {
+          "name": "test_save_validity",
+          "ok": true,
+          "seconds": 20.41,
+          "log": "_work/resources/release-final/test_save_validity.log",
+          "logSha256": "ecc6079899fa67ecc0f53f7d882f4a63e55010df9e5bad5c96ae85252eec0798"
+        },
+        {
+          "name": "test_unit_schema",
+          "ok": true,
+          "seconds": 25.572,
+          "log": "_work/resources/release-final/test_unit_schema.log",
+          "logSha256": "c90b26a5ec912cebcc06e1e30e16c693efb8c207c51942a624cf2f7ca1c59959"
+        },
+        {
+          "name": "test_restore_safety",
+          "ok": true,
+          "seconds": 14.108,
+          "log": "_work/resources/release-final/test_restore_safety.log",
+          "logSha256": "15b0da2cbbebc5f4ffbb02b62acac39501cf39934ee9d8b2f4054c7042c649ae"
+        },
+        {
+          "name": "test_acceptance_isolation",
+          "ok": true,
+          "seconds": 0.4,
+          "log": "_work/resources/release-final/test_acceptance_isolation.log",
+          "logSha256": "dba5aa914a113fa01544df69a794bd043358b4439f78d22d557e832790784e17"
+        },
+        {
+          "name": "test_duel_save",
+          "ok": true,
+          "seconds": 6.606,
+          "log": "_work/resources/release-final/test_duel_save.log",
+          "logSha256": "800560851151ebee0a2c334e1d51b20e9595f84157ca7c77aff9523963e72c70"
+        },
+        {
+          "name": "test_slot_metadata",
+          "ok": true,
+          "seconds": 0.534,
+          "log": "_work/resources/release-final/test_slot_metadata.log",
+          "logSha256": "af5e346eab2540dc2d0b163dee655161f977491e503d7121d04a8a2d86b0069a"
+        },
+        {
+          "name": "test_continuation_coverage",
+          "ok": true,
+          "seconds": 24.899,
+          "log": "_work/resources/release-final/test_continuation_coverage.log",
+          "logSha256": "c72bcbc62e89be8cec9308d658f9b0823a54a756f3851cb78c406914b7bf6f6f"
+        },
+        {
+          "name": "test_ai_research",
+          "ok": true,
+          "seconds": 10.708,
+          "log": "_work/resources/release-final/test_ai_research.log",
+          "logSha256": "77d1c3b17c901450f4b52556373701f1c88ad9ecfd20e5b06702428c37a81256"
+        },
+        {
+          "name": "test_campaign_integrity",
+          "ok": true,
+          "seconds": 102.973,
+          "log": "_work/resources/release-final/test_campaign_integrity.log",
+          "logSha256": "f89c1004a6a6c25367ae138f139d575fb57a6fe10556fd12c7009970ac903160"
+        },
+        {
+          "name": "test_legacy_isolation",
+          "ok": true,
+          "seconds": 28.375,
+          "log": "_work/resources/release-final/test_legacy_isolation.log",
+          "logSha256": "8ab9b09baa4ed4a36e4c63dd5a7ab21185478e670bbb88e289e4a1cfcd6e12f9"
+        },
+        {
+          "name": "test_contact_and_occupancy",
+          "ok": true,
+          "seconds": 9.046,
+          "log": "_work/resources/release-final/test_contact_and_occupancy.log",
+          "logSha256": "436d56d28ec42d08fb9c29662bf2f76183b9d22daa6f5bdf7ce2efb8341b6c3d"
+        },
+        {
+          "name": "test_rules_scope",
+          "ok": true,
+          "seconds": 0.749,
+          "log": "_work/resources/release-final/test_rules_scope.log",
+          "logSha256": "84f31a5fbc2728c6911e325388c00250335c70e1b5af1ba086ed0f9248904d5b"
+        },
+        {
+          "name": "test_camera_read_model",
+          "ok": true,
+          "seconds": 0.751,
+          "log": "_work/resources/release-final/test_camera_read_model.log",
+          "logSha256": "db91db364d5f49b42d3d561f386e598af64c771a8ab474f4d954cb12f93b9ee3"
+        },
+        {
+          "name": "test_app_services",
+          "ok": true,
+          "seconds": 1.303,
+          "log": "_work/resources/release-final/test_app_services.log",
+          "logSha256": "db418dc42acdb229389385838ec7e7dad9b1f8bde0dc37ce4fddf968164862d9"
+        },
+        {
+          "name": "test_snapshot_stages",
+          "ok": true,
+          "seconds": 10.414,
+          "log": "_work/resources/release-final/test_snapshot_stages.log",
+          "logSha256": "8aa6001515a930efc6bf07dd6bdce80bd7852f3a4943de239ff475ce5545130d"
+        },
+        {
+          "name": "test_build_preview_read_model",
+          "ok": true,
+          "seconds": 11.485,
+          "log": "_work/resources/release-final/test_build_preview_read_model.log",
+          "logSha256": "3cd466980a3c0365f23e7f2bc1c00186c60962c6db42cc24c7ba8b2c0ba88fa2"
+        },
+        {
+          "name": "test_resource_layer_read_model",
+          "ok": true,
+          "seconds": 17.667,
+          "log": "_work/resources/release-final/test_resource_layer_read_model.log",
+          "logSha256": "6cc11b8e11fe2a022703b2d1793d35cf39e91233be65152e71d544526543fd1b"
+        }
+      ]
+    },
+    "related": {
+      "passed": 8,
+      "total": 8,
+      "source": "_work/resources/related-final/results.json",
+      "results": [
+        {
+          "name": "test_build_feedback",
+          "ok": true,
+          "seconds": 6.926,
+          "log": "_work/resources/related-final/test_build_feedback.log",
+          "logSha256": "c61dd41d3f074ee7aa25184a50101b9f2895db6c16698b7e9e2756be35bb9894"
+        },
+        {
+          "name": "test_chibil1_presentation",
+          "ok": true,
+          "seconds": 11.06,
+          "log": "_work/resources/related-final/test_chibil1_presentation.log",
+          "logSha256": "1ed863d629e93311a8f9de2cf0c7b37e1e2bc024802b4f27566233c2c2df62b2"
+        },
+        {
+          "name": "test_resource_frontier",
+          "ok": true,
+          "seconds": 6.308,
+          "log": "_work/resources/related-final/test_resource_frontier.log",
+          "logSha256": "e0e508fda65705149c9452bfcf532bdc9bfa3003e557ffbfdacbc59af440c277"
+        },
+        {
+          "name": "test_resource_input",
+          "ok": true,
+          "seconds": 11.993,
+          "log": "_work/resources/related-final/test_resource_input.log",
+          "logSha256": "ef1246e797fff582d11875258ec2af5426c44e23c8483761c1a939865e76f55d"
+        },
+        {
+          "name": "test_automatic_gates",
+          "ok": true,
+          "seconds": 4.314,
+          "log": "_work/resources/related-final/test_automatic_gates.log",
+          "logSha256": "ae356d3828c1084edb652f3c5e615efe7f633b1d3330de54373f55aa0589cba3"
+        },
+        {
+          "name": "test_economy_rules",
+          "ok": true,
+          "seconds": 26.31,
+          "log": "_work/resources/related-final/test_economy_rules.log",
+          "logSha256": "5f59efe9decca4b40ed90bd2d774207ce442f2a4a5e6b8181b6f676a4e75508e"
+        },
+        {
+          "name": "test_restored_view",
+          "ok": true,
+          "seconds": 8.169,
+          "log": "_work/resources/related-final/test_restored_view.log",
+          "logSha256": "6667ece1dff5b7da9d7843396a4dc0bcb41705b67329358f829f997eb35c499e"
+        },
+        {
+          "name": "test_world_exchange",
+          "ok": true,
+          "seconds": 7.62,
+          "log": "_work/resources/related-final/test_world_exchange.log",
+          "logSha256": "1d1f1ec9459d63748795bdf48f7038acff15477046ae9d8c13db31cdd6075e82"
+        }
+      ]
+    },
+    "focused": {
+      "passed": 1,
+      "total": 1,
+      "source": "_work/resources/focused-final/results.json",
+      "results": [
+        {
+          "name": "test_resource_layer_read_model",
+          "ok": true,
+          "seconds": 8.128,
+          "log": "_work/resources/focused-final/test_resource_layer_read_model.log",
+          "logSha256": "88662cc9771ead888cba09c7d4f306a3f030b15047654ee871a0d6307a7d2359"
+        }
+      ]
+    },
+    "compile": {
+      "passed": 5,
+      "total": 5,
+      "source": "_work/resources/compile/results.json",
+      "results": [
+        {
+          "name": "check_runtime_scripts",
+          "ok": true,
+          "seconds": 2.767,
+          "log": "_work/resources/compile/check_runtime_scripts.log",
+          "logSha256": "9f7d6f4ba48f43cef1e3b7f1e61194bd66b332526f15829337f1e30231398f71"
+        },
+        {
+          "name": "test_architecture",
+          "ok": true,
+          "seconds": 14.347,
+          "log": "_work/resources/compile/test_architecture.log",
+          "logSha256": "9f621c794ee1e14aad6854fb014f7d56c9e4c11d3d2b553e6db4a79e961800bc"
+        },
+        {
+          "name": "dump_composition",
+          "ok": true,
+          "seconds": 3.584,
+          "log": "_work/resources/compile/dump_composition.log",
+          "logSha256": "d3931dee8ab957143c85624507d6e43d07b57495c52b3710e01919e6af304dc2"
+        },
+        {
+          "name": "test_presentation_diagnostics",
+          "ok": true,
+          "seconds": 2.272,
+          "log": "_work/resources/compile/test_presentation_diagnostics.log",
+          "logSha256": "31cc1ddd9b398e756ccd73451bc0172cb716dabf980e08a4cbaa30b255505b3f"
+        },
+        {
+          "name": "test_camera_read_model",
+          "ok": true,
+          "seconds": 0.493,
+          "log": "_work/resources/compile/test_camera_read_model.log",
+          "logSha256": "4fb459d8988e27f245fb62a6a14ef3b20cb372e1576f78c059fd4f953ef1790b"
+        }
+      ]
+    },
+    "expiredOwner": "Fourteen invalid composition/lifetime cases passed; includes both resource queries; exit 1 with no SCRIPT ERROR"
+  },
+  "contract": {
+    "key": [
+      "world identity",
+      "nav identity",
+      "resource_revision",
+      "geometry_revision",
+      "viewport Rect2"
+    ],
+    "descriptor": [
+      "index",
+      "anchor",
+      "phase"
+    ],
+    "containers": "Recursively frozen Arrays/Dictionaries; only scalar/vector values; no packed arrays or Object/Callable references",
+    "cache": "Constant-size key per update; no scan/allocation of resource records on a hit; scans decor and allocates only visible descriptors on a miss",
+    "definitions": "Resource layout changes within a world must advance resource_revision; ordinary blocker versions do not affect resource visuals"
+  },
+  "coverage": [
+    "No entries property or decor_cells read-model getter",
+    "Sixty unchanged updates across three paused frames reuse projection and rebuild count",
+    "Read query leaves persisted simulation continuation digest unchanged",
+    "Viewport entry/exit and empty projection release stale sprites",
+    "Same-phase sprite position follows geometry changes",
+    "Partial stock decrease reuses visual projection; phases 0->1, 2->3 and 4->5 refresh correctly; ore-empty phase skips sprite",
+    "A temporary candidate actually supplies the projection, then rollback returns to the old world; retained rejected projection does not retain candidate World/nav",
+    "Forced failed attach rollback preserves original world digest and cached projection",
+    "Successful restore after changing old decor array; all non-identity keys forced equal; new world invalidates cache",
+    "Same-index/phase sprite reused across worlds is repositioned",
+    "Retained projections do not retain old World/nav or closed BattleState"
+  ],
+  "inventory": {
+    "schemaVersion": 2,
+    "trackedFields": [
+      "units",
+      "selected",
+      "map_data",
+      "nav",
+      "decor_cells"
+    ],
+    "fourEntrySitesBefore": 40,
+    "fiveEntrySitesBefore": 41,
+    "sitesAfter": 38,
+    "consumersAfter": 10,
+    "battleAccessSites": 36,
+    "sceneFacadeSites": 2,
+    "source": "tools/inputs/battle_access_inventory.json"
+  },
+  "notCertified": [
+    "Hosted CI was not triggered",
+    "No formal EXE/GPU-pixel/performance certification",
+    "No resource spatial index or universal detection of arbitrary direct dictionary writes",
+    "Remaining HUD/command/minimap/unit-visual mutable accessors were not all migrated"
+  ]
+}
