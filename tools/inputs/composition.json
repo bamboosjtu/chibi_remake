@@ -55,70 +55,7 @@
     }
   },
   "ports": {
-    "simulation/ports/abilities_dependencies.gd": {
-      "host": "main"
-    },
-    "simulation/ports/ai_economy_dependencies.gd": {
-      "host": "main"
-    },
-    "simulation/ports/ai_orders_dependencies.gd": {
-      "host": "main"
-    },
     "simulation/ports/battle_simulation_dependencies.gd": {
-      "host": "main"
-    },
-    "simulation/ports/campaign_dependencies.gd": {
-      "host": "main"
-    },
-    "simulation/ports/cheat_rules_dependencies.gd": {
-      "host": "main"
-    },
-    "simulation/ports/combat_dependencies.gd": {
-      "host": "main"
-    },
-    "simulation/ports/command_groups_dependencies.gd": {
-      "host": "main"
-    },
-    "simulation/ports/construction_orders_dependencies.gd": {
-      "host": "main"
-    },
-    "simulation/ports/entity_factory_dependencies.gd": {
-      "host": "main"
-    },
-    "simulation/ports/harvest_orders_dependencies.gd": {
-      "host": "main"
-    },
-    "simulation/ports/interaction_paths_dependencies.gd": {
-      "host": "main"
-    },
-    "simulation/ports/movement_dependencies.gd": {
-      "host": "main"
-    },
-    "simulation/ports/officer_pool_dependencies.gd": {
-      "host": "main"
-    },
-    "simulation/ports/officer_teams_dependencies.gd": {
-      "host": "main"
-    },
-    "simulation/ports/production_dependencies.gd": {
-      "host": "main"
-    },
-    "simulation/ports/selection_dependencies.gd": {
-      "host": "main"
-    },
-    "simulation/ports/spatial_index_dependencies.gd": {
-      "host": "main"
-    },
-    "simulation/ports/technology_dependencies.gd": {
-      "host": "main"
-    },
-    "simulation/ports/transport_orders_dependencies.gd": {
-      "host": "main"
-    },
-    "simulation/ports/unit_actions_dependencies.gd": {
-      "host": "main"
-    },
-    "simulation/ports/world_orders_dependencies.gd": {
       "host": "main"
     },
     "app/battle/ports/bootstrap_dependencies.gd": {
@@ -184,12 +121,6 @@
     "presentation/menu/ports/level_dialog_dependencies.gd": {
       "host": "menu"
     },
-    "simulation/ports/navigation_grid_dependencies.gd": {
-      "host": "nav"
-    },
-    "simulation/ports/path_queries_dependencies.gd": {
-      "host": "nav"
-    },
     "simulation/ports/ai_access.gd": {
       "host": "main"
     },
@@ -240,6 +171,68 @@
     },
     "app/commands/economy_commands.gd": {
       "host": "main"
+    }
+  },
+  "internalScopes": {
+    "simulation/battle/abilities.gd": {
+      "host": "main"
+    },
+    "simulation/battle/ai_economy.gd": {
+      "host": "main"
+    },
+    "simulation/battle/ai_orders.gd": {
+      "host": "main"
+    },
+    "simulation/battle/cheat_rules.gd": {
+      "host": "main"
+    },
+    "simulation/battle/combat.gd": {
+      "host": "main"
+    },
+    "simulation/battle/command_groups.gd": {
+      "host": "main"
+    },
+    "simulation/battle/construction_orders.gd": {
+      "host": "main"
+    },
+    "simulation/battle/entity_factory.gd": {
+      "host": "main"
+    },
+    "simulation/battle/harvest_orders.gd": {
+      "host": "main"
+    },
+    "simulation/battle/interaction_paths.gd": {
+      "host": "main"
+    },
+    "simulation/battle/movement.gd": {
+      "host": "main"
+    },
+    "simulation/battle/officer_teams.gd": {
+      "host": "main"
+    },
+    "simulation/battle/production.gd": {
+      "host": "main"
+    },
+    "simulation/battle/selection.gd": {
+      "host": "main"
+    },
+    "simulation/battle/spatial_index.gd": {
+      "host": "main"
+    },
+    "simulation/battle/technology.gd": {
+      "host": "main"
+    },
+    "simulation/battle/transport_orders.gd": {
+      "host": "main"
+    },
+    "simulation/battle/unit_actions.gd": {
+      "host": "main"
+    },
+    "simulation/battle/world_orders.gd": {
+      "host": "main"
+    },
+    "simulation/navigation/path_queries.gd": {
+      "host": "nav"
     }
   }
 }

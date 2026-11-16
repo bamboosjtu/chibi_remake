@@ -2,9 +2,9 @@ extends RefCounted
 ## technology: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
-const Dependencies = preload("res://simulation/ports/technology_dependencies.gd")
+const REQUIRED_SERVICES := {"battle_simulation": ["_feedback"]}
 var battle: State
-var ports := Dependencies.new()
+var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
 
 func _init(data: State) -> void:
 	battle = data
@@ -268,18 +268,20 @@ func _queue_research(owner: int, building: Dictionary, idx: int, ai_dispatch := 
 	return true
 
 func _start_tech(idx: int) -> bool:
+	var services := ports.acquire(["battle_simulation"])
+	if services.is_empty(): return false
 	if battle.game_end != 0: return false
 	var building := _selected_research_building()
 	if building.is_empty():
-		ports._feedback("先选中已建成的科技建筑"); return false
+		services.battle_simulation._feedback("先选中已建成的科技建筑"); return false
 	if _building_work_busy(building):
-		ports._feedback("该建筑正在工作，请先取消或等待完成"); return false
+		services.battle_simulation._feedback("该建筑正在工作，请先取消或等待完成"); return false
 	var reason := tech_block_reason(idx)
 	if reason != "":
-		ports._feedback("无法研究：" + reason); return false
+		services.battle_simulation._feedback("无法研究：" + reason); return false
 	if not _queue_research(battle.player_owner,building,idx):
-		ports._feedback("无法开始：检查建筑、前置研究及资源"); return false
-	ports._feedback("开始%s「%s」：%s" % ["出售" if tech_is_sell(idx) else "研究",str(tech_row(idx).get("name","?")),tech_cost_text(idx)])
+		services.battle_simulation._feedback("无法开始：检查建筑、前置研究及资源"); return false
+	services.battle_simulation._feedback("开始%s「%s」：%s" % ["出售" if tech_is_sell(idx) else "研究",str(tech_row(idx).get("name","?")),tech_cost_text(idx)])
 	return true
 
 func _process_tech(_delta: float) -> void:
@@ -311,20 +313,24 @@ func _tech_for(owner: int) -> Dictionary:
 	return battle.army_tech[owner]
 
 func _apply_tech_effects(idx: int, owner := -1) -> void:
+	var services := ports.acquire(["battle_simulation"])
+	if services.is_empty(): return
 	if owner < 0: owner = battle.player_owner
 	if owner <= 0 or battle.scenario_sides.all(func(side): return int(side.owner) != owner): return
 	var state := _tech_for(owner)
 	if not preload("res://simulation/systems/technology_state.gd").complete(state, idx): return
 	for unit in battle.units:
 		if unit.alive and unit.die_t < 0 and int(unit.owner) == owner: _apply_tech_bonuses(unit)
-	if owner == battle.player_owner: ports._feedback("研究完成：%s" % str(tech_row(idx).get("name", "?")))
+	if owner == battle.player_owner: services.battle_simulation._feedback("研究完成：%s" % str(tech_row(idx).get("name", "?")))
 	print("TECH: owner%d completed %d 「%s」 %s" % [owner,idx,str(tech_row(idx).get("name", "?")),str(state)])
 
 func _cancel_tech() -> bool:
+	var services := ports.acquire(["battle_simulation"])
+	if services.is_empty(): return false
 	var job := _research_for_building(_selected_research_building())
 	if not job.is_empty():
 		battle.economy.refund(int(job.owner),job.cost); battle.research_jobs.erase(job)
-		ports._feedback("已取消研究，返还75%费用"); return true
+		services.battle_simulation._feedback("已取消研究，返还75%费用"); return true
 	if not battle.tech_progress.is_empty():
 		battle.economy.refund(battle.player_owner,battle.tech_progress.get("cost",{})); battle.tech_progress = {}
 		return true

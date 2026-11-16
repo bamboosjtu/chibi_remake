@@ -2,9 +2,9 @@ extends RefCounted
 ## entity factory: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
-const Dependencies = preload("res://simulation/ports/entity_factory_dependencies.gd")
+const REQUIRED_SERVICES := {"battle_simulation": ["_place_unit"], "command_groups": ["_nav_layer"], "entity_factory": ["_sheet_ref_for"], "production": ["_army_count"], "spatial_index": ["_free_unit_cell", "_index_remember", "_target_sync"], "technology": ["_apply_tech_bonuses"]}
 var battle: State
-var ports := Dependencies.new()
+var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
 
 func _init(data: State) -> void:
 	battle = data
@@ -116,14 +116,18 @@ func _make_unit(ob: Dictionary, is_map_object: bool) -> Dictionary:
 	return u
 
 func _initialize_unit(u: Dictionary, ob: Dictionary, w: int, h: int, k: float) -> void:
+	var services := ports.acquire(["technology"])
+	if services.is_empty(): return
 	preload("res://simulation/systems/locomotion.gd").ensure(u)
-	ports._apply_tech_bonuses(u)
+	services.technology._apply_tech_bonuses(u)
 	# Render nodes belong to the view's UID registry, including during restoration.
 	if battle.effects != null:
 		battle.effects.visual("attach_unit", [u, ob, w, h, k])
 
 func _spawn_unit(unit_id: int, owner: int, ax: float, ay: float, restoring := false) -> bool:
-	if not restoring and ports._army_count(owner) >= 200: return false
+	var services := ports.acquire(["production", "entity_factory", "command_groups", "spatial_index", "battle_simulation", "technology"])
+	if services.is_empty(): return false
+	if not restoring and services.production._army_count(owner) >= 200: return false
 	var meta: Dictionary = battle.map_data.units.get(str(unit_id), {})
 	if meta.is_empty():
 		push_warning("spawn failed: unknown unit %d" % unit_id)
@@ -131,7 +135,7 @@ func _spawn_unit(unit_id: int, owner: int, ax: float, ay: float, restoring := fa
 	if not restoring and unit_id in Config.NAVAL_UNITS and not battle.nav.has_water: return false
 	var w := int(meta.w)
 	var h := int(meta.h)
-	var sheet := ports._sheet_ref_for(unit_id, owner)
+	var sheet: String = services.entity_factory._sheet_ref_for(unit_id, owner)
 	if sheet == "":
 		push_warning("spawn failed: no sheet for unit %d owner %d" % [unit_id, owner])
 		return false
@@ -147,13 +151,13 @@ func _spawn_unit(unit_id: int, owner: int, ax: float, ay: float, restoring := fa
 	# A/B 是“脚底锚点格”，任何路径都会维护它；恢复/夹具路径不走下面的落位分支时
 	# 也必须先与坐标一致，否则读档前后的 A/B 会一边是 0 一边是真实格。
 	if not nu.is_building:
-		var anchor_cell := battle.nav.near_walkable(battle.nav.cell_of_px(ax, ay), ports._nav_layer(nu))
+		var anchor_cell := battle.nav.near_walkable(battle.nav.cell_of_px(ax, ay), services.command_groups._nav_layer(nu))
 		nu.A = anchor_cell.x; nu.B = anchor_cell.y
 	if not nu.is_building and not restoring:
 		# 水军按**水面层**落位（船坞产出的船、读档恢复的船都在水上）；陆军仍按陆地层。
-		var layer := ports._nav_layer(nu)
+		var layer: int = services.command_groups._nav_layer(nu)
 		var want := battle.nav.near_walkable(battle.nav.cell_of_px(ax, ay), layer)
-		var cell := ports._free_unit_cell(want, layer, int(nu.uid), unit_id)
+		var cell: Vector2i = services.spatial_index._free_unit_cell(want, layer, int(nu.uid), unit_id)
 		if cell.x < 0 or battle.nav.is_solid(cell, layer):
 			if battle.effects != null:
 				battle.effects.visual("free_unit", [nu])
@@ -161,15 +165,15 @@ func _spawn_unit(unit_id: int, owner: int, ax: float, ay: float, restoring := fa
 		var anchor := battle.nav.anchor_of(cell.x, cell.y)
 		nu.ax = anchor.x; nu.ay = anchor.y
 		nu.A = cell.x; nu.B = cell.y
-		ports._place_unit(nu)
+		services.battle_simulation._place_unit(nu)
 	# 新生产成员保持未编组；只有明确的组建命令才能占用武将。
 	# 生产/组建出来的新单位同样套用当前科技（幂等；_make_unit 里已调过一次）。
 	if owner == battle.player_owner:
-		ports._apply_tech_bonuses(nu)
+		services.technology._apply_tech_bonuses(nu)
 	battle.units.append(nu)
 	battle._index_units_size = battle.units.size()
-	ports._index_remember(nu)           # R13：新单位立即进入占格索引
-	ports._target_sync(nu)
+	services.spatial_index._index_remember(nu)           # R13：新单位立即进入占格索引
+	services.spatial_index._target_sync(nu)
 	return true
 
 func _attach_officer(u: Dictionary, o: Dictionary) -> void:

@@ -1,10 +1,10 @@
 import fs from 'node:fs';
 import {execFileSync, spawnSync} from 'node:child_process';
 
-const tracked = execFileSync('git', ['ls-files', '-z'], {encoding: 'buffer', maxBuffer: 64 * 1024 * 1024})
+const tracked = [...new Set(execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z'], {encoding: 'buffer', maxBuffer: 64 * 1024 * 1024})
   .toString('utf8')
   .split('\0')
-  .filter(Boolean);
+  .filter(file=>file&&fs.existsSync(file)))];
 const failures = [];
 
 const scripts = tracked.filter((file) => /\.(mjs|js)$/.test(file));

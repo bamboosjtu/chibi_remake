@@ -1,6 +1,6 @@
 extends RefCounted
 ## Data rules are fixed for a process. Code-rule changes bump the explicit ABI.
-const ABI := "battle-rules-v3"
+const ABI := "battle-rules-v4"
 ## Code behavior changes require an ABI review; source/export integrity stays in rules_manifest.
 const CATALOG_FIELDS := {
 	"unit_definitions.json": ["units"],
@@ -53,7 +53,7 @@ static func approved_migration(previous: String) -> bool:
 	var contract=JSON.parse_string(FileAccess.get_file_as_string("res://data/db/rules_contract.json"))
 	if not contract is Dictionary:return false
 	var migration=contract.get("migrations",{}).get(previous,{})
-	return migration is Dictionary and migration.get("target","")==current() and migration.get("policy","") in ["realtime-navigation-v1", "rules-scope-v1"]
+	return migration is Dictionary and migration.get("target","")==current() and migration.get("policy","") in ["realtime-navigation-v1", "rules-scope-v1", "bounded-blocked-navigation-v1"]
 
 static func rule_projection(name: String, data: Dictionary) -> Dictionary:
 	var result := {}

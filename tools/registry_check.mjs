@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
+import {validateInternalScope,argumentsAt} from './lib/internal_contracts.mjs';
 const args=process.argv.slice(2),option=(key,fallback)=>args.includes(key)?args[args.indexOf(key)+1]:fallback;
 const root=option('--root','godot/chibi_remake');
 const read=file=>fs.readFileSync(path.join(root,file),'utf8');
@@ -25,6 +26,7 @@ if(args.includes('--runtime-log')){
  process.exit(0);
 }
 let bindings=0;
+let internalCalls=0;
 for(const [file,entry] of Object.entries(manifest.ports)){
  const text=read(file);
  if(/\b(?:invoke|api\.get)\(|var _fn\w*\s*:/.test(text))throw Error(file+': obsolete dispatch');
@@ -54,13 +56,37 @@ for(const [file,entry] of Object.entries(manifest.ports)){
   }
  }
 }
+for(const [file,entry] of Object.entries(manifest.internalScopes)){
+ const source=read(file),declared=JSON.parse(source.match(/^const REQUIRED_SERVICES := (.+)$/m)?.[1]??'null');
+ if(!declared)throw Error(file+': missing local service contract');
+ for(const [provider,requirements] of Object.entries(declared)){
+  const target=manifest.hosts[entry.host][provider];
+  if(!target)throw Error(file+': unknown internal provider '+provider);
+  const provided=methods(target);
+  for(const method of requirements){if(!provided.has(method))throw Error(file+': '+provider+'.'+method+' missing');bindings++;}
+ }
+ const calls=validateInternalScope(file,source,declared);
+ for(const call of calls){
+  if(call.argumentCount===undefined)continue; // A method reference, e.g. engagement's synchronous callback.
+  const target=read(manifest.hosts[entry.host][call.provider]);
+  const declaration=new RegExp('^(?:static )?func '+call.method+'\\(','m').exec(target);
+  if(!declaration)continue; // Inherited providers are checked for method existence above.
+  const parameters=argumentsAt(target,declaration.index+declaration[0].length-1);
+  const minimum=parameters.filter(parameter=>!/(?::=|(?<![=!])=(?!=))/.test(parameter)).length;
+  if(call.argumentCount<minimum||call.argumentCount>parameters.length)throw Error(`${file}:${call.line}: ${call.provider}.${call.method} expects ${minimum}..${parameters.length} arguments, got ${call.argumentCount}`);
+ }
+ internalCalls+=calls.length;
+}
 function walk(dir){return fs.readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.name.startsWith('.')||['art','media','data','assets','addons'].includes(e.name)?[]:e.isDirectory()?walk(path.join(dir,e.name)):e.name.endsWith('.gd')?[path.join(dir,e.name)]:[]);}
 for(const file of walk(root))for(const call of fs.readFileSync(file,'utf8').matchAll(/\bcommands\.(\w+)\.(\w+)\b/g)){
  if(!methods('app/commands/'+call[1]+'_commands.gd').has(call[2]))throw Error(file+': missing domain command '+call[1]+'.'+call[2]);
 }
 for(const file of walk(root)){
  const relative=path.relative(root,file).split(path.sep).join('/');
- if(fs.readFileSync(file,'utf8').startsWith('extends "res://named_port.gd"')&&!manifest.ports[relative])throw Error('Port outside composition coverage: '+relative);
+ const source=fs.readFileSync(file,'utf8');
+ if(source.includes('res://simulation/service_dependencies.gd')&&!manifest.internalScopes[relative])throw Error('Internal scope outside composition coverage: '+relative);
+ if(relative==='simulation/service_dependencies.gd' && [...source.matchAll(/^func (\w+)\(/gm)].some(m=>!['_init','connect_services','disconnect_services','acquire'].includes(m[1])))throw Error('Internal handwritten forwarding is forbidden');
+ if(relative!=='simulation/service_dependencies.gd' && /^extends "res:\/\/(?:named_port|simulation\/service_dependencies)\.gd"/.test(source)&&!manifest.ports[relative])throw Error('Port outside composition coverage: '+relative);
 }
 // Cross-check literal factory declarations before the engine runs as well.
 for(const [host,files,variable] of [['main',['simulation/battle_world.gd','main.gd'],'(?:_modules|_application_services)'],['view',['presentation/battle/battle_view.gd'],'_components'],['menu',['menu.gd'],'_components']]){
@@ -74,4 +100,4 @@ for(const file of ['simulation/battle_state.gd','app/battle_scene_state.gd','pre
  assert.deepEqual(declared,[...source.matchAll(/^var (\w+)/gm)].map(m=>m[1]),file+': explicit property surface is stale');
 }
 for(const retired of ['registry.gd','simulation/ports/capability_links.gd','app/battle_facade.gd'])if(fs.existsSync(path.join(root,retired)))throw Error('Retired dispatch still exists: '+retired);
-console.log(`REGISTRY PASS ${Object.keys(manifest.ports).length} named ports / ${bindings} checked provider methods / no reflection dispatch`);
+console.log(`REGISTRY PASS ${Object.keys(manifest.ports).length} contracts / ${bindings} checked provider methods / ${internalCalls} verified internal receivers / no reflection dispatch`);

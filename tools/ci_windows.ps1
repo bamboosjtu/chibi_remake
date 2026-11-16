@@ -54,6 +54,8 @@ if ($LASTEXITCODE -ne 0) { throw 'Window exit safety failed' }
 if ($FullRegression) {
     node tools/test_missing_presentation.mjs --engine $godot
     if ($LASTEXITCODE -ne 0) { throw 'Missing presentation recovery checks failed' }
+    node tools/benchmark_hot_paths.mjs --engine $godot
+    if ($LASTEXITCODE -ne 0) { throw 'CPU hot path budgets failed' }
     node tools/test_continuation_coverage.mjs --engine $godot
     if ($LASTEXITCODE -ne 0) { throw 'Full continuation checks failed' }
     python tools/test_native_sources.py

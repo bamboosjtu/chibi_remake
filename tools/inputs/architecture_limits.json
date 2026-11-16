@@ -21,8 +21,7 @@
     "presentation/battle/components/hud_build.gd::_build_right_panel": 95,
     "presentation/battle/components/hud_input.gd::_input": 117,
     "presentation/battle/components/hud_layout.gd::_apply_metrics": 140,
-    "simulation/battle/entity_factory.gd::_make_unit": 101,
-    "simulation/battle/unit_actions.gd::_step_unit_inner": 190
+    "simulation/battle/entity_factory.gd::_make_unit": 101
   },
   "reviews": {
     "files:main.gd": {
@@ -111,11 +110,6 @@
       "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."
     },
     "functions:simulation/battle/entity_factory.gd::_make_unit": {
-      "owner": "project-maintainers",
-      "reviewBy": "2027-02-16",
-      "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."
-    },
-    "functions:simulation/battle/unit_actions.gd::_step_unit_inner": {
       "owner": "project-maintainers",
       "reviewBy": "2027-02-16",
       "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."

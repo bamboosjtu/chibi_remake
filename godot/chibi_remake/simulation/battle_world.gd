@@ -95,7 +95,9 @@ func dispose() -> void:
 	for unit in state.units:
 		for field in ["target","gather_obj","build_target","repair_target","board_target"]:
 			if unit.get(field) is Dictionary:unit[field]=null
-	for service in _modules.values(): service.ports.disconnect_services()
+	for service in _modules.values():
+		var dependencies = service.get("ports")
+		if dependencies != null: dependencies.disconnect_services()
 	for access in _access.values(): access.disconnect_services()
 	_modules.clear()
 

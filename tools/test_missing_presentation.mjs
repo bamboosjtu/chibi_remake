@@ -10,7 +10,7 @@ const directory=path.resolve(option('--output','_work/missing-presentation'));
 fs.mkdirSync(directory,{recursive:true});
 const project=fs.mkdtempSync(path.join(directory,'project-'));
 const source=path.resolve('godot/chibi_remake');
-const files=execFileSync('git',['ls-files','-z','--','godot/chibi_remake'],{maxBuffer:64*1024*1024}).toString().split('\0').filter(Boolean);
+const files=[...new Set(execFileSync('git',['ls-files','--cached','--others','--exclude-standard','-z','--','godot/chibi_remake'],{maxBuffer:64*1024*1024}).toString().split('\0').filter(file=>file&&fs.existsSync(file)))];
 for(const file of files){
  const relative=path.relative(source,path.resolve(file)),target=path.join(project,relative);
  fs.mkdirSync(path.dirname(target),{recursive:true});

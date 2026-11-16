@@ -2,9 +2,9 @@ extends RefCounted
 ## spatial index: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
-const Dependencies = preload("res://simulation/ports/spatial_index_dependencies.gd")
+const REQUIRED_SERVICES := {"abilities": ["_spd_mult"], "battle_simulation": ["_place_unit"], "command_groups": ["_nav_layer"], "interaction_paths": ["_footprint_cells"]}
 var battle: State
-var ports := Dependencies.new()
+var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
 var _position_cells: Dictionary={}
 var _geometry_revision := -1
 const TRANSIT_STATES := ["move","gather","deliver","join","build","repair","board","unload"]
@@ -31,14 +31,16 @@ func _unit_overlaps_other(u: Dictionary) -> bool:
 	return _unit_overlaps_other_script(u)
 
 func _unit_overlaps_other_script(u: Dictionary) -> bool:
+	var services := ports.acquire(["command_groups", "interaction_paths"])
+	if services.is_empty(): return false
 	_index_ensure_current()
 	var uid:=int(u.uid);var layer:=int(battle._cell_index_layer.get(uid,-1))
-	if layer<0 or int(battle._index_unit_id.get(uid,-1))!=int(u.unit):layer=ports._nav_layer(u)
+	if layer<0 or int(battle._index_unit_id.get(uid,-1))!=int(u.unit):layer=services.command_groups._nav_layer(u)
 	var table: Dictionary=battle._cell_index.get(layer,{})
 	if preload("res://simulation/systems/unit_footprint.gd").class_of(int(u.unit))==0:
 		var single=table.get(_unit_cell(u))
 		return single!=null and (single.size()>1 or not single.has(uid))
-	for cell in ports._footprint_cells(u):
+	for cell in services.interaction_paths._footprint_cells(u):
 		var bucket=table.get(cell)
 		if bucket!=null and (bucket.size()>1 or not bucket.has(uid)):return true
 	return false
@@ -97,12 +99,14 @@ func _index_forget(u: Dictionary) -> void:
 	battle._index_unit_id.erase(uid)
 
 func _index_remember(u: Dictionary) -> void:
+	var services := ports.acquire(["command_groups", "interaction_paths"])
+	if services.is_empty(): return
 	if not _index_eligible(u): return
 	var uid := int(u.get("uid", -1))
 	if uid < 0: return
 	var anchor := _unit_cell(u)
-	var layer := ports._nav_layer(u)
-	var cells := ports._footprint_cells(u)
+	var layer: int = services.command_groups._nav_layer(u)
+	var cells: Array = services.interaction_paths._footprint_cells(u)
 	var table: Dictionary = battle._cell_index.get(layer, {})
 	for raw in cells:
 		var bucket = table.get(raw, null)
@@ -117,13 +121,15 @@ func _index_remember(u: Dictionary) -> void:
 	battle._index_unit_id[uid] = int(u.get("unit", -1))
 
 func _index_sync(u: Dictionary) -> void:
+	var services := ports.acquire(["command_groups"])
+	if services.is_empty(): return
 	var uid := int(u.get("uid", -1))
 	if uid < 0: return
 	if not _index_eligible(u):
 		_index_forget(u)
 		return
 	var anchor := _unit_cell(u)
-	var layer := ports._nav_layer(u)
+	var layer: int = services.command_groups._nav_layer(u)
 	if battle._cell_index_cell.get(uid, null) == anchor and int(battle._cell_index_layer.get(uid, -2)) == layer \
 			and int(battle._index_unit_id.get(uid, -2)) == int(u.get("unit", -1)):
 		return
@@ -212,6 +218,8 @@ func _free_unit_cell(cell: Vector2i, layer := 0, exclude_uid := -1, unit_id := -
 	return Vector2i(-1, -1)
 
 func _separate_unit(u: Dictionary) -> void:
+	var services := ports.acquire(["abilities", "battle_simulation"])
+	if services.is_empty(): return
 	if preload("res://simulation/systems/stratagem_rules.gd").active(u):return
 	if int(u.get("site_inside_uid", -1)) >= 0: return
 	if not bool(u.get("alive", false)) or float(u.get("die_t", -1)) >= 0.0: return
@@ -231,15 +239,17 @@ func _separate_unit(u: Dictionary) -> void:
 	var p := battle.nav.anchor_of(free.x, free.y)
 	# Yield at walking speed; snapping to a free cell caused visible sideways hops.
 	var previous:=Vector2(float(u.ax),float(u.ay))
-	var next:=previous.move_toward(p,Config.SPEED*ports._spd_mult(u)*Config.SIM_DT)
+	var next:=previous.move_toward(p,Config.SPEED*services.abilities._spd_mult(u)*Config.SIM_DT)
 	u.ax=next.x;u.ay=next.y
 	var actual:=_unit_cell(u);u.A=actual.x;u.B=actual.y
 	u.moved=not next.is_equal_approx(previous)
 	if u.moved:u.dir=int(round((next-previous).angle()/(PI/4.0)))&7
 	u.path = []; u.pi = 0
-	ports._place_unit(u)
+	services.battle_simulation._place_unit(u)
 
 func _connected_separation_cell(u: Dictionary, cell: Vector2i, near_only: bool) -> Vector2i:
+	var services := ports.acquire(["command_groups"])
+	if services.is_empty(): return Vector2i.ZERO
 	var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel()
 	if kernel!=null:
 		var cursor:=0;var context:=battle.nav.native_query_context()
@@ -248,11 +258,13 @@ func _connected_separation_cell(u: Dictionary, cell: Vector2i, near_only: bool) 
 			if candidate.x<0:return Vector2i(-1,-1)
 			cursor=candidate.w
 			var result:=Vector2i(candidate.x,candidate.y)
-			if candidate.z<=1 or not battle.nav.find_path(Vector2(u.ax,u.ay),battle.nav.anchor_of(result.x,result.y),true,ports._nav_layer(u),int(u.owner),int(u.unit)).is_empty():return result
+			if candidate.z<=1 or not battle.nav.find_path(Vector2(u.ax,u.ay),battle.nav.anchor_of(result.x,result.y),true,services.command_groups._nav_layer(u),int(u.owner),int(u.unit)).is_empty():return result
 	return _connected_separation_cell_script(u,cell,near_only)
 
 func _connected_separation_cell_script(u: Dictionary, cell: Vector2i, near_only: bool) -> Vector2i:
-	var layer := ports._nav_layer(u)
+	var services := ports.acquire(["command_groups"])
+	if services.is_empty(): return Vector2i.ZERO
+	var layer: int = services.command_groups._nav_layer(u)
 	var uid := int(u.get("uid", -1))
 	var unit_id := int(u.get("unit", -1))
 	var origin := Vector2(float(u.ax), float(u.ay))

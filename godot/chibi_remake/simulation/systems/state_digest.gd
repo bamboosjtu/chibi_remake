@@ -9,6 +9,7 @@ static func snapshot(host) -> Dictionary:
 		world.append([int(u.uid),int(u.unit),int(u.owner),float(u.ax),float(u.ay),float(u.hp),bool(u.alive)])
 		var record:Dictionary={"uid":int(u.uid)}
 		for key in ["state","pi","cool","site","build_t","build_frame","carry","carry_kind","group_officer","officer","action_phase","action_wait"]:record[key]=u.get(key)
+		if u.has("blocked_cursor"): record["blockedCursor"] = int(u.blocked_cursor)
 		record["targetUid"]=int(u.target.get("uid",-1)) if u.get("target") is Dictionary else -1
 		var points:Array=[]
 		for point in u.get("path",[]):points.append([point.x,point.y])

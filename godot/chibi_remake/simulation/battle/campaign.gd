@@ -2,9 +2,7 @@ extends RefCounted
 ## campaign: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
-const Dependencies = preload("res://simulation/ports/campaign_dependencies.gd")
 var battle: State
-var ports := Dependencies.new()
 
 func _init(data: State) -> void:
 	battle = data
@@ -64,25 +62,25 @@ func _check_end() -> void:
 		return
 	var policy: Dictionary = battle.rules.defeat_policy(str(battle.map_id)) if battle.rules != null else {"mode":"economy"}
 	if int(policy.get("requiredOfficer",0))>0 and not _required_officer_alive(int(policy.requiredOfficer)):
-		battle.game_end=2;ports._show_end(2);return
+		battle.game_end=2;_show_end(2);return
 	var outcome := _objective_eval()
 	if outcome == 2:
-		battle.game_end=2;ports._show_end(2);return
+		battle.game_end=2;_show_end(2);return
 	if outcome == 1:
 		# 专属出口与通用歼灭胜利分开：objective_done + task_latches 是脚本达成的证据。
 		battle.game_end = 1
-		ports._show_end(1)
+		_show_end(1)
 		print("SCRIPTED VICTORY mission %d objective_done=%s" % [int(battle.scenario_mission), str(battle.objective_done)])
 		return
 	# 原版默认（歼灭战）：胜利 = **所有**敌对参战方的单位与建筑都清空
 	if enemy_units == 0 and enemy_buildings == 0:
 		battle.game_end = 1
-		ports._show_end(1)
+		_show_end(1)
 		print("VICTORY")
 	# 失败 = (资源1 == 0 或 我军机动单位 == 0) 且 我军建筑 == 0
 	elif int(mine.buildings)==0 and (int(mine.units)==0 or (str(policy.mode)=="economy" and battle.gold<=0.0)):
 		battle.game_end = 2
-		ports._show_end(2)
+		_show_end(2)
 		print("DEFEAT")
 
 func _required_officer_alive(officer: int) -> bool:

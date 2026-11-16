@@ -203,6 +203,24 @@
         "--noview"
       ],
       "timeout": 150
+    },
+    {
+      "script": "test_unit_action_states",
+      "markers": [
+        "UNIT ACTION STATES PASS"
+      ],
+      "args": [
+        "--noview"
+      ]
+    },
+    {
+      "script": "test_hot_path_contracts",
+      "markers": [
+        "HOT PATH CONTRACTS PASS"
+      ],
+      "args": [
+        "--noview"
+      ]
     }
   ]
 }

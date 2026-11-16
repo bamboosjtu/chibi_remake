@@ -1,9 +1,9 @@
 extends RefCounted
 ## ai economy: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
-const Dependencies = preload("res://simulation/ports/ai_economy_dependencies.gd")
+const REQUIRED_SERVICES := {"command_groups": ["_commander_for", "_construction_workers"], "construction_orders": ["building_block_reason"], "production": ["_queue_train", "train_types_for"], "technology": ["_ai_side", "_building_work_busy", "_combat_member_count", "_queue_research", "_tech_for", "_tech_line_of", "ai_tech_gate"]}
 var battle: State
-var ports := Dependencies.new()
+var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
 
 func _init(data: State) -> void:
 	battle = data
@@ -21,9 +21,11 @@ func ai_owners() -> Array:
 	return out
 
 func _ai_res_of(owner: int) -> Dictionary:
+	var services := ports.acquire(["technology"])
+	if services.is_empty(): return {}
 	if owner <= 0 or owner == battle.player_owner or owner not in ai_owners(): return {}
 	if not battle.ai_res.has(owner):
-		var sd := ports._ai_side(owner)
+		var sd: Dictionary = services.technology._ai_side(owner)
 		var r: Array = sd.get("resources", [])
 		battle.ai_res[owner] = {
 			"gold": float(r[0]) if r.size() > 0 else 1000.0,
@@ -58,16 +60,19 @@ func ai_worker_count(owner: int) -> int:
 	return n
 
 func ai_construction_commander(owner: int) -> Dictionary:
-	for commander in battle.units:
+	var roster := preload("res://simulation/queries/construction_roster.gd").new(battle.units)
+	for commander in roster.by_owner.get(owner, []):
 		if int(commander.owner) != owner or str(commander.state) != "idle": continue
-		var workers := ports._construction_workers(commander)
+		var workers := roster.construction_workers(commander)
 		if not workers.is_empty() and workers.all(func(worker): return str(worker.state) == "idle"):
 			return commander
 	return {}
 
 func _working_construction_team(unit: Dictionary) -> bool:
-	var commander := ports._commander_for(unit)
-	return ports._construction_workers(commander).any(func(worker): return worker.state == "build" and worker.get("build_target") is Dictionary)
+	var services := ports.acquire(["command_groups"])
+	if services.is_empty(): return false
+	var commander: Dictionary = services.command_groups._commander_for(unit)
+	return services.command_groups._construction_workers(commander).any(func(worker): return worker.state == "build" and worker.get("build_target") is Dictionary)
 
 func ai_group_of(u: Dictionary) -> int:
 	var officer: Dictionary = u.get("officer", {})
@@ -76,10 +81,12 @@ func ai_group_of(u: Dictionary) -> int:
 	return int(u.get("group_officer", -1))
 
 func ai_can_build(owner: int, building_type: int) -> bool:
+	var services := ports.acquire(["construction_orders"])
+	if services.is_empty(): return false
 	var frame: Dictionary = battle.map_data.units.get(str(int(building_type)), {})
 	if frame.is_empty():
 		return false
-	return ports.building_block_reason(building_type, owner) == "" and ai_can_afford(owner, ai_unit_cost(building_type))
+	return services.construction_orders.building_block_reason(building_type, owner) == "" and ai_can_afford(owner, ai_unit_cost(building_type))
 
 func _dock_can_launch(point: Vector2) -> bool:
 	if not battle.nav.has_water: return false
@@ -106,12 +113,16 @@ func ai_gift(owner: int, wood: float, food: float, stone: float) -> void:
 	r["stone"] = float(r.get("stone", 0.0)) + stone
 
 func ai_behavior(owner: int) -> int:
-	var init: Array = ports._ai_side(owner).get("init",[])
+	var services := ports.acquire(["technology"])
+	if services.is_empty(): return 0
+	var init: Array = services.technology._ai_side(owner).get("init",[])
 	return int(init[0]) if not init.is_empty() else 0
 
 func ai_research_building(owner: int, idx: int) -> Dictionary:
+	var services := ports.acquire(["technology"])
+	if services.is_empty(): return {}
 	var kinds: Array
-	match ports._tech_line_of(idx):
+	match services.technology._tech_line_of(idx):
 		"hq": kinds = [0,1]
 		"bow": kinds = [4,5]
 		"weapon","armor": kinds = [2,3]
@@ -119,24 +130,28 @@ func ai_research_building(owner: int, idx: int) -> Dictionary:
 		"ship": kinds = [20]
 		_: return {}
 	for building in battle.units:
-		if int(building.owner) == owner and building.alive and building.die_t < 0 and kinds.has(int(building.unit)) and not ports._building_work_busy(building): return building
+		if int(building.owner) == owner and building.alive and building.die_t < 0 and kinds.has(int(building.unit)) and not services.technology._building_work_busy(building): return building
 	return {}
 
 func ai_queue_hq_upgrade(owner: int) -> bool:
+	var services := ports.acquire(["technology"])
+	if services.is_empty(): return false
 	var level := ai_level(owner)
-	if level >= 3 or ports.ai_tech_gate(owner) < level+2: return false
+	if level >= 3 or services.technology.ai_tech_gate(owner) < level+2: return false
 	var kinds := ai_building_kinds(owner)
 	if level <= 1 and (not kinds.has(4) or not kinds.has(2)): return false
 	if level == 1 and (not kinds.has(8) or not kinds.has(6)): return false
-	if ports._combat_member_count(owner) < level+2: return false
-	var state := ports._tech_for(owner)
+	if services.technology._combat_member_count(owner) < level+2: return false
+	var state: Dictionary = services.technology._tech_for(owner)
 	if level == 2 and (int(state.get("bow",0)) < 2 or int(state.get("weapon",0)) < 2): return false
 	var building := ai_research_building(owner,level)
-	return not building.is_empty() and ports._queue_research(owner,building,level,true)
+	return not building.is_empty() and services.technology._queue_research(owner,building,level,true)
 
 func ai_level(owner: int) -> int:
+	var services := ports.acquire(["technology"])
+	if services.is_empty(): return 0
 	if owner == battle.player_owner: return int(battle.player_tech.get("level", 0))
-	return int(ports._tech_for(owner).get("level", 0))
+	return int(services.technology._tech_for(owner).get("level", 0))
 
 func _naval_research_gate(_owner: int) -> bool:
 	return false
@@ -150,11 +165,13 @@ func ai_force_units(owner: int) -> int:
 	return n
 
 func ai_production_building(owner: int, requested_unit := -1) -> Dictionary:
+	var services := ports.acquire(["technology", "production"])
+	if services.is_empty(): return {}
 	for u in battle.units:
 		if u.is_building and int(u.owner) == owner and u.alive and u.die_t < 0 and not bool(u.get("site", false)):
 			if requested_unit >= 0:
-				if ports._building_work_busy(u): continue
-				if not ports.train_types_for(int(u.unit), owner).any(func(opt): return int(opt.unit) == requested_unit): continue
+				if services.technology._building_work_busy(u): continue
+				if not services.production.train_types_for(int(u.unit), owner).any(func(opt): return int(opt.unit) == requested_unit): continue
 			return u
 	return {}
 
@@ -167,7 +184,9 @@ func ai_can_afford(owner: int, cost: Dictionary) -> bool:
 	return battle.economy.can_pay(owner, cost)
 
 func ai_enqueue_train(owner: int, b: Dictionary, unit_id: int, _cost: Dictionary) -> bool:
-	return ports._queue_train(owner, b, unit_id)
+	var services := ports.acquire(["production"])
+	if services.is_empty(): return false
+	return services.production._queue_train(owner, b, unit_id)
 
 func ai_disband_slot(owner: int, slot: int) -> void:
 	if battle.ai != null and owner != battle.player_owner and slot>=0 and slot<4:

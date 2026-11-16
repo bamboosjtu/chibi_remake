@@ -2,11 +2,12 @@ extends RefCounted
 ## path queries.
 const GridState = preload("res://simulation/navigation/navigation_state.gd")
 var _grid_state: GridState
-var ports = preload("res://simulation/ports/path_queries_dependencies.gd").new()
+const REQUIRED_SERVICES := {"grid": ["_id", "anchor_of", "cell_of_px", "close_route_gates", "near_walkable", "open_route_gates"]}
+var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
 const GridRay = preload("res://simulation/navigation/grid_ray.gd")
 var _gate_shape_version := -1
 var _gate_shape_cache: Dictionary={}
-var metrics := {"calls":0,"microseconds":0,"smoothMicroseconds":0,"searchMicroseconds":0,"rayCells":0}
+var metrics := {"calls":0,"microseconds":0,"smoothMicroseconds":0,"searchMicroseconds":0,"rayCells":0,"avoidWrites":0,"avoidScopes":0}
 const UnitFootprint = preload("res://simulation/systems/unit_footprint.gd")
 
 func _init(data: GridState) -> void:
@@ -25,40 +26,57 @@ func find_path_avoiding(from_px: Vector2, to_px: Vector2, exact: bool, avoid_cel
 	return result
 
 func _query_path(from_px: Vector2, to_px: Vector2, exact: bool, layer := 0, owner := -1, unit_id := -1) -> Array:
+	var services := ports.acquire(["grid"])
+	if services.is_empty(): return []
 	var cls := UnitFootprint.class_of(int(unit_id)) if int(unit_id) >= 0 else 0
 	# Friendly orders may plan through their closed automatic gates. Only the
 	# synchronous route query uses this graph; movement always sees the real state.
 	var g:=_grid_for(layer,cls)
 	_shape_apply_dirty(layer,cls)
-	var route_gates:=ports.open_route_gates(owner,layer)
+	var route_gates: Array = services.grid.open_route_gates(owner,layer)
 	var gate_shape:=_route_shape_gates(route_gates,layer,cls,owner)
 	var result := _find_path(from_px, to_px, exact, layer, cls)
 	result = _smooth_path(from_px,result,layer,cls)
 	for id in gate_shape:g.set_point_disabled(int(id),bool(gate_shape[id]))
-	ports.close_route_gates(route_gates)
+	services.grid.close_route_gates(route_gates)
 	return result
 
 ## 临时避让其他单位占格：只在本查询期间禁用，查询后恢复原状态。
 ## 用于“不叠格”后的绕行，避免把前排单位当成永久墙或直接堵死。
 
 func _query_avoiding(from_px: Vector2, to_px: Vector2, exact: bool, avoid_cells: Array, layer := 0, owner := -1, unit_id := -1) -> Array:
+	var services := ports.acquire(["grid"])
+	if services.is_empty(): return []
 	var cls := UnitFootprint.class_of(int(unit_id)) if int(unit_id) >= 0 else 0
 	if avoid_cells.is_empty():
 		return _query_path(from_px, to_px, exact, layer, owner, unit_id)
 	var g := _grid_for(layer, cls)
 	_shape_apply_dirty(layer, cls)
-	var route_gates:=ports.open_route_gates(owner,layer)
+	var route_gates: Array = services.grid.open_route_gates(owner,layer)
 	var gate_shape:=_route_shape_gates(route_gates,layer,cls,owner)
+	var prev := _avoid_overlay(g, avoid_cells, cls)
+	var result := _find_path(from_px, to_px, exact, layer, cls)
+	result = _smooth_path(from_px,result,layer,cls)
+	for id in prev:
+		g.set_point_disabled(int(id), bool(prev[id]))
+	for id in gate_shape:g.set_point_disabled(int(id),bool(gate_shape[id]))
+	services.grid.close_route_gates(route_gates)
+	return result
+
+func _avoid_overlay(g: AStar2D, avoid_cells: Array, cls: int, except_cell := Vector2i(-1,-1)) -> Dictionary:
 	var prev := {}
+	metrics.avoidScopes += 1
 	var rows:=int(_grid_state.map_data.rows);var cols:=int(_grid_state.map_data.cols)
 	var even:=UnitFootprint.offsets(cls,0);var odd:=UnitFootprint.offsets(cls,1)
 	for raw in avoid_cells:
 		var c: Vector2i = raw
+		if c == except_cell: continue
 		if cls <= 0:
 			var id := c.x*cols+c.y
 			if prev.has(id): continue
-			prev[id] = g.is_point_disabled(id)
-			g.set_point_disabled(id, true)
+			if g.is_point_disabled(id): continue
+			prev[id] = false
+			g.set_point_disabled(id, true); metrics.avoidWrites += 1
 			continue
 		# 形状图禁用的是**锚点**：只要身体会盖住避让格，该锚点就不可用。
 		for off in even:
@@ -66,21 +84,41 @@ func _query_avoiding(from_px: Vector2, to_px: Vector2, exact: bool, avoid_cells:
 			if (a.y & 1) != 0 or a.x<0 or a.y<0 or a.x>=rows or a.y>=cols: continue
 			var aid := a.x*cols+a.y
 			if prev.has(aid): continue
-			prev[aid] = g.is_point_disabled(aid)
-			g.set_point_disabled(aid, true)
+			if g.is_point_disabled(aid): continue
+			prev[aid] = false
+			g.set_point_disabled(aid, true); metrics.avoidWrites += 1
 		for off in odd:
 			var a2: Vector2i = c - off
 			if (a2.y & 1) == 0 or a2.x<0 or a2.y<0 or a2.x>=rows or a2.y>=cols: continue
 			var aid2 := a2.x*cols+a2.y
 			if prev.has(aid2): continue
-			prev[aid2] = g.is_point_disabled(aid2)
-			g.set_point_disabled(aid2, true)
-	var result := _find_path(from_px, to_px, exact, layer, cls)
-	result = _smooth_path(from_px,result,layer,cls)
-	for id in prev:
-		g.set_point_disabled(int(id), bool(prev[id]))
-	for id in gate_shape:g.set_point_disabled(int(id),bool(gate_shape[id]))
-	ports.close_route_gates(route_gates)
+			if g.is_point_disabled(aid2): continue
+			prev[aid2] = false
+			g.set_point_disabled(aid2, true); metrics.avoidWrites += 1
+	return prev
+
+func first_path_avoiding(origin: Vector2, destinations: Array, avoid_cells: Array, except_cell: Vector2i, layer: int, owner: int, unit_id: int, accepts: Callable) -> Dictionary:
+	var services := ports.acquire(["grid"])
+	if services.is_empty(): return {}
+	if destinations.is_empty(): return {}
+	var begin := Time.get_ticks_usec()
+	var cls := UnitFootprint.class_of(unit_id) if unit_id >= 0 else 0
+	var graph := _grid_for(layer, cls)
+	_shape_apply_dirty(layer, cls)
+	var gates: Array = services.grid.open_route_gates(owner, layer)
+	var gate_shape := _route_shape_gates(gates, layer, cls, owner)
+	var previous := _avoid_overlay(graph, avoid_cells, cls, except_cell)
+	var result := {}
+	for index in range(destinations.size()):
+		var path := _smooth_path(origin, _find_path(origin, destinations[index], true, layer, cls), layer, cls)
+		metrics.calls += 1
+		if not path.is_empty() and accepts.call(path):
+			result = {"index":index,"path":path}
+			break
+	for id in previous: graph.set_point_disabled(int(id), bool(previous[id]))
+	for id in gate_shape: graph.set_point_disabled(int(id), bool(gate_shape[id]))
+	services.grid.close_route_gates(gates)
+	metrics.microseconds += Time.get_ticks_usec() - begin
 	return result
 
 ## Remove the offset grid's staircase only where the same planning graph permits
@@ -149,15 +187,17 @@ func _find_path(from_px: Vector2, to_px: Vector2, exact: bool, layer: int, cls: 
 	return result
 
 func _find_path_core(from_px: Vector2, to_px: Vector2, exact: bool, layer: int, cls: int) -> Array:
+	var services := ports.acquire(["grid"])
+	if services.is_empty(): return []
 	var g := _grid_for(layer, cls)
 	# B6：起点也要吸附，否则单位站在建筑/水域格时 get_id_path 返回空 → 直穿
 	# 2026-10-16 加固：单位可能贴着/挤进不可走格的角落（停下时像素落在斜角格的另一边），
 	# 此时 from 的吸附点与当前位置之间的**视线**会被挡住。这里改为：
 	# 在起点周围扩充环里找第一个「可走且从其锚点看得见单位当前位置」的格当出发格；
 	# 找不到才返回空（维持 ARCH-003：绝不编一条穿墙直线）。
-	var from0 := ports.cell_of_px(from_px.x, from_px.y)
+	var from0: Vector2i = services.grid.cell_of_px(from_px.x, from_px.y)
 	var from := from0
-	var origin := ports.anchor_of(from.x, from.y)
+	var origin: Vector2 = services.grid.anchor_of(from.x, from.y)
 	var start_ok := _anchor_fits(from, layer, cls) \
 			and (from_px.distance_to(origin) <= 0.01 or _escape_clear_for(from_px, origin, layer, cls))
 	if not start_ok:
@@ -171,7 +211,7 @@ func _find_path_core(from_px: Vector2, to_px: Vector2, exact: bool, layer: int, 
 						clampi(from0.y + dy, 0, int(_grid_state.map_data.cols) - 1))
 					if not _anchor_fits(c, layer, cls):
 						continue
-					var an := ports.anchor_of(c.x, c.y)
+					var an: Vector2 = services.grid.anchor_of(c.x, c.y)
 					if _escape_clear_for(from_px, an, layer, cls):
 						from = c
 						origin = an
@@ -185,17 +225,17 @@ func _find_path_core(from_px: Vector2, to_px: Vector2, exact: bool, layer: int, 
 				break
 		if not found:
 			return []
-	var to := _near_fitting(ports.cell_of_px(to_px.x, to_px.y), layer, cls)
+	var to := _near_fitting(services.grid.cell_of_px(to_px.x, to_px.y), layer, cls)
 	if not _anchor_fits(to, layer, cls):
 		return []
 	if from == to:
-		return [ports.anchor_of(to.x, to.y)] if exact else []
+		return [services.grid.anchor_of(to.x, to.y)] if exact else []
 	# Open-ground orders can use the exact same collision graph directly. Keep
 	# gate waypoints on A* routes because automatic opening observes those cells.
-	var destination: Vector2=ports.anchor_of(to.x,to.y)
+	var destination: Vector2=services.grid.anchor_of(to.x,to.y)
 	if exact and _anchor_fits(_cell(to_px),layer,cls):destination=to_px
 	if start_ok and _direct_route_clear(from_px,destination,g):return [destination]
-	var ids = g.get_id_path(ports._id(from), ports._id(to))
+	var ids = g.get_id_path(services.grid._id(from), services.grid._id(to))
 	if ids.size() < 2:
 		return []                      # 不可达：交给调用方反馈，不要编一条路出来
 	var pts := []
@@ -213,7 +253,7 @@ func _find_path_core(from_px: Vector2, to_px: Vector2, exact: bool, layer: int, 
 		previous = point
 	if exact:
 		var exact_ok := segment_clear(pts.back(), to_px, layer) if cls <= 0 \
-				else (_anchor_fits(ports.cell_of_px(to_px.x, to_px.y), layer, cls) and _segment_clear_for(pts.back(), to_px, layer, cls))
+				else (_anchor_fits(services.grid.cell_of_px(to_px.x, to_px.y), layer, cls) and _segment_clear_for(pts.back(), to_px, layer, cls))
 		if exact_ok:
 			pts.append(to_px)
 	return pts
@@ -230,8 +270,10 @@ func _anchor_fits(anchor: Vector2i, layer: int, cls: int) -> bool:
 	return true
 
 func _near_fitting(cell: Vector2i, layer: int, cls: int) -> Vector2i:
+	var services := ports.acquire(["grid"])
+	if services.is_empty(): return Vector2i.ZERO
 	if cls <= 0:
-		return ports.near_walkable(cell, layer)
+		return services.grid.near_walkable(cell, layer)
 	if _anchor_fits(cell, layer, cls):
 		return cell
 	# 与 near_walkable 相同的 5 圈上限：自检用 ±6 格封闭块验证“不可达必须返回空”，
@@ -287,6 +329,8 @@ func _shape_key(layer: int, cls: int) -> String:
 	return "%d:%d" % [layer, cls]
 
 func _shape_graph(layer: int, cls: int) -> AStar2D:
+	var services := ports.acquire(["grid"])
+	if services.is_empty(): return null
 	var key := _shape_key(layer, cls)
 	if _grid_state._shape_graphs.has(key):
 		return _grid_state._shape_graphs[key]
@@ -296,7 +340,7 @@ func _shape_graph(layer: int, cls: int) -> AStar2D:
 	for a in range(rows):
 		for b in range(cols):
 			var c := Vector2i(a, b)
-			var id := ports._id(c)
+			var id: int = services.grid._id(c)
 			g.add_point(id, _grid_state.astar.get_point_position(id))
 	# Reuse the exact connection order created by Grid.setup. Geometry is shared;
 	# only each footprint's disabled flags differ. This preserves A* tie breaking
@@ -307,7 +351,7 @@ func _shape_graph(layer: int, cls: int) -> AStar2D:
 	for a in range(rows):
 		for b in range(cols):
 			var anchor := Vector2i(a, b)
-			g.set_point_disabled(ports._id(anchor), not _anchor_fits(anchor, layer, cls))
+			g.set_point_disabled(services.grid._id(anchor), not _anchor_fits(anchor, layer, cls))
 	_grid_state._shape_graphs[key] = g
 	_grid_state._shape_pending[key] = {}
 	return g

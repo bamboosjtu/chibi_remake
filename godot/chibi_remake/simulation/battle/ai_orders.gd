@@ -2,30 +2,32 @@ extends RefCounted
 ## ai orders: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
-const Dependencies = preload("res://simulation/ports/ai_orders_dependencies.gd")
+const REQUIRED_SERVICES := {"ai_economy": ["_ai_forming", "_working_construction_team", "ai_group_of", "ai_production_building"], "combat": ["_hostile_owners"], "command_groups": ["_cancel_unit_command"], "harvest_orders": ["_yield_of"], "movement": ["_path_to"]}
 const Targets = preload("res://simulation/systems/ai_targets.gd")
 var battle: State
-var ports := Dependencies.new()
+var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
 
 func _init(data: State) -> void:
 	battle = data
 
 func ai_order_rally(owner: int, skip_groups: Array = []) -> void:
-	var b := ports.ai_production_building(owner)
+	var services := ports.acquire(["ai_economy", "movement", "command_groups"])
+	if services.is_empty(): return
+	var b: Dictionary = services.ai_economy.ai_production_building(owner)
 	if b.is_empty():
 		return
 	for u in battle.units:
 		if int(u.owner) != owner or u.is_building or not u.alive or u.die_t >= 0.0:
 			continue
-		if skip_groups.has(ports.ai_group_of(u)): continue   # R10：撤退中的群不归队
-		if ports._working_construction_team(u) or ports._ai_forming(u) or bool(u.get("attached",false)): continue
+		if skip_groups.has(services.ai_economy.ai_group_of(u)): continue   # R10：撤退中的群不归队
+		if services.ai_economy._working_construction_team(u) or services.ai_economy._ai_forming(u) or bool(u.get("attached",false)): continue
 		if u.state != "idle":
 			continue
 		if Vector2(u.ax, u.ay).distance_to(Vector2(b.ax, b.ay)) > 900.0:
-			var pts := ports._path_to(u, Vector2(b.ax, b.ay), true)
+			var pts: Array = services.movement._path_to(u, Vector2(b.ax, b.ay), true)
 			if pts.is_empty():
 				continue
-			ports._cancel_unit_command(u)
+			services.command_groups._cancel_unit_command(u)
 			u.state = "move"
 			u.path = pts
 			u.pi = 0
@@ -35,12 +37,14 @@ func ai_order_assault_l1(owner: int, skip_groups: Array = []) -> void:
 	ai_order_assault(owner,skip_groups)
 
 func _l1_target(player: int) -> Dictionary:
+	var services := ports.acquire(["harvest_orders"])
+	if services.is_empty(): return {}
 	for u in battle.units:
 		if int(u.get("owner", -1)) != player or not bool(u.get("alive", false)) or float(u.get("die_t", -1)) >= 0.0:
 			continue
 		if float(u.get("hp", 0.0)) <= 0.0:
 			continue
-		if bool(u.get("decor", false)) or ports._yield_of(int(u.get("unit", -1))) != "":
+		if bool(u.get("decor", false)) or services.harvest_orders._yield_of(int(u.get("unit", -1))) != "":
 			continue
 		if int(u.get("unit", -1)) == 26:   # 大旗，类别 5
 			continue
@@ -48,13 +52,15 @@ func _l1_target(player: int) -> Dictionary:
 	return {}
 
 func ai_order_assault(owner: int, skip_groups: Array = []) -> void:
+	var services := ports.acquire(["ai_economy", "command_groups"])
+	if services.is_empty(): return
 	# 先扫一遍：有任何单位正忙 → 整体放弃（原版行为）。撤退中的群不参与该判定。
 	for u in battle.units:
 		if int(u.owner) != owner or u.is_building or not u.alive or u.die_t >= 0.0:
 			continue
 		if not Targets.ordinary_attacker(u) and (u.get("officer",{}) as Dictionary).is_empty(): continue
-		if skip_groups.has(ports.ai_group_of(u)): continue
-		if ports._working_construction_team(u) or ports._ai_forming(u) or bool(u.get("attached",false)): continue
+		if skip_groups.has(services.ai_economy.ai_group_of(u)): continue
+		if services.ai_economy._working_construction_team(u) or services.ai_economy._ai_forming(u) or bool(u.get("attached",false)): continue
 		if u.state == "attack" or u.state == "move":
 			return
 	var sent := 0
@@ -62,11 +68,11 @@ func ai_order_assault(owner: int, skip_groups: Array = []) -> void:
 		if int(u.owner) != owner or u.is_building or not u.alive or u.die_t >= 0.0 or not preload("res://simulation/systems/combat_rules.gd").can_attack(u):
 			continue
 		if not Targets.ordinary_attacker(u) and (u.get("officer",{}) as Dictionary).is_empty(): continue
-		if skip_groups.has(ports.ai_group_of(u)): continue   # R10：撤退中的群不进攻
-		if ports._working_construction_team(u) or ports._ai_forming(u) or bool(u.get("attached",false)): continue
+		if skip_groups.has(services.ai_economy.ai_group_of(u)): continue   # R10：撤退中的群不进攻
+		if services.ai_economy._working_construction_team(u) or services.ai_economy._ai_forming(u) or bool(u.get("attached",false)): continue
 		var e := Targets.select(battle.units,u,battle.player_owner,battle.scenario_mission,int(battle.map_data.cols))
 		if not e.is_empty():
-			ports._cancel_unit_command(u)
+			services.command_groups._cancel_unit_command(u)
 			u.state = "attack"
 			u.target = e
 			u.repath = 0.0
@@ -77,6 +83,8 @@ func ai_order_assault(owner: int, skip_groups: Array = []) -> void:
 		print("AI 进攻：owner %d 投入 %d 个单位" % [owner, sent])
 
 func ai_order_intercept(owner: int, focus: Dictionary, radius: float, skip_groups: Array = []) -> void:
+	var services := ports.acquire(["ai_economy", "command_groups"])
+	if services.is_empty(): return
 	# The focus supplies an existing combat target, not an omniscient map query.
 	var target = focus.get("target")
 	if not target is Dictionary or not Targets.available(target,battle.player_owner): return
@@ -89,13 +97,13 @@ func ai_order_intercept(owner: int, focus: Dictionary, radius: float, skip_group
 	for u in battle.units:
 		if int(u.owner) != owner or u.is_building or not u.alive or u.die_t >= 0.0 or not preload("res://simulation/systems/combat_rules.gd").can_attack(u):
 			continue
-		if skip_groups.has(ports.ai_group_of(u)): continue   # R10：撤退中的群不拦截
-		if ports._working_construction_team(u) or ports._ai_forming(u) or bool(u.get("attached",false)): continue
+		if skip_groups.has(services.ai_economy.ai_group_of(u)): continue   # R10：撤退中的群不拦截
+		if services.ai_economy._working_construction_team(u) or services.ai_economy._ai_forming(u) or bool(u.get("attached",false)): continue
 		if u.state == "attack":
 			continue
 		if not Targets.ordinary_attacker(u): continue
 		if absf(float(u.ax)-fp.x) > radius or absf(float(u.ay)-fp.y) > radius: continue
-		ports._cancel_unit_command(u)
+		services.command_groups._cancel_unit_command(u)
 		u.state = "attack"
 		u.target = target
 
@@ -108,6 +116,8 @@ func ai_focus_unit(owner: int) -> Dictionary:
 	return {}
 
 func _nearest_enemy_threat(u: Dictionary) -> Dictionary:
+	var services := ports.acquire(["combat"])
+	if services.is_empty(): return {}
 	# R09：普通进攻/拦截只找**人类玩家方**，多敌军地图不会出现电脑互攻。
 	var best: Dictionary = {}
 	var bd := 1.0e12
@@ -116,7 +126,7 @@ func _nearest_enemy_threat(u: Dictionary) -> Dictionary:
 	for e in battle.units:
 		if not e.alive or e.die_t >= 0.0 or bool(e.get("attached",false)):
 			continue
-		if not ports._hostile_owners(my_owner, int(e.owner)):
+		if not services.combat._hostile_owners(my_owner, int(e.owner)):
 			continue
 		if not player_side and int(e.owner) != battle.player_owner:
 			continue                    # 显式冗余：AI 之间永远不是威胁

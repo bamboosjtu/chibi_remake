@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import {validateInternalScope} from './lib/internal_contracts.mjs';
 const root = 'godot/chibi_remake';
 const walk = dir => fs.readdirSync(dir, {withFileTypes:true}).flatMap(entry => entry.name.startsWith('.') || ['art','media','data','assets','addons'].includes(entry.name) ? [] : entry.isDirectory() ? walk(dir+'/'+entry.name) : entry.name.endsWith('.gd') ? [dir+'/'+entry.name] : []);
 const sources = Object.fromEntries(walk(root).map(file => [path.relative(root,file).replaceAll('\\','/'),fs.readFileSync(file,'utf8')]));
@@ -23,10 +24,14 @@ const ports = Object.entries(registry.ports).map(([file, entry]) => {
     const nameMatches = consumers.filter(consumer => new RegExp('\\.'+name+'\\s*\\(').test(sources[consumer]));
     return {name, category, ...(provider ? {provider, forwarded, mechanical, privateContract:forwarded?.startsWith('_') ?? false} : {}), nameMatches};
   });
-  return {file, host:entry.host, consumers:consumers.sort(), providers, methods};
+  return {file, host:entry.host, kind:'guarded-adapter', consumers:consumers.sort(), providers, methods};
 });
-const report = {schemaVersion:2, safeForAutomatedDeletion:false, receiverResolution:"unresolved", method:'Static literal imports and simulation_access domains plus CONTRACTS provider resolution. Method-name matches do not resolve receivers: positive matches may refer to another object, and zero matches do not prove dead code because signals/Callables and inherited adapters exist. This inventory is a review aid, never deletion evidence.', ports};
+const internalScopes=Object.entries(registry.internalScopes).map(([file,entry])=>{
+ const declared=JSON.parse(sources[file].match(/^const REQUIRED_SERVICES := (.+)$/m)[1]);
+ return {file,host:entry.host,category:'module-capability',providers:declared,resolvedCalls:validateInternalScope(file,sources[file],declared)};
+});
+const report = {schemaVersion:3, safeForAutomatedDeletion:false, receiverResolution:"partial", method:'Internal scopes verify a restricted literal acquire/guard/direct-receiver form against the composition manifest. Other adapters retain method-name hints only: positive matches may refer to another object, and zero matches do not prove dead code because signals/Callables and inherited adapters exist. This is not a general syntax-tree call graph or deletion evidence.', ports,internalScopes};
 const target = 'tools/inputs/port_inventory.json', text = JSON.stringify(report,null,2)+'\n';
 if (process.argv.includes('--write')) fs.writeFileSync(target,text);
 else if (!fs.existsSync(target) || fs.readFileSync(target,'utf8') !== text) throw Error('Port inventory stale; review and run node tools/port_inventory.mjs --write');
-console.log(`PORT INVENTORY PASS ${ports.length} ports / name-match hints and verified contract providers / boundary and forwarding classification`);
+console.log(`PORT INVENTORY PASS ${ports.length} guarded adapters / ${internalScopes.length} internal scopes / name-match hints and verified internal receivers`);

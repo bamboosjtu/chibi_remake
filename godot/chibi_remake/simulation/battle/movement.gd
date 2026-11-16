@@ -2,9 +2,11 @@ extends RefCounted
 ## movement: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
-const Dependencies = preload("res://simulation/ports/movement_dependencies.gd")
+const REQUIRED_SERVICES := {"abilities": ["_spd_mult"], "battle_simulation": ["_feedback", "_place_unit"], "command_groups": ["_cancel_unit_command", "_nav_layer"], "interaction_paths": ["_footprint_cells"], "spatial_index": ["_unit_cell", "_unit_placement_free", "nearby_units"]}
 var battle: State
-var ports := Dependencies.new()
+var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
+const BLOCKED_ROUTE_BUDGET := 6
+var blocked_route_queries := 0
 
 func _init(data: State) -> void:
 	battle = data
@@ -19,21 +21,23 @@ func _near_walkable(c: Vector2i) -> Vector2i:
 	return battle.nav.near_walkable(c)
 
 func _path_to(u: Dictionary, target_px: Vector2, exact: bool) -> Array:
-	var layer := ports._nav_layer(u)
-	var start_cell := ports._unit_cell(u)
+	var services := ports.acquire(["command_groups", "spatial_index", "interaction_paths"])
+	if services.is_empty(): return []
+	var layer: int = services.command_groups._nav_layer(u)
+	var start_cell: Vector2i = services.spatial_index._unit_cell(u)
 	var target_cell := battle.nav.cell_of_px(target_px.x, target_px.y)
 	var avoid: Array = []
-	for other in ports.nearby_units(start_cell,target_cell,12,layer):
+	for other in services.spatial_index.nearby_units(start_cell,target_cell,12,layer):
 		if other == null or not bool(other.get("alive", false)) or float(other.get("die_t", -1)) >= 0.0: continue
 		if bool(other.get("is_building", false)) or bool(other.get("attached", false)) or int(other.get("site_inside_uid", -1)) >= 0: continue
 		if int(other.get("uid", -1)) == int(u.get("uid", -1)): continue
-		if ports._nav_layer(other) != layer: continue
-		var oc := ports._unit_cell(other)
+		if services.command_groups._nav_layer(other) != layer: continue
+		var oc: Vector2i = services.spatial_index._unit_cell(other)
 		# 只避让起点/终点附近的单位：远处单位既不影响本段路径，也会把 A* 临时挖出大量洞。
 		if maxi(absi(oc.x - start_cell.x), absi(oc.y - start_cell.y)) > 12 \
 				and maxi(absi(oc.x - target_cell.x), absi(oc.y - target_cell.y)) > 12:
 			continue
-		for raw in ports._footprint_cells(other):
+		for raw in services.interaction_paths._footprint_cells(other):
 			var fc: Vector2i = raw
 			if maxi(absi(fc.x - start_cell.x), absi(fc.y - start_cell.y)) > 12 \
 					and maxi(absi(fc.x - target_cell.x), absi(fc.y - target_cell.y)) > 12:
@@ -47,6 +51,8 @@ func _path_to(u: Dictionary, target_px: Vector2, exact: bool) -> Array:
 	return path
 
 func _follow(u: Dictionary, delta: float) -> bool:
+	var services := ports.acquire(["spatial_index", "command_groups", "abilities", "battle_simulation"])
+	if services.is_empty(): return false
 	if u.path.is_empty():
 		return true
 	if int(u.pi) < 0 or int(u.pi) >= u.path.size():
@@ -61,14 +67,14 @@ func _follow(u: Dictionary, delta: float) -> bool:
 	# 单位不能叠格：只在**最后一个路点**（真正落脚点）检查占用。
 	# 中途格允许穿过，否则前面的单位会把整条路堵死（实测采集工人 100 秒原地不动）。
 	var next_cell := battle.nav.cell_of_px(cur_wp.x, cur_wp.y)
-	if final_waypoint and not ports._unit_placement_free(next_cell, int(u.get("unit", -1)), ports._nav_layer(u), int(u.uid)):
+	if final_waypoint and not services.spatial_index._unit_placement_free(next_cell, int(u.get("unit", -1)), services.command_groups._nav_layer(u), int(u.uid)):
 		# R14：终点被占时不能悄然丢单。行军改停到附近合法空格；其余状态保持原命令，
 		# 由各自分支在下一 tick 重新找落脚点。
 		return _replan_blocked_destination(u, cur_wp)
-	var layer := ports._nav_layer(u)
+	var layer: int = services.command_groups._nav_layer(u)
 	var unit_cls := preload("res://simulation/systems/unit_footprint.gd").class_of(int(u.get("unit", -1)))
 	var position:=Vector2(float(u.ax),float(u.ay))
-	var travel: float=Config.SPEED*ports._spd_mult(u)*delta
+	var travel: float=Config.SPEED*services.abilities._spd_mult(u)*delta
 	var probe:=position.move_toward(cur_wp,travel)
 	var segment_ok := battle.nav.segment_clear_from(position, probe, layer) if unit_cls <= 0 \
 			else battle.nav.body_segment_clear_from(position, probe, layer, unit_cls)
@@ -99,15 +105,15 @@ func _follow(u: Dictionary, delta: float) -> bool:
 			u.ax=point.x;u.ay=point.y
 			var cell:=battle.nav.cell_of_px(u.ax,u.ay);u.A=cell.x;u.B=cell.y
 			u.dir=int(round(offset.angle()/(PI/4.0)))&7
-			u.moved=true;u.blocked_n=0
-			remaining-=step;ports._place_unit(u)
+			u.moved=true;u.blocked_n=0;u.erase("blocked_cursor")
+			remaining-=step;services.battle_simulation._place_unit(u)
 			if step<distance-0.00001:return false
 		u.pi+=1
 		if u.pi>=u.path.size():
 			u.path=[];u.pi=0;return true
 		# Validate the next segment before crossing a corner within this tick.
 		var next: Vector2=u.path[u.pi]
-		if int(u.pi)==u.path.size()-1 and not ports._unit_placement_free(battle.nav.cell_of_px(next.x,next.y),int(u.unit),layer,int(u.uid)):
+		if int(u.pi)==u.path.size()-1 and not services.spatial_index._unit_placement_free(battle.nav.cell_of_px(next.x,next.y),int(u.unit),layer,int(u.uid)):
 			return _replan_blocked_destination(u,next)
 		position=Vector2(float(u.ax),float(u.ay))
 		probe=position.move_toward(next,remaining)
@@ -116,37 +122,53 @@ func _follow(u: Dictionary, delta: float) -> bool:
 	return false
 
 func _replan_blocked_destination(u: Dictionary, dest_px: Vector2) -> bool:
+	var services := ports.acquire(["command_groups", "spatial_index", "battle_simulation"])
+	if services.is_empty(): return false
 	var state := str(u.get("state", ""))
-	var layer := ports._nav_layer(u)
+	var layer: int = services.command_groups._nav_layer(u)
 	var uid := int(u.get("uid", -1))
 	var unit_id := int(u.get("unit", -1))
 	if state == "move":
 		var dest_cell := battle.nav.cell_of_px(dest_px.x, dest_px.y)
+		var cursor := int(u.get("blocked_cursor", 0))
+		var candidate := 0
+		var queries := 0
 		for r in range(1, 4):
 			for dx in range(-r, r + 1):
 				for dy in range(-r, r + 1):
 					if maxi(absi(dx), absi(dy)) != r:
 						continue
+					candidate += 1
+					if candidate <= cursor: continue
 					var c := Vector2i(clampi(dest_cell.x + dx, 0, int(battle.map_data.rows) - 1),
 						clampi(dest_cell.y + dy, 0, int(battle.map_data.cols) - 1))
-					if c == dest_cell or not ports._unit_placement_free(c, unit_id, layer, uid):
+					if c == dest_cell or not services.spatial_index._unit_placement_free(c, unit_id, layer, uid):
 						continue
+					if queries >= BLOCKED_ROUTE_BUDGET:
+						# Keep the blocked final waypoint. Resume this deterministic
+						# search next tick without re-querying the original destination.
+						u["blocked_cursor"] = candidate - 1
+						return false
 					var p := battle.nav.anchor_of(c.x, c.y)
+					queries += 1
+					blocked_route_queries += 1
 					var path := _path_to(u, p, true)
 					if path.is_empty():
 						continue
 					u.path = path
 					u.pi = 0
 					u["blocked_n"] = 0
+					u.erase("blocked_cursor")
 					u.erase("repath_to")
 					return false
+		u.erase("blocked_cursor")
 		u.path = []
 		u.pi = 0
 		u["blocked_n"] = int(u.get("blocked_n", 0)) + 1
 		if int(u["blocked_n"]) >= 8:
 			u.state = "idle"
 			u.erase("repath_to")
-			ports._feedback("目的地被占用，部队已停下")
+			services.battle_simulation._feedback("目的地被占用，部队已停下")
 		else:
 			u["repath_to"] = dest_px
 		return false
@@ -157,6 +179,8 @@ func _replan_blocked_destination(u: Dictionary, dest_px: Vector2) -> bool:
 	return false
 
 func _resolve_navigation_overlaps() -> void:
+	var services := ports.acquire(["command_groups", "battle_simulation"])
+	if services.is_empty(): return
 	# 旧关卡的单格建筑占用可能与新的地面占地重叠，统一迁移到最近合法锚点。
 	# 水军按**水面层**判合法（船本来就停在水上，用陆地层会把它们全搬到岸上）。
 	# 读档恢复必须保持存档位置：这里只处理**锚点**被占地压住的情况（旧档把工人/
@@ -164,7 +188,7 @@ func _resolve_navigation_overlaps() -> void:
 	for u in battle.units:
 		if u.is_building or not u.alive or float(u.get("die_t", -1)) >= 0.0 or int(u.get("site_inside_uid", -1)) >= 0:
 			continue
-		var layer := ports._nav_layer(u)
+		var layer: int = services.command_groups._nav_layer(u)
 		var cell := battle.nav.cell_of_px(u.ax, u.ay)
 		if not battle.nav.is_solid(cell, layer):
 			continue
@@ -173,16 +197,18 @@ func _resolve_navigation_overlaps() -> void:
 			continue
 		var point := battle.nav.anchor_of(safe.x, safe.y)
 		u.ax = point.x; u.ay = point.y; u.A = safe.x; u.B = safe.y
-		ports._place_unit(u)
+		services.battle_simulation._place_unit(u)
 
 func _march_destination(unit: Dictionary, target: Vector2, reserved: Dictionary) -> Vector2:
+	var services := ports.acquire(["spatial_index", "command_groups"])
+	if services.is_empty(): return Vector2.ZERO
 	var origin:=battle.nav.cell_of_px(target.x,target.y)
 	for radius in range(7):
 		for dx in range(-radius,radius+1):
 			for dy in range(-radius,radius+1):
 				if maxi(absi(dx),absi(dy))!=radius:continue
 				var cell:=origin+Vector2i(dx,dy)
-				if not ports._unit_placement_free(cell,int(unit.unit),ports._nav_layer(unit),int(unit.uid)):continue
+				if not services.spatial_index._unit_placement_free(cell,int(unit.unit),services.command_groups._nav_layer(unit),int(unit.uid)):continue
 				var cells:=preload("res://simulation/systems/unit_footprint.gd").shape(int(unit.unit),cell)
 				if cells.any(func(c):return reserved.has(c)):continue
 				for c in cells:reserved[c]=true
@@ -193,6 +219,8 @@ func _anchor_of_cell(cell: Vector2i) -> Vector2:
 	return _anchor_of(clampi(cell.x, 0, int(battle.map_data.rows) - 1), clampi(cell.y, 0, int(battle.map_data.cols) - 1))
 
 func _move_unit_to_cell(u: Dictionary, cell: Vector2i) -> bool:
+	var services := ports.acquire(["command_groups"])
+	if services.is_empty(): return false
 	var c := Vector2i(clampi(cell.x, 0, int(battle.map_data.rows) - 1), clampi(cell.y, 0, int(battle.map_data.cols) - 1))
 	var path := _path_to(u, _anchor_of_cell(c), true)
 	if path.is_empty():
@@ -201,7 +229,7 @@ func _move_unit_to_cell(u: Dictionary, cell: Vector2i) -> bool:
 			path = _path_to(u, _anchor_of_cell(near), true)
 	if path.is_empty():
 		return false
-	ports._cancel_unit_command(u)
+	services.command_groups._cancel_unit_command(u)
 	u["hold"] = false
 	u["state"] = "move"
 	u["path"] = path

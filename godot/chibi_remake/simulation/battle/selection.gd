@@ -1,20 +1,22 @@
 extends RefCounted
 ## selection: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
-const Dependencies = preload("res://simulation/ports/selection_dependencies.gd")
+const REQUIRED_SERVICES := {"harvest_orders": ["_yield_of"]}
 var battle: State
-var ports := Dependencies.new()
+var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
 
 func _init(data: State) -> void:
 	battle = data
 
 func _neutral_object_at(pos: Vector2) -> Dictionary:
+	var services := ports.acquire(["harvest_orders"])
+	if services.is_empty(): return {}
 	var best: Dictionary = {}
 	var bd := INF
 	for o in battle.units:
 		if not bool(o.get("alive", false)) or float(o.get("die_t", -1)) >= 0.0 or int(o.get("owner", -1)) != 0:
 			continue
-		if not bool(o.get("is_building", false)) and ports._yield_of(int(o.get("unit", -1))) == "": continue
+		if not bool(o.get("is_building", false)) and services.harvest_orders._yield_of(int(o.get("unit", -1))) == "": continue
 		if float(o.get("hp", 0.0)) <= 0.0: continue
 		if not battle.visibility.is_visible(Vector2(o.ax, o.ay)): continue
 		var c := Vector2(float(o.ax), float(o.ay) - float(o.h) * 0.5)

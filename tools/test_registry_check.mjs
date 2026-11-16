@@ -5,7 +5,7 @@ const run=()=>spawnSync(process.execPath,['tools/registry_check.mjs','--root',fi
 try{copy('godot/chibi_remake');assert.equal(run().status,0);
  const navFile=path.join(fixture,'simulation/navigation/nav.gd'),navSource=fs.readFileSync(navFile,'utf8');
  fs.writeFileSync(navFile,navSource.replace('var grid :=','var grid =').replace('var paths :=','var paths ='));assert.equal(run().status,0,'typed and untyped navigation factories');fs.writeFileSync(navFile,navSource);
- const port=path.join(fixture,'simulation/ports/technology_dependencies.gd'),source=fs.readFileSync(port,'utf8');
+ const port=path.join(fixture,'app/battle/ports/scene_controller_dependencies.gd'),source=fs.readFileSync(port,'utf8');
  for(const guard of ['if provider == null:\n\t\treturn','if provider == null: # safe teardown\n\n\t\t# no dereference\n\t\treturn','if  provider==null:\n        return']){
   fs.writeFileSync(port,source.replace('if provider == null: return',guard));assert.equal(run().status,0,guard);
  }
@@ -16,10 +16,15 @@ try{copy('godot/chibi_remake');assert.equal(run().status,0);
  fs.writeFileSync(port,extra.replace('"tech_is_sell"','"__missing_method"'));assert.notEqual(run().status,0,'invalid source-only contract');
  fs.writeFileSync(port,source);
  for(const [file,change] of [
-  ['simulation/ports/abilities_dependencies.gd',s=>s.replace('"_kill"','"__missing_method"')],
-  ['simulation/ports/technology_dependencies.gd',s=>s.replace('if provider == null: return','# if provider == null: return')],
-  ['simulation/ports/technology_dependencies.gd',s=>s.replace('if provider == null: return','if provider == null:\n\treturn')],
-  ['simulation/ports/technology_dependencies.gd',s=>s.replace('if provider == null: return\n\tprovider._feedback(msg)','provider._feedback(msg)\n\tif provider == null: return')],
+  ['simulation/battle/abilities.gd',s=>s.replace('"_kill"','"__missing_method"')],
+  ['simulation/service_dependencies.gd',s=>s+'\nfunc _feedback(msg: String) -> void:\n\tpass\n'],
+  ['simulation/battle/technology.gd',s=>s.replace('if services.is_empty(): return','if false: return')],
+  ['simulation/battle/technology.gd',s=>s.replace('services.battle_simulation._feedback','services.combat._feedback')],
+  ['simulation/battle/technology.gd',s=>s.replace('ports.acquire(["battle_simulation"])','ports.acquire(["combat"])')],
+  ['simulation/battle/cheat_rules.gd',s=>s.replace('services.command_groups._cancel_unit_command(unit)','services.command_groups._cancel_unit_command(unit, target)')],
+  ['app/battle/ports/scene_controller_dependencies.gd',s=>s.replace('if provider == null: return','# if provider == null: return')],
+  ['app/battle/ports/scene_controller_dependencies.gd',s=>s.replace('if provider == null: return','if provider == null:\n\treturn')],
+  ['app/battle/ports/scene_controller_dependencies.gd',s=>s.replace('if provider == null: return\n\tprovider._feedback(msg)','provider._feedback(msg)\n\tif provider == null: return')],
   ['simulation/ports/ai_access.gd',s=>s+'\nvar _fn_legacy: Callable\n'],
   ['app/commands/technology_commands.gd',s=>s.replace('provider.tech_is_sell','provider.__missing_command')],
   ['main.gd',s=>s.replace('_modules.merge(_application_services)','_modules["undeclared"] = preload("res://app/battle/bootstrap.gd").new()\n\t_modules.merge(_application_services)')],

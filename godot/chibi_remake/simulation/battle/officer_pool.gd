@@ -2,9 +2,7 @@ extends RefCounted
 ## officer pool: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
-const Dependencies = preload("res://simulation/ports/officer_pool_dependencies.gd")
 var battle: State
-var ports := Dependencies.new()
 
 func _init(data: State) -> void:
 	battle = data

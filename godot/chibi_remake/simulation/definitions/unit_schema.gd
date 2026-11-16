@@ -6,6 +6,7 @@ const FIELDS := {
 	"occupied_cells": {"type":"Array", "default":[], "persist":false, "derived":true, "group":"derived"},
 	"route_failures": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "nullable": true, "min": 0, "max": 3},
 	"blocked_n": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "nullable": true, "min": 0, "max": 2147483647},
+	"blocked_cursor": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "min": 0, "max": 48},
 	"last_attacker_uid": {"type": "int", "default": -1, "persist": true, "derived": false, "group": "scalar", "nullable": true, "min": -1, "max": 2147483647},
 	"A": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
 	"B": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "nullable": true},

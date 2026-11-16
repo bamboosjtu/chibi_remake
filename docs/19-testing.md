@@ -316,3 +316,11 @@ pwsh -NoProfile -File tools/bench_full_battle.ps1 -ReleasePack <候选目录>/Ch
 `node tools/test_missing_presentation.mjs` 将运行脚本和 JSON 复制到独立工程，链接只读素材，再仅在副本内删除四类 HUD 母版、删除/破坏 minimap 目录，验证真实场景进入可用回退。原资源哈希必须保持不变；测试不临时隐藏工作区资源。terrain-budget 用例覆盖最低 LOD 整批拒绝、错误字节声明的解码尺寸拒绝、后台任务排空与恢复。对应 GDScript 是 wrapper 专用入口，不能直接作为正常资源目录的套件运行。
 
 该 wrapper 进入 hosted 源码发布回归与本地 FullRegression。`test_invalid_unit_removal` 验证错误索引、内容相同的克隆和已移除对象不会损坏世界；`test_save_semantics` 用正确 checksum 验证建筑分类、终局、nextUid、状态和巨大坐标输入被原子拒绝。二者属于必需 release 套件，存档语义用例也进入 CPU-only save 门禁。
+
+### 单位状态与模拟热点
+
+release 套件包含 `test_unit_action_states` 和 `test_hot_path_contracts`。前者逐一驱动十三个状态，核对非法目标退回、休息完成、交付等待、混乱前置条件和动画尾处理；现有战斗、施工、采集、载员与原生对照测试继续覆盖实际动作。后者核对资源缓存复用、耗尽分片与几何失效、失败查询后的导航标志恢复、施工成员身份与可变属性、每次更新的堵塞查询上限、中途进度保存、旧规则迁移、失败回滚及旧世界释放，并核实 chibil8 的 10736 个饰物与最大 1240 格资源片。
+
+`node tools/benchmark_hot_paths.mjs` 运行八工人采集、饰物命中、600 单位施工选择、堵塞终点和建造选址五组 CPU 场景。每组预热三次、采样三十次，记录中位数、P95、最大值及查询次数；预算由 hot_path_budgets.json 声明，使用标准完整战场的 500 ms 上限，堵塞查询另有十二次硬上限。该基准进入 hosted 源码发布回归及本地 FullRegression，不替代完整战场的实时吞吐、GPU 或正式包验收。
+
+可选 `--baseline <commit>` 将历史工程解包到独立目录，只物化哈希一致的 LFS 素材，用同一脚本比较前后耗时；八名工人的目标与路径必须完全相同。输出包含引擎及 Harness 哈希。基准对比应串行运行，避免其他回归争用 CPU；硬件相关耗时与确定性的查询上限分别报告。

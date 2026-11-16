@@ -1,0 +1,5 @@
+{
+  "description": "CPU source microbenchmarks, 30 samples after 3 warmups. Same 500ms ceiling as the standard full-battle P95 gate; operation-count regressions have deterministic assertions in test_hot_path_contracts. This does not replace GPU or packaged full-battle acceptance.",
+  "p95Ms": {"forest8Workers":500,"decorHit":500,"aiConstruction600":500,"blockedDestination":500,"buildPlacement":500},
+  "blockedQueriesPerInvocation": 12
+}

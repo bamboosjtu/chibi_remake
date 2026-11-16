@@ -2,7 +2,6 @@ extends RefCounted
 ## navigation grid.
 const GridState = preload("res://simulation/navigation/navigation_state.gd")
 var _grid_state: GridState
-var ports = preload("res://simulation/ports/navigation_grid_dependencies.gd").new()
 var _route_cache_version := -1
 var _route_gate_cache: Dictionary={}
 

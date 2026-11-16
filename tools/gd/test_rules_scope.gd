@@ -23,5 +23,6 @@ func run() -> void:
 		var changed := records.duplicate(); changed[file]="changed"
 		assert(Identity.fingerprint(changed)!=expected,"Effective input omitted: "+file)
 	assert(Identity.approved_migration("f9634e5c4bd01f214f81f529305570acc6e3550dec159515d93bae178d123d1f"))
+	assert(Identity.ABI=="battle-rules-v4" and Identity.approved_migration("fc1e06331f3969e92e529186f38cf2ddaf84abcf0f1a4a5368ea3e850873b6d6"))
 	print("RULES SCOPE PASS presentation and engine excluded / combat data included / pinned old identity migration")
 	quit()

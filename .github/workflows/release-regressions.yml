@@ -29,6 +29,9 @@ jobs:
       - name: Missing presentation resources and terrain budget recovery
         if: ${{ !cancelled() }}
         run: node tools/test_missing_presentation.mjs --engine "$GODOT_ENGINE" --output _work/hosted-presentation-failures
+      - name: CPU hot path latency and query budgets
+        if: ${{ !cancelled() }}
+        run: node tools/benchmark_hot_paths.mjs --engine "$GODOT_ENGINE" --output _work/hosted-hot-paths
       - name: Upload release evidence
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
@@ -38,3 +41,5 @@ jobs:
             _work/hosted-release
             _work/hosted-presentation-failures/results.json
             _work/hosted-presentation-failures/*.log
+            _work/hosted-hot-paths/results.json
+            _work/hosted-hot-paths/*.log
