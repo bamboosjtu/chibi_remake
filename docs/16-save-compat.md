@@ -146,6 +146,8 @@
 - SHA-256 十六进制存入 `checksum`。
 - checksum 校验只判断校验和存在且匹配；缺失时返回失败。
 - 文件有效性另外检查版本、关卡标识、单位记录及基础字段结构；只有结构合法的 v1–v7 档可走无 checksum 的兼容读取路径。
+- v8 必须显式包含 `resources`，且 `gold/wood/food/stone` 四键全部为有限非负数；必须显式包含 Array 类型的 `trainings`，空队列须写为 `[]`。缺字段不能通过默认值补齐。文件读取、内存快照应用和候选恢复共用该版本策略。
+- v1–v7 保留缺省兼容：缺生产队列表示没有生产，缺资源键沿用旧版恢复种子值（v1–v3 来自地图，v4–v7 来自候选输入）。生产/研究的费用字典仍可只列实际支付的资源，不能与玩家资源快照的完整性混用。
 - 无 checksum 的旧档可以加载，但不能替换已验证的备份。文件有效性不代表与当前关卡/规则兼容，完整语义校验仍在创建候选前执行。
 
 ## 6. 加载流程
@@ -208,12 +210,15 @@
 
 | 职责 | 模块 |
 |---|---|
-| 槽位、文件、校验和、原子写 | `app/game.gd`、`app/json_store.gd` |
+| 文件地址、读写、备份、旧目录迁移 | `app/saves/save_repository.gd`、`app/json_store.gd` |
+| 槽位元数据与缓存 | `app/saves/slot_catalog.gd`；写入成功事件使缓存失效 |
+| 战役选择与待加载会话 | `app/campaign_session.gd` |
+| 格式编解码与 autoload 兼容入口 | `app/game.gd` |
 | 目录探测与迁移 | `app/user_storage.gd` |
 | 恢复编排 | `app/save_service.gd` |
 | 共用单位字段 | `simulation/definitions/unit_schema.gd` |
 | 文件结构有效性 | `app/saves/save_envelope.gd`，独立于 checksum 与世界兼容性 |
-| 完整快照校验 | `app/saves/snapshot_validator.gd` |
+| 完整快照分阶段校验 | `app/saves/snapshot_validator.gd`：记录、地形、归属/编组、生产、科技、单位状态、全局服务与时钟 |
 | 候选实体与引用恢复 | `app/saves/snapshot_restorer.gd` |
 | 候选世界提交与能力重绑定 | `app/saves/world_transaction.gd` |
 | v1/v2/v3 兼容恢复 | `app/saves/legacy_snapshot.gd` |
@@ -246,3 +251,5 @@ v4–v8 完整快照先在不进入场景树的候选世界中恢复，再提交
 `rules_identity.gd::CATALOG_FIELDS` 显式列出单位、生产、建筑、状态调参、武将、等级奖励、命令能力和战役规则。投影排除来源说明、显示名称、图集位置、素材路径和施工帧；动作/死亡帧保留长度，因为长度参与动作节拍。地图内容版本继续单独检查。
 
 小地图、音频、视频、UI 布局、引擎哈希、注释和构建源码清单不参与规则指纹。模拟规则代码变化通过 ABI 评审管理，不能仅更新源码清单而省略规则兼容性评审。`rules-scope-v1` 仅把已登记的旧宽指纹迁移到确定的新目标；后续调平衡数据后，许可自动失效，需要重新评审。
+
+记录组的线格式键由 `UnitSchema.record_value` 提供给恢复器，位置、生命、死亡和武将身份的语义仍由 SaveService 处理。逐字段测试通过真实候选恢复验证全部 record 字段，并拒绝每个字段的错误类型；恢复不能只验证标量组。

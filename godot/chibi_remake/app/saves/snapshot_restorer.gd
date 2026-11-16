@@ -17,6 +17,7 @@ func _init(battle: Object, record: Callable, resources: Callable, trainings: Cal
 	_numeric_keys = keys
 
 func restore(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
+	if not preload("res://app/saves/save_envelope.gd").valid_collections(d): return false
 	var simulation: Dictionary = plan.simulation
 	var ids: Dictionary = plan.ids
 	var speed: int = int(plan.speed)
@@ -41,45 +42,7 @@ func restore(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 	host.selected.clear()
 	while not host.units.is_empty():
 		host.commands.world._free_unit_at(host.units.size() - 1)
-	host.next_uid = 0
-	var by_uid := {}
-	for rec in arr:
-		if not host.commands.world._spawn_unit(int(rec.unit), int(rec.owner), float(rec.x), float(rec.y), true):
-			push_error("Snapshot unit failed after validation")
-			return false
-		var u: Dictionary = host.units.back()
-		u.uid = int(rec.uid)
-		u.map_object = bool(rec.get("mapObject", false))
-		u["map_index"] = int(rec.get("mapIndex", -1))
-		var state: Dictionary = rec.simulation
-		_restore_scalars(u,rec,state,not simulation.has("rulesRevision"))
-		u.path = []
-		for point in state.get("path", []):
-			u.path.append(Vector2(float(point[0]), float(point[1])))
-		u.pi = int(state.get("pi", 0))
-		if state.has("repathTo"): u["repath_to"] = Vector2(state.repathTo[0],state.repathTo[1])
-		TickTimers.restore(state, int(d.v), u)
-		host.stratagems.restore(state,u)
-		ActionClock.restore(state,u)
-		preload("res://simulation/systems/locomotion.gd").restore(state,u)
-		if host.view != null and bool(u.get("attached",false)):
-			host.view.set_unit_attached(u,true) # 暂停读档也立即隐藏载员，不等下一次模拟更新。
-		if host.view != null and int(u.get("site_inside_uid", -1)) >= 0: host.commands.world._update_visual(u)
-		if not state.has("gather_ticks"): u.gather_ticks = int(round(float(u.gather_t) / host.SIM_DT))
-		by_uid[int(u.uid)] = u
-	# 所有实体建好后再解析引用，采矿／卸货目标可以排在工人后面。
-	for rec in arr:
-		var u: Dictionary = by_uid[int(rec.uid)]
-		u.target = by_uid.get(int(rec.simulation.get("targetUid", -1)))
-		for field in ["build_target", "repair_target", "board_target"]:
-			u[field] = by_uid.get(int(rec.simulation.get(field + "Uid", -1)))
-		var reference: Dictionary = rec.simulation.get("gatherRef", {})
-		if str(reference.get("kind", "")) == "decor":
-			u.gather_obj = host.decor_cells.get(str(reference.get("cell", "")))
-		elif str(reference.get("kind", "")) == "unit":
-			u.gather_obj = by_uid.get(int(reference.get("uid", -1)))
-		elif str(reference.get("kind", "")) == "spent":
-			u.gather_obj = {"unit":int(reference.unit),"ax":float(reference.x),"ay":float(reference.y),"alive":false,"die_t":0.0}
+	if not _restore_units(d, arr, simulation): return false
 	host.next_uid = int(d.nextUid)
 	host.commands.military._enforce_team_limits()
 	for uid in ids:
@@ -131,16 +94,7 @@ func restore(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 	host.transports.restore(int(d.v))
 	host.commands.world._update_gates()
 	host.visibility.restore(str(simulation.get("explored", "")), host.units, host.player_owner)
-	if host.view != null and host.view.event_view != null:
-		host.view.capture_motion()
-		host.view.event_view.restore_history()
-		for unit in host.units:
-			if unit.alive and float(unit.die_t)<0: host.commands.world._update_visual(unit)
-		if host.view.completion != null:
-			host.view.completion.reset()
-			host.view.end_label.hide()
-			if host.game_end != 0: host.view.show_end(host.game_end)
-		host.view.projectile_view.impacts.clear()
+	_refresh_view()
 	return true
 
 func _restore_scalars(unit: Dictionary, record: Dictionary, state: Dictionary, adopt_rules: bool) -> void:
@@ -161,3 +115,57 @@ func _restore_clock(simulation: Dictionary, speed: int) -> void:
 	if not simulation.has("speedIndex"):
 		# 旧版以1/30秒为一个tick；迁移保留已走过的tick比例。
 		host.sim_acc *= host.clock.period()/host.SIM_DT
+
+func _restore_units(d: Dictionary, arr: Array, simulation: Dictionary) -> bool:
+	host.next_uid = 0
+	var by_uid := {}
+	for rec in arr:
+		if not host.commands.world._spawn_unit(int(rec.unit), int(rec.owner), float(rec.x), float(rec.y), true):
+			push_error("Snapshot unit failed after validation")
+			return false
+		var u: Dictionary = host.units.back()
+		u.uid = int(UnitSchema.record_value(rec, "uid"))
+		u.map_object = bool(UnitSchema.record_value(rec, "map_object", false))
+		u["map_index"] = int(UnitSchema.record_value(rec, "map_index", -1))
+		var state: Dictionary = rec.simulation
+		_restore_scalars(u,rec,state,not simulation.has("rulesRevision"))
+		u.path = []
+		for point in state.get("path", []):
+			u.path.append(Vector2(float(point[0]), float(point[1])))
+		u.pi = int(state.get("pi", 0))
+		if state.has("repathTo"): u["repath_to"] = Vector2(state.repathTo[0],state.repathTo[1])
+		TickTimers.restore(state, int(d.v), u)
+		host.stratagems.restore(state,u)
+		ActionClock.restore(state,u)
+		preload("res://simulation/systems/locomotion.gd").restore(state,u)
+		if host.view != null and bool(u.get("attached",false)):
+			host.view.set_unit_attached(u,true) # 暂停读档也立即隐藏载员，不等下一次模拟更新。
+		if host.view != null and int(u.get("site_inside_uid", -1)) >= 0: host.commands.world._update_visual(u)
+		if not state.has("gather_ticks"): u.gather_ticks = int(round(float(u.gather_t) / host.SIM_DT))
+		by_uid[int(u.uid)] = u
+	# 所有实体建好后再解析引用，采矿／卸货目标可以排在工人后面。
+	for rec in arr:
+		var u: Dictionary = by_uid[int(rec.uid)]
+		u.target = by_uid.get(int(rec.simulation.get("targetUid", -1)))
+		for field in ["build_target", "repair_target", "board_target"]:
+			u[field] = by_uid.get(int(rec.simulation.get(field + "Uid", -1)))
+		var reference: Dictionary = rec.simulation.get("gatherRef", {})
+		if str(reference.get("kind", "")) == "decor":
+			u.gather_obj = host.decor_cells.get(str(reference.get("cell", "")))
+		elif str(reference.get("kind", "")) == "unit":
+			u.gather_obj = by_uid.get(int(reference.get("uid", -1)))
+		elif str(reference.get("kind", "")) == "spent":
+			u.gather_obj = {"unit":int(reference.unit),"ax":float(reference.x),"ay":float(reference.y),"alive":false,"die_t":0.0}
+	return true
+
+func _refresh_view() -> void:
+	if host.view != null and host.view.event_view != null:
+		host.view.capture_motion()
+		host.view.event_view.restore_history()
+		for unit in host.units:
+			if unit.alive and float(unit.die_t)<0: host.commands.world._update_visual(unit)
+		if host.view.completion != null:
+			host.view.completion.reset()
+			host.view.end_label.hide()
+			if host.game_end != 0: host.view.show_end(host.game_end)
+		host.view.projectile_view.impacts.clear()

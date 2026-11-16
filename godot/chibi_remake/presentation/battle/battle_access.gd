@@ -63,6 +63,25 @@ func selection_description() -> Dictionary:
 	result.make_read_only()
 	return result
 
+func camera_bounds() -> Vector2:
+	var data = preload("res://named_port.gd").require_provider(_data, "camera bounds")
+	return Vector2(float(data.map_data.get("terrainW",0)), float(data.map_data.get("terrainH",0))) if data != null else Vector2.ZERO
+
+func opening_camera_position() -> Vector2:
+	var data = preload("res://named_port.gd").require_provider(_data, "opening camera")
+	if data == null: return Vector2.ZERO
+	var x := 0.0
+	var y := 0.0
+	var count := 0
+	for unit in data.units:
+		if int(unit.owner) == int(data.player_owner) and not bool(unit.is_building) and bool(unit.alive):
+			x += float(unit.ax); y += float(unit.ay); count += 1
+	return Vector2(x/count,y/count) if count > 0 else camera_bounds() * 0.5
+
+func camera_tile_geometry() -> Vector3:
+	var data = preload("res://named_port.gd").require_provider(_data, "camera tile geometry")
+	return Vector3(float(data.tile_w),float(data.tile_hw),float(data.tile_hh)) if data != null else Vector3.ZERO
+
 var decor_cells:
 	get:
 		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")

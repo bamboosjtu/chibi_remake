@@ -12,6 +12,10 @@ try{
  write('simulation/test.gd','extends RefCounted\n');write('presentation/test.gd','extends RefCounted\n');
  write('app/private.gd','extends RefCounted\nfunc bad(view):\n\treturn view._ui\n');assert.notEqual(run().status,0);
  write('app/private.gd','extends RefCounted\n');
+ write('app/private.gd','extends RefCounted\nfunc bad(world):\n\tworld._modules.clear()\n');assert.notEqual(run().status,0);
+ write('app/private.gd','extends RefCounted\n');
+ write('presentation/battle/components/camera_controller.gd','extends RefCounted\nfunc bad(host):\n\treturn host.units\n');assert.notEqual(run().status,0);
+ write('presentation/battle/components/camera_controller.gd','extends RefCounted\n');
  write('presentation/test.gd','extends RefCounted\nfunc bad(host):\n\thost.saver.apply_snapshot({})\n');assert.notEqual(run().status,0);
  write('presentation/test.gd','extends RefCounted\n');
  const limits={files:{'simulation/test.gd':600},functions:{},violations:[],reviews:{}};

@@ -16,9 +16,7 @@ static func create(live: Node2D) -> RefCounted:
 	var candidate=preload("res://app/saves/candidate_world.gd").new()
 	if not candidate.prepare(fresh,fresh.map_data): candidate.dispose();return null
 	var state=candidate.state
-	for i in range(state.map_data.objects.size()):
-		var unit: Dictionary=candidate._modules.entity_factory._make_unit(state.map_data.objects[i],true)
-		unit.map_index=i;state.units.append(unit)
+	if not candidate.world.seed_map_units(): candidate.dispose();return null
 	candidate.commands.world._rebuild_unit_index();state.nav.rebuild_buildings(state.units)
 	candidate.commands.world._update_gates();candidate.commands.economy._build_decor_targets()
 	candidate.commands.orders._resolve_navigation_overlaps()

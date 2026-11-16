@@ -3,7 +3,6 @@ extends RefCounted
 const SIM_DT = preload("res://simulation/battle_config.gd").SIM_DT
 var world := preload("res://simulation/battle_world.gd").new()
 var state = world.state
-var _modules: Dictionary = world._modules
 var commands := preload("res://app/battle_commands.gd").new()
 var view = null
 var saver: RefCounted
@@ -27,11 +26,11 @@ func prepare(source: RefCounted, definition: Dictionary = {}) -> bool:
 	preload("res://simulation/battle_state_fields.gd").copy_inputs(source, state)
 	world.set_definition(definition if not definition.is_empty() else source.map_data)
 	state.map_data = world.definition.duplicate(true)
-	var access := world._access.duplicate()
+	var access := {}
 	# Candidates expose simulation commands only, and never construct application services.
 	for key in commands.port_objects():
 		if key != "commands.session": access[key] = commands.port_objects()[key]
-	var report := preload("res://composition_contract.gd").wire(world._modules, "snapshot", access)
+	var report: Dictionary = world.connect_services("snapshot", access, {}, false)
 	if not report.missing.is_empty(): return false
 	world.prepare_map()
 	world.set_ai_enabled(source.ai != null)

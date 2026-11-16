@@ -20,13 +20,13 @@ const ports = Object.entries(registry.ports).map(([file, entry]) => {
     const lifecycle = ['_init','connect_services','disconnect_services'].includes(name);
     const mechanical = !!forwarded && body.trimEnd().split('\n').length <= 5;
     const category = lifecycle ? 'module-capability' : crossLayer ? 'cross-layer' : forwarded?.startsWith('_') ? 'private-contract' : mechanical ? 'pure-forwarding' : 'module-capability';
-    const directCallers = consumers.filter(consumer => new RegExp('\\.'+name+'\\s*\\(').test(sources[consumer]));
-    return {name, category, ...(provider ? {provider, forwarded, mechanical, privateContract:forwarded?.startsWith('_') ?? false} : {}), directCallers};
+    const nameMatches = consumers.filter(consumer => new RegExp('\\.'+name+'\\s*\\(').test(sources[consumer]));
+    return {name, category, ...(provider ? {provider, forwarded, mechanical, privateContract:forwarded?.startsWith('_') ?? false} : {}), nameMatches};
   });
   return {file, host:entry.host, consumers:consumers.sort(), providers, methods};
 });
-const report = {schemaVersion:1, method:'Static literal imports and simulation_access domains plus CONTRACTS provider resolution. Direct call evidence is conservative; zero matches do not prove dead code because signals/Callables and inherited adapters exist.', ports};
+const report = {schemaVersion:2, safeForAutomatedDeletion:false, receiverResolution:"unresolved", method:'Static literal imports and simulation_access domains plus CONTRACTS provider resolution. Method-name matches do not resolve receivers: positive matches may refer to another object, and zero matches do not prove dead code because signals/Callables and inherited adapters exist. This inventory is a review aid, never deletion evidence.', ports};
 const target = 'tools/inputs/port_inventory.json', text = JSON.stringify(report,null,2)+'\n';
 if (process.argv.includes('--write')) fs.writeFileSync(target,text);
 else if (!fs.existsSync(target) || fs.readFileSync(target,'utf8') !== text) throw Error('Port inventory stale; review and run node tools/port_inventory.mjs --write');
-console.log(`PORT INVENTORY PASS ${ports.length} ports / caller and provider evidence / boundary and forwarding classification`);
+console.log(`PORT INVENTORY PASS ${ports.length} ports / name-match hints and verified contract providers / boundary and forwarding classification`);

@@ -1,0 +1,1072 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-16",
+  "timezone": "Asia/Shanghai",
+  "baseCommit": "658608fd02cca68c38d18dd7104d292d0bbf4680",
+  "scope": "Local source acceptance for six follow-up steps; not a hosted CI or formal binary certification",
+  "sourceContext": {
+    "normalizedTextSha256": "f072418475fbb3f857a855b6720c9b9ff0c677530d36c4e17c1f361544ad73df",
+    "fileCount": 990
+  },
+  "engine": {
+    "version": "4.7.2.stable.official.ed1daf0bf",
+    "platform": "win32",
+    "sha256": "ab1824f85bfd8e0e4128182c000c4003a3e042245b2967848d089b2a04b22424"
+  },
+  "baselineFileUnchanged": true,
+  "checks": {
+    "static": {
+      "passed": 29,
+      "total": 29,
+      "results": [
+        {
+          "name": "architecture/architecture_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.383
+        },
+        {
+          "name": "architecture/test_architecture_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.966
+        },
+        {
+          "name": "architecture/port_inventory",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.167
+        },
+        {
+          "name": "registry/registry_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.193
+        },
+        {
+          "name": "registry/test_registry_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 3.741
+        },
+        {
+          "name": "data/unit_schema_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.083
+        },
+        {
+          "name": "data/rules_manifest",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.103
+        },
+        {
+          "name": "data/data_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 3.577
+        },
+        {
+          "name": "data/test_scenario_generator",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.096
+        },
+        {
+          "name": "data/test_map_export_navigation",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.07
+        },
+        {
+          "name": "data/test_opening_forces",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.473
+        },
+        {
+          "name": "docs/docs_lint",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.453
+        },
+        {
+          "name": "docs/test_docs_lint",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 1.769
+        },
+        {
+          "name": "docs/test_markdown_anchors",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.073
+        },
+        {
+          "name": "repository/syntax_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 8.614
+        },
+        {
+          "name": "repository/suite_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.07
+        },
+        {
+          "name": "repository/test_suite_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.074
+        },
+        {
+          "name": "repository/test_repository_policy",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 4.306
+        },
+        {
+          "name": "repository/test_ci_checks",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.075
+        },
+        {
+          "name": "tooling/test_engine_integrity",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.18
+        },
+        {
+          "name": "tooling/test_bootstrap",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 1.106
+        },
+        {
+          "name": "tooling/powershell_encoding",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.132
+        },
+        {
+          "name": "tooling/test_powershell_encoding",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.074
+        },
+        {
+          "name": "tooling/test_godot_process",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 1.521
+        },
+        {
+          "name": "tooling/test_regression_result",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.073
+        },
+        {
+          "name": "tooling/test_terrain_dedup",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.109
+        },
+        {
+          "name": "tooling/test_terrain_equivalence",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 1.881
+        },
+        {
+          "name": "tooling/test_runtime_assets",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.381
+        },
+        {
+          "name": "tooling/terrain-declarations",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.577
+        }
+      ]
+    },
+    "development": {
+      "passed": 75,
+      "total": 75,
+      "runs": [
+        "_work/followup/development-final-0/results.json",
+        "_work/followup/development-final-1/results.json",
+        "_work/followup/development-final-2-fixed/results.json"
+      ],
+      "results": [
+        {
+          "name": "test_transports",
+          "ok": true,
+          "seconds": 132.534,
+          "log": "_work/followup/development-final-0/test_transports.log",
+          "logSha256": "71972444eef0d79700bd8ed5c10dcc0c68c91e1bc48dafb583abd29913a1fe0c"
+        },
+        {
+          "name": "test_naval_casualty_save",
+          "ok": true,
+          "seconds": 28.695,
+          "log": "_work/followup/development-final-0/test_naval_casualty_save.log",
+          "logSha256": "86edf49c230d0c93ff5d15d79825064fee1c641908bbe18bad5d440b82b49d84"
+        },
+        {
+          "name": "test_research_jobs",
+          "ok": true,
+          "seconds": 23.057,
+          "log": "_work/followup/development-final-0/test_research_jobs.log",
+          "logSha256": "93bc14801e9a9e738850cfed479ea07dfb1d959673ca234abd14767eeb747644"
+        },
+        {
+          "name": "test_projectiles",
+          "ok": true,
+          "seconds": 18.729,
+          "log": "_work/followup/development-final-0/test_projectiles.log",
+          "logSha256": "68fc4c67bfe94fc5c245696d93ff9f51edc361e1ad632e3cc2e5d3d930de6822"
+        },
+        {
+          "name": "test_pressure_contracts",
+          "ok": true,
+          "seconds": 13.923,
+          "log": "_work/followup/development-final-0/test_pressure_contracts.log",
+          "logSha256": "5f05f783a1108ac1d9fac5fff4d1c2cba092027adc2002685e37a0c51a1246bf"
+        },
+        {
+          "name": "test_chibil1_presentation",
+          "ok": true,
+          "seconds": 11.045,
+          "log": "_work/followup/development-final-0/test_chibil1_presentation.log",
+          "logSha256": "8074aa82723d473ba64c77a392a2235d3c176267cbdea07025bd53a5fd219701"
+        },
+        {
+          "name": "test_building_research",
+          "ok": true,
+          "seconds": 9.776,
+          "log": "_work/followup/development-final-0/test_building_research.log",
+          "logSha256": "7f4da60f9a7bab9be5bb8fc61fcac4657fde86ec4b965715ef75644110312601"
+        },
+        {
+          "name": "test_movement_quality",
+          "ok": true,
+          "seconds": 9.701,
+          "log": "_work/followup/development-final-0/test_movement_quality.log",
+          "logSha256": "54a9fbfe65c1b370748084e70d66d9e8e297c43f1c88a34d78fc9971b163ec77"
+        },
+        {
+          "name": "test_unit_index",
+          "ok": true,
+          "seconds": 9.328,
+          "log": "_work/followup/development-final-0/test_unit_index.log",
+          "logSha256": "3ab7d5b785035fb74ef601de99983ce81ea083cb99d28f8723de9cb34b119fcf"
+        },
+        {
+          "name": "test_hq_delivery",
+          "ok": true,
+          "seconds": 7.316,
+          "log": "_work/followup/development-final-0/test_hq_delivery.log",
+          "logSha256": "e4d89a5e408d3ae0a6507fd0f9f92bfbc98a5f89b5aead6450727ddfc24cd3ea"
+        },
+        {
+          "name": "test_special_units",
+          "ok": true,
+          "seconds": 7.151,
+          "log": "_work/followup/development-final-0/test_special_units.log",
+          "logSha256": "7265d6f465d74e89bf069e2965374767f2d3b2c77dfb15d32e04ba0bcf127710"
+        },
+        {
+          "name": "test_modular_battle",
+          "ok": true,
+          "seconds": 6.491,
+          "log": "_work/followup/development-final-0/test_modular_battle.log",
+          "logSha256": "5b8dba1caf9761541277045b128cec9b6526e6c33bcf946edba0c6056b10075d"
+        },
+        {
+          "name": "test_worker_visuals",
+          "ok": true,
+          "seconds": 5.437,
+          "log": "_work/followup/development-final-0/test_worker_visuals.log",
+          "logSha256": "df3981eaf8a9fb8d62f149e943a1aecf8241ca9bdbd9aea9bf39ee92c65da134"
+        },
+        {
+          "name": "test_action_clock",
+          "ok": true,
+          "seconds": 8.727,
+          "log": "_work/followup/development-final-0/test_action_clock.log",
+          "logSha256": "6b56667b310f531f1d3db21484c5a6b994bcfb1389fa38dd65352bfea9bb18bc"
+        },
+        {
+          "name": "test_world_exchange",
+          "ok": true,
+          "seconds": 7.649,
+          "log": "_work/followup/development-final-0/test_world_exchange.log",
+          "logSha256": "10cf6a428731ee14b35e19f6354c4b3a5ff77095d51929c17ab63dba042e2643"
+        },
+        {
+          "name": "test_spatial_rules",
+          "ok": true,
+          "seconds": 4.288,
+          "log": "_work/followup/development-final-0/test_spatial_rules.log",
+          "logSha256": "e6609e69fdb67c84d1d9206912801d561755f1c125dba1001c50876f9ed7b338"
+        },
+        {
+          "name": "test_harvest_retarget",
+          "ok": true,
+          "seconds": 4.304,
+          "log": "_work/followup/development-final-0/test_harvest_retarget.log",
+          "logSha256": "88cd949c81a95d0d9044f22e53c2bd4d827d1919c6bfdcb47a9f5c03c16f3cff"
+        },
+        {
+          "name": "test_l1_assault",
+          "ok": true,
+          "seconds": 4.114,
+          "log": "_work/followup/development-final-0/test_l1_assault.log",
+          "logSha256": "74d0d08d0aa5444b9c510d80c35891bd39d8e97f0439d62dafaa6aaadb979cd2"
+        },
+        {
+          "name": "test_worker_feedback",
+          "ok": true,
+          "seconds": 7.441,
+          "log": "_work/followup/development-final-0/test_worker_feedback.log",
+          "logSha256": "915fa1b61be6186ea946e73c8baa4df6494034a51caef527737e08cb31473800"
+        },
+        {
+          "name": "test_ai_policy",
+          "ok": true,
+          "seconds": 4.315,
+          "log": "_work/followup/development-final-0/test_ai_policy.log",
+          "logSha256": "e4f99064ce5a3247011d0a7591aef139eab82cf18f588545451650c2ab0087eb"
+        },
+        {
+          "name": "test_unit_collision",
+          "ok": true,
+          "seconds": 4.119,
+          "log": "_work/followup/development-final-0/test_unit_collision.log",
+          "logSha256": "a717cbb2dc65de7df1cd8d9d9b4caac487b88af8e50006ee691b603bc7064b52"
+        },
+        {
+          "name": "test_native_geometry",
+          "ok": true,
+          "seconds": 3.651,
+          "log": "_work/followup/development-final-0/test_native_geometry.log",
+          "logSha256": "d0058414fa8849014061e7827104669eb1844cd11516b89b7db172817b2ab3b1"
+        },
+        {
+          "name": "test_presentation_diagnostics",
+          "ok": true,
+          "seconds": 2.15,
+          "log": "_work/followup/development-final-0/test_presentation_diagnostics.log",
+          "logSha256": "05d8a7f08e537a583f95e90a8a1c0ab6223d1f39a69d8c637ba77bb7a431a82d"
+        },
+        {
+          "name": "test_texture_states",
+          "ok": true,
+          "seconds": 0.49,
+          "log": "_work/followup/development-final-0/test_texture_states.log",
+          "logSha256": "1173278e9501d277d5345fa7da8fd57f53f7cd23c7e3d68e80b5497234c7dcea"
+        },
+        {
+          "name": "test_army_technology",
+          "ok": true,
+          "seconds": 86.012,
+          "log": "_work/followup/development-final-1/test_army_technology.log",
+          "logSha256": "926c094a96de7ef590b0084d465911c168efeb2fc2c34be80ff5ec0e368ec4a3"
+        },
+        {
+          "name": "test_native_world",
+          "ok": true,
+          "seconds": 29.808,
+          "log": "_work/followup/development-final-1/test_native_world.log",
+          "logSha256": "652e04a95d679847b574546bbb6afc16b4f60fc670fbe24fdb54db9fed6ca192"
+        },
+        {
+          "name": "test_ai_slots",
+          "ok": true,
+          "seconds": 30.712,
+          "log": "_work/followup/development-final-1/test_ai_slots.log",
+          "logSha256": "05c70cb5c6c6dbf6a1e11fdae4d0da0232a99802a23c70e9bae02044d7ace027"
+        },
+        {
+          "name": "test_worker_groups",
+          "ok": true,
+          "seconds": 26.18,
+          "log": "_work/followup/development-final-1/test_worker_groups.log",
+          "logSha256": "294267df4a8e4d4cc1f6abbc056335be3a03ccce05172295a0571bac7f3cc580"
+        },
+        {
+          "name": "test_initial_teams",
+          "ok": true,
+          "seconds": 20.301,
+          "log": "_work/followup/development-final-1/test_initial_teams.log",
+          "logSha256": "937c1601c490cc863cc29c8940d17acb307a1cbb2408f89936651e6db2670bb7"
+        },
+        {
+          "name": "test_realtime_queries",
+          "ok": true,
+          "seconds": 10.911,
+          "log": "_work/followup/development-final-1/test_realtime_queries.log",
+          "logSha256": "0c10db56be7c464eab04cb09695d4cb01d77b1228f26666472e645e4697702e1"
+        },
+        {
+          "name": "test_architecture",
+          "ok": true,
+          "seconds": 14.02,
+          "log": "_work/followup/development-final-1/test_architecture.log",
+          "logSha256": "fc245db06089933d7e6b4a47cd50bd6f7745c2577a735d2468555b123d6a5cae"
+        },
+        {
+          "name": "test_original_media",
+          "ok": true,
+          "seconds": 11.217,
+          "log": "_work/followup/development-final-1/test_original_media.log",
+          "logSha256": "e790b0697bee352ca7b8213cfd9257d8c02bed21e205b0e486757af80bffe802"
+        },
+        {
+          "name": "test_unload_state",
+          "ok": true,
+          "seconds": 9.502,
+          "log": "_work/followup/development-final-1/test_unload_state.log",
+          "logSha256": "1a0b0c36c418e1f16cd750846c0a1fbc241d713af7bca9b0f8aba0a21d7d79c5"
+        },
+        {
+          "name": "test_encounter_campaign",
+          "ok": true,
+          "seconds": 9.532,
+          "log": "_work/followup/development-final-1/test_encounter_campaign.log",
+          "logSha256": "0fe9430fa28c82638dd08fff087d86945829a1a712e33fc2c05a076289d4b389"
+        },
+        {
+          "name": "test_grain_patch",
+          "ok": true,
+          "seconds": 8.244,
+          "log": "_work/followup/development-final-1/test_grain_patch.log",
+          "logSha256": "1c7680a92e44bae08d2ac8203e414e8c1bbdbc8487158c6a7f3dac72dcc80e60"
+        },
+        {
+          "name": "test_build_feedback",
+          "ok": true,
+          "seconds": 6.659,
+          "log": "_work/followup/development-final-1/test_build_feedback.log",
+          "logSha256": "b19c48d1ee05994226e70f99fcfebbdce01ed0aa205038973aec715e90138a27"
+        },
+        {
+          "name": "test_action_lifecycle",
+          "ok": true,
+          "seconds": 6.485,
+          "log": "_work/followup/development-final-1/test_action_lifecycle.log",
+          "logSha256": "8b698831370ee824dc72a5dfae1fe99ec6f0db7ccfa826b50fa9a84f73054b73"
+        },
+        {
+          "name": "test_team_lifecycle",
+          "ok": true,
+          "seconds": 6.568,
+          "log": "_work/followup/development-final-1/test_team_lifecycle.log",
+          "logSha256": "6d27cfc3d1ba6aab80db0bb674cd8d13e2582ebc6efac279c2c558e652aef69f"
+        },
+        {
+          "name": "test_ai_planning",
+          "ok": true,
+          "seconds": 5.627,
+          "log": "_work/followup/development-final-1/test_ai_planning.log",
+          "logSha256": "99cb002aa42e362337ac433faab84bf9b0dc1b0e3a1143c43cffc428556f8ed4"
+        },
+        {
+          "name": "test_benchmark_guard",
+          "ok": true,
+          "seconds": 5.487,
+          "log": "_work/followup/development-final-1/test_benchmark_guard.log",
+          "logSha256": "b05d638b0e3756b4dbd4b4e6ce272fae997b7ccd381f99f1b5acd1ab9c70a2dd"
+        },
+        {
+          "name": "test_economy_boundaries",
+          "ok": true,
+          "seconds": 33.662,
+          "log": "_work/followup/development-final-1/test_economy_boundaries.log",
+          "logSha256": "2c56b4c0702314f5a9845c33bba5c1f4dd658dfceca392cb320b108f187a03ed"
+        },
+        {
+          "name": "test_component_registry",
+          "ok": true,
+          "seconds": 4.589,
+          "log": "_work/followup/development-final-1/test_component_registry.log",
+          "logSha256": "d290fc105aec623e592d02473ea53fd5987d478454721491d73194ebc2fa1624"
+        },
+        {
+          "name": "test_edge_interaction",
+          "ok": true,
+          "seconds": 4.205,
+          "log": "_work/followup/development-final-1/test_edge_interaction.log",
+          "logSha256": "b9695e6f3ff4fbfbb66cdf9165d1c1bc0e3e49543f47ed7872a3cd721de6517f"
+        },
+        {
+          "name": "test_group_focus",
+          "ok": true,
+          "seconds": 4.237,
+          "log": "_work/followup/development-final-1/test_group_focus.log",
+          "logSha256": "3707434d3e11a7d416cd065ea4faee129acff6f41433fd6ace3494342cc06c03"
+        },
+        {
+          "name": "test_nav_invalidation",
+          "ok": true,
+          "seconds": 4.031,
+          "log": "_work/followup/development-final-1/test_nav_invalidation.log",
+          "logSha256": "8f7658c1b86ad1f4dae4d37926eb6e063cc45776042c424fdd0d0ec1f934b6e8"
+        },
+        {
+          "name": "test_visibility_rules",
+          "ok": true,
+          "seconds": 4.134,
+          "log": "_work/followup/development-final-1/test_visibility_rules.log",
+          "logSha256": "a2ef48041c51984abdfc70fb356a8302ce6b9c3d55aac4f57b72a71ba01a4eff"
+        },
+        {
+          "name": "test_automatic_gates",
+          "ok": true,
+          "seconds": 4.247,
+          "log": "_work/followup/development-final-1/test_automatic_gates.log",
+          "logSha256": "f4457cc7a2e50e0c097bef23c94278bfbe94b3c0b0bff449409d6403c6b5ea17"
+        },
+        {
+          "name": "test_native_math",
+          "ok": true,
+          "seconds": 1.419,
+          "log": "_work/followup/development-final-1/test_native_math.log",
+          "logSha256": "5d3d8f6d54a60a3a74d26c9da42c134bb14d9ca8313ea8135293481066c19a8e"
+        },
+        {
+          "name": "test_navigation_topology",
+          "ok": true,
+          "seconds": 0.488,
+          "log": "_work/followup/development-final-1/test_navigation_topology.log",
+          "logSha256": "3a113544c2a097aeacd3a654758edb69b06d385a648d2e8cab8b49ad5f75a23d"
+        },
+        {
+          "name": "test_user_storage",
+          "ok": true,
+          "seconds": 0.397,
+          "log": "_work/followup/development-final-1/test_user_storage.log",
+          "logSha256": "ebc6a0778496c014f1215a35498328044097a2d176316557f4f1baf86f6286b3"
+        },
+        {
+          "name": "test_opening_forces",
+          "ok": true,
+          "seconds": 61.125,
+          "log": "_work/followup/development-final-2-fixed/test_opening_forces.log",
+          "logSha256": "7a8913b6a5c30de4ecc5cb093e89331dc62ef702183fda3e535f984a8d248c6b"
+        },
+        {
+          "name": "test_tick_timers",
+          "ok": true,
+          "seconds": 38.327,
+          "log": "_work/followup/development-final-2-fixed/test_tick_timers.log",
+          "logSha256": "0b4a66549e38f50543217942395c308e04c76e4b8719fdab075219b345378ac3"
+        },
+        {
+          "name": "test_clock",
+          "ok": true,
+          "seconds": 32.298,
+          "log": "_work/followup/development-final-2-fixed/test_clock.log",
+          "logSha256": "cb46fde7a35038182969beb4e7c687bda337dc606fd95f7ccb02a91eb6c30e78"
+        },
+        {
+          "name": "test_economy_rules",
+          "ok": true,
+          "seconds": 26.962,
+          "log": "_work/followup/development-final-2-fixed/test_economy_rules.log",
+          "logSha256": "990c60ac12d01203ebea1a1225c2419f58f5cfd760acb06e952c1aaf48650452"
+        },
+        {
+          "name": "test_meta_abilities",
+          "ok": true,
+          "seconds": 19.189,
+          "log": "_work/followup/development-final-2-fixed/test_meta_abilities.log",
+          "logSha256": "26adfde0a9967172515d55d7085b5dee8df24199dfdfd32a292f66c843510e5e"
+        },
+        {
+          "name": "test_unit_research",
+          "ok": true,
+          "seconds": 17.164,
+          "log": "_work/followup/development-final-2-fixed/test_unit_research.log",
+          "logSha256": "a75a978ae694cc0f0bcd107126577641bf77156c19d3d9457833847249aae7d7"
+        },
+        {
+          "name": "test_resource_input",
+          "ok": true,
+          "seconds": 12.444,
+          "log": "_work/followup/development-final-2-fixed/test_resource_input.log",
+          "logSha256": "88c804ec169805d94aeea65637f3e288b43ba72cfb185e0fe08384f18aa302e0"
+        },
+        {
+          "name": "test_restored_view",
+          "ok": true,
+          "seconds": 8.166,
+          "log": "_work/followup/development-final-2-fixed/test_restored_view.log",
+          "logSha256": "779d9d374dea5753b6f2083fed1c5a1090a749b3c7def3b7bba24b3eb6e2b6a3"
+        },
+        {
+          "name": "test_duel",
+          "ok": true,
+          "seconds": 8.417,
+          "log": "_work/followup/development-final-2-fixed/test_duel.log",
+          "logSha256": "61e84321806aef613a9f0ed13b4dc8ff26e9657547cfbcb33d5b2cffaa4d39ad"
+        },
+        {
+          "name": "test_scenario_end",
+          "ok": true,
+          "seconds": 7.61,
+          "log": "_work/followup/development-final-2-fixed/test_scenario_end.log",
+          "logSha256": "58bcb095310799c44f1860ed8d86cbd39440672aa0c2bed650745fc9fd609f33"
+        },
+        {
+          "name": "test_construction",
+          "ok": true,
+          "seconds": 6.582,
+          "log": "_work/followup/development-final-2-fixed/test_construction.log",
+          "logSha256": "0fe348a2e4d2f886d4b063bf00b5c7c5c278ba52ebf13c0de0fee18b796503fc"
+        },
+        {
+          "name": "test_research_rules",
+          "ok": true,
+          "seconds": 6.99,
+          "log": "_work/followup/development-final-2-fixed/test_research_rules.log",
+          "logSha256": "c3c7c1f10b608f0f70ab6bb8ab2ec43d61b9fb75aed8a1c5213e1a7789ea36ed"
+        },
+        {
+          "name": "test_clock_ui",
+          "ok": true,
+          "seconds": 6.474,
+          "log": "_work/followup/development-final-2-fixed/test_clock_ui.log",
+          "logSha256": "c32d1dd23e8dd2c6329e7eb519b3d94d508244ecca2e1085c69c854e17b33b7b"
+        },
+        {
+          "name": "test_resource_frontier",
+          "ok": true,
+          "seconds": 6.123,
+          "log": "_work/followup/development-final-2-fixed/test_resource_frontier.log",
+          "logSha256": "badd85ff93f64abe7b1173515141a4f1b6a224dd7a6aa878887fb94bad8f809e"
+        },
+        {
+          "name": "test_command_replace",
+          "ok": true,
+          "seconds": 6.209,
+          "log": "_work/followup/development-final-2-fixed/test_command_replace.log",
+          "logSha256": "f7d0e394483968997b4b080050e359294df1291890c8d354fc0f81eca6af9677"
+        },
+        {
+          "name": "test_input_research",
+          "ok": true,
+          "seconds": 5.215,
+          "log": "_work/followup/development-final-2-fixed/test_input_research.log",
+          "logSha256": "f3b26c9b61de4d154163bd051a18b6bd49d67d38ad9292bd46502a1579903579"
+        },
+        {
+          "name": "test_combat_rules",
+          "ok": true,
+          "seconds": 6.2,
+          "log": "_work/followup/development-final-2-fixed/test_combat_rules.log",
+          "logSha256": "ab4066fb258b69618cc6a9941f74ccd102503178692bbdc110ad6ab7a7179bad"
+        },
+        {
+          "name": "test_building_panels",
+          "ok": true,
+          "seconds": 4.317,
+          "log": "_work/followup/development-final-2-fixed/test_building_panels.log",
+          "logSha256": "989f1db074b3b8a394256dddb5257d52d191e5391196e5cf53d1720ff9ea37c8"
+        },
+        {
+          "name": "test_building_square",
+          "ok": true,
+          "seconds": 3.466,
+          "log": "_work/followup/development-final-2-fixed/test_building_square.log",
+          "logSha256": "7956e9de31f85516b632cce34abd2895640d172abdf635d4550bfd46ddfdc5a7"
+        },
+        {
+          "name": "test_ability_menus",
+          "ok": true,
+          "seconds": 4.122,
+          "log": "_work/followup/development-final-2-fixed/test_ability_menus.log",
+          "logSha256": "d0e116b4db3f3c115e42cb070fffec3b1a73deaa7ec756fd0aef32a6467291e2"
+        },
+        {
+          "name": "test_unit_footprint",
+          "ok": true,
+          "seconds": 3.975,
+          "log": "_work/followup/development-final-2-fixed/test_unit_footprint.log",
+          "logSha256": "da058094b97d0a20b6da3cb5509aaf59e25a44d5d3314fc4e92f34e40652b7c2"
+        },
+        {
+          "name": "test_hud_metrics",
+          "ok": true,
+          "seconds": 4.144,
+          "log": "_work/followup/development-final-2-fixed/test_hud_metrics.log",
+          "logSha256": "4cd31e613f48bcb070100b6a2b0a9b4fbe45e2f00cd45155f55fa19220028d66"
+        },
+        {
+          "name": "test_cmd_paging",
+          "ok": true,
+          "seconds": 4.06,
+          "log": "_work/followup/development-final-2-fixed/test_cmd_paging.log",
+          "logSha256": "7e0e6f927bc8c6e60d55d02446c62a5938a5e4325784c2507170802b425ed216"
+        },
+        {
+          "name": "check_runtime_scripts",
+          "ok": true,
+          "seconds": 2.59,
+          "log": "_work/followup/development-final-2-fixed/check_runtime_scripts.log",
+          "logSha256": "1d36e9912da8b319f25e3a26629ff7f85192871a7ada39dac9892266d7377164"
+        },
+        {
+          "name": "test_sfx",
+          "ok": true,
+          "seconds": 0.511,
+          "log": "_work/followup/development-final-2-fixed/test_sfx.log",
+          "logSha256": "fd25a7ca8d5496ad9d76f270a7ea7d39a8a1c5a268e94eee4c2ac6c3a310402d"
+        }
+      ]
+    },
+    "releaseAndSelftests": {
+      "passed": 22,
+      "total": 22,
+      "runs": [
+        "_work/followup/release-final/results.json"
+      ],
+      "results": [
+        {
+          "name": "test_battle_interaction",
+          "ok": true,
+          "seconds": 6.726,
+          "log": "_work/followup/release-final/test_battle_interaction.log",
+          "logSha256": "54c5ba0581510cc0f2cf7c1b379fb1ac15609ca8f65e73ce9011370a78020294"
+        },
+        {
+          "name": "test_m0",
+          "ok": true,
+          "seconds": 24.945,
+          "log": "_work/followup/release-final/test_m0.log",
+          "logSha256": "1a84f1a68288c41cb5a2c714e07c0b97085cbc1d63b75ac458f98a0297a2e3f2"
+        },
+        {
+          "name": "test_review_contracts",
+          "ok": true,
+          "seconds": 6.199,
+          "log": "_work/followup/release-final/test_review_contracts.log",
+          "logSha256": "7bdc76b9e5922354b0b1c69735609910c339b2d7cf9e2b45f8a3604c3af77e55"
+        },
+        {
+          "name": "test_save_roundtrip",
+          "ok": true,
+          "seconds": 17.601,
+          "log": "_work/followup/release-final/test_save_roundtrip.log",
+          "logSha256": "458b22e19a14b73c957c64dd0996f420a3dbfe99fd601b8497ab22b94f4efb55"
+        },
+        {
+          "name": "test_save_validity",
+          "ok": true,
+          "seconds": 21.288,
+          "log": "_work/followup/release-final/test_save_validity.log",
+          "logSha256": "3c7a5e6525a3191c507932f69e04eca4491f2ecaa7d6fecf90ed64e98ac594be"
+        },
+        {
+          "name": "test_unit_schema",
+          "ok": true,
+          "seconds": 26.869,
+          "log": "_work/followup/release-final/test_unit_schema.log",
+          "logSha256": "9e311510f069a4022d5c4164b7bdd6dae441da4d4fd4bd6e6976595785e06f25"
+        },
+        {
+          "name": "test_restore_safety",
+          "ok": true,
+          "seconds": 13.739,
+          "log": "_work/followup/release-final/test_restore_safety.log",
+          "logSha256": "08017f7662564250948cb5ed70a8b88422e68fcdf242864a2052ff23d360bd67"
+        },
+        {
+          "name": "test_acceptance_isolation",
+          "ok": true,
+          "seconds": 0.401,
+          "log": "_work/followup/release-final/test_acceptance_isolation.log",
+          "logSha256": "cbc034298a2ee30f7e26866b0bc7c3738091e87e58afc169ef7e403fe92ee81f"
+        },
+        {
+          "name": "test_duel_save",
+          "ok": true,
+          "seconds": 6.581,
+          "log": "_work/followup/release-final/test_duel_save.log",
+          "logSha256": "82eaa9337f984c7b53f17e38ff96bfdb143c4436ed17212ecbed6b3d4981407b"
+        },
+        {
+          "name": "test_slot_metadata",
+          "ok": true,
+          "seconds": 0.494,
+          "log": "_work/followup/release-final/test_slot_metadata.log",
+          "logSha256": "ec79bed9596ec897734bcab38119fb8a5bb52927b879fe07323d9064d20df430"
+        },
+        {
+          "name": "test_continuation_coverage",
+          "ok": true,
+          "seconds": 23.663,
+          "log": "_work/followup/release-final/test_continuation_coverage.log",
+          "logSha256": "ec1dbe521f1d07aee3dbb3e396b7ce2ea8d9a68a870551992f7f54d57506a9f6"
+        },
+        {
+          "name": "test_ai_research",
+          "ok": true,
+          "seconds": 9.291,
+          "log": "_work/followup/release-final/test_ai_research.log",
+          "logSha256": "32e8a6792daf67937af05955195a0fde980b1e0f58afb963cfc4fc109160d0bb"
+        },
+        {
+          "name": "test_campaign_integrity",
+          "ok": true,
+          "seconds": 98.058,
+          "log": "_work/followup/release-final/test_campaign_integrity.log",
+          "logSha256": "a05ff124ab981e3c508505dc50fe89d55d7c44e6f4e701f2e1beab96523c87dd"
+        },
+        {
+          "name": "test_legacy_isolation",
+          "ok": true,
+          "seconds": 25.197,
+          "log": "_work/followup/release-final/test_legacy_isolation.log",
+          "logSha256": "a66f9f9ef6a6d1ded9abf0a752618490688a73d944f77558309bf0af9d50775a"
+        },
+        {
+          "name": "test_contact_and_occupancy",
+          "ok": true,
+          "seconds": 4.803,
+          "log": "_work/followup/release-final/test_contact_and_occupancy.log",
+          "logSha256": "87213c56f5551c0ef89dbb8094336d056660706c09a629ff0f1cda0cdb325068"
+        },
+        {
+          "name": "test_rules_scope",
+          "ok": true,
+          "seconds": 0.494,
+          "log": "_work/followup/release-final/test_rules_scope.log",
+          "logSha256": "e80788c83044e97fe411d8cbe7c9a7a3a5d17468889cdb78b84b5a8659789484"
+        },
+        {
+          "name": "test_camera_read_model",
+          "ok": true,
+          "seconds": 0.488,
+          "log": "_work/followup/release-final/test_camera_read_model.log",
+          "logSha256": "182087a68c822da99daf5f7c28caee7e69b119eb96e3348dfd2d08283024f108"
+        },
+        {
+          "name": "test_app_services",
+          "ok": true,
+          "seconds": 0.857,
+          "log": "_work/followup/release-final/test_app_services.log",
+          "logSha256": "deb2ff67dbecb7ea64ca6056403f57533a747e5c91f21df671d24b729ebfcd7f"
+        },
+        {
+          "name": "test_snapshot_stages",
+          "ok": true,
+          "seconds": 7.241,
+          "log": "_work/followup/release-final/test_snapshot_stages.log",
+          "logSha256": "96ffd7e3819ef9514f07e6e11bc95cc22043b5e2b6cb515bdfff46ed8c60ecfc"
+        },
+        {
+          "name": "selftest-chibic1",
+          "ok": true,
+          "seconds": 8.847,
+          "log": "_work/followup/release-final/selftest-chibic1.log",
+          "logSha256": "5c640d52dd1bdb05f7eb8f89a33f5ae5d24079fe5055c498e0afed06070ec97b"
+        },
+        {
+          "name": "selftest-chibil1",
+          "ok": true,
+          "seconds": 9.198,
+          "log": "_work/followup/release-final/selftest-chibil1.log",
+          "logSha256": "eb49834311adb52ada416579c39a66d7bd5e68d329826fc667341773639c3f2f"
+        },
+        {
+          "name": "selftest-chibic17",
+          "ok": true,
+          "seconds": 18.473,
+          "log": "_work/followup/release-final/selftest-chibic17.log",
+          "logSha256": "71929498c291f25f15621cdc840578bd023a4c5ad471279beed37bdb9f87db7f"
+        }
+      ]
+    },
+    "saveOverlay": {
+      "passed": 7,
+      "total": 7,
+      "runs": [
+        "_work/followup/save-final/results.json"
+      ],
+      "results": [
+        {
+          "name": "test_save_roundtrip",
+          "ok": true,
+          "seconds": 17,
+          "log": "_work/followup/save-final/test_save_roundtrip.log",
+          "logSha256": "c936e409b4f42887264dde7fcdee42a85e2d99fbdaaa0e6942bbde4677e1384b"
+        },
+        {
+          "name": "test_save_validity",
+          "ok": true,
+          "seconds": 20.235,
+          "log": "_work/followup/save-final/test_save_validity.log",
+          "logSha256": "5a0d324e4c1b598f47a19ea7c3835841512fb34bb19ad40413f9dcc087251717"
+        },
+        {
+          "name": "test_unit_schema",
+          "ok": true,
+          "seconds": 25.404,
+          "log": "_work/followup/save-final/test_unit_schema.log",
+          "logSha256": "ebdff91884d7d6eed60aa1045c6d83a690d7266cb9332d7033166b3967bad1b5"
+        },
+        {
+          "name": "test_legacy_isolation",
+          "ok": true,
+          "seconds": 24.716,
+          "log": "_work/followup/save-final/test_legacy_isolation.log",
+          "logSha256": "0766ff5c2ad332fbaa3ffb435324d43d5c484383ae0624c56b248ed562622e93"
+        },
+        {
+          "name": "test_rules_scope",
+          "ok": true,
+          "seconds": 0.486,
+          "log": "_work/followup/save-final/test_rules_scope.log",
+          "logSha256": "9e9ca97a413d41b39f9e2477c908e67abd9c5200c7ddf7ea65aaeb8cb1d1ffa9"
+        },
+        {
+          "name": "test_app_services",
+          "ok": true,
+          "seconds": 0.862,
+          "log": "_work/followup/save-final/test_app_services.log",
+          "logSha256": "ec52464f7a7f56ead57f9de56e587f507d7262ac97a797c8186a720783e4026b"
+        },
+        {
+          "name": "test_snapshot_stages",
+          "ok": true,
+          "seconds": 7.05,
+          "log": "_work/followup/save-final/test_snapshot_stages.log",
+          "logSha256": "a8dda5797f9721f5db7b3f2979b8856300dbc30d652a1e4967df8aedd9710075"
+        }
+      ]
+    },
+    "ci": {
+      "passed": 5,
+      "total": 5,
+      "runs": [
+        "_work/followup/ci-final/results.json"
+      ],
+      "results": [
+        {
+          "name": "check_runtime_scripts",
+          "ok": true,
+          "seconds": 2.34,
+          "log": "_work/followup/ci-final/check_runtime_scripts.log",
+          "logSha256": "eb4f059aaaf352243e6fa18e6e0bc991437752eaa32e5b46f58e00adb5a83cda"
+        },
+        {
+          "name": "test_architecture",
+          "ok": true,
+          "seconds": 13.729,
+          "log": "_work/followup/ci-final/test_architecture.log",
+          "logSha256": "44b976567fc7db60eac6863b6cb6e9ce0c5bdf39d17eec1404f6a96cb89c0e29"
+        },
+        {
+          "name": "dump_composition",
+          "ok": true,
+          "seconds": 3.651,
+          "log": "_work/followup/ci-final/dump_composition.log",
+          "logSha256": "fa100940b4778cf607018178022fce3b3506aed354a226c22db762145fb239a5"
+        },
+        {
+          "name": "test_presentation_diagnostics",
+          "ok": true,
+          "seconds": 2.158,
+          "log": "_work/followup/ci-final/test_presentation_diagnostics.log",
+          "logSha256": "51f9970ddca38549c21fc15b22c63d46d8d856f21f74532f9456f8efb3a568ee"
+        },
+        {
+          "name": "test_camera_read_model",
+          "ok": true,
+          "seconds": 0.501,
+          "log": "_work/followup/ci-final/test_camera_read_model.log",
+          "logSha256": "be33e6b1cdfddfd460e5ae2327c96ddda575ec3d0a338cb2ab4caa18548569a8"
+        }
+      ]
+    },
+    "baselines": {
+      "passed": 2,
+      "total": 2,
+      "runs": [
+        "_work/followup/baselines-final/results.json"
+      ],
+      "results": [
+        {
+          "name": "sim-chibic1-15",
+          "ok": true,
+          "seconds": 16.53,
+          "log": "_work/followup/baselines-final/sim-chibic1-15.log",
+          "logSha256": "d4582d970ba73b1ffb308339a126f2f902c05c4b9a26bd27b709588191094659"
+        },
+        {
+          "name": "sim-chibic1-60",
+          "ok": true,
+          "seconds": 57.063,
+          "log": "_work/followup/baselines-final/sim-chibic1-60.log",
+          "logSha256": "d9241bc32f8466756bb2e4878855bad5279a8446da80c557161fafcf47734549"
+        }
+      ]
+    },
+    "runtimeComposition": "Four runtime roots matched; ten invalid-composition rejection cases and presentation policy passed"
+  },
+  "focusedCoverage": {
+    "v8MissingFields": "Nine checksum-correct incomplete/wrong-shape cases; original world/resources/queue retained; v1-v7 omissions explicit",
+    "recordFields": "All thirteen record fields through actual candidate restoration; wrong types rejected",
+    "worldCollections": "Read-only detached module collection; runtime source cannot directly access private World collections",
+    "camera": "Value isolation, current data and empty-army fallback; existing HUD/camera interaction regressions passed",
+    "validator": "Seven independent rejection stages; 217-line prepare reduced to 18 lines",
+    "services": "Independent repository/catalog/campaign; same-size cache invalidation and detached metadata",
+    "spentResource": "JSON integer-valued float enum regression fixed; save suite and entire affected development partition rerun"
+  },
+  "portInventory": {
+    "schemaVersion": 2,
+    "receiverResolution": "unresolved",
+    "safeForAutomatedDeletion": false
+  },
+  "limitations": [
+    "Hosted GitHub workflows were not triggered",
+    "Formal EXE/GPU/performance and complete terrain staging are outside this source acceptance"
+  ],
+  "recheckNote": "The first full development run exposed an existing spent-resource JSON float enum issue. Corrected it, added a real JSON roundtrip fixture, and reran the full affected partition plus all save tests. Other broad runs were retained; their behavior was unaffected by this narrow correction."
+}

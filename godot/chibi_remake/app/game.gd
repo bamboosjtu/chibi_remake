@@ -5,26 +5,63 @@ extends Node
 # 资源、训练订单与各子系统快照一并写入。v1/v2/v3 旧档由 app/saves/legacy_snapshot.gd
 # 兼容恢复，迁移规则见 docs/16-save-compat.md。
 
-var current_map := "chibic1"
-var pending_load := false
-var pending_load_slot := 0
-var startup_map_consumed := false
-var startup_load_consumed := false
-var startup_video_seen := false
-## 读档失败时由 main 写入；主菜单显示后清空。不能静默开新局再覆盖原档。
-var last_load_error := ""
-## 测试钩子：让下一次 save_game 必然失败，用于验证“保存失败不丢旧档”的 UI 路径。
-var force_save_failure := false
-var last_save_error := {}
+const Repository = preload("res://app/saves/save_repository.gd")
+const Catalog = preload("res://app/saves/slot_catalog.gd")
+const CampaignSession = preload("res://app/campaign_session.gd")
+var campaign := CampaignSession.new()
+var repository := Repository.new(is_valid_save, can_rotate_save)
+var slot_catalog := Catalog.new(load_save, save_slot_path, SAVE_SLOTS)
 var startup_valid := false
-var _slot_metadata := {}
 
-var storage = preload("res://app/user_storage.gd").new()
-var SAVE_PATH := "user://save.json"
+var current_map: String:
+	get: return campaign.current_map
+	set(value): campaign.current_map = value
+
+var pending_load: bool:
+	get: return campaign.pending_load
+	set(value): campaign.pending_load = value
+
+var pending_load_slot: int:
+	get: return campaign.pending_load_slot
+	set(value): campaign.pending_load_slot = value
+
+var startup_map_consumed: bool:
+	get: return campaign.startup_map_consumed
+	set(value): campaign.startup_map_consumed = value
+
+var startup_load_consumed: bool:
+	get: return campaign.startup_load_consumed
+	set(value): campaign.startup_load_consumed = value
+
+var startup_video_seen: bool:
+	get: return campaign.startup_video_seen
+	set(value): campaign.startup_video_seen = value
+
+var last_load_error: String:
+	get: return campaign.last_load_error
+	set(value): campaign.last_load_error = value
+
+var force_save_failure: bool:
+	get: return repository.force_failure
+	set(value): repository.force_failure=value
+var last_save_error: Dictionary:
+	get: return repository.last_error
+	set(value): repository.last_error=value
+var storage: RefCounted:
+	get: return repository.storage
+	set(value): repository.storage=value
+var SAVE_PATH: String:
+	get: return repository.path
+	set(value):
+		repository.path=value
+		if slot_catalog != null: slot_catalog.invalidate()
 const SAVE_VERSION := 8
-const SAVE_SLOTS := 20
+const SAVE_SLOTS = Repository.SAVE_SLOTS
 const Store = preload("res://app/json_store.gd")
 const UnitSchema = preload("res://simulation/definitions/unit_schema.gd")
+
+func _init() -> void:
+	repository.changed.connect(slot_catalog.invalidate)
 
 func _ready() -> void:
 	var acceptance := preload("res://app/acceptance_storage.gd").configure(storage, OS.get_cmdline_user_args())
@@ -47,24 +84,7 @@ func _ready() -> void:
 ## Keep valid existing saves when the profile or fallback location changes.
 ## `legacy_directories()` only reads; it never creates the folders it looks at.
 func _migrate_legacy_userdata() -> void:
-	var new_dir := SAVE_PATH.get_base_dir()
-	var old_dirs: Array[String] = preload("res://app/user_storage.gd").legacy_directories()
-	var names := ["save.json", "save.json.bak"]
-	for slot in range(1,SAVE_SLOTS+1):
-		var name := "slot-%02d.json" % slot
-		names.append(name);names.append(name+".bak")
-	for name in names:
-		var dst := new_dir.path_join(name)
-		if not Store.read(dst,is_valid_save).is_empty(): continue
-		var newest := ""
-		for old_dir in old_dirs:
-			if old_dir == new_dir: continue
-			var src := old_dir.path_join(name)
-			if Store._read(src,is_valid_save).is_empty(): continue
-			if newest.is_empty() or FileAccess.get_modified_time(src) > FileAccess.get_modified_time(newest): newest = src
-		if newest.is_empty(): continue
-		if Store.commit(dst,FileAccess.get_file_as_string(newest),is_valid_save,can_rotate_save):
-			print("migrated legacy save: ",newest)
+	repository.migrate_legacy_userdata()
 
 ## 内置中文字体：运行时直接加载 OTF，不依赖编辑器导入缓存（新克隆/无 .godot 也能跑）。
 ## 导出包通过 include_filter="*.otf" 带上原始字体；失败时退回系统字体并留警告。
@@ -93,20 +113,10 @@ func _install_cjk_font() -> void:
 ## @param extra      {"nextUid":int, "trainings":Array, "gameEnd":int}
 ## @return 是否真的落盘成功（调用方应当据此提示玩家，而不是假定成功）
 func save_game(units: Array, resources: Dictionary = {}, extra: Dictionary = {}, slot := 0) -> bool:
-	last_save_error = {}
-	if int(extra.get("pendingDuels",0)) > 0:
-		last_save_error = {"stage":"unsettled duel; use session save command","code":ERR_BUSY}
-		return false
+	if not repository.begin_save(slot, int(extra.get("pendingDuels",0))): return false
 	var path := save_slot_path(slot)
-	if path.is_empty():
-		last_save_error={"stage":"invalid slot","code":ERR_INVALID_PARAMETER};return false
-	if force_save_failure:
-		push_warning("save_game: forced failure (test hook)")
-		return false
 	var payload := snapshot(units, resources, extra)
 	var ok := _atomic_write(path, JSON.stringify(payload, "", true, true))
-	if not ok:
-		last_save_error = Store.last_error.duplicate(true)
 	if ok:
 		print("gamesaved: %s units=%d trainings=%d nextUid=%d" % [path, payload.units.size(), payload.trainings.size(), int(extra.get("nextUid", 0))])
 	return ok
@@ -262,110 +272,39 @@ static func can_rotate_save(d: Dictionary) -> bool:
 
 ## 先写临时文件并**校验可解析**，再替换正式档 —— 任一步失败都保留前一份有效存档。
 func _atomic_write(path: String, text: String) -> bool:
-	var ok := storage.commit(path, text, is_valid_save, can_rotate_save)
-	if ok:
-		SAVE_PATH = storage.current_path
-		_slot_metadata.clear()
-	return ok
+	return repository.commit(path,text)
 
 func has_save() -> bool:
-	for slot in range(SAVE_SLOTS+1):
-		if _slot_info(slot).valid: return true
-	return false
+	return slot_catalog.has_save()
 
 func load_save(slot := 0) -> Dictionary:
-	var path := save_slot_path(slot)
-	return {} if path.is_empty() else Store.read(path, is_valid_save)
+	return repository.load_slot(slot)
 
-## Slot zero retains the existing save.json as an independent automatic/legacy save.
 func save_slot_path(slot: int) -> String:
-	if slot<0 or slot>SAVE_SLOTS:return ""
-	return SAVE_PATH if slot==0 else SAVE_PATH.get_base_dir().path_join("slot-%02d.json" % slot)
+	return repository.slot_path(slot)
 
 func save_slots() -> Array:
-	var out := []
-	for slot in range(SAVE_SLOTS+1):
-		out.append(_slot_info(slot).duplicate())
-	return out
+	return slot_catalog.entries()
 
 func _slot_info(slot: int) -> Dictionary:
-	var path := save_slot_path(slot)
-	var signature := []
-	for file in [path,path+".bak"]:
-		var reader := FileAccess.open(file, FileAccess.READ)
-		signature.append([FileAccess.get_modified_time(file),reader.get_length()] if reader != null else [-1,0])
-	if _slot_metadata.has(path) and _slot_metadata[path].signature == signature: return _slot_metadata[path].info
-	var data := load_save(slot)
-	var info := {"slot":slot,"valid":not data.is_empty(),"occupied":signature[0][0]!=-1 or signature[1][0]!=-1,"name":str(data.get("saveName","")),"map":str(data.get("map","")),"savedAt":str(data.get("savedAt",""))}
-	_slot_metadata[path] = {"signature":signature,"info":info}
-	return info
+	return slot_catalog.info(slot)
 
 static func campaign_caption(id: String) -> String:
-	var campaign := "刘备战役" if id.begins_with("chibil") else "曹操战役"
-	return "%s · 第%d关" % [campaign,int(id.substr(6))] if id.begins_with("chibi") else "战役进度"
+	return CampaignSession.campaign_caption(id)
 
-## ARCH-005：只把**真正的关卡**列进来。
-## 以前只校验「是 Dictionary」，于是 data/officers.json 会变成一个零对象的伪关卡。
-## 现在要求：显式 kind（若声明必须为 level）+ 关卡必需字段存在且类型正确。
-const LEVEL_REQUIRED := ["terrainW", "terrainH", "rows", "cols", "objects", "walkable"]
-
-static func is_level_doc(d) -> bool:
-	if not (d is Dictionary):
-		return false
-	if d.has("kind") and str(d.kind) != "level":
-		return false
-	for k in LEVEL_REQUIRED:
-		if not d.has(k):
-			return false
-	if not (d.objects is Array) or not (d.walkable is Array):
-		return false
-	if float(d.get("terrainW", 0)) <= 0.0 or float(d.get("terrainH", 0)) <= 0.0:
-		return false
-	if int(d.get("rows", 0)) <= 0 or int(d.get("cols", 0)) <= 0:
-		return false
-	return true
+const LEVEL_REQUIRED = CampaignSession.LEVEL_REQUIRED
+static func is_level_doc(data) -> bool:
+	return CampaignSession.is_level_doc(data)
 
 func list_levels() -> Array:
-	var out := []
-	var da := DirAccess.open("res://data")
-	if da == null:
-		return out
-	for fn in da.get_files():
-		if not fn.ends_with(".json"):
-			continue
-		var f := FileAccess.open("res://data/" + fn, FileAccess.READ)
-		if f == null:
-			continue
-		var head = JSON.parse_string(f.get_as_text())
-		f.close()
-		# ARCH-005：坏 JSON / 数据库文件 / 缺图字段一律不能成为可点击关卡
-		if not is_level_doc(head):
-			push_warning("list_levels: 跳过 data/%s（不是有效关卡）" % fn)
-			continue
-		out.append({
-			"id": fn.get_basename(),
-			"name": str(head.get("name", fn)),
-			"objects": (head.get("objects", []) as Array).size(),
-		})
-	out.sort_custom(func(a, b): return str(a.id) < str(b.id))
-	return out
+	return campaign.list_levels()
 
-## BATTLE.EXP order, including both Liu Bei 7a/7b chapters. Never cross campaigns.
 func next_level(map_id: String) -> Dictionary:
-	var catalog: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/db/startup_briefings.json"))
-	var levels: Array = catalog.get("levels", [])
-	for i in range(levels.size()-1):
-		if str(levels[i].map) == map_id and str(levels[i].campaign) == str(levels[i+1].campaign):
-			return levels[i+1]
-	return {}
+	return campaign.next_level(map_id)
 
 func advance_campaign(map_id: String) -> bool:
-	var entry := next_level(map_id)
-	if entry.is_empty(): return false
-	current_map = str(entry.map)
-	pending_load = false
-	pending_load_slot = 0
-	get_tree().paused = false
+	if not campaign.advance(map_id): return false
+	get_tree().paused=false
 	return get_tree().change_scene_to_file("res://main.tscn") == OK
 
 func _exit_tree() -> void:

@@ -2,6 +2,8 @@
 
 日期：2026-11-16（Asia/Shanghai）。工程起点：`23f112b7b89ebf939ee95d03ce6a82d4c3eddb27`。评审依据为 `tmp/review.md`，按本轮用户指定的 P0 → P1 → P2 → P3 顺序执行。
 
+本文件保留首轮基线；后续六项修复与新的验收记录见 `followup.md`、`followup-acceptance.json`。
+
 ## 1. 本轮边界与交付
 
 本轮落地质量门禁、存档可靠性、Unit Schema 首版、UI 瞬态隔离、组合根试点和端口依赖盘点。保留 Dictionary 单位模型，存档格式仍为 v8，原有确定性基线不变。端口没有做代码生成，也没有按“搜索不到调用者”批量删除接口。

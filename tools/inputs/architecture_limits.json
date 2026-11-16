@@ -14,8 +14,6 @@
     "testing/technology_checks.gd::_selftest_tech": 125,
     "app/battle/bootstrap.gd::_ready": 153,
     "app/battle/scene_controller.gd::_battle_input": 84,
-    "app/saves/snapshot_restorer.gd::restore": 126,
-    "app/saves/snapshot_validator.gd::prepare": 217,
     "presentation/menu/campaign_dialog.gd::_build_campaign_dialog": 98,
     "presentation/menu/controller.gd::_ready": 220,
     "presentation/menu/level_dialog.gd::_build_level_dialog": 151,
@@ -73,16 +71,6 @@
       "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."
     },
     "functions:app/battle/scene_controller.gd::_battle_input": {
-      "owner": "project-maintainers",
-      "reviewBy": "2027-02-16",
-      "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."
-    },
-    "functions:app/saves/snapshot_restorer.gd::restore": {
-      "owner": "project-maintainers",
-      "reviewBy": "2027-02-16",
-      "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."
-    },
-    "functions:app/saves/snapshot_validator.gd::prepare": {
       "owner": "project-maintainers",
       "reviewBy": "2027-02-16",
       "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."

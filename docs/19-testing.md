@@ -297,3 +297,5 @@ pwsh -NoProfile -File tools/bench_full_battle.ps1 -ReleasePack <候选目录>/Ch
 单位字段检查同时使用 `unit_schema_check.mjs` 的工厂/常见字面量写入检查、`test_unit_schema.gd` 的逐字段保存/校验/恢复，以及真实快照和续跑样本。静态扫描无法证明任意动态键表达式的完整性，新增动态字段必须补充真实场景样本。Schema 不替代载员、科技、生产、AI 和引用的语义验证。
 
 源码发布回归使用 `runtime_assets.mjs --check --hash --versioned-only` 检查已提交资源；该模式不要求生成地形缓存，也不认证完整 staging 图。正式构建继续使用完整的 `--check --hash`，生成地形后再验收。
+
+`test_save_validity` 以正确 checksum 覆盖 v8 缺整组资源、缺任一资源键、缺队列及队列错误类型，并核对拒绝后资源/生产队列和世界身份不变。`test_unit_schema` 的 record 组走完整候选恢复；`test_snapshot_stages` 分别破坏七个校验阶段并检查拒绝的原子性。`test_app_services` 覆盖服务独立性、写入保护和槽缓存失效；`test_camera_read_model` 验证值投影不返回可变世界引用。

@@ -14,6 +14,7 @@ func run() -> void:
 	var game: Node = root.get_node("Game")
 	var battle = load("res://main.tscn").instantiate()
 	root.add_child(battle); battle.set_process(false)
+	_record_fields(game, battle)
 	for tick in range(60): battle.commands.world._sim_step(battle.SIM_DT)
 	for unit in battle.units:
 		assert(Schema.omissions(unit).is_empty(), "Unregistered runtime unit fields: " + str(Schema.omissions(unit)))
@@ -57,3 +58,44 @@ func sentinel(key: String):
 		"Array": return [27]
 		"Dictionary": return {"wood":1}
 	return field.default
+
+func _record_fields(game: Node, battle: Node2D) -> void:
+	var original: Dictionary = game.snapshot(battle.units, battle.commands.world._resources(), battle.saver.save_extra())
+	var seed: Array = battle.units.duplicate(true)
+	var worker_index: int = seed.find(seed.filter(func(unit): return int(unit.unit) == 30)[0])
+	var extra: Dictionary = battle.saver.save_extra(); extra.simulation.ai={}
+	for field in Schema.fields("record"):
+		battle.ai=null
+		var units := seed.duplicate(true)
+		var index := worker_index
+		if field == "is_building": index=units.find(units.filter(func(unit): return unit.is_building)[0])
+		var unit: Dictionary = units[index]
+		unit.group_officer=-1
+		match field:
+			"uid": unit.uid += 10000
+			"alive": unit.alive=false; unit.hp=0; unit.state="dead"
+			"ax", "ay": unit[field] += 0.25
+			"hp": unit.hp -= 1
+			"owner": unit.owner=2 if int(unit.owner)!=2 else 3
+			"unit": unit.unit=32
+			"is_building": pass # Factory classification must agree with the saved unit type.
+			"map_object": unit.map_object=false
+			"map_index": unit.map_index=137
+			"die_t": unit.die_t=0.5; unit.state="dead"; unit.hp=-7
+			"state": unit.state="move"
+			"officer": unit.officer=battle.commands.military._officer_by_index(0).duplicate(true)
+			_: unit[field]=sentinel(field)
+		var saved: Dictionary = game.snapshot(units, battle.commands.world._resources(), extra)
+		var key: String = Schema.FIELDS[field].key
+		var record: Dictionary = saved.units[index]
+		assert(record.has(key) and Schema.valid_record(record), "Record serialization/validation omitted " + field)
+		var invalid := saved.duplicate(true)
+		invalid.units[index][key]="invalid" if Schema.FIELDS[field].type=="Dictionary" and field!="officer" else {"invalid":true}
+		assert(not Schema.valid_record(invalid.units[index]), "Record type validation omitted " + field)
+		assert(not battle.saver.apply_snapshot(invalid))
+		assert(battle.saver.apply_snapshot(saved), "Record restore rejected " + field)
+		var restored: Dictionary = battle.units.filter(func(value): return int(value.uid)==int(record.uid))[0]
+		var after: Dictionary = Schema.snapshot_record(restored)
+		assert(game.save_canonical_text({"value":record[key]})==game.save_canonical_text({"value":after[key]}), "Record restore omitted " + field)
+	assert(battle.saver.apply_snapshot(original))
+	print("UNIT RECORD SCHEMA PASS every record field / actual candidate restoration / wire aliases / invalid types")

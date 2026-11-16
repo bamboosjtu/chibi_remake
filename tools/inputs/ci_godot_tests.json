@@ -34,6 +34,15 @@
       "markers": [
         "PRESENTATION DIAGNOSTICS PASS"
       ]
+    },
+    {
+      "script": "test_camera_read_model",
+      "markers": [
+        "CAMERA READ MODEL PASS"
+      ],
+      "args": [
+        "--noview"
+      ]
     }
   ]
 }

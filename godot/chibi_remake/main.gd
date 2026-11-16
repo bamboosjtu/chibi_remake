@@ -71,28 +71,23 @@ var saver: RefCounted:
 	get: return scene.saver
 	set(value): scene.saver = value
 
-var _access: Dictionary:
-	get: return world._access
 var _api_missing: Array = []
 
 func _init() -> void:
-	_modules = world._modules
 	for field in state.PROXY_FIELDS: _state_fields[field] = true
 	for field in scene.PROXY_FIELDS: _scene_fields[field] = true
 	_wire_world()
 
 func _wire_world() -> void:
-	_modules = world._modules.duplicate()
+	_modules = world.module_view().duplicate()
 	if not _application_services.has("bootstrap"): _application_services["bootstrap"] = preload("res://app/battle/bootstrap.gd").new(state, scene, self)
 	if not _application_services.has("cheat_controller"): _application_services["cheat_controller"] = preload("res://app/battle/cheat_controller.gd").new(state, scene, self)
 	if not _application_services.has("duel_controller"): _application_services["duel_controller"] = preload("res://app/battle/duel_controller.gd").new(state, scene, self)
 	if not _application_services.has("scene_controller"): _application_services["scene_controller"] = preload("res://app/battle/scene_controller.gd").new(state, scene, self)
 	_modules.merge(_application_services)
-	var access := _access.duplicate()
-	access.merge(commands.port_objects())
-	var report := preload("res://composition_contract.gd").wire(_modules, "main", access)
+	_modules.make_read_only()
+	var report: Dictionary = world.connect_services("main", commands.port_objects(), _application_services)
 	_api_missing = report.missing
-	if _api_missing.is_empty():_modules.battle_simulation.connect_native()
 	if not state.effects.visual_requested.is_connected(_on_visual): state.effects.visual_requested.connect(_on_visual)
 	if not state.effects.sound_requested.is_connected(_on_sound): state.effects.sound_requested.connect(_on_sound)
 	if not state.effects.duel_requested.is_connected(_on_duel): state.effects.duel_requested.connect(_on_duel)
@@ -171,11 +166,11 @@ func dispose_services() -> void:
 	commands.disconnect_services()
 	for service in _application_services.values(): service.ports.disconnect_services()
 	_application_services.clear()
-	_modules.clear()
+	_modules = {}
 	world.dispose()
 
 func simulation_access(domain: String) -> RefCounted:
-	return _access[domain]
+	return world.simulation_access(domain)
 
 
 func _on_duel(outcome: String, onm: String, enm: String, ticket: int) -> void:

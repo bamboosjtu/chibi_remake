@@ -60,10 +60,28 @@ func prepare_map() -> void:
 	state.nav.setup(state.map_data)
 	state.visibility.setup(Vector2(float(state.map_data.terrainW), float(state.map_data.terrainH)))
 
-func connect_services(label: String) -> Dictionary:
-	var report: Dictionary=preload("res://composition_contract.gd").wire(_modules, label, _access)
-	if report.missing.is_empty():_modules.battle_simulation.connect_native()
+func seed_map_units() -> bool:
+	if not state.units.is_empty(): return false
+	for index in range(state.map_data.objects.size()):
+		var unit: Dictionary = _modules.entity_factory._make_unit(state.map_data.objects[index], true)
+		unit.map_index = index
+		state.units.append(unit)
+	return true
+
+func connect_services(label: String, access_overrides: Dictionary = {}, application_services: Dictionary = {}, activate_native := true) -> Dictionary:
+	var services := _modules.duplicate()
+	services.merge(application_services)
+	var access := _access.duplicate()
+	access.merge(access_overrides, true)
+	var report: Dictionary=preload("res://composition_contract.gd").wire(services, label, access)
+	if report.missing.is_empty() and activate_native:_modules.battle_simulation.connect_native()
 	return report
+
+func module_view() -> Dictionary:
+	# Diagnostics may inspect services, but cannot replace members of the owned graph.
+	var result := _modules.duplicate()
+	result.make_read_only()
+	return result
 
 func simulation_access(domain: String) -> RefCounted:
 	return _access[domain]

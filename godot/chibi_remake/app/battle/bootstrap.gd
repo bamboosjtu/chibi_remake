@@ -207,12 +207,7 @@ func _apply_scenario() -> void:
 		battle.gold, battle.wood, battle.food, battle.stone, battle.scenario_avi])
 
 func _build_units() -> void:
-	var idx := 0
-	for ob in battle.map_data.objects:
-		var u := ports._make_unit(ob, true)
-		u["map_index"] = idx          # 地图对象在 objects 里的序号，存档配对用
-		idx += 1
-		battle.units.append(u)
+	if not node.world.seed_map_units(): ports._fatal("地图实体已经初始化")
 
 func _build_train_types() -> void:
 	var cnt := {}

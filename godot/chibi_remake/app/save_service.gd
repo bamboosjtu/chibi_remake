@@ -18,6 +18,7 @@ extends RefCounted
 var host: Object
 var last_load_error := ""
 var _content_revision_cache := ""
+const UnitSchema = preload("res://simulation/definitions/unit_schema.gd")
 const ActionClock = preload("res://simulation/systems/action_clock.gd")
 const TickTimers = preload("res://simulation/systems/tick_timers.gd")
 const TechnologyState = preload("res://simulation/systems/technology_state.gd")
@@ -40,6 +41,9 @@ func _apply_snapshot(d: Dictionary) -> bool:
 	if d.is_empty():
 		last_load_error = "进度为空、校验失败或无法读取。"
 		push_warning("load save: 存档为空或无法解析")
+		return false
+	if not preload("res://app/saves/save_envelope.gd").valid_collections(d):
+		last_load_error = "存档版本、资源或生产队列字段不完整；当前战场已保留。"
 		return false
 	if str(d.get("map", "")) != str(host.map_id):
 		last_load_error = "存档关卡与当前战场不匹配。"
@@ -139,25 +143,25 @@ func _apply_v3(d: Dictionary, arr: Array) -> int:
 func _apply_legacy(d: Dictionary, arr: Array, ver: int) -> int:
 	return preload("res://app/saves/legacy_snapshot.gd").new(host, _apply_unit_record, _restore_trainings)._apply_legacy(d, arr, ver)
 func _apply_unit_record(u: Dictionary, rec: Dictionary) -> void:
-	u.ax = float(rec.get("x", u.ax))
-	u.ay = float(rec.get("y", u.ay))
+	u.ax = float(UnitSchema.record_value(rec, "ax", u.ax))
+	u.ay = float(UnitSchema.record_value(rec, "ay", u.ay))
 	var cell: Vector2i=host.nav.cell_of_px(u.ax,u.ay)
 	u.A=cell.x;u.B=cell.y
-	var dying := float(rec.get("dieT",-1.0)) >= 0.0
-	var recorded_alive := bool(rec.get("alive",true))
-	var recorded_hp := float(rec.get("hp",u.maxhp))
+	var dying := float(UnitSchema.record_value(rec, "die_t", -1.0)) >= 0.0
+	var recorded_alive := bool(UnitSchema.record_value(rec, "alive", true))
+	var recorded_hp := float(UnitSchema.record_value(rec, "hp", u.maxhp))
 	u.hp = recorded_hp if dying or not recorded_alive else maxf(0.0,recorded_hp)
 	u.alive = recorded_alive and (u.hp > 0.0 or dying or bool(rec.get("simulation", {}).get("site", false)))
-	u.state = str(rec.get("state", "idle")) if u.alive else "dead"
+	u.state = str(UnitSchema.record_value(rec, "state", "idle")) if u.alive else "dead"
 	u.target = null
 	u.path = []
 	u.pi = 0
 	# ARCH-001：淡出中的对象也要保留死亡进度，否则读档后会重新获得行动能力
-	u.die_t = float(rec.get("dieT", -1.0)) if u.alive else -1.0
+	u.die_t = float(UnitSchema.record_value(rec, "die_t", -1.0)) if u.alive else -1.0
 	if u.alive and u.die_t >= 0.0:
 		u.state = "dead"
 	# ARCH-008：武将身份按索引恢复（不再靠排序位置重新分配）
-	var oi := int(rec.get("officerIndex", -1))
+	var oi := int(UnitSchema.record_value(rec, "officer", -1))
 	u["officer"] = {}
 	if oi >= 0:
 		var o: Dictionary = host.commands.military._officer_by_index(oi)
@@ -173,6 +177,10 @@ func _apply_unit_record(u: Dictionary, rec: Dictionary) -> void:
 			host.view.unit_nodes(u).hbar.visible = false
 
 func _restore_resources(d: Dictionary) -> void:
+	if int(d.get("v", 1)) >= 8:
+		for key in preload("res://app/saves/save_envelope.gd").RESOURCE_KEYS:
+			host.set(key, float(d.resources[key]))
+		return
 	var res = d.get("resources", null)
 	if res is Dictionary:
 		host.gold = float(res.get("gold", host.gold))
@@ -182,11 +190,13 @@ func _restore_resources(d: Dictionary) -> void:
 
 ## ARCH-002：生产队列也恢复（队列在 `_start_train` 时已经扣过费）
 func _restore_trainings(d: Dictionary) -> void:
-	var tlist: Array = host.trainings
-	tlist.clear()
 	var arr = d.get("trainings", null)
 	if not (arr is Array):
+		# Legacy missing queues mean no production. v8 is rejected before restoration.
+		if int(d.get("v", 1)) < 8: host.trainings.clear()
 		return
+	var tlist: Array = host.trainings
+	tlist.clear()
 	var by_uid := {}
 	for u in host.units:
 		by_uid[int(u.uid)] = u

@@ -2,12 +2,26 @@ extends RefCounted
 ## File-level validity, independent of installed rules and any live world.
 ## SnapshotValidator additionally checks map identity, technology and world references.
 const Schema = preload("res://simulation/definitions/unit_schema.gd")
+const RESOURCE_KEYS := ["gold", "wood", "food", "stone"]
 
 static func integer(value, minimum := 0) -> bool:
 	return (value is int or value is float) and is_finite(float(value)) and float(value) == floorf(float(value)) and float(value) >= minimum and float(value) <= 2147483647
 
 static func number(value) -> bool:
 	return (value is int or value is float) and is_finite(float(value))
+
+static func valid_collections(data: Dictionary) -> bool:
+	var version = data.get("v", 1)
+	if not integer(version, 1) or int(version) > 8: return false
+	var complete := int(version) >= 8
+	if complete and (not data.has("resources") or not data.has("trainings")): return false
+	var resources = data.get("resources", {})
+	if not resources is Dictionary: return false
+	for key in RESOURCE_KEYS:
+		if complete and not resources.has(key): return false
+	for value in resources.values():
+		if not number(value) or float(value) < 0: return false
+	return data.get("trainings", []) is Array
 
 static func valid(data: Dictionary) -> bool:
 	var version = data.get("v", 1)
@@ -16,10 +30,7 @@ static func valid(data: Dictionary) -> bool:
 	if data.has("kind") and data.kind != "save": return false
 	if not data.get("units") is Array: return false
 	if int(version) < 4 and data.units.is_empty(): return false
-	if not data.get("resources", {}) is Dictionary: return false
-	for value in data.get("resources", {}).values():
-		if not number(value) or float(value) < 0: return false
-	if not data.get("trainings", []) is Array: return false
+	if not valid_collections(data): return false
 	if int(version) >= 4:
 		if not data.get("simulation") is Dictionary or not integer(data.get("nextUid")): return false
 	var seen := {}

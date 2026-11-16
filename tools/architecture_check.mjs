@@ -40,6 +40,8 @@ for (const file of files(root)) {
   const source = fs.readFileSync(file, 'utf8');
   const code = source.replace(/("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|#[^\r\n]*/g,(all,string)=>string??'');
   const count = source.trimEnd().split('\n').length;
+  if (relative !== 'simulation/battle_world.gd' && /\bworld\.(?:_modules|_access)\b|\bworld\.(?:get|set)\(\s*['"]_(?:modules|access)['"]/.test(code)) fail(`${relative}: accesses private BattleWorld collections`);
+  if (relative === 'presentation/battle/components/camera_controller.gd' && /\bhost\.(?:units|selected|map_data|nav)\b/.test(code)) fail(`${relative}: camera bypasses value read model`);
   const budget = limits.files[relative] ?? 600;
   if (count > budget) fail(`${relative}: ${count} lines exceeds ${budget}`);
   if (relative.startsWith('simulation/')) {

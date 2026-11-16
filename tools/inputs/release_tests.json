@@ -35,7 +35,8 @@
     {
       "script": "test_save_validity",
       "markers": [
-        "SAVE VALIDITY PASS"
+        "SAVE VALIDITY PASS",
+        "V8 REQUIRED FIELDS PASS"
       ],
       "args": [
         "--noview"
@@ -45,7 +46,8 @@
     {
       "script": "test_unit_schema",
       "markers": [
-        "UNIT SCHEMA PASS"
+        "UNIT SCHEMA PASS",
+        "UNIT RECORD SCHEMA PASS"
       ],
       "args": [
         "--noview"
@@ -137,6 +139,33 @@
       "script": "test_rules_scope",
       "markers": [
         "RULES SCOPE PASS"
+      ],
+      "args": [
+        "--noview"
+      ]
+    },
+    {
+      "script": "test_camera_read_model",
+      "markers": [
+        "CAMERA READ MODEL PASS"
+      ],
+      "args": [
+        "--noview"
+      ]
+    },
+    {
+      "script": "test_app_services",
+      "markers": [
+        "APP SERVICES PASS"
+      ],
+      "args": [
+        "--noview"
+      ]
+    },
+    {
+      "script": "test_snapshot_stages",
+      "markers": [
+        "SNAPSHOT STAGES PASS"
       ],
       "args": [
         "--noview"

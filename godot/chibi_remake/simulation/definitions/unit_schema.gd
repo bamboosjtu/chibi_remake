@@ -200,7 +200,7 @@ static func valid_relations(state: Dictionary) -> bool:
 					"unit":
 						if not _reference(value.get("uid")) or int(value.uid) < 0: return false
 					"spent":
-						if value.get("unit") not in [10,11,22,24,25] or not _point([value.get("x"),value.get("y")]): return false
+						if not _reference(value.get("unit")) or int(value.unit) not in [10,11,22,24,25] or not _point([value.get("x"),value.get("y")]): return false
 					_: return false
 	return true
 
@@ -222,6 +222,9 @@ static func snapshot_record(unit: Dictionary) -> Dictionary:
 		var definition: Dictionary = FIELDS[key]
 		result[definition.key] = decode(key, unit.get(key, definition.default)) if key != "officer" else int(unit.get("officer", {}).get("index", -1))
 	return result
+
+static func record_value(record: Dictionary, field: String, fallback = null):
+	return record.get(FIELDS[field].key, fallback)
 
 static func valid_record(record: Dictionary) -> bool:
 	for key in fields("record"):
