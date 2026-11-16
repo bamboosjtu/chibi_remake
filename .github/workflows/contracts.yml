@@ -2,10 +2,8 @@ name: contracts
 
 # Repository contracts that need no engine, no export templates and no LFS art:
 # composition registry, layer boundaries, declared runtime assets and the
-# release-suite shape. `ci.yml` keeps the engine smoke because that one needs a
-# 3.4 GiB build; these checks are pure file inspection and run in seconds, so
-# there is no reason to leave them to a local machine. They ran in ci.yml until
-# 0111288a removed every non-syntax job.
+# complete test inventory. Engine-only simulation gates live in ci.yml;
+# full source release regressions have an explicit workflow_dispatch entry.
 on:
   push:
   pull_request:
@@ -23,11 +21,36 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Registry, architecture and repository contracts
-        run: node tools/ci_lightweight.mjs
+      - name: Architecture and waiver reviews
+        if: ${{ !cancelled() }}
+        run: node tools/ci_lightweight.mjs --group architecture
+      - name: Composition registry
+        if: ${{ !cancelled() }}
+        run: node tools/ci_lightweight.mjs --group registry
+      - name: Simulation data and rules manifest
+        if: ${{ !cancelled() }}
+        run: node tools/ci_lightweight.mjs --group data
+      - name: Documentation
+        if: ${{ !cancelled() }}
+        run: node tools/ci_lightweight.mjs --group docs
+      - name: Repository syntax and complete test inventory
+        if: ${{ !cancelled() }}
+        run: node tools/ci_lightweight.mjs --group repository
+      - name: Tooling contracts
+        if: ${{ !cancelled() }}
+        run: node tools/ci_lightweight.mjs --group tooling
       - name: Indexed asset declarations and LFS pointers
+        if: ${{ !cancelled() }}
         run: node tools/audit_clone_inputs.mjs --index
       - name: Rebuildable terrain source declarations
+        if: ${{ !cancelled() }}
         run: node tools/terrain_sources.mjs --index
       - name: Historical terrain equivalence reference coverage
+        if: ${{ !cancelled() }}
         run: node tools/compare_terrain_rebuild.mjs --declarations
+      - name: Upload check summaries
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract-results
+          path: _work/lightweight

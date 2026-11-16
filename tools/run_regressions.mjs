@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import path from 'node:path';
+import {spawnSync} from 'node:child_process';
 import {runGodot} from './lib/godot_process.mjs';
 import {matchesKnownFailure} from './lib/regression_result.mjs';
 
@@ -22,7 +23,7 @@ const jobs = [];
 for (let i = 0; i < args.length; i++) {
   if (args[i] === '--suite') {
     const suite = JSON.parse(fs.readFileSync(args[++i], 'utf8'));
-    for (const test of suite.tests) jobs.push({name: test.script, markers: test.markers, expectedFailure: test.expectedFailure,
+    for (const test of suite.tests) jobs.push({name: test.script, markers: test.markers, expectedFailure: test.expectedFailure, fixture: test.fixture,
       timeout: test.timeout ?? 120,
       args: ['--headless', ...targetArgs, '--script', path.join(scripts, test.script + '.gd'), '--', '--no-intro', ...(test.args ?? [])]});
   }
@@ -43,7 +44,19 @@ for (const job of jobs) {
 	// Portable markers override APPDATA; every regression also needs a save
 	// namespace so testing an installed EXE/PCK cannot touch player slots.
 	job.args.push('--save-test-id=regression-'+crypto.randomUUID());
-  const result = await runGodot({engine, directory, ...job});
+  let result;
+  if (job.fixture) {
+    if (job.fixture !== 'opening-forces') throw Error('Unknown regression fixture: ' + job.fixture);
+    fs.mkdirSync(directory, {recursive:true});
+    const fixture = path.join(directory, job.name + '-fixture.json');
+    const prepared = spawnSync(process.execPath, ['tools/test_opening_forces.mjs', '--output', fixture], {encoding:'utf8'});
+    if (prepared.status !== 0 || prepared.error) {
+      const output = (prepared.stdout ?? '') + (prepared.stderr ?? '') + (prepared.error?.message ?? '');
+      const log = path.join(directory, job.name + '-fixture.log'); fs.writeFileSync(log, output);
+      result = {name:job.name, ok:false, code:prepared.status, timedOut:false, missing:['fixture preparation'], seconds:0, log, output};
+    } else job.args.push('--opening-fixture=' + fixture);
+  }
+  result ??= await runGodot({engine, directory, ...job});
   if (!result.ok && job.expectedFailure && !result.timedOut) {
     result.knownFailure = matchesKnownFailure(result.output, job.expectedFailure);
   }

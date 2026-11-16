@@ -28,7 +28,8 @@ func run() -> void:
 	assert(recovered and bool(game.Store.read(orphan).get("recovered", false)))
 	# 语法完整但校验和损坏的主档，不能取代有效备份。
 	var checked: String = game.SAVE_PATH.get_base_dir().path_join("checksum-backup.json")
-	var payload := {"generation": 1}
+	var payload: Dictionary = game.snapshot(b.units,b.commands.world._resources(),b.commands.session._save_extra())
+	payload.erase("checksum"); payload["generation"] = 1
 	payload.checksum = game.save_checksum(payload)
 	assert(game._atomic_write(checked, JSON.stringify(payload)))
 	assert(game._atomic_write(checked, JSON.stringify(payload)))

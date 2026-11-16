@@ -1,23 +1,24 @@
 extends RefCounted
 ## Data rules are fixed for a process. Code-rule changes bump the explicit ABI.
-const ABI := "battle-rules-v2"
+const ABI := "battle-rules-v3"
+## Code behavior changes require an ABI review; source/export integrity stays in rules_manifest.
+const CATALOG_FIELDS := {
+	"unit_definitions.json": ["units"],
+	"production_units.json": ["units"],
+	"buildings.json": ["units"],
+	"unit_tuning.json": ["statusTicks", "hasteMoveMultiplier", "slowMoveMultiplier", "farsightCells"],
+	"officers.json": ["blocks"],
+	"officer_progression.json": ["thresholds", "levelCap", "gradeTable", "rewards"],
+	"command_variants.json": ["three_layer_model"],
+	"scenario_rules.json": ["missions", "campaignModes", "defaultDefeatMode"],
+}
+const METADATA := ["name", "heroTypeName", "description", "source", "sourceSha256", "provenance", "sheet", "sheetK", "spriteName", "rank", "message", "message_id", "sound_id"]
 static var _current := ""
 static func current() -> String:
 	if not _current.is_empty(): return _current
-	var names := DirAccess.get_files_at("res://data/db")
-	names.sort()
 	var records := {}
-	for name in names:
-		if str(name) in ["rules_manifest.json","rules_contract.json","registry_compatibility.json"]:continue
-		if str(name).ends_with(".json"):
-			records[str(name)] = catalog_hash(FileAccess.get_file_as_string("res://data/db/"+str(name)))
-	var manifest: Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://data/db/rules_manifest.json"))
-	for file in manifest.files:
-		# Text scripts are accessible in a source checkout. Compiled exports use
-		# the build-checked source identities stored in the manifest instead.
-		var bytes:=FileAccess.get_file_as_bytes(file) if FileAccess.file_exists(file) else PackedByteArray()
-		var text_script: bool=bytes.size()>0 and bytes.slice(0,4).get_string_from_ascii()!="GDSC"
-		records[file]=bytes.get_string_from_utf8().trim_prefix("\ufeff").replace("\r\n","\n").sha256_text() if text_script else manifest.files[file]
+	for name in CATALOG_FIELDS:
+		records[name] = catalog_hash(JSON.stringify(rule_projection(name, JSON.parse_string(FileAccess.get_file_as_string("res://data/db/" + name)))))
 	_current = fingerprint(records)
 	return _current
 
@@ -38,8 +39,9 @@ static func _canonical(value):
 static func fingerprint(records: Dictionary) -> String:
 	var keys := records.keys();keys.sort()
 	var ordered := {}
-	for key in keys: ordered[str(key)] = records[key]
-	return (ABI+str(Engine.get_version_info().get("hash",""))+JSON.stringify(ordered)).sha256_text()
+	for key in keys:
+		if CATALOG_FIELDS.has(key): ordered[str(key)] = records[key]
+	return (ABI+JSON.stringify(ordered)).sha256_text()
 
 static func legacy_scenario_hashes() -> Array:
 	var data = JSON.parse_string(FileAccess.get_file_as_string("res://data/db/rules_contract.json"))
@@ -51,4 +53,26 @@ static func approved_migration(previous: String) -> bool:
 	var contract=JSON.parse_string(FileAccess.get_file_as_string("res://data/db/rules_contract.json"))
 	if not contract is Dictionary:return false
 	var migration=contract.get("migrations",{}).get(previous,{})
-	return migration is Dictionary and migration.get("target","")==current() and migration.get("policy","")=="realtime-navigation-v1"
+	return migration is Dictionary and migration.get("target","")==current() and migration.get("policy","") in ["realtime-navigation-v1", "rules-scope-v1"]
+
+static func rule_projection(name: String, data: Dictionary) -> Dictionary:
+	var result := {}
+	for key in CATALOG_FIELDS.get(name, []): result[key] = _rule_value(data.get(key))
+	return result
+
+static func _rule_value(value):
+	if value is Dictionary:
+		var result := {}
+		for key in value:
+			if key in METADATA: continue
+			if key == "frames": continue # Atlas layout is presentation-only.
+			if key == "clips":
+				var lengths := {}
+				for clip in value.clips:
+					lengths[clip] = value.clips[clip].map(func(row): return row.size())
+				result.clips = lengths # Action and death cadence depend on length, not frame pixels.
+			elif key == "constructionFrames": continue
+			else: result[key] = _rule_value(value[key])
+		return result
+	if value is Array: return value.map(_rule_value)
+	return value

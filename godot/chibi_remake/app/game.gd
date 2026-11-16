@@ -24,6 +24,7 @@ var SAVE_PATH := "user://save.json"
 const SAVE_VERSION := 8
 const SAVE_SLOTS := 20
 const Store = preload("res://app/json_store.gd")
+const UnitSchema = preload("res://simulation/definitions/unit_schema.gd")
 
 func _ready() -> void:
 	var acceptance := preload("res://app/acceptance_storage.gd").configure(storage, OS.get_cmdline_user_args())
@@ -54,15 +55,15 @@ func _migrate_legacy_userdata() -> void:
 		names.append(name);names.append(name+".bak")
 	for name in names:
 		var dst := new_dir.path_join(name)
-		if not Store.read(dst,verify_save_checksum).is_empty(): continue
+		if not Store.read(dst,is_valid_save).is_empty(): continue
 		var newest := ""
 		for old_dir in old_dirs:
 			if old_dir == new_dir: continue
 			var src := old_dir.path_join(name)
-			if Store._read(src,verify_save_checksum).is_empty(): continue
+			if Store._read(src,is_valid_save).is_empty(): continue
 			if newest.is_empty() or FileAccess.get_modified_time(src) > FileAccess.get_modified_time(newest): newest = src
 		if newest.is_empty(): continue
-		if Store.commit(dst,FileAccess.get_file_as_string(newest),verify_save_checksum):
+		if Store.commit(dst,FileAccess.get_file_as_string(newest),is_valid_save,can_rotate_save):
 			print("migrated legacy save: ",newest)
 
 ## 内置中文字体：运行时直接加载 OTF，不依赖编辑器导入缓存（新克隆/无 .godot 也能跑）。
@@ -116,13 +117,9 @@ func snapshot(units: Array, resources: Dictionary, extra: Dictionary) -> Diction
 	for unit in units: by_uid[int(unit.uid)] = unit
 	var contains_ref := func(value): return value is Dictionary and is_same(by_uid.get(int(value.get("uid",-1))),value)
 	for u in units:
-		var simulation := {}
-		for field in ["rolling_t","rolling_ticks","ambush_t","effect_task","effect_tasks"]:
-			if u.has(field):simulation[field]=u[field]
-		for field in preload("res://simulation/systems/locomotion.gd").FIELDS:
-			if u.has(field): simulation[field] = u[field]
-		for key in preload("res://app/saves/snapshot_fields.gd").UNIT_FIELDS:
-			simulation[key] = int(u.get(key,0)) if key == "blocked_n" else u.get(key)
+		var unregistered := UnitSchema.omissions(u)
+		assert(unregistered.is_empty(), "Register new unit fields before saving: " + str(unregistered))
+		var simulation := UnitSchema.snapshot_scalars(u)
 		simulation["targetUid"] = int(u.target.get("uid", -1)) if u.get("target") is Dictionary else -1
 		# REQ-001：采集目标用**稳定引用**（单位 uid / 饰物格），不裸存对象。
 		var gobj = u.get("gather_obj", null)
@@ -141,20 +138,9 @@ func snapshot(units: Array, resources: Dictionary, extra: Dictionary) -> Diction
 		for point in u.get("path", []):
 			simulation.path.append([point.x, point.y])
 		if u.get("repath_to") is Vector2: simulation["repathTo"] = [u.repath_to.x,u.repath_to.y]
-		recs.append({
-			"simulation": simulation,
-			"uid": int(u.get("uid", -1)),
-			"alive": bool(u.alive),
-			"x": float(u.ax), "y": float(u.ay),
-			"hp": float(u.hp),
-			"owner": int(u.owner), "unit": int(u.unit),
-			"building": bool(u.is_building),
-			"mapObject": bool(u.get("map_object", false)),
-			"mapIndex": int(u.get("map_index", -1)),
-			"dieT": float(u.get("die_t", -1.0)),
-			"state": str(u.get("state", "idle")),
-			"officerIndex": int((u.get("officer", {}) as Dictionary).get("index", -1)),
-		})
+		var record := UnitSchema.snapshot_record(u)
+		record["simulation"] = simulation
+		recs.append(record)
 	var trains := snapshot_trainings(extra.get("trainings", []))
 	var payload := {
 		"v": SAVE_VERSION,
@@ -257,7 +243,7 @@ static func save_checksum(payload: Dictionary) -> String:
 
 static func verify_save_checksum(d: Dictionary) -> bool:
 	if not d.has("checksum"):
-		return int(d.get("v", 1)) < 8 # Only legacy saves predate the checksum contract.
+		return false # Absence is a legacy format policy, never proof of integrity.
 	var copy := d.duplicate(true)
 	copy.erase("checksum")
 	var canon := save_canonical_text(copy)
@@ -266,9 +252,17 @@ static func verify_save_checksum(d: Dictionary) -> bool:
 		push_warning("save checksum mismatch (len=%d)" % canon.length())
 	return ok
 
+static func is_valid_save(d: Dictionary) -> bool:
+	if not preload("res://app/saves/save_envelope.gd").valid(d): return false
+	return verify_save_checksum(d) if d.has("checksum") else int(d.get("v", 1)) < 8
+
+static func can_rotate_save(d: Dictionary) -> bool:
+	# Unchecksummed legacy archives remain loadable but cannot displace a verified backup.
+	return d.has("checksum") and is_valid_save(d)
+
 ## 先写临时文件并**校验可解析**，再替换正式档 —— 任一步失败都保留前一份有效存档。
 func _atomic_write(path: String, text: String) -> bool:
-	var ok := storage.commit(path, text, verify_save_checksum)
+	var ok := storage.commit(path, text, is_valid_save, can_rotate_save)
 	if ok:
 		SAVE_PATH = storage.current_path
 		_slot_metadata.clear()
@@ -281,7 +275,7 @@ func has_save() -> bool:
 
 func load_save(slot := 0) -> Dictionary:
 	var path := save_slot_path(slot)
-	return {} if path.is_empty() else Store.read(path, verify_save_checksum)
+	return {} if path.is_empty() else Store.read(path, is_valid_save)
 
 ## Slot zero retains the existing save.json as an independent automatic/legacy save.
 func save_slot_path(slot: int) -> String:

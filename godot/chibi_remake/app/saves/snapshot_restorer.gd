@@ -7,6 +7,7 @@ var _restore_trainings: Callable
 var _numeric_keys: Callable
 const ActionClock = preload("res://simulation/systems/action_clock.gd")
 const TickTimers = preload("res://simulation/systems/tick_timers.gd")
+const UnitSchema = preload("res://simulation/definitions/unit_schema.gd")
 
 func _init(battle: Object, record: Callable, resources: Callable, trainings: Callable, keys: Callable) -> void:
 	host = battle
@@ -27,6 +28,8 @@ func restore(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 	# R07：待确认的施法/单挑引用属于旧世界，恢复后不能保留为可执行状态。
 	host.commands.military._reset_jimou()
 	host.duel_pending = false
+	host.cmd_pending = ""
+	host.cmd_pending_data = {}
 	host.commands.economy._build_decor_targets()
 	for key in decor_snapshot:
 		var entry: Dictionary = decor_snapshot[key]
@@ -143,13 +146,12 @@ func restore(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 func _restore_scalars(unit: Dictionary, record: Dictionary, state: Dictionary, adopt_rules: bool) -> void:
 	if not adopt_rules: unit.maxhp=float(state.get("maxhp",unit.maxhp))
 	_apply_unit_record.call(unit,record)
-	for key in preload("res://app/saves/snapshot_fields.gd").restore_fields():
+	for key in UnitSchema.fields("scalar"):
 		# Legacy archives adopt current base/max HP rules while retaining saved
 		# actual HP. The applied tech-HP marker still prevents double bonuses.
 		if adopt_rules and key in ["base_maxhp","maxhp"]: continue
 		if state.get(key)!=null:
-			var want:=typeof(unit.get(key))
-			unit[key]=state[key] if want==TYPE_NIL else type_convert(state[key],want)
+			unit[key]=UnitSchema.decode(key, state[key])
 
 func _restore_clock(simulation: Dictionary, speed: int) -> void:
 	host.clock.set_speed(int(speed))

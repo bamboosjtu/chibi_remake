@@ -1,8 +1,8 @@
 name: ci
 
-# Hosted checks are deliberately lightweight: syntax plus a Godot headless
-# first-map smoke without LFS art or export templates. Full regressions and
-# multi-GB packaging remain local operations.
+# Push/PR gates run syntax, CPU-only saves, complete declared simulation
+# baselines, all-map startup and continuation without runtime art/templates.
+# The opt-in release-regressions workflow hydrates art for the full source suite.
 on:
   push:
   pull_request:
@@ -12,6 +12,28 @@ permissions:
   contents: read
 
 jobs:
+  simulation-baselines:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: ./.github/actions/setup-reviewed-godot
+      - name: Complete deterministic baselines and all map startups
+        run: node tools/run_regressions.mjs --engine "$GODOT_ENGINE" --baselines --maps --output _work/ci-baselines
+      - name: Save validity, schema and continuation regressions
+        if: ${{ !cancelled() }}
+        run: node tools/run_regressions.mjs --engine "$GODOT_ENGINE" --suite tools/inputs/save_tests.json --output _work/ci-saves
+      - name: Upload simulation evidence
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: simulation-baselines-and-saves
+          path: |
+            _work/ci-baselines
+            _work/ci-saves
   continuation:
     # Per-map CPU-only transactions; no LFS art or export templates required.
     runs-on: ubuntu-latest

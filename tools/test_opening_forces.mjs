@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const read = p => fs.readFileSync(path.join(root, p), 'utf8');
+const read = p => fs.readFileSync(path.join(root, p), 'utf8').replaceAll('\r\n', '\n');
 const count = text => Object.fromEntries([...text.matchAll(/\((\d+)\)×(\d+)/g)].map(m => [m[1], Number(m[2])]));
 const sorted = object => Object.fromEntries(Object.entries(object).sort(([a], [b]) => Number(a) - Number(b)));
 const sum = counts => Object.values(counts).reduce((a, b) => a + b, 0);

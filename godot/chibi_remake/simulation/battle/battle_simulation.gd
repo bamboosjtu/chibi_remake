@@ -14,8 +14,7 @@ func _init(data: State) -> void:
 	battle = data
 
 func _feedback(msg: String) -> void:
-	battle.feedback_text = msg
-	battle.effects.visual("feedback")
+	battle.effects.visual("feedback", [msg])
 
 func _resources() -> Dictionary:
 	return {"gold": battle.gold, "wood": battle.wood, "food": battle.food, "stone": battle.stone}

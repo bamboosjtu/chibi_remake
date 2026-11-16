@@ -69,14 +69,10 @@ var decor_cells:
 		return data.decor_cells if data != null else null
 
 var ev_count:
-	get:
-		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
-		return data.ev_count if data != null else 0
+	get: return _scene.ev_count
 
 var feedback_text:
-	get:
-		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
-		return data.feedback_text if data != null else null
+	get: return _scene.feedback_text
 
 var fire_fields:
 	get:
@@ -145,9 +141,6 @@ var resource_revision:
 		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
 		return data.resource_revision if data != null else 0
 
-var saver:
-	get: return _scene.saver
-
 var scenario_mission:
 	get:
 		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
@@ -159,9 +152,7 @@ var scenario_source:
 		return data.scenario_source if data != null else null
 
 var sec_visible:
-	get:
-		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
-		return data.sec_visible if data != null else null
+	get: return _scene.sec_visible
 
 var selected:
 	get:
@@ -169,9 +160,7 @@ var selected:
 		return data.selected if data != null else null
 
 var selecting:
-	get:
-		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
-		return data.selecting if data != null else null
+	get: return _scene.selecting
 
 var sfx:
 	get: return _scene.sfx

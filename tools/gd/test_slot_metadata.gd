@@ -10,14 +10,14 @@ func run() -> void:
 	var game := CountingGame.new()
 	game.SAVE_PATH = OS.get_environment("LOCALAPPDATA").path_join("metadata-fixture/save.json")
 	var store = preload("res://app/json_store.gd")
-	assert(store.commit(game.save_slot_path(20),'{"v":7,"map":"chibil1","saveName":"first"}',game.verify_save_checksum))
+	assert(store.commit(game.save_slot_path(20),fixture(game, "first"),game.is_valid_save))
 	assert(game.has_save())
 	var initial := game.reads
 	assert(initial == 21)
 	for i in range(10): assert(game.has_save())
 	game.save_slots()
 	assert(game.reads == initial,"Unchanged slots must not be parsed/hashed again")
-	assert(store.commit(game.save_slot_path(20),'{"v":7,"map":"chibil1","saveName":"externally changed longer title"}',game.verify_save_checksum))
+	assert(store.commit(game.save_slot_path(20),fixture(game, "externally changed longer title"),game.is_valid_save))
 	assert(game.save_slots()[20].name == "externally changed longer title" and game.reads == initial+1)
 	var broken := FileAccess.open(game.save_slot_path(20),FileAccess.WRITE); broken.store_string("broken"); broken.close()
 	assert(game.has_save() and game.save_slots()[20].name == "first","Backup fallback must invalidate metadata")
@@ -26,3 +26,8 @@ func run() -> void:
 	game.free()
 	print("SLOT METADATA PASS no repeat JSON/hash work / external replacement / backup fallback / corruption invalidation")
 	quit()
+
+func fixture(game: Node, title: String) -> String:
+	var data := {"v":3,"map":"chibil1","saveName":title,"units":[{"uid":0,"unit":32,"owner":2,"x":100,"y":100,"hp":100}]}
+	data.checksum = game.save_checksum(data)
+	return JSON.stringify(data)

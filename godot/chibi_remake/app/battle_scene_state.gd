@@ -1,5 +1,5 @@
 extends RefCounted
-const PROXY_FIELDS := ["saver", "cam", "bgm", "sfx", "remaster_art", "view", "cheat_input_open", "hover_text", "show_units", "show_buildings", "hud_acc", "show_debug", "ready_to_save", "load_staging", "requested_map", "feedback_until", "feedback_observed"]
+const PROXY_FIELDS := ["saver", "cam", "bgm", "sfx", "remaster_art", "view", "cheat_input_open", "hover_text", "show_units", "show_buildings", "hud_acc", "show_debug", "ready_to_save", "load_staging", "requested_map", "feedback_until", "feedback_observed", "feedback_text", "ev_count", "sec_visible", "drag_pan", "selecting", "sel_start", "sel_end"]
 ## Scene-owned services and nodes. No simulation rules.
 const RemasterArt = preload("res://presentation/battle/art_catalog.gd")
 
@@ -40,3 +40,21 @@ var requested_map := ""
 
 var feedback_until := 0
 var feedback_observed := ""
+
+var feedback_text := ""
+var ev_count := 0
+var sec_visible := {}
+var drag_pan := false
+var selecting := false
+var sel_start := Vector2.ZERO
+var sel_end := Vector2.ZERO
+
+func reset_transients() -> void:
+	drag_pan = false
+	selecting = false
+	sel_start = Vector2.ZERO
+	sel_end = Vector2.ZERO
+	feedback_text = ""
+	feedback_until = 0
+	feedback_observed = ""
+	hover_text = ""

@@ -53,6 +53,7 @@ func prepare(d: Dictionary, arr: Array) -> Dictionary:
 	for rec in arr:
 		if not rec is Dictionary or not rec.get("simulation") is Dictionary:
 			return {}
+		if not preload("res://simulation/definitions/unit_schema.gd").valid_record(rec): return {}
 		var uid := int(rec.get("uid", -1))
 		if uid < 0 or ids.has(uid) or not host.map_data.units.has(str(int(rec.get("unit", -1)))):
 			return {}
@@ -63,7 +64,7 @@ func prepare(d: Dictionary, arr: Array) -> Dictionary:
 		if not rec.simulation.get("path", []) is Array:
 			return {}
 		for point in rec.simulation.get("path", []):
-			if not point is Array or point.size() != 2:
+			if not _valid_destination(point) or point == null:
 				return {}
 		if not _valid_destination(rec.simulation.get("repathTo")): return {}
 		if rec.simulation.has("route_failures") and (not _valid_integer.call(rec.simulation.route_failures) or float(rec.simulation.route_failures)>3): return {}
@@ -189,6 +190,7 @@ func prepare(d: Dictionary, arr: Array) -> Dictionary:
 		if not rec2 is Dictionary:
 			return {}
 		var st2: Dictionary = rec2.get("simulation", {})
+		if not preload("res://simulation/definitions/unit_schema.gd").valid_snapshot(st2): return {}
 		if not TickTimers.valid_snapshot(st2, int(d.v)) or not ActionClock.valid_snapshot(st2): return {}
 		if not preload("res://simulation/systems/locomotion.gd").valid_snapshot(st2): return {}
 		if not host.stratagems.valid_snapshot(st2):return {}

@@ -17,16 +17,9 @@ const INPUTS := [
 	"army_tech",
 	"scenario_sides",
 	"game_end",
-	"feedback_text",
 	"_officer_initial_state",
 	"map_data",
 	"map_id",
-	"ev_count",
-	"sec_visible",
-	"drag_pan",
-	"selecting",
-	"sel_start",
-	"sel_end",
 	"gold",
 	"wood",
 	"food",
@@ -55,16 +48,12 @@ const INPUTS := [
 	"objective_done",
 	"officer_policy",
 	"cli_mode",
-	"jimou_pending",
-	"jimou_caster",
-	"duel_pending",
-	"cmd_pending",
-	"cmd_pending_data",
 	"decor_targets",
 	"decor_cells",
 	"control_groups",
-	"_input_command",
 ]
+## Pending command references and input execution context belong to the old session.
+const RESET := ["jimou_pending", "jimou_caster", "duel_pending", "cmd_pending", "cmd_pending_data", "_input_command"]
 const RESTORED := [
 	"units",
 	"selected",
@@ -107,7 +96,7 @@ const READ_ONLY := [
 ]
 
 static func omissions(source: RefCounted) -> Array:
-	var expected: Array = INPUTS + RESTORED + OBJECTS + PRESERVED + READ_ONLY
+	var expected: Array = INPUTS + RESET + RESTORED + OBJECTS + PRESERVED + READ_ONLY
 	var missing: Array = []
 	for property in source.get_property_list():
 		var key := str(property.name)

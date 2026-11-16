@@ -156,73 +156,10 @@ func _set(key: StringName, value) -> bool:
 	return false
 
 static func available_slots(behavior: int, gate: int, level: int, human_level: int, human_gold: float, mission: int) -> Array:
-	match behavior:
-		0:
-			match gate:
-				1: return [0] if human_gold > 9999 else []
-				2:
-					var out := [0]
-					if level > 0: out.append_array([1,2])
-					return out
-				3:
-					var out := [0]
-					if level > 0 and human_gold > 19999: out.append(1)
-					if level > 1: out.append(2)
-					return out
-				4:
-					var out := [0]
-					if level > 1 and human_level > 1: out.append(1)
-					if level > 2: out.append(2)
-					return out
-		1:
-			match gate:
-				1,2: return [0]
-				3: return [0,3]
-				4: return [3]
-		2:
-			if mission == 0: return []
-			match gate:
-				1: return [0] if human_gold > 9999 else []
-				2:
-					var out := [0]
-					if level > 0: out.append_array([1,2])
-					if mission == 30: out.append_array([1,2])
-					return out
-				3:
-					var out := [0]
-					if level > 0 and human_gold > 19999: out.append(1)
-					if level > 1: out.append(2)
-					if mission == 30: out.append_array([1,2])
-					return out
-				4:
-					var out := [0]
-					if level > 1 and human_level > 1: out.append(1)
-					if level > 2: out.append(2)
-					if mission == 30: out.append_array([1,2])
-					return out
-	return []
-
-## 水军槽准入（CONF-18E）：仅行为档位 1；与陆军槽独立。
+	return preload("res://simulation/systems/ai_decisions.gd").available_slots(behavior, gate, level, human_level, human_gold, mission)
 
 static func naval_slots(behavior: int, gate: int) -> Array:
-	if behavior != 1: return []
-	match gate:
-		1,2: return [0]
-		3: return [0,3]
-		4: return [0,1,3]
-	return []
-
-## 每22次思考最多一道普通研究；HQ在建造/经济计划内独立派发。
+	return preload("res://simulation/systems/ai_decisions.gd").naval_slots(behavior, gate)
 
 static func plan_item_for(kind: int, owner: int) -> int:
-	var pr: Array = PLAN_PAIR.get(int(kind), [])
-	if pr.is_empty():
-		return 0
-	return int(pr[0]) if (owner % 2) == 1 else int(pr[1])
-
-## 建造优先序：帅帐 → 兵营系 → 经济 → 防御 → 船坞。
-## 原版 `FUN_0046e4b0` 是「科技闸 → 自身等级 → 已有建筑槽 → 归属奇偶」四层 switch；
-## 原型只实现**科技闸 + 已有建筑**两层（等级与奇偶未建模，见 docs/AI.md §4）。
-## 建造优先序，按**建筑种类**（= PLAN_PAIR 的键，即偶数 id）排列。
-## 原版 `FUN_0046e4b0` 是「科技闸 → 自身等级 → 已有建筑槽 → **归属奇偶**」四层；
-## 等级层由 ARMY_BY_TIER 覆盖（那层是兵种表），这里覆盖槽位与奇偶两层。
+	return preload("res://simulation/systems/ai_decisions.gd").plan_item_for(kind, owner)

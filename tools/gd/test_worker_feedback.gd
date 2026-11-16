@@ -20,13 +20,16 @@ func run() -> void:
 	var leader: Dictionary = b.selected[0]
 	b.view.update_panel() # Cache the grouped panel before selecting a new worker.
 	b.selected = [hq]; b.gold = 20000; b.wood = 20000; b.food = 20000
+	b.view.update_panel()
+	assert(b.view.cmd_buttons[0].icon != null and str(b.view.cmd_buttons[0].get_meta("build_hint")).contains("400"), "idle training option must include its cost")
 	assert(b.commands.economy._queue_train(b.player_owner, hq, 30))
 	b.view.update_panel()
-	assert(b.view.cmd_buttons[0].icon != null and b.view.cmd_buttons[0].get_node("ProductionProgress").text == "0%")
-	assert(str(b.view.cmd_buttons[0].get_meta("build_hint")).contains("400"), "training hover must include the cost")
+	var panel = b.view.classic_panel
+	assert(panel.work_icon.visible and panel.progress_bar.visible and panel.progress_bar.value == 0)
+	assert(b.view.cmd_capsules.size() == 1 and b.view.cmd_capsules[0].text == "取消生产")
 	for tick in range(50): b.commands.economy._process_trainings(b.SIM_DT)
 	b.view.update_panel()
-	assert(b.view.cmd_buttons[0].get_node("ProductionProgress").text == "50%")
+	assert(panel.progress_bar.value == 50 and panel.work_badge.text == "100人")
 	await capture(b, "worker-training")
 	var game := root.get_node("Game")
 	assert(game.save_game(b.units, b.commands.world._resources(), b.commands.session._save_extra()), "save during worker production")
@@ -40,14 +43,16 @@ func run() -> void:
 	for i in range(4): assert(b.view.art_buttons[i].btn.visible)
 	assert(not b.view.art_buttons[4].btn.visible)
 	assert(b.view.art_buttons[1].btn.get_meta("cmd_name") == "组建" and b.view.art_buttons[2].btn.get_meta("cmd_name") == "加入", "panel cache must refresh grouped -> independent")
-	assert(b.view.art_buttons[1].btn.texture.resource_path.ends_with("command-form-v1.svg"))
+	assert(b.view.art_buttons[1].btn.get_meta("command_id") == 16144 and b.view.art_buttons[1].btn.get_meta("source_frame") == 167 and b.view.art_buttons[1].btn.texture != null, "form command must use its registered icon")
 	await capture(b, "independent-worker")
 	# Cargo state, not combat action, selects the existing wheelbarrow frames.
 	for kind in ["wood", "stone", "food"]:
 		worker.carry = 200.0; worker.carry_kind = kind; worker.state = "deliver"; worker.moved = true
+		worker.move_facing = int(worker.dir)
+		b.cam.position = Vector2(worker.ax,worker.ay); b.cam.force_update_scroll()
 		b.commands.world._update_visual(worker)
 		var clip: String = {"wood":"act1", "stone":"act2", "food":"act3"}[kind]
-		assert(b.commands.military._clip_dir(worker, clip, int(worker.dir) & 7).any(func(frame): return int(frame) == int(b.view.unit_nodes(worker).frame)), "cargo %s must display its wheelbarrow clip" % kind)
+		assert(worker.clips[clip][(int(worker.move_facing)+2)%8].any(func(frame): return int(frame) == int(b.view.unit_nodes(worker).frame)), "visible cargo %s must display its wheelbarrow clip" % kind)
 		await capture(b, "worker-cart-" + kind)
 	worker.carry = 0.0; worker.carry_kind = ""
 	assert(b.commands.military._order_join(leader) == 1)
@@ -56,7 +61,8 @@ func run() -> void:
 		if int(worker.group_officer) >= 0: break
 	assert(int(worker.group_officer) == int(leader.officer.index) and b.commands.military.control_group_size(1) == 6, "join must reach the commander and update the existing slot")
 	b.view.update_panel()
-	assert(b.view.art_buttons[6].btn.get_meta("cmd_name") == "解散", "independent -> grouped refresh")
+	assert(b.view._panel_specs().map(func(sp): return int(sp.id)) == [16130,16136,16142,16146])
+	assert(b.view.art_buttons[1].btn.get_meta("cmd_name") == "解散", "independent -> member refresh")
 	# JSON number normalization must retain integrity checks for large integers.
 	var extra: Dictionary = b.commands.session._save_extra()
 	extra.simulation.officerProgress["precision_probe"] = 9007199254740993

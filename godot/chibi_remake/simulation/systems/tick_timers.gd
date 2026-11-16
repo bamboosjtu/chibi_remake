@@ -3,10 +3,16 @@ extends RefCounted
 ## Fire fields have their own global update clock; old burn_t/burn_dps remain legacy-only.
 const REST_PERIOD = preload("res://simulation/battle_config.gd").REST_TICKS
 const BUILD_PERIOD = preload("res://simulation/battle_config.gd").BUILD_STEP_TICKS
-const STATUS_DURATION := 800
+static var STATUS_DURATION: int = int(Schema.FIELDS.inspired_t.max)
 const LEGACY_TICK_SECONDS := 1.0 / 30.0
-const STATUS_KEYS = preload("res://simulation/definitions/status_fields.gd").KEYS
-const ELAPSED_PERIODS := {"rest_t": REST_PERIOD, "build_t": BUILD_PERIOD,"rolling_ticks":30}
+const Schema = preload("res://simulation/definitions/unit_schema.gd")
+static var STATUS_KEYS: Array = Schema.fields("status")
+static var ELAPSED_PERIODS: Dictionary = _elapsed_periods()
+
+static func _elapsed_periods() -> Dictionary:
+	var result := {}
+	for key in Schema.fields("elapsed"): result[key] = int(Schema.FIELDS[key].max) + 1
+	return result
 
 static func valid_snapshot(state: Dictionary, version: int) -> bool:
 	for key in STATUS_KEYS + ["hidden_t"] + ELAPSED_PERIODS.keys():

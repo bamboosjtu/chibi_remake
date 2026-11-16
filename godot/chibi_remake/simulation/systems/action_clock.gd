@@ -1,11 +1,11 @@
 extends RefCounted
 ## 攻击/修理共用整数节拍。动作相位只在等待结束后逐tick推进。
 const Kernel=preload("res://simulation/native/math_kernel.gd")
-const FIELDS := ["action_wait","action_phase","action_started","action_kind","action_target_uid"]
+const Schema = preload("res://simulation/definitions/unit_schema.gd")
+static var FIELDS: Array = Schema.fields("action")
 
 static func reset(unit: Dictionary) -> void:
-	unit.action_wait = 0; unit.action_phase = 0; unit.action_started = false
-	unit.action_kind = ""; unit.action_target_uid = -1
+	for key in FIELDS: unit[key] = Schema.default_value(key)
 
 static func period(unit: Dictionary) -> int:
 	var rate := maxi(1,int(unit.get("rate",100)))
@@ -47,20 +47,12 @@ static func step_script(unit: Dictionary, kind: String, target_uid: int, buildin
 	return true # 相位保留到下一轮；N<3始终不会返回true。
 
 static func valid_snapshot(state: Dictionary) -> bool:
-	for key in ["action_wait","action_phase","action_target_uid"]:
-		if not state.has(key): continue
-		var value = state[key]
-		if not (value is int or value is float) or not is_finite(float(value)) or float(value) != floorf(float(value)): return false
-		var maximum := 1000 if key == "action_wait" else (23 if key == "action_phase" else 2147483647)
-		if float(value) < (-1 if key == "action_target_uid" else 0) or float(value) > maximum: return false
-	if state.has("action_started") and not state.action_started is bool: return false
-	if state.has("action_kind") and state.action_kind not in ["","attack","repair"]: return false
-	return true
+	return Schema.valid_group(state, "action")
 
 static func restore(state: Dictionary, unit: Dictionary) -> void:
 	reset(unit)
 	for key in FIELDS:
-		if state.has(key): unit[key] = int(state[key]) if key in ["action_wait","action_phase","action_target_uid"] else state[key]
+		if state.has(key): unit[key] = Schema.decode(key, state[key])
 
 static func prepare_attack(unit: Dictionary,target: Dictionary,attack_range: float,width: float,tower: bool) -> int:
 	var kernel:=Kernel.get_kernel()

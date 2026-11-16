@@ -1,0 +1,54 @@
+{
+  "description": "CPU-only hosted save gate. Overlay of required release tests; no LFS art or export templates.",
+  "tests": [
+    {
+      "script": "test_save_roundtrip",
+      "markers": [
+        "SAVE ROUNDTRIP PASS"
+      ],
+      "args": [
+        "--noview"
+      ]
+    },
+    {
+      "script": "test_save_validity",
+      "markers": [
+        "SAVE VALIDITY PASS"
+      ],
+      "args": [
+        "--noview"
+      ],
+      "timeout": 120
+    },
+    {
+      "script": "test_unit_schema",
+      "markers": [
+        "UNIT SCHEMA PASS"
+      ],
+      "args": [
+        "--noview"
+      ],
+      "timeout": 150
+    },
+    {
+      "script": "test_legacy_isolation",
+      "markers": [
+        "LEGACY ISOLATION PASS",
+        "RULES IDENTITY PASS"
+      ],
+      "args": [
+        "--noview"
+      ],
+      "timeout": 240
+    },
+    {
+      "script": "test_rules_scope",
+      "markers": [
+        "RULES SCOPE PASS"
+      ],
+      "args": [
+        "--noview"
+      ]
+    }
+  ]
+}

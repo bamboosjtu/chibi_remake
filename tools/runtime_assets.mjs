@@ -4,11 +4,15 @@ import {spawnSync} from 'node:child_process';
 import {PROJECT,SNAPSHOT,collectAssets,readAssets,ignoreAllowlist} from './lib/runtime_assets.mjs';
 
 const args=process.argv.slice(2),write=args.includes('--write'),hash=args.includes('--hash');
+const versionedOnly=!write&&args.includes('--versioned-only');
 const noOriginalMedia=!write&&(args.includes('--no-original-media')||process.env.CHIBI_NO_ORIGINAL_MEDIA==='1');
 if(!write&&!args.includes('--check'))throw Error('Usage: node tools/runtime_assets.mjs --write | --check [--hash]');
-const listed=spawnSync(process.execPath,['tools/stage_release.mjs',`_work/runtime-assets-${process.pid}`,'--list-inputs'],{encoding:'utf8',maxBuffer:16*1024*1024,env:{...process.env,CHIBI_NO_ORIGINAL_MEDIA:noOriginalMedia?'1':'0'}});
-if(listed.status!==0)throw Error(listed.stderr);
-const expected=collectAssets(JSON.parse(listed.stdout));
+let expected;
+if(!versionedOnly){
+ const listed=spawnSync(process.execPath,['tools/stage_release.mjs',`_work/runtime-assets-${process.pid}`,'--list-inputs'],{encoding:'utf8',maxBuffer:16*1024*1024,env:{...process.env,CHIBI_NO_ORIGINAL_MEDIA:noOriginalMedia?'1':'0'}});
+ if(listed.status!==0)throw Error(listed.stderr);
+ expected=collectAssets(JSON.parse(listed.stdout));
+}
 if(write) {
  const lines=[];let bytes=0;
  for(const [i,row] of expected.entries()) {
@@ -23,7 +27,7 @@ if(write) {
  console.log('RUNTIME ASSETS WRITE files='+expected.length+' GiB='+(bytes/2**30).toFixed(3));
 } else {
  const all=readAssets(),rows=noOriginalMedia?all.filter(row=>!row.path.startsWith('media/')):all;
- if(JSON.stringify(rows.map(({path,metadata})=>({path,metadata})))!==JSON.stringify(expected))throw Error('Runtime assets changed; review and run node tools/runtime_assets.mjs --write');
+ if(!versionedOnly&&JSON.stringify(rows.map(({path,metadata})=>({path,metadata})))!==JSON.stringify(expected))throw Error('Runtime assets changed; review and run node tools/runtime_assets.mjs --write');
  for(const row of rows) {
   const file=PROJECT+'/'+row.path;
   if(fs.statSync(file).size!==row.bytes)throw Error('Runtime asset size changed: '+row.path);
@@ -31,5 +35,5 @@ if(write) {
  }
  const ignoreText=fs.readFileSync('.gitignore','utf8').replace(/\r\n/g,'\n');
  if(!ignoreText.includes(ignoreAllowlist(all)))throw Error('Runtime asset allowlist is stale');
- console.log('RUNTIME ASSETS PASS files='+rows.length+(hash?' / sha256':' / size')+' / exact staging inputs; production references excluded');
+ console.log((versionedOnly?'VERSIONED RUNTIME ASSETS PASS ':'RUNTIME ASSETS PASS ')+'files='+rows.length+(hash?' / sha256':' / size')+(versionedOnly?' / declared versioned blobs; generated terrain/staging validation is separate':' / exact staging inputs; production references excluded'));
 }

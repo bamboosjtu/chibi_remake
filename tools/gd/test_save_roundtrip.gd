@@ -25,6 +25,8 @@ func run() -> void:
 	samples.seed = 20261106
 	for sample in range(6):
 		for tick in range(samples.randi_range(7, 57)): battle.commands.world._sim_step(battle.SIM_DT)
+		for unit in battle.units:
+			assert(preload("res://simulation/definitions/unit_schema.gd").omissions(unit).is_empty())
 		var before: Dictionary = Digest.sections(battle, game)
 		var combat: String = game.save_canonical_text(Digest.snapshot(battle).combat)
 		assert(battle.commands.session._save_game())

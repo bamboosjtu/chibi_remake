@@ -1,6 +1,7 @@
 extends RefCounted
 static var last_error: Dictionary = {}
 static var context: Dictionary = {}
+static var force_commit_failure := false # One-shot regression seam after backup/quarantine.
 
 static func _fail(stage: String, code: int = FAILED) -> bool:
 	last_error = context.duplicate(true)
@@ -28,7 +29,7 @@ static func read(path: String, validator: Callable = Callable()) -> Dictionary:
 		return value
 	return _read(path + ".bak", validator)
 
-static func commit(path: String, text: String, validator: Callable = Callable()) -> bool:
+static func commit(path: String, text: String, validator: Callable = Callable(), backup_validator: Callable = Callable()) -> bool:
 	last_error = {}
 	path = ProjectSettings.globalize_path(path).replace("\\", "/").simplify_path()
 	context = {"path": path, "directory": path.get_base_dir(), "temporary": ""}
@@ -60,7 +61,7 @@ static func commit(path: String, text: String, validator: Callable = Callable())
 	var damaged := ""
 	if d.file_exists(name):
 		# 仅当当前档有效才可撤下备份；损坏主档不能覆盖有效备份。
-		if _read(path, validator).is_empty():
+		if _read(path, backup_validator if backup_validator.is_valid() else validator).is_empty():
 			# 没有备份的损坏旧档也必须允许重新保存，否则会永久困在“保存失败”。
 			# 保留原始字节供诊断，不覆盖现有的有效备份。
 			damaged = name + ".damaged-%d-%d" % [OS.get_process_id(), Time.get_ticks_usec()]
@@ -71,6 +72,9 @@ static func commit(path: String, text: String, validator: Callable = Callable())
 				return _fail("replace backup")
 			if d.rename(name, name + ".bak") != OK:
 				return _fail("backup primary")
+	if force_commit_failure:
+		force_commit_failure = false
+		return _fail("forced commit failure")
 	if d.rename(tmp_path.get_file(), name) != OK:
 		if not d.file_exists(name):
 			if not _read(path + ".bak", validator).is_empty(): d.rename(name + ".bak", name)

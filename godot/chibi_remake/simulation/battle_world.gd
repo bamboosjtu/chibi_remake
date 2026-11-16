@@ -47,6 +47,18 @@ func _init() -> void:
 	_modules["transport_orders"] = preload("res://simulation/battle/transport_orders.gd").new(state)
 	_modules["unit_actions"] = preload("res://simulation/battle/unit_actions.gd").new(state)
 	_modules["world_orders"] = preload("res://simulation/battle/world_orders.gd").new(state)
+	state.command_rules = preload("res://simulation/systems/command_rules.gd").new(self)
+	state.player_commands = preload("res://simulation/systems/player_commands.gd").new(self)
+	state.rules = preload("res://simulation/systems/scenario_rules.gd").new(self)
+	set_ai_enabled(true)
+
+func set_ai_enabled(enabled: bool) -> void:
+	if not enabled: state.ai = null
+	elif state.ai == null: state.ai = preload("res://simulation/systems/ai.gd").new(self)
+
+func prepare_map() -> void:
+	state.nav.setup(state.map_data)
+	state.visibility.setup(Vector2(float(state.map_data.terrainW), float(state.map_data.terrainH)))
 
 func connect_services(label: String) -> Dictionary:
 	var report: Dictionary=preload("res://composition_contract.gd").wire(_modules, label, _access)

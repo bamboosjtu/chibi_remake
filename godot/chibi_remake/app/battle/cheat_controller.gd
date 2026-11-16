@@ -50,8 +50,8 @@ func handle_cheat_input(event: InputEvent) -> bool:
 
 func _set_cheat_input(opened: bool) -> void:
 	scene.cheat_input_open = opened
-	battle.drag_pan = false
-	battle.selecting = false
+	scene.drag_pan = false
+	scene.selecting = false
 	text = ""
 	matched = 0
 	if opened:

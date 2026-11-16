@@ -3,7 +3,8 @@ import path from 'node:path';
 
 const args=process.argv.slice(2);
 const root = (args.includes('--root')?args[args.indexOf('--root')+1]:'godot/chibi_remake').replaceAll('\\','/');
-const limits = JSON.parse(fs.readFileSync('tools/inputs/architecture_limits.json', 'utf8'));
+const limitsFile = args.includes('--limits') ? args[args.indexOf('--limits') + 1] : 'tools/inputs/architecture_limits.json';
+const limits = JSON.parse(fs.readFileSync(limitsFile, 'utf8'));
 const files = directory => fs.readdirSync(directory, {withFileTypes: true}).flatMap(entry => {
   if (entry.name.startsWith('.') || ['art', 'media', 'assets', 'addons', 'data'].includes(entry.name)) return [];
   const file = directory + '/' + entry.name;
@@ -24,6 +25,12 @@ const dependencies = (file, seen = new Set()) => {
 };
 let failures = 0, reviews = 0, waivedHits = 0;
 const fail = message => { console.error(message); failures++; };
+const today = new Date().toISOString().slice(0, 10);
+for (const kind of ['files', 'functions', 'violations']) for (const key of Object.keys(kind === 'violations' ? Object.fromEntries((limits.violations ?? []).map(key => [key, true])) : limits[kind])) {
+  const review = limits.reviews?.[kind + ':' + key];
+  if (!review?.owner?.trim() || !review?.reason?.trim() || !/^\d{4}-\d{2}-\d{2}$/.test(review?.reviewBy ?? '') || !Number.isFinite(Date.parse(review.reviewBy)) || new Date(review.reviewBy).toISOString().slice(0,10) !== review.reviewBy) fail(`Missing waiver owner/reason/reviewBy: ${kind}:${key}`);
+  else if (review.reviewBy < today) fail(`Expired architecture waiver: ${kind}:${key} (${review.owner}, ${review.reviewBy})`);
+}
 const waive = (key, message) => {
   if (waived.has(key)) waivedHits++;
   else fail(message + ' [' + key + ']');

@@ -53,6 +53,9 @@ func run() -> void:
 		assert(Identity.fingerprint(changed)!=fingerprint,"Omitted effective rules input: "+file)
 	var current: Dictionary=game.snapshot(b.units,b.commands.world._resources(),b.commands.session._save_extra())
 	assert(str(current.simulation.rulesRevision).length()==64)
+	var scoped: Dictionary=current.duplicate(true)
+	scoped.simulation.rulesRevision="f9634e5c4bd01f214f81f529305570acc6e3550dec159515d93bae178d123d1f"
+	assert(b.saver.apply_snapshot(scoped),"Pinned prior wide fingerprint migration")
 	var bad: Dictionary=current.duplicate(true);bad.simulation.rulesRevision="wrong"
 	assert(not b.saver.apply_snapshot(bad))
 	assert(game.save_checksum(b.saver.continuation_snapshot(game))==expected)

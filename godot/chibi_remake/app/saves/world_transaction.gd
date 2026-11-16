@@ -37,6 +37,9 @@ func _install(live: Node2D, candidate: RefCounted) -> bool:
 			if live.game_end != 0: view.show_end(live.game_end)
 		view.projectile_view.impacts.clear()
 		if view.cmd_box_ready(): view.update_panel()
+	live.scene.reset_transients()
+	live.cmd_pending = ""
+	live.cmd_pending_data = {}
 	live.visibility.set_full_reveal(live.cheat_reveal)
 	live.commands.session._set_cheat_input(false)
 	candidate.world = null

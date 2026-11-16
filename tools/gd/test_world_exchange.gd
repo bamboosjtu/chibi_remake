@@ -16,6 +16,13 @@ func run() -> void:
 	battle.view.event_view.restore_history()
 	assert(battle.world.definition.is_read_only())
 	assert(battle.world.definition.units.is_read_only())
+	var candidate = load("res://app/saves/candidate_world.gd").new()
+	assert(candidate.prepare(battle.state, battle.world.definition))
+	for key in ["economy","projectiles","fire_fields","transports","harvesting","construction","stratagems","command_rules","player_commands","rules","ai"]:
+		assert(candidate.state.get(key).get_script() == battle.state.get(key).get_script(), "Different startup/candidate service: " + key)
+	assert(candidate.world._modules.keys() == battle.world._modules.keys())
+	candidate.dispose()
+
 	var snapshot: Dictionary = game.snapshot(battle.units,battle.commands.world._resources(),battle.commands.session._save_extra())
 	var before: Dictionary = Digest.sections(battle,game)
 	var entry_id: int = battle.get_instance_id()

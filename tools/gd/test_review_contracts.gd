@@ -14,7 +14,7 @@ func run() -> void:
 	malformed = catalog.duplicate(true)
 	malformed.units["30"].costs = [-1,0,0]
 	assert(not unit_rules.valid_catalog(malformed, true))
-	assert(game.verify_save_checksum({"v":7}))
+	assert(not game.verify_save_checksum({"v":7}) and not game.is_valid_save({"v":7}))
 	assert(not game.verify_save_checksum({"v":8}))
 	game.current_map="chibil1"
 	var b:Node=load("res://main.tscn").instantiate();root.add_child(b);b.set_process(false);b.cli_mode=true;b.ai=null

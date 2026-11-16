@@ -167,9 +167,9 @@ func _order_form_up(officer_index: int) -> void:
 			done += 1
 			break          # 一个武将只带一支部队（占用位唯一）
 	if done == 0:
-		battle.feedback_text = "组建失败"
+		battle.effects.visual("feedback", ["组建失败"])
 	else:
-		battle.feedback_text = "组建完成"
+		battle.effects.visual("feedback", ["组建完成"])
 		_auto_assign_new_team(officer_index)
 
 func _auto_assign_new_team(officer_index: int) -> void:

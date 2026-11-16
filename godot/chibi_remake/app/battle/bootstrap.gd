@@ -64,15 +64,14 @@ func _ready() -> void:
 
 	Game.current_map = battle.map_id
 	_apply_scenario()          # ARCH-007：玩家归属/初始资源来自 BATTLE.EXP
-	battle.nav.setup(battle.map_data)        # ARCH-006：瓦片尺寸 + A* 网格都归 nav.gd 管（原来在 _build_astar）
-	battle.visibility.setup(Vector2(float(battle.map_data.terrainW), float(battle.map_data.terrainH)))
+	node.world.prepare_map()
 
 	# R7：归属过滤键从数据里实际出现的归属建立，不再假设只有 0..4
 	for ob in battle.map_data.get("objects", []):
-		battle.sec_visible[int(ob.owner)] = true
-	if battle.sec_visible.is_empty():
+		scene.sec_visible[int(ob.owner)] = true
+	if scene.sec_visible.is_empty():
 		for i in range(5):
-			battle.sec_visible[i] = true
+			scene.sec_visible[i] = true
 
 	# ARCH-013：表现层（HUD/相机/单位外观/框选）在 battle_view.gd 里。
 	# ⚠️ 必须在这里就先建好：地形、单位、HUD 的节点都挂在它下面。
@@ -112,9 +111,7 @@ func _ready() -> void:
 		if not battle.selected.is_empty():
 			ports._group_assign(1)
 			battle.selected=[battle.selected[0]]
-	battle.rules = preload("res://simulation/systems/scenario_rules.gd").new(node)
 	battle.terrain_base = battle.map_data.get("terrainWalkable", battle.map_data.walkable).duplicate()
-	battle.ai = preload("res://simulation/systems/ai.gd").new(node)
 	if scene.view!=null and DisplayServer.get_name()!="headless":battle.nav.warm_runtime_shapes()
 	scene.saver = SaveSvc.new(node)  # ARCH-006：存档编排在 save_service.gd（与 ai.gd 同样的鸭子类型宿主）
 	var had_pending_load := bool(Game.pending_load)
@@ -175,8 +172,6 @@ func _ready() -> void:
 		node.get_tree().quit()
 
 func _initialize_session() -> void:
-	battle.command_rules=preload("res://simulation/systems/command_rules.gd").new(node)
-	battle.player_commands = preload("res://simulation/systems/player_commands.gd").new(node)
 	var command_pump := preload("res://app/command_pump.gd").new(node)
 	node.add_child(command_pump)
 	battle.player_commands.commands_applied.connect(func():

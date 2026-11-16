@@ -169,7 +169,7 @@ func _battle_input(event: InputEvent) -> void:
 	if scene.cam == null:
 		return                      # B5：加载失败后不要在这里空指针
 	if event is InputEventKey and event.pressed and not event.echo:
-		battle.ev_count += 1
+		scene.ev_count += 1
 		# --- 编队（原版左侧 1..10 那条按钮就是干这个的）---
 		# Ctrl+数字 = 编入该组；数字 = 呼出该组。
 		var _numb := -1
@@ -204,25 +204,25 @@ func _battle_input(event: InputEvent) -> void:
 	elif event is InputEventMouseButton:
 		var mbe := event as InputEventMouseButton
 		if mbe.pressed:
-			battle.ev_count += 1
+			scene.ev_count += 1
 		# 原版不能缩放 —— 滚轮不再改变比例（镜头平移/中键拖拽保留）
 		if mbe.pressed and mbe.button_index == MOUSE_BUTTON_WHEEL_UP:
 			pass
 		elif mbe.pressed and mbe.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			pass
 		elif mbe.button_index == MOUSE_BUTTON_MIDDLE:
-			battle.drag_pan = mbe.pressed
+			scene.drag_pan = mbe.pressed
 		elif mbe.button_index == MOUSE_BUTTON_LEFT:
 			if mbe.pressed:
-				battle.selecting = true
-				battle.sel_start = node.get_canvas_transform().affine_inverse() * mbe.position
-				battle.sel_end = battle.sel_start
-			elif battle.selecting:
-				battle.selecting = false
+				scene.selecting = true
+				scene.sel_start = node.get_canvas_transform().affine_inverse() * mbe.position
+				scene.sel_end = scene.sel_start
+			elif scene.selecting:
+				scene.selecting = false
 				_marquee_hide()
 				var add := Input.is_key_pressed(KEY_SHIFT)
 				var world_pos := node.get_canvas_transform().affine_inverse() * mbe.position
-				var clicked := battle.sel_start.distance_to(world_pos) <= 7.0
+				var clicked := scene.sel_start.distance_to(world_pos) <= 7.0
 				if clicked and ports.cmd_pending_kind() != "":
 					# 原版模型：先点面板按钮、再点地图目标 —— 待选命令用**左键**落到目标上。
 					ports._order_at(world_pos)
@@ -240,18 +240,18 @@ func _battle_input(event: InputEvent) -> void:
 			ports._order_context(node.get_canvas_transform().affine_inverse() * mbe.position)
 	elif event is InputEventMouseMotion:
 		var mme := event as InputEventMouseMotion
-		if battle.drag_pan:
+		if scene.drag_pan:
 			if not Input.is_mouse_button_pressed(MOUSE_BUTTON_MIDDLE):
-				battle.drag_pan = false       # R6：中键在窗口外松开也不会卡住
+				scene.drag_pan = false       # R6：中键在窗口外松开也不会卡住
 			else:
 				_pan_by(mme.relative)
-		elif battle.selecting:
-			battle.sel_end = node.get_canvas_transform().affine_inverse() * mme.position
+		elif scene.selecting:
+			scene.sel_end = node.get_canvas_transform().affine_inverse() * mme.position
 			var r := _sel_rect()
 			_marquee_update(r)
 
 func _sel_rect() -> Rect2:
-	return Rect2(battle.sel_start, battle.sel_end - battle.sel_start).abs()
+	return Rect2(scene.sel_start, scene.sel_end - scene.sel_start).abs()
 
 func _pan_by(pixels: Vector2) -> void:
 	if scene.view != null:
@@ -301,14 +301,14 @@ func _process(delta: float) -> void:
 	scene.hud_acc += delta
 	if scene.hud_acc >= 1.0 / Config.HUD_HZ:      # R1：文字刷新限频
 		scene.hud_acc = 0.0
-		if battle.feedback_text != "" and (scene.feedback_until == 0 or scene.feedback_observed != battle.feedback_text):
-			scene.feedback_observed = battle.feedback_text
+		if scene.feedback_text != "" and (scene.feedback_until == 0 or scene.feedback_observed != scene.feedback_text):
+			scene.feedback_observed = scene.feedback_text
 			# 旧实现：只有 _feedback() 设过 feedback_until 的提示才活得过下一帧；
 			# 直接赋值（"没有走得到的资源点"/"没有资源点"/"组建完成" 等）会在这里被
 			# **立刻清掉** —— 用户实测"点击采集无反应"（提示其实赋了值，只是从未显示）。
 			scene.feedback_until = Time.get_ticks_msec() + 2500
-		elif battle.feedback_text != "" and Time.get_ticks_msec() > scene.feedback_until:
-			battle.feedback_text = ""
+		elif scene.feedback_text != "" and Time.get_ticks_msec() > scene.feedback_until:
+			scene.feedback_text = ""
 		var hud_begin:=Time.get_ticks_usec()
 		_view_hud()
 		hud_microseconds+=Time.get_ticks_usec()-hud_begin

@@ -33,12 +33,9 @@ func prepare(source: RefCounted, definition: Dictionary = {}) -> bool:
 		if key != "commands.session": access[key] = commands.port_objects()[key]
 	var report := preload("res://composition_contract.gd").wire(world._modules, "snapshot", access)
 	if not report.missing.is_empty(): return false
-	state.nav.setup(state.map_data)
-	state.visibility.setup(Vector2(float(state.map_data.terrainW), float(state.map_data.terrainH)))
-	state.command_rules = preload("res://simulation/systems/command_rules.gd").new(world)
-	state.player_commands = preload("res://simulation/systems/player_commands.gd").new(world)
-	state.rules = preload("res://simulation/systems/scenario_rules.gd").new(world)
-	if source.ai != null: state.ai = preload("res://simulation/systems/ai.gd").new(world)
+	world.prepare_map()
+	world.set_ai_enabled(source.ai != null)
+
 	saver = preload("res://app/save_service.gd").new(self)
 	return true
 

@@ -1,0 +1,19 @@
+import fs from 'node:fs';
+const root = 'godot/chibi_remake';
+const schema = fs.readFileSync(root+'/simulation/definitions/unit_schema.gd','utf8');
+const declared = new Set([...schema.matchAll(/^\s*"(\w+)": \{/gm)].map(match => match[1]));
+const factory = fs.readFileSync(root+'/simulation/battle/entity_factory.gd','utf8');
+const keys = new Set([...factory.slice(factory.indexOf('var u := {'),factory.indexOf('battle.sheet_by_unit')).matchAll(/"(\w+)"\s*:/g)].map(match => match[1]));
+const literal = '(?:true|false|null|-?\\d+(?:\\.\\d+)?|""|\\[\\]|\\{\\})';
+const defaults = Object.fromEntries([...schema.matchAll(new RegExp('^\\s*"(\\w+)": \\{[^\\n]*?"default": ('+literal+')(?=,)', 'gm'))].map(match => [match[1],JSON.parse(match[2])]));
+for (const match of factory.slice(factory.indexOf('var u := {'),factory.indexOf('battle.sheet_by_unit')).matchAll(new RegExp('"(\\w+)":\\s*('+literal+')(?=[,\\s])','g'))) {
+  if (declared.has(match[1]) && JSON.stringify(defaults[match[1]]) !== JSON.stringify(JSON.parse(match[2]))) throw Error('Unit default drift: '+match[1]);
+}
+const walk = dir => fs.readdirSync(dir,{withFileTypes:true}).flatMap(entry => entry.isDirectory() ? walk(dir+'/'+entry.name) : entry.name.endsWith('.gd') ? [dir+'/'+entry.name] : []);
+for (const file of walk(root+'/simulation')) {
+  const source = fs.readFileSync(file,'utf8');
+  for (const match of source.matchAll(/\b(?:u|unit|nu|gate)\.(\w+)\s*=(?!=)|\b(?:u|unit|nu|gate)\["(\w+)"\]\s*=(?!=)/g)) keys.add(match[1] ?? match[2]);
+}
+const missing = [...keys].filter(key => !declared.has(key));
+if (missing.length) throw Error('Unregistered unit field writes: '+missing.join(', '));
+console.log(`UNIT SCHEMA DECLARATIONS PASS ${declared.size} definitions / factory keys and literal unit writes covered`);

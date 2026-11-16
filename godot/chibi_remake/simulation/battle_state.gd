@@ -1,5 +1,5 @@
 extends RefCounted
-const PROXY_FIELDS := ["session", "effects", "units", "selected", "_officer_pool", "player_owner", "cheats_enabled", "auto_control", "cheat_build_any", "cheat_invulnerable", "cheat_reveal", "economy", "trainings", "player_tech", "tech_progress", "research_jobs", "army_tech", "scenario_sides", "game_end", "clock", "feedback_text", "_officer_initial_state", "nav", "visibility", "map_data", "map_id", "ev_count", "sec_visible", "drag_pan", "selecting", "sel_start", "sel_end", "gold", "wood", "food", "stone", "projectiles", "fire_fields", "transports", "harvesting", "construction", "resource_revision", "sheet_by_unit", "train_types", "build_types", "next_uid", "_cell_index", "_cell_index_cell", "_cell_index_layer", "_cell_index_cells", "_index_unit_id", "_foot_cache", "_targets", "_target_owner", "_index_units_ref", "_index_units_size", "cnt_player", "cnt_enemy", "tile_w", "tile_hw", "tile_hh", "scenario_source", "scenario_mission", "scenario_avi", "ai", "ai_res", "sim_acc", "simulation_rng", "sim_tick", "simtest_seconds", "cnt_enemy_buildings", "task_latches", "terrain_changes", "terrain_base", "officer_progress", "rules", "task_events", "objective_done", "officer_policy", "cli_mode", "command_rules", "stratagems", "jimou_pending", "jimou_caster", "duel_pending", "cmd_pending", "cmd_pending_data", "decor_targets", "decor_cells", "control_groups", "_input_command", "automatic_gates", "player_commands"]
+const PROXY_FIELDS := ["session", "effects", "units", "selected", "_officer_pool", "player_owner", "cheats_enabled", "auto_control", "cheat_build_any", "cheat_invulnerable", "cheat_reveal", "economy", "trainings", "player_tech", "tech_progress", "research_jobs", "army_tech", "scenario_sides", "game_end", "clock", "_officer_initial_state", "nav", "visibility", "map_data", "map_id", "gold", "wood", "food", "stone", "projectiles", "fire_fields", "transports", "harvesting", "construction", "resource_revision", "sheet_by_unit", "train_types", "build_types", "next_uid", "_cell_index", "_cell_index_cell", "_cell_index_layer", "_cell_index_cells", "_index_unit_id", "_foot_cache", "_targets", "_target_owner", "_index_units_ref", "_index_units_size", "cnt_player", "cnt_enemy", "tile_w", "tile_hw", "tile_hh", "scenario_source", "scenario_mission", "scenario_avi", "ai", "ai_res", "sim_acc", "simulation_rng", "sim_tick", "simtest_seconds", "cnt_enemy_buildings", "task_latches", "terrain_changes", "terrain_base", "officer_progress", "rules", "task_events", "objective_done", "officer_policy", "cli_mode", "command_rules", "stratagems", "jimou_pending", "jimou_caster", "duel_pending", "cmd_pending", "cmd_pending_data", "decor_targets", "decor_cells", "control_groups", "_input_command", "automatic_gates", "player_commands"]
 ## Single owner of battle data. No scene nodes or rendering handles.
 const CombatRules = preload("res://simulation/systems/combat_rules.gd")
 const TechnologyState = preload("res://simulation/systems/technology_state.gd")
@@ -104,7 +104,6 @@ var game_end := 0
 
 var clock = preload("res://simulation/systems/battle_clock.gd").new()
 
-var feedback_text := ""
 
 
 ## HUD 提示（几秒后自动消失）。main 仍保留同名方法，行为一致。
@@ -120,19 +119,13 @@ var map_data: Dictionary = {}
 var map_id := "chibic1"
 
 
-var ev_count := 0
 
 
 
-var sec_visible := {}           # 归属 id -> 是否显示；由地图数据里的归属填充
 
-var drag_pan := false
 
-var selecting := false
 
-var sel_start := Vector2.ZERO
 
-var sel_end := Vector2.ZERO
 
 var gold := 3000.0
 

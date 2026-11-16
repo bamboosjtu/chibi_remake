@@ -14,7 +14,7 @@
 | 本地 CI | `tools/ci_windows.ps1` | 默认文档、素材清单、架构与最小冒烟；`-FullRegression` 扩展到完整回归 |
 | 托管契约 | `.github/workflows/contracts.yml` | `tools/ci_lightweight.mjs`：注册表、分层、素材白名单与发布套件形状 |
 
-GitHub Actions 分两个工作流：`contracts` 运行资源/LFS 索引审计、地形源清单与历史分块声明检查，以及不依赖引擎与 LFS 工作文件的静态契约（注册表、分层、素材白名单）；`ci` 运行 `tools/syntax_check.mjs`（JS/JSON）、PowerShell 语法解析，以及不依赖 LFS 的 Godot 轻量门禁（`check_runtime_scripts.gd` 编译全部运行脚本，`test_architecture.gd --noview` 加载第一关数据并验证核心模拟）。完整回归、引擎模板测试与构建发布仍在本地执行。
+GitHub Actions 的 `contracts` 把架构、注册表、数据、文档、仓库完整性和工具检查作为独立可观察步骤；即使前一项失败，后续检查仍执行，最终 job 保留失败状态。`ci` 在无 LFS 美术的条件下执行语法、引擎编译、完整已登记模拟基线、34 张地图启动、存档/Schema 回归与四图续跑。`release-regressions` 通过 `workflow_dispatch` 获取运行时美术并校验哈希后运行源码引擎的发布测试套件；它不代替 Windows EXE、GPU、性能和打包验收。
 
 ## 2. 引擎自检
 
@@ -286,3 +286,14 @@ pwsh -NoProfile -File tools/bench_full_battle.ps1 -ReleasePack <候选目录>/Ch
 
 
 协议 v4 将 FPS 测量起点固定在预热 60 + 逻辑采样 300 = 360 tick。随后 30 个渲染预热帧保持自动模拟关闭，并比较完整快照摘要；确认状态未变化后，才开启正常逐帧处理并测量 FPS、真实 tick 吞吐和命令延迟。手动逻辑采样的渲染帧同步显示模型，防止新增单位长期保留初始化可见性。报告包含 `frameInitialTick`、`frameInitialStateChecksum`、`renderWarmupPreservedSimulation`；候选门禁核对固定起点。历史 v2/v3 的 FPS 数字保留，但不与 v4 结果当作同一初始状态直接比较。
+
+
+## 测试归属与门禁结果
+
+`node tools/suite_check.mjs` 检查 `tools/gd` 下全部 GDScript：自动套件必须有成功标记，非自动入口必须在 `manual_tests.json` 中声明类别、前提与运行方式。CI/save 套件是主套件的覆盖子集；主套件间不能重复归属。新增脚本未登记、条目失效或手工排除缺少理由均阻止门禁。开局兵力测试声明 `opening-forces` fixture，runner 先从规格文档生成并校验输入；准备失败单独记为失败并继续其他测试。
+
+`node tools/ci_lightweight.mjs` 执行全部检查并汇总；`--group architecture|registry|data|docs|repository|tooling` 执行对应组，均把机器可读结果写入 `_work/lightweight`。退出非零表示至少一项失败，不允许用后续成功覆盖失败。架构体积预算与边界豁免必须有 owner、reason、reviewBy；到期阻止门禁。端口关系清单由 `node tools/port_inventory.mjs --write` 更新，默认只校验新鲜度，不自动删除接口。
+
+单位字段检查同时使用 `unit_schema_check.mjs` 的工厂/常见字面量写入检查、`test_unit_schema.gd` 的逐字段保存/校验/恢复，以及真实快照和续跑样本。静态扫描无法证明任意动态键表达式的完整性，新增动态字段必须补充真实场景样本。Schema 不替代载员、科技、生产、AI 和引用的语义验证。
+
+源码发布回归使用 `runtime_assets.mjs --check --hash --versioned-only` 检查已提交资源；该模式不要求生成地形缓存，也不认证完整 staging 图。正式构建继续使用完整的 `--check --hash`，生成地形后再验收。

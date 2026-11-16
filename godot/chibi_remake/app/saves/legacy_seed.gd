@@ -25,7 +25,7 @@ static func create(live: Node2D) -> RefCounted:
 	state._officer_initial_state=candidate.commands.military._officer_pool_state()
 	form_officers(candidate)
 	state.visibility.update(state.units,state.player_owner)
-	state.ai=preload("res://simulation/systems/ai.gd").new(candidate.world)
+	candidate.world.set_ai_enabled(true)
 	return candidate
 
 static func form_officers(candidate: RefCounted) -> void:

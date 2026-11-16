@@ -483,6 +483,165 @@
         "--noview"
       ],
       "timeout": 240
+    },
+    {
+      "script": "test_action_clock",
+      "markers": [
+        "ACTION CLOCK PASS",
+        "ACTION REPAIR PASS",
+        "ACTION REPAIR STOP PASS",
+        "ACTION ATTACK PASS",
+        "ACTION SAVE PASS"
+      ],
+      "timeout": 240
+    },
+    {
+      "script": "test_building_square",
+      "markers": [
+        "BUILDING SQUARE PASS"
+      ],
+      "timeout": 240
+    },
+    {
+      "script": "test_clock",
+      "markers": [
+        "CLOCK PASS",
+        "CLOCK SAVE PASS"
+      ],
+      "timeout": 240,
+      "args": [
+        "--noview"
+      ]
+    },
+    {
+      "script": "test_combat_rules",
+      "markers": [
+        "COMBAT FORMULA PASS",
+        "COMBAT NAVAL PASS",
+        "COMBAT TECH PASS"
+      ],
+      "timeout": 240
+    },
+    {
+      "script": "test_economy_boundaries",
+      "markers": [
+        "ECONOMY TRANSFER PASS",
+        "ECONOMY GRANARY PASS",
+        "ECONOMY REPAIR PASS",
+        "ECONOMY SNAPSHOT PASS"
+      ],
+      "timeout": 240
+    },
+    {
+      "script": "test_edge_interaction",
+      "markers": [
+        "EDGE INTERACTION PASS"
+      ],
+      "timeout": 240
+    },
+    {
+      "script": "test_grain_patch",
+      "markers": [
+        "GRAIN PATCH PASS"
+      ],
+      "timeout": 240
+    },
+    {
+      "script": "test_harvest_retarget",
+      "markers": [
+        "HARVEST RETARGET PASS"
+      ],
+      "timeout": 240
+    },
+    {
+      "script": "test_hq_delivery",
+      "markers": [
+        "HQ DELIVERY PASS",
+        "HQ FOOTPRINT PASS"
+      ],
+      "timeout": 240
+    },
+    {
+      "script": "test_hud_metrics",
+      "markers": [
+        "HUD-METRICS PASS"
+      ],
+      "timeout": 240
+    },
+    {
+      "script": "test_l1_assault",
+      "markers": [
+        "L1 ASSAULT PASS"
+      ],
+      "timeout": 240
+    },
+    {
+      "script": "test_opening_forces",
+      "markers": [
+        "OPENING CHAPTER PASS",
+        "OPENING WORLD PASS"
+      ],
+      "timeout": 240,
+      "fixture": "opening-forces",
+      "args": [
+        "--noview"
+      ]
+    },
+    {
+      "script": "test_scenario_end",
+      "markers": [
+        "SCENARIO 29 PASS",
+        "SCENARIO 29 MAP PASS"
+      ],
+      "timeout": 240
+    },
+    {
+      "script": "test_sfx",
+      "markers": [
+        "SFX PASS"
+      ],
+      "timeout": 240
+    },
+    {
+      "script": "test_special_units",
+      "markers": [
+        "SPECIAL DATA PASS",
+        "SPECIAL RESEARCH PASS",
+        "SPECIAL EXECUTION PASS"
+      ],
+      "timeout": 240
+    },
+    {
+      "script": "test_team_lifecycle",
+      "markers": [
+        "TEAM LIFECYCLE PASS"
+      ],
+      "timeout": 240
+    },
+    {
+      "script": "test_tick_timers",
+      "markers": [
+        "TIMER REST PASS",
+        "TIMER BUILD PASS",
+        "TIMER STATUS PASS",
+        "TIMER SAVE PASS",
+        "TIMER SPEED PASS"
+      ],
+      "timeout": 240
+    },
+    {
+      "script": "test_unit_footprint",
+      "markers": [
+        "UNIT FOOTPRINT PASS"
+      ],
+      "timeout": 240
+    },
+    {
+      "script": "test_worker_feedback",
+      "markers": [
+        "WORKER FEEDBACK PASS"
+      ],
+      "timeout": 240
     }
   ]
 }

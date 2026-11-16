@@ -1,0 +1,34 @@
+name: release-regressions
+
+# Full source-engine release suite; opt-in because it hydrates runtime LFS art.
+# Native Windows EXE, GPU, packaging and performance acceptance remain separate.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release-suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: ./.github/actions/setup-reviewed-godot
+      - name: Hydrate runtime assets only
+        run: git lfs pull --include="godot/chibi_remake/**" --exclude=""
+      - name: Validate runtime asset hashes
+        run: |
+          node tools/audit_clone_inputs.mjs --index
+          node tools/runtime_assets.mjs --check --hash --versioned-only
+      - name: Source engine release suite
+        run: node tools/run_regressions.mjs --engine "$GODOT_ENGINE" --suite tools/inputs/release_tests.json --output _work/hosted-release
+      - name: Upload release evidence
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-release-regressions
+          path: _work/hosted-release

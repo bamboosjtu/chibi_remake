@@ -33,6 +33,26 @@
       ]
     },
     {
+      "script": "test_save_validity",
+      "markers": [
+        "SAVE VALIDITY PASS"
+      ],
+      "args": [
+        "--noview"
+      ],
+      "timeout": 120
+    },
+    {
+      "script": "test_unit_schema",
+      "markers": [
+        "UNIT SCHEMA PASS"
+      ],
+      "args": [
+        "--noview"
+      ],
+      "timeout": 150
+    },
+    {
       "script": "test_restore_safety",
       "markers": [
         "RESTORE SAFETY PASS"
@@ -108,6 +128,15 @@
       "markers": [
         "CONTACT PASS",
         "OCCUPANCY PASS"
+      ],
+      "args": [
+        "--noview"
+      ]
+    },
+    {
+      "script": "test_rules_scope",
+      "markers": [
+        "RULES SCOPE PASS"
       ],
       "args": [
         "--noview"

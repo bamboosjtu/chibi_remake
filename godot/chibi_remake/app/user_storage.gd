@@ -88,7 +88,7 @@ static func _has_slots(directory: String) -> bool:
 		if name == "save.json" or name == "save.json.bak" or name.begins_with("slot-"): return true
 	return false
 
-func commit(path: String, text: String, validator: Callable) -> bool:
+func commit(path: String, text: String, validator: Callable, backup_validator: Callable = Callable()) -> bool:
 	var store = preload("res://app/json_store.gd")
 	attempts.clear()
 	var roots: Array[String] = [path.get_base_dir()]
@@ -97,7 +97,7 @@ func commit(path: String, text: String, validator: Callable) -> bool:
 			if not roots.has(directory): roots.append(directory)
 	for directory in roots:
 		var target := directory.path_join(path.get_file())
-		if store.commit(target, text, validator):
+		if store.commit(target, text, validator, backup_validator):
 			current_path = directory.path_join("save.json")
 			pinned = true
 			return true
