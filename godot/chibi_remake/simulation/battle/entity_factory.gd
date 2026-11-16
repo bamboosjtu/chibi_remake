@@ -21,7 +21,7 @@ func _make_unit(ob: Dictionary, is_map_object: bool) -> Dictionary:
 	var tail_v := 0
 	for i in range(ob.tail.size()):
 		tail_v += int(ob.tail[i]) << (8 * i)
-	var building: bool = int(ob.unit) <= 26
+	var building: bool = preload("res://simulation/definitions/unit_schema.gd").is_building_type(int(ob.unit))
 	# 注意：JSON 里的数字是 float，str(32.0) 与 JSON 的键 "32" 不一定相等；
 	# 必须 str(int(...)) 才能命中（此前 v6 的属性没生效就是这个原因）。
 	var meta: Dictionary = battle.map_data.units.get(str(int(ob.unit)), {})

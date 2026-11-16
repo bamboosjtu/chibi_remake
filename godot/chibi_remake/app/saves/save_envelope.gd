@@ -10,6 +10,13 @@ static func integer(value, minimum := 0) -> bool:
 static func number(value) -> bool:
 	return (value is int or value is float) and is_finite(float(value))
 
+static func valid_header(data: Dictionary) -> bool:
+	var version = data.get("v",1)
+	if not integer(version,1) or int(version)>8: return false
+	var ended = data.get("gameEnd",0)
+	if not integer(ended) or float(ended)>2: return false
+	return int(version)<4 or integer(data.get("nextUid"))
+
 static func valid_collections(data: Dictionary) -> bool:
 	var version = data.get("v", 1)
 	if not integer(version, 1) or int(version) > 8: return false
@@ -25,7 +32,7 @@ static func valid_collections(data: Dictionary) -> bool:
 
 static func valid(data: Dictionary) -> bool:
 	var version = data.get("v", 1)
-	if not integer(version, 1) or int(version) > 8: return false
+	if not valid_header(data): return false
 	if not data.get("map") is String or str(data.map).is_empty(): return false
 	if data.has("kind") and data.kind != "save": return false
 	if not data.get("units") is Array: return false

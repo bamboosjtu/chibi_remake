@@ -26,9 +26,15 @@ jobs:
           node tools/runtime_assets.mjs --check --hash --versioned-only
       - name: Source engine release suite
         run: node tools/run_regressions.mjs --engine "$GODOT_ENGINE" --suite tools/inputs/release_tests.json --output _work/hosted-release
+      - name: Missing presentation resources and terrain budget recovery
+        if: ${{ !cancelled() }}
+        run: node tools/test_missing_presentation.mjs --engine "$GODOT_ENGINE" --output _work/hosted-presentation-failures
       - name: Upload release evidence
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: source-release-regressions
-          path: _work/hosted-release
+          path: |
+            _work/hosted-release
+            _work/hosted-presentation-failures/results.json
+            _work/hosted-presentation-failures/*.log

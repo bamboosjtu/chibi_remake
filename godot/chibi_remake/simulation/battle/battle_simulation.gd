@@ -150,6 +150,7 @@ func _prune_dead() -> void:
 		i -= 1
 
 func _free_unit_at(i: int) -> void:
+	if i < 0 or i >= battle.units.size(): return
 	var u: Dictionary = battle.units[i]
 	if u.has("occupied_cells"):
 		battle.nav.occupy(u.occupied_cells, -1)

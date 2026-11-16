@@ -62,6 +62,7 @@ func _order_disband() -> int:
 	var leaders: Array = []
 	var detached := 0
 	for unit in battle.selected:
+		if not battle.units.any(func(current): return is_same(current,unit)): continue
 		if unit.alive and unit.die_t<0 and int(unit.owner)==battle.player_owner and unit.get("officer",{}).is_empty() and int(unit.get("group_officer",-1))>=0:
 			unit.group_officer=-1
 			if unit.state=="build":ports._cancel_unit_command(unit)
@@ -69,6 +70,8 @@ func _order_disband() -> int:
 		if unit.alive and unit.die_t<0 and not bool(unit.get("attached",false)) and unit.owner == battle.player_owner and not (unit.get("officer", {}) as Dictionary).is_empty():
 			leaders.append(unit)
 	for leader in leaders:
+		var position := battle.units.find_custom(func(current): return int(current.uid)==int(leader.uid) and is_same(current,leader))
+		if position < 0: continue
 		var idx := int(leader.officer.index)
 		for member in battle.units:
 			if member.alive and member.owner == leader.owner and int(member.get("group_officer", -1)) == idx:
@@ -78,7 +81,7 @@ func _order_disband() -> int:
 		if battle.jimou_caster == leader:
 			ports._reset_jimou()
 		leader.alive = false
-		ports._free_unit_at(battle.units.find(leader))
+		ports._free_unit_at(position)
 	battle.selected = []                                   # 原版：解散即清空选择
 	if not leaders.is_empty():
 		ports._feedback("部队已解散（%d 队），成员保留，可重新组建" % leaders.size())

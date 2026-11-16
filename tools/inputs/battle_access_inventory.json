@@ -9,7 +9,7 @@
   "references": [
     {
       "file": "presentation/battle/battle_minimap.gd",
-      "line": 60,
+      "line": 76,
       "field": "map_data",
       "syntax": "property",
       "origin": "battle-access-host",
@@ -17,7 +17,7 @@
     },
     {
       "file": "presentation/battle/battle_minimap.gd",
-      "line": 60,
+      "line": 76,
       "field": "map_data",
       "syntax": "property",
       "origin": "battle-access-host",
@@ -25,7 +25,7 @@
     },
     {
       "file": "presentation/battle/battle_minimap.gd",
-      "line": 74,
+      "line": 90,
       "field": "map_data",
       "syntax": "property",
       "origin": "battle-access-host",
@@ -33,7 +33,7 @@
     },
     {
       "file": "presentation/battle/battle_minimap.gd",
-      "line": 82,
+      "line": 98,
       "field": "units",
       "syntax": "property",
       "origin": "battle-access-host",
@@ -41,7 +41,7 @@
     },
     {
       "file": "presentation/battle/battle_minimap.gd",
-      "line": 84,
+      "line": 100,
       "field": "units",
       "syntax": "property",
       "origin": "battle-access-host",
@@ -49,7 +49,7 @@
     },
     {
       "file": "presentation/battle/battle_minimap.gd",
-      "line": 116,
+      "line": 132,
       "field": "map_data",
       "syntax": "property",
       "origin": "battle-access-host",
@@ -257,7 +257,7 @@
     },
     {
       "file": "presentation/battle/terrain_stream.gd",
-      "line": 80,
+      "line": 81,
       "field": "units",
       "syntax": "property",
       "origin": "battle-access-host",

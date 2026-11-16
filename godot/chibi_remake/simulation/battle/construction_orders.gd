@@ -292,7 +292,7 @@ func ai_place_building(owner: int, building_type: int, commander: Dictionary = {
 		if _assign_build_worker(worker, site): assigned += 1
 	if assigned == 0:
 		# 新开工失败；尚无有效施工命令，回滚本次落地与扣费。
-		ports._free_unit_at(battle.units.find(site))
+		ports._free_unit_at(battle.units.find_custom(func(current): return int(current.uid)==int(site.uid) and is_same(current,site)))
 		battle.economy.refund(owner, cost, 100)
 		return false
 	battle.construction.order_commander(site, available)

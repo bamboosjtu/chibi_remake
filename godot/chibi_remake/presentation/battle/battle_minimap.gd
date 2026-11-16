@@ -14,23 +14,13 @@ var marker_mesh: MultiMeshInstance2D
 var camera_overlay: Control
 var marker_capacity := 0
 var marker_data := PackedFloat32Array()
+var terrain_error := ""
 
 func _init(h: Node2D,v: Node2D) -> void:
 	host=h;view=v;mouse_filter=Control.MOUSE_FILTER_IGNORE
 
 func _ready() -> void:
-	if catalog.is_empty():
-		var file:=FileAccess.open("res://data/db/minimap_terrain.json",FileAccess.READ)
-		assert(file!=null,"Missing minimap terrain catalog")
-		catalog=JSON.parse_string(file.get_as_text()).maps
-	var entry: Dictionary=catalog.get(str(host.map_id),{})
-	assert(not entry.is_empty(),"Missing map thumbnail: "+str(host.map_id))
-	var image:=Image.new()
-	# Decode outside assert: release templates strip assertions and their operands.
-	var error := image.load_png_from_buffer(Marshalls.base64_to_raw(str(entry.png)))
-	if error != OK:
-		push_error("Cannot decode minimap terrain for " + str(host.map_id))
-		return
+	var image := _terrain_image()
 	map_texture=ImageTexture.create_from_image(image)
 	terrain=TextureRect.new();terrain.texture=map_texture
 	terrain.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
@@ -54,6 +44,32 @@ void fragment() {
 	marker_mesh.multimesh=instances;overlay.add_child(marker_mesh)
 	camera_overlay=Control.new();camera_overlay.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	camera_overlay.draw.connect(_draw_camera);overlay.add_child(camera_overlay)
+
+func _terrain_image() -> Image:
+	if catalog.is_empty():
+		var file := FileAccess.open("res://data/db/minimap_terrain.json",FileAccess.READ)
+		if file == null: return _missing_terrain("缺少地形缩略图目录")
+		var parser := JSON.new()
+		if parser.parse(file.get_as_text()) != OK or not parser.data is Dictionary or not parser.data.get("maps") is Dictionary:
+			return _missing_terrain("地形缩略图目录损坏")
+		catalog=parser.data.maps
+	var entry = catalog.get(str(host.map_id))
+	if not entry is Dictionary or not entry.get("png") is String:
+		return _missing_terrain("缺少当前关卡的地形缩略图")
+	var bytes := Marshalls.base64_to_raw(entry.png)
+	if bytes.size() <= 8 or bytes.slice(0,8) != PackedByteArray([137,80,78,71,13,10,26,10]):
+		return _missing_terrain("地形缩略图不是有效 PNG")
+	var image := Image.new()
+	if image.load_png_from_buffer(bytes) != OK: return _missing_terrain("地形缩略图解码失败")
+	return image
+
+func _missing_terrain(reason: String) -> Image:
+	terrain_error=reason+"："+str(host.map_id)
+	push_error(terrain_error)
+	tooltip_text="地形缩略图不可用；单位标记和镜头导航仍可使用。"
+	var image := Image.create(2,2,false,Image.FORMAT_RGBA8)
+	image.fill(Color(0.12,0.11,0.09))
+	return image
 
 func _draw() -> void:
 	if terrain==null:return

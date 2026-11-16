@@ -184,6 +184,25 @@
         "RESOURCE READ MODEL PASS"
       ],
       "timeout": 180
+    },
+    {
+      "script": "test_invalid_unit_removal",
+      "markers": [
+        "INVALID UNIT REMOVAL PASS"
+      ],
+      "args": [
+        "--noview"
+      ]
+    },
+    {
+      "script": "test_save_semantics",
+      "markers": [
+        "SAVE SEMANTICS PASS"
+      ],
+      "args": [
+        "--noview"
+      ],
+      "timeout": 150
     }
   ]
 }

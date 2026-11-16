@@ -69,6 +69,16 @@
       "args": [
         "--noview"
       ]
+    },
+    {
+      "script": "test_save_semantics",
+      "markers": [
+        "SAVE SEMANTICS PASS"
+      ],
+      "args": [
+        "--noview"
+      ],
+      "timeout": 150
     }
   ]
 }

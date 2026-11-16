@@ -8,6 +8,7 @@ var _numeric_keys: Callable
 const ActionClock = preload("res://simulation/systems/action_clock.gd")
 const TickTimers = preload("res://simulation/systems/tick_timers.gd")
 const UnitSchema = preload("res://simulation/definitions/unit_schema.gd")
+const Envelope = preload("res://app/saves/save_envelope.gd")
 
 func _init(battle: Object, record: Callable, resources: Callable, trainings: Callable, keys: Callable) -> void:
 	host = battle
@@ -17,7 +18,7 @@ func _init(battle: Object, record: Callable, resources: Callable, trainings: Cal
 	_numeric_keys = keys
 
 func restore(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
-	if not preload("res://app/saves/save_envelope.gd").valid_collections(d): return false
+	if not Envelope.valid_header(d) or not Envelope.valid_collections(d): return false
 	var simulation: Dictionary = plan.simulation
 	var ids: Dictionary = plan.ids
 	var speed: int = int(plan.speed)

@@ -42,6 +42,7 @@ func _compatible_rules(simulation: Dictionary) -> bool:
 
 func prepare(d: Dictionary, arr: Array) -> Dictionary:
 	compatibility_error = ""
+	if not preload("res://app/saves/save_envelope.gd").valid_header(d): return _reject("header")
 	if not preload("res://app/saves/save_envelope.gd").valid_collections(d): return _reject("resources/trainings")
 	if not d.get("simulation", {}) is Dictionary: return _reject("simulation")
 	var simulation: Dictionary = d.get("simulation", {})
@@ -72,8 +73,9 @@ func _index_units(arr: Array, simulation: Dictionary) -> Dictionary:
 		if not rec is Dictionary or not rec.get("simulation") is Dictionary:
 			return {}
 		if not preload("res://simulation/definitions/unit_schema.gd").valid_record(rec): return {}
-		var uid := int(rec.get("uid", -1))
-		if uid < 0 or ids.has(uid) or not host.map_data.units.has(str(int(rec.get("unit", -1)))):
+		if not preload("res://app/saves/save_envelope.gd").integer(rec.get("uid")): return {}
+		var uid := int(rec.uid)
+		if ids.has(uid) or not host.map_data.units.has(str(int(rec.get("unit", -1)))):
 			return {}
 		if host.commands.world._sheet_ref_for(int(rec.unit), int(rec.get("owner", -1))) == "":
 			return {}

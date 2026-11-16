@@ -155,3 +155,5 @@ Game 的后续拆分边界为 SnapshotCodec、SaveRepository、SlotCatalog、Cam
 后续读模型盘点、建造预览迁移和验收记录见 `battle-access.md`、`read-model-acceptance.json`。
 
 资源层后续迁移及独立验收记录见 `battle-resources.md`、`resources-acceptance.json`。
+
+剩余问题评审的再复核、选定修复和独立验收见 `review-recheck.md`、`review-recheck-acceptance.json`。

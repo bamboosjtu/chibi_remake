@@ -5,6 +5,7 @@ var chunks: Array = []
 var active := {}
 var loaded_bytes := 0
 var budget := 402653184
+var loading_error := ""
 const RESIDENT_FRACTION := 0.94 # Leave space for transient uploads and cache turnover.
 
 func resident_limit() -> int:
@@ -135,12 +136,17 @@ func update_visible(rect: Rect2, blocking := true) -> void:
 	var lod := 4
 	while lod > 1 and estimate(visible, lod) > resident_limit():
 		lod /= 2
+	if estimate(visible,lod) > resident_limit():
+		_stop_loading("Terrain minimum LOD exceeds resident budget"); return
+	loading_error=""
 	var wanted := {}
 	for i in visible:
 		wanted["%d/%d" % [i, lod]] = i
 	_wanted=wanted
 	_queued.clear()
-	if blocking:_finish_requests(true)
+	if blocking:
+		_finish_requests(true)
+		if not loading_error.is_empty(): return
 	# Cache nearby offscreen chunks until their memory is needed again.
 	for key in active:
 		active[key].visible=wanted.has(key)
@@ -151,9 +157,16 @@ func update_visible(rect: Rect2, blocking := true) -> void:
 		if blocking:
 			var job:=DecodeJob.new(str(chunks[wanted[key]].lods[str(lod)].texture))
 			job.decode();_install_chunk(key,job)
+			if not loading_error.is_empty(): break
 		elif not _pending.has(key):_queued.append(key)
 	if not blocking:_start_requests()
-	assert(loaded_bytes <= budget)
+	if loaded_bytes > budget: _stop_loading("Terrain resident accounting exceeds budget")
+
+func _stop_loading(reason: String) -> void:
+	if loading_error != reason: push_error(reason)
+	loading_error=reason
+	_wanted={}
+	_queued.clear()
 
 func _start_requests() -> void:
 	while _pending.size()<2 and not _queued.is_empty():
@@ -175,13 +188,13 @@ func _finish_requests(blocking: bool) -> void:
 		if not blocking:break
 
 func _install_chunk(key: String, job: DecodeJob) -> void:
-	if job.error!=OK:push_error("Invalid terrain chunk: "+job.path);return
+	if job.error!=OK or job.decoded==null:push_error("Invalid terrain chunk: "+job.path);return
 	var entry: Dictionary=chunks[_wanted[key]]
 	var lod:=int(key.get_slice("/",1))
-	var weight:=int(entry.lods[str(lod)].bytes)
+	var weight:=maxi(int(entry.lods[str(lod)].bytes),job.decoded.get_width()*job.decoded.get_height()*4)
 	while loaded_bytes+weight>resident_limit():
 		var candidates: Array=active.keys().filter(func(k):return not _wanted.has(k))
-		if candidates.is_empty():push_error("Terrain budget exceeded");return
+		if candidates.is_empty():_stop_loading("Terrain decoded chunk exceeds resident budget");return
 		candidates.sort_custom(func(a,b):return int(_used.get(a,0))<int(_used.get(b,0)))
 		_evict(str(candidates[0]))
 	var sprite:=Sprite2D.new();sprite.material=gate_material

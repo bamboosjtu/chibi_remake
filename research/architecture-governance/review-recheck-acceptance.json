@@ -1,0 +1,1143 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-16",
+  "timezone": "Asia/Shanghai",
+  "baseCommit": "089e9c38a6ed048175d6ce917a00c3479c6def6c",
+  "startingWorktree": "clean",
+  "inputReport": {
+    "requested": "tmp/research.md",
+    "confirmedByUser": "tmp/review.md",
+    "sha256": "78080c9fe8ccbb7e3acfd980fedb3729a53b87e2b697ef3f22bb8b5e1cadcb06"
+  },
+  "scope": "Recheck of remaining findings; selected runtime correctness fixes, local source acceptance",
+  "sourceContext": {
+    "normalizedTextSha256": "c8e39e6d4c4129ea7036a4ce66238d40b32d4d96ed43f173baddbdbe97ffbc94",
+    "fileCount": 1000
+  },
+  "engine": {
+    "version": "4.7.2.stable.official.ed1daf0bf",
+    "sha256": "ab1824f85bfd8e0e4128182c000c4003a3e042245b2967848d089b2a04b22424"
+  },
+  "baselineFileUnchanged": true,
+  "checks": {
+    "static": {
+      "passed": 31,
+      "total": 31,
+      "results": [
+        {
+          "name": "architecture/architecture_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.504
+        },
+        {
+          "name": "architecture/test_architecture_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 2.615
+        },
+        {
+          "name": "architecture/port_inventory",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.2
+        },
+        {
+          "name": "architecture/battle_access_inventory",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.134
+        },
+        {
+          "name": "architecture/test_battle_access_inventory",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.106
+        },
+        {
+          "name": "registry/registry_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.265
+        },
+        {
+          "name": "registry/test_registry_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 7.422
+        },
+        {
+          "name": "data/unit_schema_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.149
+        },
+        {
+          "name": "data/rules_manifest",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.143
+        },
+        {
+          "name": "data/data_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 4.92
+        },
+        {
+          "name": "data/test_scenario_generator",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.128
+        },
+        {
+          "name": "data/test_map_export_navigation",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.093
+        },
+        {
+          "name": "data/test_opening_forces",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.644
+        },
+        {
+          "name": "docs/docs_lint",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.625
+        },
+        {
+          "name": "docs/test_docs_lint",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 2.799
+        },
+        {
+          "name": "docs/test_markdown_anchors",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.092
+        },
+        {
+          "name": "repository/syntax_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 11.939
+        },
+        {
+          "name": "repository/suite_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.092
+        },
+        {
+          "name": "repository/test_suite_check",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.1
+        },
+        {
+          "name": "repository/test_repository_policy",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 5.967
+        },
+        {
+          "name": "repository/test_ci_checks",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.093
+        },
+        {
+          "name": "tooling/test_engine_integrity",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.206
+        },
+        {
+          "name": "tooling/test_bootstrap",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 1.397
+        },
+        {
+          "name": "tooling/powershell_encoding",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.196
+        },
+        {
+          "name": "tooling/test_powershell_encoding",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.113
+        },
+        {
+          "name": "tooling/test_godot_process",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 2.025
+        },
+        {
+          "name": "tooling/test_regression_result",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.086
+        },
+        {
+          "name": "tooling/test_terrain_dedup",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.155
+        },
+        {
+          "name": "tooling/test_terrain_equivalence",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 2.321
+        },
+        {
+          "name": "tooling/test_runtime_assets",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.407
+        },
+        {
+          "name": "tooling/terrain-declarations",
+          "ok": true,
+          "status": 0,
+          "signal": null,
+          "seconds": 0.778
+        }
+      ]
+    },
+    "development": {
+      "passed": 75,
+      "total": 75,
+      "sources": [
+        "_work/review/development-final-0/results.json",
+        "_work/review/development-final-1/results.json",
+        "_work/review/development-final-2/results.json"
+      ],
+      "results": [
+        {
+          "name": "test_transports",
+          "ok": true,
+          "seconds": 178.593,
+          "log": "_work/review/development-final-0/test_transports.log",
+          "logSha256": "3c2400b06191c67491c5b1af23a18e28d8106d1225b932c2d31cba52c322626c"
+        },
+        {
+          "name": "test_naval_casualty_save",
+          "ok": true,
+          "seconds": 49.798,
+          "log": "_work/review/development-final-0/test_naval_casualty_save.log",
+          "logSha256": "e8dfd8dd2cbac38039bcb856176382f52b4d3a52feb4414a370e4eefbdbaa0eb"
+        },
+        {
+          "name": "test_worker_groups",
+          "ok": true,
+          "seconds": 35.479,
+          "log": "_work/review/development-final-0/test_worker_groups.log",
+          "logSha256": "c3e6b8afd401858ec6c992f4760d4cdd06ece6b9c6a5372a09691a5267422c8d"
+        },
+        {
+          "name": "test_projectiles",
+          "ok": true,
+          "seconds": 24.678,
+          "log": "_work/review/development-final-0/test_projectiles.log",
+          "logSha256": "7915a2eaaff37c3969150db426e1c8f2a4d7c87ff3dc27cb2ffcc9e9d58e327e"
+        },
+        {
+          "name": "test_pressure_contracts",
+          "ok": true,
+          "seconds": 24.443,
+          "log": "_work/review/development-final-0/test_pressure_contracts.log",
+          "logSha256": "a796f25ca81380e06e66383bdeae51cd922eba784bcb9cce1719568d3b057216"
+        },
+        {
+          "name": "test_chibil1_presentation",
+          "ok": true,
+          "seconds": 14.873,
+          "log": "_work/review/development-final-0/test_chibil1_presentation.log",
+          "logSha256": "d7ae0562591e7a403d82344488e392db8ace1abcb018bdb389b06529f272370b"
+        },
+        {
+          "name": "test_movement_quality",
+          "ok": true,
+          "seconds": 12.177,
+          "log": "_work/review/development-final-0/test_movement_quality.log",
+          "logSha256": "4b932714573c94a00e975677e5f67f9643c3865eee6696eed50af84758197775"
+        },
+        {
+          "name": "test_unit_index",
+          "ok": true,
+          "seconds": 13.391,
+          "log": "_work/review/development-final-0/test_unit_index.log",
+          "logSha256": "12165861c31c1b8919c71c5a2665d355e2ed5b134f00798258166f81288ad10e"
+        },
+        {
+          "name": "test_grain_patch",
+          "ok": true,
+          "seconds": 10.062,
+          "log": "_work/review/development-final-0/test_grain_patch.log",
+          "logSha256": "9c1e6331a6c536a759c278892ed77414df8f89e7e25c02bef5e02d2a33f2eb0b"
+        },
+        {
+          "name": "test_scenario_end",
+          "ok": true,
+          "seconds": 10.794,
+          "log": "_work/review/development-final-0/test_scenario_end.log",
+          "logSha256": "a638d75a5a8fd58fdf689894d526e3af3d24ce93444979775dd409d4a70ee9eb"
+        },
+        {
+          "name": "test_special_units",
+          "ok": true,
+          "seconds": 12.259,
+          "log": "_work/review/development-final-0/test_special_units.log",
+          "logSha256": "1453eb59739403217e78fce85702f8b07d065ed19518b0a7b8654b57ecb92ab0"
+        },
+        {
+          "name": "test_construction",
+          "ok": true,
+          "seconds": 8.178,
+          "log": "_work/review/development-final-0/test_construction.log",
+          "logSha256": "305b456d5e2269d2b19c98341eb14475cbdf66f0e7c4cad983bde7498a0a8803"
+        },
+        {
+          "name": "test_action_lifecycle",
+          "ok": true,
+          "seconds": 7.258,
+          "log": "_work/review/development-final-0/test_action_lifecycle.log",
+          "logSha256": "affc0a25b30df5569478dc1bb6dc2e0682b4b18ab06d8451eac61e85c1369815"
+        },
+        {
+          "name": "test_combat_rules",
+          "ok": true,
+          "seconds": 7.731,
+          "log": "_work/review/development-final-0/test_combat_rules.log",
+          "logSha256": "4af5bcbc64a701081956cf971b208ae7f70c70b1bec13f5cb55417b14899f99b"
+        },
+        {
+          "name": "test_benchmark_guard",
+          "ok": true,
+          "seconds": 5.977,
+          "log": "_work/review/development-final-0/test_benchmark_guard.log",
+          "logSha256": "0326c24eb007fbdfe9ca581ac4f745e7870290e5f48e5e30dd7bd45a0158dc77"
+        },
+        {
+          "name": "test_component_registry",
+          "ok": true,
+          "seconds": 6.073,
+          "log": "_work/review/development-final-0/test_component_registry.log",
+          "logSha256": "062699e66b34b10c37d529666d1dad7791843e50dcaa83480c962d21ece7e45b"
+        },
+        {
+          "name": "test_building_panels",
+          "ok": true,
+          "seconds": 4.942,
+          "log": "_work/review/development-final-0/test_building_panels.log",
+          "logSha256": "317001065270f70be649c6218a22a435c07f5ac96f91ad0002247c82820ee7cf"
+        },
+        {
+          "name": "test_spatial_rules",
+          "ok": true,
+          "seconds": 5.209,
+          "log": "_work/review/development-final-0/test_spatial_rules.log",
+          "logSha256": "8a445efeb6c21b52405f6ad5b8398ccbc1f1898486a5f8689f0c46bed4325a3a"
+        },
+        {
+          "name": "test_edge_interaction",
+          "ok": true,
+          "seconds": 5.798,
+          "log": "_work/review/development-final-0/test_edge_interaction.log",
+          "logSha256": "0b819ff84db126d722394ebeb8b9668bdbdf94e7a454c9c67626e7079e5689aa"
+        },
+        {
+          "name": "test_ability_menus",
+          "ok": true,
+          "seconds": 5.048,
+          "log": "_work/review/development-final-0/test_ability_menus.log",
+          "logSha256": "5eb2a2bf88ff4baeb8c1f5411d23284606970f9ce81cfd9fd4364d407eb75b06"
+        },
+        {
+          "name": "test_cmd_paging",
+          "ok": true,
+          "seconds": 4.948,
+          "log": "_work/review/development-final-0/test_cmd_paging.log",
+          "logSha256": "5cd6526a8f061a1e6b041d1f020a4963bda452e8f75ffb55bb5d1e860aed84e9"
+        },
+        {
+          "name": "test_native_geometry",
+          "ok": true,
+          "seconds": 4.136,
+          "log": "_work/review/development-final-0/test_native_geometry.log",
+          "logSha256": "ab29e45efa2cc798ab7cb798cf13dd2e0003508c6562ac2e8d21f5a6dafdc542"
+        },
+        {
+          "name": "test_sfx",
+          "ok": true,
+          "seconds": 0.498,
+          "log": "_work/review/development-final-0/test_sfx.log",
+          "logSha256": "550c8e6e9198aeeb9802190fa8d7bfbd5a9b2c49d27c1c986ca752dd9c2b56d5"
+        },
+        {
+          "name": "test_texture_states",
+          "ok": true,
+          "seconds": 0.495,
+          "log": "_work/review/development-final-0/test_texture_states.log",
+          "logSha256": "2533cc942de8aff1f9dcdd5e76f72f48257879127f41f9bcf2b109b79a9cdf18"
+        },
+        {
+          "name": "test_navigation_topology",
+          "ok": true,
+          "seconds": 0.578,
+          "log": "_work/review/development-final-0/test_navigation_topology.log",
+          "logSha256": "e811fea9871a07b0fa1cfd06355569a80c5b0eb0130ed37c29782331ba26795f"
+        },
+        {
+          "name": "test_army_technology",
+          "ok": true,
+          "seconds": 108.123,
+          "log": "_work/review/development-final-1/test_army_technology.log",
+          "logSha256": "99ac68c9b66f4d2e6ab887e65e7aebeedce0d97fb3edb22be9abb570920a6e53"
+        },
+        {
+          "name": "test_economy_boundaries",
+          "ok": true,
+          "seconds": 46.113,
+          "log": "_work/review/development-final-1/test_economy_boundaries.log",
+          "logSha256": "64e15875d24a110feaaa2b266cd429d529918d13f1bfd2ce8fa6f8e6e6b3d863"
+        },
+        {
+          "name": "test_ai_slots",
+          "ok": true,
+          "seconds": 56.869,
+          "log": "_work/review/development-final-1/test_ai_slots.log",
+          "logSha256": "4b76fff26e878c400a159bec8e2fc6b1f127687296d9e7c0308af08e41fe7fc7"
+        },
+        {
+          "name": "test_economy_rules",
+          "ok": true,
+          "seconds": 42.016,
+          "log": "_work/review/development-final-1/test_economy_rules.log",
+          "logSha256": "b7e12cb0464d166f1061898a1d1cf05dcaa92397dd8f12d47789ef82898d0494"
+        },
+        {
+          "name": "test_initial_teams",
+          "ok": true,
+          "seconds": 27.362,
+          "log": "_work/review/development-final-1/test_initial_teams.log",
+          "logSha256": "ffd83977415414f609f57ce5d21151e400203c8200726cacf2532ddb6cc24b98"
+        },
+        {
+          "name": "test_unit_research",
+          "ok": true,
+          "seconds": 25.396,
+          "log": "_work/review/development-final-1/test_unit_research.log",
+          "logSha256": "7046df90e566cc988336ee1dbc90e5bbb7931f7ba41cb3685e1621e00c06c6f9"
+        },
+        {
+          "name": "test_resource_input",
+          "ok": true,
+          "seconds": 17.148,
+          "log": "_work/review/development-final-1/test_resource_input.log",
+          "logSha256": "173817acb9b65b809937c23a4dbb9b58cabdc7d25f19e6a21254ed0fac03ca02"
+        },
+        {
+          "name": "test_realtime_queries",
+          "ok": true,
+          "seconds": 14.874,
+          "log": "_work/review/development-final-1/test_realtime_queries.log",
+          "logSha256": "1f1664a0eaa7d41370204ceac10959505c3a867968922782bb64b5ec731c96e3"
+        },
+        {
+          "name": "test_encounter_campaign",
+          "ok": true,
+          "seconds": 12.275,
+          "log": "_work/review/development-final-1/test_encounter_campaign.log",
+          "logSha256": "30a8dc5e9ec07a3188d0ed40964456c4ba603df2a6217fc34b527078ce20488c"
+        },
+        {
+          "name": "test_action_clock",
+          "ok": true,
+          "seconds": 13.298,
+          "log": "_work/review/development-final-1/test_action_clock.log",
+          "logSha256": "4485a9f89b1a364f0b7fdf625bfee06420cf36f6a585bd0bbdfa6065137936c3"
+        },
+        {
+          "name": "test_restored_view",
+          "ok": true,
+          "seconds": 10.981,
+          "log": "_work/review/development-final-1/test_restored_view.log",
+          "logSha256": "210abb27c24dba5bef286684461bb10d62c8d336e33fc072815bd08deae217f6"
+        },
+        {
+          "name": "test_hq_delivery",
+          "ok": true,
+          "seconds": 12.503,
+          "log": "_work/review/development-final-1/test_hq_delivery.log",
+          "logSha256": "84c0e50188be06d43bc055f496c7d160fc72b3da454852ef08206d408a7aaa0e"
+        },
+        {
+          "name": "test_build_feedback",
+          "ok": true,
+          "seconds": 7.725,
+          "log": "_work/review/development-final-1/test_build_feedback.log",
+          "logSha256": "af7335dd6f8e38786c6ccf782cba9d6479d8ad951edf3eec5bef69df4bc63642"
+        },
+        {
+          "name": "test_team_lifecycle",
+          "ok": true,
+          "seconds": 7.437,
+          "log": "_work/review/development-final-1/test_team_lifecycle.log",
+          "logSha256": "a1029f398f97a4d29e659698d16a879b43a80150bd2c52a4eaa41101f1c437ef"
+        },
+        {
+          "name": "test_clock_ui",
+          "ok": true,
+          "seconds": 7.831,
+          "log": "_work/review/development-final-1/test_clock_ui.log",
+          "logSha256": "4769f59dca07ec8f6a1afa27cc4ba0871b5bbe94bdd94753ffa1b638e66d8142"
+        },
+        {
+          "name": "test_ai_planning",
+          "ok": true,
+          "seconds": 6.434,
+          "log": "_work/review/development-final-1/test_ai_planning.log",
+          "logSha256": "90607caf0c9d34741f350400866b56102a8a55923b6bff7023f82e9b508f3e80"
+        },
+        {
+          "name": "test_worker_visuals",
+          "ok": true,
+          "seconds": 6.813,
+          "log": "_work/review/development-final-1/test_worker_visuals.log",
+          "logSha256": "db140ba5ff569a6bc6b6fc154e4a609ae205cead443b261ada7fb0206cd99b98"
+        },
+        {
+          "name": "test_ai_policy",
+          "ok": true,
+          "seconds": 4.664,
+          "log": "_work/review/development-final-1/test_ai_policy.log",
+          "logSha256": "5bed5ee00a03843dfa650d773d6cf0168b31e816175197587cbd15c818583690"
+        },
+        {
+          "name": "test_automatic_gates",
+          "ok": true,
+          "seconds": 5.215,
+          "log": "_work/review/development-final-1/test_automatic_gates.log",
+          "logSha256": "c964453d669179ed8fd47cd3093833ad1e5b74e4f7566dc68d0a49cc90d873bd"
+        },
+        {
+          "name": "test_hud_metrics",
+          "ok": true,
+          "seconds": 6.4,
+          "log": "_work/review/development-final-1/test_hud_metrics.log",
+          "logSha256": "28f9b6ac7b9336871f5e023871c81249baf4dc58efa113e13e2e9eaccbcb5305"
+        },
+        {
+          "name": "test_unit_collision",
+          "ok": true,
+          "seconds": 4.484,
+          "log": "_work/review/development-final-1/test_unit_collision.log",
+          "logSha256": "4bd3a212e9e55854bf3cca20bbe960485c9fd2337b4cb9ad80c1f273f8cff73a"
+        },
+        {
+          "name": "test_nav_invalidation",
+          "ok": true,
+          "seconds": 5.034,
+          "log": "_work/review/development-final-1/test_nav_invalidation.log",
+          "logSha256": "7018644f9cde84a0732bd79f0dd32ecea626f91e9d3346e1e48f48335514e84d"
+        },
+        {
+          "name": "test_building_square",
+          "ok": true,
+          "seconds": 4.096,
+          "log": "_work/review/development-final-1/test_building_square.log",
+          "logSha256": "17a157ea3e873ed96755a597bcb31edabf076d39e6725d66ea2a82179c8d0b78"
+        },
+        {
+          "name": "test_native_math",
+          "ok": true,
+          "seconds": 1.605,
+          "log": "_work/review/development-final-1/test_native_math.log",
+          "logSha256": "bcf11871f2d59fea2bf0c4daaee3b2204d3eb800d2574fd8aca4feb48950b08a"
+        },
+        {
+          "name": "test_opening_forces",
+          "ok": true,
+          "seconds": 92.295,
+          "log": "_work/review/development-final-2/test_opening_forces.log",
+          "logSha256": "76b0ceecb8d581ba957beab87a71e2cfb067da9d7536d10a099b4c9a04534e50"
+        },
+        {
+          "name": "test_tick_timers",
+          "ok": true,
+          "seconds": 50.714,
+          "log": "_work/review/development-final-2/test_tick_timers.log",
+          "logSha256": "4a9099ef954d905733f61aa93a6665d4bfe909c3834210fe94c2c6bb21bed6a9"
+        },
+        {
+          "name": "test_clock",
+          "ok": true,
+          "seconds": 56.198,
+          "log": "_work/review/development-final-2/test_clock.log",
+          "logSha256": "cbcb74d22bbf3ff065e33d2ec86cdc1bb489a095b8bbc6f94b7289bc59793682"
+        },
+        {
+          "name": "test_native_world",
+          "ok": true,
+          "seconds": 47.993,
+          "log": "_work/review/development-final-2/test_native_world.log",
+          "logSha256": "2177098232f55abe76c6fa6da7b882b52b499e1183c503648536917971dc7e92"
+        },
+        {
+          "name": "test_research_jobs",
+          "ok": true,
+          "seconds": 31.552,
+          "log": "_work/review/development-final-2/test_research_jobs.log",
+          "logSha256": "f249003619c0471f65cb600aa562df2405f2c4cc220c0ec7edcc5a8b1234dfc8"
+        },
+        {
+          "name": "test_meta_abilities",
+          "ok": true,
+          "seconds": 30.354,
+          "log": "_work/review/development-final-2/test_meta_abilities.log",
+          "logSha256": "a5e6eff717c9f16566657939e80729b59b3aa8f8f275f370d9bd70fbd42cb417"
+        },
+        {
+          "name": "test_architecture",
+          "ok": true,
+          "seconds": 19.316,
+          "log": "_work/review/development-final-2/test_architecture.log",
+          "logSha256": "dd5897b44c67f482876d27da5ab3e475146b9a7654b6de76287683fbab111664"
+        },
+        {
+          "name": "test_original_media",
+          "ok": true,
+          "seconds": 12.387,
+          "log": "_work/review/development-final-2/test_original_media.log",
+          "logSha256": "4c1849ac6b2794292cca5bfa10b4357437243bfbe999e542be5303a756e9074e"
+        },
+        {
+          "name": "test_building_research",
+          "ok": true,
+          "seconds": 15.56,
+          "log": "_work/review/development-final-2/test_building_research.log",
+          "logSha256": "9bafea9e807c560d98d44dcd99bd84546473e152cef5870bc380a3922bff0a2a"
+        },
+        {
+          "name": "test_unload_state",
+          "ok": true,
+          "seconds": 13.398,
+          "log": "_work/review/development-final-2/test_unload_state.log",
+          "logSha256": "8d3763cc9829da71b055f9af58d08c4b8d891b67a71681c0c14fe19a3f0ba8c5"
+        },
+        {
+          "name": "test_duel",
+          "ok": true,
+          "seconds": 15.097,
+          "log": "_work/review/development-final-2/test_duel.log",
+          "logSha256": "f379549ff22bd5b5f4224762f327d84a6368519ad3ea803db6933c8622299031"
+        },
+        {
+          "name": "test_world_exchange",
+          "ok": true,
+          "seconds": 9.196,
+          "log": "_work/review/development-final-2/test_world_exchange.log",
+          "logSha256": "35bc15ce635c3f761bf1c14749bf2107a60fecb648e85bc5a4a53b80c50cafa9"
+        },
+        {
+          "name": "test_worker_feedback",
+          "ok": true,
+          "seconds": 9.099,
+          "log": "_work/review/development-final-2/test_worker_feedback.log",
+          "logSha256": "cd65811592b762f74e93eb84c694373f462fc5461e2838f7247d3d24620527d7"
+        },
+        {
+          "name": "test_research_rules",
+          "ok": true,
+          "seconds": 8.291,
+          "log": "_work/review/development-final-2/test_research_rules.log",
+          "logSha256": "d2794705b7e10c17863b567f68c3a5c327d14efd1f84ede630c9a76889a356a3"
+        },
+        {
+          "name": "test_modular_battle",
+          "ok": true,
+          "seconds": 8.095,
+          "log": "_work/review/development-final-2/test_modular_battle.log",
+          "logSha256": "906be9158fac9d1be285f971b5d529120fe9bbf8e522aee974b5a9ad680f0ddd"
+        },
+        {
+          "name": "test_command_replace",
+          "ok": true,
+          "seconds": 7.463,
+          "log": "_work/review/development-final-2/test_command_replace.log",
+          "logSha256": "de0bf5db431ad97a8aa7c2edae06bee398120d36e8f7f4a12a02ba504c5938f8"
+        },
+        {
+          "name": "test_resource_frontier",
+          "ok": true,
+          "seconds": 9.014,
+          "log": "_work/review/development-final-2/test_resource_frontier.log",
+          "logSha256": "12356355a10f08ad08b76e9e3de9409198161594456d5cc6b155f28ba58831bc"
+        },
+        {
+          "name": "test_input_research",
+          "ok": true,
+          "seconds": 6.139,
+          "log": "_work/review/development-final-2/test_input_research.log",
+          "logSha256": "6e0f2269b3e742677a8b0aeac11f8f3e052d95a72c0a4dd857ae78dfd406b7bb"
+        },
+        {
+          "name": "test_harvest_retarget",
+          "ok": true,
+          "seconds": 5.134,
+          "log": "_work/review/development-final-2/test_harvest_retarget.log",
+          "logSha256": "8e8ab606d2033e232575b9c6657b9d4d79ff0285bee19d31c5c4c8bbf556c53f"
+        },
+        {
+          "name": "test_group_focus",
+          "ok": true,
+          "seconds": 4.677,
+          "log": "_work/review/development-final-2/test_group_focus.log",
+          "logSha256": "8ce32218e623c5ddb31cab72b1574cc5d197385c41c29018a3366eb7bb3cc781"
+        },
+        {
+          "name": "test_visibility_rules",
+          "ok": true,
+          "seconds": 4.47,
+          "log": "_work/review/development-final-2/test_visibility_rules.log",
+          "logSha256": "f0c8792907165090a4c572d5c940beaebe7d7e3dc0a22ac601b2b1b6325efb5a"
+        },
+        {
+          "name": "test_l1_assault",
+          "ok": true,
+          "seconds": 4.374,
+          "log": "_work/review/development-final-2/test_l1_assault.log",
+          "logSha256": "367126520087d175ea34058661c886a0b07bca30c47ab4e7ac16aa9dd1ee171b"
+        },
+        {
+          "name": "test_unit_footprint",
+          "ok": true,
+          "seconds": 4.274,
+          "log": "_work/review/development-final-2/test_unit_footprint.log",
+          "logSha256": "94d1fde4c8c268a8e4c4fc7dad7fc38ca0414721bc4fafe46a3a6df32a7a9387"
+        },
+        {
+          "name": "check_runtime_scripts",
+          "ok": true,
+          "seconds": 2.431,
+          "log": "_work/review/development-final-2/check_runtime_scripts.log",
+          "logSha256": "a7d3049c83731ebd4f62c8a7d328e7afc8725ca9860400a4b402796f0fd8cb71"
+        },
+        {
+          "name": "test_presentation_diagnostics",
+          "ok": true,
+          "seconds": 2.342,
+          "log": "_work/review/development-final-2/test_presentation_diagnostics.log",
+          "logSha256": "6057df0893be855492e7633328ea11c4deaaaf75bf8d34d400a4f99357985d92"
+        },
+        {
+          "name": "test_user_storage",
+          "ok": true,
+          "seconds": 0.39,
+          "log": "_work/review/development-final-2/test_user_storage.log",
+          "logSha256": "7f5541f28faa33676a34d9f32fd2e7d9dfd5b6ba0f205a316373ce6ced352a59"
+        }
+      ]
+    },
+    "releaseAndSelftests": {
+      "passed": 26,
+      "total": 26,
+      "sources": [
+        "_work/review/release-final/results.json"
+      ],
+      "results": [
+        {
+          "name": "test_battle_interaction",
+          "ok": true,
+          "seconds": 9.136,
+          "log": "_work/review/release-final/test_battle_interaction.log",
+          "logSha256": "4e4c86ed7c4b2e930e2d862b534a274b65888482e8fdbfe3b17a50707f00ca55"
+        },
+        {
+          "name": "test_m0",
+          "ok": true,
+          "seconds": 36.621,
+          "log": "_work/review/release-final/test_m0.log",
+          "logSha256": "eaef881cfe48fb81e6686923f9d82f632375248a88722b39a537914872fa1897"
+        },
+        {
+          "name": "test_review_contracts",
+          "ok": true,
+          "seconds": 8.629,
+          "log": "_work/review/release-final/test_review_contracts.log",
+          "logSha256": "d26b598ac45237c2db5c208d0b5ed0c1e21a62708c0cdd66faf11b3e3e0c1032"
+        },
+        {
+          "name": "test_save_roundtrip",
+          "ok": true,
+          "seconds": 28.345,
+          "log": "_work/review/release-final/test_save_roundtrip.log",
+          "logSha256": "ef0d5d03cca9d998cc414944e2fa3be0a41493ecc923fd7c341a00eb348dec53"
+        },
+        {
+          "name": "test_save_validity",
+          "ok": true,
+          "seconds": 30.937,
+          "log": "_work/review/release-final/test_save_validity.log",
+          "logSha256": "0eaa7845893c4ba1fd39d4f676de7911b25cb0826235ab608794b2ddf8d44724"
+        },
+        {
+          "name": "test_unit_schema",
+          "ok": true,
+          "seconds": 34.178,
+          "log": "_work/review/release-final/test_unit_schema.log",
+          "logSha256": "7c905609e142fdbe862cb2f83ab3b18b7f8d7cc5dd09efbe76bcab1b9f9662fe"
+        },
+        {
+          "name": "test_restore_safety",
+          "ok": true,
+          "seconds": 19.051,
+          "log": "_work/review/release-final/test_restore_safety.log",
+          "logSha256": "de075960e09e99164fef72d8855e19b8740f5db1b2f8ecb0b3de1e3016326a0e"
+        },
+        {
+          "name": "test_acceptance_isolation",
+          "ok": true,
+          "seconds": 0.393,
+          "log": "_work/review/release-final/test_acceptance_isolation.log",
+          "logSha256": "06cfcb8d107385a063521cb1372d7226e48f5657bc79a35e521493026f94feba"
+        },
+        {
+          "name": "test_duel_save",
+          "ok": true,
+          "seconds": 7.066,
+          "log": "_work/review/release-final/test_duel_save.log",
+          "logSha256": "d09a9f2f866f747e7b5a8203e387152d8e32da9ca5456da6291f696015dc8364"
+        },
+        {
+          "name": "test_slot_metadata",
+          "ok": true,
+          "seconds": 0.495,
+          "log": "_work/review/release-final/test_slot_metadata.log",
+          "logSha256": "3aa71a612b083cad01cda2c49d8bf0780949ff92ec83659fb7542180cd6e2e96"
+        },
+        {
+          "name": "test_continuation_coverage",
+          "ok": true,
+          "seconds": 33.028,
+          "log": "_work/review/release-final/test_continuation_coverage.log",
+          "logSha256": "dd4a338e60edce9a7bdf2d88d49584e4841d26fd40d86a8396934b65a99f4dff"
+        },
+        {
+          "name": "test_ai_research",
+          "ok": true,
+          "seconds": 12.755,
+          "log": "_work/review/release-final/test_ai_research.log",
+          "logSha256": "fbee0c107d27866198ffb98906b06db91a421d6947e296db38208538279f3c00"
+        },
+        {
+          "name": "test_campaign_integrity",
+          "ok": true,
+          "seconds": 152.299,
+          "log": "_work/review/release-final/test_campaign_integrity.log",
+          "logSha256": "fac889f5433b18ffa51c9c47ac0d571fe73fba7c977dc9a187ab16bda849c222"
+        },
+        {
+          "name": "test_legacy_isolation",
+          "ok": true,
+          "seconds": 37.642,
+          "log": "_work/review/release-final/test_legacy_isolation.log",
+          "logSha256": "69f6fd4f1a02c4254c725376e27fc42f429febf387906920c5a8476c41cbed93"
+        },
+        {
+          "name": "test_contact_and_occupancy",
+          "ok": true,
+          "seconds": 6.45,
+          "log": "_work/review/release-final/test_contact_and_occupancy.log",
+          "logSha256": "6c88fced7fe5e6c4702a37c669f21a073f8092894a0e3299c55be3c7b86cff8b"
+        },
+        {
+          "name": "test_rules_scope",
+          "ok": true,
+          "seconds": 0.623,
+          "log": "_work/review/release-final/test_rules_scope.log",
+          "logSha256": "4148ae5d08bedf73997116095cce406396a9b749c334c60ef17874f96f471f25"
+        },
+        {
+          "name": "test_camera_read_model",
+          "ok": true,
+          "seconds": 0.714,
+          "log": "_work/review/release-final/test_camera_read_model.log",
+          "logSha256": "82e6da17089e1a8ff489bf23a2485de395b5730d3b53c5c876dd8aaacb2e8f5d"
+        },
+        {
+          "name": "test_app_services",
+          "ok": true,
+          "seconds": 1.388,
+          "log": "_work/review/release-final/test_app_services.log",
+          "logSha256": "bfa8c52f16ce8ab246dae107290e86fb0ff68be7ff2c9717d19779f447763285"
+        },
+        {
+          "name": "test_snapshot_stages",
+          "ok": true,
+          "seconds": 11.569,
+          "log": "_work/review/release-final/test_snapshot_stages.log",
+          "logSha256": "2f5e992bb382170c2a76f4032af6f5c86887340f34d995ab8e1eff075c4b690a"
+        },
+        {
+          "name": "test_build_preview_read_model",
+          "ok": true,
+          "seconds": 10.053,
+          "log": "_work/review/release-final/test_build_preview_read_model.log",
+          "logSha256": "3e2c1ffa4cbaf093d5c9779bb120ebba171d7983aa194aeb359a838747754985"
+        },
+        {
+          "name": "test_resource_layer_read_model",
+          "ok": true,
+          "seconds": 14.405,
+          "log": "_work/review/release-final/test_resource_layer_read_model.log",
+          "logSha256": "2ef75267b51f71a7142cef5adf2867a8a401540735e26e4a186110fe1a3e1f4e"
+        },
+        {
+          "name": "test_invalid_unit_removal",
+          "ok": true,
+          "seconds": 6.695,
+          "log": "_work/review/release-final/test_invalid_unit_removal.log",
+          "logSha256": "80e02d535bb2beb4246a9360454879075d409dffabdcd6dca3db5f9b828be9bd"
+        },
+        {
+          "name": "test_save_semantics",
+          "ok": true,
+          "seconds": 46.33,
+          "log": "_work/review/release-final/test_save_semantics.log",
+          "logSha256": "9c4a1f6fb800c39c6af774efcedf838f39ae4a64d24c1674362f1e6699782a53"
+        },
+        {
+          "name": "selftest-chibic1",
+          "ok": true,
+          "seconds": 10.322,
+          "log": "_work/review/release-final/selftest-chibic1.log",
+          "logSha256": "fd57d87d6361c310e85c1e12389aec628997d9c9ee8349e0bf88ddf28a73ce72"
+        },
+        {
+          "name": "selftest-chibil1",
+          "ok": true,
+          "seconds": 9.373,
+          "log": "_work/review/release-final/selftest-chibil1.log",
+          "logSha256": "d5943afc3e2f1cc66d3a6d44aca1b8596db8aa60294f38c9dc2f4b9e7cc0dab5"
+        },
+        {
+          "name": "selftest-chibic17",
+          "ok": true,
+          "seconds": 17.923,
+          "log": "_work/review/release-final/selftest-chibic17.log",
+          "logSha256": "6a84b710440cc0ab3b0368adf7d0f2190252eb69da1cfd30d0c2b43aa47a122d"
+        }
+      ]
+    },
+    "ci": {
+      "passed": 5,
+      "total": 5,
+      "sources": [
+        "_work/review/ci-final/results.json"
+      ],
+      "results": [
+        {
+          "name": "check_runtime_scripts",
+          "ok": true,
+          "seconds": 3.396,
+          "log": "_work/review/ci-final/check_runtime_scripts.log",
+          "logSha256": "610aa9ef9026d27f8272031fb2a1fe069c5a9908ee5c0cce9cc72ffef7acf969"
+        },
+        {
+          "name": "test_architecture",
+          "ok": true,
+          "seconds": 21.607,
+          "log": "_work/review/ci-final/test_architecture.log",
+          "logSha256": "88f2f122324598e6559cf1b30545e113be1cc92dd1bbca7cd6b2ab2de5f4931a"
+        },
+        {
+          "name": "dump_composition",
+          "ok": true,
+          "seconds": 5.377,
+          "log": "_work/review/ci-final/dump_composition.log",
+          "logSha256": "525865641765642730383e00c9c86cef374da87232cb8c71acdcc19234f03150"
+        },
+        {
+          "name": "test_presentation_diagnostics",
+          "ok": true,
+          "seconds": 2.572,
+          "log": "_work/review/ci-final/test_presentation_diagnostics.log",
+          "logSha256": "411026d8d25a263265ecde3e4fba1154b7ea843a0a83eed6be122c5f84f879e8"
+        },
+        {
+          "name": "test_camera_read_model",
+          "ok": true,
+          "seconds": 0.52,
+          "log": "_work/review/ci-final/test_camera_read_model.log",
+          "logSha256": "8663ee53e23c43760ff82d01e774d0b93ece71430fff38f8a252c8f7fde607d0"
+        }
+      ]
+    },
+    "baselines": {
+      "passed": 2,
+      "total": 2,
+      "sources": [
+        "_work/review/baselines-final/results.json"
+      ],
+      "results": [
+        {
+          "name": "sim-chibic1-15",
+          "ok": true,
+          "seconds": 18.809,
+          "log": "_work/review/baselines-final/sim-chibic1-15.log",
+          "logSha256": "7154a02603cdf3afd8b35cef8735978672b59a8979c41b751fdc664112e2a309"
+        },
+        {
+          "name": "sim-chibic1-60",
+          "ok": true,
+          "seconds": 58.367,
+          "log": "_work/review/baselines-final/sim-chibic1-60.log",
+          "logSha256": "d5b7182bc6abea09e74d202617547b1ec1780e188ffb61ce7a62bad5fc962121"
+        }
+      ]
+    },
+    "presentationFaults": {
+      "passed": 9,
+      "total": 9,
+      "sources": [
+        "_work/review/presentation/results.json"
+      ],
+      "results": [
+        {
+          "name": "panel",
+          "ok": true,
+          "seconds": 7.075,
+          "log": "_work/review/presentation/panel.log",
+          "logSha256": "ed211d886aa466022dcbab80ba571aa1860c6971e43562e91970316ce04225ff"
+        },
+        {
+          "name": "controls",
+          "ok": true,
+          "seconds": 6.735,
+          "log": "_work/review/presentation/controls.log",
+          "logSha256": "40e511eff9c73c4bafe5591ad107ad49df1b24c4334f92dc0cec9556e2c856da"
+        },
+        {
+          "name": "banner",
+          "ok": true,
+          "seconds": 5.261,
+          "log": "_work/review/presentation/banner.log",
+          "logSha256": "da697f2d731dd639402ce0f9b88b9a602833d0198da17a16c9c5e2689b9d4988"
+        },
+        {
+          "name": "icons",
+          "ok": true,
+          "seconds": 7.257,
+          "log": "_work/review/presentation/icons.log",
+          "logSha256": "81aa1f862dae1e199272532b9bc3ec3001257143be0f735b77b53854f983086f"
+        },
+        {
+          "name": "minimap-missing",
+          "ok": true,
+          "seconds": 4.7,
+          "log": "_work/review/presentation/minimap-missing.log",
+          "logSha256": "c2ef90dcda48202535e611b30d4f9dbb91a78c9f978b498175ce5995e03f8824"
+        },
+        {
+          "name": "minimap-invalid",
+          "ok": true,
+          "seconds": 4.531,
+          "log": "_work/review/presentation/minimap-invalid.log",
+          "logSha256": "6d35e4835ba8d692804f0ae52723f4c5a908a239e808094f6b267a62782262e3"
+        },
+        {
+          "name": "minimap-entry",
+          "ok": true,
+          "seconds": 4.58,
+          "log": "_work/review/presentation/minimap-entry.log",
+          "logSha256": "9bc0534ecb0f723d353b11076355099fee370392cf5a8b9e92ce94ad56e4f131"
+        },
+        {
+          "name": "minimap-png",
+          "ok": true,
+          "seconds": 4.553,
+          "log": "_work/review/presentation/minimap-png.log",
+          "logSha256": "4639488d3d51fad1cccf7131847f6c0304f43518b810a221e5b35af499291afe"
+        },
+        {
+          "name": "terrain-budget",
+          "ok": true,
+          "seconds": 0.492,
+          "log": "_work/review/presentation/terrain-budget.log",
+          "logSha256": "e44daf2a2a2061f172ebb20571463d2402b11b40e74ec2dda31711c7a59bafa5"
+        }
+      ]
+    },
+    "runtimeContracts": "14 invalid-composition/lifetime cases and presentation release-event policy passed",
+    "modifiedPowerShell": "ci_windows.ps1 syntax parsed successfully; UTF-8 compatibility checks passed",
+    "workflowYaml": "Parsed locally; hosted workflow not triggered"
+  },
+  "closedFindings": [
+    "HUD source texture/image null dereferences; actual flat top-bar fallback",
+    "Minimap missing/bad catalog, entry and image now create a placeholder with overlays",
+    "Terrain minimum-LOD batch preflight, actual decoded byte accounting, pending task discard and recovery",
+    "Negative/large removal indices are no-ops before any state mutation",
+    "Disband rejects cloned/removed nonmembers; cleanup locates UID plus object identity instead of Dictionary.find",
+    "Save building flag matches factory predicate; gameEnd enum and state catalog enforced",
+    "Header/identity numbers bounded before conversion; Vector2 overflow rejected; checksum-correct invalid input leaves current world unchanged"
+  ],
+  "partialOrOpen": [
+    "Full map coordinate/A/B/pi constraints, all reference integrity, task collection caps, backup provenance UI",
+    "Performance hotspots and unit state-machine decomposition require their own fixtures and measurements",
+    "Port scale, broad state and remaining mutable read models",
+    "Simulation loading/stratagem lazy I/O, duplicated role/cap constants",
+    "Pause/input ownership, startup parsing, external same-size/mtime slot replacement, campaign scene-switch rollback",
+    "Candidate performance-contract omission bypass, export/automation boundary, signatures/versions and native launcher hosted CI"
+  ],
+  "staleClaims": [
+    "Old untracked follow-up files are now committed",
+    "Read-model migration is no longer camera-only",
+    "Terrain already had a per-install refusal; new work adds batch preflight and decoded-size hardening"
+  ],
+  "notCertified": [
+    "Hosted CI not triggered; workflow only configured and parsed",
+    "No formal EXE/GPU pixel/performance certification",
+    "Existing published version directories and verification evidence were not modified"
+  ]
+}

@@ -309,3 +309,10 @@ pwsh -NoProfile -File tools/bench_full_battle.ps1 -ReleasePack <候选目录>/Ch
 `test_resource_layer_read_model` 验证固定三字段的递归只读可见投影、跨三个暂停帧的 60 次缓存复用、视口进出、同阶段几何重定位、普通阻挡版本不触发重扫，以及 0→1、2→3、4→5 的资源耗尽与空矿跳过。它还实际读取临时世界后回滚、注入读档失败回滚、强制全部非身份缓存值相等后加载新世界，并在保留旧投影时检查旧世界/导航和关闭战场状态的释放。资源键和资源投影的过期 owner 查询由进程级负向测试覆盖。
 
 借用清单 schemaVersion 2 将 decor_cells 纳入扫描。相机、建造预览、资源层都有禁止回退到借用入口的门禁，资源层另覆盖该资源字典；已有逐帧深拷贝世界数据的禁止规则扩展到 decor_cells。
+
+
+### 缺图和损坏表现资源
+
+`node tools/test_missing_presentation.mjs` 将运行脚本和 JSON 复制到独立工程，链接只读素材，再仅在副本内删除四类 HUD 母版、删除/破坏 minimap 目录，验证真实场景进入可用回退。原资源哈希必须保持不变；测试不临时隐藏工作区资源。terrain-budget 用例覆盖最低 LOD 整批拒绝、错误字节声明的解码尺寸拒绝、后台任务排空与恢复。对应 GDScript 是 wrapper 专用入口，不能直接作为正常资源目录的套件运行。
+
+该 wrapper 进入 hosted 源码发布回归与本地 FullRegression。`test_invalid_unit_removal` 验证错误索引、内容相同的克隆和已移除对象不会损坏世界；`test_save_semantics` 用正确 checksum 验证建筑分类、终局、nextUid、状态和巨大坐标输入被原子拒绝。二者属于必需 release 套件，存档语义用例也进入 CPU-only save 门禁。

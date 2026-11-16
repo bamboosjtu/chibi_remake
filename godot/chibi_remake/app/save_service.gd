@@ -42,8 +42,9 @@ func _apply_snapshot(d: Dictionary) -> bool:
 		last_load_error = "进度为空、校验失败或无法读取。"
 		push_warning("load save: 存档为空或无法解析")
 		return false
-	if not preload("res://app/saves/save_envelope.gd").valid_collections(d):
-		last_load_error = "存档版本、资源或生产队列字段不完整；当前战场已保留。"
+	var envelope = preload("res://app/saves/save_envelope.gd")
+	if not envelope.valid_header(d) or not envelope.valid_collections(d):
+		last_load_error = "存档头部、资源或生产队列字段不兼容；当前战场已保留。"
 		return false
 	if str(d.get("map", "")) != str(host.map_id):
 		last_load_error = "存档关卡与当前战场不匹配。"

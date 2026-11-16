@@ -168,6 +168,12 @@
       "category": "manual",
       "reason": "Native visual/art acceptance; requires runtime art and a rendering window or review of generated evidence.",
       "command": "Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/verify_full_art.gd -- --no-intro --save-test-id=manual-verify_full_art"
+    },
+    {
+      "script": "test_missing_presentation",
+      "category": "wrapper",
+      "reason": "Executed by the wrapper against an isolated project with missing/corrupt assets and terrain budgets; must not run the missing-file assertions in the normal project.",
+      "command": "node tools/test_missing_presentation.mjs"
     }
   ]
 }

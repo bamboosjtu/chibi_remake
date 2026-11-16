@@ -78,18 +78,18 @@ const FIELDS := {
 	"turn_tick": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "locomotion", "min": 0, "max": 2147483647},
 	"move_started": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "locomotion"},
 	"move_turning": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "locomotion"},
-	"uid": {"type": "int", "default": -1, "persist": true, "derived": false, "group": "record", "key": "uid"},
+	"uid": {"type": "int", "default": -1, "persist": true, "derived": false, "group": "record", "key": "uid", "min": 0, "max": 2147483647},
 	"alive": {"type": "bool", "default": true, "persist": true, "derived": false, "group": "record", "key": "alive"},
 	"ax": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "record", "key": "x"},
 	"ay": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "record", "key": "y"},
 	"hp": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "record", "key": "hp"},
-	"owner": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "record", "key": "owner"},
-	"unit": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "record", "key": "unit"},
+	"owner": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "record", "key": "owner", "min": 0, "max": 2147483647},
+	"unit": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "record", "key": "unit", "min": 0, "max": 2147483647},
 	"is_building": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "record", "key": "building"},
 	"map_object": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "record", "key": "mapObject"},
 	"map_index": {"type": "int", "default": -1, "persist": true, "derived": false, "group": "record", "key": "mapIndex"},
 	"die_t": {"type": "float", "default": -1.0, "persist": true, "derived": false, "group": "record", "key": "dieT"},
-	"state": {"type": "String", "default": "idle", "persist": true, "derived": false, "group": "record", "key": "state"},
+	"state": {"type": "String", "default": "idle", "persist": true, "derived": false, "group": "record", "key": "state", "values":["idle","attack","move","join","board","boarded","unload","gather","deliver","rest","repair","build","dead"]},
 	"officer": {"type": "Dictionary", "default": {}, "persist": true, "derived": false, "group": "record", "key": "officerIndex"},
 	"target": {"type": "Dictionary", "default": null, "persist": true, "derived": false, "group": "relation", "codec": "uid", "key": "targetUid"},
 	"build_target": {"type": "Dictionary", "default": null, "persist": true, "derived": false, "group": "relation", "codec": "uid", "key": "build_targetUid"},
@@ -211,7 +211,7 @@ static func _point(value) -> bool:
 	if not value is Array or value.size() != 2: return false
 	for number in value:
 		if not (number is int or number is float) or not is_finite(float(number)): return false
-	return true
+	return Vector2(float(value[0]),float(value[1])).is_finite()
 
 static func omissions(unit: Dictionary) -> Array:
 	return unit.keys().filter(func(key): return not FIELDS.has(key))
@@ -234,4 +234,14 @@ static func valid_record(record: Dictionary) -> bool:
 			var value = record[alias]
 			if not (value is int or value is float) or not is_finite(float(value)) or float(value) != floorf(float(value)) or float(value) < -1 or float(value) > 116: return false
 		elif not valid_value(key, record[alias]): return false
+	var x_key: String = FIELDS.ax.key
+	var y_key: String = FIELDS.ay.key
+	if record.has(x_key) and record.has(y_key) and not _point([record[x_key],record[y_key]]): return false
+	var unit_key: String = FIELDS.unit.key
+	var building_key: String = FIELDS.is_building.key
+	if record.has(unit_key) and record.has(building_key):
+		if bool(record[building_key]) != is_building_type(int(record[unit_key])): return false
 	return true
+
+static func is_building_type(unit_id: int) -> bool:
+	return unit_id >= 0 and unit_id <= 26
