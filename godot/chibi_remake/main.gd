@@ -74,6 +74,7 @@ var saver: RefCounted:
 var _api_missing: Array = []
 
 func _init() -> void:
+	if not preload("res://simulation/definitions/rule_catalog.gd").is_ready(): return
 	for field in state.PROXY_FIELDS: _state_fields[field] = true
 	for field in scene.PROXY_FIELDS: _scene_fields[field] = true
 	_wire_world()
@@ -145,6 +146,8 @@ func _on_sound(action: String, arguments: Array) -> void:
 		_: _presentation_diagnostics.unknown("sound", action)
 
 func _ready() -> void:
+	if not Game.startup_valid:
+		set_process(false); return
 	# Validate all required providers before initializing a map.
 	# The same explicit contract check runs in exported builds.
 	if preload("res://composition_contract.gd").abort_if_broken("main", _api_missing): return

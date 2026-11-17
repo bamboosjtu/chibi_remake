@@ -6,6 +6,13 @@ try{
  write('simulation/test.gd','extends RefCounted\n# load("res://app/ignored.gd")\n');assert.equal(run().status,0);
  for(const quote of ['"',"'"]){write('simulation/test.gd','extends RefCounted\nconst Bad = load('+quote+'res://app/upper.gd'+quote+')\n');assert.notEqual(run().status,0);}
  write('simulation/test.gd','extends RefCounted\n');
+ for(const expression of ['FileAccess.open("rules.json", 1)', 'FileAccess.get_file_as_string("rules.json")', 'DirAccess.open(".")', 'JSON.parse_string("{}")', 'JSON.new()', 'ResourceLoader.load("rules.tres")', 'GDExtensionManager.load_extension("math.gdextension")', 'load("res://simulation/helper.gd")', 'OS.execute("reader", [])', 'Time.get_ticks_usec()', 'ProfileClock.now(true)']){
+  write('simulation/test.gd','extends RefCounted\nfunc bad():\n\treturn '+expression+'\n');assert.notEqual(run().status,0,expression);
+ }
+ write('simulation/test.gd','extends RefCounted\n# FileAccess.open("ignored", 1)\nconst NOTE="JSON.parse_string and Time.get_ticks_usec() are forbidden"\nconst Valid=preload("res://simulation/helper.gd")\nfunc sample():\n\treturn ProfileClock.now(profile_enabled)\n');assert.equal(run().status,0);
+ write('simulation/definitions/profile_clock.gd','extends RefCounted\nstatic func now(enabled):\n\treturn Time.get_ticks_usec()\n');assert.notEqual(run().status,0);
+ write('simulation/definitions/profile_clock.gd','extends RefCounted\nstatic func now(enabled):\n\treturn Time.get_ticks_usec() if enabled else 0\n');assert.equal(run().status,0);
+ write('simulation/test.gd','extends RefCounted\n');
  write('presentation/test.gd',"extends RefCounted\nconst Bad=preload('res://simulation/test.gd')\n");
  write('simulation/test.gd',"extends 'res://named_port.gd'\nconst Indirect=load('res://simulation/systems/mutable.gd')\n");
  write('simulation/systems/mutable.gd','extends RefCounted\n');assert.notEqual(run().status,0);
@@ -46,5 +53,5 @@ try{
  assert.notEqual(checkReview().status,0,'Expired waivers must fail');
  limits.reviews['files:simulation/test.gd'].reviewBy='2099-02-31';assert.notEqual(checkReview().status,0,'Invalid calendar date');
  limits.reviews['files:simulation/test.gd'].reviewBy='2099-02-28';assert.equal(checkReview().status,0);
- console.log('ARCHITECTURE NEGATIVE PASS both quote styles / dynamic literal load / transitive mutable dependency / commented imports ignored');
+ console.log('ARCHITECTURE NEGATIVE PASS both quote styles / dynamic literal load / transitive mutable dependency / simulation I/O and opt-in profiling / comments and strings ignored');
 }finally{assert.equal(path.dirname(root),parent);fs.rmSync(root,{recursive:true,force:true});}

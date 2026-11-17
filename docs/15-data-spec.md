@@ -18,14 +18,16 @@
 | `data/db/audio_index.json` | 122 条音频索引 |
 | `data/db/events.json` | 事件 → 视频或文本 |
 | `data/db/scenario_rules.json` | 8 个任务的条件与效果 |
-| `data/db/registry_compatibility.json` | 存档内容版本的上/下兼容映射 |
+| `data/db/buildings.json` | 建筑费用、缺失类型与施工帧覆盖 |
+| `data/db/unit_tuning.json` | 状态持续 tick、移动倍率与视野扩展 |
+| `data/db/native_math.json` | 可选原生后端签名与算法契约 |
 | `data/db/video_catalog.json` | AVI 视频路径、尺寸、帧率、时长与 SHA256 |
 
 - 关卡文件由 `tools/godot_export.mjs` 生成，并作为可运行的数据快照进入 Git；构建可用 `-SkipData` 复用现有文件。
 - 数字在 JSON 中可能以浮点表示；读取时按字段语义转整数，键统一用字符串。
 - 上述三份研究数据由根目录执行 `node tools/import_research_systems.mjs` 同步；游戏运行时无需访问 `research` 目录。
 
-单位加载顺序固定为：关卡提供布局和素材；兵种表覆盖属性；生产表覆盖费用并补充缺失兵种。两个目录全部校验成功后才修改关卡定义。保留的关卡属性属于导出快照，不能改变运行时的覆盖顺序。`tools/inputs/schema/content.json` 规定目录与关卡结构，数据门禁还校验通行数组长度及对象类型引用。
+单位加载顺序固定为：关卡提供布局和素材；兵种表覆盖属性；生产表覆盖费用并补充缺失兵种。启动规则目录整批校验并冻结后，才向各世界的独立关卡定义应用覆盖。保留的关卡属性属于导出快照，不能改变运行时的覆盖顺序。`tools/inputs/schema/content.json` 规定目录与关卡结构，数据门禁还校验通行数组长度及对象类型引用。
 
 ## 2. 关卡文件
 
@@ -234,11 +236,10 @@
 存档将关卡定义与规则版本分开标识：
 
 - `contentRevision`：关卡有效定义的规范哈希，覆盖尺寸、通行网格、水层、资源布置、导航、参战方、有效单位定义与地图对象；排除图集路径与显示倍率。字典键序及文本换行不影响标识。
-- `rulesRevision`：引擎代码版本、全部模拟脚本与开局装配脚本、完整规则数据的规范哈希。脚本以 UTF-8/LF 规范化；JSON 按语义与排序后的键计算，排除仅负责声明与迁移的清单。
-- `rules_manifest.json`：编译导出后的脚本身份声明。编辑模拟代码后须执行 `node tools/rules_manifest.mjs --write`；构建与轻量门禁检查声明是否与代码一致。
-- `rules_contract.json`、`registry_compatibility.json`：明确的旧内容迁移依据，不作为正在运行的战斗规则。添加兼容记录不会改变当前规则版本。
+- `rulesRevision`：明确的行为 ABI 与八个已安装玩法目录的有效投影哈希；文本格式、显示名称、图集路径等元数据不进入指纹。原生签名目录负责后端完整性，不改变玩法身份。
+- `rules_manifest.json`：模拟脚本与开局装配脚本的完整性声明；脚本按 UTF-8/LF 规范化。编辑模拟代码后执行 `node tools/rules_manifest.mjs --write`，构建与轻量门禁校验声明。
 
-无规则指纹的旧档采用已声明的迁移策略；新档要求规则版本匹配。规则版本与存档结构版本独立，不因增加指纹字段提升 v8 格式号。替换纹理、打包路径或文本格式不会改变模拟版本；规则或关卡定义变化须迁移或拒收。
+只接受当前 v9 存档的确切规则和关卡身份，不保留旧版本迁移或兼容映射。规则身份与源码完整性分别校验，详见[存档与兼容](16-save-compat.md)。规则目录由启动加载器一次读取并冻结；运行中的保存、恢复和模拟读取同一份内存规则，不重新打开规则文件。
 
 ## 7. 数据校验
 
@@ -257,6 +258,8 @@
 |---|---|
 | 关卡导出 | `tools/godot_export.mjs` |
 | 关卡注册与校验 | `app/game.gd::is_level_doc`、`list_levels` |
+| 规则加载与校验 | `app/rules/rule_loader.gd`、`simulation/definitions/rule_contract.gd` |
+| 冻结目录 | `simulation/definitions/rule_catalog.gd` |
 | 类型与费用合并 | `app/battle/bootstrap.gd`（生产单位覆盖） |
 | 武将库 | `simulation/battle/officer_pool.gd` |
 | 命令与光标 | `presentation/hud/command_catalog.gd`、`software_cursor.gd` |

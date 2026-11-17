@@ -6,12 +6,10 @@ var campaign_modes := {}
 var default_defeat_mode := "economy"
 func _init(h: Object) -> void:
 	host = h.simulation_access("scenario_rules") if h.has_method("simulation_access") else h
-	var f := FileAccess.open("res://data/db/scenario_rules.json", FileAccess.READ)
-	if f != null:
-		var data: Dictionary = JSON.parse_string(f.get_as_text())
-		missions = data.get("missions", {})
-		campaign_modes = data.get("campaignModes", {})
-		default_defeat_mode = str(data.get("defaultDefeatMode","economy"))
+	var data := preload("res://simulation/definitions/rule_catalog.gd").get_catalog("scenario_rules.json")
+	missions = data.missions
+	campaign_modes = data.campaignModes
+	default_defeat_mode = data.defaultDefeatMode
 
 func defeat_policy(map_id: String) -> Dictionary:
 	return campaign_modes.get(map_id,{"mode":default_defeat_mode}).duplicate(true)

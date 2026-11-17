@@ -1,6 +1,7 @@
 extends RefCounted
 ## unit actions: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
+const ProfileClock = preload("res://simulation/definitions/profile_clock.gd")
 const Config = preload("res://simulation/battle_config.gd")
 const REQUIRED_SERVICES := {"battle_simulation": ["_feedback"], "combat": ["_fire_attack", "_melee_line_clear", "_nearest_enemy"], "command_groups": ["_cancel_unit_command"], "construction_orders": ["_do_repair", "_site_entry_path", "_valid_build_worker"], "harvest_orders": ["_deposit_carry", "_deposits_for"], "interaction_paths": ["_deposit_ready", "_dist_to_obj", "_edge_cell_distance", "_edge_interaction_choice", "_edge_interaction_path", "_interaction_path"], "movement": ["_follow", "_path_to"], "officer_teams": ["_auto_assign_new_team"], "spatial_index": ["_contains_unit", "_separate_unit", "_unit_cell"], "transport_orders": ["_attach_to_ship", "_retry_unload"]}
 var battle: State
@@ -30,12 +31,12 @@ func _step_unit(u: Dictionary, delta: float) -> void:
 func _step_unit_profiled(u: Dictionary, delta: float) -> void:
 	var services := ports.acquire(["spatial_index"])
 	if services.is_empty(): return
-	var at:=Time.get_ticks_usec()
+	var at:=ProfileClock.now(profile_enabled)
 	var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel()
 	if kernel!=null and _try_native_attack(u,delta,kernel):
 		_profile_time("nativeAttack",at);profile["units"]=int(profile.get("units",0))+1;return
 	preload("res://simulation/systems/stratagem_rules.gd").begin_update(u);at=_profile_time("beginStatus",at)
-	_step_unit_inner(u,delta);var end:=Time.get_ticks_usec()
+	_step_unit_inner(u,delta);var end:=ProfileClock.now(profile_enabled)
 	var key: String="kind%d" % int(u.unit);profile[key]=int(profile.get(key,0))+end-at
 	at=_profile_time("action",at)
 	services.spatial_index._separate_unit(u);at=_profile_time("separation",at)
@@ -45,11 +46,11 @@ func _step_unit_profiled(u: Dictionary, delta: float) -> void:
 	profile["units"]=int(profile.get("units",0))+1
 
 func _profile_time(key: String, at: int) -> int:
-	var now:=Time.get_ticks_usec();profile[key]=int(profile.get(key,0))+now-at;return now
+	var now:=ProfileClock.now(profile_enabled);profile[key]=int(profile.get(key,0))+now-at;return now
 
 
 func _step_unit_inner(u: Dictionary, delta: float) -> void:
-	var phase := Time.get_ticks_usec() if profile_enabled else 0
+	var phase := ProfileClock.now(profile_enabled)
 	if not _prepare_action(u, delta): return
 	if profile_enabled: _profile_time("prepare", phase)
 	match str(u.state):
@@ -284,7 +285,7 @@ func _step_build(u: Dictionary, delta: float) -> void:
 func _step_attack(u: Dictionary,delta: float,tower: bool) -> void:
 	var services := ports.acquire(["spatial_index", "command_groups", "combat", "movement"])
 	if services.is_empty(): return
-	var phase:=Time.get_ticks_usec() if profile_enabled else 0
+	var phase:=ProfileClock.now(profile_enabled)
 	var raw_target = u.target
 	if not (raw_target is Dictionary) or not raw_target.alive or raw_target.die_t >= 0 or raw_target.get("attached",false) or not services.spatial_index._contains_unit(raw_target):
 		services.command_groups._cancel_unit_command(u)
@@ -344,7 +345,7 @@ func _try_native_attack(u: Dictionary,delta: float,kernel: Object) -> bool:
 	var services := ports.acquire(["combat", "movement", "spatial_index"])
 	if services.is_empty(): return false
 	if u.state!="attack" or bool(u.is_building):return false
-	var at:=Time.get_ticks_usec() if profile_enabled else 0
+	var at:=ProfileClock.now(profile_enabled)
 	var result: int=kernel.attack_fast(u,delta,battle.nav.native_query_context(),battle._target_owner,battle._targets,battle.units,battle._index_units_ref,battle._index_units_size)
 	if profile_enabled:at=_profile_time("nativePrepare",at)
 	if result<0:return false

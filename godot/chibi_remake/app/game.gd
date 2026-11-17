@@ -7,6 +7,7 @@ var campaign := CampaignSession.new()
 var repository := Repository.new(is_valid_save, can_rotate_save)
 var slot_catalog := Catalog.new(repository.read_slot, save_slot_path, SAVE_SLOTS)
 var startup_valid := false
+var _rule_errors: Array = []
 
 var current_map: String:
 	get: return campaign.current_map
@@ -57,11 +58,16 @@ const UnitSchema = preload("res://simulation/definitions/unit_schema.gd")
 
 func _init() -> void:
 	repository.changed.connect(slot_catalog.invalidate)
+	# Godot constructs the main scene before autoload _ready callbacks.
+	_rule_errors = preload("res://app/rules/rule_loader.gd").initialize()
+	if _rule_errors.is_empty(): _rule_errors = preload("res://app/rules/native_backend.gd").initialize()
 
 func _ready() -> void:
 	var acceptance := preload("res://app/acceptance_storage.gd").configure(storage, OS.get_cmdline_user_args())
 	if not acceptance.valid:
 		push_error(acceptance.error); get_tree().quit(1); return
+	if not _rule_errors.is_empty():
+		push_error("Rule startup failed:\n" + "\n".join(_rule_errors)); get_tree().quit(1); return
 	SAVE_PATH = acceptance.path
 	var acceptance_run: bool = acceptance.testing
 	startup_valid = true

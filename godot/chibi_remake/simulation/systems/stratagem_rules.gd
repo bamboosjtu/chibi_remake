@@ -4,13 +4,11 @@ const STATUS_FIELDS := {1:"inspired_t",2:"haste_t",3:"slow_t",4:"farsight_t",5:"
 const CONFUSION = preload("res://simulation/definitions/status_fields.gd").CONFUSION
 const ROLLING = preload("res://simulation/definitions/status_fields.gd").ROLLING
 const ACTIVE_TASKS := [CONFUSION,ROLLING]
-static var tuning:Dictionary={}
 const Access = preload("res://simulation/ports/stratagem_rules_access.gd")
 var host: Access
 func _init(h:Object) -> void:host = h.simulation_access("stratagem_rules") if h.has_method("simulation_access") else h
 static func config() -> Dictionary:
-	if tuning.is_empty():tuning=JSON.parse_string(FileAccess.get_file_as_string("res://data/db/unit_tuning.json"))
-	return tuning
+	return preload("res://simulation/definitions/rule_catalog.gd").get_catalog("unit_tuning.json")
 
 func eligible(unit:Dictionary, owner:int) -> bool:
 	return bool(unit.get("alive",false)) and float(unit.get("die_t",-1))<0 and not bool(unit.get("is_building",false)) \

@@ -1,19 +1,6 @@
 extends RefCounted
-static var data: Dictionary = _load()
-
-static func _load() -> Dictionary:
-	var result: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/db/officer_progression.json"))
-	_freeze(result)
-	return result
-
-static func _freeze(value) -> void:
-	if value is Dictionary:
-		for child in value.values(): _freeze(child)
-		value.make_read_only()
-	elif value is Array:
-		for child in value: _freeze(child)
-		value.make_read_only()
-
+static var data: Dictionary:
+	get: return preload("res://simulation/definitions/rule_catalog.gd").get_catalog("officer_progression.json")
 
 static func cell(officer: Dictionary) -> Dictionary:
 	var category:=clampi(int(officer.get("tier",4)),1,4)

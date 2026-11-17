@@ -39,6 +39,7 @@ for (const file of files(root)) {
   const relative = path.posix.relative(root, file);
   const source = fs.readFileSync(file, 'utf8');
   const code = source.replace(/("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|#[^\r\n]*/g,(all,string)=>string??'');
+  const executable = code.replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g, '""');
   const count = source.trimEnd().split('\n').length;
   if (relative !== 'simulation/battle_world.gd' && /\bworld\.(?:_modules|_access)\b|\bworld\.(?:get|set)\(\s*['"]_(?:modules|access)['"]/.test(code)) fail(`${relative}: accesses private BattleWorld collections`);
   if (['presentation/battle/components/camera_controller.gd','presentation/battle/build_preview.gd','presentation/battle/battle_resources.gd'].includes(relative) && /\bhost\.(?:units|selected|map_data|nav|decor_cells)\b|\bhost(?:\.(?:get|get\.bind)\(\s*|\[\s*)['"](?:units|selected|map_data|nav|decor_cells)['"]/.test(code)) fail(`${relative}: bypasses value read model`);
@@ -46,6 +47,12 @@ for (const file of files(root)) {
   const budget = limits.files[relative] ?? 600;
   if (count > budget) fail(`${relative}: ${count} lines exceeds ${budget}`);
   if (relative.startsWith('simulation/')) {
+    if (/\b(?:FileAccess|DirAccess|ResourceLoader|GDExtensionManager|load)\b|\bJSON\s*\.\s*(?:new|parse\w*)\b|\bOS\s*\.\s*(?:execute|execute_with_pipe|create_process)\b/.test(executable)) fail(`${relative}: simulation performs runtime I/O or JSON parsing; load validated rules at startup`);
+    const clocks=[...executable.matchAll(/\bTime\b/g)];
+    if(clocks.length && !(relative === 'simulation/definitions/profile_clock.gd' && clocks.length === 1 && /^\s*return Time\.get_ticks_usec\(\) if enabled else 0\s*$/m.test(executable))) fail(`${relative}: wall-clock sampling must use opt-in ProfileClock`);
+    for(const call of executable.matchAll(/\bProfileClock\s*\.\s*now\s*\(([^)]*)\)/g)){
+      if(!['profile_enabled','profile_enabled or timing_enabled'].includes(call[1].trim().replace(/\s+/g,' '))) fail(`${relative}: profiling clock requires an explicit opt-in flag`);
+    }
     if (/res:\/\/(app|presentation)\//.test(code)) fail(`${relative}: simulation imports an upper layer`);
     if (/var\s+\w+\s*:\s*(Node2D|Control|CanvasLayer|Camera2D|Sprite2D)\b/.test(code)) fail(`${relative}: simulation retains a scene node`);
     if (/\b(Node2D|Control|CanvasLayer|Camera2D|Sprite2D|AudioStreamPlayer)\.new\(/.test(code)) fail(`${relative}: simulation creates a presentation node`);

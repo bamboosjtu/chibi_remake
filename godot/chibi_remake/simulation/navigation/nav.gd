@@ -139,6 +139,9 @@ func contact_clear(a: Vector2,b: Vector2,ignore: Dictionary,layer: int) -> bool:
 func performance_counters() -> Dictionary:
 	return paths.metrics.duplicate()
 
+func set_profiling(enabled: bool) -> void:
+	paths.profile_enabled = enabled
+
 ## Materialize possible mobile footprints during world preparation, rather than
 ## stopping a live battle when the first cavalry/ship order needs a new graph.
 func warm_runtime_shapes() -> void:

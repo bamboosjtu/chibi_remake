@@ -1,11 +1,12 @@
 extends RefCounted
-## Shared initial officer data for new battles and legacy normalization.
+## Each world owns its mutable officer progression, copied once at creation.
 static func pool(sides: Array) -> Array:
-	var data: Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://data/db/officers.json"))
+	var data := preload("res://simulation/definitions/rule_catalog.gd").get_catalog("officers.json")
 	var result: Array=[[],[],[],[]];var by_id := {}
 	for block in data.blocks:
-		result[int(block.faction)-1]=block.officers
-		for officer in block.officers: by_id[int(officer.index)+1]=officer
+		var officers: Array = block.officers.duplicate(true)
+		result[int(block.faction)-1] = officers
+		for officer in officers: by_id[int(officer.index)+1]=officer
 	for side in sides:
 		var roster: Array=side.get("roster",[]);var ranks: Array=side.get("ranks",[])
 		for i in range(mini(roster.size(),ranks.size())):

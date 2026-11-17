@@ -4,7 +4,7 @@ var host: Access
 var model: Dictionary
 func _init(owner: Object) -> void:
 	host = owner.simulation_access("command_rules") if owner.has_method("simulation_access") else owner
-	model=JSON.parse_string(FileAccess.get_file_as_string("res://data/db/command_variants.json")).three_layer_model
+	model = preload("res://simulation/definitions/rule_catalog.gd").get_catalog("command_variants.json").three_layer_model
 
 func team_kind(leader: Dictionary) -> String:
 	var saved:=str(leader.get("team_kind",""))

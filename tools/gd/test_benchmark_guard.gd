@@ -28,6 +28,10 @@ func run() -> void:
 	assert(await harness._start_live_measurement(b,report))
 	assert(b.sim_tick==fixed_tick and report.frameInitialTick==fixed_tick and report.renderWarmupPreservedSimulation,"Renderer warmup must preserve the exact simulation start")
 	assert(not str(report.frameInitialStateChecksum).is_empty())
+	assert(b._modules.battle_simulation.timing_enabled and b.nav.paths.profile_enabled,"Benchmark must opt in to wall-clock sampling")
+	var measured: int=b._modules.battle_simulation.tick_microseconds
+	b.commands.world._sim_step(b.SIM_DT)
+	assert(b._modules.battle_simulation.tick_microseconds>measured)
 	harness.free()
 	b.game_end=1;assert(not script.workload_valid(b))
 	b.scene.ready_to_save=false;b.free();done=true;print("BENCHMARK GUARD PASS real briefing pause / rendered frames without gameplay rejected / manual-tick bypass rejected / ended battle rejected");quit()

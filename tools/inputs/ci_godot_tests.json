@@ -43,6 +43,15 @@
       "args": [
         "--noview"
       ]
+    },
+    {
+      "script": "test_rule_catalog",
+      "markers": [
+        "RULE CATALOG PASS"
+      ],
+      "args": [
+        "--noview"
+      ]
     }
   ]
 }

@@ -2,6 +2,8 @@ extends RefCounted
 ## path queries.
 const GridState = preload("res://simulation/navigation/navigation_state.gd")
 var _grid_state: GridState
+const ProfileClock = preload("res://simulation/definitions/profile_clock.gd")
+var profile_enabled := false
 const REQUIRED_SERVICES := {"grid": ["_id", "anchor_of", "cell_of_px", "close_route_gates", "near_walkable", "open_route_gates"]}
 var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
 const GridRay = preload("res://simulation/navigation/grid_ray.gd")
@@ -14,15 +16,15 @@ func _init(data: GridState) -> void:
 	_grid_state = data
 
 func find_path(from_px: Vector2, to_px: Vector2, exact: bool, layer := 0, owner := -1, unit_id := -1) -> Array:
-	var begin:=Time.get_ticks_usec()
+	var begin:=ProfileClock.now(profile_enabled)
 	var result:=_query_path(from_px,to_px,exact,layer,owner,unit_id)
-	metrics.calls+=1;metrics.microseconds+=Time.get_ticks_usec()-begin
+	metrics.calls+=1;metrics.microseconds+=ProfileClock.now(profile_enabled)-begin
 	return result
 
 func find_path_avoiding(from_px: Vector2, to_px: Vector2, exact: bool, avoid_cells: Array, layer := 0, owner := -1, unit_id := -1) -> Array:
-	var begin:=Time.get_ticks_usec()
+	var begin:=ProfileClock.now(profile_enabled)
 	var result:=_query_avoiding(from_px,to_px,exact,avoid_cells,layer,owner,unit_id)
-	metrics.calls+=1;metrics.microseconds+=Time.get_ticks_usec()-begin
+	metrics.calls+=1;metrics.microseconds+=ProfileClock.now(profile_enabled)-begin
 	return result
 
 func _query_path(from_px: Vector2, to_px: Vector2, exact: bool, layer := 0, owner := -1, unit_id := -1) -> Array:
@@ -101,7 +103,7 @@ func first_path_avoiding(origin: Vector2, destinations: Array, avoid_cells: Arra
 	var services := ports.acquire(["grid"])
 	if services.is_empty(): return {}
 	if destinations.is_empty(): return {}
-	var begin := Time.get_ticks_usec()
+	var begin := ProfileClock.now(profile_enabled)
 	var cls := UnitFootprint.class_of(unit_id) if unit_id >= 0 else 0
 	var graph := _grid_for(layer, cls)
 	_shape_apply_dirty(layer, cls)
@@ -118,7 +120,7 @@ func first_path_avoiding(origin: Vector2, destinations: Array, avoid_cells: Arra
 	for id in previous: graph.set_point_disabled(int(id), bool(previous[id]))
 	for id in gate_shape: graph.set_point_disabled(int(id), bool(gate_shape[id]))
 	services.grid.close_route_gates(gates)
-	metrics.microseconds += Time.get_ticks_usec() - begin
+	metrics.microseconds += ProfileClock.now(profile_enabled) - begin
 	return result
 
 ## Remove the offset grid's staircase only where the same planning graph permits
@@ -126,9 +128,9 @@ func first_path_avoiding(origin: Vector2, destinations: Array, avoid_cells: Arra
 ## therefore apply to shortcuts too. Gate waypoints remain for automatic opening.
 
 func _smooth_path(origin: Vector2, points: Array, layer: int, cls: int) -> Array:
-	var begin:=Time.get_ticks_usec()
+	var begin:=ProfileClock.now(profile_enabled)
 	var result:=_smooth_core(origin,points,layer,cls)
-	metrics.smoothMicroseconds+=Time.get_ticks_usec()-begin
+	metrics.smoothMicroseconds+=ProfileClock.now(profile_enabled)-begin
 	return result
 
 func _smooth_core(origin: Vector2, points: Array, layer: int, cls: int) -> Array:
@@ -181,9 +183,9 @@ func contact_clear(a: Vector2,b: Vector2,ignore: Dictionary,layer: int) -> bool:
 	return true
 
 func _find_path(from_px: Vector2, to_px: Vector2, exact: bool, layer: int, cls: int) -> Array:
-	var begin:=Time.get_ticks_usec()
+	var begin:=ProfileClock.now(profile_enabled)
 	var result:=_find_path_core(from_px,to_px,exact,layer,cls)
-	metrics.searchMicroseconds+=Time.get_ticks_usec()-begin
+	metrics.searchMicroseconds+=ProfileClock.now(profile_enabled)-begin
 	return result
 
 func _find_path_core(from_px: Vector2, to_px: Vector2, exact: bool, layer: int, cls: int) -> Array:

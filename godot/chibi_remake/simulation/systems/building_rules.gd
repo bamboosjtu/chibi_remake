@@ -2,9 +2,7 @@ extends RefCounted
 ## Confirmed building research. Map geometry and historical save snapshots stay intact.
 
 static func apply_definitions(map_data: Dictionary) -> void:
-	var file := FileAccess.open("res://data/db/buildings.json", FileAccess.READ)
-	if file == null: return
-	var definitions: Dictionary = JSON.parse_string(file.get_as_text()).get("units", {})
+	var definitions: Dictionary = preload("res://simulation/definitions/rule_catalog.gd").get_catalog("buildings.json").units
 	for uid in definitions:
 		var definition: Dictionary = definitions[uid]
 		if not map_data.units.has(uid): map_data.units[uid] = definition.duplicate(true)

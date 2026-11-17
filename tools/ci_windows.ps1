@@ -43,6 +43,8 @@ node tools/test_registry_check.mjs
 if ($LASTEXITCODE -ne 0) { throw 'Negative composition checks failed' }
 node tools/test_registry_runtime.mjs --engine $godot
 if ($LASTEXITCODE -ne 0) { throw 'Runtime composition rejection failed' }
+node tools/test_rule_startup.mjs --engine $godot
+if ($LASTEXITCODE -ne 0) { throw 'Rule startup and tick I/O checks failed' }
 if ($FullRegression) {
     node tools/run_regressions.mjs --engine $godot --selftests --baselines --maps --suite tools/inputs/release_tests.json --suite tools/inputs/development_tests.json --suite tools/inputs/known_failures.json --output _work/ci/regressions
 } else {

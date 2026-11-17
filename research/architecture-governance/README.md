@@ -4,6 +4,8 @@
 
 本文件保留首轮基线；后续六项修复与新的验收记录见 `followup.md`、`followup-acceptance.json`。
 
+规则启动边界与 tick I/O 专项见 `rule-loading.md`、`rule-loading-acceptance.json`；该记录包含主场景启动顺序、冻结目录、候选世界隔离与当前验收结果。
+
 ## 1. 本轮边界与交付
 
 本轮落地质量门禁、存档可靠性、Unit Schema 首版、UI 瞬态隔离、组合根试点和端口依赖盘点。保留 Dictionary 单位模型，存档格式仍为 v8，原有确定性基线不变。端口没有做代码生成，也没有按“搜索不到调用者”批量删除接口。

@@ -6,6 +6,9 @@ var _modules: Dictionary = {}
 var _access: Dictionary = {}
 
 func _init() -> void:
+	if not preload("res://simulation/definitions/rule_catalog.gd").is_ready():
+		preload("res://composition_contract.gd").abort_if_broken("battle rules", [{"provider":"rule catalog", "method":"startup initialization"}])
+		return
 	state.simulation_rng.seed = 0x4348494249
 	_access["ai"] = preload("res://simulation/ports/ai_access.gd").new(state)
 	_access["command_rules"] = preload("res://simulation/ports/command_rules_access.gd").new(state)

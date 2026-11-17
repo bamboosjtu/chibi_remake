@@ -1,11 +1,13 @@
 extends RefCounted
 ## battle simulation: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
+const ProfileClock = preload("res://simulation/definitions/profile_clock.gd")
 const Dependencies = preload("res://simulation/ports/battle_simulation_dependencies.gd")
 var battle: State
 var ports := Dependencies.new()
 var tick_microseconds := 0
 var profile_enabled := false
+var timing_enabled := false
 var profile: Dictionary={}
 var native_unit_profile: Dictionary={}
 var native_unit_port: Object
@@ -67,7 +69,7 @@ func _update_gates() -> void:
 
 func _sim_step(dt: float) -> void:
 	if battle.game_end != 0: return
-	var tick_begin:=Time.get_ticks_usec()
+	var tick_begin:=ProfileClock.now(profile_enabled or timing_enabled)
 	var phase:=tick_begin
 	if battle.effects!=null:battle.effects.simulating=true
 	if battle.effects != null:battle.effects.visual("capture_motion", [])
@@ -100,7 +102,7 @@ func _sim_step(dt: float) -> void:
 		battle.effects.simulating=false
 		battle.effects.visual("world_dirty")
 	if profile_enabled:_profile_time("settlement",phase)
-	tick_microseconds+=Time.get_ticks_usec()-tick_begin
+	tick_microseconds+=ProfileClock.now(profile_enabled or timing_enabled)-tick_begin
 
 
 func connect_native() -> void:
@@ -170,4 +172,4 @@ func _set_frame(u: Dictionary, f: int) -> void:
 	battle.effects.visual("set_frame", [u, f])
 
 func _profile_time(key: String, at: int) -> int:
-	var now:=Time.get_ticks_usec();profile[key]=int(profile.get(key,0))+now-at;return now
+	var now:=ProfileClock.now(profile_enabled);profile[key]=int(profile.get(key,0))+now-at;return now

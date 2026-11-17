@@ -1,6 +1,7 @@
 extends RefCounted
 const Grades = preload("res://simulation/definitions/officer_grades.gd")
-static var data: Dictionary = Grades.data
+static var data: Dictionary:
+	get: return Grades.data
 static func award(officer: Dictionary, amount: int) -> bool:
 	if officer.is_empty() or amount<0:return false
 	var level:=clampi(int(officer.get("level",0)),0,int(data.levelCap))

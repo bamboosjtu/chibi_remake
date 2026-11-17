@@ -159,6 +159,8 @@ func run() -> void:
 	battle._modules.unit_actions.profile_enabled=profile_units
 	battle._modules.unit_actions.profile.clear()
 	battle._modules.battle_simulation.profile_enabled=profile_units
+	battle._modules.battle_simulation.timing_enabled=true
+	battle.nav.set_profiling(true)
 	battle._modules.battle_simulation.profile.clear()
 	battle._modules.battle_simulation.native_unit_profile.clear()
 	var path_begin: Dictionary=battle.nav.performance_counters()
@@ -240,6 +242,8 @@ func _logic_frame(battle: Node2D) -> void:
 func _start_live_measurement(battle: Node2D, report: Dictionary) -> bool:
 	battle._modules.unit_actions.profile_enabled=false
 	battle._modules.battle_simulation.profile_enabled=false
+	battle._modules.battle_simulation.timing_enabled=false
+	battle.nav.set_profiling(false)
 	var game: Node=root.get_node("Game")
 	var checksum: String=game.save_checksum(battle.saver.continuation_snapshot(game))
 	for i in range(30):await _logic_frame(battle)
@@ -248,5 +252,7 @@ func _start_live_measurement(battle: Node2D, report: Dictionary) -> bool:
 	report["frameInitialTick"]=battle.sim_tick
 	report["frameInitialStateChecksum"]=checksum
 	report["renderWarmupPreservedSimulation"]=true
+	battle._modules.battle_simulation.timing_enabled=true
+	battle.nav.set_profiling(true)
 	battle.sim_acc=0;battle.set_process(true)
 	return true

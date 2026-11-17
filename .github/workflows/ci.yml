@@ -120,6 +120,8 @@ jobs:
         run: node tools/registry_check.mjs --runtime-log _work/ci-godot/dump_composition.log
       - name: Invalid compositions must exit nonzero
         run: node tools/test_registry_runtime.mjs --engine "$GODOT_ENGINE"
+      - name: Rule startup faults and tick without catalog files
+        run: node tools/test_rule_startup.mjs --engine "$GODOT_ENGINE" --cpu-only --output _work/ci-rule-startup
       - name: Fetch minimal terrain source fixture
         run: git lfs pull --include="source/terrain/paint/00.png,source/terrain/masks/terrain-00-source.png" --exclude=""
       - name: Rebuildable terrain cache and failure recovery
@@ -129,4 +131,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: godot-ci-logs
-          path: _work/ci-godot
+          path: |
+            _work/ci-godot
+            _work/ci-rule-startup

@@ -18,7 +18,8 @@ static func current() -> String:
 	if not _current.is_empty(): return _current
 	var records := {}
 	for name in CATALOG_FIELDS:
-		records[name] = catalog_hash(JSON.stringify(rule_projection(name, JSON.parse_string(FileAccess.get_file_as_string("res://data/db/" + name)))))
+		var document := preload("res://simulation/definitions/rule_catalog.gd").get_catalog(name)
+		records[name] = catalog_hash(JSON.stringify(rule_projection(name, document)))
 	_current = fingerprint(records)
 	return _current
 

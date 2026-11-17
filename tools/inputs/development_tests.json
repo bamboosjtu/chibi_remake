@@ -642,6 +642,12 @@
         "WORKER FEEDBACK PASS"
       ],
       "timeout": 240
+    },
+    {
+      "script": "test_rule_catalog",
+      "markers": [
+        "RULE CATALOG PASS"
+      ]
     }
   ]
 }
