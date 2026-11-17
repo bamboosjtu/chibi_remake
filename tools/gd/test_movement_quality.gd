@@ -106,9 +106,6 @@ func run() -> void:
 				frames_seen[battle.commands.military._clip_frame(sample,str(pose.clip),int(pose.direction),int(pose.step))]=true
 			assert(frames_seen.size()==expected_frames.size())
 	assert(active_types>=21)
-	var legacy:Dictionary={"dir":5,"move_facing":0,"walk_tick":99,"move_started":true,"is_building":false}
-	Locomotion.restore({},legacy)
-	assert(legacy.move_facing==5 and legacy.walk_tick==0 and not legacy.move_started)
 	# A 180-degree corner visits adjacent sectors using turn poses, without resetting gait.
 	var turning:Dictionary=archer.duplicate();turning.move_facing=0;turning.dir=4
 	turning.walk_tick=120;turning.turn_tick=0;turning.move_started=true;turning.move_turning=false

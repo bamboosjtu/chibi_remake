@@ -25,6 +25,16 @@ func cancel_work(kind: String, uid: int, epoch: int) -> bool:
 	var action := _cancel_work_now.bind(kind,uid,epoch)
 	return battle.player_commands.submit(22 if kind == "site" else 23,action,Vector2.ZERO,uid) > 0
 
+func submit_command(mode: int, action: Callable, target := Vector2.ZERO, uid := -1, parameter := 0) -> int:
+	if not action.is_valid(): return 0
+	return battle.player_commands.submit(mode,_execute_command.bind(node.world.get_instance_id(),action),target,uid,parameter)
+
+func _execute_command(epoch: int, action: Callable) -> void:
+	if node.world.get_instance_id()==epoch and action.is_valid(): action.call()
+
+func pump_commands() -> int:
+	return battle.player_commands.pump()
+
 func _cancel_work_now(kind: String, uid: int, epoch: int) -> void:
 	if epoch != node.world.get_instance_id(): return
 	for unit: Dictionary in battle.units:

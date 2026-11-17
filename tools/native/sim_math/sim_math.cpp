@@ -93,7 +93,7 @@ class ChibiSimulationMath : public RefCounted {
             farsight_t{"farsight_t"}, site_flag{"site"}, position{"position"},
             source_cells{"cells"};
         Variant alive{"alive"};
-        Variant burn_t{"burn_t"};
+
         Variant site_follow_uid{"site_follow_uid"};
         Variant ambush_t{"ambush_t"};
         Variant atk_range{"atk_range"};
@@ -685,7 +685,7 @@ class ChibiSimulationMath : public RefCounted {
                         const Dictionary &owners, const Dictionary &targets, const Array &units,
                         const Array &indexed, int64_t indexed_size) {
         if (String(u.get(k.state, "")) != attack_state || boolean(u, k.building) ||
-            boolean(u, k.attached) || double(u.get(k.burn_t, 0.0)) > 0 ||
+            boolean(u, k.attached) ||
             integer(u, k.site, -1) >= 0 || integer(u, k.site_follow_uid, -1) >= 0 || active(u) ||
             integer(u, k.ambush_t) > 0)
             return -1;

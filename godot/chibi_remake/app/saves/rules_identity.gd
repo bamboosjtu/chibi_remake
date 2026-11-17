@@ -43,18 +43,6 @@ static func fingerprint(records: Dictionary) -> String:
 		if CATALOG_FIELDS.has(key): ordered[str(key)] = records[key]
 	return (ABI+JSON.stringify(ordered)).sha256_text()
 
-static func legacy_scenario_hashes() -> Array:
-	var data = JSON.parse_string(FileAccess.get_file_as_string("res://data/db/rules_contract.json"))
-	return data.get("legacyScenarioHashes",[]) if data is Dictionary else []
-
-## Explicitly reviewed transitions only. Pin both fingerprints so this approval
-## cannot silently apply to later balance or scenario changes.
-static func approved_migration(previous: String) -> bool:
-	var contract=JSON.parse_string(FileAccess.get_file_as_string("res://data/db/rules_contract.json"))
-	if not contract is Dictionary:return false
-	var migration=contract.get("migrations",{}).get(previous,{})
-	return migration is Dictionary and migration.get("target","")==current() and migration.get("policy","") in ["realtime-navigation-v1", "rules-scope-v1", "bounded-blocked-navigation-v1"]
-
 static func rule_projection(name: String, data: Dictionary) -> Dictionary:
 	var result := {}
 	for key in CATALOG_FIELDS.get(name, []): result[key] = _rule_value(data.get(key))

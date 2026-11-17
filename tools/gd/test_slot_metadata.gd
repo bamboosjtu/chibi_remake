@@ -33,6 +33,6 @@ func run() -> void:
 	quit()
 
 func fixture(game: Node, title: String) -> String:
-	var data := {"v":3,"map":"chibil1","saveName":title,"units":[{"uid":0,"unit":32,"owner":2,"x":100,"y":100,"hp":100}]}
-	data.checksum = game.save_checksum(data)
+	var unit := {"uid":0,"unit":32,"owner":2,"ax":100,"ay":100,"hp":100,"maxhp":100,"base_maxhp":100,"alive":true,"is_building":false,"target":null}
+	var data: Dictionary=game.snapshot([unit],{}, {"saveName":title,"nextUid":1,"simulation":{"rngState":"0","tick":0,"speedIndex":2,"accumulator":0,"contentRevision":"0".repeat(64),"rulesRevision":preload("res://app/saves/rules_identity.gd").current()}})
 	return JSON.stringify(data)

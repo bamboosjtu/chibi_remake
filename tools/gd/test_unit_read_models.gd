@@ -4,6 +4,8 @@ class ProjectionProbe extends RefCounted:
 	var sim_tick := 0
 	var units: Array = []
 	var nav: Object
+	var visibility: Object
+	var player_owner := 0
 var done := false
 func _initialize() -> void:
 	create_timer(120).timeout.connect(func():
@@ -60,7 +62,7 @@ func run() -> void:
 	done=true;quit()
 
 func _projection_cost(battle: Node2D) -> void:
-	var probe:=ProjectionProbe.new();probe.nav=battle.nav
+	var probe:=ProjectionProbe.new();probe.nav=battle.nav;probe.visibility=battle.visibility;probe.player_owner=battle.player_owner
 	var source: Dictionary=battle.units.filter(func(unit):return int(unit.unit)==30)[0]
 	for index in range(800):
 		var unit: Dictionary=source.duplicate();unit.uid=index;probe.units.append(unit)

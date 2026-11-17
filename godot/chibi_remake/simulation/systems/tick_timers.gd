@@ -1,10 +1,9 @@
 extends RefCounted
-## v6：这些字段只存逻辑 tick。旧存档的秒值在入档边界统一迁移。
-## Fire fields have their own global update clock; old burn_t/burn_dps remain legacy-only.
+## Persisted durations are integer logic ticks.
+## Fire fields own their separate global effect clock.
 const REST_PERIOD = preload("res://simulation/battle_config.gd").REST_TICKS
 const BUILD_PERIOD = preload("res://simulation/battle_config.gd").BUILD_STEP_TICKS
 static var STATUS_DURATION: int = int(Schema.FIELDS.inspired_t.max)
-const LEGACY_TICK_SECONDS := 1.0 / 30.0
 const Schema = preload("res://simulation/definitions/unit_schema.gd")
 static var STATUS_KEYS: Array = Schema.fields("status")
 static var ELAPSED_PERIODS: Dictionary = _elapsed_periods()
@@ -14,29 +13,20 @@ static func _elapsed_periods() -> Dictionary:
 	for key in Schema.fields("elapsed"): result[key] = int(Schema.FIELDS[key].max) + 1
 	return result
 
-static func valid_snapshot(state: Dictionary, version: int) -> bool:
-	for key in STATUS_KEYS + ["hidden_t"] + ELAPSED_PERIODS.keys():
+static func valid_snapshot(state: Dictionary) -> bool:
+	for key in STATUS_KEYS + ELAPSED_PERIODS.keys():
 		if not state.has(key): continue
 		var value = state[key]
-		if value == null and version < 6: continue # 旧档缺省字段曾写为 null。
 		if not (value is int or value is float) or not is_finite(float(value)) or float(value) < 0:
 			return false
-		var limit := STATUS_DURATION if key in STATUS_KEYS or key=="hidden_t" else int(ELAPSED_PERIODS[key])
-		if version >= 6:
-			if float(value) != floorf(float(value)): return false
-			if float(value) > limit or (ELAPSED_PERIODS.has(key) and float(value) == limit): return false
-		elif float(value) > limit * LEGACY_TICK_SECONDS + 0.000001:
-			return false
+		var limit := STATUS_DURATION if key in STATUS_KEYS else int(ELAPSED_PERIODS[key])
+		if float(value) != floorf(float(value)): return false
+		if float(value) > limit or (ELAPSED_PERIODS.has(key) and float(value) == limit): return false
 	return true
 
-static func restore(state: Dictionary, version: int, unit: Dictionary) -> void:
+static func restore(state: Dictionary, unit: Dictionary) -> void:
 	for key in STATUS_KEYS + ELAPSED_PERIODS.keys():
-		var value = state.get(key,state.get("hidden_t",0) if key=="ambush_t" else null)
-		var ticks := 0
-		if value != null:
-			ticks = int(value) if version >= 6 else roundi(float(value) / LEGACY_TICK_SECONDS)
-		var limit := STATUS_DURATION if key in STATUS_KEYS or key=="hidden_t" else int(ELAPSED_PERIODS[key]) - 1
-		unit[key] = clampi(ticks, 0, limit)
+		unit[key] = int(state[key])
 
 static func step_statuses(unit: Dictionary) -> void:
 	var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel()

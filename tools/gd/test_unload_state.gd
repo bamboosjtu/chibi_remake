@@ -92,7 +92,7 @@ func run() -> void:
 	ship.path = []
 	ship.pi = 0
 	var payload := snapshot()
-	assert(int(payload.v) == 8)
+	assert(int(payload.v) == 9)
 	var ship_record: Dictionary = payload.units.filter(func(u): return int(u.uid) == ship_uid)[0]
 	assert(ship_record.simulation.get("unload_active") == true, "R03: unload_active 必须入档")
 	assert(int(ship_record.simulation.get("unload_t", -1)) == 3, "R03: unload_t 相位必须入档")

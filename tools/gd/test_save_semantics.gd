@@ -39,8 +39,9 @@ func run() -> void:
 		assert(game.is_valid_save(valid) and battle.saver.apply_snapshot(valid))
 	var schema = load("res://simulation/definitions/unit_schema.gd")
 	for state in schema.FIELDS.state.values:
-		assert(schema.valid_record({"state":state}))
-	assert(schema.valid_record({"unit":47.0,"building":false,"state":"boarded"}))
+		assert(schema.valid_value("state",state))
+	var boarded: Dictionary=original.units[0].duplicate(true);boarded.unit=47.0;boarded.building=false;boarded.state="boarded"
+	assert(schema.valid_record(boarded))
 	assert(battle.saver.apply_snapshot(original))
 	battle.scene.ready_to_save=false; battle.free()
 	print("SAVE SEMANTICS PASS correct-checksum rejection / building derived from unit / gameEnd enum / bounded nextUid / state catalog / atomic rejection")

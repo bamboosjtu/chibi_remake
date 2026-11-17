@@ -60,7 +60,7 @@ func restored_mask() -> void:
 	var previous: RefCounted=battle.visibility
 	paused=true
 	assert(battle.saver.apply_snapshot(saved))
-	assert(not is_same(previous,battle.visibility) and is_same(battle.view.fog_sprite.visibility,battle.visibility))
+	assert(not is_same(previous,battle.visibility) and battle.view.host.visibility_view().key[1]==battle.visibility.get_instance_id())
 	battle.view.fog_sprite._process(0)
 	if DisplayServer.get_name()!="headless":await RenderingServer.frame_post_draw
 	assert(is_zero_approx(mask_alpha(visible)),"loaded army must clear the real rendered mask")

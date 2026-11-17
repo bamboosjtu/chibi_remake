@@ -44,12 +44,12 @@ func run() -> void:
 		assert(not battle.saver.apply_snapshot(snapshot))
 		assert(battle.state.get_instance_id()==identity and game.save_checksum(battle.saver.continuation_snapshot(game))==digest)
 	_task_limits(base,identity,digest)
-	_legacy_cleanup(base)
+	_strict_navigation(base)
 	_restore_ownership(base)
 	_json_limits()
 	_backup_source()
 	battle.scene.ready_to_save=false;battle.free();done=true
-	print("SAVE BOUNDARIES PASS checksum-correct rejection / map and route limits / legacy cache-cursor-reference cleanup / bounded tasks and JSON / backup provenance and same-size cache invalidation")
+	print("SAVE BOUNDARIES PASS checksum-correct rejection / map and route limits / strict cursor and derived caches / bounded tasks and JSON / backup provenance and same-size cache invalidation")
 	quit()
 
 func _signed(data: Dictionary) -> void:
@@ -77,48 +77,28 @@ func _task_limits(base: Dictionary, identity: int, digest: String) -> void:
 	assert(Semantics.valid_rng("-9223372036854775808") and Semantics.valid_rng("9223372036854775807"))
 	assert(not Semantics.valid_rng("-9223372036854775809"))
 
-func _legacy_cleanup(base: Dictionary) -> void:
+func _strict_navigation(base: Dictionary) -> void:
+	var index: int=base.units.find_custom(func(record):return int(record.unit)==30)
+	var id: int=battle.state.get_instance_id()
+	for change in [{"pi":999,"path":[[10,10]]},{"pi":17,"path":[]},{"A":1},{"pi":null}]:
+		var snapshot: Dictionary=base.duplicate(true);snapshot.units[index].simulation.merge(change,true)
+		_signed(snapshot);assert(not battle.saver.apply_snapshot(snapshot) and battle.state.get_instance_id()==id)
 	var snapshot: Dictionary=base.duplicate(true)
-	var index: int=snapshot.units.find_custom(func(record):return int(record.unit)==30)
-	var uid: int=snapshot.units[index].uid
-	var record: Dictionary=snapshot.units[index]
-	record.x=-1;record.y=-1
-	record.simulation.A=1000000;record.simulation.B=-1000000
-	record.simulation.pi=999;record.simulation.path=[[10,10]]
-	record.simulation.targetUid=2147483647;record.simulation.join_target_uid=2147483647
-	_signed(snapshot)
+	snapshot.units[index].simulation.targetUid=2147483647
+	snapshot.units[index].simulation.join_target_uid=2147483647
 	assert(battle.saver.apply_snapshot(snapshot))
-	var restored: Dictionary=battle.units.filter(func(unit):return int(unit.uid)==uid)[0]
-	assert(restored.ax>=0 and restored.ay>=0)
-	var cell: Vector2i=battle.nav.cell_of_px(restored.ax,restored.ay)
-	assert(restored.A==cell.x and restored.B==cell.y and restored.pi==0 and restored.path.is_empty())
-	assert(restored.target==null and restored.join_target_uid==-1)
-	assert(record.simulation.pi==999 and record.simulation.A==1000000,"Normalization must not mutate the caller's archive")
-	var canonical: Dictionary=game.snapshot(battle.units,battle.commands.world._resources(),battle.saver.save_extra())
-	assert(not canonical.units[index].simulation.has("A") and not canonical.units[index].simulation.has("B"))
-	for version in [4,5,6,7,8]:
-		var old: Dictionary=base.duplicate(true);old.v=version
-		old.units[index].simulation.path=[];old.units[index].simulation.pi=17
-		assert(battle.saver.apply_snapshot(old))
-		assert(battle.units.filter(func(unit):return int(unit.uid)==uid)[0].pi==0)
-	var positional_flags: Dictionary=base.duplicate(true);positional_flags.v=3
-	for row in positional_flags.units:
-		for field in ["alive","building","mapObject"]:
-			if row.has(field): row[field]=1.0 if row[field] else 0.0
-	_signed(positional_flags)
-	assert(game.is_valid_save(positional_flags) and battle.saver.apply_snapshot(positional_flags),"Legacy numeric booleans must remain readable")
+	assert(battle.units[index].target==null and battle.units[index].join_target_uid==-1)
+	assert(not snapshot.units[index].simulation.has("A"))
 
 func _restore_ownership(base: Dictionary) -> void:
 	var snapshot: Dictionary=base.duplicate(true)
 	var building: Dictionary=snapshot.units.filter(func(unit):return int(unit.owner)==battle.player_owner and int(unit.unit) in [0,1])[0]
 	snapshot.trainings=[{"buildingUid":building.uid,"owner":battle.player_owner,"unit":30,"t":25,"ticks":true,"cost":{"gold":400}}]
 	snapshot.simulation.aiResources={"2":{"gold":200,"food":100,"wood":100,"stone":100}}
-	snapshot.simulation.techProgress={"tech":0,"t":1,"cost":{"gold":50}}
 	assert(battle.saver.apply_snapshot(snapshot))
 	snapshot.trainings[0].cost.gold=9999
 	snapshot.simulation.aiResources["2"].gold=9999
-	snapshot.simulation.techProgress.cost.gold=9999
-	assert(battle.trainings[0].cost.gold==400 and battle.ai_res[2].gold==200 and battle.tech_progress.cost.gold==50)
+	assert(battle.trainings[0].cost.gold==400 and battle.ai_res[2].gold==200)
 	assert(battle.saver._valid_cost({"wood":1}) and not battle.saver._valid_cost({"future":1}))
 
 func _json_limits() -> void:

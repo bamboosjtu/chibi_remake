@@ -123,10 +123,6 @@ func world_exchange_contract(actor: Dictionary) -> void:
 	sim.commands.economy._remove_decor(sim.decor_cells["15_20"])
 	assert(sim.commands.orders._resource_patch_cells(sim.decor_cells["14_20"]).size()==1 and cells.size()==2)
 	var previous: Dictionary=snapshot.duplicate(true)
-	previous.simulation.rulesRevision="fc1e06331f3969e92e529186f38cf2ddaf84abcf0f1a4a5368ea3e850873b6d6"
-	for record in previous.units: record.simulation.erase("blocked_cursor")
-	assert(sim.saver.apply_snapshot(previous),"Pinned v3 saves must explicitly adopt bounded repathing")
-	assert(int(sim.units[0].get("blocked_cursor",0))==0)
 	previous.simulation.rulesRevision="unreviewed-rules"
 	assert(not sim.saver.apply_snapshot(previous))
 

@@ -64,7 +64,7 @@ func _refresh_cmd_panel() -> void:
 		return
 	# 建造清单与主命令共用格位；建筑缩略图来自已接入的高清帧。
 	if _ui.build_menu and not sel.is_empty():
-		var bts0: Array = _ui.host.build_types
+		var bts0: Array = _ui.host.build_options()
 		for bi in range(bts0.size()):
 			var bopt0: Dictionary = bts0[bi]
 			var reason: String = _ui.host.commands.economy.building_block_reason(int(bopt0.unit))

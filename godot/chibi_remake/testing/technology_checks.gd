@@ -38,7 +38,6 @@ func _selftest_tech() -> void:
 			host.selected.clear()
 	# 自检只在 _ready 跑一次；先归零，保证从"未研发"状态验证完整流程。
 	host.player_tech = {"level": 0, "bow": 0, "weapon": 0, "armor": 0, "catapult": 0, "ship_atk": 0, "ship_def": 0}
-	host.tech_progress = {}
 	# 本图（CHIBIC1）我方可能只有工兵；找一个近战单位，没有就临时生成步兵 32 用于断言。
 	var melee: Dictionary = {}
 	for u in host.units:

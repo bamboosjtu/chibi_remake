@@ -76,14 +76,6 @@ func restore(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 	for unit in host.units:
 		host.commands.technology._apply_tech_bonuses(unit)
 	host.research_jobs = simulation.get("researchJobs",[]).duplicate(true)
-	host.tech_progress = {}
-	var tp = simulation.get("techProgress", {})
-	if tp is Dictionary and not (tp as Dictionary).is_empty():
-		host.tech_progress = {
-			"tech": int((tp as Dictionary).get("tech", -1)),
-			"t": float((tp as Dictionary).get("t", 0.0)),
-			"cost": (tp as Dictionary).get("cost", {}).duplicate(true),
-		}
 	if host.ai != null:
 		host.ai.restore(simulation.get("ai", {}))
 	# rebuild_buildings performs the terrain reset and preserves resource cells.
@@ -92,30 +84,22 @@ func restore(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 	# R02：读档重建的占地必须与新建一致；旧档若把单位留在建筑占地里，这里按重建后的
 	# 真实阻挡把它们挪到最近可走格，避免“合法工人被包进帅帐”。
 	host.commands.orders._resolve_navigation_overlaps()
-	host.transports.restore(int(d.v))
+	host.transports.restore()
 	host.commands.world._update_gates()
 	host.visibility.restore(str(simulation.get("explored", "")), host.units, host.player_owner)
 	_refresh_view()
 	return true
 
-func _restore_scalars(unit: Dictionary, record: Dictionary, state: Dictionary, adopt_rules: bool) -> void:
-	if not adopt_rules: unit.maxhp=float(state.get("maxhp",unit.maxhp))
+func _restore_scalars(unit: Dictionary, record: Dictionary, state: Dictionary) -> void:
+	unit.maxhp = float(state.maxhp)
 	_apply_unit_record.call(unit,record)
-	for key in UnitSchema.fields("scalar"):
-		# Legacy archives adopt current base/max HP rules while retaining saved
-		# actual HP. The applied tech-HP marker still prevents double bonuses.
-		if adopt_rules and key in ["base_maxhp","maxhp"]: continue
-		if state.get(key)!=null:
-			unit[key]=UnitSchema.decode(key, state[key])
+	UnitSchema.restore_scalars(state,unit)
 
 func _restore_clock(simulation: Dictionary, speed: int) -> void:
-	host.clock.set_speed(int(speed))
-	host.sim_tick = int(simulation.get("tick", 0))
-	if simulation.has("rngState"):host.simulation_rng.state = int(str(simulation.rngState))
-	host.sim_acc = float(simulation.get("accumulator", 0))
-	if not simulation.has("speedIndex"):
-		# 旧版以1/30秒为一个tick；迁移保留已走过的tick比例。
-		host.sim_acc *= host.clock.period()/host.SIM_DT
+	host.clock.set_speed(speed)
+	host.sim_tick = int(simulation.tick)
+	host.simulation_rng.state = int(simulation.rngState)
+	host.sim_acc = float(simulation.accumulator)
 
 func _restore_units(d: Dictionary, arr: Array, simulation: Dictionary) -> bool:
 	host.next_uid = 0
@@ -129,20 +113,19 @@ func _restore_units(d: Dictionary, arr: Array, simulation: Dictionary) -> bool:
 		u.map_object = bool(UnitSchema.record_value(rec, "map_object", false))
 		u["map_index"] = int(UnitSchema.record_value(rec, "map_index", -1))
 		var state: Dictionary = rec.simulation
-		_restore_scalars(u,rec,state,not simulation.has("rulesRevision"))
+		_restore_scalars(u,rec,state)
 		u.path = []
-		for point in UnitSchema.navigation_path(state.get("path",[]),int(state.get("pi",0))):
-			u.path.append(preload("res://app/saves/snapshot_semantics.gd").clamp_point(Vector2(float(point[0]),float(point[1])),host.map_data))
-		u.pi = UnitSchema.navigation_cursor(u.path,int(state.get("pi",0)))
-		if state.has("repathTo"): u["repath_to"] = preload("res://app/saves/snapshot_semantics.gd").clamp_point(Vector2(state.repathTo[0],state.repathTo[1]),host.map_data)
-		TickTimers.restore(state, int(d.v), u)
+		for point in state.path:
+			u.path.append(Vector2(float(point[0]),float(point[1])))
+		u.pi = int(state.pi)
+		if state.has("repathTo"): u["repath_to"] = Vector2(state.repathTo[0],state.repathTo[1])
+		TickTimers.restore(state,u)
 		host.stratagems.restore(state,u)
 		ActionClock.restore(state,u)
 		preload("res://simulation/systems/locomotion.gd").restore(state,u)
 		if host.view != null and bool(u.get("attached",false)):
 			host.view.set_unit_attached(u,true) # 暂停读档也立即隐藏载员，不等下一次模拟更新。
 		if host.view != null and int(u.get("site_inside_uid", -1)) >= 0: host.commands.world._update_visual(u)
-		if not state.has("gather_ticks"): u.gather_ticks = int(round(float(u.gather_t) / host.SIM_DT))
 		by_uid[int(u.uid)] = u
 	# 所有实体建好后再解析引用，采矿／卸货目标可以排在工人后面。
 	for rec in arr:

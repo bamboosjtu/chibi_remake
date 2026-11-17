@@ -16,7 +16,7 @@ try{
  write('app/saves/probe.gd','extends RefCounted\n');
  write('app/read_models/unit_projection.gd','extends RefCounted\nfunc bad(unit):\n\treturn unit.duplicate(true)\n');assert.notEqual(run().status,0);
  write('app/read_models/unit_projection.gd','extends RefCounted\n');
- for(const field of ['units','selected','map_data','nav','trainings']){
+ for(const field of ['units', 'selected', 'map_data', 'nav', 'decor_cells', 'trainings', 'visibility', 'clock', 'projectiles', 'fire_fields', 'player_commands', 'build_types', 'cmd_pending_data', 'task_events', 'terrain_changes']){
   write('presentation/battle/components/unit_visuals.gd','extends RefCounted\nfunc bad(host):\n\treturn host.'+field+'\n');assert.notEqual(run().status,0);
  }
  write('presentation/battle/components/unit_visuals.gd','extends RefCounted\n');

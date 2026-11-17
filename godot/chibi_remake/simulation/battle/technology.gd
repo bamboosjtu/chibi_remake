@@ -251,7 +251,7 @@ func _selected_research_building() -> Dictionary:
 	return {}
 
 func _building_work_busy(building: Dictionary) -> bool:
-	return bool(building.get("site",false)) or battle.trainings.any(func(tr):return is_same(tr.b,building)) or not _research_for_building(building).is_empty() or (int(building.owner) == battle.player_owner and not battle.tech_progress.is_empty())
+	return bool(building.get("site",false)) or battle.trainings.any(func(tr):return is_same(tr.b,building)) or not _research_for_building(building).is_empty()
 
 func _queue_research(owner: int, building: Dictionary, idx: int, ai_dispatch := false) -> bool:
 	if idx < 0 or idx >= Config.TECH_TABLE.size() or building.is_empty(): return false
@@ -285,12 +285,6 @@ func _start_tech(idx: int) -> bool:
 	return true
 
 func _process_tech(_delta: float) -> void:
-	# v4-v6旧档的无引用单项研究继续完成；新订单全部使用建筑引用。
-	if not battle.tech_progress.is_empty():
-		battle.tech_progress.t = int(battle.tech_progress.get("t",0)) + 1
-		if int(battle.tech_progress.t) >= Config.TECH_TICKS:
-			var idx := int(battle.tech_progress.tech); battle.tech_progress = {}
-			_apply_tech_effects(idx)
 	var by_uid := {}
 	if not battle.research_jobs.is_empty():
 		for unit in battle.units: by_uid[int(unit.uid)] = unit
@@ -331,14 +325,11 @@ func _cancel_tech() -> bool:
 	if not job.is_empty():
 		battle.economy.refund(int(job.owner),job.cost); battle.research_jobs.erase(job)
 		services.battle_simulation._feedback("已取消研究，返还75%费用"); return true
-	if not battle.tech_progress.is_empty():
-		battle.economy.refund(battle.player_owner,battle.tech_progress.get("cost",{})); battle.tech_progress = {}
-		return true
 	return false
 
 func _display_research() -> Dictionary:
 	var job := _research_for_building(_selected_research_building())
-	return job if not job.is_empty() else battle.tech_progress
+	return job
 
 func tech_research_active() -> bool:
 	return not _display_research().is_empty()

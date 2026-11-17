@@ -12,7 +12,6 @@ const INPUTS := [
 	"cheat_reveal",
 	"trainings",
 	"player_tech",
-	"tech_progress",
 	"research_jobs",
 	"army_tech",
 	"scenario_sides",

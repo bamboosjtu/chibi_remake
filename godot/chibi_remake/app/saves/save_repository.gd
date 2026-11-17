@@ -1,6 +1,6 @@
 extends RefCounted
 signal changed
-## File/slot addressing, write transactions and legacy directory migration.
+## File/slot addressing and checked write transactions.
 const Store = preload("res://app/json_store.gd")
 const SAVE_SLOTS := 20
 var storage = preload("res://app/user_storage.gd").new()
@@ -43,24 +43,4 @@ func commit(filename: String, text: String) -> bool:
 		changed.emit()
 	else: last_error=Store.last_error.duplicate(true)
 	return ok
-
-func migrate_legacy_userdata() -> void:
-	var new_dir := path.get_base_dir()
-	var old_dirs: Array[String] = preload("res://app/user_storage.gd").legacy_directories()
-	var names := ["save.json", "save.json.bak"]
-	for slot in range(1,SAVE_SLOTS+1):
-		var name := "slot-%02d.json" % slot
-		names.append(name);names.append(name+".bak")
-	for name in names:
-		var dst := new_dir.path_join(name)
-		if not Store.read(dst,validate).is_empty(): continue
-		var newest := ""
-		for old_dir in old_dirs:
-			if old_dir == new_dir: continue
-			var src := old_dir.path_join(name)
-			if Store._read(src,validate).is_empty(): continue
-			if newest.is_empty() or FileAccess.get_modified_time(src) > FileAccess.get_modified_time(newest): newest = src
-		if newest.is_empty(): continue
-		if Store.commit(dst,FileAccess.get_file_as_string(newest),validate,backup_validate):
-			print("migrated legacy save: ",newest)
 

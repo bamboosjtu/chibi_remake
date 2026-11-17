@@ -56,11 +56,8 @@ func run() -> void:
 		bad.simulation.projectiles=b.projectiles.snapshot();bad.simulation.projectiles[0].merge(change,true)
 		assert(not b.saver.apply_snapshot(bad) and is_same(target,find(target_uid)))
 		b.projectiles.active.clear()
-	# 旧档无弹体字段，清空读档前的飞行效果，不伪造旧版即时攻击。
-	var old: Dictionary=valid.duplicate(true);old.v=6;old.simulation.erase("projectiles")
-	b.commands.military._fire_attack(archer,target);assert(b.saver.apply_snapshot(old) and b.projectiles.active.is_empty())
-	archer=find(archer_uid);target=find(target_uid)
-	print("PROJECTILE SAVE PASS midflight64 / arrival160 / invalid atomic / legacy clears stale flight")
+	assert(b.saver.apply_snapshot(valid));archer=find(archer_uid);target=find(target_uid)
+	print("PROJECTILE SAVE PASS midflight64 / arrival160 / invalid atomic / current flight restored")
 	var cat:=spawn(34,b.player_owner,Vector2(1000,1500))
 	target.ax=1160;target.ay=1500
 	var cell: Vector2i=b.commands.orders._cell_of_px(target.ax,target.ay)

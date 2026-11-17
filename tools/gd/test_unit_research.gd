@@ -192,11 +192,6 @@ func run() -> void:
 	for bad_queue in [[27,27],[27,28,27],[42],null]:
 		var corrupt:=stored.duplicate(true);corrupt.units[0].simulation.effect_tasks=bad_queue
 		assert(not b.saver.apply_snapshot(corrupt))
-	var legacy:=stored.duplicate(true)
-	for record in legacy.units:
-		record.simulation.erase("ambush_t");record.simulation.erase("effect_tasks");record.simulation.erase("effect_task")
-	legacy.units[0].simulation.hidden_t=100
-	assert(b.saver.apply_snapshot(legacy) and b.units[0].ambush_t==100,"legacy stealth flag migrates to visible ambush")
-	print("UNIT FIRE PASS one ground cell / first hit5 then9..97 / fixed10 / friendly and buildings / leave-reenter /240max / phase save / malformed states rejected / legacy ambush migration")
+	print("UNIT FIRE PASS one ground cell / first hit5 then9..97 / fixed10 / friendly and buildings / leave-reenter /240max / phase save / malformed states rejected")
 	print("UNIT RESEARCH PASS research/units + confirmed research/magics; provisional repair tuning and user encounter combat retained")
 	b.free();done=true;quit()

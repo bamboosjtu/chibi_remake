@@ -46,9 +46,4 @@ static func valid_snapshot(state: Dictionary) -> bool:
 	return Schema.valid_group(state, "locomotion")
 
 static func restore(state: Dictionary, u: Dictionary) -> void:
-	# Visual construction may already have seeded defaults before saved dir is read.
-	# An old snapshot must seed from that restored direction, not from spawn facing.
-	for field in FIELDS: u.erase(field)
-	for field in FIELDS:
-		if state.has(field): u[field] = Schema.decode(field, state[field])
-	ensure(u)
+	for field in FIELDS: u[field] = Schema.decode(field,state[field])

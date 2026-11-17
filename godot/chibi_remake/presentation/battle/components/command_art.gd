@@ -336,7 +336,7 @@ func _on_panel_slot(i: int) -> void:
 		"unload": _ui.host.commands.military._cmd_begin("unload")
 		"form": ports._act_open_officer_pick()
 		"join": _ui.host.commands.military._cmd_begin("join")
-		"return": _ui.host.player_commands.submit(25,_ui.host.commands.military._return_selected_cargo)
+		"return": _ui.host.commands.session.submit_command(25,_ui.host.commands.military._return_selected_cargo)
 		"watch": ports._act_watch()
 		"formation":
 			_ui.art_sub = "" if _ui.art_sub == "form" else "form"
@@ -353,7 +353,7 @@ func _open_build_menu() -> void:
 	if not _ui.host.can_build_selected():
 		_ui.host.commands.world._feedback("建造由麾下带工人的武将发起；独立工人请先组建队伍")
 		return
-	if _ui.host.build_types.is_empty():
+	if _ui.host.build_options().is_empty():
 		_ui.host.commands.world._feedback("本关没有可建造的建筑")
 		return
 	_ui.build_menu = true
@@ -369,7 +369,7 @@ func _on_art_hot(i: int) -> void:
 
 func _on_art_form(i: int) -> void:
 	if not _unlocked_indices(true).has(i): return
-	_ui.host.player_commands.submit(10,_ui.host.commands.military._set_formation.bind(i),Vector2.ZERO,-1,i)
+	_ui.host.commands.session.submit_command(10,_ui.host.commands.military._set_formation.bind(i),Vector2.ZERO,-1,i)
 	_ui.art_sub = ""
 	_refresh_cmd_art()
 

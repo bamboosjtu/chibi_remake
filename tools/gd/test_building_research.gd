@@ -28,8 +28,8 @@ func run() -> void:
 	assert(game.save_game(battle.units,battle.commands.world._resources(),battle.commands.session._save_extra()))
 	var snapshot: Dictionary=game.load_save()
 	for arg in OS.get_cmdline_user_args():
-		if arg.begins_with("--legacy-save="):
-			var file:=FileAccess.open(arg.substr(14),FileAccess.READ)
+		if arg.begins_with("--save-file="):
+			var file:=FileAccess.open(arg.substr(12),FileAccess.READ)
 			assert(file!=null);snapshot=JSON.parse_string(file.get_as_text())
 	assert(battle.saver.apply_snapshot(snapshot),"existing save must load with the building registry overlay")
 	root.content_scale_mode=Window.CONTENT_SCALE_MODE_DISABLED

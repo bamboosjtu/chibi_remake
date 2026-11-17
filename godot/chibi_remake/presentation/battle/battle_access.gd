@@ -10,6 +10,7 @@ var _data: WeakRef
 var _scene: RefCounted
 var commands: RefCounted
 var _unit_projection := preload("res://app/read_models/unit_projection.gd").new()
+var _context_projection := preload("res://app/read_models/context_projection.gd").new()
 
 func _init(data: Object, services: RefCounted, commands: RefCounted) -> void:
 	_data = weakref(data)
@@ -19,11 +20,6 @@ func _init(data: Object, services: RefCounted, commands: RefCounted) -> void:
 var cheat_input_open:
 	get: return _scene.cheat_input_open
 
-var build_types:
-	get:
-		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
-		return data.build_types if data != null else null
-
 var cam:
 	get: return _scene.cam
 
@@ -31,16 +27,6 @@ var cli_mode:
 	get:
 		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
 		return data.cli_mode if data != null else null
-
-var clock:
-	get:
-		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
-		return data.clock if data != null else null
-
-var cmd_pending_data:
-	get:
-		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
-		return data.cmd_pending_data if data != null else null
 
 var cnt_enemy:
 	get:
@@ -111,7 +97,45 @@ func invalidate_unit_views() -> void:
 	_unit_projection.invalidate()
 
 func projection_counters() -> Dictionary:
-	return _unit_projection.metrics.duplicate()
+	var result := _unit_projection.metrics.duplicate()
+	result.merge(_context_projection.metrics)
+	return result
+
+func visibility_view() -> Dictionary:
+	var data = preload("res://named_port.gd").require_provider(_data,"visibility values")
+	return _context_projection.visibility(data) if data != null else {}
+
+func visibility_geometry() -> Vector2:
+	var data = preload("res://named_port.gd").require_provider(_data,"visibility geometry")
+	return Vector2(data.visibility.width,data.visibility.height)*data.visibility.CELL if data != null else Vector2.ZERO
+
+func point_visible(point: Vector2) -> bool:
+	var data = preload("res://named_port.gd").require_provider(_data,"visibility query")
+	return data.visibility.is_visible(point) if data != null else false
+
+func clock_view() -> Dictionary:
+	var data = preload("res://named_port.gd").require_provider(_data,"clock values")
+	return _context_projection.clock(data) if data != null else {}
+
+func build_options() -> Array:
+	var data = preload("res://named_port.gd").require_provider(_data,"build options")
+	return _context_projection.options(data) if data != null else []
+
+func effect_views() -> Dictionary:
+	var data = preload("res://named_port.gd").require_provider(_data,"effect values")
+	return _context_projection.effects(data) if data != null else {}
+
+func event_count() -> int:
+	var data = preload("res://named_port.gd").require_provider(_data,"event count")
+	return data.task_events.size() if data != null else 0
+
+func task_event_id(index: int) -> int:
+	var data = preload("res://named_port.gd").require_provider(_data,"event value")
+	return int(data.task_events[index].id) if data != null and index>=0 and index<data.task_events.size() else -1
+
+func terrain_has_changes(keys: Array) -> bool:
+	var data = preload("res://named_port.gd").require_provider(_data,"terrain changes")
+	return keys.all(func(key): return data.terrain_changes.has(key)) if data != null else false
 
 func can_build_selected() -> bool:
 	var data = preload("res://named_port.gd").require_provider(_data,"construction eligibility")
@@ -233,11 +257,6 @@ var ev_count:
 var feedback_text:
 	get: return _scene.feedback_text
 
-var fire_fields:
-	get:
-		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
-		return data.fire_fields if data != null else null
-
 var food:
 	get:
 		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
@@ -267,20 +286,10 @@ var officer_policy:
 		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
 		return data.officer_policy if data != null else null
 
-var player_commands:
-	get:
-		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
-		return data.player_commands if data != null else null
-
 var player_owner:
 	get:
 		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
 		return data.player_owner if data != null else 0
-
-var projectiles:
-	get:
-		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
-		return data.projectiles if data != null else null
 
 var remaster_art:
 	get: return _scene.remaster_art
@@ -328,16 +337,6 @@ var stone:
 		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
 		return data.stone if data != null else 0
 
-var task_events:
-	get:
-		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
-		return data.task_events if data != null else null
-
-var terrain_changes:
-	get:
-		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
-		return data.terrain_changes if data != null else null
-
 var tile_hh:
 	get:
 		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
@@ -355,11 +354,6 @@ var tile_w:
 
 var view:
 	get: return _scene.view
-
-var visibility:
-	get:
-		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
-		return data.visibility if data != null else null
 
 var wood:
 	get:

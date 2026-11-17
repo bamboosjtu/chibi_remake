@@ -10,7 +10,7 @@ func _init(data: UIState, node: Node2D) -> void:
 
 func build_terrain() -> void:
 	# Visual streaming must finish while the opening briefing pauses the simulation.
-	var fog: Sprite2D=load("res://presentation/battle/battle_fog.gd").new(_ui.host.get.bind("visibility"))
+	var fog: Sprite2D=load("res://presentation/battle/battle_fog.gd").new(_ui.host.visibility_view)
 	_ui.fog_sprite=fog
 	fog.process_mode=Node.PROCESS_MODE_ALWAYS
 	surface.add_child(fog)

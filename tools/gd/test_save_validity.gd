@@ -16,8 +16,8 @@ func run() -> void:
 	empty_world.checksum=game.save_checksum(empty_world)
 	assert(game.is_valid_save(empty_world), "Modern snapshots may contain an empty terminal world")
 	var legacy := good.duplicate(true); legacy.v=7; legacy.erase("checksum")
-	assert(game.is_valid_save(legacy) and not game.verify_save_checksum(legacy) and not game.can_rotate_save(legacy))
-	for invalid in [{"v":7}, {"checksum":"wrong"}, {"v":"7"}, {"v":-1}, {"v":9}, {"v":7.5}]:
+	assert(not game.is_valid_save(legacy) and not game.verify_save_checksum(legacy) and not game.can_rotate_save(legacy))
+	for invalid in [{"v":7}, {"checksum":"wrong"}, {"v":"7"}, {"v":-1}, {"v":10}, {"v":7.5}]:
 		assert(not game.is_valid_save(invalid))
 	var malformed := good.duplicate(true); malformed.units[0].uid="bad"
 	malformed.erase("checksum"); malformed.checksum=game.save_checksum(malformed)
@@ -28,7 +28,8 @@ func run() -> void:
 	assert(not battle.saver.apply_snapshot(invalid_path), "Reject path coordinate types before restoration")
 	for invalid_reference in [{"repathTo":null},{"targetUid":"bad"},{"gatherRef":null}]:
 		assert(not preload("res://simulation/definitions/unit_schema.gd").valid_snapshot(invalid_reference))
-	var spent = JSON.parse_string('{"gatherRef":{"kind":"spent","unit":24,"x":1,"y":2}}')
+	var spent: Dictionary=good.units[0].simulation.duplicate(true)
+	spent.gatherRef={"kind":"spent","unit":24.0,"x":1,"y":2}
 	assert(preload("res://simulation/definitions/unit_schema.gd").valid_snapshot(spent), "JSON integer-valued floats must preserve spent sources")
 	spent.gatherRef.unit=24.5
 	assert(not preload("res://simulation/definitions/unit_schema.gd").valid_snapshot(spent))
@@ -46,7 +47,7 @@ func run() -> void:
 	assert(store.commit(path,JSON.stringify(good),game.is_valid_save,game.can_rotate_save))
 	assert(game.is_valid_save(store.read(path,game.is_valid_save)))
 	battle.scene.ready_to_save=false; battle.free()
-	print("SAVE VALIDITY PASS checksum separate from structure / legacy accepted conservatively / failed rotation preserves verified backup")
+	print("SAVE VALIDITY PASS checksum separate from structure / retired formats rejected / failed rotation preserves verified backup")
 	done=true; quit()
 
 func _required_fields(game: Node, battle: Node2D) -> void:
@@ -73,13 +74,6 @@ func _required_fields(game: Node, battle: Node2D) -> void:
 		var path: String = game.SAVE_PATH.get_base_dir().path_join("incomplete-v8.json")
 		assert(game.Store.commit(path, JSON.stringify(invalid), game.verify_save_checksum))
 		assert(game.Store.read(path, game.is_valid_save).is_empty())
-	for version in range(1,8):
-		assert(preload("res://app/saves/save_envelope.gd").valid_collections({"v":version}))
-		assert(preload("res://app/saves/save_envelope.gd").valid_collections({"v":version,"resources":{"gold":1}}))
-	var old := complete.duplicate(true); old.v=7; old.erase("resources"); old.erase("trainings"); old.erase("checksum")
-	var legacy_resources: Dictionary = battle.commands.world._resources()
-	assert(battle.saver.apply_snapshot(old))
-	assert(battle.commands.world._resources()==legacy_resources and battle.trainings.is_empty())
 	assert(battle.saver.apply_snapshot(complete))
 	assert(game.save_checksum(battle.saver.continuation_snapshot(game)) == before)
-	print("V8 REQUIRED FIELDS PASS correct checksum / every resource required / queue required / atomic rejection / legacy omissions")
+	print("CURRENT REQUIRED FIELDS PASS correct checksum / every resource required / queue required / atomic rejection")

@@ -98,16 +98,10 @@ func _setup_gate_apertures(map_id: String) -> void:
 
 func _process(_delta: float) -> void:
 	_finish_requests(false)
-	if event_patch != null:
-		for key in patch.get("keys", []):
-			if not host.terrain_changes.has(key):
-				event_patch.free()
-				event_patch = null
-				break
+	if event_patch != null and not host.terrain_has_changes(patch.get("keys",[])):
+		event_patch.free(); event_patch=null
 	if event_patch == null and not patch.is_empty():
-		var changed := true
-		for key in patch["keys"]:
-			changed = changed and host.terrain_changes.has(key)
+		var changed: bool = host.terrain_has_changes(patch["keys"])
 		if changed:
 			event_patch = Sprite2D.new()
 			event_patch.texture = Textures.load_texture(patch.texture)

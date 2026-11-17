@@ -151,10 +151,7 @@ func _intercept_near(owner: int, skip_groups: Array = []) -> void:
 	# DAT_004856ac is one shared, saturating warmup counter, not a per-side period.
 	# Key 0 is reserved (neutral is never an AI); old per-owner clocks migrate once.
 	if not _ai_state._intercept.has(0):
-		var previous := 0
-		for count in _ai_state._intercept.values(): previous = maxi(previous,int(count))
-		_ai_state._intercept.clear()
-		_ai_state._intercept[0] = clampi(previous,0,INTERCEPT_PERIOD)
+		_ai_state._intercept[0] = 0
 	if int(_ai_state._intercept[0]) < INTERCEPT_PERIOD:
 		_ai_state._intercept[0] += 1
 		return
@@ -322,9 +319,7 @@ func _retreat_step(owner: int) -> Dictionary:
 
 func _active_retreats(owner: int) -> Dictionary:
 	var groups := _officer_groups(owner)
-	var had = _ai_state._retreat.get(owner, {})
-	if not had is Dictionary:
-		had = {}                      # 旧档迁移：int 只表示“曾在撤退”，无法定位群
+	var had: Dictionary = _ai_state._retreat.get(owner,{})
 	_ai_state._retreat[owner] = had
 	for idx in had.keys():
 		if not groups.has(idx) or (groups[idx] as Array).all(func(unit): return str(unit.state)=="idle"):

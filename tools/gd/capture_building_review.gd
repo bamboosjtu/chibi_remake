@@ -1,7 +1,7 @@
 extends SceneTree
 var battle: Node2D
 var output := "user://building-review"
-var legacy := ""
+var archive := ""
 
 func _initialize() -> void:
 	create_timer(120).timeout.connect(func():quit(1))
@@ -25,14 +25,14 @@ func label_at(layer: Node, text: String, pos: Vector2, size:=22) -> void:
 func run() -> void:
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--output="):output=arg.substr(9)
-		if arg.begins_with("--legacy-save="):legacy=arg.substr(14)
+		if arg.begins_with("--save-file="):archive=arg.substr(12)
 	DirAccess.make_dir_recursive_absolute(output)
 	root.content_scale_mode=Window.CONTENT_SCALE_MODE_DISABLED;root.size=Vector2i(1920,1080)
 	root.get_node("Game").current_map="chibil1"
 	battle=load("res://main.tscn").instantiate();root.add_child(battle)
 	battle.set_process(false);battle.cli_mode=true
-	if legacy!="":
-		var file:=FileAccess.open(legacy,FileAccess.READ)
+	if archive!="":
+		var file:=FileAccess.open(archive,FileAccess.READ)
 		assert(battle.saver.apply_snapshot(JSON.parse_string(file.get_as_text())))
 	battle.visibility.current.fill(1);battle.visibility.explored.fill(1);battle.visibility.revision+=1
 	var gates: Array=battle.units.filter(func(u):return int(u.unit) in [16,17])

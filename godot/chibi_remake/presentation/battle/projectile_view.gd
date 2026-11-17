@@ -15,10 +15,11 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	for effect in host.projectiles.active:
-		var point: Vector2=host.projectiles.position_of(effect)
-		if not host.visibility.is_visible(point): continue
-		var direction:=Vector2(effect.tx-effect.x,effect.ty-effect.y).normalized()
+	var values: Dictionary=host.effect_views()
+	for effect in values.projectiles:
+		var point: Vector2=effect.point
+		if not effect.visible: continue
+		var direction: Vector2=effect.direction
 		if direction==Vector2.ZERO:direction=Vector2.RIGHT
 		if effect.kind in ["arrow","ambush"]:
 			point-=Vector2(0,12)
@@ -30,14 +31,14 @@ func _draw() -> void:
 			draw_line(tail,tail+direction*4+side*2,Color(0.68,0.24,0.17),1.2,true)
 			draw_line(tail,tail+direction*4-side*2,Color(0.68,0.24,0.17),1.2,true)
 		else:
-			var ratio: float=float(effect.travel)/maxf(1.0,host.projectiles.distance(effect))
+			var ratio: float=float(effect.ratio)
 			draw_circle(point,4,Color(0.04,0.03,0.02,0.35),true,-1,true)
 			point.y-=10+sin(ratio*PI)*28
 			draw_colored_polygon(PackedVector2Array([point+Vector2(-4,-2),point+Vector2(-1,-5),point+Vector2(4,-3),point+Vector2(5,2),point+Vector2(0,5),point+Vector2(-5,2)]),Color(0.29,0.27,0.23))
 			draw_colored_polygon(PackedVector2Array([point+Vector2(-4,-2),point+Vector2(-1,-5),point+Vector2(4,-3),point+Vector2(0,0)]),Color(0.65,0.61,0.51))
-	for fire in host.fire_fields.active:
-		var point:Vector2=host.cell_anchor(int(fire.a),int(fire.b))
-		if not host.visibility.is_visible(point):continue
+	for fire in values.fires:
+		var point:Vector2=fire.point
+		if not fire.visible:continue
 		var fade:float=minf(1.0,float(100-int(fire.age))/12.0)
 		for i in range(3):
 			var foot:Vector2=point+Vector2((i-1)*7,absf(i-1)*2)
@@ -47,6 +48,6 @@ func _draw() -> void:
 			draw_colored_polygon(PackedVector2Array([foot+Vector2(-3,0),foot+Vector2(sway*0.5,-height*0.6),foot+Vector2(3,0)]),Color(1,0.85,0.18,fade))
 	for effect in impacts:
 		var point: Vector2=effect.point
-		if not host.visibility.is_visible(point):continue
+		if not host.point_visible(point):continue
 		var progress: float=effect.life/0.22
 		draw_arc(point,3+progress*13,0,TAU,16,Color(0.83,0.65,0.36,1-progress),1.5,true)

@@ -1,20 +1,5 @@
 extends RefCounted
-# 存档 / 读档编排（ARCH-006 第二步：从 main.gd 抽出来）
-#
-# 与 ai.gd 相同的**鸭子类型宿主**模式：宿主（main.gd，Node2D）提供
-#   units / trainings / gold / wood / food / stone / next_uid / game_end
-# 以及 `_spawn_unit()` / `_free_unit_at()` / `_officer_by_index()` 三个钩子，
-# 本模块只负责"把存档记录写回世界状态"的编排，不碰渲染细节。
-#
-# 四条硬约束（ARCH-001 / ARCH-002）：
-#   1. `uid` 按存档写回，**不重新分配** —— 否则身份漂移，训练出来的兵会对错人
-#   2. `next_uid` 一并恢复 —— 否则新单位会撞上旧 uid
-#   3. **完整快照语义**：快照里没点名的地图对象 = 已阵亡并被 `_prune_dead` 清理 → 必须移除，
-#      否则读档会把它们"复活"
-#   4. 任何失败都必须 push_warning / print，**不许静默**（B2 的老毛病）
-#
-# v3 = 具名字段 + 完整快照；v1（4 字段数组）/ v2（10 字段数组）旧档仍可读。
-
+## Validate a current-format archive, then atomically install its candidate world.
 var host: Object
 var last_load_error := ""
 var last_load_source := "none"
@@ -48,6 +33,9 @@ func _apply_snapshot(d: Dictionary) -> bool:
 		push_warning("load save: 存档为空或无法解析")
 		return false
 	var envelope = preload("res://app/saves/save_envelope.gd")
+	if d.get("v") != preload("res://app/saves/save_format.gd").VERSION:
+		last_load_error = "仅支持当前 v9 存档；旧版本不再迁移，当前战场已保留。"
+		return false
 	if not envelope.valid_header(d) or not envelope.valid_collections(d):
 		last_load_error = "存档头部、资源或生产队列字段不兼容；当前战场已保留。"
 		return false
@@ -59,47 +47,13 @@ func _apply_snapshot(d: Dictionary) -> bool:
 		last_load_error = "进度缺少有效的单位列表。"
 		push_warning("load save: 存档里没有单位数据")
 		return false
-	var ver := int(d.get("v", 1))
-	if ver < 4 and not envelope.valid(d):
-		last_load_error = "旧档记录字段不兼容；当前战场已保留。"
-		return false
-	if ver < 4 and not preload("res://app/saves/snapshot_semantics.gd").valid_legacy(arr,ver,host.map_data):
-		last_load_error = "旧档坐标超出关卡范围；当前战场已保留。"
-		return false
-	if ver in [4,5,6,7,8]:
-		var applied_v4 := _apply_v4(d, arr)
-		if applied_v4:
-			if host.player_commands != null: host.player_commands.clear()
-			host.commands.world._rebuild_unit_index()   # R13：交换世界后整表重建（含 uid 重编号）
-		return applied_v4
-	if ver > Game.SAVE_VERSION:
-		last_load_error = "存档由更新版本创建，当前版本不能读取。"
-		return false
-	return preload("res://app/saves/world_transaction.gd").new().apply_legacy(host,d,arr,ver)
+	var applied := _restore_current(d,arr)
+	if applied:
+		host.player_commands.clear()
+		host.commands.world._rebuild_unit_index()
+	return applied
 
-func restore_legacy(d: Dictionary, arr: Array, ver: int) -> bool:
-	var resources=d.get("resources")
-	if resources is Dictionary:
-		for key in ["gold","wood","food","stone"]:
-			if not resources.has(key):continue
-			var value=resources[key]
-			if not (value is int or value is float) or not is_finite(float(value)) or float(value)<0:return false
-	var applied := 0
-	if ver >= 3:
-		applied = _apply_v3(d, arr)
-	else:
-		applied = _apply_legacy(d, arr, ver)
-	if applied == 0:
-		push_warning("load save: %d 条记录一条都没能应用（存档与当前关卡不匹配？）" % arr.size())
-		return false
-	_restore_resources(d)
-	host.commands.world._rebuild_unit_index()
-	if applied > 0:
-		host.auto_control = false # v1-v3 have no delegation flag.
-		for unit in host.units: host.next_uid=maxi(int(host.next_uid),int(unit.uid)+1)
-	return applied > 0
-
-func _apply_v4(d: Dictionary, arr: Array) -> bool:
+func _restore_current(d: Dictionary, arr: Array) -> bool:
 	var validator = preload("res://app/saves/snapshot_validator.gd").new(host, content_revision, _valid_cost, _valid_integer)
 	var plan: Dictionary = validator.prepare(d, arr)
 	if plan.is_empty():
@@ -114,34 +68,19 @@ func restore_candidate(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 
 func content_revision() -> String:
 	if _content_revision_cache.is_empty():
-		var data: Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://data/%s.json" % str(host.map_id)))
-		preload("res://simulation/systems/unit_rules.gd").apply_definitions(data)
-		preload("res://simulation/systems/building_rules.gd").apply_definitions(data)
-		var projection:=_map_projection(data,true)
+		var data: Dictionary=host.world.definition.duplicate(true)
+		var projection:=_map_projection(data)
 		_content_revision_cache=("battle-content-v3:"+preload("res://app/saves/rules_identity.gd").catalog_hash(JSON.stringify(projection))).sha256_text()
 	return _content_revision_cache
 
-func legacy_content_compatible(previous: String) -> bool:
-	for hash in preload("res://app/saves/rules_identity.gd").legacy_scenario_hashes():
-		if previous == _map_revision(str(hash)): return true
-	return false
-
-func _map_revision(scenario_hash: String) -> String:
-	var f := FileAccess.open("res://data/%s.json" % str(host.map_id), FileAccess.READ)
-	var data: Dictionary = JSON.parse_string(f.get_as_text())
-	var simulation:=_map_projection(data,false)
-	return ("battle-content-v2:one-based-officers:med-groups:" + JSON.stringify(simulation) + scenario_hash).sha256_text()
-
-func _map_projection(data: Dictionary, modern: bool) -> Dictionary:
+func _map_projection(data: Dictionary) -> Dictionary:
 	var simulation := {}
-	var fields: Array=["rows", "cols", "tileW", "terrainW", "terrainH", "walkable", "terrainWalkable", "scenario", "navigation", "units", "objects"]
-	if modern:fields.append_array(["waterWalkable","decor"])
-	for key in fields:simulation[key]=data.get(key)
+	for key in ["rows","cols","tileW","terrainW","terrainH","walkable","terrainWalkable","scenario","navigation","units","objects","waterWalkable","decor"]:
+		simulation[key] = data.get(key)
 	for entry in simulation.units.values():
-		entry.erase("sheet")
-		entry.erase("sheetK")
-	for entry in simulation.objects:
-		entry.erase("sheet")
+		entry.erase("sheet"); entry.erase("sheetK")
+	if simulation.objects == null: simulation.objects = []
+	for entry in simulation.objects: entry.erase("sheet")
 	return simulation
 
 func _numeric_keys(value: Dictionary) -> Dictionary:
@@ -150,13 +89,8 @@ func _numeric_keys(value: Dictionary) -> Dictionary:
 		result[int(key)] = value[key]
 	return result
 
-func _apply_v3(d: Dictionary, arr: Array) -> int:
-	return preload("res://app/saves/legacy_snapshot.gd").new(host, _apply_unit_record, _restore_trainings)._apply_v3(d, arr)
-func _apply_legacy(d: Dictionary, arr: Array, ver: int) -> int:
-	return preload("res://app/saves/legacy_snapshot.gd").new(host, _apply_unit_record, _restore_trainings)._apply_legacy(d, arr, ver)
 func _apply_unit_record(u: Dictionary, rec: Dictionary) -> void:
 	var anchor := Vector2(float(UnitSchema.record_value(rec,"ax",u.ax)),float(UnitSchema.record_value(rec,"ay",u.ay)))
-	anchor = preload("res://app/saves/snapshot_semantics.gd").clamp_point(anchor,host.map_data)
 	u.ax = anchor.x
 	u.ay = anchor.y
 	var cell: Vector2i=host.nav.cell_of_px(u.ax,u.ay)
@@ -188,42 +122,17 @@ func _apply_unit_record(u: Dictionary, rec: Dictionary) -> void:
 		host.view.apply_loaded_unit(u)
 
 func _restore_resources(d: Dictionary) -> void:
-	if int(d.get("v", 1)) >= 8:
-		for key in preload("res://app/saves/save_envelope.gd").RESOURCE_KEYS:
-			host.set(key, float(d.resources[key]))
-		return
-	var res = d.get("resources", null)
-	if res is Dictionary:
-		host.gold = float(res.get("gold", host.gold))
-		host.wood = float(res.get("wood", host.wood))
-		host.food = float(res.get("food", host.food))
-		host.stone = float(res.get("stone", host.stone))
+	for key in preload("res://app/saves/save_envelope.gd").RESOURCE_KEYS: host.set(key,float(d.resources[key]))
 
-## ARCH-002：生产队列也恢复（队列在 `_start_train` 时已经扣过费）
 func _restore_trainings(d: Dictionary) -> void:
-	var arr = d.get("trainings", null)
-	if not (arr is Array):
-		# Legacy missing queues mean no production. v8 is rejected before restoration.
-		if int(d.get("v", 1)) < 8: host.trainings.clear()
-		return
-	var tlist: Array = host.trainings
-	tlist.clear()
 	var by_uid := {}
-	for u in host.units:
-		by_uid[int(u.uid)] = u
-	for rec in arr:
-		if not (rec is Dictionary):
-			continue
-		var b: Dictionary = by_uid.get(int(rec.get("buildingUid", -1)), {})
-		if b.is_empty():
-			continue                      # 生产建筑已不存在 → 丢弃该队列项
-		tlist.append({
-			"owner": int(rec.get("owner", b.owner)),
-			"b": b, "unit": int(rec.get("unit", -1)),
-			"t": float(rec.get("t", 0.0)) if bool(rec.get("ticks", false)) else ceilf(float(rec.get("t", 0.0)) / host.SIM_DT), "cost": rec.get("cost", {}).duplicate(true), "ticks": true,
-		})
+	for unit in host.units: by_uid[int(unit.uid)] = unit
+	host.trainings.clear()
+	for record in d.trainings:
+		var order := {"owner":int(record.owner),"b":by_uid[int(record.buildingUid)],"unit":int(record.unit),"t":float(record.t),"cost":record.cost.duplicate(true),"ticks":true}
 		for field in ["aiSlot","aiToken","navalSlot","navalToken"]:
-			if rec.has(field): tlist.back()[field]=int(rec[field])
+			if record.has(field): order[field] = int(record[field])
+		host.trainings.append(order)
 
 func _valid_cost(value: Variant) -> bool:
 	return preload("res://simulation/definitions/resource_cost.gd").valid(value)
@@ -240,15 +149,14 @@ func save_extra(reconcile := true) -> Dictionary:
 		var target: Dictionary = host.decor_cells[key]
 		if int(target.unit) in [100,102,104]: decor[key] = {"stock": float(target.get("stock", 0))}
 	var extra := {"nextUid": int(host.next_uid), "trainings": host.trainings, "gameEnd": int(host.game_end), "simulation": {
-		"rngState": str(host.simulation_rng.state), "contentRevision": content_revision(), "rulesRevision":preload("res://app/saves/rules_identity.gd").current(), "rulesPolicy":"legacy-adopts-current; fingerprinted-requires-match", "tick": host.sim_tick, "accumulator": host.sim_acc, "speedIndex": host.clock.speed_index,
+		"rngState": str(host.simulation_rng.state), "contentRevision": content_revision(), "rulesRevision":preload("res://app/saves/rules_identity.gd").current(), "tick": host.sim_tick, "accumulator": host.sim_acc, "speedIndex": host.clock.speed_index,
 		"explored": host.visibility.snapshot(), "projectiles":host.projectiles.snapshot(), "fireFields":host.fire_fields.snapshot(), "decorResources": decor,
 		"aiResources": host.ai_res, "groups": host.control_groups,
 		"taskLatches": host.task_latches, "officerProgress": host.officer_progress, "terrainChanges": host.terrain_changes, "taskEvents": host.task_events, "objectiveDone": host.objective_done,
 		"officerPool": host.commands.military._officer_pool_state(),
-		# 科技树：等级表（player_tech）与进行中的研究（tech_progress，含已扣费用以便取消返还）。
+		# 科技树：等级表（player_tech）与研究队列。
 		"playerTech": host.player_tech.duplicate(true),
 		"armyTech": host.army_tech.duplicate(true),
-		"techProgress": host.tech_progress.duplicate(true),
 		"researchJobs": host.research_jobs.duplicate(true),
 		"ai": host.ai.snapshot() if host.ai != null else {},
 	}}

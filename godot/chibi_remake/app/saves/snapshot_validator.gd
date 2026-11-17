@@ -20,23 +20,10 @@ func _valid_control_fields(simulation: Dictionary) -> bool:
 	return Semantics.valid_control(simulation)
 
 func _compatible_rules(simulation: Dictionary) -> bool:
-	if simulation.has("rulesRevision"):
-		if simulation.rulesRevision != preload("res://app/saves/rules_identity.gd").current() and not preload("res://app/saves/rules_identity.gd").approved_migration(str(simulation.rulesRevision)):
-			compatibility_error="存档使用的规则版本与当前不同，未配置迁移；当前战场和存档均保留。";return false
-		if simulation.get("rulesPolicy","") != "legacy-adopts-current; fingerprinted-requires-match": return false
-	if str(simulation.get("contentRevision", "")) != content_revision.call():
-		var compatible: bool = not simulation.has("rulesRevision") and host.saver.legacy_content_compatible(str(simulation.get("contentRevision","")))
-		var registry := FileAccess.open("res://data/db/registry_compatibility.json", FileAccess.READ)
-		if registry != null:
-			var contract = JSON.parse_string(registry.get_as_text())
-			var previous := str(simulation.get("contentRevision", ""))
-			if contract is Dictionary and previous!="" and str(contract.get("previous",{}).get(host.map_id,""))==previous:
-				var target:=str(contract.get("current",{}).get(host.map_id,""))
-				var approved: bool=target==content_revision.call() or (not simulation.has("rulesRevision") and host.saver.legacy_content_compatible(target))
-				compatible=compatible or approved
-		if not compatible:
-			push_warning("存档内容版本与关卡不匹配")
-			return false
+	if simulation.get("rulesRevision") != preload("res://app/saves/rules_identity.gd").current():
+		compatibility_error="存档规则与当前版本不匹配，当前战场已保留。"; return false
+	if simulation.get("contentRevision") != content_revision.call():
+		compatibility_error="存档关卡内容与当前版本不匹配，当前战场已保留。"; return false
 	return true
 
 func prepare(d: Dictionary, arr: Array) -> Dictionary:
@@ -45,6 +32,7 @@ func prepare(d: Dictionary, arr: Array) -> Dictionary:
 	if not preload("res://app/saves/save_envelope.gd").valid_collections(d): return _reject("resources/trainings")
 	if not d.get("simulation", {}) is Dictionary: return _reject("simulation")
 	var simulation: Dictionary = d.get("simulation", {})
+	if not preload("res://app/saves/save_envelope.gd").known_world_fields(simulation): return _reject("world fields")
 	if not _valid_control_fields(simulation): return _reject("control fields")
 	if not _compatible_rules(simulation): return {}
 	var indexed := _index_units(arr, simulation)
@@ -173,7 +161,7 @@ func _production_buildings(d: Dictionary, ids: Dictionary) -> Dictionary:
 
 func _valid_technology(simulation: Dictionary, ids: Dictionary, arr: Array, production_buildings: Dictionary) -> bool:
 	if not Semantics.valid_tasks(simulation): return false
-	# 科技树：player_tech 的每个值必须是数字；tech_progress 若存在必须是合法记录。
+	# 科技树：player_tech 的每个值必须是数字。
 	if not TechnologyState.valid(simulation.get("playerTech", {})): return false
 	var army_tech = simulation.get("armyTech", {})
 	if not army_tech is Dictionary: return false
@@ -183,17 +171,6 @@ func _valid_technology(simulation: Dictionary, ids: Dictionary, arr: Array, prod
 		if owner <= 0 or owner == host.player_owner: return false
 		if host.scenario_sides.all(func(side): return int(side.owner) != owner) and arr.all(func(unit): return int(unit.owner) != owner): return false
 		if not TechnologyState.valid(army_tech[key]): return false
-	var tech_prog = simulation.get("techProgress", null)
-	if tech_prog != null:
-		if not tech_prog is Dictionary:
-			return false
-		# 空字典＝当前没有研究（合法）；非空则必须指向一条合法科技。
-		if not (tech_prog as Dictionary).is_empty():
-			var research = tech_prog.get("tech", -1)
-			var elapsed = tech_prog.get("t", 0)
-			if not (research is int or research is float) or not is_finite(float(research)) or float(research) != floorf(float(research)) or float(research) < 0 or float(research) >= host.TECH_TABLE.size(): return false
-			if not (elapsed is int or elapsed is float) or not is_finite(float(elapsed)) or float(elapsed) < 0 or float(elapsed) >= host.TECH_TICKS or float(elapsed) != floorf(float(elapsed)): return false
-			if not _valid_cost.call(tech_prog.get("cost", {})): return false
 	var jobs = simulation.get("researchJobs",[])
 	if not jobs is Array: return false
 	var researching := {}
@@ -221,25 +198,22 @@ func _valid_unit_states(d: Dictionary, arr: Array, ids: Dictionary) -> bool:
 			return false
 		var st2: Dictionary = rec2.get("simulation", {})
 		if not preload("res://simulation/definitions/unit_schema.gd").valid_snapshot(st2): return false
-		if not TickTimers.valid_snapshot(st2, int(d.v)) or not ActionClock.valid_snapshot(st2): return false
+		if not TickTimers.valid_snapshot(st2) or not ActionClock.valid_snapshot(st2): return false
 		if not preload("res://simulation/systems/locomotion.gd").valid_snapshot(st2): return false
 		if not host.stratagems.valid_snapshot(st2):return false
 		# R01：统一“基础上限 + 科技当前兵力”的合法范围；升级部队 hp > maxhp 是契约内状态。
 		# 只约束仍在场的单位：淡出中的尸体允许保留负 HP（击杀结算不夹到 0）。
-		if int(d.v) >= 8 and bool(rec2.get("alive", false)) and float(rec2.get("dieT", -1.0)) < 0.0:
+		if bool(rec2.get("alive", false)) and float(rec2.get("dieT", -1.0)) < 0.0:
 			var life = rec2.get("hp", -1)
 			var maximum = st2.get("maxhp", life)
 			var base_max = st2.get("base_maxhp", maximum)
 			var tech_bonus = st2.get("tech_hp_bonus", 0)
-			if maximum == null: maximum = life          # 旧档缺省字段曾写为 null
-			if base_max == null: base_max = maximum
-			if tech_bonus == null: tech_bonus = 0
 			if not TechnologyState.valid_hp(life, maximum, base_max, tech_bonus): return false
 		var last = st2.get("last_attacker_uid",-1)
 		if not (last is int or last is float) or not is_finite(float(last)) or float(last)!=floorf(float(last)) or float(last)<-1 or float(last)>2147483647: return false
 		var team=st2.get("team_kind")
 		if team!=null and team not in ["","worker","combat"]:return false
-		for key in ["group_officer", "carry", "gather_t", "gather_ticks", "delivery_ticks", "tech_hp_bonus", "mou", "formation", "haste_t", "slow_t", "farsight_t", "confused_t", "burn_t", "burn_dps"]:
+		for key in ["group_officer", "carry", "gather_t", "gather_ticks", "delivery_ticks", "tech_hp_bonus", "mou", "formation", "haste_t", "slow_t", "farsight_t", "confused_t"]:
 			var v1 = st2.get(key, null)
 			if v1 != null and (not (v1 is float or v1 is int) or not is_finite(float(v1))):
 				return false
@@ -283,7 +257,7 @@ func _complete_plan(d: Dictionary, simulation: Dictionary, ids: Dictionary) -> D
 		if int(base.unit) in [100,102] and float(stock) > 200: return {}
 	if not host.projectiles.valid_snapshot(simulation.get("projectiles",[])): return {}
 	if not host.fire_fields.valid_snapshot(simulation.get("fireFields",[])):return {}
-	if not host.transports.valid_snapshot(ids,int(d.v)):return {}
+	if not host.transports.valid_snapshot(ids):return {}
 	if not host.construction.valid_snapshot(ids): return {}
 	if host.ai != null and not host.ai.valid_snapshot(simulation.get("ai",{}),ids,d.get("trainings",[]),int(d.get("nextUid",0))): return {}
 	var speed = simulation.get("speedIndex",2)

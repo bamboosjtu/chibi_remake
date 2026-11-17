@@ -103,21 +103,9 @@ func run() -> void:
 	b.commands.military._jimou_begin(2); b.commands.military._jimou_cast_at(Vector2(enemy.ax, enemy.ay))
 	assert(enemy.slow_t == 800 and enemy.haste_t == 0)
 	print("TIMER STATUS PASS six x800 / expiry save / farsight saved / real cast refresh / mutual exclusion")
-	# v4/v5 秒值先迁移再按模型类型写入；不能先 int() 秒值丢失小数。
-	hero.rest_t = 9; hero.build_t = 3; hero.burn_t = 2.5; hero.burn_dps = 20
-	for key in Timers.STATUS_KEYS: hero[key] = 799
-	var current := snapshot()
-	for version in [4,5]:
-		var legacy: Dictionary = current.duplicate(true)
-		legacy.v = version
-		for record in legacy.units:
-			for key in Timers.STATUS_KEYS + Timers.ELAPSED_PERIODS.keys():
-				record.simulation[key] = float(record.simulation[key]) / 30.0
-			record.simulation.erase("farsight_t") # 旧正式档没有该字段。
-		assert(b.saver.apply_snapshot(legacy))
-		hero = find_unit(hero_uid)
-		assert(hero.rest_t == 9 and hero.build_t == 3 and hero.farsight_t == 0 and hero.inspired_t == 799)
-		assert(hero.burn_t == 2.5 and hero.burn_dps == 20, "burn approximation must not change units")
+	hero.rest_t=9;hero.build_t=3
+	for key in Timers.STATUS_KEYS: hero[key]=799
+	var current:=snapshot()
 	assert(b.saver.apply_snapshot(current))
 	hero = find_unit(hero_uid); b.selected = [hero]
 	var before := world_text()
@@ -126,15 +114,12 @@ func run() -> void:
 		invalid.units.filter(func(r): return r.uid == hero_uid)[0].simulation[pair[0]] = pair[1]
 		assert(not b.saver.apply_snapshot(invalid), "invalid tick must be rejected before world exchange")
 		assert(b.selected.size() == 1 and is_same(b.selected[0], hero) and world_text() == before)
-	var missing: Dictionary = current.duplicate(true)
-	for record in missing.units:
-		for key in Timers.STATUS_KEYS + Timers.ELAPSED_PERIODS.keys(): record.simulation.erase(key)
-	assert(b.saver.apply_snapshot(missing))
-	hero = find_unit(hero_uid)
-	assert((Timers.STATUS_KEYS + Timers.ELAPSED_PERIODS.keys()).all(func(key): return hero[key] is int and hero[key] == 0))
-	print("TIMER SAVE PASS v6 / v4-v5 migration / missing defaults / invalid atomic / burn unchanged")
+	var missing: Dictionary=current.duplicate(true)
+	missing.units[0].simulation.erase("rest_t")
+	assert(not b.saver.apply_snapshot(missing))
+	print("TIMER SAVE PASS integer ticks / missing fields rejected / invalid atomic")
 	# 同一40tick在四档速度、不同渲染帧率下结果相同。
-	hero.hp = hero.maxhp - 100; hero.state = "rest"; hero.hold = true; hero.burn_t = 0
+	hero.hp = hero.maxhp - 100; hero.state = "rest"; hero.hold = true; hero.rest_t=0
 	hero.haste_t = 800
 	for u in b.units:
 		if int(u.uid) != hero_uid: b.commands.military._cancel_unit_command(u); u.hold = true

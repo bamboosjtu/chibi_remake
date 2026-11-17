@@ -12,7 +12,7 @@ func _order_stop(_hold: bool) -> void:
 	_ui.host.commands.military.stop_selected()
 
 func _act_build(idx: int) -> void:
-	var bts: Array = _ui.host.build_types
+	var bts: Array = _ui.host.build_options()
 	if idx < 0 or idx >= bts.size():
 		return
 	_ui.host.commands.economy._start_build(bts[idx])
@@ -34,14 +34,14 @@ func _act_train(i: int) -> void:
 	var tts: Array = _ui.host.commands.economy.train_types_for(int(b.unit)) if not b.is_empty() else []
 	if i < 0 or i >= tts.size():
 		return
-	_ui.host.player_commands.submit(16,_ui.host.commands.economy._start_train.bind(tts[i]),Vector2.ZERO,-1,int(tts[i].unit))
+	_ui.host.commands.session.submit_command(16,_ui.host.commands.economy._start_train.bind(tts[i]),Vector2.ZERO,-1,int(tts[i].unit))
 
 func _act_research(idx: int) -> void:
-	_ui.host.player_commands.submit(17,_ui.host.commands.technology._start_tech.bind(idx),Vector2.ZERO,-1,idx)
+	_ui.host.commands.session.submit_command(17,_ui.host.commands.technology._start_tech.bind(idx),Vector2.ZERO,-1,idx)
 	ports._refresh_cmd_panel()
 
 func _act_cancel_research() -> void:
-	_ui.host.player_commands.submit(24,_ui.host.commands.technology._cancel_tech)
+	_ui.host.commands.session.submit_command(24,_ui.host.commands.technology._cancel_tech)
 	ports._refresh_cmd_panel()
 
 func _act_group(n: int) -> void:
@@ -63,13 +63,13 @@ func _act_board() -> void:
 	_ui.host.commands.military._cmd_begin("board")
 
 func _act_watch() -> void:
-	_ui.host.player_commands.submit(3,_ui.host.commands.military._cmd_watch)
+	_ui.host.commands.session.submit_command(3,_ui.host.commands.military._cmd_watch)
 
 func _act_rest() -> void:
-	_ui.host.player_commands.submit(4,_ui.host.commands.military._cmd_rest)
+	_ui.host.commands.session.submit_command(4,_ui.host.commands.military._cmd_rest)
 
 func _act_disband() -> void:
-	_ui.host.player_commands.submit(6,_ui.host.commands.military._cmd_disband)
+	_ui.host.commands.session.submit_command(6,_ui.host.commands.military._cmd_disband)
 
 func _act_duel() -> void:
 	_ui.host.commands.military._duel_begin()

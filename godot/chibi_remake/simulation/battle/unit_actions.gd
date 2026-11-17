@@ -2,7 +2,7 @@ extends RefCounted
 ## unit actions: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
-const REQUIRED_SERVICES := {"battle_simulation": ["_feedback"], "combat": ["_fire_attack", "_kill", "_melee_line_clear", "_nearest_enemy"], "command_groups": ["_cancel_unit_command"], "construction_orders": ["_do_repair", "_site_entry_path", "_valid_build_worker"], "harvest_orders": ["_deposit_carry", "_deposits_for"], "interaction_paths": ["_deposit_ready", "_dist_to_obj", "_edge_cell_distance", "_edge_interaction_choice", "_edge_interaction_path", "_interaction_path"], "movement": ["_follow", "_path_to"], "officer_teams": ["_auto_assign_new_team"], "spatial_index": ["_contains_unit", "_separate_unit", "_unit_cell"], "transport_orders": ["_attach_to_ship", "_retry_unload"]}
+const REQUIRED_SERVICES := {"battle_simulation": ["_feedback"], "combat": ["_fire_attack", "_melee_line_clear", "_nearest_enemy"], "command_groups": ["_cancel_unit_command"], "construction_orders": ["_do_repair", "_site_entry_path", "_valid_build_worker"], "harvest_orders": ["_deposit_carry", "_deposits_for"], "interaction_paths": ["_deposit_ready", "_dist_to_obj", "_edge_cell_distance", "_edge_interaction_choice", "_edge_interaction_path", "_interaction_path"], "movement": ["_follow", "_path_to"], "officer_teams": ["_auto_assign_new_team"], "spatial_index": ["_contains_unit", "_separate_unit", "_unit_cell"], "transport_orders": ["_attach_to_ship", "_retry_unload"]}
 var battle: State
 var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
 var profile_enabled := false
@@ -48,19 +48,6 @@ func _profile_time(key: String, at: int) -> int:
 	var now:=Time.get_ticks_usec();profile[key]=int(profile.get(key,0))+now-at;return now
 
 
-func _step_legacy_burn(u: Dictionary, delta: float) -> bool:
-	var services := ports.acquire(["combat"])
-	if services.is_empty(): return false
-	# Legacy saves may still contain the former unit-following burn; new casts use fire_fields.
-	if float(u.get("burn_t", 0.0)) > 0.0 and bool(u.get("alive", false)):
-		u["burn_t"] = maxf(0.0, float(u["burn_t"]) - delta)
-		if not (battle.cheat_invulnerable and int(u.owner) == battle.player_owner):
-			u["hp"] = float(u["hp"]) - float(u.get("burn_dps", 0.0)) * delta
-		if float(u["hp"]) <= 0.0:
-			services.combat._kill(u, {})
-			return true
-	return false
-
 func _step_unit_inner(u: Dictionary, delta: float) -> void:
 	var phase := Time.get_ticks_usec() if profile_enabled else 0
 	if not _prepare_action(u, delta): return
@@ -77,7 +64,7 @@ func _step_unit_inner(u: Dictionary, delta: float) -> void:
 		"rest": _step_rest(u, delta)
 		"repair": _step_repair(u, delta)
 		"build": _step_build(u, delta)
-	# Idle, unload and legacy passive states share the same final animation step.
+	# Idle, unload and passive states share the same final animation step.
 	u.anim += delta
 
 func _is_tower(u: Dictionary) -> bool:
@@ -89,7 +76,6 @@ func _prepare_action(u: Dictionary, delta: float) -> bool:
 	u.moved = false
 	if bool(u.get("attached", false)):
 		return false
-	if _step_legacy_burn(u, delta): return false
 	# Confusion/rolling idle tasks wait behind the running order, without clearing it.
 	if preload("res://simulation/systems/stratagem_rules.gd").active(u):
 		u.anim += delta

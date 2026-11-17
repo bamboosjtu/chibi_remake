@@ -25,16 +25,16 @@ func run() -> void:
 	var saved: Dictionary = game.snapshot([source], {}, {}).units[0].simulation
 	var restored := {"dir":0,"is_building":false}
 	Schema.restore_scalars(saved, restored)
-	Timers.restore(saved, 8, restored)
+	Timers.restore(saved,restored)
 	Locomotion.restore(saved, restored)
 	Clock.restore(saved, restored)
 	preload("res://simulation/systems/stratagem_rules.gd").restore(saved, restored)
-	assert(Schema.valid_snapshot(saved) and Timers.valid_snapshot(saved,8))
+	assert(Schema.valid_snapshot(saved) and Timers.valid_snapshot(saved))
 	for key in Schema.persisted_scalars():
 		assert(saved.has(key), "Snapshot omitted " + key)
 		assert(restored.has(key) and game.save_canonical_text({"value":restored[key]}) == game.save_canonical_text({"value":source[key]}), "Restore omitted/changed " + key)
 		var invalid := saved.duplicate(true); invalid[key] = {"invalid":true} if Schema.FIELDS[key].type != "Dictionary" else "invalid"
-		assert(not Schema.valid_snapshot(invalid) or not Timers.valid_snapshot(invalid,8), "Validator omitted " + key)
+		assert(not Schema.valid_snapshot(invalid) or not Timers.valid_snapshot(invalid), "Validator omitted " + key)
 	var snapshot: Dictionary = game.snapshot(battle.units, battle.commands.world._resources(), battle.saver.save_extra())
 	battle.selecting=true; battle.drag_pan=true; battle.feedback_text="old world"; battle.cmd_pending="build"; battle.cmd_pending_data={"old":true}; battle._input_command=true
 	var transaction = load("res://app/saves/world_transaction.gd")

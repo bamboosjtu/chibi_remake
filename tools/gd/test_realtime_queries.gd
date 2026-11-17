@@ -74,15 +74,10 @@ func view_and_save() -> void:
 	assert(not is_same(restored,unit) and restored.route_failures==2 and is_equal_approx(restored.repath,1.25))
 	scene.view.flush_visuals()
 	assert(is_equal_approx(scene.view.unit_nodes(restored).spr.position.x,float(restored.ax)-float(restored.w)*0.5),"Old queued unit references cannot repaint a restored world")
-	var contract: Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://data/db/rules_contract.json"))
 	var migration: Dictionary=snapshot.duplicate(true)
-	migration.simulation.rulesRevision=contract.migrations.keys()[0]
-	for record in migration.units:record.simulation.erase("route_failures")
-	assert(scene.saver.apply_snapshot(migration),"The previous released v8 fingerprint has an explicit migration")
-	assert(scene.units.all(func(u):return int(u.get("route_failures",-1))==0))
 	migration.simulation.rulesRevision="unapproved-future-rules"
 	assert(not scene.saver.apply_snapshot(migration),"Unknown rule changes still require explicit approval")
 	var invalid: Dictionary=snapshot.duplicate(true);invalid.units[0].simulation.route_failures=4
 	assert(not scene.saver.apply_snapshot(invalid))
 	scene.scene.ready_to_save=false;scene.free()
-	print("REALTIME VISUALS PASS five ticks one sync / current UID resolution / retry save continuity / reviewed v8 migration / unknown rules rejected / invalid retry state rejected")
+	print("REALTIME VISUALS PASS five ticks one sync / current UID resolution / retry save continuity / exact current identity / unknown rules rejected / invalid retry state rejected")

@@ -164,8 +164,6 @@ func damage_fog_and_autoplay() -> void:
 	assert(b.fire_fields.ignite(Vector2(leader.ax,leader.ay)))
 	for i in range(5): b.fire_fields.step()
 	assert(leader.hp==hp)
-	leader.burn_t=1.0; leader.burn_dps=300
-	b.commands.orders._step_unit(leader,b.SIM_DT); assert(leader.hp==hp and leader.burn_t<1)
 	var enemy_hp: float=enemy.hp
 	b.commands.military._apply_hit(enemy,10,int(leader.uid)); assert(enemy.hp==enemy_hp-10)
 	key(KEY_F7); b.commands.military._apply_hit(leader,10,int(enemy.uid)); assert(leader.hp==hp-10)
@@ -174,7 +172,7 @@ func damage_fog_and_autoplay() -> void:
 	key(KEY_F8); b.commands.session._step_auto_control()
 	assert(idle.state=="attack" and is_same(idle.target,enemy))
 	assert(held.state=="idle" and busy.state=="move" and worker.state=="idle")
-	print("META RULES PASS reversible fog / no exploration pollution / melee-projectile-fire shared immunity / legacy burn / only own side / idle combat delegation")
+	print("META RULES PASS reversible fog / no exploration pollution / melee-projectile-fire shared immunity / only own side / idle combat delegation")
 
 func save_controls() -> void:
 	var stored := snapshot()
@@ -190,11 +188,7 @@ func save_controls() -> void:
 	var legacy := stored.duplicate(true); legacy.simulation.erase("autoControl")
 	assert(b.saver.apply_snapshot(legacy) and not b.auto_control)
 	assert(not b.commands.session._save_extra().simulation.has("autoControl"))
-	var v3 := stored.duplicate(true); v3.v=3
-	b.auto_control=true; key(KEY_ENTER)
-	assert(b.cheat_input_open and b.saver.apply_snapshot(v3))
-	assert(not b.auto_control and not b.cheat_input_open,"successful legacy loads also reset unsaved delegation and close input")
-	print("META SAVE PASS auto flag continuation / optional legacy field / invalid type atomic / session toggles preserved / console closes on commit")
+	print("META SAVE PASS auto flag continuation / optional auto flag / invalid type atomic / session toggles preserved / console closes on commit")
 
 func teams_and_formations() -> void:
 	fixture()

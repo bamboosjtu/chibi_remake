@@ -86,7 +86,7 @@ func _make_unit(ob: Dictionary, is_map_object: bool) -> Dictionary:
 		"repair_target": null, "build_target": null,
 		"inspired_t": 0,        # 七种计谋状态的剩余单位更新次数
 		"haste_t": 0, "slow_t": 0, "confused_t": 0, "farsight_t": 0,
-		"ambush_t": 0, "rolling_t":0,"rolling_ticks":0,"effect_tasks":[],"effect_task":0,"burn_t": 0.0, "burn_dps": 0.0,
+		"ambush_t": 0, "rolling_t":0,"rolling_ticks":0,"effect_tasks":[],"effect_task":0,
 		# ---- 水战/装载（原版模式 0xC/0xD，见分析 §13）----
 		"attached": false,        # 被载单位：已附着到运输船（脱离地图，不可操作）
 		"aboard_uid": -1,         # 所附运输船的 uid（读档后仍能按 uid 找回来）

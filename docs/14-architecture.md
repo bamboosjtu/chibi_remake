@@ -90,18 +90,18 @@ while sim_acc >= 速度周期 且 本帧步数 < 5:
 
 ## 7. 存档服务
 
-`Game` 保留格式编解码、场景生命周期和既有 autoload API。SaveRepository 拥有文件地址、写事务和旧目录迁移，SlotCatalog 拥有元数据缓存，CampaignSession 拥有战役选择与待加载状态。写入成功通过事件使槽位缓存失效，服务可脱离 Game 单独测试。世界恢复按以下顺序进行：
+`Game` 保留格式编解码、场景生命周期和既有 autoload API。SaveRepository 拥有文件地址、写事务，SlotCatalog 拥有元数据缓存，CampaignSession 拥有战役选择与待加载状态。写入成功通过事件使槽位缓存失效，服务可脱离 Game 单独测试。世界恢复按以下顺序进行：
 
 1. 校验内容版本、字段、UID、引用与各子系统快照；
 2. 使用同一纯模拟服务图创建 RefCounted 候选，不实例化 `main.tscn`，恢复实体、引用、科技、载员、视野与导航；
 3. 候选全部成功后暂换世界并暂存新单位节点；显示验证成功才释放旧世界和旧节点，失败则恢复原世界及原节点；
 4. 清理候选服务与旧节点。
 
-验证或候选恢复失败时保留原世界与选择。地图定义为深层只读数据；会话开关由独立 `session_state` 持有，界面字段由场景持有，空间索引按世界重建。`simulation/battle_state_fields.gd` 显式登记字段策略，新增字段未登记即拒绝读档；提交不再逐字段搬运或重绑模拟服务 host。`simulation/definitions/unit_schema.gd` 是单位字段的唯一登记处，包含类型、默认值、持久化、派生策略和恢复分组；snapshot、validator、restorer、timers、action clock、locomotion 由它取得字段定义，关系引用和版本迁移仍由对应编解码器处理。工厂和常见单位写入的静态检查，加上真实单位与逐字段反射回归，防止字段静默遗漏。存档版本与旧档迁移口径保持不变，详见[存档与兼容](16-save-compat.md)。
+验证或候选恢复失败时保留原世界与选择。地图定义为深层只读数据；会话开关由独立 `session_state` 持有，界面字段由场景持有，空间索引按世界重建。`simulation/battle_state_fields.gd` 显式登记字段策略，新增字段未登记即拒绝读档；提交不再逐字段搬运或重绑模拟服务 host。`simulation/definitions/unit_schema.gd` 是单位字段的唯一登记处，包含类型、默认值、持久化、派生策略和恢复分组；snapshot、validator、restorer、timers、action clock、locomotion 由它取得字段定义，关系引用由当前格式编解码器处理。工厂和常见单位写入的静态检查，加上真实单位与逐字段反射回归，防止字段静默遗漏。存档只接受当前格式，详见[存档与兼容](16-save-compat.md)。
 
 反馈文本、输入事件计数、阵营显示开关、拖拽与框选坐标属于 `battle_scene_state`，不进入候选世界；成功读档清空待选命令与拖拽/反馈瞬态，失败保留原会话。`_input_command` 是模拟命令入队的执行上下文，继续由 session 持有。
 
-v1–v3 先在候选中应用旧格式并规范化、验证为内部快照，再走同一世界交换事务；v4–v8 共用完整候选恢复。存档格式版本保持 8。
+存档格式为 v9，读取器没有旧版本迁移分支。规则与地图身份必须精确匹配。
 
 ## 8. 地形与纹理
 
@@ -261,4 +261,13 @@ BattleAccess 退役 units、selected、map_data、nav、decor_cells、trainings 
 
 存档编排使用 attach_loaded_world、finish_loaded_world、apply_loaded_unit 等表现入口；精灵、血条、历史、完成界面和弹体痕迹由视图自己维护。门禁禁止存档流程直接操作 unit_nodes/event_view/completion/end_label/projectile_view；应用启动与媒体组合的其他表现依赖仍分别治理。
 
-借用清单 schemaVersion 3 包含六类入口，对整个 presentation 检查属性及字面量 get/index 回退，并禁止恢复这些 getter 和深拷贝整个单位记录。零命中仅覆盖这些入口：build_types、cmd_pending_data、task_events、terrain_changes 及 clock、visibility、projectiles、fire_fields、player_commands 等剩余容器/能力仍需窄化；别名和命令返回值也仍需审查。相机、音频、纹理和视图节点属于表现层所有权，不等同于模拟状态投影。
+借用清单 schemaVersion 4 包含十五类入口，对整个 presentation 检查属性及字面量 get/index 回退，并禁止恢复这些 getter 和深拷贝整个单位记录。零命中覆盖集合、visibility/clock/projectiles/fire_fields/player_commands 服务及建造、待定指令、任务和地形配置；别名和其他命令返回值仍需审查。相机、音频、纹理和视图节点属于表现层所有权，不等同于模拟状态投影。
+
+
+### 服务与配置读边界
+
+visibility_view 返回冻结的世界/服务身份键、尺寸及不可变字节字符串，只在修订变化时编码；渲染器自行解码并拥有图像缓冲。point_visible 与 visibility_geometry 是标量查询，渲染上下文不保存模拟可见性对象。时钟以冻结的速度、标签和周期返回，速度写入仍经命令入口。
+
+弹体与火场查询只检查有界活动表的显示字段，变化后才构建点、方向、比例、年龄与可见标记。手动服务步进不必依赖 sim_tick 也会失效。建造选项按世界和内容签名冻结，事件和地形仅提供计数、ID 和布尔查询。缓存键不保存服务对象；相同修订与数值的替换世界仍因身份不同而重建。
+
+前端指令通过会话命令端口提交和泵送，不能取得或清空队列。排队动作在执行时检查世界身份，失败回滚后的旧世界动作仍有效，成功换世界后旧 epoch 拒绝执行。雾、小地图、HUD、动画与效果组件均不得恢复服务 getter。

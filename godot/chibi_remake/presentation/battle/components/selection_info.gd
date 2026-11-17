@@ -185,7 +185,7 @@ func _dominant(sel: Array) -> Dictionary:
 	return {"unit": best_id, "n": best, "sample": sample[best_id]}
 
 func _act_assign_officer(idx: int) -> void:
-	_ui.host.player_commands.submit(14,_ui.host.commands.military._order_form_up.bind(idx),Vector2.ZERO,-1,idx)
+	_ui.host.commands.session.submit_command(14,_ui.host.commands.military._order_form_up.bind(idx),Vector2.ZERO,-1,idx)
 	_ui.officer_pick = false
 	ports._refresh_cmd_panel()
 
@@ -262,7 +262,7 @@ func _rebuild_stats_text() -> void:
 				if trs.is_empty():
 					lines.append("生产队列：空")
 				for tr in trs:
-					lines.append("生产中 %s  余 %.1fs" % [str(_ui.host.commands.world._unit_name(int(tr.unit))), float(tr.t) * _ui.host.clock.period()])
+					lines.append("生产中 %s  余 %.1fs" % [str(_ui.host.commands.world._unit_name(int(tr.unit))), float(tr.t) * _ui.host.clock_view().period])
 			else:
 				# 与原版面板同序：攻击力 / 防御力 / 射程 / 视野（均取自 DATA.EXP）
 				lines.append("攻击力 %.0f    防御力 %.0f" % [float(u.attack), float(u.defence)])

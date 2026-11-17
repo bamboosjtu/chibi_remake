@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 3,
-  "method": "Literal host/_ui.host properties and literal get/index lookups; excludes the provider. Six retired collection/navigation getters are guarded across presentation. Aliases, dynamic keys and command-returned dictionaries require manual review; stateful service capabilities remain a separate migration surface. Host origins are reviewed conventions, not inferred types.",
+  "schemaVersion": 4,
+  "method": "Literal host/_ui.host properties and literal get/index lookups; excludes the provider. Fifteen retired collection, service and configuration getters are guarded across presentation. Aliases, dynamic keys and command-returned dictionaries require manual review. Host origins are reviewed conventions, not inferred types.",
   "guardedScope": "All presentation scripts except the provider",
   "migratedConsumers": [
     "presentation/battle/components/camera_controller.gd",
@@ -15,7 +15,11 @@
     "presentation/battle/projectile_view.gd",
     "presentation/battle/terrain_stream.gd",
     "presentation/hud/battle_hud_panel.gd",
-    "presentation/hud/software_cursor.gd"
+    "presentation/hud/software_cursor.gd",
+    "presentation/battle/battle_fog.gd",
+    "presentation/battle/components/world_layers.gd",
+    "presentation/hud/battle_menu.gd",
+    "presentation/media/event_view.gd"
   ],
   "references": [],
   "consumers": []

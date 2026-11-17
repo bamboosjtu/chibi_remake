@@ -38,7 +38,8 @@ func _ensure(data: Object) -> void:
 
 func units(data: Object) -> Array:
 	_ensure(data)
-	var key := [_world, data.sim_tick, data.units.size(), _revision, data.nav.get_instance_id(), data.nav.geometry_revision]
+	var key := [_world, data.sim_tick, data.units.size(), _revision, data.nav.get_instance_id(), data.nav.geometry_revision,
+		data.visibility.get_instance_id(),data.visibility.revision,data.player_owner]
 	if key == _units_key: return _units
 	var result := []
 	var members := {}
@@ -46,6 +47,7 @@ func units(data: Object) -> Array:
 	for unit: Dictionary in data.units:
 		_indices[int(unit.uid)] = result.size()
 		var row := _scalars(unit,ROSTER_FIELDS)
+		row.visible = int(unit.owner)==int(data.player_owner) or data.visibility.is_visible(Vector2(unit.ax,unit.ay))
 		var officer: Dictionary = unit.get("officer",{})
 		row.officer = {"index":int(officer.index),"name":str(officer.get("name",""))} if not officer.is_empty() else {}
 		row.officer.make_read_only(); row.make_read_only()

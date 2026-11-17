@@ -99,5 +99,5 @@ for(const file of ['simulation/battle_state.gd','app/battle_scene_state.gd','pre
  const source=read(file),declared=JSON.parse(source.match(/^const PROXY_FIELDS := (.+)$/m)?.[1]??'null');
  assert.deepEqual(declared,[...source.matchAll(/^var (\w+)/gm)].map(m=>m[1]),file+': explicit property surface is stale');
 }
-for(const retired of ['registry.gd','simulation/ports/capability_links.gd','app/battle_facade.gd'])if(fs.existsSync(path.join(root,retired)))throw Error('Retired dispatch still exists: '+retired);
+for(const retired of ['registry.gd','simulation/ports/capability_links.gd','app/battle_facade.gd','app/saves/legacy_snapshot.gd','app/saves/legacy_seed.gd','data/db/rules_contract.json','data/db/registry_compatibility.json'])if(fs.existsSync(path.join(root,retired)))throw Error('Retired implementation still exists: '+retired);
 console.log(`REGISTRY PASS ${Object.keys(manifest.ports).length} contracts / ${bindings} checked provider methods / ${internalCalls} verified internal receivers / no reflection dispatch`);

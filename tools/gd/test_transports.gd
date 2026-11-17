@@ -109,7 +109,7 @@ func run() -> void:
 	assert(b.commands.orders._order_board(foreign)==0 and not b.commands.orders._attach_to_ship(extra,foreign))
 	var stale: Dictionary=ship.duplicate();assert(b.commands.orders._order_board(stale)==0)
 	foreign.die_t=0;assert(b.commands.orders._order_board(foreign)==0) # 保持死亡，避免占着 sea 格阻止后续船停靠
-	var aboard:=snapshot();assert(aboard.v==8 and b.saver.apply_snapshot(aboard))
+	var aboard:=snapshot();assert(aboard.v==9 and b.saver.apply_snapshot(aboard))
 	ship=find(ship_uid)
 	assert(ship.carry_n==16 and ship.carry_hp==1600)
 	if b.view!=null:
@@ -231,14 +231,7 @@ func run() -> void:
 			7:vessel.simulation.loaded=false
 			8:unit.simulation.aboard_uid=-1
 		assert(not b.saver.apply_snapshot(invalid) and is_same(b.units[0],identity) and b.selected==[identity])
-	var old: Dictionary=aboard.duplicate(true);old.v=7
-	var vessel: Dictionary=old.units.filter(func(u):return int(u.uid)==ship_uid)[0]
-	vessel.simulation.carry_n=0;vessel.simulation.carry_hp=999;vessel.simulation.loaded=false
-	var legacy_passenger: Dictionary=old.units.filter(func(u):return int(u.uid)==int(people[0]))[0]
-	legacy_passenger.state="attack";legacy_passenger.simulation.path=[[1,2]];legacy_passenger.simulation.targetUid=ship_uid
-	assert(b.saver.apply_snapshot(old));ship=find(ship_uid)
-	assert(ship.carry_n==16 and ship.carry_hp==1600 and ship.loaded)
-	assert(find(people[0]).state=="boarded" and find(people[0]).path.is_empty() and find(people[0]).target==null)
+	assert(b.saver.apply_snapshot(aboard));ship=find(ship_uid)
 	# 载员受全军升级影响时汇总同步；单个载员死亡和整船沉没都不能留下活体孤儿。
 	b.commands.technology._apply_tech_effects(0,b.player_owner)
 	var upgraded:=snapshot();assert(b.saver.apply_snapshot(upgraded));ship=find(ship_uid)
@@ -285,7 +278,7 @@ func run() -> void:
 	b.commands.world._free_unit_at(b.units.find(ship))
 	var sunk:=snapshot();assert(b.saver.apply_snapshot(sunk))
 	assert(people.slice(0,16).all(func(uid):return find(uid).die_t>=0 or not find(uid).alive))
-	print("TRANSPORT SNAPSHOT PASS v8 manifest atomic / legacy v7 summary rebuilt / HQ HP sync / passenger death / sink all / ship removed / no resurrection")
+	print("TRANSPORT SNAPSHOT PASS current manifest atomic / exact counts / HQ HP sync / passenger death / sink all / ship removed / no resurrection")
 	# 所有11张有初始水军的地图都跑岸边装载/卸载与存读，不将单图测试称为全水战通关。
 	for map_id in MAPS:
 		open_battle(map_id);pair=shore_pair();sea=pair[0];land=pair[1]

@@ -31,18 +31,6 @@ static func portable_dir() -> String:
 	var username := OS.get_environment("USERNAME").validate_filename()
 	return root.path_join(username if not username.is_empty() else "player")
 
-## Read-only list of places earlier builds wrote saves to. Nothing here is
-## created or probed, so migration never resurrects the folder it reads from.
-static func legacy_directories() -> Array[String]:
-	var sources := directories()
-	var exe_dir := OS.get_executable_path().get_base_dir()
-	# Published builds ran from `release/versions/<version>/`, one level deeper.
-	if exe_dir.get_base_dir().get_file() == "versions": exe_dir = exe_dir.get_base_dir().get_base_dir()
-	var username := OS.get_environment("USERNAME").validate_filename()
-	sources.append(exe_dir.path_join("userdata").path_join(username if not username.is_empty() else "player"))
-	sources.append(OS.get_user_data_dir().get_base_dir().path_join("Chibi Verifier"))
-	return sources
-
 static func writable(directory: String) -> bool:
 	# Probe the nearest existing ancestor. Only JsonStore.commit creates the
 	# actual save directory, so starting the game never leaves empty candidates.

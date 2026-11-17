@@ -129,8 +129,6 @@ func run() -> void:
 			3:slot.members[0]=-1
 			4:invalid.trainings.append({"buildingUid":inf.uid,"unit":32,"owner":owner,"t":1,"ticks":true,"cost":{},"aiSlot":0,"aiToken":99})
 		assert(not b.saver.apply_snapshot(invalid) and is_same(b.units[0],identity) and b.selected==[identity])
-	var legacy: Dictionary=intact.duplicate(true);legacy.v=6;legacy.simulation.ai.erase("trainingSlots")
-	assert(b.saver.apply_snapshot(legacy) and b.ai.slots.records.is_empty())
 	# 骑兵5、车2+步6；升级后才换成200人，不依赖玩家开放表。
 	b.commands.technology._tech_for(owner).level=1;funds()
 	assert(not b.ai.slots.dispatch(owner,1,b.ai.army_for(owner)), "upgraded training needs a completed HQ")

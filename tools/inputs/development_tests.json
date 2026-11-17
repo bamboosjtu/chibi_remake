@@ -36,7 +36,7 @@
         "TRANSPORT AI PASS carried units excluded from assault-intercept-rally / focus and threats / manifest remains valid",
         "TRANSPORT LAND PASS water-layer sailing / mixed selection / occupied coast / pending unload save / retry / partial save /16 unique land cells / cargo retained",
         "TRANSPORT TECH-HP PASS upgraded hp>maxhp boards / damaged / in-cargo upgrade / inflight HP rejected",
-        "TRANSPORT SNAPSHOT PASS v8 manifest atomic / legacy v7 summary rebuilt / HQ HP sync / passenger death / sink all / ship removed / no resurrection",
+        "TRANSPORT SNAPSHOT PASS current manifest atomic / exact counts / HQ HP sync / passenger death / sink all / ship removed / no resurrection",
         "TRANSPORT MAP PASS",
         "TRANSPORT WORLDS PASS 11 naval maps / actual coastline / board / loaded snapshot / unique landing"
       ],
@@ -47,7 +47,7 @@
       "script": "test_projectiles",
       "markers": [
         "PROJECTILE ARROW PASS speed16 / no launch damage / fixed flight / moving target locked / launch damage frozen",
-        "PROJECTILE SAVE PASS midflight64 / arrival160 / invalid atomic / legacy clears stale flight",
+        "PROJECTILE SAVE PASS midflight64 / arrival160 / invalid atomic / current flight restored",
         "PROJECTILE STONE PASS speed8 / fixed landing cell / moving target escapes / friendly occupant / B defence / minimum1",
         "PROJECTILE LIMIT PASS stale target UID / dead shooter / 100 slots / full drops shot and damage / no retry",
         "PROJECTILE SPEED PASS four speeds x30-144fps / first34 launch / tick40 travel96 / one arrival by50"
@@ -159,7 +159,7 @@
     {
       "script": "test_ai_policy",
       "markers": [
-        "AI RETREAT PASS 42-thought clock / explicit point / targeted units / no invented retreat / snapshot migration",
+        "AI RETREAT PASS 42-thought clock / explicit point / targeted units / no invented retreat / current snapshot shape",
         "AI WORKERS PASS replenishment enters construction group / gather-repair preserved / recover after wipe"
       ]
     },
@@ -330,7 +330,7 @@
       "script": "test_research_jobs",
       "markers": [
         "RESEARCH CONCURRENCY PASS two buildings / same-building production lock / cancel selected only / 199tick save",
-        "RESEARCH SNAPSHOT PASS invalid atomic / job references / production conflicts / legacy single-job continuation",
+        "RESEARCH SNAPSHOT PASS invalid atomic / job references / production conflicts / current jobs only",
         "RESEARCH TRANSACTIONS PASS sale200tick / debit start / credit once / cancel75 / AI owner isolated"
       ],
       "args": []

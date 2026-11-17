@@ -80,7 +80,7 @@ func _draw() -> void:
 	overlay.size=size
 	if view.fog_sprite!=null and view.fog_sprite.texture!=null:
 		fog_material.set_shader_parameter("fog_mask",view.fog_sprite.texture)
-		fog_material.set_shader_parameter("fog_uv_scale",world_size/(Vector2(host.visibility.width,host.visibility.height)*host.visibility.CELL))
+		fog_material.set_shader_parameter("fog_uv_scale",world_size/(host.visibility_geometry()))
 		terrain.show()
 	else:terrain.hide()
 	overlay.queue_redraw()
@@ -91,7 +91,6 @@ func _draw_overlay() -> void:
 	var off:=world_rect.position
 	# Resolve the guarded read model once for this synchronous draw, not per dot.
 	var player:=int(host.player_owner)
-	var vision=host.visibility
 	var scale: float=view.ui_scale
 	var count:=0
 	marker_mesh.visible=gpu_markers
@@ -101,7 +100,7 @@ func _draw_overlay() -> void:
 		if not bool(unit.alive) or float(unit.die_t)>=0:continue
 		if bool(unit.get("attached",false)) or int(unit.get("site_inside_uid",-1))>=0:continue
 		var owner:=int(unit.owner)
-		if owner!=player and not vision.is_visible(Vector2(unit.ax,unit.ay)):continue
+		if owner!=player and not bool(unit.visible):continue
 		var color:=Color(0.55,0.55,0.55)
 		if owner==player:color=Color(0.3,1.0,0.35)
 		elif owner!=0:color=Color(1.0,0.3,0.25)

@@ -12,7 +12,7 @@ func run() -> void:
 	var invalid := baseline.duplicate(true); invalid.units.append(invalid.units[0].duplicate(true)); cases.append([invalid,"unit records"])
 	invalid=baseline.duplicate(true); invalid.simulation.terrainChanges={"bad":true}; cases.append([invalid,"terrain"])
 	invalid=baseline.duplicate(true); invalid.simulation.aiResources={"2":3}; cases.append([invalid,"owners/groups/officers"])
-	invalid=baseline.duplicate(true); invalid.trainings=[{"buildingUid":2147483647,"unit":30}]; cases.append([invalid,"production"])
+	invalid=baseline.duplicate(true); invalid.trainings=[{"buildingUid":2147483647,"unit":30,"owner":battle.player_owner,"t":0,"ticks":true,"cost":{}}]; cases.append([invalid,"production"])
 	invalid=baseline.duplicate(true); invalid.simulation.playerTech={"level":-1}; cases.append([invalid,"technology/research"])
 	invalid=baseline.duplicate(true); invalid.units[0].simulation.action_phase=999; cases.append([invalid,"unit simulation"])
 	invalid=baseline.duplicate(true); invalid.simulation.speedIndex=99; cases.append([invalid,"world services/clock"])

@@ -14,7 +14,7 @@
       "script": "test_save_validity",
       "markers": [
         "SAVE VALIDITY PASS",
-        "V8 REQUIRED FIELDS PASS"
+        "CURRENT REQUIRED FIELDS PASS"
       ],
       "args": [
         "--noview"
@@ -33,10 +33,9 @@
       "timeout": 150
     },
     {
-      "script": "test_legacy_isolation",
+      "script": "test_current_format",
       "markers": [
-        "LEGACY ISOLATION PASS",
-        "RULES IDENTITY PASS"
+        "CURRENT FORMAT PASS"
       ],
       "args": [
         "--noview"

@@ -4,47 +4,45 @@ const Config = preload("res://simulation/battle_config.gd")
 const FIELDS := {
 	"gate_open": {"type":"bool", "default":false, "persist":false, "derived":true, "group":"derived"},
 	"occupied_cells": {"type":"Array", "default":[], "persist":false, "derived":true, "group":"derived"},
-	"route_failures": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "nullable": true, "min": 0, "max": 3},
-	"blocked_n": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "nullable": true, "min": 0, "max": 2147483647},
+	"route_failures": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "min": 0, "max": 3},
+	"blocked_n": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "min": 0, "max": 2147483647},
 	"blocked_cursor": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "min": 0, "max": 48},
-	"last_attacker_uid": {"type": "int", "default": -1, "persist": true, "derived": false, "group": "scalar", "nullable": true, "min": -1, "max": 2147483647},
-	"A": {"type": "int", "default": 0, "persist": false, "derived": true, "group": "cell_cache", "nullable": true},
-	"B": {"type": "int", "default": 0, "persist": false, "derived": true, "group": "cell_cache", "nullable": true},
-	"maxhp": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"base_maxhp": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"hold": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"cool": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"repath": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"pi": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "nullable": true, "min": 0, "max": 2147483647},
-	"anim": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"dir": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"moved": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"build_frame": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"status_173": {"type": "int", "default": 70, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"event_experience": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"attack_bonus": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"defence_bonus": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"officer_might": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"officer_intellect": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"group_officer": {"type": "int", "default": -1, "persist": true, "derived": false, "group": "scalar", "nullable": true, "min": -1, "max": 116},
-	"team_kind": {"type": "String", "default": "", "persist": true, "derived": false, "group": "scalar", "nullable": true, "values": ["", "worker", "combat"]},
-	"carry": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"carry_kind": {"type": "String", "default": "", "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"gather_t": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"gather_ticks": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"delivery_ticks": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"tech_hp_bonus": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"mou": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"formation": {"type": "int", "default": -1, "persist": true, "derived": false, "group": "scalar", "nullable": true},
+	"last_attacker_uid": {"type": "int", "default": -1, "persist": true, "derived": false, "group": "scalar", "min": -1, "max": 2147483647},
+	"A": {"type": "int", "default": 0, "persist": false, "derived": true, "group": "cell_cache"},
+	"B": {"type": "int", "default": 0, "persist": false, "derived": true, "group": "cell_cache"},
+	"maxhp": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar"},
+	"base_maxhp": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar"},
+	"hold": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "scalar"},
+	"cool": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar"},
+	"repath": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar"},
+	"pi": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "min": 0, "max": 2147483647},
+	"anim": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar"},
+	"dir": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar"},
+	"moved": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "scalar"},
+	"build_frame": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar"},
+	"status_173": {"type": "int", "default": 70, "persist": true, "derived": false, "group": "scalar"},
+	"event_experience": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar"},
+	"attack_bonus": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar"},
+	"defence_bonus": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar"},
+	"officer_might": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar"},
+	"officer_intellect": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar"},
+	"group_officer": {"type": "int", "default": -1, "persist": true, "derived": false, "group": "scalar", "min": -1, "max": 116},
+	"team_kind": {"type": "String", "default": "", "persist": true, "derived": false, "group": "scalar", "values": ["", "worker", "combat"]},
+	"carry": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar"},
+	"carry_kind": {"type": "String", "default": "", "persist": true, "derived": false, "group": "scalar"},
+	"gather_t": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar"},
+	"gather_ticks": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar"},
+	"delivery_ticks": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar"},
+	"tech_hp_bonus": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar"},
+	"mou": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar"},
+	"formation": {"type": "int", "default": -1, "persist": true, "derived": false, "group": "scalar"},
 	"haste_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "status", "min": 0, "max": 800},
 	"slow_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "status", "min": 0, "max": 800},
 	"farsight_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "status", "min": 0, "max": 800},
 	"confused_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "status", "min": 0, "max": 800},
-	"burn_t": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"burn_dps": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"fo_x": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"fo_y": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"site": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "scalar", "nullable": true},
+	"fo_x": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar"},
+	"fo_y": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar"},
+	"site": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "scalar"},
 	"rest_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "elapsed", "min": 0, "max": Config.REST_TICKS - 1},
 	"build_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "elapsed", "min": 0, "max": Config.BUILD_STEP_TICKS - 1},
 	"action_wait": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "action", "min": 0, "max": 1000},
@@ -53,22 +51,22 @@ const FIELDS := {
 	"action_kind": {"type": "String", "default": "", "persist": true, "derived": false, "group": "action", "values": ["", "attack", "repair"]},
 	"action_target_uid": {"type": "int", "default": -1, "persist": true, "derived": false, "group": "action", "min": -1, "max": 2147483647},
 	"inspired_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "status", "min": 0, "max": 800},
-	"stock": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"stock_max": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"attached": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"join_target_uid": {"type": "int", "default": -1, "persist": true, "derived": false, "group": "scalar", "nullable": true, "min": -1, "max": 2147483647},
-	"aboard_uid": {"type": "int", "default": -1, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"carry_n": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"carry_hp": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"loaded": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"unload_active": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"unload_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"site_inside_uid": {"type": "int", "default": -1, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"site_follow_uid": {"type": "int", "default": -1, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"site_entry_x": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"site_entry_y": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"site_exit_pending": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"build_cost": {"type": "Dictionary", "default": {}, "persist": true, "derived": false, "group": "scalar", "nullable": true},
+	"stock": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "optional": true},
+	"stock_max": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "optional": true},
+	"attached": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "scalar"},
+	"join_target_uid": {"type": "int", "default": -1, "persist": true, "derived": false, "group": "scalar", "min": -1, "max": 2147483647},
+	"aboard_uid": {"type": "int", "default": -1, "persist": true, "derived": false, "group": "scalar"},
+	"carry_n": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar"},
+	"carry_hp": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar"},
+	"loaded": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "scalar"},
+	"unload_active": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "scalar"},
+	"unload_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar"},
+	"site_inside_uid": {"type": "int", "default": -1, "persist": true, "derived": false, "group": "scalar"},
+	"site_follow_uid": {"type": "int", "default": -1, "persist": true, "derived": false, "group": "scalar"},
+	"site_entry_x": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar"},
+	"site_entry_y": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar"},
+	"site_exit_pending": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "scalar"},
+	"build_cost": {"type": "Dictionary", "default": {}, "persist": true, "derived": false, "group": "scalar"},
 	"rolling_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "status", "min": 0, "max": 800},
 	"rolling_ticks": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "elapsed", "min": 0, "max": 29},
 	"ambush_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "status", "min": 0, "max": 800},
@@ -126,13 +124,29 @@ const FIELDS := {
 static func fields(group: String) -> Array:
 	return FIELDS.keys().filter(func(key): return FIELDS[key].group == group)
 
+static var _persisted_scalars: Array = _scalar_fields()
+static var _wire_fields: Dictionary = _allowed_fields()
+
+static func _scalar_fields() -> Array:
+	var result := FIELDS.keys().filter(func(key): return FIELDS[key].persist and FIELDS[key].group not in ["record","relation"])
+	result.make_read_only()
+	return result
+
+static func _allowed_fields() -> Dictionary:
+	var result := {}
+	for key in _persisted_scalars: result[key] = true
+	for key in fields("relation"): result[FIELDS[key].key] = true
+	result.make_read_only()
+	return result
+
 static func persisted_scalars() -> Array:
-	return FIELDS.keys().filter(func(key): return FIELDS[key].persist and FIELDS[key].group not in ["record", "relation"])
+	return _persisted_scalars
 
 static func snapshot_scalars(unit: Dictionary) -> Dictionary:
 	var result := {}
 	for key in persisted_scalars():
-		if unit.has(key): result[key] = unit[key] if FIELDS[key].type != "int" or unit[key] == null else int(unit[key])
+		if FIELDS[key].get("optional",false) and not unit.has(key): continue
+		result[key] = decode(key,unit.get(key,FIELDS[key].default))
 	if unit.has("pi"): result.pi = navigation_cursor(unit.get("path",[]),int(unit.pi))
 	return result
 
@@ -144,9 +158,7 @@ static func navigation_path(path: Array, cursor: int) -> Array:
 
 static func restore_scalars(state: Dictionary, unit: Dictionary, group := "scalar") -> void:
 	for key in fields(group):
-		var value = state.get(key)
-		if value == null: continue # Older v4-v8 writers emitted null for absent optional fields.
-		unit[key] = decode(key, value)
+		if state.has(key): unit[key] = decode(key,state[key])
 
 static func decode(key: String, value):
 	match FIELDS[key].type:
@@ -159,7 +171,7 @@ static func default_value(key: String):
 
 static func valid_value(key: String, value) -> bool:
 	var field: Dictionary = FIELDS[key]
-	if value == null: return bool(field.get("nullable", false))
+	if value == null: return false
 	match field.type:
 		"int", "float":
 			if not (value is int or value is float) or not is_finite(float(value)): return false
@@ -183,9 +195,16 @@ static func valid_group(state: Dictionary, group: String) -> bool:
 	return true
 
 static func valid_snapshot(state: Dictionary) -> bool:
-	for group in ["scalar", "action", "locomotion", "effect", "cell_cache"]:
+	for key in persisted_scalars():
+		if not state.has(key):
+			if FIELDS[key].get("optional",false): continue
+			return false
+		if not valid_value(key,state[key]): return false
+	for key in state:
+		if not _wire_fields.has(key): return false
+	for group in ["scalar", "action", "locomotion", "effect"]:
 		if not valid_group(state, group): return false
-	return valid_relations(state) # Timers have a versioned migration; referential integrity needs world IDs.
+	return valid_relations(state)
 
 static func valid_relations(state: Dictionary) -> bool:
 	for name in fields("relation"):
@@ -239,7 +258,7 @@ static func record_value(record: Dictionary, field: String, fallback = null):
 static func valid_record(record: Dictionary) -> bool:
 	for key in fields("record"):
 		var alias: String = FIELDS[key].key
-		if not record.has(alias): continue
+		if not record.has(alias): return false
 		if key == "officer":
 			var value = record[alias]
 			if not (value is int or value is float) or not is_finite(float(value)) or float(value) != floorf(float(value)) or float(value) < -1 or float(value) > 116: return false

@@ -94,5 +94,3 @@ static func valid_snapshot(state:Dictionary) -> bool:
 static func restore(state:Dictionary, unit:Dictionary) -> void:
 	unit.effect_tasks=state.get("effect_tasks",[]).map(func(task):return int(task))
 	unit.effect_task=int(state.get("effect_task",0))
-	# Old saves used immediate confusion. Keep an existing pause until that flag ends.
-	if not state.has("effect_task") and int(unit.get("confused_t",0))>0:unit.effect_task=CONFUSION

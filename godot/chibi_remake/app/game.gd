@@ -1,10 +1,5 @@
 extends Node
-# 全局游戏状态：当前关卡 / 存档 / 关卡列表（autoload "Game"）
-#
-# 存档格式版本见 SAVE_VERSION（当前 8）：单位记录使用具名字段与稳定 uid，
-# 资源、训练订单与各子系统快照一并写入。v1/v2/v3 旧档由 app/saves/legacy_snapshot.gd
-# 兼容恢复，迁移规则见 docs/16-save-compat.md。
-
+## Current-format save codec and application lifecycle.
 const Repository = preload("res://app/saves/save_repository.gd")
 const Catalog = preload("res://app/saves/slot_catalog.gd")
 const CampaignSession = preload("res://app/campaign_session.gd")
@@ -55,7 +50,7 @@ var SAVE_PATH: String:
 	set(value):
 		repository.path=value
 		if slot_catalog != null: slot_catalog.invalidate()
-const SAVE_VERSION := 8
+const SAVE_VERSION = preload("res://app/saves/save_format.gd").VERSION
 const SAVE_SLOTS = Repository.SAVE_SLOTS
 const Store = preload("res://app/json_store.gd")
 const UnitSchema = preload("res://simulation/definitions/unit_schema.gd")
@@ -73,18 +68,12 @@ func _ready() -> void:
 	print("SAVE LOCATION ",SAVE_PATH)
 	# 干净环境/CI 的自托管 APPDATA 下 user:// 目录可能还不存在；先建目录再写 boot/save。
 	DirAccess.make_dir_recursive_absolute(SAVE_PATH.get_base_dir() if acceptance_run else OS.get_user_data_dir())
-	if not acceptance_run: _migrate_legacy_userdata()
 	_install_cjk_font()
 	if DisplayServer.get_name() != "headless": add_child(preload("res://presentation/hud/software_cursor.gd").new())
 	var f := FileAccess.open(SAVE_PATH.get_base_dir().path_join("boot.log") if acceptance_run else "user://boot.log", FileAccess.WRITE)
 	if f != null:
 		f.store_string("boot %s\nargs=%s\n" % [Time.get_datetime_string_from_system(), str(OS.get_cmdline_user_args())])
 		f.close()
-
-## Keep valid existing saves when the profile or fallback location changes.
-## `legacy_directories()` only reads; it never creates the folders it looks at.
-func _migrate_legacy_userdata() -> void:
-	repository.migrate_legacy_userdata()
 
 ## 内置中文字体：运行时直接加载 OTF，不依赖编辑器导入缓存（新克隆/无 .godot 也能跑）。
 ## 导出包通过 include_filter="*.otf" 带上原始字体；失败时退回系统字体并留警告。
@@ -253,7 +242,7 @@ static func save_checksum(payload: Dictionary) -> String:
 
 static func verify_save_checksum(d: Dictionary) -> bool:
 	if not d.has("checksum"):
-		return false # Absence is a legacy format policy, never proof of integrity.
+		return false
 	var copy := d.duplicate(true)
 	copy.erase("checksum")
 	var canon := save_canonical_text(copy)
@@ -264,10 +253,9 @@ static func verify_save_checksum(d: Dictionary) -> bool:
 
 static func is_valid_save(d: Dictionary) -> bool:
 	if not preload("res://app/saves/save_envelope.gd").valid(d): return false
-	return verify_save_checksum(d) if d.has("checksum") else int(d.get("v", 1)) < 8
+	return verify_save_checksum(d)
 
 static func can_rotate_save(d: Dictionary) -> bool:
-	# Unchecksummed legacy archives remain loadable but cannot displace a verified backup.
 	return d.has("checksum") and is_valid_save(d)
 
 ## 先写临时文件并**校验可解析**，再替换正式档 —— 任一步失败都保留前一份有效存档。

@@ -1,10 +1,7 @@
 extends Sprite2D
 ## 遮罩只消费模拟层探索数据；HUD 不受遮罩影响。
 var _read_visibility: Callable
-var _state: RefCounted
-var visibility: RefCounted:
-	get: return _read_visibility.call()
-var _revision := -1
+var _key: Array = []
 var _target: SubViewport
 var _quad: ColorRect
 var _current_texture: ImageTexture
@@ -19,13 +16,12 @@ func _init(read_visibility: Callable) -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 
 func _process(_delta: float) -> void:
-	var state := visibility
-	if not is_same(state, _state):
-		_state = state
-		_revision = -1
-		texture = null
-	if state.revision == _revision: return
-	_revision = state.revision
+	var values: Dictionary = _read_visibility.call()
+	if values.is_empty() or values.key == _key: return
+	_key = values.key
+	scale = values.cell
+	var state := {"width":values.size.x,"height":values.size.y,
+		"current":Marshalls.base64_to_raw(values.current),"explored":Marshalls.base64_to_raw(values.explored)}
 	var begin:=Time.get_ticks_usec()
 	if DisplayServer.get_name()=="headless":
 		_cpu_mask(state) # Assertion-enabled, non-rendering tests can still inspect alpha.
@@ -33,19 +29,20 @@ func _process(_delta: float) -> void:
 		_gpu_mask(state)
 	upload_microseconds+=Time.get_ticks_usec()-begin
 
-func _cpu_mask(state: RefCounted) -> void:
+func _cpu_mask(state: Dictionary) -> void:
 	var pixels := PackedByteArray()
 	pixels.resize(state.width * state.height * 4)
 	for i in range(state.current.size()):
 		pixels[i * 4 + 3] = 0 if state.current[i] else (165 if state.explored[i] else 255)
 	var mask := Image.create_from_data(state.width, state.height, false, Image.FORMAT_RGBA8, pixels)
-	if texture == null: texture = ImageTexture.create_from_image(mask)
-	else: (texture as ImageTexture).update(mask)
+	# The dummy renderer does not retain update() pixels for get_image(). This
+	# branch owns a CPU-inspectable test texture; rendered frames use the GPU path.
+	texture = ImageTexture.create_from_image(mask)
 
 ## Upload the simulation's two byte planes directly. A small render target keeps
 ## the public RGBA mask shared by the battlefield and minimap; no per-cell script
 ## conversion runs on a rendered frame. The 0/1 bytes are normalized by R8.
-func _gpu_mask(state: RefCounted) -> void:
+func _gpu_mask(state: Dictionary) -> void:
 	var dimensions:=Vector2i(state.width,state.height)
 	var current:=Image.create_from_data(dimensions.x,dimensions.y,false,Image.FORMAT_R8,state.current)
 	var explored:=Image.create_from_data(dimensions.x,dimensions.y,false,Image.FORMAT_R8,state.explored)

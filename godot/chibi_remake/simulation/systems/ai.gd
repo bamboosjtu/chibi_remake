@@ -43,20 +43,11 @@ func restore(value: Dictionary) -> void:
 		table.clear()
 		for key in value.get(pair[0], {}):
 			table[int(key)] = int(value[pair[0]][key])
-	# R10：撤退状态按群保存：owner -> {group: 1}。旧档的 owner->1 只表示
-	# “该势力曾经在撤退”，无法定位到群，按空闲时自动恢复处理（下一次检查会结束它）。
 	_ai_state._retreat.clear()
-	var retreat_value = value.get("retreat", {})
-	if retreat_value is Dictionary:
-		for key in retreat_value:
-			var entry = retreat_value[key]
-			var groups := {}
-			if entry is Dictionary:
-				for group in entry:
-					groups[int(group)] = 1
-			elif _ai_state.slots.integer(entry) and int(entry) != 0:
-				groups = {}          # 旧档迁移：不知道是哪个群，不假装仍在撤退
-			_ai_state._retreat[int(key)] = groups
+	for owner in value.get("retreat",{}):
+		var groups := {}
+		for group in value.retreat[owner]: groups[int(group)] = 1
+		_ai_state._retreat[int(owner)] = groups
 	_ai_state._retreat_points.clear()
 	for key in value.get("retreatPoints",{}): _ai_state._retreat_points[int(key)] = value.retreatPoints[key].duplicate()
 
@@ -68,8 +59,8 @@ func valid_snapshot(value: Variant, ids: Dictionary, orders: Array, next_uid: in
 		for key in value.get(field,{}):
 			if not str(key).is_valid_int(): return false
 			var entry = value[field][key]
-			if field == "retreat" and entry is Dictionary:
-				# 新格式：群号 -> 1；群号必须是合法整数。
+			if field == "retreat":
+				if not entry is Dictionary: return false
 				for group in entry:
 					if not str(group).is_valid_int() or not _ai_state.slots.integer(entry[group]): return false
 				continue

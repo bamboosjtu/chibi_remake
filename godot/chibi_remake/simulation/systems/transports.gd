@@ -40,11 +40,7 @@ func reconcile() -> void:
 		var total: Dictionary=totals.get(int(ship.uid),{"n":0,"hp":0.0})
 		ship.carry_n=int(total.n);ship.carry_hp=float(total.hp);ship.loaded=int(total.n)>0
 
-func restore(version: int) -> void:
-	if version<8:
-		for unit in host.units:
-			if bool(unit.get("attached",false)) and bool(unit.alive) and float(unit.die_t)<0:
-				host._cancel_unit_command(unit);unit.state="boarded"
+func restore() -> void:
 	reconcile()
 
 func landing_cell(ship: Dictionary, unit: Dictionary = {}) -> Vector2i:
@@ -105,27 +101,21 @@ func boarding_path(unit: Dictionary, ship: Dictionary) -> Array:
 static func integer(value: Variant, minimum: int=0) -> bool:
 	return (value is int or value is float) and is_finite(float(value)) and float(value)==floorf(float(value)) and float(value)>=minimum and float(value)<=2147483647
 
-func valid_snapshot(ids: Dictionary, version: int) -> bool:
+func valid_snapshot(ids: Dictionary) -> bool:
 	var totals:={}
 	for uid in ids:
 		var unit: Dictionary=ids[uid];var state: Dictionary=unit.simulation
 		if str(unit.get("state",""))=="unload" and (int(unit.unit)!=SHIP or bool(state.get("attached",false))):return false
 		for field in ["attached","loaded"]:
-			if state.has(field) and not state[field] is bool and not (state[field]==null and version<8):return false
+			if state.has(field) and not state[field] is bool:return false
 		# R03：卸载状态与节拍相位必须是合法结构；旧档缺字段按未卸载迁移。
 		var unload_active=state.get("unload_active",false);var unload_t=state.get("unload_t",0)
-		if unload_active==null:unload_active=false
-		if unload_t==null:unload_t=0
 		if not unload_active is bool or not integer(unload_t):return false
 		if bool(unload_active) or str(unit.get("state",""))=="unload":
 			if int(unit.unit)!=SHIP or bool(unit.building) or bool(state.get("attached",false)):return false
 			if not bool(unit.alive) or float(unit.dieT)>=0:return false
 		elif int(unit.unit)!=SHIP and (bool(unload_active) or int(unload_t)!=0):return false
 		var aboard=state.get("aboard_uid",-1);var count=state.get("carry_n",0);var hp=state.get("carry_hp",0)
-		if version<8:
-			if aboard==null:aboard=-1
-			if count==null:count=0
-			if hp==null:hp=0
 		if not integer(aboard,-1) or not integer(count) or int(count)>CAPACITY:return false
 		if not (hp is int or hp is float) or not is_finite(float(hp)) or float(hp)<0:return false
 		if int(unit.unit)!=SHIP and (int(count)!=0 or float(hp)!=0 or bool(state.get("loaded",false))):return false
@@ -134,22 +124,19 @@ func valid_snapshot(ids: Dictionary, version: int) -> bool:
 			continue
 		if bool(unit.building) or int(unit.unit) in NAVAL:return false
 		if not bool(unit.alive) or float(unit.dieT)>=0:
-			if version>=8 and int(aboard)!=-1:return false
-			continue # 旧版沉船遗留的隐藏尸体在恢复时清船引用。
+			if int(aboard)!=-1:return false
+			continue
 		if int(aboard)==int(uid) or not ids.has(int(aboard)):return false
 		var ship: Dictionary=ids[int(aboard)]
 		if int(ship.unit)!=SHIP or int(ship.owner)!=int(unit.owner) or not bool(ship.alive) or float(ship.dieT)>=0 or bool(ship.simulation.get("attached",false)):return false
-		if version>=8 and str(unit.get("state",""))!="boarded":return false
+		if str(unit.get("state",""))!="boarded":return false
 		var life=unit.get("hp",-1);var maximum=state.get("maxhp",life)
 		if not (life is int or life is float) or not is_finite(float(life)) or float(life)<0:return false
 		if not (maximum is int or maximum is float) or not is_finite(float(maximum)) or float(maximum)<0:return false
 		# R01：科技允许普通部队“当前 HP 高于基础上限”（technology.gd 保留这一契约）。
 		# 载员校验因此不能再用 hp <= maxhp，而要用统一的可接受上限：
 		# 基础上限 + 科技累计获得的当前兵力（每级 400，最高 3 级 = 1200）。
-		if maximum==null:maximum=life
 		var base=state.get("base_maxhp",maximum);var bonus=state.get("tech_hp_bonus",0)
-		if base==null:base=maximum
-		if bonus==null:bonus=0
 		if not TechnologyState.valid_hp(life,maximum,base,bonus):return false
 		if not totals.has(int(aboard)):totals[int(aboard)]={"n":0,"hp":0.0}
 		totals[int(aboard)].n+=1;totals[int(aboard)].hp+=float(life)
@@ -158,5 +145,5 @@ func valid_snapshot(ids: Dictionary, version: int) -> bool:
 		var unit: Dictionary=ids[uid]
 		if int(unit.unit)!=SHIP:continue
 		var state: Dictionary=unit.simulation;var total: Dictionary=totals.get(uid,{"n":0,"hp":0.0})
-		if version>=8 and (int(state.get("carry_n",0))!=int(total.n) or absf(float(state.get("carry_hp",0))-float(total.hp))>0.00001 or bool(state.get("loaded",false))!=(int(total.n)>0)):return false
+		if (int(state.get("carry_n",0))!=int(total.n) or absf(float(state.get("carry_hp",0))-float(total.hp))>0.00001 or bool(state.get("loaded",false))!=(int(total.n)>0)):return false
 	return true

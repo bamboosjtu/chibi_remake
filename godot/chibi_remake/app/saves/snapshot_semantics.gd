@@ -1,5 +1,5 @@
 extends RefCounted
-## Map-dependent admission and documented legacy cleanup windows.
+## Current-format map and bounded-collection admission.
 const Schema = preload("res://simulation/definitions/unit_schema.gd")
 const MAX_TASK_ENTRIES := 4096
 const MAX_TASK_NODES := 32768
@@ -48,12 +48,12 @@ static func valid_rng(value) -> bool:
 
 static func valid_control(simulation: Dictionary) -> bool:
 	if simulation.has("autoControl") and not simulation.autoControl is bool: return false
-	if simulation.has("rngState") and not valid_rng(simulation.rngState): return false
-	return not simulation.has("tick") or _natural(simulation.tick)
+	if not valid_rng(simulation.get("rngState")): return false
+	return _natural(simulation.get("tick"))
 
 static func valid_timing(simulation: Dictionary) -> bool:
-	var speed = simulation.get("speedIndex",2)
-	var accumulator = simulation.get("accumulator",0)
+	var speed = simulation.get("speedIndex")
+	var accumulator = simulation.get("accumulator")
 	if not _natural(speed) or float(speed)>3: return false
 	return (accumulator is int or accumulator is float) and is_finite(float(accumulator)) and float(accumulator)>=0
 
@@ -62,39 +62,20 @@ static func bounds(map: Dictionary) -> Vector2:
 
 static func valid_point(point, map: Dictionary) -> bool:
 	if not Schema._point(point): return false
-	# Historical edge clicks may sit just outside the canvas. One tile is the
-	# admitted cleanup margin, not unbounded coordinates or a navigable region.
 	var size := bounds(map)
-	var margin := float(map.get("tileW",44))
-	return float(point[0]) >= -margin and float(point[1]) >= -margin and float(point[0]) <= size.x+margin and float(point[1]) <= size.y+margin
-
-static func clamp_point(point: Vector2, map: Dictionary) -> Vector2:
-	var size := bounds(map)
-	return Vector2(clampf(point.x,0,maxf(0,size.x-0.001)),clampf(point.y,0,maxf(0,size.y-0.001)))
+	return float(point[0])>=0 and float(point[1])>=0 and float(point[0])<size.x and float(point[1])<size.y
 
 static func valid_unit(record: Dictionary, map: Dictionary) -> bool:
 	if not valid_point([record.get("x"),record.get("y")],map): return false
 	var state: Dictionary = record.simulation
-	for field in ["A","B","pi"]:
-		if state.get(field) != null and not Schema.valid_value(field,state[field]): return false
-	if state.get("pi") != null and float(state.pi) < 0: return false
-	var path = state.get("path",[])
-	if not path is Array or path.size() > int(map.rows)*int(map.cols)+2: return false
+	var path = state.get("path")
+	var cursor = state.get("pi")
+	if not path is Array or not _natural(cursor) or path.size()>int(map.rows)*int(map.cols)+2: return false
+	if (path.is_empty() and int(cursor)!=0) or (not path.is_empty() and int(cursor)>=path.size()): return false
 	for point in path:
 		if not valid_point(point,map): return false
 	var entry := [state.get("site_entry_x",0),state.get("site_entry_y",0)]
-	for index in range(2):
-		if entry[index] == null: entry[index] = 0
 	if not valid_point(entry,map): return false
 	var resource = state.get("gatherRef",{})
 	if resource is Dictionary and resource.get("kind","")=="spent" and not valid_point([resource.get("x"),resource.get("y")],map): return false
 	return not state.has("repathTo") or valid_point(state.repathTo,map)
-
-static func valid_legacy(records: Array, version: int, map: Dictionary) -> bool:
-	for record in records:
-		if version >= 3:
-			if not record is Dictionary or not valid_point([record.get("x"),record.get("y")],map): return false
-		else:
-			var first := 1 if version == 1 else 2
-			if not record is Array or record.size() <= first+1 or not valid_point([record[first],record[first+1]],map): return false
-	return true

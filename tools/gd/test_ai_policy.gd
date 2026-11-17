@@ -109,12 +109,9 @@ func run() -> void:
 	var invalid: Dictionary=snap.duplicate(true)
 	invalid.retreatPoints={1:["bad",1]}
 	assert(not brain.valid_snapshot(invalid,{},[],100))
-	var legacy: Dictionary=snap.duplicate(true)
-	legacy.erase("retreatClock");legacy.erase("retreatPoints");legacy.retreat={1:1}
-	assert(brain.valid_snapshot(legacy,{},[],100))
-	brain.restore(legacy)
-	assert(brain.snapshot().retreatClock.is_empty() and brain.snapshot().retreatPoints.is_empty())
-	print("AI RETREAT PASS 42-thought clock / explicit point / targeted units / no invented retreat / snapshot migration")
+	var invalid_shape: Dictionary=snap.duplicate(true);invalid_shape.retreat={1:1}
+	assert(not brain.valid_snapshot(invalid_shape,{},[],100))
+	print("AI RETREAT PASS 42-thought clock / explicit point / targeted units / no invented retreat / current snapshot shape")
 
 	# ---- R11：补工进入施工编组，且不抢采集/修理 ----
 	blank()

@@ -60,7 +60,7 @@ func open(for_save: bool, default_title := "") -> void:
 			var campaign: String=Game.campaign_caption(entry.map)
 			caption="%s%s  ·  %s" % [title.left(24),"  ·  "+campaign if title!=campaign else "",str(entry.savedAt).replace("T"," ")]
 			if entry.get("source","") == "backup": caption += "  ·  使用备份"
-		elif entry.occupied:caption="记录损坏，无法读取"
+		elif entry.occupied:caption="格式不支持或数据无效"
 		records.add_item("%s    %s" % [prefix,caption])
 		var index:=entries.size()-1
 		if not saving and not entry.valid:records.set_item_disabled(index,true)

@@ -201,7 +201,7 @@ func _visual_context() -> Dictionary:
 	if has_camera:
 		var size: Vector2=surface.get_viewport_rect().size/camera.zoom
 		area=Rect2(camera.position-size*0.5,size).grow(128)
-	return {"selected":selected,"player":int(_ui.host.player_owner),"buildings":bool(_ui.host.show_buildings),"units":bool(_ui.host.show_units),"sides":_ui.host.sec_visible,"visibility":_ui.host.visibility,"camera":has_camera,"area":area,"halfHeight":float(_ui.host.tile_hh)}
+	return {"selected":selected,"player":int(_ui.host.player_owner),"buildings":bool(_ui.host.show_buildings),"units":bool(_ui.host.show_units),"sides":_ui.host.sec_visible,"camera":has_camera,"area":area,"halfHeight":float(_ui.host.tile_hh)}
 
 func update_visual(u: Dictionary, context: Dictionary={}) -> void:
 	if context.is_empty():context=_visual_context()
@@ -215,7 +215,7 @@ func update_visual(u: Dictionary, context: Dictionary={}) -> void:
 		if bool(u.get("attached", false)) or int(u.get("site_inside_uid", -1)) >= 0:
 			vis = false
 	if int(u.owner)!=int(context.player):
-		vis=vis and context.visibility.is_visible(Vector2(u.ax,u.ay))
+		vis=vis and (bool(u.visible) if u.has("visible") else _ui.host.point_visible(Vector2(u.ax,u.ay)))
 	if vis and not bool(u.is_building) and context.camera:
 		vis=(context.area as Rect2).has_point(Vector2(float(u.ax),float(u.ay)-float(u.h)*0.5))
 	if not vis:

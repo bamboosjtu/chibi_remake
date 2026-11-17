@@ -149,13 +149,8 @@ func run() -> void:
 	var game := root.get_node("Game")
 	assert(game.save_game(battle.units, battle.commands.world._resources(), battle.commands.session._save_extra()))
 	var snapshot: Dictionary = game.load_save()
-	var file := FileAccess.open("res://data/db/registry_compatibility.json", FileAccess.READ)
-	var contract: Dictionary = JSON.parse_string(file.get_as_text())
-	snapshot.simulation.contentRevision = contract.previous.chibil1
-	# The prior release predates the independent rules fingerprint fields.
-	snapshot.simulation.erase("rulesRevision");snapshot.simulation.erase("rulesPolicy")
 	assert(battle.saver.apply_snapshot(snapshot))
 	snapshot.simulation.contentRevision = "unknown"
 	assert(not battle.saver.apply_snapshot(snapshot))
-	print("BUILD INPUT PASS 12 buildings, HD icons, paging/back, costs; command order move/attack; previous-save compatibility")
+	print("BUILD INPUT PASS 12 buildings, HD icons, paging/back, costs; command order move/attack; current identity required")
 	battle.free(); done = true; quit()

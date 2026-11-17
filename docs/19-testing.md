@@ -10,7 +10,7 @@
 | 模拟摘要 | `--simtest=<秒>` | 固定 tick 后的状态摘要，跨版本/跨速度回归 |
 | 独立回归 | `tools/gd/test_*.gd` | 子系统与跨系统场景，断言式 |
 | 数据与工具 | `tools/test_*.mjs`、`test_publish.ps1` | 关卡数据、开局配置、内容管线、发布夹具 |
-| 候选冒烟 | `tools/verify_candidate.ps1` | 实际 EXE 全地图加载、同一 PCK 的四项冒烟与确定性基线；跳过时只能生成未发布候选 |
+| 候选冒烟 | `tools/verify_candidate.ps1` | 实际 EXE 全地图加载、同一 PCK 的完整 release 套件与已登记模拟基线；跳过时只能生成未发布候选 |
 | 本地 CI | `tools/ci_windows.ps1` | 默认文档、素材清单、架构与最小冒烟；`-FullRegression` 扩展到完整回归 |
 | 托管契约 | `.github/workflows/contracts.yml` | `tools/ci_lightweight.mjs`：注册表、分层、素材白名单与发布套件形状 |
 
@@ -175,7 +175,7 @@ powershell -NoProfile -File tools/ci_windows.ps1 -FullRegression
 
 ### 单位
 
-`test_unit_research` 汇总 26 种 canonical 属性、17 种生产费用、平民采集/交付/修理与禁止建造、混合施工队、工人费用和 100 更新训练、完整占地上下船/离岸等待/4 更新相位存档；并验证 15 支队伍选取、800 更新末清状态、混乱排队/过期跳过、滚木视野首目标士气 −50、32/45 埋伏固定 30 且可见、主将单体恢复、火场 5/9/…/97 结算/友伤/建筑/离开重入/240 上限、坏档原子拒绝和旧隐蔽字段迁移。
+`test_unit_research` 汇总 26 种 canonical 属性、17 种生产费用、平民采集/交付/修理与禁止建造、混合施工队、工人费用和 100 更新训练、完整占地上下船/离岸等待/4 更新相位存档；并验证 15 支队伍选取、800 更新末清状态、混乱排队/过期跳过、滚木视野首目标士气 −50、32/45 埋伏固定 30 且可见、主将单体恢复、火场 5/9/…/97 结算/友伤/建筑/离开重入/240 上限、坏档原子拒绝和当前状态字段拒绝检查。
 
 ### 原片播放与死亡编队
 
@@ -247,7 +247,7 @@ CI 的续跑矩阵分别检查 chibic1、chibil1、chibic10、chibic17：保留�
 
 新增诊断包括 `pathCallsPerTick`、`pathMsPerTick`、搜索/平滑分项、`updateVisualMsPerFrame` 和 `fogUpdateMsPerFrame`。后两者是 CPU 提交时间，实际帧时间仍包含 GPU 合成。渲染模式将视野的两张 R8 位图上传后在小型视口中合成 RGBA 雾层，大地图与小地图继续共享同一张三档透明度纹理；无渲染测试保留 CPU 参考路径。`test_restored_view` 另在实际窗口中读取合成纹理，验证暂停读档后的透明度。
 
-`test_realtime_queries` 覆盖网格边界归属、密集参考射线、失败重寻路冷却及恢复、五次追帧一次表现同步、旧对象排除、重试状态存读及明确批准的 v8 规则迁移。`test_visibility_rules` 以完整重建对照 40 轮随机移动、重叠、载员及视野半径变化，核对可见计数与探索记忆。
+`test_realtime_queries` 覆盖网格边界归属、密集参考射线、失败重寻路冷却及恢复、五次追帧一次表现同步、旧对象排除、重试状态存读及不匹配规则身份拒绝。`test_visibility_rules` 以完整重建对照 40 轮随机移动、重叠、载员及视野半径变化，核对可见计数与探索记忆。
 
 完整战场实测结果由 `bench_full_battle.ps1` 输出的 JSON 报告保存，报告路径可通过 `-Output` 指定。验收应核对全部轮次的 `qualityPassed` 与 `validationFailures`，不能只引用通过轮次。
 
@@ -264,7 +264,7 @@ pwsh -NoProfile -File tools/bench_full_battle.ps1 -DeveloperSource -Stress -Prof
 
 原有 `-Stress` 继续运行 660/240，不改变旧工作负载及预算。`-CapacityStress` 按真实关卡参战方补足每方 200 实体槽；建筑、工人及武将本体计入同一上限。chibic17 的三方满员为 460 个机动单位、240 个初始交战单位；报告逐方记录实体、建筑与武将数。该用例和添加第四方的历史 660 用例分别报告，互不替代。
 
-协议 v4 记录计算后端、分段计时开关、人口分布、导航预热以及引擎/PCK 哈希。已发布目录只有根 DLL 时照常运行，不要求额外 addons 目录。验收仍要求真实模拟持续推进、最快档 tick P95 ≤30 ms、tick 吞吐 ≥95%、命令队列延迟 P95 ≤100 ms，以及标准/压力 FPS ≥60/30；不丢欠账、不降低频率、不更新确定性基线来消除差异。
+协议 v4 记录计算后端、分段计时开关、人口分布、导航预热以及引擎/PCK 哈希。已发布目录只有根 DLL 时照常运行，不要求额外 addons 目录。验收仍要求真实模拟持续推进、最快档 tick P95 ≤30 ms、tick 吞吐 ≥95%、命令队列延迟 P95 ≤100 ms，以及标准/压力 FPS ≥60/30；不丢欠账、不降低频率、行为变化须记录原因并重新验证基线，不能直接更新参考值来消除失败。
 
 `test_pressure_contracts` 校验坐标与接触缓存的精度、失效、剖析一致性及两种人口工作负载。`test_native_math`、`test_native_geometry` 和 `test_native_world` 分别对照 2,000 个状态夹具、16,000 次攻击更新、160 轮完整视野更新、800 个接触/占格夹具、100 个有序分离选择，以及 660 单位的六个完整世界采样点。无原生后端时保留脚本执行；Windows 的原生数学测试必须实际加载 DLL。
 
@@ -298,7 +298,7 @@ pwsh -NoProfile -File tools/bench_full_battle.ps1 -ReleasePack <候选目录>/Ch
 
 源码发布回归使用 `runtime_assets.mjs --check --hash --versioned-only` 检查已提交资源；该模式不要求生成地形缓存，也不认证完整 staging 图。正式构建继续使用完整的 `--check --hash`，生成地形后再验收。
 
-`test_save_validity` 以正确 checksum 覆盖 v8 缺整组资源、缺任一资源键、缺队列及队列错误类型，并核对拒绝后资源/生产队列和世界身份不变。`test_unit_schema` 的 record 组走完整候选恢复；`test_snapshot_stages` 分别破坏七个校验阶段并检查拒绝的原子性。`test_app_services` 覆盖服务独立性、写入保护和槽缓存失效；`test_camera_read_model` 验证值投影不返回可变世界引用。
+`test_save_validity` 以正确 checksum 覆盖当前格式缺整组资源、缺任一资源键、缺队列及队列错误类型，并核对拒绝后资源/生产队列和世界身份不变。`test_unit_schema` 的 record 组走完整候选恢复；`test_snapshot_stages` 分别破坏七个校验阶段并检查拒绝的原子性。`test_app_services` 覆盖服务独立性、写入保护和槽缓存失效；`test_camera_read_model` 验证值投影不返回可变世界引用。
 
 
 `test_build_preview_read_model` 检查投影的递归只读容器和固定字段集、复制值隔离、跨三个暂停帧的缓存复用、资源/选择/导航失效、失败交换回滚、所有非身份缓存值相同的世界替换，以及旧世界/导航的释放。测试也以真实读档核对相机读模型仍读取当前世界。过期 owner 的预览 key/model 两种查询另由进程级契约负向测试覆盖，必须非零退出且无 SCRIPT ERROR。
@@ -319,7 +319,7 @@ pwsh -NoProfile -File tools/bench_full_battle.ps1 -ReleasePack <候选目录>/Ch
 
 ### 单位状态与模拟热点
 
-release 套件包含 `test_unit_action_states` 和 `test_hot_path_contracts`。前者逐一驱动十三个状态，核对非法目标退回、休息完成、交付等待、混乱前置条件和动画尾处理；现有战斗、施工、采集、载员与原生对照测试继续覆盖实际动作。后者核对资源缓存复用、耗尽分片与几何失效、失败查询后的导航标志恢复、施工成员身份与可变属性、每次更新的堵塞查询上限、中途进度保存、旧规则迁移、失败回滚及旧世界释放，并核实 chibil8 的 10736 个饰物与最大 1240 格资源片。
+release 套件包含 `test_unit_action_states` 和 `test_hot_path_contracts`。前者逐一驱动十三个状态，核对非法目标退回、休息完成、交付等待、混乱前置条件和动画尾处理；现有战斗、施工、采集、载员与原生对照测试继续覆盖实际动作。后者核对资源缓存复用、耗尽分片与几何失效、失败查询后的导航标志恢复、施工成员身份与可变属性、每次更新的堵塞查询上限、中途进度保存、规则身份拒绝、失败回滚及旧世界释放，并核实 chibil8 的 10736 个饰物与最大 1240 格资源片。
 
 `node tools/benchmark_hot_paths.mjs` 运行八工人采集、饰物命中、600 单位施工选择、堵塞终点和建造选址五组 CPU 场景。每组预热三次、采样三十次，记录中位数、P95、最大值及查询次数；预算由 hot_path_budgets.json 声明，使用标准完整战场的 500 ms 上限，堵塞查询另有十二次硬上限。该基准进入 hosted 源码发布回归及本地 FullRegression，不替代完整战场的实时吞吐、GPU 或正式包验收。
 
@@ -327,6 +327,13 @@ release 套件包含 `test_unit_action_states` 和 `test_hot_path_contracts`。�
 
 ### 存档边界与单位投影隔离
 
-`test_save_boundaries` 属于 release 和 CPU-only save 套件：正确 checksum 下的越界位置、超长路径、非法游标、整数溢出、悬空引用类型错误、任务数量/深度超限和坏费用被原子拒绝；旧游标与格缓存、v3 数字布尔值和 v4–v8 缺省继续恢复。它验证解析前的大小/深度限额、输入容器所有权，以及同大小同修改时间下的备份来源失效、槽位标签和实际读取反馈。
+`test_save_boundaries` 属于 release 和 CPU-only save 套件：正确 checksum 下的越界位置、超长路径、非法游标、整数溢出、悬空引用类型错误、任务数量/深度超限和坏费用被原子拒绝；旧版本、派生格缓存、缺失字段和非法游标拒绝。它验证解析前的大小/深度限额、输入容器所有权，以及同大小同修改时间下的备份来源失效、槽位标签和实际读取反馈。
 
 `test_unit_read_models` 覆盖递归冻结、复制值隔离、暂停时的属性/选择/武将类别变化、tick/事件/导航几何失效、跨三个渲染帧的缓存复用，以及世界交换、回滚、旧 UID 回调拒绝和保留投影时旧世界释放。另以 800 个名册项、24 个可见单位采样十次更新，检查 600 次不变帧命中和静态元数据仅复制一次；该成本记录不替代完整战场 FPS 验收。过期宿主的单位、选择、生产、工作、指针和运动查询进入进程级负向测试，要求退出 1 且无二次脚本错误。
+
+
+### 服务投影与当前格式
+
+test_context_read_models 检查雾、时钟、选项、弹体及火场的递归冻结、字节缓冲隔离、暂停帧复用和手动步进失效；强制新世界的逻辑修订相同后验证身份失效、交换回滚、旧排队动作拒绝及服务释放。test_restored_view 核对可见/已探索/未知三种实际像素。
+
+test_current_format 接受 v9，拒绝 v1–v8、无 checksum、旧规则别名和不匹配地图内容；拒绝不得改变当前世界。旧格式恢复正向用例已退役，仍保留当前格式的完整读写与续跑、载员、计时、AI、Schema 和脚本/原生对照。

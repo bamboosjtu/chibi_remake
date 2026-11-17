@@ -36,7 +36,7 @@
       "script": "test_save_validity",
       "markers": [
         "SAVE VALIDITY PASS",
-        "V8 REQUIRED FIELDS PASS"
+        "CURRENT REQUIRED FIELDS PASS"
       ],
       "args": [
         "--noview"
@@ -115,10 +115,9 @@
       "timeout": 600
     },
     {
-      "script": "test_legacy_isolation",
+      "script": "test_current_format",
       "markers": [
-        "LEGACY ISOLATION PASS",
-        "RULES IDENTITY PASS"
+        "CURRENT FORMAT PASS"
       ],
       "args": [
         "--noview"
@@ -236,6 +235,13 @@
       "script": "test_unit_read_models",
       "markers": [
         "UNIT READ MODELS PASS"
+      ],
+      "timeout": 120
+    },
+    {
+      "script": "test_context_read_models",
+      "markers": [
+        "CONTEXT READ MODELS PASS"
       ],
       "timeout": 120
     }

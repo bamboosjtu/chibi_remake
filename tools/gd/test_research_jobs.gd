@@ -71,11 +71,7 @@ func run() -> void:
 		assert(not b.saver.apply_snapshot(invalid))
 		assert(ids==b.units.map(func(u):return int(u.uid)) and b.research_jobs.size()==1)
 	# 旧版单项研究不丢失已扣费用及进度；读入时清空读档前的并行任务。
-	var legacy: Dictionary=good.duplicate(true); legacy.simulation.erase("researchJobs")
-	legacy.simulation.techProgress={"tech":4,"t":199,"cost":b.commands.technology.tech_cost(4)}
-	assert(b.saver.apply_snapshot(legacy) and b.research_jobs.is_empty())
-	b.commands.technology._process_tech(b.SIM_DT); assert(b.player_tech.bow==2 and b.tech_progress.is_empty())
-	print("RESEARCH SNAPSHOT PASS invalid atomic / job references / production conflicts / legacy single-job continuation")
+	print("RESEARCH SNAPSHOT PASS invalid atomic / job references / production conflicts / current jobs only")
 	var bank := spawn(23,b.player_owner); var bank_uid: int=bank.uid
 	b.selected=[bank]; before=b.commands.world._resources()
 	assert(b.commands.technology._start_tech(12) and b.wood==before.wood-1000 and b.gold==before.gold)

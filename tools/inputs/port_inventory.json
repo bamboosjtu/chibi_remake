@@ -4352,9 +4352,7 @@
           "forwarded": "_cancel_unit_command",
           "mechanical": true,
           "privateContract": true,
-          "nameMatches": [
-            "simulation/systems/transports.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "_footprint_cells",
@@ -5752,6 +5750,8 @@
         "scene_controller": {
           "file": "app/battle/scene_controller.gd",
           "methods": [
+            "submit_command",
+            "pump_commands",
             "cancel_work",
             "_apply_save",
             "_save_extra",
@@ -5817,6 +5817,24 @@
           "category": "pure-forwarding",
           "provider": "scene_controller",
           "forwarded": "cancel_work",
+          "mechanical": true,
+          "privateContract": false,
+          "nameMatches": []
+        },
+        {
+          "name": "submit_command",
+          "category": "pure-forwarding",
+          "provider": "scene_controller",
+          "forwarded": "submit_command",
+          "mechanical": true,
+          "privateContract": false,
+          "nameMatches": []
+        },
+        {
+          "name": "pump_commands",
+          "category": "pure-forwarding",
+          "provider": "scene_controller",
+          "forwarded": "pump_commands",
           "mechanical": true,
           "privateContract": false,
           "nameMatches": []
@@ -9657,7 +9675,7 @@
           "caller": "_apply_tech_effects",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 324,
+          "line": 318,
           "argumentCount": 1
         },
         {
@@ -9665,7 +9683,7 @@
           "caller": "_cancel_tech",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 333,
+          "line": 327,
           "argumentCount": 1
         }
       ]
@@ -9865,7 +9883,6 @@
         ],
         "combat": [
           "_fire_attack",
-          "_kill",
           "_melee_line_clear",
           "_nearest_enemy"
         ],
@@ -9925,18 +9942,10 @@
         },
         {
           "file": "simulation/battle/unit_actions.gd",
-          "caller": "_step_legacy_burn",
-          "provider": "combat",
-          "method": "_kill",
-          "line": 60,
-          "argumentCount": 2
-        },
-        {
-          "file": "simulation/battle/unit_actions.gd",
           "caller": "_prepare_action",
           "provider": "transport_orders",
           "method": "_retry_unload",
-          "line": 102,
+          "line": 88,
           "argumentCount": 1
         },
         {
@@ -9944,7 +9953,7 @@
           "caller": "_prepare_action",
           "provider": "command_groups",
           "method": "_cancel_unit_command",
-          "line": 108,
+          "line": 94,
           "argumentCount": 1
         },
         {
@@ -9952,14 +9961,14 @@
           "caller": "_prepare_action",
           "provider": "combat",
           "method": "_nearest_enemy",
-          "line": 110
+          "line": 96
         },
         {
           "file": "simulation/battle/unit_actions.gd",
           "caller": "_prepare_action",
           "provider": "combat",
           "method": "_nearest_enemy",
-          "line": 114,
+          "line": 100,
           "argumentCount": 2
         },
         {
@@ -9967,7 +9976,7 @@
           "caller": "_follow_working_members",
           "provider": "movement",
           "method": "_path_to",
-          "line": 133,
+          "line": 119,
           "argumentCount": 3
         },
         {
@@ -9975,7 +9984,7 @@
           "caller": "_step_move",
           "provider": "movement",
           "method": "_path_to",
-          "line": 146,
+          "line": 132,
           "argumentCount": 3
         },
         {
@@ -9983,7 +9992,7 @@
           "caller": "_step_move",
           "provider": "movement",
           "method": "_follow",
-          "line": 150,
+          "line": 136,
           "argumentCount": 2
         },
         {
@@ -9991,7 +10000,7 @@
           "caller": "_step_join",
           "provider": "command_groups",
           "method": "_cancel_unit_command",
-          "line": 160,
+          "line": 146,
           "argumentCount": 1
         },
         {
@@ -9999,7 +10008,7 @@
           "caller": "_step_join",
           "provider": "interaction_paths",
           "method": "_edge_cell_distance",
-          "line": 161,
+          "line": 147,
           "argumentCount": 2
         },
         {
@@ -10007,7 +10016,7 @@
           "caller": "_step_join",
           "provider": "command_groups",
           "method": "_cancel_unit_command",
-          "line": 164,
+          "line": 150,
           "argumentCount": 1
         },
         {
@@ -10015,7 +10024,7 @@
           "caller": "_step_join",
           "provider": "officer_teams",
           "method": "_auto_assign_new_team",
-          "line": 167,
+          "line": 153,
           "argumentCount": 1
         },
         {
@@ -10023,7 +10032,7 @@
           "caller": "_step_join",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 168,
+          "line": 154,
           "argumentCount": 1
         },
         {
@@ -10031,7 +10040,7 @@
           "caller": "_step_join",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 169,
+          "line": 155,
           "argumentCount": 1
         },
         {
@@ -10039,7 +10048,7 @@
           "caller": "_step_join",
           "provider": "interaction_paths",
           "method": "_edge_interaction_path",
-          "line": 171,
+          "line": 157,
           "argumentCount": 2
         },
         {
@@ -10047,7 +10056,7 @@
           "caller": "_step_join",
           "provider": "command_groups",
           "method": "_cancel_unit_command",
-          "line": 172,
+          "line": 158,
           "argumentCount": 1
         },
         {
@@ -10055,7 +10064,7 @@
           "caller": "_step_join",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 172,
+          "line": 158,
           "argumentCount": 1
         },
         {
@@ -10063,7 +10072,7 @@
           "caller": "_step_join",
           "provider": "movement",
           "method": "_follow",
-          "line": 173,
+          "line": 159,
           "argumentCount": 2
         },
         {
@@ -10071,7 +10080,7 @@
           "caller": "_step_board",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 186,
+          "line": 172,
           "argumentCount": 1
         },
         {
@@ -10079,7 +10088,7 @@
           "caller": "_step_board",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 191,
+          "line": 177,
           "argumentCount": 1
         },
         {
@@ -10087,7 +10096,7 @@
           "caller": "_step_board",
           "provider": "movement",
           "method": "_follow",
-          "line": 192,
+          "line": 178,
           "argumentCount": 2
         },
         {
@@ -10095,7 +10104,7 @@
           "caller": "_step_board",
           "provider": "transport_orders",
           "method": "_attach_to_ship",
-          "line": 195,
+          "line": 181,
           "argumentCount": 2
         },
         {
@@ -10103,7 +10112,7 @@
           "caller": "_step_gather",
           "provider": "interaction_paths",
           "method": "_edge_cell_distance",
-          "line": 205,
+          "line": 191,
           "argumentCount": 2
         },
         {
@@ -10111,7 +10120,7 @@
           "caller": "_step_gather",
           "provider": "interaction_paths",
           "method": "_edge_interaction_choice",
-          "line": 207,
+          "line": 193,
           "argumentCount": 2
         },
         {
@@ -10119,7 +10128,7 @@
           "caller": "_step_gather",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 213,
+          "line": 199,
           "argumentCount": 1
         },
         {
@@ -10127,7 +10136,7 @@
           "caller": "_step_gather",
           "provider": "movement",
           "method": "_follow",
-          "line": 214,
+          "line": 200,
           "argumentCount": 2
         },
         {
@@ -10135,7 +10144,7 @@
           "caller": "_step_deliver",
           "provider": "harvest_orders",
           "method": "_deposits_for",
-          "line": 222,
+          "line": 208,
           "argumentCount": 2
         },
         {
@@ -10143,7 +10152,7 @@
           "caller": "_step_deliver",
           "provider": "interaction_paths",
           "method": "_deposit_ready",
-          "line": 225,
+          "line": 211,
           "argumentCount": 2
         },
         {
@@ -10151,7 +10160,7 @@
           "caller": "_step_deliver",
           "provider": "harvest_orders",
           "method": "_deposit_carry",
-          "line": 230,
+          "line": 216,
           "argumentCount": 1
         },
         {
@@ -10159,7 +10168,7 @@
           "caller": "_step_deliver",
           "provider": "interaction_paths",
           "method": "_edge_interaction_path",
-          "line": 241,
+          "line": 227,
           "argumentCount": 4
         },
         {
@@ -10167,7 +10176,7 @@
           "caller": "_step_deliver",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 244,
+          "line": 230,
           "argumentCount": 1
         },
         {
@@ -10175,7 +10184,7 @@
           "caller": "_step_deliver",
           "provider": "movement",
           "method": "_follow",
-          "line": 245,
+          "line": 231,
           "argumentCount": 2
         },
         {
@@ -10183,7 +10192,7 @@
           "caller": "_step_repair",
           "provider": "spatial_index",
           "method": "_contains_unit",
-          "line": 264,
+          "line": 250,
           "argumentCount": 1
         },
         {
@@ -10191,7 +10200,7 @@
           "caller": "_step_repair",
           "provider": "command_groups",
           "method": "_cancel_unit_command",
-          "line": 265,
+          "line": 251,
           "argumentCount": 1
         },
         {
@@ -10199,7 +10208,7 @@
           "caller": "_step_repair",
           "provider": "command_groups",
           "method": "_cancel_unit_command",
-          "line": 267,
+          "line": 253,
           "argumentCount": 1
         },
         {
@@ -10207,7 +10216,7 @@
           "caller": "_step_repair",
           "provider": "command_groups",
           "method": "_cancel_unit_command",
-          "line": 269,
+          "line": 255,
           "argumentCount": 1
         },
         {
@@ -10215,7 +10224,7 @@
           "caller": "_step_repair",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 269,
+          "line": 255,
           "argumentCount": 1
         },
         {
@@ -10223,7 +10232,7 @@
           "caller": "_step_repair",
           "provider": "interaction_paths",
           "method": "_dist_to_obj",
-          "line": 270,
+          "line": 256,
           "argumentCount": 2
         },
         {
@@ -10231,7 +10240,7 @@
           "caller": "_step_repair",
           "provider": "interaction_paths",
           "method": "_interaction_path",
-          "line": 272,
+          "line": 258,
           "argumentCount": 3
         },
         {
@@ -10239,7 +10248,7 @@
           "caller": "_step_repair",
           "provider": "command_groups",
           "method": "_cancel_unit_command",
-          "line": 273,
+          "line": 259,
           "argumentCount": 1
         },
         {
@@ -10247,7 +10256,7 @@
           "caller": "_step_repair",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 273,
+          "line": 259,
           "argumentCount": 1
         },
         {
@@ -10255,7 +10264,7 @@
           "caller": "_step_repair",
           "provider": "movement",
           "method": "_follow",
-          "line": 274,
+          "line": 260,
           "argumentCount": 2
         },
         {
@@ -10263,7 +10272,7 @@
           "caller": "_step_repair",
           "provider": "construction_orders",
           "method": "_do_repair",
-          "line": 280,
+          "line": 266,
           "argumentCount": 2
         },
         {
@@ -10271,7 +10280,7 @@
           "caller": "_step_repair",
           "provider": "command_groups",
           "method": "_cancel_unit_command",
-          "line": 280,
+          "line": 266,
           "argumentCount": 1
         },
         {
@@ -10279,7 +10288,7 @@
           "caller": "_step_build",
           "provider": "construction_orders",
           "method": "_valid_build_worker",
-          "line": 287,
+          "line": 273,
           "argumentCount": 2
         },
         {
@@ -10287,7 +10296,7 @@
           "caller": "_step_build",
           "provider": "interaction_paths",
           "method": "_edge_cell_distance",
-          "line": 289,
+          "line": 275,
           "argumentCount": 2
         },
         {
@@ -10295,7 +10304,7 @@
           "caller": "_step_build",
           "provider": "construction_orders",
           "method": "_site_entry_path",
-          "line": 291,
+          "line": 277,
           "argumentCount": 2
         },
         {
@@ -10303,7 +10312,7 @@
           "caller": "_step_build",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 293,
+          "line": 279,
           "argumentCount": 1
         },
         {
@@ -10311,7 +10320,7 @@
           "caller": "_step_build",
           "provider": "movement",
           "method": "_follow",
-          "line": 294,
+          "line": 280,
           "argumentCount": 2
         },
         {
@@ -10319,7 +10328,7 @@
           "caller": "_step_attack",
           "provider": "spatial_index",
           "method": "_contains_unit",
-          "line": 303,
+          "line": 289,
           "argumentCount": 1
         },
         {
@@ -10327,7 +10336,7 @@
           "caller": "_step_attack",
           "provider": "command_groups",
           "method": "_cancel_unit_command",
-          "line": 304,
+          "line": 290,
           "argumentCount": 1
         },
         {
@@ -10335,7 +10344,7 @@
           "caller": "_step_attack",
           "provider": "spatial_index",
           "method": "_unit_cell",
-          "line": 322,
+          "line": 308,
           "argumentCount": 1
         },
         {
@@ -10343,7 +10352,7 @@
           "caller": "_step_attack",
           "provider": "spatial_index",
           "method": "_unit_cell",
-          "line": 322,
+          "line": 308,
           "argumentCount": 1
         },
         {
@@ -10351,7 +10360,7 @@
           "caller": "_step_attack",
           "provider": "combat",
           "method": "_melee_line_clear",
-          "line": 324,
+          "line": 310,
           "argumentCount": 2
         },
         {
@@ -10359,7 +10368,7 @@
           "caller": "_step_attack",
           "provider": "combat",
           "method": "_fire_attack",
-          "line": 330,
+          "line": 316,
           "argumentCount": 2
         },
         {
@@ -10367,7 +10376,7 @@
           "caller": "_step_attack",
           "provider": "command_groups",
           "method": "_cancel_unit_command",
-          "line": 332,
+          "line": 318,
           "argumentCount": 1
         },
         {
@@ -10375,7 +10384,7 @@
           "caller": "_step_attack",
           "provider": "movement",
           "method": "_follow",
-          "line": 338,
+          "line": 324,
           "argumentCount": 2
         },
         {
@@ -10383,7 +10392,7 @@
           "caller": "_repath_attack",
           "provider": "interaction_paths",
           "method": "_edge_interaction_path",
-          "line": 348,
+          "line": 334,
           "argumentCount": 2
         },
         {
@@ -10391,7 +10400,7 @@
           "caller": "_repath_attack",
           "provider": "movement",
           "method": "_path_to",
-          "line": 350,
+          "line": 336,
           "argumentCount": 3
         },
         {
@@ -10399,7 +10408,7 @@
           "caller": "_try_native_attack",
           "provider": "combat",
           "method": "_fire_attack",
-          "line": 365,
+          "line": 351,
           "argumentCount": 2
         },
         {
@@ -10407,7 +10416,7 @@
           "caller": "_try_native_attack",
           "provider": "movement",
           "method": "_follow",
-          "line": 367,
+          "line": 353,
           "argumentCount": 2
         },
         {
@@ -10415,7 +10424,7 @@
           "caller": "_try_native_attack",
           "provider": "spatial_index",
           "method": "_separate_unit",
-          "line": 371,
+          "line": 357,
           "argumentCount": 1
         }
       ]

@@ -14,6 +14,14 @@ for(const [name,body] of Object.entries({
  work_values_expired:'var data=Node2D.new()\n\tvar reader=preload("res://presentation/battle/battle_access.gd").new(data,RefCounted.new(),RefCounted.new())\n\tdata.free()\n\tassert(reader.building_work(0).is_empty())\n\treader.free()',
  cursor_values_expired:'var data=Node2D.new()\n\tvar reader=preload("res://presentation/battle/battle_access.gd").new(data,RefCounted.new(),RefCounted.new())\n\tdata.free()\n\tassert(reader.cursor_targets(Vector2.ZERO,"attack").is_empty())\n\treader.free()',
  motion_values_expired:'var data=Node2D.new()\n\tvar reader=preload("res://presentation/battle/battle_access.gd").new(data,RefCounted.new(),RefCounted.new())\n\tdata.free()\n\tassert(reader.motion_views().is_empty())\n\treader.free()',
+ visibility_values_expired:'var data=Node2D.new()\n\tvar reader=preload("res://presentation/battle/battle_access.gd").new(data,RefCounted.new(),RefCounted.new())\n\tdata.free()\n\tassert(reader.visibility_view().is_empty())\n\treader.free()',
+ clock_values_expired:'var data=Node2D.new()\n\tvar reader=preload("res://presentation/battle/battle_access.gd").new(data,RefCounted.new(),RefCounted.new())\n\tdata.free()\n\tassert(reader.clock_view().is_empty())\n\treader.free()',
+ options_values_expired:'var data=Node2D.new()\n\tvar reader=preload("res://presentation/battle/battle_access.gd").new(data,RefCounted.new(),RefCounted.new())\n\tdata.free()\n\tassert(reader.build_options().is_empty())\n\treader.free()',
+ effects_values_expired:'var data=Node2D.new()\n\tvar reader=preload("res://presentation/battle/battle_access.gd").new(data,RefCounted.new(),RefCounted.new())\n\tdata.free()\n\tassert(reader.effect_views().is_empty())\n\treader.free()',
+ events_values_expired:'var data=Node2D.new()\n\tvar reader=preload("res://presentation/battle/battle_access.gd").new(data,RefCounted.new(),RefCounted.new())\n\tdata.free()\n\tassert(reader.event_count()==0)\n\treader.free()',
+ terrain_values_expired:'var data=Node2D.new()\n\tvar reader=preload("res://presentation/battle/battle_access.gd").new(data,RefCounted.new(),RefCounted.new())\n\tdata.free()\n\tassert(not reader.terrain_has_changes([]))\n\treader.free()',
+ submit_expired:'var port=preload("res://app/commands/session_commands.gd").new()\n\tassert(port.submit_command(3,Callable())==0)',
+ pump_expired:'var port=preload("res://app/commands/session_commands.gd").new()\n\tassert(port.pump_commands()==0)',
  command_missing:'var port=preload("res://app/commands/technology_commands.gd").new()\n\tpreload("res://composition_contract.gd").wire({},"command negative",{"commands.technology":port})',
  command_method:'var port=preload("res://app/commands/technology_commands.gd").new()\n\tvar value=RefCounted.new()\n\tpreload("res://composition_contract.gd").wire({"technology":value},"command negative",{"commands.technology":port})',
  command_expired:'var port=preload("res://app/commands/technology_commands.gd").new()\n\tvar value=RefCounted.new()\n\tport._provider_technology=weakref(value)\n\tvalue=null\n\tif port.tech_is_sell(0): push_error("invalid fallback")',
@@ -32,7 +40,7 @@ for(const [name,body] of Object.entries({
  assert.match(result.output,/shutdown requested \(exit 1\); current frame continues with defaults/);
  if(['absent_call','expired','scope_absent','scope_expired'].includes(name))assert.match(result.output,/PROBE caller continued after guarded return/);
 }
-console.log('REGISTRY RUNTIME NEGATIVE PASS 23 cases: missing provider / missing method / expired scopes, wrappers and read model / unknown debug events and state property; exit 1 without SCRIPT ERROR');
+console.log('REGISTRY RUNTIME NEGATIVE PASS 31 cases: missing provider / missing method / expired scopes, wrappers and read model / unknown debug events and state property; exit 1 without SCRIPT ERROR');
 const releasePolicy=await runGodot({engine,directory,name:'presentation-release-policy',timeout:30,args:['--headless','--path',path.resolve('godot/chibi_remake'),'--script',path.resolve('tools/gd/test_presentation_diagnostics.gd')],markers:['PRESENTATION DIAGNOSTICS PASS']});
 assert(releasePolicy.ok,releasePolicy.output);
 assert.doesNotMatch(releasePolicy.output,/explicit port contract failed/);

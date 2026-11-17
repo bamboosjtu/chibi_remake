@@ -8,7 +8,7 @@ func _initialize() -> void:
 func run() -> void:
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--output="):output=arg.substr(9)
-		if arg.begins_with("--legacy-save="):saved=arg.substr(14)
+		if arg.begins_with("--save-file="):saved=arg.substr(12)
 	DirAccess.make_dir_recursive_absolute(output)
 	root.content_scale_mode=Window.CONTENT_SCALE_MODE_DISABLED;root.size=Vector2i(1920,1080)
 	root.get_node("Game").current_map="chibil1"

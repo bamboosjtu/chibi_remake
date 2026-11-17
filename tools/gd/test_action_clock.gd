@@ -91,10 +91,8 @@ func run() -> void:
 	for change in [{"action_wait":1001},{"action_phase":24},{"action_started":1},{"action_kind":"gather"}]:
 		var bad: Dictionary=saved.duplicate(true)
 		bad.units[0].simulation.merge(change,true);assert(not b.saver.apply_snapshot(bad))
-	var legacy: Dictionary=saved.duplicate(true);legacy.v=6
-	for rec in legacy.units:
-		for field in Clock.FIELDS:rec.simulation.erase(field)
-	assert(b.saver.apply_snapshot(legacy))
-	assert(b.units.all(func(u):return u.action_wait==0 and u.action_phase==0 and not u.action_started))
-	print("ACTION SAVE PASS v%d / invalid atomic / v6 missing clock initializes cleanly"%game.SAVE_VERSION)
+	var incomplete: Dictionary=saved.duplicate(true)
+	incomplete.units[0].simulation.erase("action_wait")
+	assert(not b.saver.apply_snapshot(incomplete))
+	print("ACTION SAVE PASS v%d / invalid atomic / missing clock rejected"%game.SAVE_VERSION)
 	done=true;b.queue_free();await process_frame;quit(0)
