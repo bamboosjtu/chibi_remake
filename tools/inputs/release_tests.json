@@ -221,6 +221,23 @@
       "args": [
         "--noview"
       ]
+    },
+    {
+      "script": "test_save_boundaries",
+      "markers": [
+        "SAVE BOUNDARIES PASS"
+      ],
+      "args": [
+        "--noview"
+      ],
+      "timeout": 150
+    },
+    {
+      "script": "test_unit_read_models",
+      "markers": [
+        "UNIT READ MODELS PASS"
+      ],
+      "timeout": 120
     }
   ]
 }

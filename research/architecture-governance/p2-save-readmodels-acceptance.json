@@ -1,0 +1,2009 @@
+{
+  "schemaVersion": 1,
+  "checkpoint": "779894d7bd671d2a0cfa343e5d548ecc69d2d856",
+  "review": {
+    "file": "tmp/review.md",
+    "sha256": "315e9e170de684b53d6aeb41538c1149102913b4fe7d29b14e1d9f332c1f1537"
+  },
+  "runtimeSources": {
+    "godot/chibi_remake/app/acceptance_storage.gd": "7ee9592963f3d30ddf140b288a8b622968ee779938a5992a6ac20fcbdc0e35c2",
+    "godot/chibi_remake/app/battle/bootstrap.gd": "e78b67eb89d1edaeb85fde7b5482aaf9b038c1a57c1f48ef89feecc42c89a51a",
+    "godot/chibi_remake/app/battle/cheat_controller.gd": "e2b8cc553a6f91072f26cf64dbd00205263aabec48e233ca93f0c859b33eb5c2",
+    "godot/chibi_remake/app/battle/duel_controller.gd": "f71829f09dd4cc822755b110d8ea8ca17a54cfd6cafdceb7132a69b63168d64d",
+    "godot/chibi_remake/app/battle/ports/bootstrap_dependencies.gd": "580ed9c169d53b0c2759f6d6add84a7fe0ebdbc05075cb512c866876e85ddcba",
+    "godot/chibi_remake/app/battle/ports/cheat_controller_dependencies.gd": "de6c8df159458616322acb1d5eed7f90ae17a869141b53a777aa39162fe0f53e",
+    "godot/chibi_remake/app/battle/ports/duel_controller_dependencies.gd": "75119d7f884a087457dbda1cc26c639ee625daa4c258644c6dee2b9f59e42de4",
+    "godot/chibi_remake/app/battle/ports/scene_controller_dependencies.gd": "83376e18c614653099f1c73bdd8b80e942926092630821b1d137bd51a05aaa8b",
+    "godot/chibi_remake/app/battle/scene_controller.gd": "a87efc15eabc8468445a6cf3071a011e8ab5705b19bcf1d6f01f182204b1d94f",
+    "godot/chibi_remake/app/battle_commands.gd": "1183113ddf35e43d44ccb3365be10f4a48e8473a3e24bd46eec5d390c98c473f",
+    "godot/chibi_remake/app/battle_scene_state.gd": "55141bbaf5042f9de37d3dfda221aff5bb80665df9e7a86f80dffaa073f96916",
+    "godot/chibi_remake/app/campaign_session.gd": "b6d85c940b121f6189d64b34af9abaa96936f4fb97e66a541b6cdbc99b074c8b",
+    "godot/chibi_remake/app/command_pump.gd": "d9f03108435c4997f3b1aba03a9f6a928cf1d269a5bc404a6ac0d4bcd6cfc086",
+    "godot/chibi_remake/app/commands/economy_commands.gd": "d69ed71a2bc90a098b341222e448531e7774d57bd2e3d59bd7ead760aad7aaff",
+    "godot/chibi_remake/app/commands/military_commands.gd": "1d6d10f83a0cab08513acc14a58c84718b9c10ccb9b4d2588d21f4c40c5cb0c6",
+    "godot/chibi_remake/app/commands/orders_commands.gd": "82f8785445865880e30a1ffd78b8b2b7cf6d457e9726a723181be209030c0036",
+    "godot/chibi_remake/app/commands/session_commands.gd": "0f6541beaa4857554fd749a09bff988d01fb7ea4d554b4ae41829907eb38e6e9",
+    "godot/chibi_remake/app/commands/technology_commands.gd": "5ebeaeccfc3400cd7f393024df0bc0b60bca791c0ebbf340c47042ed19ba1b10",
+    "godot/chibi_remake/app/commands/world_commands.gd": "dcfefef97d0cd38363d6e32887fa9111d46c46bc915cf41f2d1ccae00059bbcc",
+    "godot/chibi_remake/app/game.gd": "13d6c24df45ed0d31e555de6e54d3f651d54753bb7870bd20dccfee22508d881",
+    "godot/chibi_remake/app/json_store.gd": "8b52d1b3f876d69b309a038a1574d1df017fe39fa42367a945ae8fcb1f4c3e73",
+    "godot/chibi_remake/app/read_models/unit_projection.gd": "703e01ef1db8e55b95d1d91e9346d4d8a27316b7492d804a682bf4c8542c60cc",
+    "godot/chibi_remake/app/save_service.gd": "e31a5a90351d48ea7d8c92331d721c744831d2b6181794f7ccd076afdc34b4a7",
+    "godot/chibi_remake/app/saves/candidate_world.gd": "ba63045080a127c6949495ce357bc1e7b0526a8ecf7f07bd8532d6d6046e382f",
+    "godot/chibi_remake/app/saves/json_limits.gd": "f444ad06ef6402a8eaeaf83cdc3d9a6374e56ca9f5ff43dd4c1070a86fbddddd",
+    "godot/chibi_remake/app/saves/legacy_seed.gd": "5e5cbf3794274e0cdd30fa9694ee0145cd9181461ad512b43bab03c4830159ad",
+    "godot/chibi_remake/app/saves/legacy_snapshot.gd": "7e0bf31222e8ed7057649a1257f47db832798086c2a375375f8034b9b393f701",
+    "godot/chibi_remake/app/saves/rules_identity.gd": "7381fa2cfe10f2f4a3ebc8e02787872d01160b5d6c51e0587bd6b6a0a2dfde32",
+    "godot/chibi_remake/app/saves/save_envelope.gd": "6457844b6caa5791440aadf275a638a6c1fe0fb2209b9e896f7f4c6ac63395cb",
+    "godot/chibi_remake/app/saves/save_repository.gd": "f418671516858a4760baf6a288f215abaa62866fd292d66527738f9f6fce0289",
+    "godot/chibi_remake/app/saves/slot_catalog.gd": "94cf70255695e654bf0889a44d26f92c32af183aa21f9a0f202f36abb4260860",
+    "godot/chibi_remake/app/saves/snapshot_restorer.gd": "ccbcb1d1bc6dc9ca22948644bf501139c5164c4a0df5b94842974874c63be156",
+    "godot/chibi_remake/app/saves/snapshot_semantics.gd": "8d98644dc7ebcbabdb82aac654962db9783cadd4bc0ddb7272589eef699d199f",
+    "godot/chibi_remake/app/saves/snapshot_validator.gd": "e1d3ad7d9b799483c22af19534edba2550a1798f1f40c971c7cdbcfc45c3cedf",
+    "godot/chibi_remake/app/saves/world_transaction.gd": "043423925aede0ca24d4653f0d41018cabf301626884f63012aac3429b2358fd",
+    "godot/chibi_remake/app/user_storage.gd": "97385d5beec64f7fd39dc8aaf74e0435671cda80726e4372e3d3d10a368b2214",
+    "godot/chibi_remake/composition_contract.gd": "122727a52a5b950a022faa5d2dcbb7a78b983163167009c17f7fdfc4475e2086",
+    "godot/chibi_remake/main.gd": "b2aae076eb27a6bbd71e800ae5daf8b3a49e095c3db1a3e30a3bb4747287a731",
+    "godot/chibi_remake/menu.gd": "58e46e0e530f3385c6b52335530d975df2d8686c011091eeef4ecd87ba3356ee",
+    "godot/chibi_remake/named_port.gd": "6e7a10e6fb04c286aeea226d66e3d16203254070fe80c5a6ef50103d85d0418e",
+    "godot/chibi_remake/presentation/audio/bgm.gd": "2816bb40063dd56c31df0239a81984a7f5abdfd03fae7997a704971b7fafe5f7",
+    "godot/chibi_remake/presentation/audio/generated_audio.gd": "d9d0a7d989395b2f94f50527833929c47b0fbb730e5096cc83c2444ec2b34b72",
+    "godot/chibi_remake/presentation/audio/sfx.gd": "5fb918e9c07fcdcc92047d7f06147ac2adee0ab353a64e2ac1e7c91c87dc1a99",
+    "godot/chibi_remake/presentation/battle/art_catalog.gd": "67c5bea28f2cc0e442ecbfb33c08dd3cee2276cc55feac56ae976e0a8126ada4",
+    "godot/chibi_remake/presentation/battle/battle_access.gd": "d53476602ad3d4d14f5853b230e65a313c06ba201255bad918d5b380d696015d",
+    "godot/chibi_remake/presentation/battle/battle_fog.gd": "fa4309a9d1d66447af4b6dba19251a426b922ca55b5c24125e9705b6fd2f571f",
+    "godot/chibi_remake/presentation/battle/battle_minimap.gd": "7301dc003a01fec4ad66d35223e093ee531c1db189f350c7e056ca1bfff1168e",
+    "godot/chibi_remake/presentation/battle/battle_resources.gd": "c6e88d16e2d6c301c0e1bbe99b33a5fe4d476831f793372b35167cca13f728ee",
+    "godot/chibi_remake/presentation/battle/battle_view.gd": "d1a73c97e239820ab52269a32ced4c505f659b544b489441828ff312fec2e905",
+    "godot/chibi_remake/presentation/battle/build_preview.gd": "f66c9187312735ef571ee2e5677cd427158d437d4eba58ff1a0e1b2fd4400c81",
+    "godot/chibi_remake/presentation/battle/components/battle_view_state.gd": "7668aaf167267ee55a36f9b1f79fe8bed59cee2ba54ed8722876a212216bbf72",
+    "godot/chibi_remake/presentation/battle/components/camera_controller.gd": "8d12edc96f7afccb86f3c7203151cf08cc9e36bf40d17a12f1747eea67d9ee46",
+    "godot/chibi_remake/presentation/battle/components/command_actions.gd": "6e61040bb628fad1b4e427572cd26e9b7d4bcc1fbbc977eed0339e8b30c4d2ea",
+    "godot/chibi_remake/presentation/battle/components/command_art.gd": "a6c6e2ae2614fe12d00b6fa366bd3df546d1211a47c5f722230d1d069f5ce787",
+    "godot/chibi_remake/presentation/battle/components/command_model.gd": "79fbfb8c94d3952a0b0f01e68ef255c34106d70433f010ba9413ffdec351a269",
+    "godot/chibi_remake/presentation/battle/components/controller.gd": "a120e755df25606c637c95d610aef49d196f7bcdc906aaa204785cedb6178a1c",
+    "godot/chibi_remake/presentation/battle/components/hud_build.gd": "6ee4ff90b2bbe143c0f2c70ce812c78d375a4fe010bff41e91ed902f1d2eba9a",
+    "godot/chibi_remake/presentation/battle/components/hud_input.gd": "2d344ec4b9e0c25f8bf3b9855922ef03a019030394104f2a1df9892f2b8d7744",
+    "godot/chibi_remake/presentation/battle/components/hud_layout.gd": "24744b33a52278c786fd977c3878f37cefb8b9e1c3e311d690577775097fd151",
+    "godot/chibi_remake/presentation/battle/components/legacy_layout.gd": "4b429d32c42d64b74feea872bc8f665bbe2a2f42a7cd78602b95981843e550c3",
+    "godot/chibi_remake/presentation/battle/components/ports/camera_controller_dependencies.gd": "f971ffdcfa9fdc519782cbd27c65e6053d3bb7d4cbe51948b026f2b3a830dd74",
+    "godot/chibi_remake/presentation/battle/components/ports/command_actions_dependencies.gd": "358ecf3342391905bb538fcb26944b4f199a796fa27702f095023769f8b7045b",
+    "godot/chibi_remake/presentation/battle/components/ports/command_art_dependencies.gd": "d2cb26736a5efe36116fb782d2f0f1da3b335f59da943bd08ec1202ec971fad9",
+    "godot/chibi_remake/presentation/battle/components/ports/command_model_dependencies.gd": "cbdb25b9a94da94c0443930adbbebc24f03e26b0603664fb99a275ff7102876c",
+    "godot/chibi_remake/presentation/battle/components/ports/controller_dependencies.gd": "c8a1c8bd23c2d84d92bbe939dca2b127bc9ee36caa01ef7684fff63d9988d5ff",
+    "godot/chibi_remake/presentation/battle/components/ports/hud_build_dependencies.gd": "00dfc28b752cb17e0edd8df409cfcd8bf47a4ed3f59862474b47044bc79596ea",
+    "godot/chibi_remake/presentation/battle/components/ports/hud_input_dependencies.gd": "1ab97e9f73bd0b4dfa95b66e5cb0dbf0140932698606a53386fa97d93ec37a96",
+    "godot/chibi_remake/presentation/battle/components/ports/hud_layout_dependencies.gd": "280d0ea7fb05632f82b97f8e64bfb4d88f3eb359d1283baf11ea3201bee51745",
+    "godot/chibi_remake/presentation/battle/components/ports/legacy_layout_dependencies.gd": "695b4a073bedfb77e845ce4313eccda4d5a2fb665bd7f45a8828328e5305a83a",
+    "godot/chibi_remake/presentation/battle/components/ports/selection_info_dependencies.gd": "b141c913b7baa5607f5b198c3860e94d760ea39e1451b4b8d0e1257c31715d90",
+    "godot/chibi_remake/presentation/battle/components/ports/unit_visuals_dependencies.gd": "477f2233f0152d8f5db2fa40c8cd95aee2254b4937b05201e7374eafef729d1e",
+    "godot/chibi_remake/presentation/battle/components/ports/world_layers_dependencies.gd": "a14c749bb8ff19f860d6e4f115feb9b19d47149360829498fd725a01c8215a14",
+    "godot/chibi_remake/presentation/battle/components/selection_info.gd": "96998b8fb3461f61e968cd07572242fa7de35bfd52fdf767840fe7a5c09d7d36",
+    "godot/chibi_remake/presentation/battle/components/unit_visuals.gd": "c44cb65bd790245b903f37a99d46b65111003b052ee591f85801e5769ad3bccd",
+    "godot/chibi_remake/presentation/battle/components/world_layers.gd": "20a14150ffa29997e5278ac82b8fded0027a5746293d49658627e35d8cf380c4",
+    "godot/chibi_remake/presentation/battle/event_diagnostics.gd": "768fcdf43196e61b67911792d4b2df115da81d92b83dffa47cce3d41abf71df3",
+    "godot/chibi_remake/presentation/battle/full_art_catalog.gd": "0407d52365d8d79a18e860459a82cd522784024df6b227f04bc0900937a443a4",
+    "godot/chibi_remake/presentation/battle/gate_module.gd": "9f89f96d0cc74d4f7c6ff676b4bd7d1edb73a5ed4a3e5552795788e66bd45826",
+    "godot/chibi_remake/presentation/battle/gate_occlusion.gd": "acd60b448cedc9670b34b8dbc9d66fdf25044be2ca2fb481be38e2469711fd89",
+    "godot/chibi_remake/presentation/battle/projectile_view.gd": "329bc757cdbd0655a94c35f3452f19b08dacbe78c8f1eb1f5b95cbb83e6d8c73",
+    "godot/chibi_remake/presentation/battle/runtime_textures.gd": "a486a0de93cbf39b4dfb0f8f4d5536e1b051e0919db9ff73b39c2ba44744bfa7",
+    "godot/chibi_remake/presentation/battle/terrain_stream.gd": "6ec636a8871101d9a375da6d15a96e67d9b9bb2f7dd6143723309de874f76d49",
+    "godot/chibi_remake/presentation/battle/view_math.gd": "d62dd978431fb4064597164130afae26eb5686e8b91cb03c5780bfa9b80b051f",
+    "godot/chibi_remake/presentation/battle/world_nodes.gd": "9562ca94d3c4ee125b4f581afb39ee1efc4497856927447a7d839e98c694fb57",
+    "godot/chibi_remake/presentation/hud/battle_chrome.gd": "d29723368176cb6a1d190eb210d834ddf2dae5bf031fd164fc42bc0ded3470f7",
+    "godot/chibi_remake/presentation/hud/battle_completion.gd": "b7cdc92d1c7994cca268924efdc30315cc0b14f57b6a9411af491ce51b319834",
+    "godot/chibi_remake/presentation/hud/battle_hud_panel.gd": "5c467f43ff761000db12cb9dba457b78643dbf4dc4e527b54f4cdba4178cc116",
+    "godot/chibi_remake/presentation/hud/battle_menu.gd": "d7fa1d2f0d02977703516dc9397c672df5d8dc56e6cc4e1d150cd483b39cff88",
+    "godot/chibi_remake/presentation/hud/battle_skin.gd": "654e74ed6f511a4812efba9d480d6f9ca896545e92ab1cf73d948ef5917c699a",
+    "godot/chibi_remake/presentation/hud/cheat_console.gd": "a3fd412d9322c82ce5d165fbc0760b327e7596b6571cb7857fa538c03fc7a753",
+    "godot/chibi_remake/presentation/hud/command_catalog.gd": "e56cc1b89f106ad483bb341ba2365438dc8afa903ce38762ae486588b143dd2f",
+    "godot/chibi_remake/presentation/hud/hud_metrics.gd": "1d240e463e6d9fd7cf0817d4ac057e3a4938091e23ac533349d0d7ac1ab83bfa",
+    "godot/chibi_remake/presentation/hud/mission_briefing.gd": "1c63acc68ed0641447fa1336433a213abb1802c640d9f19dd58f9a0c97835ff0",
+    "godot/chibi_remake/presentation/hud/officer_portrait.gd": "8a1e408c476b48f8b1938ee4b7afd06d9acccb40feec23d0b1ac48b4f7460bab",
+    "godot/chibi_remake/presentation/hud/ornate_frame.gd": "0929196c19cd7e73fb16350248c1ff76f762c8f987dfa78faec59d1ea6cf7d05",
+    "godot/chibi_remake/presentation/hud/save_slots_dialog.gd": "43878c3f81eb8921d7e76bff9f0cdf540ae819a6530738dec6cc0f539a634373",
+    "godot/chibi_remake/presentation/hud/software_cursor.gd": "561697e409f90b96e3ffb63f0cd02385062dc72b9281603fa546bb0005958f20",
+    "godot/chibi_remake/presentation/menu/automation_driver.gd": "7ee3f719e272a9649bd8d6280dab74ebdb327276ecf9fd5525fdd31b9f00e8bf",
+    "godot/chibi_remake/presentation/menu/campaign_dialog.gd": "a126d3054f000d612cd78da27d16d3852d733e712dbfb06f6a739c58dc0f28f3",
+    "godot/chibi_remake/presentation/menu/controller.gd": "f109862b47979b793a3d0fbde9809df2a62c6a7f13fe24f23d700a32c9553f12",
+    "godot/chibi_remake/presentation/menu/level_dialog.gd": "a6bf711d609ec98c90f0408ca7e5a5a10ea1010be39d09e193d36bade830ef64",
+    "godot/chibi_remake/presentation/menu/menu_state.gd": "45f02e80f663007ef11aadc0c01e7c94c097c0f4c3a4a91cdab17b3886886da8",
+    "godot/chibi_remake/presentation/menu/menu_styles.gd": "0fb00a38cb80d2365131509fb0e2b13a3b687e78fd447b5e93f9ca29623e0253",
+    "godot/chibi_remake/presentation/menu/ports/automation_driver_dependencies.gd": "d9899fab9413c3ac5491f257a3a0919a2e68d75fd0e19f9e8305abc1bc46dc63",
+    "godot/chibi_remake/presentation/menu/ports/campaign_dialog_dependencies.gd": "0b3d47f857dabd2c54c16ac3108ddaf4b71cad713460cc8dc51e61ae7b7d66a9",
+    "godot/chibi_remake/presentation/menu/ports/controller_dependencies.gd": "032df633c2b14cc5c4880ed5e163a936084d746b8778574ad684e831e3318f7b",
+    "godot/chibi_remake/presentation/menu/ports/level_dialog_dependencies.gd": "2d368c2ba63cc794f88631ed3253dd51e82d450ef6d4641db28bdf05d54a5a90",
+    "godot/chibi_remake/presentation/menu/ports/menu_styles_dependencies.gd": "3478ef72d9b29a95fffef1a4edcf5d998391d48bc9cba86e66821ed93550dd24",
+    "godot/chibi_remake/property_contract.gd": "6c1a25f86df80dc3671ab20304ca58fcfeb7b9c577fdb146184bf51e591899ad",
+    "godot/chibi_remake/simulation/battle/abilities.gd": "2947d8684e39770896ff105897a4738c19fc3f8a729d8db636f4f1c24b77f7e7",
+    "godot/chibi_remake/simulation/battle/ai_economy.gd": "bcc7a8c95b0e1d81ca6b7a03a3214a6ea391fa66250fce383d36314b841aab92",
+    "godot/chibi_remake/simulation/battle/ai_orders.gd": "9b4e4ca7f57f7c95743a17ac314b51cb2c73c7a38bb872aab68224af183e3e0a",
+    "godot/chibi_remake/simulation/battle/battle_simulation.gd": "8dcd1dee5692df79327b5b87372459ffce3717d18b06577e312afb489f76dae0",
+    "godot/chibi_remake/simulation/battle/campaign.gd": "7b0b7bd70bc19dbdf83bf035f5fb3970621a2f13372d391f28ad2ebe15775c2d",
+    "godot/chibi_remake/simulation/battle/cheat_rules.gd": "b3533e3a24954b931dc6dc879d231297bfb6687485da8deca7cb0bfa8ae99fe9",
+    "godot/chibi_remake/simulation/battle/combat.gd": "7a230610b843436126b5c626c6271ae06bc119a8d041e8c23b5b7316c287d62a",
+    "godot/chibi_remake/simulation/battle/command_groups.gd": "db655d6f611b4ee4ecefb8735c3f3a31e18557ce51ea6d9f706b279f2ba3ea98",
+    "godot/chibi_remake/simulation/battle/construction_orders.gd": "b96275feb3a92e4d3d762c51d199c94cd4abe99ccf2b099e1a6e7be2590175ed",
+    "godot/chibi_remake/simulation/battle/entity_factory.gd": "7ed9b7fff492b38d53a96ba66c2301fa24b9e9caa0f8474c5fd5fc3d3775a1fd",
+    "godot/chibi_remake/simulation/battle/harvest_orders.gd": "2b16f785df7a11e4f89b038edebf3c0cc36e50cb782783383adfda9d8ed1fca5",
+    "godot/chibi_remake/simulation/battle/interaction_paths.gd": "35953628cb46cbeb0b968a1f5c19cbc39f18acaa75d4e26a4fdcf68adafae416",
+    "godot/chibi_remake/simulation/battle/movement.gd": "8a9fa3784c7c21b0716748aa2127d582c825e0907f295b8504adab3955efede0",
+    "godot/chibi_remake/simulation/battle/officer_pool.gd": "41899a8a1ec6130d8208416598d705581a7d4f3a77cf895f527429e10470252d",
+    "godot/chibi_remake/simulation/battle/officer_teams.gd": "18d1f2518e8361cd4961ead07f7b8df25063faa696eabbebb9faf8b50eceae6c",
+    "godot/chibi_remake/simulation/battle/production.gd": "a3e481c3822ad26b9b3b3b1f9e4e008518972467aa89e1a4ec5c1f5a05afa515",
+    "godot/chibi_remake/simulation/battle/selection.gd": "724f2d209d900c839f9bb4b740f1793700060c372c106832ef9e162dd64bc7bf",
+    "godot/chibi_remake/simulation/battle/spatial_index.gd": "9f0afdc978fc69368e3a4e9c038896c0f7b5b986dab251ff372a7004e674eef6",
+    "godot/chibi_remake/simulation/battle/technology.gd": "6ef5cbbd39916f18a2cf1f0f6ab32e015c03aa8eceea539a936117ee1136d6a1",
+    "godot/chibi_remake/simulation/battle/transport_orders.gd": "47f3744fe2dcdcd84873e4b10a3ba9410ced7246d09887e6d53a2896496da476",
+    "godot/chibi_remake/simulation/battle/unit_actions.gd": "0ea9bec202e1562f17aec7a402ea443a623905dd09c607da42a656caf5525c71",
+    "godot/chibi_remake/simulation/battle/world_orders.gd": "c4f4228e11ef09a161a1bcbcafce72901562512435d70b4166e1a50b6b8db6aa",
+    "godot/chibi_remake/simulation/battle_config.gd": "b195657d8f0ccd20bd9597a5d9caadd585d84bae423121fbb82c4b4a15597e4a",
+    "godot/chibi_remake/simulation/battle_effects.gd": "4bab6a87c8870a2b649ceda5a05493a43240ce81720165f75612142acdb11cf3",
+    "godot/chibi_remake/simulation/battle_state.gd": "742b5d0b1d9505207520cdb52366739a38153ebb9e4346f9403ff1010cac4f09",
+    "godot/chibi_remake/simulation/battle_state_fields.gd": "265ce7e94b27cac1c351292b8f9ad5330fee9c7daf7d8e750d68a0073b94cece",
+    "godot/chibi_remake/simulation/battle_world.gd": "35bf2c29966452e1578890b56b551a205738e70607e8bd69132ebda4aad7a96b",
+    "godot/chibi_remake/simulation/definitions/action_visual.gd": "876ff01b2befde02742686c0bb842ea5871bfbf8f2b59d3354dfe9a6602a85cc",
+    "godot/chibi_remake/simulation/definitions/death_visual.gd": "9cad8c7f0a4452c6c81ae27fc6fe9302564beb15f99bc6b88c5bd1fb1f5122d8",
+    "godot/chibi_remake/simulation/definitions/frozen_data.gd": "7e33ab9cad122cf35b5a8fffbcfbc5fadb4c8731bf7f7a222b34a41fcb208696",
+    "godot/chibi_remake/simulation/definitions/officer_grades.gd": "e56982fcbf27a02ff0197a38f7ce3882739fb1409e539152cbcfc9a13493f29b",
+    "godot/chibi_remake/simulation/definitions/opening_officers.gd": "d725d3685881c32a695eeb6242a2fafed65d75cbfe2ab9faa4b60418ad46d7c4",
+    "godot/chibi_remake/simulation/definitions/resource_cost.gd": "d5f99cb61909507f1980f79ab3bf23b068ae15a92097edd0407e13b918396eb4",
+    "godot/chibi_remake/simulation/definitions/status_fields.gd": "c0b7e2227b8b5f1051fd379fbd2f2bdcf84460d76d0be9f993c60b1caa79439d",
+    "godot/chibi_remake/simulation/definitions/unit_schema.gd": "df860a002d69a6d19f7ec27bc795729068af05d5450a085db09b8c3db4442f50",
+    "godot/chibi_remake/simulation/native/math_kernel.gd": "e8fc2380050d06803447a0e6296288668ec400c405cc433eb944e74a34a9efc9",
+    "godot/chibi_remake/simulation/navigation/automatic_gates.gd": "f9a8051d636b9dabbf4c6a897bf23d300d313eb0d634423e8d621c6a73cbe021",
+    "godot/chibi_remake/simulation/navigation/grid_ray.gd": "9dda8d077c85a8677859b0b0a1aae250cd29736603a86a5e01ef36d6cd8e1f37",
+    "godot/chibi_remake/simulation/navigation/nav.gd": "f345f229133c8fa387a474143479ce2caa95a02795d134ae1728566011f64fa7",
+    "godot/chibi_remake/simulation/navigation/navigation_grid.gd": "716ac3b5f1343597fffea582ef4eebedd045c9add9eab15a586cc7b166328d86",
+    "godot/chibi_remake/simulation/navigation/navigation_state.gd": "9f8418d58ceb2367c24cc81edf9e6f62ecc1fe3aabe756592302d64880e38862",
+    "godot/chibi_remake/simulation/navigation/path_queries.gd": "1a6a8ded4801e2c09b14fc404ff07633a79e30a45ee18f42e8903ccb31688e97",
+    "godot/chibi_remake/simulation/ports/ai_access.gd": "591044169cbe70c03ada1d0606e6b7e2aad5455144128bdda856c2498b2f9880",
+    "godot/chibi_remake/simulation/ports/battle_simulation_dependencies.gd": "fee3a81391be6ca1de5381c14fd85b8a2f1c0eab063886dcd188a7e4319660b0",
+    "godot/chibi_remake/simulation/ports/command_rules_access.gd": "d3ea18ebcd8d5fc4f37b1dc56e44a23803dc99725716150fae255a29d00eaf87",
+    "godot/chibi_remake/simulation/ports/construction_interior_access.gd": "bda666648df45e1f19aae13b53066645a556cd1ed05f26ff0f403499b18aa050",
+    "godot/chibi_remake/simulation/ports/economy_access.gd": "c1846d525ce7115e5a2f516e539991ef93a03ed45e86e315fc280e7b8dc106a5",
+    "godot/chibi_remake/simulation/ports/fire_fields_access.gd": "3d08781a5ada5db744cd487caf638ed426ccaa50e8764a3c97087a9d95ed46a7",
+    "godot/chibi_remake/simulation/ports/harvesting_access.gd": "2c6b83c084d054c5c36ed92468e08d365bf4c0e176f935edfa354010ec711c56",
+    "godot/chibi_remake/simulation/ports/player_commands_access.gd": "8df892b8bceb17859b3896f95ef89e5623ab476a4c25dd84f50bcd539e5019f4",
+    "godot/chibi_remake/simulation/ports/projectiles_access.gd": "0b387a0a86fcceecf4fb94cfda1613049a7dd4bce95831f202e603483bc56430",
+    "godot/chibi_remake/simulation/ports/scenario_rules_access.gd": "672e2edb27fd34043c69b5b7e8ceaab3943957b814e0553d36a82124085a3d89",
+    "godot/chibi_remake/simulation/ports/stratagem_rules_access.gd": "93d6950a9dda9674806ccc96f0a2c5a28afb3063978836f3c74ff2ab5f56424d",
+    "godot/chibi_remake/simulation/ports/transports_access.gd": "48f4a96d06a71139a979295d750e8fcb873e02f19f433f09579a1d6103038a07",
+    "godot/chibi_remake/simulation/queries/construction_roster.gd": "1c185c2201f3d9c464c1baf4e7a64280043cda60570d53b08271db29c097b2c3",
+    "godot/chibi_remake/simulation/queries/resource_index.gd": "44785ea694eadf2f61a178aae89549f88cf79be793ab5bdcccf661b5f6ad4ab6",
+    "godot/chibi_remake/simulation/service_dependencies.gd": "64f9e18d3291e2b444eca46d27f87c5ff57bff48db51a6a0a75f1c412ea7ac5e",
+    "godot/chibi_remake/simulation/session_state.gd": "a3ba4b2a75d00af3a3c61e466b4000c69fd617210fe0e62e735ec4971d2a1c3b",
+    "godot/chibi_remake/simulation/systems/action_clock.gd": "2848fc2071898b278ae73959e0664a4e50ce012a9eeb848a9ea129423a550edc",
+    "godot/chibi_remake/simulation/systems/ai.gd": "9a94280cdb6f54f69670b00d99fb027719f32f6cee23c17caf1e7e9f7247b745",
+    "godot/chibi_remake/simulation/systems/ai_config.gd": "9297e0c0d5224251b3660e5d43d4eb8c96fdb560286301c0d43f713665aed25f",
+    "godot/chibi_remake/simulation/systems/ai_decisions.gd": "80bae66497f04d1228e52710d5817964e9e0cb2751ac99e89769f1b097bd7173",
+    "godot/chibi_remake/simulation/systems/ai_naval_slots.gd": "9acd3fba8939e90f139ed7a6851d59a258afa80c911cc222a172e8d48e053ca3",
+    "godot/chibi_remake/simulation/systems/ai_state.gd": "b4773edf4193cdc8f8651986ac90bf2747f359ac9f8373f3406accc7c2e1cefa",
+    "godot/chibi_remake/simulation/systems/ai_targets.gd": "9e8e7d34245ec878da4914e7aa5972fb5110be88123df0309c6f967486871a2b",
+    "godot/chibi_remake/simulation/systems/ai_training_slots.gd": "4c8f961cbbf709e8be3d3350973b0bdd3dc1d97a3e71af2d97ab6f669aa374dc",
+    "godot/chibi_remake/simulation/systems/animation_rules.gd": "71b5f6f1bf3705a92d33edc3f1384133a271b9d0437d415f9b4bdf0eeb9e545f",
+    "godot/chibi_remake/simulation/systems/battle_clock.gd": "b41a68c92d850ffc17d9a0d689aabc31d4bc9649c0ff3c1a1eb8b79d3d915d93",
+    "godot/chibi_remake/simulation/systems/battle_visibility.gd": "8d42064d4b7af310c11284bfe3a7b2b5a4177977ce75e590dbeefd3db1302f9a",
+    "godot/chibi_remake/simulation/systems/building_rules.gd": "39b54f229cd76b9bd3f61525798e382e19164924f54071f9f3322472154bf76c",
+    "godot/chibi_remake/simulation/systems/combat_rules.gd": "a579e5da0490302af00953ae5cdd7612f1ec53d125bc4abd0c945bbc927f100b",
+    "godot/chibi_remake/simulation/systems/command_rules.gd": "aab6176f10996d5107cddf3c2fe330f9a102934692963bb9cbbbe0d4d3105a6e",
+    "godot/chibi_remake/simulation/systems/construction_interior.gd": "516cac8bca91d3cca458d2eca88149f7ec46bf29beabd0115895d264be7e2773",
+    "godot/chibi_remake/simulation/systems/economy.gd": "227d8765c70eabb3b748f3324cb30e027dc308e435d50ade2e0dadc24827b7f3",
+    "godot/chibi_remake/simulation/systems/engagement.gd": "91cce24084b8eea000cc33c0c79c80eacf47bb04f740b0c7e80cb77affba259f",
+    "godot/chibi_remake/simulation/systems/fire_fields.gd": "074c709a0d763a17662fff383beaddaf1ad371f84713771148756287ae2c7d51",
+    "godot/chibi_remake/simulation/systems/harvesting.gd": "f2ff528280f9848ce488d2d1849e76a622d31fc3373ec7d77e94031d32da85c1",
+    "godot/chibi_remake/simulation/systems/locomotion.gd": "00bda6d9e3281a27804684434923b3bf9e53eeb2d257c03a361959649203ff57",
+    "godot/chibi_remake/simulation/systems/officer_progression.gd": "c980319fbd3733b48220f1543cbe699b7bbb6c5d6f9cca932fdb3bc80b7c62c9",
+    "godot/chibi_remake/simulation/systems/player_commands.gd": "f644e9104577b911b255350a84305bd9be2be11fc23e85e5b41e597ee5c59994",
+    "godot/chibi_remake/simulation/systems/projectiles.gd": "f5a04b7d36ba4dc03972fb801129a41ccff660aba5d78d54aedc0994ad55cd1d",
+    "godot/chibi_remake/simulation/systems/scenario_rules.gd": "96e191cbf5a766632bc621ef0d4691705d19df5dbf261c59e092bfa48531cba7",
+    "godot/chibi_remake/simulation/systems/state_digest.gd": "0c4e0a0e28ec7c43e6e4f7ac14689c3e8e1f31e3913fcdd5936cb38b5ea12705",
+    "godot/chibi_remake/simulation/systems/stratagem_rules.gd": "6446946e93f664f51ba5583fc389c63b35be41fa79c8b374b5227c67138d82a0",
+    "godot/chibi_remake/simulation/systems/technology_state.gd": "2da929a9c02cc6f95d64b0fc3f7e28dff34125c9010c1d9f8957567d93b605f5",
+    "godot/chibi_remake/simulation/systems/tick_timers.gd": "1b6e8602e8291805849ba1e2393e45a358bed35a733689aac7c22b390214ba6f",
+    "godot/chibi_remake/simulation/systems/transports.gd": "4a4f24e07b78eea14a9c7bdbb9b9ef5e458004014893f790d01da6a272e6ca8e",
+    "godot/chibi_remake/simulation/systems/unit_footprint.gd": "f4da18011f0aa614126f9334c460127044cd659f5633f55f60027c81ed459224",
+    "godot/chibi_remake/simulation/systems/unit_rules.gd": "189eae3ae03ef8f8af417bac41adf721d8ea1354fd943650edb8c6743090d84e",
+    "godot/chibi_remake/testing/battle_selftest.gd": "b5dc6d528471eaee9ccf4a7437a88c974553af0430bd6672b9872d5d51be556d",
+    "godot/chibi_remake/testing/full_battle_benchmark.gd": "918389002cb797fc70493928a038e398f42f625af9e1b1d2df868cb53f58922c",
+    "godot/chibi_remake/testing/gathering_checks.gd": "da8208f56ae6ea00bbbdbd7a6c840fa8e0d0c0489b866e516c5d303cea22c8d6",
+    "godot/chibi_remake/testing/groups_checks.gd": "b3ae48593761edb97d1f73827c29652b5d3ae4dee47716dd2314a4a99ab25737",
+    "godot/chibi_remake/testing/native_save_acceptance.gd": "521a25a36d3116cc24e799eda17cb49871aaa7cc041ed601b2b8b93b03fac489",
+    "godot/chibi_remake/testing/navigation_checks.gd": "93af8775df19f0d93a6517cefb1c4889c14e17702510e9fb4f3c519c85c75d69",
+    "godot/chibi_remake/testing/technology_checks.gd": "042cb2dffd91226d3ba7674b12ee51ceeb170a36d731356b3ccd0cc906dc8f8c"
+  },
+  "attempts": {
+    "release-final": {
+      "file": "_work/p2/release-final/results.json",
+      "sha256": "b8746d64b0ade83c80fe23aaeacffedef426570d15cbae5bc2a3ab187b6c7a2a",
+      "rows": [
+        {
+          "name": "test_battle_interaction",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 7.258,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_battle_interaction.log",
+          "logSha256": "dcb8bb941971fb26111cfa415e47b68d54e7afb96b2afdaaf60f9b2295e0f9c1"
+        },
+        {
+          "name": "test_m0",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 26.647,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_m0.log",
+          "logSha256": "66d60ee7ce9fd18a8116c1e4455e281aaca9e596e0a375d7b6949836235f2423"
+        },
+        {
+          "name": "test_review_contracts",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 6.591,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_review_contracts.log",
+          "logSha256": "65ae0b96b09b107f3dc5ecece965764690b95df5d99e4bac22a097a87f6d6025"
+        },
+        {
+          "name": "test_save_roundtrip",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 18.046,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_save_roundtrip.log",
+          "logSha256": "a847f426b499c32894133bba4f9e1ee702ab4302a2b6f9643688ab8ce228b2a1"
+        },
+        {
+          "name": "test_save_validity",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 21.258,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_save_validity.log",
+          "logSha256": "e4bc3e5d2e1538a98e826cbbc89d96278080c03dcd52ccd45006d635eedfe959"
+        },
+        {
+          "name": "test_restore_safety",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 14.126,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_restore_safety.log",
+          "logSha256": "7564ce5db3555787a6a6a61201906a125dc6de77e6f2423691d7341be4e52df6"
+        },
+        {
+          "name": "test_acceptance_isolation",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 0.395,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_acceptance_isolation.log",
+          "logSha256": "2b20965b5b564eea130fb99479a25822902a46e0a77c80358b6db578c6474128"
+        },
+        {
+          "name": "test_duel_save",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 6.473,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_duel_save.log",
+          "logSha256": "45e11854594eec557fbf5f5d7a10146ccf97558a2006b3d0a2478b581f87e462"
+        },
+        {
+          "name": "test_slot_metadata",
+          "ok": false,
+          "code": 1,
+          "timedOut": false,
+          "missing": [
+            "SLOT METADATA PASS"
+          ],
+          "seconds": 0.706,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_slot_metadata.log",
+          "logSha256": "1a69843af7a8bc77ade599fb59c828bbcc858b7f73e9ccf8f044dbe3fe26820e"
+        },
+        {
+          "name": "test_continuation_coverage",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 26.142,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_continuation_coverage.log",
+          "logSha256": "84f941368c7ec5d7f0b790db8515a27e7b2182dc53dbd6f70a002eda28428399"
+        },
+        {
+          "name": "test_ai_research",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 11.776,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_ai_research.log",
+          "logSha256": "c52b5210e94d546723ac60689424fdb6a3a584cd4c748b4a26560ead3d3c196f"
+        },
+        {
+          "name": "test_campaign_integrity",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 93.085,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_campaign_integrity.log",
+          "logSha256": "2d248ecfa5b3eaa16935cf64668165aea6c49126018471a566029fcbc8dbf2d3"
+        },
+        {
+          "name": "test_legacy_isolation",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 23.319,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_legacy_isolation.log",
+          "logSha256": "650b5d3a6fa3567e79c0af15a627e4e7a5604f71fae73971ca6345d88af201b4"
+        },
+        {
+          "name": "test_contact_and_occupancy",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.693,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_contact_and_occupancy.log",
+          "logSha256": "c0e5e929e9cc4cd93b7a5635a5a12c9a406cfefbc97d5af96b375752c77534d3"
+        },
+        {
+          "name": "test_rules_scope",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 0.481,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_rules_scope.log",
+          "logSha256": "1fbb5415fe61dbbd29739355c1cecd8fbb459cde9db85003aa8825f0c1e5f635"
+        },
+        {
+          "name": "test_camera_read_model",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 0.486,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_camera_read_model.log",
+          "logSha256": "ae550a9ffcc8466609ae90abb014a6455a79af337e8dbd1046d34e616a592934"
+        },
+        {
+          "name": "test_app_services",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 0.856,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_app_services.log",
+          "logSha256": "23697bb6726b430a7c9afb9ac00d1ba71f8389c6359837c3c3562f8b5d3b45bb"
+        },
+        {
+          "name": "test_snapshot_stages",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 7.523,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_snapshot_stages.log",
+          "logSha256": "aa129e3c5041de0b360350b706a2c3271c6d077cba6f0c1a9d4d1fb6257b18dd"
+        },
+        {
+          "name": "test_build_preview_read_model",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 7.837,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_build_preview_read_model.log",
+          "logSha256": "26db22b59fe1829eb07d1af4d66ccac892bbe46ee78024c20776055af15c4e45"
+        },
+        {
+          "name": "test_resource_layer_read_model",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 8.206,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_resource_layer_read_model.log",
+          "logSha256": "28eef3f19b3b47324838737a3885cd3a3d03592bc99d9ae6700b3c7ca906e786"
+        },
+        {
+          "name": "test_invalid_unit_removal",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 5.726,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_invalid_unit_removal.log",
+          "logSha256": "df313fc5f99b6be1dddaedaca8870211a63650286e76743e984f358b55665a33"
+        },
+        {
+          "name": "test_save_semantics",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 38.842,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_save_semantics.log",
+          "logSha256": "3c7c2813ee689b700681f867dcd205671e736a2e3cfd6a699e102938a125e9e3"
+        },
+        {
+          "name": "test_unit_action_states",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.424,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_unit_action_states.log",
+          "logSha256": "9e4ab353db40c45a8179c75041b1eb369030a72593042ed8bee77558f408c877"
+        },
+        {
+          "name": "test_hot_path_contracts",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 5.435,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_hot_path_contracts.log",
+          "logSha256": "e5666ceef24dc90a4cccade2154989728fba11cd9ec17a85afc2fdc37f9ff421"
+        },
+        {
+          "name": "test_save_boundaries",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 30.913,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_save_boundaries.log",
+          "logSha256": "9e18e46062a0ed4fd9baac9f710d526201c67269422e8e62529c45edca0e53b9"
+        },
+        {
+          "name": "test_unit_read_models",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 7.258,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\release-final\\test_unit_read_models.log",
+          "logSha256": "3bbfacf4cd9c81451d7bf133f13113001d39b92127319e335d03fcd5317f0186"
+        }
+      ]
+    },
+    "development-final-0": {
+      "file": "_work/p2/development-final-0/results.json",
+      "sha256": "8869caff19a3bdb7bf57996aa62b3c7d899b54d60e3f58c567d5e4f5e271215a",
+      "rows": [
+        {
+          "name": "test_opening_forces",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 63.745,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_opening_forces.log",
+          "logSha256": "6f5a6a5c4e5112d67ac89662c1dc735622f335f408ca1e6150dd883fb93104db"
+        },
+        {
+          "name": "test_clock",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 34.361,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_clock.log",
+          "logSha256": "9dcc8bbbc62abaa5aaa63f71fa6bcf75a18c29e408df39795d85e663be8b3f2a"
+        },
+        {
+          "name": "test_ai_slots",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 30.497,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_ai_slots.log",
+          "logSha256": "b8731e7788867dbe7a2ae5ed87aea682ca5cc965dc6cf7ae97ee7e2af9735c57"
+        },
+        {
+          "name": "test_economy_rules",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 27.685,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_economy_rules.log",
+          "logSha256": "a4ceabcf80717695b0615224ad4aaf7345585fa5614a68948f0d604bc8cc4c05"
+        },
+        {
+          "name": "test_research_jobs",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 24.344,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_research_jobs.log",
+          "logSha256": "90848fa5892ec723f13f8f45b5e163abdd0fd3fcbf7040271059312a03f4054e"
+        },
+        {
+          "name": "test_projectiles",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 18.786,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_projectiles.log",
+          "logSha256": "c6aa91cea8ebadef46b21137986e1601e8fb312a87bb175deb459dfaadfce7ea"
+        },
+        {
+          "name": "test_duel",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 8.856,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_duel.log",
+          "logSha256": "55583e95c5607355068656b8018108635272bacc1b44b37a758ef57ac8fee6dd"
+        },
+        {
+          "name": "test_pressure_contracts",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 14.529,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_pressure_contracts.log",
+          "logSha256": "ffbd1a08fa81a03fb73008db27ee0231d22aa1ccb24fc4698690b05b7b289a99"
+        },
+        {
+          "name": "test_original_media",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 11.23,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_original_media.log",
+          "logSha256": "71285d8835b6102292de2564889bf1071a6f8e3207393009a3a93019025df5be"
+        },
+        {
+          "name": "test_encounter_campaign",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 8.512,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_encounter_campaign.log",
+          "logSha256": "7a76e08c25b7217ba88a60da9fdacd0f1b7c6017627b455661a73cacc24a658a"
+        },
+        {
+          "name": "test_resource_input",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 12.442,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_resource_input.log",
+          "logSha256": "bb4159cd44661c56fc3f3ed6c4970d2d86a03360edb33463eb4aef78da400ecc"
+        },
+        {
+          "name": "test_realtime_queries",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 11.51,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_realtime_queries.log",
+          "logSha256": "b8a0b5015a1405331c4bf499dd9c204002d69006ce2036ac594afe67dddb8f56"
+        },
+        {
+          "name": "test_building_research",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 10.208,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_building_research.log",
+          "logSha256": "148742fc5d9634240b5df6f4d0c6fd22942693997a1e09d08178305aabdf242e"
+        },
+        {
+          "name": "test_world_exchange",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 7.828,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_world_exchange.log",
+          "logSha256": "e33b4c0f966fabe167b1bb1a966ecdc18f021850ef1c2ff6cd708323a341032d"
+        },
+        {
+          "name": "test_grain_patch",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 7.713,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_grain_patch.log",
+          "logSha256": "ed741fc137974fe2934fab460ee38dc63fb23e7997d8fbe8670d88a1993349e4"
+        },
+        {
+          "name": "test_combat_rules",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 6.684,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_combat_rules.log",
+          "logSha256": "72f4125a571baafe8f898c269748ced25cb7d5da80fa030e187c19c7df092faa"
+        },
+        {
+          "name": "test_unit_collision",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.221,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_unit_collision.log",
+          "logSha256": "2cdeac01a05319598305d1649309933350e46313064c03d327dabfc7365d26c8"
+        },
+        {
+          "name": "test_ability_menus",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.416,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_ability_menus.log",
+          "logSha256": "2a918de1c68cbbbcc2c953db235543e1afe1dc22707ae86bbcda2853e6417960"
+        },
+        {
+          "name": "test_resource_frontier",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 7.059,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_resource_frontier.log",
+          "logSha256": "1ad0ef501174a77cc39da9cfdc441872ec5d993e1285278ec54e881b31ad8128"
+        },
+        {
+          "name": "test_special_units",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 7.434,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_special_units.log",
+          "logSha256": "5925f67280c81e53ebfa854a1ec9180cb854e7b3260b994b9babf3478fe68207"
+        },
+        {
+          "name": "test_benchmark_guard",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 5.652,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_benchmark_guard.log",
+          "logSha256": "4bb3a6ef880766c60935639b684923951dc83d2c696d3c80c2f2614056c4c41e"
+        },
+        {
+          "name": "test_build_feedback",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 6.772,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_build_feedback.log",
+          "logSha256": "32a61f982e8e35af8ef643071340889f53e8699f1c6de79c15463f3cdf606389"
+        },
+        {
+          "name": "test_team_lifecycle",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 6.575,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_team_lifecycle.log",
+          "logSha256": "94d5525b54297ffe5c7b4b20710c6e65dd2fd6583994fcda861a517d39e19c0e"
+        },
+        {
+          "name": "test_edge_interaction",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.496,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_edge_interaction.log",
+          "logSha256": "9a12ed333bafab1c7d2ea2d3a389eea71e65f8e9b221b4425ebf01a74710e843"
+        },
+        {
+          "name": "test_command_replace",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 6.609,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_command_replace.log",
+          "logSha256": "d4b87675a04e9dcd7d5d3bd63e385eb40ff7bc1d05df03a77f50c5619c7e3eab"
+        },
+        {
+          "name": "test_ai_planning",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 5.814,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_ai_planning.log",
+          "logSha256": "49041fa75a8b683e74b12e26cde7783374e509fc1d030274401602a54771c646"
+        },
+        {
+          "name": "test_worker_visuals",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 5.535,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_worker_visuals.log",
+          "logSha256": "9f3d9ef690da8481eeb92f6a1a63a14fc9e6d7f21e849b0bdee25181c214b2c9"
+        },
+        {
+          "name": "test_visibility_rules",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.405,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_visibility_rules.log",
+          "logSha256": "2211881473edcff4b0338af584955f24b80c005c413e59bee595bb85a013c3fa"
+        },
+        {
+          "name": "test_nav_invalidation",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.32,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_nav_invalidation.log",
+          "logSha256": "8b0464cd79cf2c889b128dc61ae6ad3aefd1e1fe101a20622964e12bffce21f0"
+        },
+        {
+          "name": "test_cmd_paging",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.32,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_cmd_paging.log",
+          "logSha256": "b5ebd3cc706b33647a69ee1ac361e8d5405161e8298059b907d13667c970c8eb"
+        },
+        {
+          "name": "test_group_focus",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.314,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_group_focus.log",
+          "logSha256": "c67b200f0566481e47423b921a96fe3d21630e62cd8e6d2b8b6740a6cf4b6ad7"
+        },
+        {
+          "name": "test_unit_footprint",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.221,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_unit_footprint.log",
+          "logSha256": "408e3a9809f92ed8221e79e0e8563820a699f3ce7c661a5b85116961d49fe80d"
+        },
+        {
+          "name": "test_native_math",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 1.5,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_native_math.log",
+          "logSha256": "19825108655b035a7a212922a004d1a6afe83b10ffdfbcea1a9b03bcc66a7902"
+        },
+        {
+          "name": "test_user_storage",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 0.504,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_user_storage.log",
+          "logSha256": "b107bca3f433e61c8b6f45888d2925b29ff0941a906b4d68e75bdc203e7d5557"
+        },
+        {
+          "name": "test_navigation_topology",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 0.573,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_navigation_topology.log",
+          "logSha256": "32c002dbfb1acd1570486a54ede2852150d8d381d82b867cd277cf2c2b09f441"
+        },
+        {
+          "name": "test_texture_states",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 0.48,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_texture_states.log",
+          "logSha256": "caa3decaaa86f0e88f2cbf8a08d404fc50dd4093b6b052bc4ff8eca5f17011c7"
+        },
+        {
+          "name": "test_sfx",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 0.526,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-0\\test_sfx.log",
+          "logSha256": "42e106f3304558868b61f7e3e01fa209bc38f450b04d5adda46d4df7fbe79555"
+        }
+      ]
+    },
+    "development-final-1": {
+      "file": "_work/p2/development-final-1/results.json",
+      "sha256": "78e49b74149d56d9cf708d8e8c08801afae7151d994aa338e17b9acb9734c80c",
+      "rows": [
+        {
+          "name": "test_tick_timers",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 41.212,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_tick_timers.log",
+          "logSha256": "b4d372b8318fac276aebe092e5caf7253a22ca9065def3d3e8310b8d7e23ce18"
+        },
+        {
+          "name": "test_native_world",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 30.265,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_native_world.log",
+          "logSha256": "2987431cfd95ce61119c267530182b363bd12ab8897986cc32d15e6ab0572f90"
+        },
+        {
+          "name": "test_naval_casualty_save",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 29.056,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_naval_casualty_save.log",
+          "logSha256": "4e55c009c87f3ca18e7fb735cd84dc1f78d937dc89b95a4fefec46daa08a51fd"
+        },
+        {
+          "name": "test_economy_boundaries",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 36.133,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_economy_boundaries.log",
+          "logSha256": "d426e6c736dcf83935e456b7629a8c3552db0758617dbc6ffd72ac7086fd54c0"
+        },
+        {
+          "name": "test_worker_groups",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 27.808,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_worker_groups.log",
+          "logSha256": "438e6b884619563e1490f96075c4f72a4210bf2f2697bebb375ca5903580aa5b"
+        },
+        {
+          "name": "test_initial_teams",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 21.132,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_initial_teams.log",
+          "logSha256": "98c6a6346eecc63b49c17566e5fe8adbccfa7dfe401b85e9e3a83319e4ea6b89"
+        },
+        {
+          "name": "test_meta_abilities",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 19.628,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_meta_abilities.log",
+          "logSha256": "6b326519226e75536ed76a383bec20940cfaea3768c48502dec202e8841aeacc"
+        },
+        {
+          "name": "test_architecture",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 14.441,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_architecture.log",
+          "logSha256": "73ce9d76fd4306b709caf84f71aaf059ecda3ce5a9dfecdaeb6d28cdee56f799"
+        },
+        {
+          "name": "test_restored_view",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 9.037,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_restored_view.log",
+          "logSha256": "31c5209682b1133ca09d8b1b76ade242e0b8771ec0293174f1e97d39296807f9"
+        },
+        {
+          "name": "test_unit_research",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 16.906,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_unit_research.log",
+          "logSha256": "9958b8348f4bd4d3e5a9131c02e4f40be20d34de0a2bc5390c98db55c1683196"
+        },
+        {
+          "name": "test_movement_quality",
+          "ok": false,
+          "code": 1,
+          "timedOut": false,
+          "missing": [
+            "MOVEMENT QUALITY PASS",
+            "MOVEMENT RESEARCH PASS"
+          ],
+          "seconds": 4.931,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_movement_quality.log",
+          "logSha256": "c1b6b29b4fcd52726cdfdc84275cc8e31ab24c371987c6592e6e74eb929f7166"
+        },
+        {
+          "name": "test_unload_state",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 9.955,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_unload_state.log",
+          "logSha256": "0f25469edcd236e44a0fa9e585e7dca31b44d14193e67163ad9080c3595137e6"
+        },
+        {
+          "name": "test_chibil1_presentation",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 11.636,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_chibil1_presentation.log",
+          "logSha256": "55fdec452078aa99c0c871812958ae898c82dd8893305051db03c09fe3e309ce"
+        },
+        {
+          "name": "test_action_clock",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 9.174,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_action_clock.log",
+          "logSha256": "123f928a38dbb4f9cbbbcfb38623c85aabc0fe93fe6f3158a73e961de059d9cb"
+        },
+        {
+          "name": "test_construction",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 7.147,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_construction.log",
+          "logSha256": "bfb7f09aa0cc66b38e4ae277a7443fc0e99c130c1d7ffe7c9767e46e1699c283"
+        },
+        {
+          "name": "test_hq_delivery",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 7.522,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_hq_delivery.log",
+          "logSha256": "4091dcf01c95783232efc0e6117c0568453b5218e9993734ca0a32dc0958d063"
+        },
+        {
+          "name": "test_research_rules",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 7.569,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_research_rules.log",
+          "logSha256": "081efaa111dbe7fd1fcf49943cf835dc162c57598d06612ea302f113bd2147cf"
+        },
+        {
+          "name": "test_worker_feedback",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 7.986,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_worker_feedback.log",
+          "logSha256": "749d5d5ff3a9e54dbca8b7faa02fdbcd303a05850beef281be9ba8dff3ab729d"
+        },
+        {
+          "name": "test_automatic_gates",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.96,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_automatic_gates.log",
+          "logSha256": "a18f3339bca1dc6850b57fb46f0da4019624803aa4c4dc7284ac70cddb1f724c"
+        },
+        {
+          "name": "test_scenario_end",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 8.204,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_scenario_end.log",
+          "logSha256": "05a2f625cd0cd76f661696869e0167133fe04c07a140e52141d31a6160c5f9c8"
+        },
+        {
+          "name": "test_action_lifecycle",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 6.575,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_action_lifecycle.log",
+          "logSha256": "e7e29dd8e1c6ff45d7f6c1f42204bb67512b021983b9368cb1ca1b3e63ff02ea"
+        },
+        {
+          "name": "test_spatial_rules",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.502,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_spatial_rules.log",
+          "logSha256": "f9766b0b8cf63440de53aa424f439f8825c4996a7b8cf3abb72c98fcbdca366e"
+        },
+        {
+          "name": "test_modular_battle",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 6.671,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_modular_battle.log",
+          "logSha256": "ef682bb5cc5872eca793502e126cbe3e9ef64a3add272a741c0e5d75649a310f"
+        },
+        {
+          "name": "test_clock_ui",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 6.971,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_clock_ui.log",
+          "logSha256": "85d8f9c804dedd6308dfc62a00f096a7a9c3eeb0d83ead22815accd48eabfe3c"
+        },
+        {
+          "name": "test_building_panels",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.504,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_building_panels.log",
+          "logSha256": "a17c2a6d5e53a704262242d5d96dadfada400fb551551d8487e58ad20a976abc"
+        },
+        {
+          "name": "test_hud_metrics",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.315,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_hud_metrics.log",
+          "logSha256": "b44e1e881122e4fb90b4e8e4814fc3ef926494fe7da7f5236650609a07b4c3bb"
+        },
+        {
+          "name": "test_input_research",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 5.454,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_input_research.log",
+          "logSha256": "e1671968448a4033e02fa2812407d306c534ce340508f3e7708a7cd8246244db"
+        },
+        {
+          "name": "test_harvest_retarget",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.509,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_harvest_retarget.log",
+          "logSha256": "23abd537d480c682595e8515c64b6713debe7d3bb23d0f9fc063c9e3a00efab1"
+        },
+        {
+          "name": "test_component_registry",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.7,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_component_registry.log",
+          "logSha256": "237171fb14f3bf86e4a97024a9111b4327c512d940ae392ad1382fae63f98845"
+        },
+        {
+          "name": "test_ai_policy",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.442,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_ai_policy.log",
+          "logSha256": "1f5e38b8c6dd9589f9c12f5709b15d82e35275e208de3dded2e8c27dd657cf8c"
+        },
+        {
+          "name": "test_l1_assault",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.255,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_l1_assault.log",
+          "logSha256": "891eb999595c9cab9bbb16edc5ac09c5e823281df9dbdfb99d7bfa846cc4b0af"
+        },
+        {
+          "name": "test_native_geometry",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 3.747,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_native_geometry.log",
+          "logSha256": "207125954a6cccc5f69fe0dd02c54dd337555ef9c4cf3c2a6f035fd6df2089fa"
+        },
+        {
+          "name": "test_building_square",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 3.842,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_building_square.log",
+          "logSha256": "f638036e9fab408bc3f1d3727931d3a7aa5b624999895cc125072850e8c08da3"
+        },
+        {
+          "name": "test_presentation_diagnostics",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 2.16,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\test_presentation_diagnostics.log",
+          "logSha256": "5388615c484c7ad38771ddd67e8cf543bdb0ea8fc05c568ff96798f06c6e732a"
+        },
+        {
+          "name": "check_runtime_scripts",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 2.445,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\development-final-1\\check_runtime_scripts.log",
+          "logSha256": "91b132f6a9158c3e95c3c7335236e67487fb7540b521bcad97d6b6100bfb7634"
+        }
+      ]
+    },
+    "serial-final": {
+      "file": "_work/p2/serial-final/results.json",
+      "sha256": "7db9e4eace24807b0bdbc3d6c78cc7838a482a11c11adc40d17b5513b7caeda1",
+      "rows": [
+        {
+          "name": "test_unit_schema",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 25.125,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\serial-final\\test_unit_schema.log",
+          "logSha256": "ad8428b7be8ec152a513132de1db008bab77bf552503d543491815e40cb9eea4"
+        },
+        {
+          "name": "test_transports",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 120.543,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\serial-final\\test_transports.log",
+          "logSha256": "95c6f45cf3df30d98b42604491fbd02c9f4b9f5635754d1a9814b6b06b8afbe4"
+        },
+        {
+          "name": "test_army_technology",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 79.007,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\serial-final\\test_army_technology.log",
+          "logSha256": "9197300e564b531b7d5b80203429e2981de9819a3c11d88e70745f68af449cd4"
+        },
+        {
+          "name": "test_unit_index",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 8.952,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\serial-final\\test_unit_index.log",
+          "logSha256": "3e3f5abe9839163db5f1ec1a50a05dd808ef9a2de6eed6d311e4555b1ef70043"
+        }
+      ]
+    },
+    "fixture-fixes": {
+      "file": "_work/p2/fixture-fixes/results.json",
+      "sha256": "868437ea8dfa472860d7ab3b80fbf6637e1edd302d0aa48d9f998107964adc29",
+      "rows": [
+        {
+          "name": "test_slot_metadata",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 0.502,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\fixture-fixes\\test_slot_metadata.log",
+          "logSha256": "2914d26a804facf9778ec1378c61edea7159cc55baace3c6b3a408857f7d4efe"
+        },
+        {
+          "name": "test_movement_quality",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 8.777,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\fixture-fixes\\test_movement_quality.log",
+          "logSha256": "968d36147edccc531716876e87dd656dd4fd48438831347fe128bd347176a8f0"
+        }
+      ]
+    },
+    "fixture-fixes-final": {
+      "file": "_work/p2/fixture-fixes-final/results.json",
+      "sha256": "c701520cd283f2c377c8f3d6b350cf4f2edc33066bd48b185b6dd004470bf0e3",
+      "rows": [
+        {
+          "name": "test_slot_metadata",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 0.499,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\fixture-fixes-final\\test_slot_metadata.log",
+          "logSha256": "b1cc0ecd89a28a4ca74699a9791102033083a93a86a675e131ae8e90a9da3305"
+        },
+        {
+          "name": "test_movement_quality",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 8.739,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\fixture-fixes-final\\test_movement_quality.log",
+          "logSha256": "39c4d8bf5a5f2e70fe32c02191f0d8f6d0b3d94aee4e38ca7844dc06f1e99fb0"
+        },
+        {
+          "name": "test_unit_read_models",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 7.821,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\fixture-fixes-final\\test_unit_read_models.log",
+          "logSha256": "914981455da49cba1774dcb0084ceccdda3d0888fc7d1d6fb7c0c81425cbafe7"
+        },
+        {
+          "name": "test_save_boundaries",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 33.933,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\fixture-fixes-final\\test_save_boundaries.log",
+          "logSha256": "3e7541a7c5a53b40b1202b478ddb2e8abd9a3cc554f91c88a0962a12bbb955d2"
+        }
+      ]
+    },
+    "world-final": {
+      "file": "_work/p2/world-final/results.json",
+      "sha256": "f675101807c84993b07f7750d37e35e83894b339410877cc14a2e76d9198e46c",
+      "rows": [
+        {
+          "name": "check_runtime_scripts",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 2.435,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\check_runtime_scripts.log",
+          "logSha256": "da9e728bd22f8ecbc2065769ca8d7d958582504a2ea37a0ab680575bf16afa35"
+        },
+        {
+          "name": "test_architecture",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 13.772,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\test_architecture.log",
+          "logSha256": "6753fce19fbebfcbef37af0217f15a525154bbcd7e2a4d4d1551b6094ea7a176"
+        },
+        {
+          "name": "dump_composition",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 3.467,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\dump_composition.log",
+          "logSha256": "3b784a239740926f043bd792394c7b4351a815b294d22ce53160b1c37791f95d"
+        },
+        {
+          "name": "test_presentation_diagnostics",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 2.064,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\test_presentation_diagnostics.log",
+          "logSha256": "a2c5adcb927d6d835aa473f6ca0191f5d9120df4e53f0fb947a774d747bfcb0a"
+        },
+        {
+          "name": "test_camera_read_model",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 0.493,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\test_camera_read_model.log",
+          "logSha256": "a883c5837cce0eefb262243d0511db56d2d7a6ca9db26bf1312cc28e8d30cb29"
+        },
+        {
+          "name": "selftest-chibic1",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 8.659,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\selftest-chibic1.log",
+          "logSha256": "9f314176db29517597067306644249d4cd89333f8eee022ed32fe7e1b177c1bd"
+        },
+        {
+          "name": "selftest-chibil1",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 8.754,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\selftest-chibil1.log",
+          "logSha256": "fad957503e646e91f7879e239d83ebb02f792a1fb97f853881c2a802381c3a55"
+        },
+        {
+          "name": "selftest-chibic17",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 17.885,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\selftest-chibic17.log",
+          "logSha256": "0b03628bd509cf27b67f6e6dc40181702fcf37fcea5a9326926f5351185de5ef"
+        },
+        {
+          "name": "sim-chibic1-15",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 16.637,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\sim-chibic1-15.log",
+          "logSha256": "ab9db415db27ea90034210efedc5c1eda018ac4f570ae115715003df4c90988b"
+        },
+        {
+          "name": "sim-chibic1-60",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 57.035,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\sim-chibic1-60.log",
+          "logSha256": "f9bc36007813a1d667b56d1286edf473af24e6a33b5f9d715436be5f7566543d"
+        },
+        {
+          "name": "load-chibic1",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 3.196,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibic1.log",
+          "logSha256": "726806ae3aeca8ed3a701190587d838d7ad2c9deafd582c2601d4c8375d5732b"
+        },
+        {
+          "name": "load-chibic10",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.086,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibic10.log",
+          "logSha256": "3777fa0ae063fff810428240fddfb17de4da108845e5a07840439f42af7fe730"
+        },
+        {
+          "name": "load-chibic11",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.04,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibic11.log",
+          "logSha256": "ac7c709c74a32c8bc40a2ca03755f1613355834522660cde9891186772f7fbb7"
+        },
+        {
+          "name": "load-chibic12",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.051,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibic12.log",
+          "logSha256": "51999a6672917a7e9bcb85b7d4de7a03ab2a18e76313ff76815114b53f94d335"
+        },
+        {
+          "name": "load-chibic13",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 5.456,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibic13.log",
+          "logSha256": "d058786a7c02b100542d8a32932d274cdb7f6ba24159ad156323dd565ca8af66"
+        },
+        {
+          "name": "load-chibic14",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.038,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibic14.log",
+          "logSha256": "0aac9abf4b7d1150710f5ca29b6be04c8b84dc1c6d7d2b7573946b801c83addd"
+        },
+        {
+          "name": "load-chibic15",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.027,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibic15.log",
+          "logSha256": "937704dd1b19ca56cb194801c2277effc99f2ff4d669512b01f34e65bf13b105"
+        },
+        {
+          "name": "load-chibic16",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.033,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibic16.log",
+          "logSha256": "40918f9489be3311f293cb137d7b924d041383702345217d4446194342f27a86"
+        },
+        {
+          "name": "load-chibic17",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.027,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibic17.log",
+          "logSha256": "9f74cc5a862cb1a9c8bd2fa3a33a692413c0d9c13cfc08f37faee9fa5a9fec6a"
+        },
+        {
+          "name": "load-chibic2",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 3.192,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibic2.log",
+          "logSha256": "867ac0057e9993777a025f0e88af883b76e6c6d12d33ba4caba9a82883f7c88d"
+        },
+        {
+          "name": "load-chibic3",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 3.564,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibic3.log",
+          "logSha256": "057da81b0d531a4a870466080e6db18902b3420add1037bc89e237cf3901df6c"
+        },
+        {
+          "name": "load-chibic4",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 3.573,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibic4.log",
+          "logSha256": "92b18b961c6efac905107a2dc2dd44494062991378d6dd3ba9c94474f4057f36"
+        },
+        {
+          "name": "load-chibic5",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 3.562,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibic5.log",
+          "logSha256": "80a575390251ba877d7c7bb9723c2ddd6c961fa7cb310a01c1943dca1281607d"
+        },
+        {
+          "name": "load-chibic6",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.039,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibic6.log",
+          "logSha256": "392c0409d36d02493e6348bffa2adaea42e951ad8600b2ce75b59eb9cb71ab03"
+        },
+        {
+          "name": "load-chibic7",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.131,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibic7.log",
+          "logSha256": "77a7f3468ce8788ff1f1b0345834ad6c9744868d5d71326244461fde462163e0"
+        },
+        {
+          "name": "load-chibic8",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.032,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibic8.log",
+          "logSha256": "11bece11646cba9e75f3f97e9a550a1e79196175a4e87a6c2b99dca95c5f485f"
+        },
+        {
+          "name": "load-chibic9",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.031,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibic9.log",
+          "logSha256": "a9fb696befadefe3bd0993ec8277fe26b674b3af8855d0dde58f621109989442"
+        },
+        {
+          "name": "load-chibil1",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 3.192,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibil1.log",
+          "logSha256": "e07c455c9d917423e19ac121de4312f164650ff22fce61d8b80c79594dda9491"
+        },
+        {
+          "name": "load-chibil10",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.041,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibil10.log",
+          "logSha256": "571cff89e3ee94dcec74a7c7ba8224bc28c328cd2c9d254b47bade9627fc3ee9"
+        },
+        {
+          "name": "load-chibil11",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.066,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibil11.log",
+          "logSha256": "a87b6e0a80f44b6fd9636223cf40bb8bde64bd6189946746d3ee2efaa0e599ec"
+        },
+        {
+          "name": "load-chibil12",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.036,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibil12.log",
+          "logSha256": "eedf60f6ad85e42fd86c86b7cbd62076e23eedebd525aa16261b7c900996e839"
+        },
+        {
+          "name": "load-chibil13",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.431,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibil13.log",
+          "logSha256": "8939e46c710967f213a9375d165434ad81e9bf4b92c48004bb9d832c78b08e34"
+        },
+        {
+          "name": "load-chibil14",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.035,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibil14.log",
+          "logSha256": "4440496081ad3aeb500e08d7cfd7361d75a0390bde46cc17e9b842e9e1099234"
+        },
+        {
+          "name": "load-chibil15",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.101,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibil15.log",
+          "logSha256": "22840b4703e11668a065ecbd6228099c56701724f7cb3f7e4dbfb99dc0ecfb24"
+        },
+        {
+          "name": "load-chibil16",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 3.933,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibil16.log",
+          "logSha256": "263776f17a7e9225d5a3408f0b53ba338231fee0ff5d3aaff019c169282d0b79"
+        },
+        {
+          "name": "load-chibil2",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 3.217,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibil2.log",
+          "logSha256": "52c80e83d14a323dc24704b9998acdec3311b2cf90acd155ff96d72b20923753"
+        },
+        {
+          "name": "load-chibil3",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 3.473,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibil3.log",
+          "logSha256": "f5cf81010b0323a79add2baf40c2fc3295a54c132cddd9d29a299830be89953a"
+        },
+        {
+          "name": "load-chibil4",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 3.463,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibil4.log",
+          "logSha256": "36a003bfc0a51e5d444cf601890f48617dc536b35ecf2e91a04ad38fa6395e49"
+        },
+        {
+          "name": "load-chibil5",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.105,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibil5.log",
+          "logSha256": "74525e59049cfbe6b265e80c09cbd30a9089802120cc0293a4b81221fd56b387"
+        },
+        {
+          "name": "load-chibil6",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.073,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibil6.log",
+          "logSha256": "7f650a403f2c55299d64f6875e93efcd409cab153ff05e6baf59d271e58119de"
+        },
+        {
+          "name": "load-chibil7a",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.849,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibil7a.log",
+          "logSha256": "86389da1c1748be5d707aa182572f5d18598be1aa723f4513ca54967ea1db234"
+        },
+        {
+          "name": "load-chibil7b",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 3.736,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibil7b.log",
+          "logSha256": "53749891b55a9967cd9e4e5dbc2ca350edef136db77ae34d6a82932bc381537c"
+        },
+        {
+          "name": "load-chibil8",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.727,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibil8.log",
+          "logSha256": "4db7aceadc5ae584813f17add6d84819b0ed671686da984eb51ea9dc1437511c"
+        },
+        {
+          "name": "load-chibil9",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.011,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\world-final\\load-chibil9.log",
+          "logSha256": "a0e7fb19ef906683bc61846e341a3f027e1219502451219d645d93175e55c6d3"
+        }
+      ]
+    },
+    "presentation": {
+      "file": "_work/p2/presentation/results.json",
+      "sha256": "7f91d011908f9105b4b19fb096f053bd3822e7758a867ea26e9a71938ab4d609",
+      "rows": [
+        {
+          "name": "panel",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 6.463,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\presentation\\panel.log",
+          "logSha256": "f8b3b23f8992b60a8dae4bcdaa51b6f390f1b768164dc803676578f502b4e78a"
+        },
+        {
+          "name": "controls",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.297,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\presentation\\controls.log",
+          "logSha256": "50ef75239e468cc5de790db12250fe667a5631a93c25e0d50296b7ec36619fca"
+        },
+        {
+          "name": "banner",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.287,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\presentation\\banner.log",
+          "logSha256": "3419ae44d775ce3509d2bfa4f43ae49a021875e0721514d5dfc64603233feb53"
+        },
+        {
+          "name": "icons",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.479,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\presentation\\icons.log",
+          "logSha256": "03264f1db84d5ae70456c91ac57d8e301c40f8bdde849810874c51864bc03546"
+        },
+        {
+          "name": "minimap-missing",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.233,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\presentation\\minimap-missing.log",
+          "logSha256": "c0f4538b53dfa6bd125247736540ce4089e595ffe4333369f81e9f6e0691a51a"
+        },
+        {
+          "name": "minimap-invalid",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.203,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\presentation\\minimap-invalid.log",
+          "logSha256": "0c8eb808d635d68a2e4a01cb6a9f04551abf6d8cf6d3526a46aaebfd9a97a8b2"
+        },
+        {
+          "name": "minimap-entry",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.317,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\presentation\\minimap-entry.log",
+          "logSha256": "acd63be8a300b655175ca2a5ba80634891cdbf6483a5776807895d11211771ea"
+        },
+        {
+          "name": "minimap-png",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 4.708,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\presentation\\minimap-png.log",
+          "logSha256": "067020968c740b919f088f5b2fe62bf439e94e46d227b1e02cef15bea925a965"
+        },
+        {
+          "name": "terrain-budget",
+          "ok": true,
+          "code": 0,
+          "timedOut": false,
+          "missing": [],
+          "seconds": 0.485,
+          "log": "D:\\Games\\3DMGAME_chibi.CHS.Green\\_work\\p2\\presentation\\terrain-budget.log",
+          "logSha256": "7bf629d2c5e24975c0ce7733372df84ca2c1cccdcd227d90c3cb5d4eac2e830f"
+        }
+      ]
+    }
+  },
+  "tests": {
+    "release": {
+      "count": 27,
+      "allPassed": true,
+      "failedOriginalAttempts": [
+        "test_slot_metadata"
+      ]
+    },
+    "development": {
+      "count": 75,
+      "allPassed": true,
+      "failedOriginalAttempts": [
+        "test_movement_quality"
+      ]
+    },
+    "save": {
+      "count": 9,
+      "allPassed": true,
+      "execution": "Same scripts and args, covered by release and serial runs"
+    },
+    "world": {
+      "ci": 5,
+      "maps": 34,
+      "selftests": 3,
+      "baselines": 2,
+      "allPassed": true,
+      "baselineReferenceUnchanged": true
+    },
+    "lightweight": {
+      "count": 31,
+      "allPassed": true,
+      "file": "_work/lightweight/all.json",
+      "sha256": "0a61592d0427241b782dca8a40f188b2157a23c523ef10e47b942ec54d62acab"
+    },
+    "presentation": {
+      "count": 9,
+      "allPassed": true
+    },
+    "lifetime": {
+      "count": 23,
+      "allPassed": true,
+      "logs": {
+        "_work/p2/registry-runtime/named-absent_call.log": "17a4b831109b52ddff702504a9ee23069e52f623dbecdc945cc2b5150a853fb8",
+        "_work/p2/registry-runtime/named-command_expired.log": "2f54f0f2184451ede1fd4263071b636d62efe8e6a4db9f6ee64eba2543443b86",
+        "_work/p2/registry-runtime/named-command_method.log": "9e5b66a727c7b4ebc7af239f499242bfe3ec6e791a143f1ad45225866f27866d",
+        "_work/p2/registry-runtime/named-command_missing.log": "6fcadf2805f01dc05f3173b221b5672bcc95985774b49f70b0717adac74aa302",
+        "_work/p2/registry-runtime/named-cursor_values_expired.log": "d70c7a7870b9d9a3054b4dbeee583ca29f691d44923f17673305e3fd1ba12d57",
+        "_work/p2/registry-runtime/named-expired.log": "473ef8956338c77255e47031de6268f9026114ced621ff6912d47ceb583b9c89",
+        "_work/p2/registry-runtime/named-missing.log": "09c7db10c7bc892717fc04853d8d9742958f12cee1cf2b47c4a0ecec3bb10df8",
+        "_work/p2/registry-runtime/named-motion_values_expired.log": "3fe218afdf27711c75988a2b477fa5f4f2609cbe6a1ca8ee9b79208d5bdb7f29",
+        "_work/p2/registry-runtime/named-preview_key_expired.log": "435dd65362563372090d519ba442ab65e4c6bbf86217fe4efcd24c80a3165446",
+        "_work/p2/registry-runtime/named-preview_model_expired.log": "5be4ff90c226b9a6a96ac96659939fa3702f050b401fd22da91f14c2a92a1cb2",
+        "_work/p2/registry-runtime/named-production_values_expired.log": "970af4fb1dab5bc94ba8212805d4bc6eaa40d67fa352c8776256dfbb17d54ae9",
+        "_work/p2/registry-runtime/named-reader_expired.log": "b4d8864973f655c476fc490580d87ceec23a601d163a5d9b3c1dd097569d040f",
+        "_work/p2/registry-runtime/named-resource_key_expired.log": "164db27c5b226c326e6cf72b7e2a461c039c36cd7098611402c19904842b5749",
+        "_work/p2/registry-runtime/named-resource_projection_expired.log": "575d9e3dedbd864b99ab315e23838cfa238f40582eae7a21efe88cde67a469aa",
+        "_work/p2/registry-runtime/named-scope_absent.log": "83a269ceb811b61a5cc8b207932ebd34b75ab49eaa06bf6d2279d5401985b0df",
+        "_work/p2/registry-runtime/named-scope_expired.log": "a317d953056b46af716a6abcbd0e4c463a3f0652a67b536a78734b75ecc9220d",
+        "_work/p2/registry-runtime/named-selection_values_expired.log": "b145a9b5e6f825cab282202c44883bb7ee25234edf04935c8d63d6103bbc3bbc",
+        "_work/p2/registry-runtime/named-unit_values_expired.log": "26bd3381c598348ad67a77da7b7e0b4fe04158a5d79f29ebe59ed1b5308ce0ce",
+        "_work/p2/registry-runtime/named-unknown_sound.log": "bbe29a67aa10a9f08427f436b374245e92906151b5f2bac182c2d0d33f987379",
+        "_work/p2/registry-runtime/named-unknown_state.log": "35ed6dc37a8543139c6b3a76933c472bf72a13d29b23f3514617cda4d0b1c762",
+        "_work/p2/registry-runtime/named-unknown_visual.log": "380e805f7e9bc5617b0791e63b158138e1167bba7bede0d38fb12b564fa74f10",
+        "_work/p2/registry-runtime/named-visual_values_expired.log": "639bdf7c5bf1bd549a89445fb0b756d6852f60c8a5d2292744c367fdcbe2d5dd",
+        "_work/p2/registry-runtime/named-work_values_expired.log": "5678a51e67cf08d650fe14d752ba4026cf105e02e9e67de6b8c78cef6b9ce956"
+      }
+    }
+  },
+  "runtimeSourceSignature": "bd646c47033a7ed26d29ca56ceb850f408a6aeb4ca9c7ddaaf841ad45d718f68",
+  "projection": {
+    "units": 800,
+    "visible": 24,
+    "updates": 10,
+    "unchangedFrameHits": 600,
+    "staticSpriteCopies": 1,
+    "medianMs": 11.186,
+    "p95Ms": 16.688,
+    "scope": "CPU value construction, not full-frame/GPU acceptance"
+  },
+  "readBoundary": {
+    "inventory": "tools/inputs/battle_access_inventory.json",
+    "sha256": "06f5515e428dc5ee1a7234cd217f0b073a30542e4e488e74e0518f0791a83a87",
+    "schemaVersion": 3,
+    "retiredGetters": [
+      "units",
+      "selected",
+      "map_data",
+      "nav",
+      "decor_cells",
+      "trainings"
+    ],
+    "literalUses": 0,
+    "remaining": [
+      "build_types",
+      "cmd_pending_data",
+      "task_events",
+      "terrain_changes",
+      "clock",
+      "visibility",
+      "projectiles",
+      "fire_fields",
+      "player_commands",
+      "unresolved command-returned records"
+    ]
+  },
+  "limits": {
+    "fileBytes": 33554432,
+    "jsonDepth": 64,
+    "taskEntriesEach": 4096,
+    "taskNodes": 32768,
+    "taskDepth": 8,
+    "coordinateMargin": "one tileW; clamp admitted outside-canvas points on restore",
+    "pathLength": "rows*cols+2",
+    "cursor": "nonnegative int32; legacy out-of-range cleanup",
+    "rulesAbi": "battle-rules-v4, unchanged"
+  },
+  "harness": {
+    "tools/gd/test_save_boundaries.gd": "f7f7064a8da803e53dd0e9c739914a917592049f35bfda450d373fa7854f69ee",
+    "tools/gd/test_unit_read_models.gd": "5fb96d8f94491f7d5a482a7e1565a578968462a3495235a0b68af6a58b45e246",
+    "tools/gd/test_slot_metadata.gd": "7e6f41162a5365f4407485bef8e1d1f553768fb552bda101b4139c784dfcf3a7",
+    "tools/gd/test_movement_quality.gd": "2968972d6729e8102e37d8fc2972696e6ac65a3a3255df14d948de2981064f73",
+    "tools/run_regressions.mjs": "c603034a6cb35c0a50902c392081867f715f21147b3fa9f99c4d1bb79d2ea157",
+    "tools/lib/godot_process.mjs": "e0d122b745a48bb44a0fd43aafc0a51bafbdf49be24778772bac759571367d83",
+    "tools/test_registry_runtime.mjs": "6da74cc9cff879116f70ce517ee479f03f0eeae692bba50140e2f02a80fba3db"
+  },
+  "engine": {
+    "file": "Godot_v4.7.2-stable_win64.exe",
+    "sha256": "ab1824f85bfd8e0e4128182c000c4003a3e042245b2967848d089b2a04b22424"
+  }
+}

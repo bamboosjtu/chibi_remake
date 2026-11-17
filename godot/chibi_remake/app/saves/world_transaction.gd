@@ -21,22 +21,13 @@ func _install(live: Node2D, candidate: RefCounted) -> bool:
 	var presentation: Dictionary = view.stage_world_nodes() if view != null else {}
 	var previous: RefCounted = live.exchange_world(candidate.world)
 	if view != null:
-		for unit in live.units:
-			var sheet: String = str(live.sheet_by_unit.get("%d_%d" % [int(unit.unit), int(unit.owner)], ""))
-			view.attach_unit(unit, {"sheet":sheet,"unit":unit.unit,"owner":unit.owner}, int(unit.w),int(unit.h),float(unit.k))
-		if force_view_failure_after_attach or not view.world_nodes_complete(live.units):
+		var complete: bool = view.attach_loaded_world(live.units,live.sheet_by_unit)
+		if force_view_failure_after_attach or not complete:
 			live.exchange_world(previous)
 			view.rollback_world_nodes(presentation)
 			candidate.dispose(); return false
 		view.commit_world_nodes(presentation)
-		view.capture_motion()
-		if view.event_view != null: view.event_view.restore_history()
-		for unit in live.units: view.update_visual(unit)
-		if view.completion != null:
-			view.completion.reset(); view.end_label.hide()
-			if live.game_end != 0: view.show_end(live.game_end)
-		view.projectile_view.impacts.clear()
-		if view.cmd_box_ready(): view.update_panel()
+		view.finish_loaded_world(live.units,live.game_end)
 	live.scene.reset_transients()
 	live.cmd_pending = ""
 	live.cmd_pending_data = {}

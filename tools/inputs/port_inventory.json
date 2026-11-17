@@ -5752,6 +5752,7 @@
         "scene_controller": {
           "file": "app/battle/scene_controller.gd",
           "methods": [
+            "cancel_work",
             "_apply_save",
             "_save_extra",
             "_save_game",
@@ -5807,6 +5808,15 @@
           "category": "pure-forwarding",
           "provider": "scene_controller",
           "forwarded": "focus_group",
+          "mechanical": true,
+          "privateContract": false,
+          "nameMatches": []
+        },
+        {
+          "name": "cancel_work",
+          "category": "pure-forwarding",
+          "provider": "scene_controller",
+          "forwarded": "cancel_work",
           "mechanical": true,
           "privateContract": false,
           "nameMatches": []

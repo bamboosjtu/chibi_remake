@@ -8,6 +8,7 @@ var compatibility_error := ""
 const ActionClock = preload("res://simulation/systems/action_clock.gd")
 const TickTimers = preload("res://simulation/systems/tick_timers.gd")
 const TechnologyState = preload("res://simulation/systems/technology_state.gd")
+const Semantics = preload("res://app/saves/snapshot_semantics.gd")
 
 func _init(battle: Node2D, revision: Callable, cost: Callable, integer: Callable) -> void:
 	host = battle
@@ -16,9 +17,7 @@ func _init(battle: Node2D, revision: Callable, cost: Callable, integer: Callable
 	_valid_integer = integer
 
 func _valid_control_fields(simulation: Dictionary) -> bool:
-	if simulation.has("autoControl") and not simulation.autoControl is bool: return false
-	if simulation.has("rngState") and (not simulation.rngState is String or not str(simulation.rngState).is_valid_int()):return false
-	return true
+	return Semantics.valid_control(simulation)
 
 func _compatible_rules(simulation: Dictionary) -> bool:
 	if simulation.has("rulesRevision"):
@@ -73,6 +72,7 @@ func _index_units(arr: Array, simulation: Dictionary) -> Dictionary:
 		if not rec is Dictionary or not rec.get("simulation") is Dictionary:
 			return {}
 		if not preload("res://simulation/definitions/unit_schema.gd").valid_record(rec): return {}
+		if not Semantics.valid_unit(rec,host.map_data): return {}
 		if not preload("res://app/saves/save_envelope.gd").integer(rec.get("uid")): return {}
 		var uid := int(rec.uid)
 		if ids.has(uid) or not host.map_data.units.has(str(int(rec.get("unit", -1)))):
@@ -172,10 +172,7 @@ func _production_buildings(d: Dictionary, ids: Dictionary) -> Dictionary:
 	return {"buildings":production_buildings}
 
 func _valid_technology(simulation: Dictionary, ids: Dictionary, arr: Array, production_buildings: Dictionary) -> bool:
-	if not simulation.get("taskLatches", {}) is Dictionary:
-		return false
-	if not simulation.get("taskEvents", []) is Array:
-		return false
+	if not Semantics.valid_tasks(simulation): return false
 	# 科技树：player_tech 的每个值必须是数字；tech_progress 若存在必须是合法记录。
 	if not TechnologyState.valid(simulation.get("playerTech", {})): return false
 	var army_tech = simulation.get("armyTech", {})
@@ -290,9 +287,7 @@ func _complete_plan(d: Dictionary, simulation: Dictionary, ids: Dictionary) -> D
 	if not host.construction.valid_snapshot(ids): return {}
 	if host.ai != null and not host.ai.valid_snapshot(simulation.get("ai",{}),ids,d.get("trainings",[]),int(d.get("nextUid",0))): return {}
 	var speed = simulation.get("speedIndex",2)
-	if not (speed is int or speed is float) or not is_finite(float(speed)) or float(speed)!=floorf(float(speed)) or int(speed)<0 or int(speed)>3: return {}
-	var accumulator = simulation.get("accumulator",0)
-	if not (accumulator is int or accumulator is float) or not is_finite(float(accumulator)) or float(accumulator)<0: return {}
+	if not Semantics.valid_timing(simulation): return {}
 	return {"simulation": simulation, "ids": ids, "speed": speed, "decor": decor_snapshot}
 
 func _valid_officer_state(value) -> bool:

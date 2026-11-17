@@ -23,7 +23,7 @@ func flush_visuals(interpolating := false) -> void:
 	# Resolve UIDs against the current world: queued old-world dictionaries must
 	# never survive a load/rollback and overwrite the new presentation.
 	var context:=_visual_context();context["interpolating"]=interpolating
-	for unit in _ui.host.units:
+	for unit in _ui.host.unit_views():
 		if _world_dirty or pending_visuals.has(int(unit.uid)):
 			update_visual(unit,context)
 			# The following interpolation pass writes the final mobile transform.
@@ -122,7 +122,7 @@ func place_unit(u: Dictionary) -> void:
 		if s.position!=point:s.position=point
 
 func capture_motion() -> void:
-	for unit: Dictionary in _ui.host.units:
+	for unit: Dictionary in _ui.host.motion_views():
 		var uid:=int(unit.uid)
 		var nodes: Dictionary=_ui._nodes_by_uid.get(int(unit.uid),{})
 		# Hidden units have no interpolated pixels; first reveal starts at the
@@ -136,10 +136,12 @@ func capture_motion() -> void:
 
 func interpolate_motion(alpha: float) -> void:
 	var tile_width: float=_ui.host.tile_w;var half_height: float=_ui.host.tile_hh
-	for unit in _ui.host.units:
-		if bool(unit.is_building) or not unit.alive:continue
-		var nodes:=unit_nodes(unit)
+	for row in _ui.host.unit_views():
+		if bool(row.is_building) or not row.alive:continue
+		var nodes:=unit_nodes(row)
 		if nodes.get("spr")==null or not nodes.spr.visible:continue
+		var unit: Dictionary=_ui.host.visual_unit(int(row.uid))
+		if unit.is_empty():continue
 		var current:=Vector2(float(unit.ax),float(unit.ay))
 		var previous: Vector2=_ui._motion_previous.get(int(unit.uid),current)
 		# Embarking, unloading and explicit relocation must snap, not slide through walls.
@@ -168,6 +170,13 @@ func hide_unit(u: Dictionary) -> void:
 	if b != null:
 		b.visible = false
 
+func apply_loaded_unit(unit: Dictionary) -> void:
+	var nodes := unit_nodes(unit)
+	if nodes.get("spr") != null:
+		nodes.spr.visible = unit.alive
+		nodes.spr.modulate = Color(1,1,1,maxf(0.0,1.0-maxf(0.0,float(unit.die_t))*0.55))
+	if not unit.alive and nodes.get("hbar") != null: nodes.hbar.visible = false
+
 func fade_unit(u: Dictionary, alpha: float) -> void:
 	var s = unit_nodes(u).get("spr", null)
 	if s != null:
@@ -187,7 +196,7 @@ func set_unit_attached(u: Dictionary, attached: bool) -> void:
 
 func _visual_context() -> Dictionary:
 	var selected: Dictionary={}
-	for unit in _ui.host.selected:selected[int(unit.uid)]=true
+	for unit in _ui.host.selection_views():selected[int(unit.uid)]=true
 	var camera=_ui.host.cam;var area:=Rect2();var has_camera: bool=camera!=null
 	if has_camera:
 		var size: Vector2=surface.get_viewport_rect().size/camera.zoom
@@ -215,6 +224,8 @@ func update_visual(u: Dictionary, context: Dictionary={}) -> void:
 				if nodes.get(key)!=null:nodes[key].visible=false
 		nodes["draw_visible"]=false
 		return # Invisible geometry/poses are sampled when the unit becomes visible.
+	u = _ui.host.visual_unit(int(u.uid))
+	if u.is_empty(): return
 	nodes["draw_visible"]=true
 
 	var spr = nodes.get("spr", null)
@@ -230,11 +241,9 @@ func update_visual(u: Dictionary, context: Dictionary={}) -> void:
 		if bool(u.is_building):
 			dia.z_index=int(u.ay)-1 # Ground outline is occluded by the building itself.
 			var cells: Array=u.get("occupied_cells",[])
-			if cells.is_empty():cells=_ui.host.nav.building_footprint(int(u.unit),Vector2(u.ax,u.ay),float(u.w))
 			if dia.position!=Vector2.ZERO:dia.position=Vector2.ZERO
 			if cells!=dia.get_meta("footprint",[]):
-				var outline: PackedVector2Array=_ui.host.nav.footprint_outline(cells)
-				if not outline.is_empty():outline.append(outline[0])
+				var outline := PackedVector2Array(u.footprint_outline)
 				dia.points=outline;dia.set_meta("footprint",cells.duplicate())
 	if not bool(u.is_building) and not vis:
 		if nodes.get("hbar")!=null:nodes.hbar.visible=false

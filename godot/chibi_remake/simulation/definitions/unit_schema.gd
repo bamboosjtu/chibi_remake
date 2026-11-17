@@ -8,14 +8,14 @@ const FIELDS := {
 	"blocked_n": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "nullable": true, "min": 0, "max": 2147483647},
 	"blocked_cursor": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "min": 0, "max": 48},
 	"last_attacker_uid": {"type": "int", "default": -1, "persist": true, "derived": false, "group": "scalar", "nullable": true, "min": -1, "max": 2147483647},
-	"A": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"B": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
+	"A": {"type": "int", "default": 0, "persist": false, "derived": true, "group": "cell_cache", "nullable": true},
+	"B": {"type": "int", "default": 0, "persist": false, "derived": true, "group": "cell_cache", "nullable": true},
 	"maxhp": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
 	"base_maxhp": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
 	"hold": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "scalar", "nullable": true},
 	"cool": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
 	"repath": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
-	"pi": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
+	"pi": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "nullable": true, "min": 0, "max": 2147483647},
 	"anim": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
 	"dir": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar", "nullable": true},
 	"moved": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "scalar", "nullable": true},
@@ -133,7 +133,14 @@ static func snapshot_scalars(unit: Dictionary) -> Dictionary:
 	var result := {}
 	for key in persisted_scalars():
 		if unit.has(key): result[key] = unit[key] if FIELDS[key].type != "int" or unit[key] == null else int(unit[key])
+	if unit.has("pi"): result.pi = navigation_cursor(unit.get("path",[]),int(unit.pi))
 	return result
+
+static func navigation_cursor(path: Array, cursor: int) -> int:
+	return cursor if cursor >= 0 and cursor < path.size() else 0
+
+static func navigation_path(path: Array, cursor: int) -> Array:
+	return path if cursor >= 0 and cursor < path.size() else []
 
 static func restore_scalars(state: Dictionary, unit: Dictionary, group := "scalar") -> void:
 	for key in fields(group):
@@ -157,6 +164,7 @@ static func valid_value(key: String, value) -> bool:
 		"int", "float":
 			if not (value is int or value is float) or not is_finite(float(value)): return false
 			if field.type == "int" and float(value) != floorf(float(value)): return false
+			if field.type == "int" and (float(value) < -2147483648.0 or float(value) > 2147483647.0): return false
 			if float(value) < float(field.get("min", -INF)) or float(value) > float(field.get("max", INF)): return false
 		"bool":
 			if not value is bool: return false
@@ -166,6 +174,7 @@ static func valid_value(key: String, value) -> bool:
 			if not value is Array: return false
 		"Dictionary":
 			if not value is Dictionary: return false
+			if key == "build_cost" and not preload("res://simulation/definitions/resource_cost.gd").valid(value): return false
 	return not field.has("values") or value in field["values"]
 
 static func valid_group(state: Dictionary, group: String) -> bool:
@@ -174,7 +183,7 @@ static func valid_group(state: Dictionary, group: String) -> bool:
 	return true
 
 static func valid_snapshot(state: Dictionary) -> bool:
-	for group in ["scalar", "action", "locomotion", "effect"]:
+	for group in ["scalar", "action", "locomotion", "effect", "cell_cache"]:
 		if not valid_group(state, group): return false
 	return valid_relations(state) # Timers have a versioned migration; referential integrity needs world IDs.
 

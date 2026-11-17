@@ -2,9 +2,9 @@ extends SceneTree
 class Reads extends RefCounted:
 	var count := 0
 	var repository: RefCounted
-	func load_slot(slot: int) -> Dictionary:
+	func read_slot(slot: int) -> Dictionary:
 		count += 1
-		return repository.load_slot(slot)
+		return repository.read_slot(slot)
 
 func _initialize() -> void:
 	run.call_deferred()
@@ -17,7 +17,7 @@ func run() -> void:
 	repository.storage.pinned=true
 	assert(repository.begin_save(2,0) and repository.commit(repository.slot_path(2),'{"probe":1,"saveName":"one"}'))
 	var reads := Reads.new(); reads.repository=repository
-	var catalog = load("res://app/saves/slot_catalog.gd").new(reads.load_slot,repository.slot_path,20)
+	var catalog = load("res://app/saves/slot_catalog.gd").new(reads.read_slot,repository.slot_path,20)
 	repository.changed.connect(catalog.invalidate)
 	assert(catalog.has_save() and catalog.entries()[2].valid)
 	var count := reads.count

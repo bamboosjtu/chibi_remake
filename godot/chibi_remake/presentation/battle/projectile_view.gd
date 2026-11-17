@@ -36,7 +36,7 @@ func _draw() -> void:
 			draw_colored_polygon(PackedVector2Array([point+Vector2(-4,-2),point+Vector2(-1,-5),point+Vector2(4,-3),point+Vector2(5,2),point+Vector2(0,5),point+Vector2(-5,2)]),Color(0.29,0.27,0.23))
 			draw_colored_polygon(PackedVector2Array([point+Vector2(-4,-2),point+Vector2(-1,-5),point+Vector2(4,-3),point+Vector2(0,0)]),Color(0.65,0.61,0.51))
 	for fire in host.fire_fields.active:
-		var point:Vector2=host.nav.anchor_of(int(fire.a),int(fire.b))
+		var point:Vector2=host.cell_anchor(int(fire.a),int(fire.b))
 		if not host.visibility.is_visible(point):continue
 		var fade:float=minf(1.0,float(100-int(fire.age))/12.0)
 		for i in range(3):

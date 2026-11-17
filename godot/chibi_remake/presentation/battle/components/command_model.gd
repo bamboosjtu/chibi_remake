@@ -11,7 +11,7 @@ func _init(data: UIState, node: Node2D) -> void:
 	surface = node
 
 func update_panel() -> void:
-	var sel: Array = _ui.host.selected
+	var sel: Array = _ui.host.selection_views()
 	var kind:=panel_kind()
 	if kind!="combat":_ui.art_sub=""
 	if kind!="worker":_ui.build_menu=false
@@ -35,14 +35,14 @@ func panel_kind() -> String:
 func _refresh_cmd_panel() -> void:
 	if not cmd_box_ready():
 		return
-	var sel: Array = _ui.host.selected
+	var sel: Array = _ui.host.selection_views()
 	var specs: Array = []
 	var hint: String = ""
 	# 「选择将领」子面板：列出**尚未被占用**的武将（原版列表就是这个集合）
 	if _ui.officer_pick and not sel.is_empty():
 		# 候选 = 未被占用的 + **选中部队自己持有的**（可移出再指派，原版 CTRL_GROUP_Sub）。
 		# 只用 available_officers 的话，名单分完之后这里永远是"没有可用的将领"。
-		var avail: Array = _ui.host.commands.military.officers_for_selection(_ui.host.player_owner, sel)
+		var avail: Array = _ui.host.officer_candidates()
 		if avail.is_empty():
 			specs.append({
 				"text": "没有可用的将领", "enabled": false,
@@ -91,7 +91,7 @@ func _refresh_cmd_panel() -> void:
 				str(site.get("name", "?")), int(hp), int(mx), int(100.0 * hp / mx)]
 			specs.append(_cancel_spec("取消建造", ports._act_cancel_site.bind(site)))
 		elif not b.is_empty():
-			var busy: bool = _ui.host.commands.technology._building_work_busy(b)
+			var busy: bool = bool(_ui.host.building_work(int(b.uid)).busy)
 			if busy:
 				_apply_cmd_specs([_cancel_work_spec(b)], "")
 				return
@@ -103,14 +103,14 @@ func _refresh_cmd_panel() -> void:
 				var tt: Dictionary = tts[i]
 				var ok: bool = ports._can_afford(tt) and not busy
 				var training: Dictionary = {}
-				for order in _ui.host.trainings:
-					if order.b == b and int(order.unit) == int(tt.unit): training = order; break
-				var progress := clampi(int(100.0 * (1.0 - float(training.get("t", 0)) / maxf(1.0, float(_ui.host.map_data.units[str(int(tt.unit))].hp)))), 0, 100)
+				for order in _ui.host.training_views():
+					if int(order.buildingUid) == int(b.uid) and int(order.unit) == int(tt.unit): training = order; break
+				var progress := clampi(int(100.0 * (1.0 - float(training.get("t", 0)) / maxf(1.0, _ui.host.unit_capacity(int(tt.unit))))), 0, 100)
 				specs.append({
 					"text": ("训练%s %d%%" % [str(tt.name), progress]) if not training.is_empty() else ("训练%s" % str(tt.name)),
 					"icon": _ui.host.remaster_art.unit_icon(int(tt.unit)),
 					"production": true,
-					"progress_label": ("%d%%" % progress) if not training.is_empty() else "%d人" % int(_ui.host.map_data.units[str(int(tt.unit))].hp),
+					"progress_label": ("%d%%" % progress) if not training.is_empty() else "%d人" % int(_ui.host.unit_capacity(int(tt.unit))),
 					"hover": "训练%s：%s%s" % [str(tt.name), ports._cost_text(tt), (" · %d%%" % progress) if not training.is_empty() else ""],
 					"enabled": ok,
 					"tip": "生产%s：%s\n快捷键 %d%s" % [str(tt.name), ports._cost_text(tt), i + 1, "；建筑工作中，请先取消或等待" if busy else ("" if ok else "；资源不足")],
@@ -126,7 +126,7 @@ func _refresh_cmd_panel() -> void:
 			# 没有图集时它就是等价的可点击清单（同一批 main 命令入口）。
 			if ports._worker_count(sel) > 0:
 				specs.append({"text": "运输", "enabled": true, "tip": "点资源点：工人往返搬运（载重 200）。", "act": ports._act_transport})
-				specs.append({"text": "建造", "enabled": not _ui.host.commands.military._selected_construction_workers().is_empty(), "tip": "带工人的武将发起建造；工人到位后每4tick施工。", "act": ports._open_build_menu})
+				specs.append({"text": "建造", "enabled": _ui.host.can_build_selected(), "tip": "带工人的武将发起建造；工人到位后每4tick施工。", "act": ports._open_build_menu})
 				specs.append({"text": "修理", "enabled": true, "tip": "点我方单位/建筑：+16 兵力，四资源各 −16。", "act": ports._act_repair})
 			else:
 				specs.append({"text": "警戒", "enabled": true, "tip": "取消当前命令、原地待命（不再自动索敌）。", "act": ports._act_watch})
@@ -177,7 +177,7 @@ func _cancel_spec(title: String, action: Callable) -> Dictionary:
 		"enabled":true, "tip":title + "，返还已付费用的75%", "act":action}
 
 func _cancel_work_spec(building: Dictionary) -> Dictionary:
-	if _ui.host.trainings.any(func(tr): return tr.b == building):
+	if _ui.host.training_views().any(func(tr): return int(tr.buildingUid) == int(building.uid)):
 		return _cancel_spec("取消生产", ports._act_cancel_train.bind(building))
 	return _cancel_spec("取消出售" if int(building.unit) == 23 else "取消研究", ports._act_cancel_research)
 
@@ -300,7 +300,7 @@ func _refresh_hotkeys() -> void:
 				tip = "先选中我方建筑才能生产（同按键 %d）" % (i + 1)
 			else:
 				act = ports._act_train.bind(i)
-				var busy: bool = _ui.host.commands.technology._building_work_busy(b)
+				var busy: bool = bool(_ui.host.building_work(int(b.uid)).busy)
 				usable = ports._can_afford(tt) and not busy
 				tip = "生产 %s（%s）%s" % [str(tt.name), ports._cost_text(tt), " —— 建筑工作中" if busy else ("" if usable else " —— 资源不足")]
 		else:
@@ -335,7 +335,7 @@ func _add_tech_specs(specs: Array, bid: int) -> void:
 		var unlocked: bool = bool(_ui.host.commands.technology.tech_unlocked(idx))
 		var cost: Dictionary = _ui.host.commands.technology.tech_cost(idx)
 		var affordable: bool = ports._can_afford(cost)
-		var busy: bool = not ports._selected_building().is_empty() and _ui.host.commands.technology._building_work_busy(ports._selected_building())
+		var busy: bool = not ports._selected_building().is_empty() and bool(_ui.host.building_work(int(ports._selected_building().uid)).busy)
 		var ok: bool = next and unlocked and affordable and not busy
 		var tip: String = "%s。%s" % [str(_ui.host.commands.technology.tech_effect_desc(idx)), str(_ui.host.commands.technology.tech_tip(idx))]
 		if not unlocked or not next:

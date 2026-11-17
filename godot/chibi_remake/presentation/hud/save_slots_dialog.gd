@@ -59,6 +59,7 @@ func open(for_save: bool, default_title := "") -> void:
 			var title: String=entry.name if entry.name!="" else Game.campaign_caption(entry.map)
 			var campaign: String=Game.campaign_caption(entry.map)
 			caption="%s%s  ·  %s" % [title.left(24),"  ·  "+campaign if title!=campaign else "",str(entry.savedAt).replace("T"," ")]
+			if entry.get("source","") == "backup": caption += "  ·  使用备份"
 		elif entry.occupied:caption="记录损坏，无法读取"
 		records.add_item("%s    %s" % [prefix,caption])
 		var index:=entries.size()-1
@@ -78,7 +79,7 @@ func _selected(index: int) -> void:
 	confirm_button.text=("覆盖选中记录" if entry.occupied else "保存新进度") if saving else "读取选中记录"
 	if saving:
 		status.text="只会覆盖选中的记录，其余进度保留。" if entry.occupied else "将保存为一条新进度。"
-	else:status.text="读取所选进度，恢复该记录中的战役与部队。"
+	else:status.text="主记录无法读取，将使用可用备份恢复；原文件保留。" if entry.get("source","") == "backup" else "读取所选进度，恢复该记录中的战役与部队。"
 
 func _confirm() -> void:
 	if selected_slot<0 or confirm_button.disabled:return

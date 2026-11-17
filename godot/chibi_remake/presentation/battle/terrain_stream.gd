@@ -78,7 +78,7 @@ func _setup_gate_apertures(map_id: String) -> void:
 	if not is_inside_tree() or not is_instance_valid(host) or not host.is_inside_tree(): return
 	var apertures := PackedVector4Array()
 	var slopes := PackedFloat32Array()
-	for u in host.units:
+	for u in host.unit_views():
 		if int(u.unit) not in [16,17]: continue
 		var id := int(u.unit)
 		var module = preload("res://presentation/battle/gate_module.gd")

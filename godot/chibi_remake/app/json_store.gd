@@ -15,8 +15,11 @@ static func _read(path: String, validator: Callable = Callable()) -> Dictionary:
 	var f := FileAccess.open(path, FileAccess.READ)
 	if f == null:
 		return {}
+	if f.get_length() > preload("res://app/saves/json_limits.gd").MAX_BYTES: return {}
+	var text := f.get_as_text()
+	if not preload("res://app/saves/json_limits.gd").valid_text(text): return {}
 	var parser := JSON.new()
-	if parser.parse(f.get_as_text()) != OK:
+	if parser.parse(text) != OK:
 		return {}
 	var value = parser.data
 	if not value is Dictionary or (validator.is_valid() and not validator.call(value)):
@@ -24,15 +27,20 @@ static func _read(path: String, validator: Callable = Callable()) -> Dictionary:
 	return value
 
 static func read(path: String, validator: Callable = Callable()) -> Dictionary:
+	return read_with_source(path,validator).data
+
+static func read_with_source(path: String, validator: Callable = Callable()) -> Dictionary:
 	var value := _read(path, validator)
 	if not value.is_empty():
-		return value
-	return _read(path + ".bak", validator)
+		return {"data":value,"source":"primary"}
+	value = _read(path + ".bak", validator)
+	return {"data":value,"source":"backup" if not value.is_empty() else "none"}
 
 static func commit(path: String, text: String, validator: Callable = Callable(), backup_validator: Callable = Callable()) -> bool:
 	last_error = {}
 	path = ProjectSettings.globalize_path(path).replace("\\", "/").simplify_path()
 	context = {"path": path, "directory": path.get_base_dir(), "temporary": ""}
+	if not preload("res://app/saves/json_limits.gd").valid_text(text): return _fail("payload limits")
 	var parser := JSON.new()
 	if parser.parse(text) != OK or not parser.data is Dictionary:
 		return _fail("serialize", parser.get_error_line())

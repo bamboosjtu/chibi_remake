@@ -12,6 +12,14 @@ try{
  write('simulation/test.gd','extends RefCounted\n');write('presentation/test.gd','extends RefCounted\n');
  write('app/private.gd','extends RefCounted\nfunc bad(view):\n\treturn view._ui\n');assert.notEqual(run().status,0);
  write('app/private.gd','extends RefCounted\n');
+ write('app/saves/probe.gd','extends RefCounted\nfunc bad(view):\n\tview.unit_nodes({}).spr.visible=false\n');assert.notEqual(run().status,0);
+ write('app/saves/probe.gd','extends RefCounted\n');
+ write('app/read_models/unit_projection.gd','extends RefCounted\nfunc bad(unit):\n\treturn unit.duplicate(true)\n');assert.notEqual(run().status,0);
+ write('app/read_models/unit_projection.gd','extends RefCounted\n');
+ for(const field of ['units','selected','map_data','nav','trainings']){
+  write('presentation/battle/components/unit_visuals.gd','extends RefCounted\nfunc bad(host):\n\treturn host.'+field+'\n');assert.notEqual(run().status,0);
+ }
+ write('presentation/battle/components/unit_visuals.gd','extends RefCounted\n');
  write('app/private.gd','extends RefCounted\nfunc bad(world):\n\tworld._modules.clear()\n');assert.notEqual(run().status,0);
  write('app/private.gd','extends RefCounted\n');
  write('presentation/battle/components/camera_controller.gd','extends RefCounted\nfunc bad(host):\n\treturn host.units\n');assert.notEqual(run().status,0);

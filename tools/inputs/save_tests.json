@@ -79,6 +79,16 @@
         "--noview"
       ],
       "timeout": 150
+    },
+    {
+      "script": "test_save_boundaries",
+      "markers": [
+        "SAVE BOUNDARIES PASS"
+      ],
+      "args": [
+        "--noview"
+      ],
+      "timeout": 150
     }
   ]
 }

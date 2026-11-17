@@ -20,6 +20,19 @@ func _init(data: State, services: SceneServices, surface: Node2D) -> void:
 	scene = services
 	node = surface
 
+func cancel_work(kind: String, uid: int, epoch: int) -> bool:
+	if epoch != node.world.get_instance_id() or kind not in ["site","training"]: return false
+	var action := _cancel_work_now.bind(kind,uid,epoch)
+	return battle.player_commands.submit(22 if kind == "site" else 23,action,Vector2.ZERO,uid) > 0
+
+func _cancel_work_now(kind: String, uid: int, epoch: int) -> void:
+	if epoch != node.world.get_instance_id(): return
+	for unit: Dictionary in battle.units:
+		if int(unit.uid) != uid: continue
+		if kind == "site": node.commands.economy._cancel_site(unit)
+		else: node.commands.economy._cancel_training(unit)
+		return
+
 func _write_smoke(ok: bool, why: String) -> void:
 	var f := FileAccess.open("user://smoke.json", FileAccess.WRITE)
 	if f == null:

@@ -114,6 +114,8 @@ func _on_visual(action: String, arguments: Array) -> void:
 		scene.feedback_until = 0
 		return
 	if scene.view == null: return
+	if action in ["world_dirty","place_unit","free_unit","update_visual","attach_unit","set_unit_attached"]:
+		scene.view.domain_changed()
 	if state.effects.simulating and action in ["place_unit","fade_unit","hide_unit","update_visual","set_frame"]:
 		scene.view.queue_visual(arguments[0]);return
 	match action:

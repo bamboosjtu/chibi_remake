@@ -63,32 +63,30 @@ func resolve(host: Node2D, pointer: Vector2) -> Dictionary:
 	if direction != Vector2.ZERO and not bool(host.selecting):
 		var camera := view.cam as Camera2D
 		var wanted := camera.position+direction*4
-		var clamped := Metrics.clamp_world_pos(wanted,Vector2(host.map_data.terrainW,host.map_data.terrainH),view.battle_rect(),get_viewport().get_visible_rect().size,camera.zoom)
+		var clamped := Metrics.clamp_world_pos(wanted,view.host.camera_bounds(),view.battle_rect(),get_viewport().get_visible_rect().size,camera.zoom)
 		if not clamped.is_equal_approx(camera.position):
 			var directions := [Vector2(-1,-1),Vector2(0,-1),Vector2(1,-1),Vector2(1,0),Vector2(1,1),Vector2(0,1),Vector2(-1,1),Vector2(-1,0)]
 			return {"bank":"B","row":directions.find(direction)}
 	if not view.battle_rect().has_point(pointer): return {"bank":"A","row":0}
 	if host.selecting: return {"bank":"A","row":7}
 	var point: Vector2 = host.get_canvas_transform().affine_inverse()*pointer
-	var hit: Dictionary = host.commands.orders._hover_unit(point)
 	var mode: String = host.commands.orders.cmd_pending_kind()
+	var targets: Dictionary = view.host.cursor_targets(point,mode)
 	var result := 0
 	match mode:
 		"attack":
 			result = 1
-			var target: Dictionary=host.commands.orders._attack_target_at(point)
-			if not target.is_empty():
+			if targets.attack:
 				result = 3
-				if int(target.owner)==0 and not host.commands.orders._selected_has_nonworker_attacker(): result=2
-			elif not hit.is_empty(): result=2
+				if targets.neutral and not targets.neutral_allowed: result=2
+			elif targets.hit: result=2
 		"transport":
 			result = 4
-			if not host.commands.economy._resource_at(point).is_empty() or not host.commands.economy._resource_at(point+Vector2(0,15)).is_empty(): result=5
+			if targets.resource: result=5
 		"join":
 			result = 8
-			var own: Dictionary = host.commands.orders._own_object_at(point)
-			if not own.is_empty() and not host.commands.military._commander_for(own).is_empty(): result=9
-		_: result = 6 if not hit.is_empty() else 0
+			if targets.join: result=9
+		_: result = 6 if targets.hit else 0
 	return {"bank":"A","row":result}
 
 func advance(delta: float, state: Dictionary) -> void:

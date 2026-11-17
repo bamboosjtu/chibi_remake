@@ -2,7 +2,7 @@ extends RefCounted
 ## File-level validity, independent of installed rules and any live world.
 ## SnapshotValidator additionally checks map identity, technology and world references.
 const Schema = preload("res://simulation/definitions/unit_schema.gd")
-const RESOURCE_KEYS := ["gold", "wood", "food", "stone"]
+const RESOURCE_KEYS = preload("res://simulation/definitions/resource_cost.gd").KEYS
 
 static func integer(value, minimum := 0) -> bool:
 	return (value is int or value is float) and is_finite(float(value)) and float(value) == floorf(float(value)) and float(value) >= minimum and float(value) <= 2147483647
@@ -15,7 +15,19 @@ static func valid_header(data: Dictionary) -> bool:
 	if not integer(version,1) or int(version)>8: return false
 	var ended = data.get("gameEnd",0)
 	if not integer(ended) or float(ended)>2: return false
-	return int(version)<4 or integer(data.get("nextUid"))
+	return integer(data.get("nextUid")) if int(version)>=4 or data.has("nextUid") else true
+
+static func flag(value) -> bool:
+	return value is bool or ((value is int or value is float) and float(value) in [0.0,1.0])
+
+static func _record_valid(record: Dictionary, version: int) -> bool:
+	if version >= 4: return Schema.valid_record(record)
+	var typed := record.duplicate()
+	for key in ["alive","building","mapObject"]:
+		if not typed.has(key): continue
+		if not flag(typed[key]): return false
+		typed[key] = bool(typed[key])
+	return Schema.valid_record(typed)
 
 static func valid_collections(data: Dictionary) -> bool:
 	var version = data.get("v", 1)
@@ -28,7 +40,15 @@ static func valid_collections(data: Dictionary) -> bool:
 		if complete and not resources.has(key): return false
 	for value in resources.values():
 		if not number(value) or float(value) < 0: return false
-	return data.get("trainings", []) is Array
+	if not data.get("trainings", []) is Array: return false
+	if int(version) >= 4:
+		for order in data.get("trainings",[]):
+			if not order is Dictionary or not integer(order.get("buildingUid")) or not integer(order.get("unit")): return false
+			if order.has("owner") and not integer(order.owner): return false
+			if order.has("ticks") and not order.ticks is bool: return false
+			if not number(order.get("t",0)) or float(order.get("t",0))<0: return false
+			if not preload("res://simulation/definitions/resource_cost.gd").valid(order.get("cost",{})): return false
+	return true
 
 static func valid(data: Dictionary) -> bool:
 	var version = data.get("v", 1)
@@ -40,14 +60,22 @@ static func valid(data: Dictionary) -> bool:
 	if not valid_collections(data): return false
 	if int(version) >= 4:
 		if not data.get("simulation") is Dictionary or not integer(data.get("nextUid")): return false
+		if not preload("res://app/saves/snapshot_semantics.gd").valid_tasks(data.simulation): return false
+		if not preload("res://app/saves/snapshot_semantics.gd").valid_control(data.simulation) or not preload("res://app/saves/snapshot_semantics.gd").valid_timing(data.simulation): return false
 	var seen := {}
 	for record in data.units:
 		if int(version) <= 2:
 			if not record is Array or record.size() < (4 if int(version) == 1 else 10): return false
+			if not flag(record[0] if int(version)==1 else record[1]): return false
 			for index in ([1, 2, 3] if int(version) == 1 else [0, 2, 3, 4, 5, 6]):
 				if not number(record[index]): return false
+			if int(version)==2:
+				for index in [0,5,6]:
+					if not integer(record[index]): return false
+				if seen.has(int(record[0])) or not flag(record[8]) or not integer(record[9],-1): return false
+				seen[int(record[0])] = true
 			continue
-		if not record is Dictionary or not Schema.valid_record(record): return false
+		if not record is Dictionary or not _record_valid(record,int(version)): return false
 		if not integer(record.get("uid")) or seen.has(int(record.uid)): return false
 		seen[int(record.uid)] = true
 		for key in ["unit", "owner"]:

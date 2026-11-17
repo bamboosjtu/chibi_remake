@@ -55,7 +55,7 @@ func restore(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 	host.projectiles.restore(simulation.get("projectiles",[]))
 	host.fire_fields.restore(simulation.get("fireFields",[]))
 	_restore_clock(simulation, speed)
-	host.ai_res = _numeric_keys.call(simulation.get("aiResources", {}))
+	host.ai_res = _numeric_keys.call(simulation.get("aiResources", {})).duplicate(true)
 	host.control_groups = _numeric_keys.call(simulation.get("groups", {}))
 	for key in host.control_groups:
 		host.control_groups[key]=host.control_groups[key].map(func(uid):return int(uid))
@@ -82,7 +82,7 @@ func restore(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 		host.tech_progress = {
 			"tech": int((tp as Dictionary).get("tech", -1)),
 			"t": float((tp as Dictionary).get("t", 0.0)),
-			"cost": (tp as Dictionary).get("cost", {}),
+			"cost": (tp as Dictionary).get("cost", {}).duplicate(true),
 		}
 	if host.ai != null:
 		host.ai.restore(simulation.get("ai", {}))
@@ -131,10 +131,10 @@ func _restore_units(d: Dictionary, arr: Array, simulation: Dictionary) -> bool:
 		var state: Dictionary = rec.simulation
 		_restore_scalars(u,rec,state,not simulation.has("rulesRevision"))
 		u.path = []
-		for point in state.get("path", []):
-			u.path.append(Vector2(float(point[0]), float(point[1])))
-		u.pi = int(state.get("pi", 0))
-		if state.has("repathTo"): u["repath_to"] = Vector2(state.repathTo[0],state.repathTo[1])
+		for point in UnitSchema.navigation_path(state.get("path",[]),int(state.get("pi",0))):
+			u.path.append(preload("res://app/saves/snapshot_semantics.gd").clamp_point(Vector2(float(point[0]),float(point[1])),host.map_data))
+		u.pi = UnitSchema.navigation_cursor(u.path,int(state.get("pi",0)))
+		if state.has("repathTo"): u["repath_to"] = preload("res://app/saves/snapshot_semantics.gd").clamp_point(Vector2(state.repathTo[0],state.repathTo[1]),host.map_data)
 		TickTimers.restore(state, int(d.v), u)
 		host.stratagems.restore(state,u)
 		ActionClock.restore(state,u)
@@ -147,6 +147,7 @@ func _restore_units(d: Dictionary, arr: Array, simulation: Dictionary) -> bool:
 	# 所有实体建好后再解析引用，采矿／卸货目标可以排在工人后面。
 	for rec in arr:
 		var u: Dictionary = by_uid[int(rec.uid)]
+		if not by_uid.has(int(u.get("join_target_uid",-1))): u.join_target_uid = -1
 		u.target = by_uid.get(int(rec.simulation.get("targetUid", -1)))
 		for field in ["build_target", "repair_target", "board_target"]:
 			u[field] = by_uid.get(int(rec.simulation.get(field + "Uid", -1)))
@@ -160,13 +161,4 @@ func _restore_units(d: Dictionary, arr: Array, simulation: Dictionary) -> bool:
 	return true
 
 func _refresh_view() -> void:
-	if host.view != null and host.view.event_view != null:
-		host.view.capture_motion()
-		host.view.event_view.restore_history()
-		for unit in host.units:
-			if unit.alive and float(unit.die_t)<0: host.commands.world._update_visual(unit)
-		if host.view.completion != null:
-			host.view.completion.reset()
-			host.view.end_label.hide()
-			if host.game_end != 0: host.view.show_end(host.game_end)
-		host.view.projectile_view.impacts.clear()
+	if host.view != null: host.view.finish_loaded_world(host.units,host.game_end)

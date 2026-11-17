@@ -10,7 +10,7 @@ const Catalog = preload("res://app/saves/slot_catalog.gd")
 const CampaignSession = preload("res://app/campaign_session.gd")
 var campaign := CampaignSession.new()
 var repository := Repository.new(is_valid_save, can_rotate_save)
-var slot_catalog := Catalog.new(load_save, save_slot_path, SAVE_SLOTS)
+var slot_catalog := Catalog.new(repository.read_slot, save_slot_path, SAVE_SLOTS)
 var startup_valid := false
 
 var current_map: String:
@@ -145,7 +145,7 @@ func snapshot(units: Array, resources: Dictionary, extra: Dictionary) -> Diction
 			var reference = u.get(field)
 			simulation[field + "Uid"] = int(reference.uid) if reference is Dictionary and not reference.is_empty() and contains_ref.call(reference) else -1
 		simulation["path"] = []
-		for point in u.get("path", []):
+		for point in UnitSchema.navigation_path(u.get("path",[]),int(u.get("pi",0))):
 			simulation.path.append([point.x, point.y])
 		if u.get("repath_to") is Vector2: simulation["repathTo"] = [u.repath_to.x,u.repath_to.y]
 		var record := UnitSchema.snapshot_record(u)

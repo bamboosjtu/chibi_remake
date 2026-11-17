@@ -22,11 +22,11 @@ func _act_build(idx: int) -> void:
 		ports._refresh_cmd_panel()
 
 func _act_cancel_site(site: Dictionary) -> void:
-	_ui.host.player_commands.submit(22,_ui.host.commands.economy._cancel_site.bind(site),Vector2.ZERO,int(site.uid))
+	_ui.host.commands.session.cancel_work("site",int(site.uid),int(site.get("world_id",-1)))
 	ports._refresh_cmd_panel()
 
 func _act_cancel_train(building: Dictionary) -> void:
-	_ui.host.player_commands.submit(23,_ui.host.commands.economy._cancel_training.bind(building),Vector2.ZERO,int(building.uid))
+	_ui.host.commands.session.cancel_work("training",int(building.uid),int(building.get("world_id",-1)))
 	ports._refresh_cmd_panel()
 
 func _act_train(i: int) -> void:

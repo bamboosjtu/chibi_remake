@@ -9,6 +9,7 @@ const TECH_TICKS = Config.TECH_TICKS
 var _data: WeakRef
 var _scene: RefCounted
 var commands: RefCounted
+var _unit_projection := preload("res://app/read_models/unit_projection.gd").new()
 
 func _init(data: Object, services: RefCounted, commands: RefCounted) -> void:
 	_data = weakref(data)
@@ -60,6 +61,83 @@ func selection_description() -> Dictionary:
 	var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
 	if data == null: return {}
 	var result: Dictionary = data.command_rules.describe().duplicate(true)
+	result.make_read_only()
+	return result
+
+func selection_views() -> Array:
+	var data = preload("res://named_port.gd").require_provider(_data,"selection values")
+	return _unit_projection.selection(data) if data != null else []
+
+func unit_views() -> Array:
+	var data = preload("res://named_port.gd").require_provider(_data,"unit values")
+	return _unit_projection.units(data) if data != null else []
+
+func visual_unit(uid: int) -> Dictionary:
+	var data = preload("res://named_port.gd").require_provider(_data,"unit values")
+	return _unit_projection.visual(data,uid) if data != null else {}
+
+func motion_views() -> Array:
+	var data = preload("res://named_port.gd").require_provider(_data,"motion values")
+	return _unit_projection.motion(data) if data != null else []
+
+func training_views() -> Array:
+	var data = preload("res://named_port.gd").require_provider(_data,"production values")
+	return _unit_projection.training(data) if data != null else []
+
+func building_work(uid: int) -> Dictionary:
+	var data = preload("res://named_port.gd").require_provider(_data,"building work")
+	return _unit_projection.work(data,uid) if data != null else {}
+
+func officer_candidates() -> Array:
+	var data = preload("res://named_port.gd").require_provider(_data,"officer candidates")
+	if data == null: return []
+	var result: Array = data.commands.military.officers_for_selection(data.player_owner,data.selected).duplicate(true)
+	preload("res://simulation/definitions/frozen_data.gd").freeze(result)
+	return result
+
+func unit_capacity(kind: int) -> float:
+	var data = preload("res://named_port.gd").require_provider(_data,"unit capacity")
+	return float(data.map_data.units.get(str(kind),{}).get("hp",1)) if data != null else 1.0
+
+func map_caption() -> String:
+	var data = preload("res://named_port.gd").require_provider(_data,"map caption")
+	return str(data.map_data.get("name","")) if data != null else ""
+
+func cell_anchor(a: int, b: int) -> Vector2:
+	var data = preload("res://named_port.gd").require_provider(_data,"cell anchor")
+	return data.nav.anchor_of(a,b) if data != null else Vector2.ZERO
+
+func invalidate_unit_views() -> void:
+	_unit_projection.invalidate()
+
+func projection_counters() -> Dictionary:
+	return _unit_projection.metrics.duplicate()
+
+func can_build_selected() -> bool:
+	var data = preload("res://named_port.gd").require_provider(_data,"construction eligibility")
+	return not data.commands.military._selected_construction_workers().is_empty() if data != null else false
+
+func hover_view(point: Vector2) -> Dictionary:
+	var data = preload("res://named_port.gd").require_provider(_data,"hover values")
+	if data == null: return {}
+	var hit: Dictionary = data.commands.orders._hover_unit(point)
+	if hit.is_empty(): return preload("res://simulation/definitions/frozen_data.gd").copy({})
+	return preload("res://simulation/definitions/frozen_data.gd").copy({"name":str(hit.name),"hp":float(hit.hp),"maxhp":float(hit.maxhp),"owner":int(hit.owner)})
+
+func cursor_targets(point: Vector2, mode: String) -> Dictionary:
+	var data = preload("res://named_port.gd").require_provider(_data,"cursor values")
+	if data == null: return {}
+	var result := {"hit":not data.commands.orders._hover_unit(point).is_empty(),"attack":false,"neutral":false,"neutral_allowed":false,"resource":false,"join":false}
+	match mode:
+		"attack":
+			var target: Dictionary = data.commands.orders._attack_target_at(point)
+			result.attack = not target.is_empty()
+			result.neutral = not target.is_empty() and int(target.owner) == 0
+			result.neutral_allowed = data.commands.orders._selected_has_nonworker_attacker()
+		"transport": result.resource = not data.commands.economy._resource_at(point).is_empty() or not data.commands.economy._resource_at(point+Vector2(0,15)).is_empty()
+		"join":
+			var own: Dictionary = data.commands.orders._own_object_at(point)
+			result.join = not own.is_empty() and not data.commands.military._commander_for(own).is_empty()
 	result.make_read_only()
 	return result
 
@@ -179,20 +257,10 @@ var hover_text:
 	get: return _scene.hover_text
 	set(value): _scene.hover_text = value
 
-var map_data:
-	get:
-		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
-		return data.map_data if data != null else null
-
 var map_id:
 	get:
 		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
 		return data.map_id if data != null else null
-
-var nav:
-	get:
-		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
-		return data.nav if data != null else null
 
 var officer_policy:
 	get:
@@ -234,11 +302,6 @@ var scenario_source:
 
 var sec_visible:
 	get: return _scene.sec_visible
-
-var selected:
-	get:
-		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
-		return data.selected if data != null else null
 
 var selecting:
 	get: return _scene.selecting
@@ -289,16 +352,6 @@ var tile_w:
 	get:
 		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
 		return data.tile_w if data != null else 0
-
-var trainings:
-	get:
-		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
-		return data.trainings if data != null else null
-
-var units:
-	get:
-		var data = preload("res://named_port.gd").require_provider(_data, "battle read model")
-		return data.units if data != null else null
 
 var view:
 	get: return _scene.view

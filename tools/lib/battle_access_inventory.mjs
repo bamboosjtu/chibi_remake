@@ -9,8 +9,8 @@ export function collectReadModelUses(sources) {
     const add = (match, field, syntax) => references.push({file, line:code.slice(0,match.index).split('\n').length,
       field, syntax, origin:file.endsWith('/software_cursor.gd') ? 'scene-facade' : 'battle-access-host',
       source:source.split(/\r?\n/)[code.slice(0,match.index).split('\n').length-1].trim()});
-    for (const match of masked.matchAll(/\b(?:_ui\.)?host\s*\.\s*(units|selected|map_data|nav|decor_cells)\b/g)) add(match,match[1],'property');
-    for (const match of code.matchAll(/\b(?:_ui\.)?host(?:\.(?:get|get\.bind)\(\s*|\[\s*)(['"])(units|selected|map_data|nav|decor_cells)\1/g)) {
+    for (const match of masked.matchAll(/\b(?:_ui\.)?host\s*\.\s*(units|selected|map_data|nav|decor_cells|trainings)\b/g)) add(match,match[1],'property');
+    for (const match of code.matchAll(/\b(?:_ui\.)?host(?:\.(?:get|get\.bind)\(\s*|\[\s*)(['"])(units|selected|map_data|nav|decor_cells|trainings)\1/g)) {
       if (masked.slice(match.index,match.index+4).trim()) add(match,match[2],'literal-lookup');
     }
   }

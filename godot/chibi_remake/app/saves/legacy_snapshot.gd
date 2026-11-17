@@ -26,7 +26,7 @@ static func _valid_record(record) -> bool:
 			var value=record[key]
 			if not (value is int or value is float) or not is_finite(float(value)) or float(value)!=floorf(float(value)) or float(value)<-1:return false
 	for key in ["alive","mapObject"]:
-		if record.has(key) and not record[key] is bool and record[key] not in [0,1]:return false
+		if record.has(key) and not preload("res://app/saves/save_envelope.gd").flag(record[key]):return false
 	return true
 
 func _apply_v3(d: Dictionary, arr: Array) -> int:

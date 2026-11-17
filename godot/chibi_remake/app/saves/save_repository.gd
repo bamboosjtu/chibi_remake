@@ -29,8 +29,11 @@ func begin_save(slot: int, pending_duels: int) -> bool:
 	return true
 
 func load_slot(slot: int) -> Dictionary:
+	return read_slot(slot).data
+
+func read_slot(slot: int) -> Dictionary:
 	var filename := slot_path(slot)
-	return {} if filename.is_empty() else Store.read(filename,validate)
+	return {"data":{},"source":"none"} if filename.is_empty() else Store.read_with_source(filename,validate)
 
 func commit(filename: String, text: String) -> bool:
 	last_error={}

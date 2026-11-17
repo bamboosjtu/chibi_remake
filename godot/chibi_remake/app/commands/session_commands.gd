@@ -1,6 +1,6 @@
 extends "res://named_port.gd"
 ## session: explicit commands, validated once at the composition boundary.
-const CONTRACTS := {"scene_controller": ["_apply_save", "_save_extra", "_save_game", "_screenshot", "_sheet", "_view_hud", "focus_group", "_notification", "_unhandled_input", "_process", "load_slot"], "cheat_controller": ["_cheat_adjacent_level", "_set_cheat_input", "handle_cheat_input"], "cheat_rules": ["_step_auto_control"], "bootstrap": ["_ready"], "duel_controller": ["_present_duel"]}
+const CONTRACTS := {"scene_controller": ["cancel_work", "_apply_save", "_save_extra", "_save_game", "_screenshot", "_sheet", "_view_hud", "focus_group", "_notification", "_unhandled_input", "_process", "load_slot"], "cheat_controller": ["_cheat_adjacent_level", "_set_cheat_input", "handle_cheat_input"], "cheat_rules": ["_step_auto_control"], "bootstrap": ["_ready"], "duel_controller": ["_present_duel"]}
 var _provider_scene_controller: WeakRef
 var _provider_cheat_controller: WeakRef
 var _provider_cheat_rules: WeakRef
@@ -18,6 +18,11 @@ func focus_group(n: int) -> bool:
 	var provider = _require(_provider_scene_controller, "scene_controller")
 	if provider == null: return false
 	return provider.focus_group(n)
+
+func cancel_work(kind: String, uid: int, epoch: int) -> bool:
+	var provider = _require(_provider_scene_controller, "scene_controller")
+	if provider == null: return false
+	return provider.cancel_work(kind,uid,epoch)
 
 func _apply_save() -> bool:
 	var provider = _require(_provider_scene_controller, "scene_controller")

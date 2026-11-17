@@ -20,6 +20,25 @@ func stage_world_nodes() -> Dictionary: return _world_nodes.begin()
 func rollback_world_nodes(token: Dictionary) -> void: _world_nodes.rollback(token)
 func commit_world_nodes(token: Dictionary) -> void: _world_nodes.commit(token)
 func world_nodes_complete(units: Array) -> bool: return _world_nodes.complete(units)
+
+func attach_loaded_world(units: Array, sheets: Dictionary) -> bool:
+	for unit in units:
+		var sheet: String = str(sheets.get("%d_%d" % [int(unit.unit),int(unit.owner)],""))
+		attach_unit(unit,{"sheet":sheet,"unit":unit.unit,"owner":unit.owner},int(unit.w),int(unit.h),float(unit.k))
+	return world_nodes_complete(units)
+
+func finish_loaded_world(units: Array, ended: int) -> void:
+	capture_motion()
+	if _ui.event_view != null: _ui.event_view.restore_history()
+	for unit in units: update_visual(unit)
+	if _ui.completion != null:
+		_ui.completion.reset(); _ui.end_label.hide()
+		if ended != 0: show_end(ended)
+	_ui.projectile_view.impacts.clear()
+	if cmd_box_ready(): update_panel()
+
+func apply_loaded_unit(unit: Dictionary) -> void:
+	_components["unit_visuals"].apply_loaded_unit(unit)
 var _components: Dictionary = {}
 var _fields: Dictionary = {}
 var _api_missing: Array = []
@@ -379,8 +398,10 @@ func attach_unit(u: Dictionary, ob: Dictionary, w: int, h: int, k: float) -> voi
 func free_unit(u: Dictionary) -> void:
 	_components["unit_visuals"].free_unit(u)
 func place_unit(u: Dictionary) -> void:
+	host.invalidate_unit_views()
 	_components["unit_visuals"].place_unit(u)
 func capture_motion() -> void:
+	host.invalidate_unit_views()
 	_components["unit_visuals"].capture_motion()
 func interpolate_motion(alpha: float) -> void:
 	_components["unit_visuals"].interpolate_motion(alpha)
@@ -391,7 +412,11 @@ func fade_unit(u: Dictionary, alpha: float) -> void:
 func set_unit_attached(u: Dictionary, attached: bool) -> void:
 	_components["unit_visuals"].set_unit_attached(u, attached)
 func update_visual(u: Dictionary) -> void:
+	host.invalidate_unit_views()
 	_components["unit_visuals"].update_visual(u)
+
+func domain_changed() -> void:
+	host.invalidate_unit_views()
 func mobile_pose(u: Dictionary, gait_tick := -1.0) -> Dictionary:
 	return _components["unit_visuals"].mobile_pose(u, gait_tick)
 func _apply_mobile_pose(u: Dictionary, gait_tick := -1.0) -> void:

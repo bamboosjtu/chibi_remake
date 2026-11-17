@@ -61,6 +61,10 @@ for (const file of files(root)) {
     waive(`${relative}::gameplay-rng`, `${relative}: gameplay randomness rolled outside simulation`);
   }
   if(relative.startsWith('app/') && /\bview\._ui\b/.test(code))fail(`${relative}: app reaches private presentation state`);
+  if((relative==='app/save_service.gd'||relative.startsWith('app/saves/')) && /\bview\.(?:unit_nodes|event_view|completion|end_label|projectile_view)\b/.test(code))fail(`${relative}: save pipeline bypasses loaded-view API`);
+  if(relative.startsWith('presentation/')&&relative!=='presentation/battle/battle_access.gd'&& /\bhost\.(?:units|selected|map_data|nav|decor_cells|trainings)\b|\bhost(?:\.(?:get|get\.bind)\(\s*|\[\s*)['"](?:units|selected|map_data|nav|decor_cells|trainings)['"]/.test(code))fail(`${relative}: presentation bypasses value read model`);
+  if(relative==='presentation/battle/battle_access.gd'&&/^var (?:units|selected|map_data|nav|decor_cells|trainings):/m.test(code))fail(`${relative}: retired mutable getter restored`);
+  if(relative==='app/read_models/unit_projection.gd'&&/\b(?:unit|data\.(?:units|selected|map_data))\.duplicate\(\s*true\s*\)/.test(code))fail(`${relative}: copies whole domain records instead of selecting fields`);
   if(relative.startsWith('presentation/') && /\.saver\.apply_snapshot\(|\.selected\.(?:append|clear|erase)\(/.test(code))fail(`${relative}: presentation bypasses session commands`);
   if (relative.startsWith('presentation/') && /(?:preload|load)\(\s*['"]res:\/\/simulation\/systems\//.test(code)) {
     waive(`${relative}::direct-system`, `${relative}: presentation imports a simulation system instead of a port`);

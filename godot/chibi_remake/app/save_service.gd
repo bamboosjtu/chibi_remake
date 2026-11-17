@@ -17,6 +17,7 @@ extends RefCounted
 
 var host: Object
 var last_load_error := ""
+var last_load_source := "none"
 var _content_revision_cache := ""
 const UnitSchema = preload("res://simulation/definitions/unit_schema.gd")
 const ActionClock = preload("res://simulation/systems/action_clock.gd")
@@ -28,11 +29,15 @@ func _init(h: Object) -> void:
 
 # ------------------------------------------------------------------- load ----
 func apply() -> bool:
-	var d := Game.load_save(Game.pending_load_slot)
-	return apply_snapshot(d)
+	var loaded: Dictionary = Game.repository.read_slot(Game.pending_load_slot)
+	var applied := apply_snapshot(loaded.data)
+	last_load_source = loaded.source if applied else "none"
+	if applied and last_load_source == "backup": host.commands.world._feedback("主记录无法读取，已从备份恢复进度。")
+	return applied
 
 func apply_snapshot(d: Dictionary) -> bool:
 	last_load_error = ""
+	last_load_source = "none"
 	var applied := _apply_snapshot(d)
 	if not applied and last_load_error.is_empty(): last_load_error = "快照恢复或画面重建失败，当前战场未改变。"
 	return applied
@@ -55,6 +60,12 @@ func _apply_snapshot(d: Dictionary) -> bool:
 		push_warning("load save: 存档里没有单位数据")
 		return false
 	var ver := int(d.get("v", 1))
+	if ver < 4 and not envelope.valid(d):
+		last_load_error = "旧档记录字段不兼容；当前战场已保留。"
+		return false
+	if ver < 4 and not preload("res://app/saves/snapshot_semantics.gd").valid_legacy(arr,ver,host.map_data):
+		last_load_error = "旧档坐标超出关卡范围；当前战场已保留。"
+		return false
 	if ver in [4,5,6,7,8]:
 		var applied_v4 := _apply_v4(d, arr)
 		if applied_v4:
@@ -144,8 +155,10 @@ func _apply_v3(d: Dictionary, arr: Array) -> int:
 func _apply_legacy(d: Dictionary, arr: Array, ver: int) -> int:
 	return preload("res://app/saves/legacy_snapshot.gd").new(host, _apply_unit_record, _restore_trainings)._apply_legacy(d, arr, ver)
 func _apply_unit_record(u: Dictionary, rec: Dictionary) -> void:
-	u.ax = float(UnitSchema.record_value(rec, "ax", u.ax))
-	u.ay = float(UnitSchema.record_value(rec, "ay", u.ay))
+	var anchor := Vector2(float(UnitSchema.record_value(rec,"ax",u.ax)),float(UnitSchema.record_value(rec,"ay",u.ay)))
+	anchor = preload("res://app/saves/snapshot_semantics.gd").clamp_point(anchor,host.map_data)
+	u.ax = anchor.x
+	u.ay = anchor.y
 	var cell: Vector2i=host.nav.cell_of_px(u.ax,u.ay)
 	u.A=cell.x;u.B=cell.y
 	var dying := float(UnitSchema.record_value(rec, "die_t", -1.0)) >= 0.0
@@ -172,10 +185,7 @@ func _apply_unit_record(u: Dictionary, rec: Dictionary) -> void:
 			u["officer_intellect"] = float(o.get("intellect", 0))
 	host.commands.world._place_unit(u)            # 表现层 + R13 占格索引（视图缺席时也同步索引）
 	if host.view != null:
-		host.view.unit_nodes(u).spr.visible = u.alive
-		host.view.unit_nodes(u).spr.modulate = Color(1, 1, 1, maxf(0.0, 1.0 - maxf(0.0, u.die_t) * 0.55))
-		if not u.alive:
-			host.view.unit_nodes(u).hbar.visible = false
+		host.view.apply_loaded_unit(u)
 
 func _restore_resources(d: Dictionary) -> void:
 	if int(d.get("v", 1)) >= 8:
@@ -210,17 +220,13 @@ func _restore_trainings(d: Dictionary) -> void:
 		tlist.append({
 			"owner": int(rec.get("owner", b.owner)),
 			"b": b, "unit": int(rec.get("unit", -1)),
-			"t": float(rec.get("t", 0.0)) if bool(rec.get("ticks", false)) else ceilf(float(rec.get("t", 0.0)) / host.SIM_DT), "cost": rec.get("cost", {}), "ticks": true,
+			"t": float(rec.get("t", 0.0)) if bool(rec.get("ticks", false)) else ceilf(float(rec.get("t", 0.0)) / host.SIM_DT), "cost": rec.get("cost", {}).duplicate(true), "ticks": true,
 		})
 		for field in ["aiSlot","aiToken","navalSlot","navalToken"]:
 			if rec.has(field): tlist.back()[field]=int(rec[field])
 
 func _valid_cost(value: Variant) -> bool:
-	if not value is Dictionary: return false
-	for kind in ["gold","wood","food","stone"]:
-		var amount = value.get(kind, 0)
-		if not (amount is int or amount is float) or not is_finite(float(amount)) or float(amount) < 0: return false
-	return true
+	return preload("res://simulation/definitions/resource_cost.gd").valid(value)
 
 func _valid_integer(value: Variant) -> bool:
 	return (value is int or value is float) and is_finite(float(value)) and float(value) >= 0 and float(value) == floorf(float(value))

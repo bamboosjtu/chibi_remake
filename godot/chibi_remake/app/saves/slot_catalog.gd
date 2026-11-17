@@ -1,5 +1,5 @@
 extends RefCounted
-## Slot metadata cache. All file reads go through the injected repository reader.
+## Slot metadata cache. The injected reader returns {data, source}.
 var _cache := {}
 var _load: Callable
 var _path: Callable
@@ -26,10 +26,17 @@ func info(slot: int) -> Dictionary:
 	var signature := []
 	for file in [path,path+".bak"]:
 		var reader := FileAccess.open(file, FileAccess.READ)
-		signature.append([FileAccess.get_modified_time(file),reader.get_length()] if reader != null else [-1,0])
+		if reader == null:
+			signature.append([-1,0,""]); continue
+		var length := reader.get_length()
+		reader.close()
+		var digest := FileAccess.get_sha256(file) if length <= preload("res://app/saves/json_limits.gd").MAX_BYTES else "oversized"
+		signature.append([FileAccess.get_modified_time(file),length,digest])
 	if _cache.has(path) and _cache[path].signature == signature: return _cache[path].info.duplicate()
-	var data: Dictionary = _load.call(slot)
-	var info := {"slot":slot,"valid":not data.is_empty(),"occupied":signature[0][0]!=-1 or signature[1][0]!=-1,"name":str(data.get("saveName","")),"map":str(data.get("map","")),"savedAt":str(data.get("savedAt",""))}
+	var loaded: Dictionary = _load.call(slot)
+	var data: Dictionary = loaded.data
+	var source: String = loaded.source
+	var info := {"slot":slot,"valid":not data.is_empty(),"occupied":signature[0][0]!=-1 or signature[1][0]!=-1,"source":source,"name":str(data.get("saveName","")),"map":str(data.get("map","")),"savedAt":str(data.get("savedAt",""))}
 	_cache[path] = {"signature":signature,"info":info}
 	return info.duplicate()
 

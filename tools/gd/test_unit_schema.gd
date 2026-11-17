@@ -21,6 +21,7 @@ func run() -> void:
 	assert(Schema.omissions({"new_unregistered_field":1}) == ["new_unregistered_field"])
 	var source: Dictionary = battle.units.filter(func(unit): return not unit.is_building)[0].duplicate(true)
 	for key in Schema.persisted_scalars(): source[key] = sentinel(key)
+	source.path=[Vector2.ZERO,Vector2.ONE,Vector2(2,2)] # Keep the sentinel cursor inside a real route.
 	var saved: Dictionary = game.snapshot([source], {}, {}).units[0].simulation
 	var restored := {"dir":0,"is_building":false}
 	Schema.restore_scalars(saved, restored)

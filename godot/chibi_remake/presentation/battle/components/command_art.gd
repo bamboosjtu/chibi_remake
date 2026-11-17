@@ -126,7 +126,7 @@ func _unlocked_indices(formation: bool) -> Array:
 
 func _compute_unlocked_indices(formation: bool) -> Array:
 	var level := -1
-	for unit in _ui.host.selected:
+	for unit in _ui.host.selection_views():
 		if not bool(unit.get("alive", false)) or float(unit.get("die_t", -1)) >= 0.0:
 			continue
 		if int(unit.get("owner", -1)) != int(_ui.host.player_owner) or bool(unit.get("attached", false)) or bool(unit.get("is_building", false)):
@@ -350,7 +350,7 @@ func _on_panel_slot(i: int) -> void:
 			_refresh_cmd_art()
 
 func _open_build_menu() -> void:
-	if _ui.host.commands.military._selected_construction_workers().is_empty():
+	if not _ui.host.can_build_selected():
 		_ui.host.commands.world._feedback("建造由麾下带工人的武将发起；独立工人请先组建队伍")
 		return
 	if _ui.host.build_types.is_empty():

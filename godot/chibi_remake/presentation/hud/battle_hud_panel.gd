@@ -108,7 +108,7 @@ func set_ui_scale(s: float) -> void:
 		captions[i].add_theme_font_size_override("font_size", maxi(9, int(12 * s)))
 
 func sync_selection() -> void:
-	var selection: Array = host.selected
+	var selection: Array = host.selection_views()
 	visible = not selection.is_empty()
 	if not visible: return
 	var u: Dictionary = selection[0]
@@ -141,7 +141,7 @@ func sync_selection() -> void:
 		detail.text = "官职 %s" % str(host.commands.military.officer_rank_name(officer))
 	var soldiers := 0
 	if not officer.is_empty():
-		for member in host.units:
+		for member in host.unit_views():
 			if member.alive and member.owner == u.owner and int(member.get("group_officer", -1)) == int(officer.index):
 				soldiers += int(member.hp)
 	var titles := ["武力", "智力", "经验", "谋略", "士气", "兵数"]
@@ -152,7 +152,7 @@ func sync_selection() -> void:
 		var carry := 0
 		for member in selection: carry += int(member.get("carry", 0))
 		var commander := "—"
-		for member in host.units:
+		for member in host.unit_views():
 			if member.alive and int(member.owner) == int(u.owner) and int(member.get("officer", {}).get("index", -2)) == int(u.get("group_officer", -1)):
 				commander = str(member.officer.get("name", "")).replace(" ", "")
 				break
@@ -188,18 +188,18 @@ func _sync_building_work(u: Dictionary) -> void:
 	rank_label.text = ["一级", "二级", "三级", "四级"][level]
 	progress_bar.visible = site
 	progress_bar.value = 100.0 * float(u.hp) / maxf(1.0, float(u.maxhp)) if site else 0.0
-	for training in host.trainings:
-		if training.b != u: continue
-		var definition: Dictionary = host.map_data.units[str(int(training.unit))]
+	for training in host.training_views():
+		if int(training.buildingUid) != int(u.uid): continue
+		var capacity: float = host.unit_capacity(int(training.unit))
 		work_icon.texture = host.remaster_art.unit_icon(int(training.unit))
 		work_icon.material = portrait.material
 		work_icon.show()
-		work_badge.text = "%d人" % int(definition.hp)
+		work_badge.text = "%d人" % int(capacity)
 		work_badge.show()
 		progress_bar.show()
-		progress_bar.value = 100.0 * (1.0 - float(training.t) / maxf(1.0, float(definition.hp)))
+		progress_bar.value = 100.0 * (1.0 - float(training.t) / maxf(1.0, float(capacity)))
 		break
-	var research: Dictionary = host.commands.technology._research_for_building(u)
+	var research: Dictionary = host.building_work(int(u.uid)).research
 	if not research.is_empty():
 		var selling: bool = host.commands.technology.tech_is_sell(int(research.tech))
 		work_icon.texture = view.command_catalog.work_icon(host.commands.technology.tech_row(int(research.tech))) if selling else view._unit_icon(u)

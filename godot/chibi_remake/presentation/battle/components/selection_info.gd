@@ -14,16 +14,16 @@ func update_hud_text() -> void:
 		return
 	ports._refresh_metrics()
 	_refresh_res_slots()
-	var sel: Array = _ui.host.selected
+	var sel: Array = _ui.host.selection_views()
 	var fb: String = str(_ui.host.feedback_text)
 	# 原版左下角只显示一句状态（「训练完成」）。有反馈就显示反馈，没有就显示悬停信息。
 	var l1: String = fb if fb != "" else str(_ui.host.hover_text)
 	if fb == "" and not _ui.host.show_debug: l1 = ""
 	_ui.info.text = l1
 	_ui.info.visible = l1 != "" and _ui._art_hover_name == ""
-	var md: Dictionary = _ui.host.map_data
+	var map_name: String = _ui.host.map_caption()
 	var l2: String = "三国赤壁 — %s \"%s\"   第 %d 关   我军 归属%d   我军 %d · 敌军 %d · 已选 %d" % [
-		str(_ui.host.map_id).to_upper(), str(md.get("name", "")), int(_ui.host.scenario_mission),
+		str(_ui.host.map_id).to_upper(), map_name, int(_ui.host.scenario_mission),
 		int(_ui.host.player_owner), int(_ui.host.cnt_player), int(_ui.host.cnt_enemy), sel.size()]
 	# ARCH-011：工程信息（map id / 帧率 / 事件数 / 武将策略）默认不展示，Ctrl+F3 打开
 	if bool(_ui.host.show_debug):
@@ -42,7 +42,7 @@ func _refresh_res_slots() -> void:
 		l.text = "%.0f" % float(vals[i])
 
 func _officer_selection() -> Dictionary:
-	for u in _ui.host.selected:
+	for u in _ui.host.selection_views():
 		if bool(u.get("alive", false)) and not bool(u.is_building) and not (u.get("officer", {}) as Dictionary).is_empty():
 			return u
 	return {}
@@ -50,7 +50,7 @@ func _officer_selection() -> Dictionary:
 func _refresh_banner() -> void:
 	if _ui.banner == null:
 		return
-	var sel: Array = _ui.host.selected
+	var sel: Array = _ui.host.selection_views()
 	if sel.is_empty():
 		_ui.banner.visible = false
 		return
@@ -87,7 +87,7 @@ func _refresh_sel_frame() -> void:
 		return
 	if _ui.sel_frame == null:
 		return
-	var sel: Array = _ui.host.selected
+	var sel: Array = _ui.host.selection_views()
 	if sel.is_empty():
 		_ui.sel_portrait.texture = null
 		_ui.sel_name.text = "—— 未选择 ——"
@@ -129,7 +129,7 @@ func _refresh_troop() -> void:
 		return
 	if _ui.troop_frame == null:
 		return
-	var sel: Array = _ui.host.selected
+	var sel: Array = _ui.host.selection_views()
 	if sel.is_empty():
 		_ui.troop_frame.visible = false        # 未选择时不显示空框（空的金框看着像坏掉的占位）
 		_ui.troop_icon.texture = null
@@ -199,14 +199,14 @@ func _act_close_officer_pick() -> void:
 	ports._refresh_cmd_panel()
 
 func _selected_building() -> Dictionary:
-	for u in _ui.host.selected:
+	for u in _ui.host.selection_views():
 		if bool(u.is_building) and int(u.owner) == int(_ui.host.player_owner) and bool(u.alive) \
 				and not bool(u.get("site", false)):
 			return u
 	return {}
 
 func _selected_site() -> Dictionary:
-	for u in _ui.host.selected:
+	for u in _ui.host.selection_views():
 		if bool(u.is_building) and int(u.owner) == int(_ui.host.player_owner) and bool(u.alive) and bool(u.get("site", false)):
 			return u
 	return {}
@@ -247,7 +247,7 @@ func _rebuild_stats_text() -> void:
 		return
 	if _ui.panel_label == null:
 		return
-	var sel: Array = _ui.host.selected
+	var sel: Array = _ui.host.selection_views()
 	var lines: PackedStringArray = PackedStringArray()
 	if sel.is_empty():
 		lines.append("左键 选兵/框选 · Shift 加选 · 右键 移动/攻击")
@@ -258,7 +258,7 @@ func _rebuild_stats_text() -> void:
 		if sel.size() == 1:
 			var u: Dictionary = sel[0]
 			if bool(u.is_building):
-				var trs: Array = _ui.host.trainings
+				var trs: Array = _ui.host.training_views()
 				if trs.is_empty():
 					lines.append("生产队列：空")
 				for tr in trs:
@@ -305,13 +305,13 @@ func _rebuild_stats_text() -> void:
 
 func _sel_state_text() -> String:
 	var parts: PackedStringArray = PackedStringArray()
-	for u in _ui.host.selected:
-		parts.append("%s:%s/%d" % [str(u.name), str(u.state), (u.path as Array).size()])
+	for u in _ui.host.selection_views():
+		parts.append("%s:%s/%d" % [str(u.name), str(u.state), int(u.path_count)])
 	return ",".join(parts) if parts.size() > 0 else "-"
 
 func update_hover() -> void:
 	_ui.host.hover_text = ""
 	if not _ui.host.show_debug:return
-	var hu: Dictionary = _ui.host.commands.orders._hover_unit(surface.get_global_mouse_position())
+	var hu: Dictionary = _ui.host.hover_view(surface.get_global_mouse_position())
 	if not hu.is_empty():
 		_ui.host.hover_text = "%s  hp %.0f/%.0f  owner %d" % [str(hu.name), float(hu.hp), float(hu.maxhp), int(hu.owner)]

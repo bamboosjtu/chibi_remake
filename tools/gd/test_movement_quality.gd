@@ -72,6 +72,9 @@ func run() -> void:
 		assert(is_equal_approx(battle.view.unit_nodes(worker).diamond.position.x,positions.back()))
 	for i in range(1,positions.size()):assert(is_equal_approx(positions[i]-positions[i-1],2.2))
 	archer.moved=true;archer.anim=0.15;archer.state="move";archer.dir=0
+	# Visual sampling resolves current-world UIDs; the archer is still a member
+	# for this animation probe, after the earlier single-worker interpolation.
+	battle.units=[worker,archer];battle.commands.world._rebuild_unit_index()
 	Locomotion.ensure(archer);archer.walk_tick=4;archer.move_facing=0;archer.move_turning=false
 	battle.cam.position=Vector2(archer.ax,archer.ay);battle.cam.force_update_scroll()
 	battle.commands.world._update_visual(archer)
