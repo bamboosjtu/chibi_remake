@@ -1,4 +1,5 @@
 extends RefCounted
+const Roles = preload("res://simulation/definitions/unit_roles.gd")
 const Access = preload("res://simulation/ports/command_rules_access.gd")
 var host: Access
 var model: Dictionary
@@ -30,7 +31,7 @@ func describe() -> Dictionary:
 	var leader:Dictionary=selected_leader(selected)
 	var kind: String
 	var ids: Array
-	if selected.all(func(u):return int(u.unit)==47):
+	if selected.all(func(u):return Roles.is_transport(int(u.unit))):
 		kind="transport";ids=model.transport.commands.duplicate()
 	elif not leader.is_empty():
 		kind=team_kind(leader);ids=model.leader[kind].duplicate()

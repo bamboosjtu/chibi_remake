@@ -1,4 +1,5 @@
 extends RefCounted
+const Balance = preload("res://simulation/definitions/balance_rules.gd")
 ## bootstrap: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
@@ -307,7 +308,7 @@ func _assign_officers() -> void:
 		for soldier in us:
 			var native_id := int(soldier.get("tail_value", 0))
 			var index := native_id - 1
-			if formed.has(index) and int(member_counts.get(index, 0)) < Config.TEAM_MAX_MEMBERS:
+			if formed.has(index) and int(member_counts.get(index, 0)) < Balance.team_max_members():
 				soldier["group_officer"] = index
 				member_counts[index] = int(member_counts.get(index, 0)) + 1
 		print("officers: MED 开局编制 %d 队；战役可用名单 %d 人" % [formed.size(), officers.size()])

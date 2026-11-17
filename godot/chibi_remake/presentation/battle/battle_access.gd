@@ -1,11 +1,8 @@
 extends Node2D
 ## Explicit battle read model and command surface for presentation components.
 ## Data owner is weak and guarded. Scene/session and domain ports share subtree lifetime.
-const Config = preload("res://simulation/battle_config.gd")
 const ActionClock = preload("res://simulation/definitions/action_visual.gd")
-const EXP_LEVELS = Config.EXP_LEVELS
 const Progression = preload("res://simulation/definitions/officer_grades.gd")
-const TECH_TICKS = Config.TECH_TICKS
 var _data: WeakRef
 var _scene: RefCounted
 var commands: RefCounted

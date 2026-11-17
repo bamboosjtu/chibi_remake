@@ -11,7 +11,7 @@ func _initialize() -> void:
 func run() -> void:
 	var game: Node = root.get_node("Game")
 	assert(game.startup_valid and Catalog.is_ready() and Loader.read_count == Contract.FILES.size())
-	assert(Loader.initialize().is_empty() and Loader.read_count == 9)
+	assert(Loader.initialize().is_empty() and Loader.read_count == Contract.FILES.size())
 	if "--rules-expect-script" in OS.get_cmdline_user_args():
 		assert(preload("res://simulation/native/math_kernel.gd").get_kernel() == null)
 	# Remove source files before the FIRST rules-system query, including config().
@@ -93,7 +93,15 @@ func _loader_failures() -> void:
 		var file := FileAccess.open(directory.path_join(name), FileAccess.WRITE)
 		file.store_string(JSON.stringify(Catalog.get_catalog(name))); file.close()
 	var good := Loader.read_bundle(directory)
-	assert(good.errors.is_empty() and good.documents.size() == 9)
+	assert(good.errors.is_empty() and good.documents.size() == Contract.FILES.size())
+	var roles: Dictionary = Catalog.get_catalog("unit_roles.json").duplicate(true)
+	roles.workers.append(999)
+	var reference := FileAccess.open(directory.path_join("unit_roles.json"), FileAccess.WRITE)
+	reference.store_string(JSON.stringify(roles)); reference.close()
+	var rejected := Loader.read_bundle(directory)
+	assert(rejected.documents.is_empty() and str(rejected.errors).contains("reference"))
+	reference = FileAccess.open(directory.path_join("unit_roles.json"), FileAccess.WRITE)
+	reference.store_string(JSON.stringify(Catalog.get_catalog("unit_roles.json"))); reference.close()
 	var file := FileAccess.open(directory.path_join("command_variants.json"), FileAccess.WRITE)
 	file.store_string("{broken"); file.close()
 	file = FileAccess.open(directory.path_join("officers.json"), FileAccess.WRITE)

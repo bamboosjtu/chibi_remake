@@ -1,6 +1,6 @@
 extends RefCounted
+const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## research/meta: confirmed state changes; no rendering or scene dependency.
-const Config = preload("res://simulation/battle_config.gd")
 const State = preload("res://simulation/battle_state.gd")
 const AUTO_PERIOD := preload("res://simulation/systems/ai_config.gd").THINK_PERIOD
 var battle: State
@@ -59,7 +59,7 @@ func _step_auto_control() -> void:
 		if not battle.stratagems.eligible(unit, battle.player_owner): continue
 		if str(unit.state) != "idle" or bool(unit.get("hold", false)) or float(unit.get("carry", 0)) > 0: continue
 		if str(unit.get("team_kind", "")) == "worker": continue
-		if not preload("res://simulation/systems/combat_rules.gd").can_attack(unit) or int(unit.unit) in Config.WORKER_UNITS: continue
+		if not preload("res://simulation/systems/combat_rules.gd").can_attack(unit) or Roles.is_worker(int(unit.unit)): continue
 		if battle.stratagems.active(unit) or not unit.get("effect_tasks", []).is_empty(): continue
 		var target: Dictionary = services.combat._nearest_enemy(unit, extent)
 		if not target.is_empty():

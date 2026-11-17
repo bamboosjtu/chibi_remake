@@ -1,4 +1,5 @@
 extends RefCounted
+const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## abilities: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
@@ -176,7 +177,7 @@ func _formation_target_cell(u: Dictionary, cell: Vector2i) -> Vector2i:
 
 func _spd_mult(u: Dictionary) -> float:
 	var m := 1.0
-	if float(u.get("haste_t", 0.0)) > 0.0 and int(u.unit) not in [46,47,48,49,52]:
+	if float(u.get("haste_t", 0.0)) > 0.0 and not Roles.is_naval(int(u.unit)):
 		m *= float(battle.stratagems.config().hasteMoveMultiplier)
 	if float(u.get("slow_t", 0.0)) > 0.0:
 		m *= float(battle.stratagems.config().slowMoveMultiplier)

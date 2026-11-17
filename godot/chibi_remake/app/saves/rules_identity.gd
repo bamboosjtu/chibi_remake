@@ -11,6 +11,9 @@ const CATALOG_FIELDS := {
 	"officer_progression.json": ["thresholds", "levelCap", "gradeTable", "rewards"],
 	"command_variants.json": ["three_layer_model"],
 	"scenario_rules.json": ["missions", "campaignModes", "defaultDefeatMode"],
+	"tech.json": ["rows", "lines", "buildingLines", "researchTicks", "limits"],
+	"unit_roles.json": ["workers", "heroes", "naval", "transports", "officers", "meleeTechnology", "navalTechnology", "mobileHpTechnology", "technologyCategories", "channelBAttack"],
+	"balance.json": ["armyCap", "commanderCap", "teamMaxMembers", "transportCapacity"],
 }
 const METADATA := ["name", "heroTypeName", "description", "source", "sourceSha256", "provenance", "sheet", "sheetK", "spriteName", "rank", "message", "message_id", "sound_id"]
 static var _current := ""
@@ -47,6 +50,11 @@ static func fingerprint(records: Dictionary) -> String:
 static func rule_projection(name: String, data: Dictionary) -> Dictionary:
 	var result := {}
 	for key in CATALOG_FIELDS.get(name, []): result[key] = _rule_value(data.get(key))
+	if name == "unit_roles.json":
+		for key in result:
+			if key == "technologyCategories":
+				for group in result[key]: group.sort()
+			else: result[key].sort()
 	return result
 
 static func _rule_value(value):

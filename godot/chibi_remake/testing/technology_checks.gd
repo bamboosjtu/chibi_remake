@@ -1,4 +1,5 @@
 extends RefCounted
+const Technology = preload("res://simulation/definitions/technology_rules.gd")
 ## Development assertions; shipped for --selftest candidate validation.
 var host: Node2D
 var _suite: WeakRef
@@ -11,11 +12,11 @@ func _init(battle: Node2D, runner: RefCounted) -> void:
 
 func _selftest_tech() -> void:
 	print("SELFTEST tech: 表=%d 条 建筑菜单 武器库2=%s 弓兵所14=%s 钱庄23=%s" % [
-		host.TECH_TABLE.size(), str(host.commands.technology.tech_rows_for_building(2)),
+		Technology.table().size(), str(host.commands.technology.tech_rows_for_building(2)),
 		str(host.commands.technology.tech_rows_for_building(14)), str(host.commands.technology.tech_rows_for_building(23))])
-	suite._check(host.TECH_TABLE.size() == 23, "科技表 23 条（附录 C）")
-	var row12: Dictionary = host.TECH_TABLE[12]
-	var row22: Dictionary = host.TECH_TABLE[22]
+	suite._check(Technology.table().size() == 23, "科技表 23 条（附录 C）")
+	var row12: Dictionary = Technology.table()[12]
+	var row22: Dictionary = Technology.table()[22]
 	suite._check(int(row12["v"][0]) == 500 and int(row12["v"][1]) == 1000, "卖木一千 = 金+500 / 木−1000")
 	suite._check(int(row22["v"][4]) == 6 and int(row22["v"][5]) == 10, "装甲升级效果列 = 6/10（B8D23/B8D24）")
 	suite._check(host.commands.technology.tech_rows_for_building(2).has(6), "武器库菜单含「兵器一级」")
@@ -77,7 +78,7 @@ func _selftest_tech() -> void:
 		var sold = host.commands.technology._start_tech(12)
 		suite._check(sold, "卖木一千下单")
 		suite._check(host.commands.technology.tech_research_active(), "卖资源进入 200 tick 队列")
-		for i in range(host.TECH_TICKS):
+		for i in range(Technology.ticks()):
 			host.commands.technology._process_tech(1.0 / 30.0)
 		suite._check(not host.commands.technology.tech_research_active(), "卖资源 200 tick 后成交")
 		suite._check(is_equal_approx(host.gold, sg + 500.0) and is_equal_approx(host.wood, sw - 1000.0),
@@ -104,7 +105,7 @@ func _selftest_tech() -> void:
 	suite._check(not second, "研究进行中时第二次开始被拒绝")
 	suite._check(is_equal_approx(host.gold, g1), "被拒绝的第二次开始没有扣费")
 	# --- 200 tick 后生效：直接走队列处理器，避免 AI 在 6.7 秒里改变样本状态 ---
-	for i in range(host.TECH_TICKS):
+	for i in range(Technology.ticks()):
 		host.commands.technology._process_tech(1.0 / 30.0)
 	suite._check(not host.commands.technology.tech_research_active(), "200 tick 后研究队列清空")
 	print("SELFTEST tech: 完成后 attack_bonus=%.0f（期望表值 %.0f） player_tech=%s" % [

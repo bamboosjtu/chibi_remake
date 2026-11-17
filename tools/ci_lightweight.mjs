@@ -4,7 +4,7 @@ import {spawnSync} from 'node:child_process';
 import {runChecks} from './lib/ci_checks.mjs';
 
 const groups = {
-  architecture: ['architecture_check', 'test_architecture_check', 'port_inventory', 'battle_access_inventory', 'test_battle_access_inventory'],
+  architecture: ['rule_constants_check', 'test_rule_constants_check', 'architecture_check', 'test_architecture_check', 'port_inventory', 'battle_access_inventory', 'test_battle_access_inventory'],
   registry: ['registry_check', 'test_registry_check'],
   data: ['unit_schema_check', 'rules_manifest', 'data_check', 'test_scenario_generator', 'test_map_export_navigation', 'test_opening_forces'],
   docs: ['docs_lint', 'test_docs_lint', 'test_markdown_anchors'],

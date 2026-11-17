@@ -1,7 +1,8 @@
 extends RefCounted
+const Balance = preload("res://simulation/definitions/balance_rules.gd")
+const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## A single synchronous decision's roster. Rebuild at the next decision rather
 ## than caching mutable ownership/group/attachment fields across ticks.
-const Config = preload("res://simulation/battle_config.gd")
 const Rules = preload("res://simulation/systems/unit_rules.gd")
 var by_owner: Dictionary = {}
 var groups: Dictionary = {}
@@ -26,12 +27,12 @@ func members(owner: int, officer: int) -> Array:
 func construction_workers(commander: Dictionary) -> Array:
 	if commander.is_empty() or not is_same(identities.get(int(commander.get("uid", -1))), commander): return []
 	if not commander.alive or commander.die_t >= 0 or commander.get("attached", false): return []
-	if int(commander.unit) not in Config.HERO_UNITS or commander.get("officer", {}).is_empty(): return []
+	if not Roles.is_hero(int(commander.unit)) or commander.get("officer", {}).is_empty(): return []
 	var count := 0
 	var workers := []
 	for member: Dictionary in members(int(commander.owner), int(commander.officer.index)):
 		if member.is_building or member == commander: continue
 		count += 1
-		if count > Config.TEAM_MAX_MEMBERS or int(member.unit) not in Config.WORKER_UNITS: return []
+		if count > Balance.team_max_members() or not Roles.is_worker(int(member.unit)): return []
 		if Rules.can_build(member) and not member.get("attached", false): workers.append(member)
 	return workers

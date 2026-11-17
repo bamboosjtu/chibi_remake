@@ -1,4 +1,5 @@
 extends RefCounted
+const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## CONF-18E 水军槽：0/1 槽快船各 8，3 槽运输船 1；2 槽不参与。
 ## 只在行为档位 1 驱动；四槽“在途”全 0 才派下一艘。
 const Access = preload("res://simulation/ports/ai_access.gd")
@@ -15,7 +16,7 @@ static func capacity(slot: int) -> int:
 	return 0
 
 static func unit_for(slot: int) -> int:
-	return 47 if slot == 3 else 46
+	return Roles.transport_id() if slot == 3 else 46
 
 static func active(slot: int) -> bool:
 	return slot in [0, 1, 3]

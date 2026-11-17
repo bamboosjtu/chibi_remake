@@ -1,4 +1,6 @@
 extends RefCounted
+const Balance = preload("res://simulation/definitions/balance_rules.gd")
+const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## unit actions: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
 const ProfileClock = preload("res://simulation/definitions/profile_clock.gd")
@@ -83,7 +85,7 @@ func _prepare_action(u: Dictionary, delta: float) -> bool:
 		return false
 	if (int(u.get("site_inside_uid",-1))>=0 or int(u.get("site_follow_uid",-1))>=0) and battle.construction.step(u): return false
 	# 下船按每 4 拍一名推进；船接到新命令也不打断在舱载员的卸载。
-	if int(u.get("unit", -1)) == Config.TRANSPORT_UNIT and (bool(u.get("unload_active", false)) or str(u.get("state", "")) == "unload"):
+	if int(u.get("unit", -1)) == Roles.transport_id() and (bool(u.get("unload_active", false)) or str(u.get("state", "")) == "unload"):
 		u.unload_t = int(u.get("unload_t", 0)) + 1
 		if int(u.unload_t) % 4 == 0:
 			services.transport_orders._retry_unload(u)
@@ -149,7 +151,7 @@ func _step_join(u: Dictionary, delta: float) -> void:
 		var idx := int(leader.officer.index)
 		var members: Array = battle.units.filter(func(member): return bool(member.alive) and member.die_t < 0 and int(member.owner) == int(u.owner) and int(member.get("group_officer", -1)) == idx)
 		services.command_groups._cancel_unit_command(u)
-		if members.size() < Config.TEAM_MAX_MEMBERS:
+		if members.size() < Balance.team_max_members():
 			u.group_officer = idx
 			services.officer_teams._auto_assign_new_team(idx)
 			services.battle_simulation._feedback("已加入%s的队伍" % str(leader.officer.name).replace(" ", ""))
@@ -165,12 +167,12 @@ func _step_board(u: Dictionary, delta: float) -> void:
 	# 装载（模式 0xC）：走到运输船旁 → 附着上船（船计数 +1、HP 累加）。
 	var bship = u.get("board_target", null)
 	if not (bship is Dictionary) or not battle.transports.valid_ship(bship) or str(bship.state)=="unload" \
-			or int(bship.get("unit", -1)) != Config.TRANSPORT_UNIT \
+			or int(bship.get("unit", -1)) != Roles.transport_id() \
 			or int(bship.get("owner", -1)) != int(u.get("owner", -1)):
 		u.state = "idle"; u.board_target = null
-	elif int(bship.get("carry_n", 0)) >= Config.TRANSPORT_CAPACITY:
+	elif int(bship.get("carry_n", 0)) >= Balance.transport_capacity():
 		u.state = "idle"; u.board_target = null
-		services.battle_simulation._feedback("运输船已满（%d）" % Config.TRANSPORT_CAPACITY)
+		services.battle_simulation._feedback("运输船已满（%d）" % Balance.transport_capacity())
 	elif not battle.transports.adjacent(u,bship):
 		if u.path.is_empty():
 			u.path = battle.transports.boarding_path(u,bship); u.pi = 0

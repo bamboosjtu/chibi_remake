@@ -121,6 +121,7 @@ class ChibiSimulationMath : public RefCounted {
     std::unordered_map<int64_t, int> classes;
     std::vector<Vector2i> shapes[4][2];
     std::vector<int64_t> naval;
+    int64_t transport_unit_id = -1;
     static ChibiNavigationQuery *query(const Dictionary &c, const Variant &key) {
         Variant raw = c.get(key, Variant());
         auto q = raw.get_type() == Variant::OBJECT
@@ -508,7 +509,8 @@ class ChibiSimulationMath : public RefCounted {
 
     void configure(const Array &fields, const StringName &row, int64_t ticks, int64_t confused_task,
                    int64_t rolling_task, const Dictionary &types, const Array &offsets,
-                   const Array &naval_types) {
+                   const Array &naval_types, int64_t transport_type) {
+        transport_unit_id = transport_type;
         statuses.clear();
         for (int64_t i = 0; i < fields.size(); ++i)
             statuses.emplace_back(String(fields[i]));
@@ -689,7 +691,7 @@ class ChibiSimulationMath : public RefCounted {
             integer(u, k.site, -1) >= 0 || integer(u, k.site_follow_uid, -1) >= 0 || active(u) ||
             integer(u, k.ambush_t) > 0)
             return -1;
-        if (integer(u, k.unit, -1) == 47 || double(u.get(k.atk_range, 0.0)) <= 0 ||
+        if (integer(u, k.unit, -1) == transport_unit_id || double(u.get(k.atk_range, 0.0)) <= 0 ||
             (double(u.get(k.attack, 0.0)) <= 0 && double(u.get(k.attack_b, 0.0)) <= 0))
             return -1;
         if (units.size() != indexed_size || !UtilityFunctions::is_same(units, indexed))
@@ -833,7 +835,7 @@ class ChibiSimulationMath : public RefCounted {
                                       "full_reveal", "farsight_cells"),
                              &ChibiSimulationMath::update_visibility);
         ClassDB::bind_method(D_METHOD("configure", "fields", "clip", "ticks", "confusion",
-                                      "rolling", "classes", "offsets", "naval"),
+                                      "rolling", "classes", "offsets", "naval", "transport"),
                              &ChibiSimulationMath::configure);
         ClassDB::bind_method(D_METHOD("step_clock", "unit", "kind", "target", "building"),
                              &ChibiSimulationMath::step_clock);

@@ -1,4 +1,5 @@
 extends RefCounted
+const Balance = preload("res://simulation/definitions/balance_rules.gd")
 ## construction orders: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
@@ -94,7 +95,7 @@ func build_placement_at(pos: Vector2, opt: Dictionary) -> Dictionary:
 	var result := {"valid":false, "unit":bid, "anchor":point, "cells":[], "outline":PackedVector2Array(), "reason":"地形不对，无法建造"}
 	if meta.is_empty(): return result
 	if battle.game_end != 0 or not battle.build_types.any(func(entry): return int(entry.unit) == bid): return result
-	if services.production._army_count(battle.player_owner) >= 200: result.reason = "已达200单位上限"; return result
+	if services.production._army_count(battle.player_owner) >= Balance.army_cap(): result.reason = "已达%d单位上限" % Balance.army_cap(); return result
 	var cells := battle.nav.building_footprint(bid, point, float(meta.w))
 	result.cells = cells
 	result.outline = battle.nav.footprint_outline(cells)
@@ -159,8 +160,8 @@ func _build_site_at(pos: Vector2, opt: Dictionary) -> bool:
 	if not battle.build_types.any(func(entry): return int(entry.unit) == bid): return false
 	var workers: Array = services.command_groups._selected_construction_workers()
 	var cost: Dictionary = services.ai_economy.ai_unit_cost(bid) # 执行入口使用定义造价，不信任UI传入价格。
-	if services.production._army_count(battle.player_owner) >= 200 or workers.is_empty() or not battle.economy.pay(battle.player_owner, cost):
-		services.battle_simulation._feedback("无法建造：需带工人的武将队伍、足够资源且未达200单位上限")
+	if services.production._army_count(battle.player_owner) >= Balance.army_cap() or workers.is_empty() or not battle.economy.pay(battle.player_owner, cost):
+		services.battle_simulation._feedback("无法建造：需带工人的武将队伍、足够资源且未达%d单位上限" % Balance.army_cap())
 		return false
 	var site := _place_building(battle.player_owner, bid, pos, true, workers, true)
 	if site.is_empty():
@@ -305,7 +306,7 @@ func ai_place_building(owner: int, building_type: int, commander: Dictionary = {
 	if not base.is_empty():
 		near = Vector2(base.ax, base.ay)
 	# AI与玩家共用施工状态机；没有工人不会创建自动增长的空工地。
-	if not services.ai_economy.ai_can_build(owner, building_type) or services.production._army_count(owner) >= 200: return false
+	if not services.ai_economy.ai_can_build(owner, building_type) or services.production._army_count(owner) >= Balance.army_cap(): return false
 	var cost: Dictionary = services.ai_economy.ai_unit_cost(building_type)
 	if not battle.economy.pay(owner, cost): return false
 	var site := _place_building(owner, building_type, near, true, available)

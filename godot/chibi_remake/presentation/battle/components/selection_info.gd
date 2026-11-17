@@ -110,7 +110,7 @@ func _refresh_sel_frame() -> void:
 		if not off.is_empty():
 			var lv := int(off.get("level", 0))
 			var need := 0
-			if lv >= 0 and lv < int(_ui.host.EXP_LEVELS.size()): need = int(_ui.host.EXP_LEVELS[lv])
+			if lv >= 0 and lv < int(preload("res://simulation/definitions/officer_grades.gd").data.thresholds.size()): need = int(preload("res://simulation/definitions/officer_grades.gd").data.thresholds[lv])
 			_ui.sel_rank.text = "归属 %s   %s   经验 %d/%d" % [str(off.get("name", "?")), str(_ui.host.commands.military.officer_rank_name(off)), int(off.get("exp", 0)), need]
 		else:
 			_ui.sel_rank.text = "%s   #%d" % ["建筑" if bool(u.is_building) else "部队", int(u.unit)]

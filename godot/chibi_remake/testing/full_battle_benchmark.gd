@@ -14,7 +14,7 @@ func _ready() -> void:_initialize()
 ## the host can also record the process peak working set.
 
 const Config = preload("res://simulation/battle_config.gd")
-const COMBAT_TYPES := [29, 31, 33, 35]
+const Roles = preload("res://simulation/definitions/unit_roles.gd")
 var script_kernel := false
 var capacity_stress := false
 var profile_only := false
@@ -87,7 +87,7 @@ func _fill(battle: Node2D) -> int:
 	while _mobile_count(battle) < target_units and attempts < target_units * 200:
 		attempts += 1
 		var owner: int = int(owners[attempts % owners.size()])
-		var unit_id: int = int(COMBAT_TYPES[attempts % COMBAT_TYPES.size()])
+		var unit_id: int = int(Roles.ids("officers")[attempts % Roles.ids("officers").size()])
 		var ax := rng.randf_range(120.0, terrain_w - 120.0)
 		var ay := rng.randf_range(120.0, terrain_h - 120.0)
 		if battle.commands.world._spawn_unit(unit_id, owner, ax, ay, false):
@@ -99,7 +99,7 @@ func _fill(battle: Node2D) -> int:
 	for unit in battle.units:
 		if engaging >= engage: break
 		if not bool(unit.get("alive", false)) or bool(unit.get("is_building", false)): continue
-		if int(unit.get("unit", 0)) in COMBAT_TYPES and str(unit.get("state", "")) in ["idle", ""]:
+		if int(unit.get("unit", 0)) in Roles.ids("officers") and str(unit.get("state", "")) in ["idle", ""]:
 			var enemy: Dictionary = battle.commands.military._nearest_enemy(unit, 100000.0)
 			if not enemy.is_empty():
 				unit.target = enemy

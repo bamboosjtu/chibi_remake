@@ -1,7 +1,7 @@
 extends RefCounted
+const Balance = preload("res://simulation/definitions/balance_rules.gd")
 ## officer teams: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
-const Config = preload("res://simulation/battle_config.gd")
 const REQUIRED_SERVICES := {"abilities": ["_reset_jimou"], "battle_simulation": ["_clear_control_group_for", "_clear_officer_control_groups", "_feedback", "_free_unit_at", "_place_unit"], "combat": ["officer_rank_name"], "command_groups": ["_cancel_unit_command", "_commander_for", "_group_units"], "entity_factory": ["_attach_officer", "_make_unit", "_sheet_ref_for"], "interaction_paths": ["_edge_interaction_path"], "officer_pool": ["_officer_by_index", "_officer_held_only_by_selection", "_sync_officer_to_pool", "officer_in_use"], "production": ["_army_count", "_commander_count"], "spatial_index": ["_free_unit_cell"], "technology": ["_apply_tech_bonuses", "_is_worker_unit"]}
 var battle: State
 var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
@@ -28,7 +28,7 @@ func _grant_officer_exp(u: Dictionary, amount: float) -> void:
 func _form_hero_unit(u: Dictionary, idx: int) -> bool:
 	var services := ports.acquire(["production", "officer_pool", "entity_factory", "spatial_index", "technology", "battle_simulation"])
 	if services.is_empty(): return false
-	if services.production._army_count(int(u.owner)) >= 200 or services.production._commander_count(int(u.owner)) >= 20: return false
+	if services.production._army_count(int(u.owner)) >= Balance.army_cap() or services.production._commander_count(int(u.owner)) >= Balance.commander_cap(): return false
 	if u.is_building or not u.alive or u.die_t >= 0.0 or services.officer_pool.officer_in_use(idx): return false
 	var o: Dictionary = services.officer_pool._officer_by_index(idx)
 	if o.is_empty(): return false
@@ -39,7 +39,7 @@ func _form_hero_unit(u: Dictionary, idx: int) -> bool:
 	for member in battle.selected:
 		if member.alive and member.die_t < 0.0 and not member.is_building and member.owner == u.owner and member.get("officer", {}).is_empty() and int(member.get("group_officer", -1)) < 0:
 			members.append(member)
-			if members.size() == Config.TEAM_MAX_MEMBERS: break
+			if members.size() == Balance.team_max_members(): break
 	if members.is_empty(): return false
 	var w := int(meta.get("w", 64))
 	var h := int(meta.get("h", 64))
@@ -103,7 +103,7 @@ func _order_join(target: Dictionary) -> int:
 		return 0
 	var idx := int(leader.officer.index)
 	var members: Array = battle.units.filter(func(u): return bool(u.alive) and u.die_t < 0 and int(u.owner) == battle.player_owner and int(u.get("group_officer", -1)) == idx)
-	var room := Config.TEAM_MAX_MEMBERS - members.size()
+	var room := Balance.team_max_members() - members.size()
 	var count := 0
 	for member in battle.selected.duplicate():
 		if room <= 0: break

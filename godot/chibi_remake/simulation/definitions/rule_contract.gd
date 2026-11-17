@@ -1,6 +1,7 @@
 extends RefCounted
 ## Validate consumed gameplay fields before any catalog becomes visible.
-const FILES := ["unit_definitions.json", "production_units.json", "buildings.json", "unit_tuning.json", "officers.json", "officer_progression.json", "command_variants.json", "scenario_rules.json", "native_math.json"]
+const FILES := ["unit_definitions.json", "production_units.json", "buildings.json", "unit_tuning.json", "officers.json", "officer_progression.json", "command_variants.json", "scenario_rules.json", "native_math.json", "tech.json", "unit_roles.json", "balance.json"]
+const Constants = preload("res://simulation/definitions/constant_contract.gd")
 const Scenario = preload("res://simulation/definitions/scenario_contract.gd")
 const UnitSchema = preload("res://simulation/definitions/unit_schema.gd")
 const Status = preload("res://simulation/definitions/status_fields.gd")
@@ -10,11 +11,15 @@ static func errors(documents: Dictionary) -> Array:
 	for name in FILES:
 		if not documents.has(name): result.append(name + ": missing catalog")
 		elif not valid(name, documents[name]): result.append(name + ": invalid required gameplay fields")
+	if result.is_empty() and not Constants.references(documents): result.append("Rule catalogs: invalid unit or officer reference")
 	return result
 
 static func valid(name: String, data) -> bool:
 	if not data is Dictionary: return false
 	match name:
+		"tech.json": return Constants.technology(data)
+		"unit_roles.json": return Constants.roles(data)
+		"balance.json": return Constants.balance(data)
 		"unit_definitions.json": return valid_units(data, true)
 		"production_units.json", "buildings.json": return valid_units(data)
 		"unit_tuning.json": return _tuning(data)
@@ -71,7 +76,7 @@ static func _officers(data: Dictionary) -> bool:
 			if not officer is Dictionary or not whole(officer.get("index")) or indices.has(officer.index): return false
 			indices[officer.index] = true
 			if not text(officer.get("name")) or not whole(officer.get("tier"), 1, 4) or not whole(officer.get("level"), 0, 9): return false
-			if not whole(officer.get("heroType")) or not int(officer.heroType) in [29, 31, 33, 35]: return false
+			if not whole(officer.get("heroType")): return false
 			for field in ["might", "intellect", "hp"]:
 				if not nonnegative(officer.get(field)): return false
 	return true

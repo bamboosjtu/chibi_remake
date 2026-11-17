@@ -13,7 +13,7 @@ func _run() -> void:
 	var hero: Dictionary = b.selected.filter(func(u): return not (u.get("officer", {}) as Dictionary).is_empty())[0]
 	var idx := int(hero.officer.index)
 	var lv0 := int(hero.officer.get("level", 0))
-	hero.officer.exp = int(b.EXP_LEVELS[lv0]) - 1
+	hero.officer.exp = int(preload("res://simulation/definitions/officer_grades.gd").data.thresholds[lv0]) - 1
 	b.commands.military._grant_officer_exp(hero, 1)
 	assert(int(hero.officer.get("level", 0)) == mini(9, lv0 + 1), "经验达到阈值应升官职")
 	var members: Array = b.units.filter(func(u): return int(u.get("group_officer", -1)) == idx)

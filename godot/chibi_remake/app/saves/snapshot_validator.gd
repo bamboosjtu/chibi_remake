@@ -1,4 +1,5 @@
 extends RefCounted
+const Technology = preload("res://simulation/definitions/technology_rules.gd")
 ## Validate the complete snapshot before constructing or modifying any world.
 var host: Node2D
 var content_revision: Callable
@@ -179,11 +180,11 @@ func _valid_technology(simulation: Dictionary, ids: Dictionary, arr: Array, prod
 		for field in ["buildingUid","owner","tech","t"]:
 			if not _valid_integer.call(job.get(field,-1)): return false
 		var uid := int(job.buildingUid); var owner := int(job.owner); var idx := int(job.tech)
-		if owner <= 0 or not ids.has(uid) or production_buildings.has(uid) or int(job.t) >= host.TECH_TICKS or idx >= host.TECH_TABLE.size(): return false
+		if owner <= 0 or not ids.has(uid) or production_buildings.has(uid) or int(job.t) >= Technology.ticks() or idx >= Technology.table().size(): return false
 		var building: Dictionary = ids[uid]
 		if not bool(building.get("building",false)) or int(building.owner) != owner or not bool(building.get("alive",false)) or float(building.get("dieT",-1)) >= 0 or bool(building.get("simulation",{}).get("site",false)): return false
 		var line: String = host.commands.technology._tech_line_of(idx)
-		var lines: Array = host.TECH_BUILDING_LINES.get(int(building.unit),[])
+		var lines: Array = Technology.building_lines(int(building.unit))
 		if owner != host.player_owner and int(building.unit) in [4,5]: lines = ["bow"]
 		if not lines.has(line) or not _valid_cost.call(job.get("cost",{})): return false
 		var key := "%d/%d" % [owner,idx]

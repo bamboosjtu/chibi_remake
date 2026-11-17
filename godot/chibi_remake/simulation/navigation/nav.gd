@@ -1,4 +1,5 @@
 extends RefCounted
+const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## Stable navigation API backed by grid and path-query components.
 var state := preload("res://simulation/navigation/navigation_state.gd").new()
 var grid := preload("res://simulation/navigation/navigation_grid.gd").new(state)
@@ -151,7 +152,7 @@ func warm_runtime_shapes() -> void:
 		if uid<27:continue
 		var cls:=preload("res://simulation/systems/unit_footprint.gd").class_of(uid)
 		if cls==0:continue
-		var water: bool=uid in preload("res://simulation/battle_config.gd").NAVAL_UNITS
+		var water: bool=Roles.is_naval(uid)
 		if water and not state.has_water:continue
 		var layer:=1 if water else 0;var shape:=Vector2i(layer,cls)
 		if prepared.has(shape):continue

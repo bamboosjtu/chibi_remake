@@ -648,6 +648,15 @@
       "markers": [
         "RULE CATALOG PASS"
       ]
+    },
+    {
+      "script": "test_rule_constants",
+      "markers": [
+        "RULE CONSTANTS PASS"
+      ],
+      "args": [
+        "--noview"
+      ]
     }
   ]
 }

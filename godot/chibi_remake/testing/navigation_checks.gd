@@ -1,4 +1,5 @@
 extends RefCounted
+const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## Development assertions; shipped for --selftest candidate validation.
 var host: Node2D
 var _suite: WeakRef
@@ -45,7 +46,7 @@ func _selftest_naval() -> void:
 					continue
 				# R04：船是 4 格占位，必须挑身体完全落在水面、且确实能停下的靠岸格；
 				# 否则 _spawn_unit 会为了合法船体把船挪离岸边，装载距离超出 80px。
-				if host.nav.is_water(n) and not host.nav.is_solid(n, 1) and host.commands.world._unit_placement_free(n, host.TRANSPORT_UNIT, 1, -1):
+				if host.nav.is_water(n) and not host.nav.is_solid(n, 1) and host.commands.world._unit_placement_free(n, Roles.transport_id(), 1, -1):
 					waters.append(n)
 		if not waters.is_empty():
 			ship_cell = waters[0]
@@ -59,7 +60,7 @@ func _selftest_naval() -> void:
 		suite._skip("水战：本图找不到陆路可达的海岸")
 		return
 	var sp = host.nav.anchor_of(ship_cell.x, ship_cell.y)
-	if not host.commands.world._spawn_unit(host.TRANSPORT_UNIT, host.player_owner, sp.x, sp.y):
+	if not host.commands.world._spawn_unit(Roles.transport_id(), host.player_owner, sp.x, sp.y):
 		suite._skip("水战：运输船图集缺失，无法生成测试船")
 		return
 	var ship: Dictionary = host.units.back()

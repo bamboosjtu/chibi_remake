@@ -29,6 +29,6 @@ static func _load() -> Array:
 	var offsets: Array = []
 	for cls in range(4):
 		for parity in range(2): offsets.append(Footprint.offsets(cls, parity))
-	provider.configure(Status.KEYS, Action.CLIP_NAME, Action.FRAME_TICKS, Status.CONFUSION, Status.ROLLING, Footprint.CLASS_BY_UNIT, offsets, preload("res://simulation/battle_config.gd").NAVAL_UNITS)
+	provider.configure(Status.KEYS, Action.CLIP_NAME, Action.FRAME_TICKS, Status.CONFUSION, Status.ROLLING, Footprint.CLASS_BY_UNIT, offsets, preload("res://simulation/definitions/unit_roles.gd").ids("naval"), preload("res://simulation/definitions/unit_roles.gd").transport_id())
 	Kernel.install(provider)
 	return []

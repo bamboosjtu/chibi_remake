@@ -1,4 +1,6 @@
 extends RefCounted
+const Balance = preload("res://simulation/definitions/balance_rules.gd")
+const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## entity factory: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
@@ -127,12 +129,12 @@ func _initialize_unit(u: Dictionary, ob: Dictionary, w: int, h: int, k: float) -
 func _spawn_unit(unit_id: int, owner: int, ax: float, ay: float, restoring := false) -> bool:
 	var services := ports.acquire(["production", "entity_factory", "command_groups", "spatial_index", "battle_simulation", "technology"])
 	if services.is_empty(): return false
-	if not restoring and services.production._army_count(owner) >= 200: return false
+	if not restoring and services.production._army_count(owner) >= Balance.army_cap(): return false
 	var meta: Dictionary = battle.map_data.units.get(str(unit_id), {})
 	if meta.is_empty():
 		push_warning("spawn failed: unknown unit %d" % unit_id)
 		return false
-	if not restoring and unit_id in Config.NAVAL_UNITS and not battle.nav.has_water: return false
+	if not restoring and Roles.is_naval(unit_id) and not battle.nav.has_water: return false
 	var w := int(meta.w)
 	var h := int(meta.h)
 	var sheet: String = services.entity_factory._sheet_ref_for(unit_id, owner)

@@ -19,7 +19,7 @@ for(const file of files){
  if(/\.(png|svg|jpe?g|ico|otf|ttf|wav|ogg|avi|dll|bin)$/i.test(file)){try{fs.linkSync(file,target);}catch{fs.copyFileSync(file,target);}}
  else fs.copyFileSync(file,target);
 }
-const names=['unit_definitions','production_units','buildings','unit_tuning','officers','officer_progression','command_variants','scenario_rules','native_math'];
+const names=['unit_definitions','production_units','buildings','unit_tuning','officers','officer_progression','command_variants','scenario_rules','native_math','tech','unit_roles','balance'];
 const original=Object.fromEntries(names.map(name=>[name,fs.readFileSync(path.join(source,'data/db',name+'.json'))]));
 const nativeFile='simulation/native/bin/ChibiSimulationMath.dll';
 const nativeAvailable=process.platform==='win32'&&fs.existsSync(path.join(source,nativeFile));
@@ -41,6 +41,7 @@ const cases=[
  {name:'parse',change:()=>write('command_variants','{broken'),errors:['command_variants.json: JSON line']},
  {name:'all-invalid',change:()=>{for(const name of names)write(name,'{}');},errors:names.map(name=>name+'.json: invalid required gameplay fields')},
  {name:'aggregate',change:()=>{fs.unlinkSync(path.join(project,'data/db/unit_tuning.json'));write('command_variants','{broken');write('officers','{}');},errors:['unit_tuning.json: cannot read','command_variants.json: JSON line','officers.json: invalid required gameplay fields']},
+ {name:'cross-reference',change:()=>{const value=JSON.parse(original.unit_roles);value.workers.push(999);write('unit_roles',JSON.stringify(value));},errors:['invalid unit or officer reference']},
  {name:'scene-refuses-invalid',scene:'res://main.tscn',change:()=>write('unit_tuning','{}'),
   markers:['Rule startup failed:','unit_tuning.json: invalid required gameplay fields'],errors:['Rule startup failed:']},
 ];

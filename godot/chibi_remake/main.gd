@@ -2,9 +2,6 @@ extends Node2D
 ## Battle composition root. Rules and state live in composed services.
 const Config = preload("res://simulation/battle_config.gd")
 const CombatRules = preload("res://simulation/systems/combat_rules.gd")
-const TECH_TABLE = Config.TECH_TABLE
-const TECH_BUILDING_LINES = Config.TECH_BUILDING_LINES
-const TECH_TICKS = Config.TECH_TICKS
 const SPEED = Config.SPEED
 const ActionClock = preload("res://simulation/systems/action_clock.gd")
 const UnitFootprint = preload("res://simulation/systems/unit_footprint.gd")
@@ -19,8 +16,6 @@ const GATHER_SECONDS = Config.GATHER_SECONDS
 const GATHER_REACH = Config.GATHER_REACH
 const EDGE_DISTANCE = Config.EDGE_DISTANCE
 const DEPOSIT_EDGE_PX = Config.DEPOSIT_EDGE_PX
-const TRANSPORT_UNIT = Config.TRANSPORT_UNIT
-const EXP_LEVELS = Config.EXP_LEVELS
 const SCRIPTED_OBJECTIVES = Config.SCRIPTED_OBJECTIVES
 const SPECIAL_OBJECTIVE_MISSIONS = Config.SPECIAL_OBJECTIVE_MISSIONS
 var commands := preload("res://app/battle_commands.gd").new()

@@ -1,7 +1,8 @@
 extends RefCounted
+const Balance = preload("res://simulation/definitions/balance_rules.gd")
+const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## transport orders: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
-const Config = preload("res://simulation/battle_config.gd")
 const REQUIRED_SERVICES := {"abilities": ["_reset_jimou"], "battle_simulation": ["_feedback", "_place_unit"], "command_groups": ["_cancel_unit_command", "_command_units", "_is_naval"], "spatial_index": ["_index_forget", "_target_forget"]}
 var battle: State
 var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
@@ -47,7 +48,7 @@ func _selected_transport() -> Dictionary:
 
 func _has_own_transport() -> bool:
 	for u in battle.units:
-		if bool(u.get("alive", false)) and int(u.get("unit", -1)) == Config.TRANSPORT_UNIT and int(u.get("owner", -1)) == battle.player_owner:
+		if bool(u.get("alive", false)) and int(u.get("unit", -1)) == Roles.transport_id() and int(u.get("owner", -1)) == battle.player_owner:
 			return true
 	return false
 
@@ -58,8 +59,8 @@ func _order_board(ship: Dictionary) -> int:
 		services.battle_simulation._feedback("上船：请选择有效的我方运输船")
 		return 0
 	battle.transports.reconcile()
-	if int(ship.get("carry_n", 0)) >= Config.TRANSPORT_CAPACITY:
-		services.battle_simulation._feedback("运输船已满（%d）" % Config.TRANSPORT_CAPACITY)
+	if int(ship.get("carry_n", 0)) >= Balance.transport_capacity():
+		services.battle_simulation._feedback("运输船已满（%d）" % Balance.transport_capacity())
 		return 0
 	var n := 0
 	for u in services.command_groups._command_units():
@@ -74,7 +75,7 @@ func _order_board(ship: Dictionary) -> int:
 		u["pi"] = 0
 		n += 1
 	if n > 0:
-		services.battle_simulation._feedback("%d 支部队前往上船（载员 %d/%d）" % [n, int(ship.get("carry_n", 0)), Config.TRANSPORT_CAPACITY])
+		services.battle_simulation._feedback("%d 支部队前往上船（载员 %d/%d）" % [n, int(ship.get("carry_n", 0)), Balance.transport_capacity()])
 	else:
 		services.battle_simulation._feedback("没有可上船的部队（水军/已装载单位不能上船）")
 	return n
@@ -85,8 +86,8 @@ func _attach_to_ship(u: Dictionary, ship: Dictionary) -> bool:
 	if not battle.transports.valid_unit(u) or not battle.transports.valid_ship(ship) or int(u.owner)!=int(ship.owner) or bool(u.is_building) or services.command_groups._is_naval(u) or bool(u.get("attached",false)) or str(ship.state)=="unload":return false
 	if not battle.transports.adjacent(u,ship):return false
 	battle.transports.reconcile()
-	if int(ship.get("carry_n", 0)) >= Config.TRANSPORT_CAPACITY:
-		services.battle_simulation._feedback("运输船已满（%d）" % Config.TRANSPORT_CAPACITY)
+	if int(ship.get("carry_n", 0)) >= Balance.transport_capacity():
+		services.battle_simulation._feedback("运输船已满（%d）" % Balance.transport_capacity())
 		return false
 	services.command_groups._cancel_unit_command(u)
 	u["attached"] = true
@@ -107,7 +108,7 @@ func _attach_to_ship(u: Dictionary, ship: Dictionary) -> bool:
 		services.abilities._reset_jimou()             # R07：上船后不能继续确认施法
 	if battle.effects != null:
 		battle.effects.visual("set_unit_attached", [u, true])
-	services.battle_simulation._feedback("装载：%s 上船（%d/%d）" % [str(u.get("name", "部队")), int(ship.carry_n), Config.TRANSPORT_CAPACITY])
+	services.battle_simulation._feedback("装载：%s 上船（%d/%d）" % [str(u.get("name", "部队")), int(ship.carry_n), Balance.transport_capacity()])
 	return true
 
 func _detach_from_ship(u: Dictionary, ship: Dictionary) -> bool:
@@ -138,7 +139,7 @@ func _detach_from_ship(u: Dictionary, ship: Dictionary) -> bool:
 
 func _unload_selected() -> void:
 	for ship in battle.selected:
-		if int(ship.unit)==Config.TRANSPORT_UNIT:_order_unload(ship)
+		if int(ship.unit)==Roles.transport_id():_order_unload(ship)
 
 func _order_unload(ship: Dictionary, _pos:=Vector2.ZERO) -> int:
 	var services := ports.acquire(["command_groups", "battle_simulation"])

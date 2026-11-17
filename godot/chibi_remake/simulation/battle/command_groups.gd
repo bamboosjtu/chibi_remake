@@ -1,7 +1,8 @@
 extends RefCounted
+const Balance = preload("res://simulation/definitions/balance_rules.gd")
+const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## command groups: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
-const Config = preload("res://simulation/battle_config.gd")
 const REQUIRED_SERVICES := {"abilities": ["_reset_jimou"], "battle_simulation": ["_feedback"], "officer_teams": ["_order_disband"], "technology": ["_is_worker_unit"], "transport_orders": ["_unload_selected"], "world_orders": ["_clear_pending"]}
 var battle: State
 var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
@@ -125,7 +126,7 @@ func _cmd_rest() -> void:
 		services.battle_simulation._feedback("只有武将部队可以休整")
 
 func _is_hero_unit(u: Dictionary) -> bool:
-	return int(u.get("unit", -1)) in Config.HERO_UNITS
+	return Roles.is_hero(int(u.get("unit", -1)))
 
 func _construction_workers(commander: Dictionary) -> Array:
 	return preload("res://simulation/queries/construction_roster.gd").new(battle.units).construction_workers(commander)
@@ -144,13 +145,13 @@ func _enforce_team_limits() -> void:
 		if not commander.alive or commander.die_t >= 0 or commander.get("officer", {}).is_empty(): continue
 		var members: Array = battle.units.filter(func(u): return u.alive and u.die_t < 0 and not u.is_building and u != commander and int(u.owner) == int(commander.owner) and int(u.get("group_officer", -1)) == int(commander.officer.index))
 		members.sort_custom(func(a,b): return int(a.uid) < int(b.uid))
-		for i in range(Config.TEAM_MAX_MEMBERS, members.size()):
+		for i in range(Balance.team_max_members(), members.size()):
 			var member: Dictionary = members[i]
 			member.group_officer = -1
 			if member.state == "build": _cancel_unit_command(member)
 
 func _is_naval(u: Dictionary) -> bool:
-	return int(u.get("unit", -1)) in Config.NAVAL_UNITS
+	return Roles.is_naval(int(u.get("unit", -1)))
 
 func _nav_layer(u: Dictionary) -> int:
 	return 1 if _is_naval(u) and battle.nav.has_water else 0

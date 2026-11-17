@@ -1,4 +1,6 @@
 extends Control
+const Roles = preload("res://simulation/definitions/unit_roles.gd")
+const Technology = preload("res://simulation/definitions/technology_rules.gd")
 ## 原版右侧信息区：人物像、竖排姓名、经验／谋略／士气／粮数。
 var host: Node2D
 var view: Node2D
@@ -160,7 +162,7 @@ func sync_selection() -> void:
 	if bool(u.is_building):
 		_sync_building(u)
 		return
-	elif int(u.unit)==47:
+	elif Roles.is_transport(int(u.unit)):
 		titles=["生命","状态","载员","载员兵力","视野","装卸"]
 		var status: String="卸载中" if str(u.state)=="unload" else ("航行中" if str(u.state)=="move" else "待命")
 		data=["%d/%d"%[int(u.hp),int(u.maxhp)],status,"%d/16"%int(u.carry_n),str(int(u.carry_hp)),str(int(u.vision)),"载有部队" if int(u.carry_n)>0 else "空载"]
@@ -206,4 +208,4 @@ func _sync_building_work(u: Dictionary) -> void:
 		view.command_catalog.decorate_sale(work_icon, selling)
 		work_icon.show()
 		progress_bar.show()
-		progress_bar.value = 100.0 * float(research.t) / float(host.TECH_TICKS)
+		progress_bar.value = 100.0 * float(research.t) / float(Technology.ticks())

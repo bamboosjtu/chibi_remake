@@ -1,8 +1,7 @@
 extends RefCounted
+const Roles = preload("res://simulation/definitions/unit_roles.gd")
+const Balance = preload("res://simulation/definitions/balance_rules.gd")
 ## 船员关联为权威状态；人数/兵力为派生汇总，不作为载员身份来源。
-const CAPACITY:=16
-const SHIP:=47
-const NAVAL:=[46,47,48,49,52]
 const TechnologyState = preload("res://simulation/systems/technology_state.gd")
 const Footprint = preload("res://simulation/systems/unit_footprint.gd")
 const Access = preload("res://simulation/ports/transports_access.gd")
@@ -15,7 +14,7 @@ func valid_unit(unit: Dictionary) -> bool:
 	return not unit.is_empty() and host.units.any(func(u):return is_same(u,unit)) and bool(unit.get("alive",false)) and float(unit.get("die_t",-1))<0
 
 func valid_ship(ship: Dictionary) -> bool:
-	return valid_unit(ship) and int(ship.unit)==SHIP and not bool(ship.get("attached",false))
+	return valid_unit(ship) and int(ship.unit)==Roles.transport_id() and not bool(ship.get("attached",false))
 
 func passengers(ship: Dictionary) -> Array:
 	return host.units.filter(func(u):return bool(u.get("alive",false)) and float(u.get("die_t",-1))<0 and bool(u.get("attached",false)) and int(u.get("aboard_uid",-1))==int(ship.uid))
@@ -23,7 +22,7 @@ func passengers(ship: Dictionary) -> Array:
 func ship_for(unit: Dictionary) -> Dictionary:
 	var uid:=int(unit.get("aboard_uid",-1))
 	for ship in host.units:
-		if int(ship.uid)==uid and int(ship.unit)==SHIP:return ship
+		if int(ship.uid)==uid and int(ship.unit)==Roles.transport_id():return ship
 	return {}
 
 func reconcile() -> void:
@@ -36,7 +35,7 @@ func reconcile() -> void:
 		if not totals.has(uid):totals[uid]={"n":0,"hp":0.0}
 		totals[uid].n+=1;totals[uid].hp+=float(unit.hp)
 	for ship in host.units:
-		if int(ship.unit)!=SHIP:continue
+		if int(ship.unit)!=Roles.transport_id():continue
 		var total: Dictionary=totals.get(int(ship.uid),{"n":0,"hp":0.0})
 		ship.carry_n=int(total.n);ship.carry_hp=float(total.hp);ship.loaded=int(total.n)>0
 
@@ -105,30 +104,30 @@ func valid_snapshot(ids: Dictionary) -> bool:
 	var totals:={}
 	for uid in ids:
 		var unit: Dictionary=ids[uid];var state: Dictionary=unit.simulation
-		if str(unit.get("state",""))=="unload" and (int(unit.unit)!=SHIP or bool(state.get("attached",false))):return false
+		if str(unit.get("state",""))=="unload" and (int(unit.unit)!=Roles.transport_id() or bool(state.get("attached",false))):return false
 		for field in ["attached","loaded"]:
 			if state.has(field) and not state[field] is bool:return false
 		# R03：卸载状态与节拍相位必须是合法结构；旧档缺字段按未卸载迁移。
 		var unload_active=state.get("unload_active",false);var unload_t=state.get("unload_t",0)
 		if not unload_active is bool or not integer(unload_t):return false
 		if bool(unload_active) or str(unit.get("state",""))=="unload":
-			if int(unit.unit)!=SHIP or bool(unit.building) or bool(state.get("attached",false)):return false
+			if int(unit.unit)!=Roles.transport_id() or bool(unit.building) or bool(state.get("attached",false)):return false
 			if not bool(unit.alive) or float(unit.dieT)>=0:return false
-		elif int(unit.unit)!=SHIP and (bool(unload_active) or int(unload_t)!=0):return false
+		elif int(unit.unit)!=Roles.transport_id() and (bool(unload_active) or int(unload_t)!=0):return false
 		var aboard=state.get("aboard_uid",-1);var count=state.get("carry_n",0);var hp=state.get("carry_hp",0)
-		if not integer(aboard,-1) or not integer(count) or int(count)>CAPACITY:return false
+		if not integer(aboard,-1) or not integer(count) or int(count)>Balance.transport_capacity():return false
 		if not (hp is int or hp is float) or not is_finite(float(hp)) or float(hp)<0:return false
-		if int(unit.unit)!=SHIP and (int(count)!=0 or float(hp)!=0 or bool(state.get("loaded",false))):return false
+		if int(unit.unit)!=Roles.transport_id() and (int(count)!=0 or float(hp)!=0 or bool(state.get("loaded",false))):return false
 		if not bool(state.get("attached",false)):
 			if int(aboard)!=-1:return false
 			continue
-		if bool(unit.building) or int(unit.unit) in NAVAL:return false
+		if bool(unit.building) or Roles.is_naval(int(unit.unit)):return false
 		if not bool(unit.alive) or float(unit.dieT)>=0:
 			if int(aboard)!=-1:return false
 			continue
 		if int(aboard)==int(uid) or not ids.has(int(aboard)):return false
 		var ship: Dictionary=ids[int(aboard)]
-		if int(ship.unit)!=SHIP or int(ship.owner)!=int(unit.owner) or not bool(ship.alive) or float(ship.dieT)>=0 or bool(ship.simulation.get("attached",false)):return false
+		if int(ship.unit)!=Roles.transport_id() or int(ship.owner)!=int(unit.owner) or not bool(ship.alive) or float(ship.dieT)>=0 or bool(ship.simulation.get("attached",false)):return false
 		if str(unit.get("state",""))!="boarded":return false
 		var life=unit.get("hp",-1);var maximum=state.get("maxhp",life)
 		if not (life is int or life is float) or not is_finite(float(life)) or float(life)<0:return false
@@ -140,10 +139,10 @@ func valid_snapshot(ids: Dictionary) -> bool:
 		if not TechnologyState.valid_hp(life,maximum,base,bonus):return false
 		if not totals.has(int(aboard)):totals[int(aboard)]={"n":0,"hp":0.0}
 		totals[int(aboard)].n+=1;totals[int(aboard)].hp+=float(life)
-		if int(totals[int(aboard)].n)>CAPACITY:return false
+		if int(totals[int(aboard)].n)>Balance.transport_capacity():return false
 	for uid in ids:
 		var unit: Dictionary=ids[uid]
-		if int(unit.unit)!=SHIP:continue
+		if int(unit.unit)!=Roles.transport_id():continue
 		var state: Dictionary=unit.simulation;var total: Dictionary=totals.get(uid,{"n":0,"hp":0.0})
 		if (int(state.get("carry_n",0))!=int(total.n) or absf(float(state.get("carry_hp",0))-float(total.hp))>0.00001 or bool(state.get("loaded",false))!=(int(total.n)>0)):return false
 	return true

@@ -41,7 +41,11 @@ def main():
     subprocess.run([str(cmake),"-S",str(HERE),"-B",str(WORK/"build"),"-G","Visual Studio 16 2019","-A","x64","-DSIM_SIGNATURE="+signature],check=True)
     subprocess.run([str(cmake),"--build",str(WORK/"build"),"--config","Release","--parallel","8"],check=True)
     output=ROOT/"godot/chibi_remake/simulation/native/bin/ChibiSimulationMath.dll"
-    output.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(WORK/"build/Release/ChibiSimulationMath.dll",output)
+    output.parent.mkdir(parents=True,exist_ok=True)
+    staged=output.with_suffix(".dll.build")
+    try:
+        shutil.copyfile(WORK/"build/Release/ChibiSimulationMath.dll",staged);staged.replace(output)
+    finally:staged.unlink(missing_ok=True)
     metadata.write_text(json.dumps({"schemaVersion":1,"sourceSignature":signature,"bindingsCommit":LOCK["commit"],"algorithm":"dictionary-math-v1"},indent=2)+"\n")
     print("NATIVE MATH BUILT",output)
 if __name__=="__main__":main()

@@ -73,6 +73,7 @@ SIMTEST: 15.0s tick=450 digest=<FNV-1a>
 | 建筑与施工 | `test_construction`、`test_build_feedback`、`test_building_square`、`test_resource_input` |
 | 生产与科技 | `test_research_jobs`、`test_army_technology`、`test_special_units`、`test_combat_rules` |
 | 编组与指令 | `test_worker_groups`、`test_team_lifecycle`、`test_command_replace`、`test_cmd_paging`、`test_battle_interaction` |
+| 规则常量与准入 | `test_rule_constants`、`rule_constants_check.mjs`：旧值基线、冻结角色、科技完成、实体/主将名额与训练预留；科技文档由目录生成并校验 |
 | 规则启动与内存边界 | `test_rule_catalog`、`test_rule_startup.mjs`：目录校验、深层冻结、无文件 tick、候选交换/回滚、可选后端与启动拒绝 |
 | 研究规则集成 | `test_research_rules`：三层指令、34 关开场白、1170 组武将属性、奖励/晋升边界、存读档 |
 | 移动质量 | `test_movement_quality`：完整步长、避墙/避资源的直线路径、显示插值、动画节拍、队伍独立落点 |

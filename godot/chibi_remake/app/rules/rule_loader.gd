@@ -30,5 +30,6 @@ static func read_bundle(directory: String) -> Dictionary:
 			errors.append(path + ": JSON line %d: %s" % [parser.get_error_line(), parser.get_error_message()])
 		elif not Contract.valid(name, parser.data): errors.append(path + ": invalid required gameplay fields")
 		else: documents[name] = parser.data
+	if errors.is_empty(): errors = Contract.errors(documents)
 	# Failed bundles cannot be consumed accidentally or published partially.
 	return {"documents": documents if errors.is_empty() else {}, "errors": errors}

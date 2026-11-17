@@ -1,7 +1,8 @@
 extends RefCounted
+const Technology = preload("res://simulation/definitions/technology_rules.gd")
+const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## technology: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
-const Config = preload("res://simulation/battle_config.gd")
 const REQUIRED_SERVICES := {"battle_simulation": ["_feedback"]}
 var battle: State
 var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
@@ -10,7 +11,7 @@ func _init(data: State) -> void:
 	battle = data
 
 func _is_worker_unit(u: Dictionary) -> bool:
-	return int(u.get("unit", -1)) in Config.WORKER_UNITS
+	return Roles.is_worker(int(u.get("unit", -1)))
 
 func _ai_side(owner: int) -> Dictionary:
 	for i in range(battle.scenario_sides.size()):
@@ -25,17 +26,17 @@ func ai_tech_gate(owner: int) -> int:
 	return int(init[1]) if init.size() > 1 else 0
 
 func tech_row(idx: int) -> Dictionary:
-	if idx < 0 or idx >= Config.TECH_TABLE.size():
+	if idx < 0 or idx >= Technology.table().size():
 		return {}
-	return Config.TECH_TABLE[idx]
+	return Technology.table()[idx]
 
 func tech_is_sell(idx: int) -> bool:
 	# 12–17 是卖资源行（§11.3 尾注：不是经济研究）。
-	return idx >= 12 and idx <= 17
+	return not tech_row(idx).is_empty() and tech_row(idx).has("sell")
 
 func _tech_line_of(idx: int) -> String:
-	for line in Config.TECH_LINES.keys():
-		var ids: Array = Config.TECH_LINES[line]
+	for line in Technology.lines().keys():
+		var ids: Array = Technology.lines()[line]
 		if ids.has(idx):
 			return str(line)
 	return ""
@@ -44,7 +45,7 @@ func _tech_line_pos(idx: int) -> int:
 	var line := _tech_line_of(idx)
 	if line == "":
 		return -1
-	var ids: Array = Config.TECH_LINES[line]
+	var ids: Array = Technology.lines()[line]
 	return ids.find(idx)
 
 func _tech_line_progress(line: String, owner := -1) -> int:
@@ -75,7 +76,7 @@ func tech_is_next(idx: int) -> bool:
 	return _tech_line_pos(idx) == _tech_line_progress(line)
 
 func tech_next_index(line: String) -> int:
-	var ids: Array = Config.TECH_LINES.get(line, [])
+	var ids: Array = Technology.lines().get(line, [])
 	var p := _tech_line_progress(line)
 	if p < 0 or p >= ids.size():
 		return -1
@@ -83,7 +84,7 @@ func tech_next_index(line: String) -> int:
 
 func tech_rows_for_building(bid: int) -> Array:
 	var out: Array = []
-	var lines: Array = Config.TECH_BUILDING_LINES.get(bid, [])
+	var lines: Array = Technology.building_lines(bid)
 	for line_v in lines:
 		var line := str(line_v)
 		if line == "hq":
@@ -91,7 +92,7 @@ func tech_rows_for_building(bid: int) -> Array:
 			if nxt >= 0 and ai_tech_gate(battle.player_owner) >= nxt + 2:
 				out.append(nxt)
 			continue
-		var ids: Array = Config.TECH_LINES.get(line, [])
+		var ids: Array = Technology.lines().get(line, [])
 		for id_v in ids:
 			var idx := int(id_v)
 			if not tech_is_completed(idx):
@@ -145,25 +146,25 @@ func tech_cost_text(idx: int) -> String:
 
 func tech_effect_desc(idx: int) -> String:
 	match idx:
-		0, 1, 2: return "现有及新建部队、建筑生命值 +400（箭楼除外，每级累加）"
+		0, 1, 2: return "现有及新建部队、建筑生命值 +%d（箭楼除外，每级累加）" % Technology.hp_per_level()
 		3, 4, 5: return "普通兵种各档射击加成：%s" % _tech_four_effects(idx)
 		6, 7, 8: return "普通兵种各档近战加成：%s" % _tech_four_effects(idx)
 		9, 10, 11: return "普通兵种各档防御加成：%s" % _tech_four_effects(idx)
 		12, 13, 14, 15, 16, 17: return tech_cost_text(idx)
-		18, 19: return "投石车攻击加成 +%d" % (10 * (idx - 17))
-		20: return "快船射击加成 +6"
-		21: return "战船射击 +15；连船防御 +15"
-		22: return "快船防御 +6；战船防御 +10"
+		18, 19: return "投石车攻击加成 +%d" % (int(tech_row(idx).v[4]))
+		20: return "快船射击加成 +%d" % tech_row(idx).v[4]
+		21: return "战船射击 +%d；连船防御 +%d" % [tech_row(idx).v[4], tech_row(idx).v[4]]
+		22: return "快船防御 +%d；战船防御 +%d" % [tech_row(idx).v[4], tech_row(idx).v[5]]
 	return ""
 
 func _tech_four_effects(idx: int) -> String:
-	var values: Array = Config.TECH_TABLE[idx].v
+	var values: Array = Technology.table()[idx].v
 	return "+%d / +%d / +%d / +%d" % [values[4],values[5],values[6],values[7]]
 
 func tech_tip(idx: int) -> String:
 	if tech_is_sell(idx):
-		return "占用钱庄200tick；开始扣除资源，完成获得金钱，取消返还75%资源"
-	return "预计%.1f秒；费用开始即扣，完成时生效" % (Config.TECH_TICKS * battle.clock.period())
+		return "占用钱庄%dtick；开始扣除资源，完成获得金钱，取消返还75%%资源" % Technology.ticks()
+	return "预计%.1f秒；费用开始即扣，完成时生效" % (Technology.ticks() * battle.clock.period())
 
 func tech_block_reason(idx: int) -> String:
 	var row := tech_row(idx)
@@ -180,7 +181,7 @@ func tech_block_reason(idx: int) -> String:
 	var pos := _tech_line_pos(idx)
 	var prog := _tech_line_progress(line)
 	if pos > prog:
-		var ids: Array = Config.TECH_LINES[line]
+		var ids: Array = Technology.lines()[line]
 		var prev := {}
 		if prog >= 0 and prog < ids.size():
 			prev = tech_row(int(ids[prog]))
@@ -254,10 +255,10 @@ func _building_work_busy(building: Dictionary) -> bool:
 	return bool(building.get("site",false)) or battle.trainings.any(func(tr):return is_same(tr.b,building)) or not _research_for_building(building).is_empty()
 
 func _queue_research(owner: int, building: Dictionary, idx: int, ai_dispatch := false) -> bool:
-	if idx < 0 or idx >= Config.TECH_TABLE.size() or building.is_empty(): return false
+	if idx < 0 or idx >= Technology.table().size() or building.is_empty(): return false
 	if not battle.units.any(func(u):return is_same(u,building)) or not building.alive or building.die_t >= 0 or int(building.owner) != owner or not building.is_building or _building_work_busy(building): return false
 	var line := _tech_line_of(idx)
-	var lines: Array = Config.TECH_BUILDING_LINES.get(int(building.unit),[])
+	var lines: Array = Technology.building_lines(int(building.unit))
 	if ai_dispatch and int(building.unit) in [4,5]: lines = ["bow"]
 	if not lines.has(line): return false
 	if not tech_is_sell(idx) and _tech_line_pos(idx) != _tech_line_progress(line,owner): return false
@@ -294,7 +295,7 @@ func _process_tech(_delta: float) -> void:
 		if building.is_empty() or not building.alive or building.die_t >= 0 or int(building.owner) != int(job.owner):
 			battle.research_jobs.remove_at(i); continue
 		job.t = int(job.t) + 1
-		if int(job.t) < Config.TECH_TICKS: continue
+		if int(job.t) < Technology.ticks(): continue
 		battle.research_jobs.remove_at(i)
 		if tech_is_sell(int(job.tech)):
 			var balance: Dictionary = battle.economy.balance(int(job.owner))
@@ -339,15 +340,15 @@ func tech_research_name() -> String:
 
 func tech_research_remaining() -> int:
 	var job := _display_research()
-	return maxi(0,Config.TECH_TICKS-int(job.get("t",0))) if not job.is_empty() else 0
+	return maxi(0,Technology.ticks()-int(job.get("t",0))) if not job.is_empty() else 0
 
 func _is_water_unit(u: Dictionary) -> bool:
-	return int(u.get("unit", -1)) in Config.TECH_WATER_UNITS
+	return Roles.is_naval_technology(int(u.get("unit", -1)))
 
 func _is_melee_unit(u: Dictionary) -> bool:
 	if bool(u.get("is_building", false)) or _is_worker_unit(u) or _is_water_unit(u):
 		return false
-	return int(u.get("unit", -1)) in Config.TECH_MELEE_UNITS
+	return Roles.is_melee_technology(int(u.get("unit", -1)))
 
 func _apply_tech_bonuses(u: Dictionary) -> void:
 	var owner := int(u.get("owner", -1))
@@ -359,12 +360,12 @@ func _apply_tech_bonuses(u: Dictionary) -> void:
 	var level := int(state.get("level", 0))
 	if bool(u.get("is_building", false)):
 		if int(u.unit) < 27 and int(u.unit) not in [18, 19]:
-			var want_max := base_max + 400.0 * level
+			var want_max := base_max + Technology.hp_per_level() * level
 			u["maxhp"] = want_max
 			u["hp"] = clampf(float(u.get("hp", 0.0)), 0.0, want_max)
-	elif int(u.unit) in Config.MOBILE_HP_UNITS:
+	elif Roles.has_mobile_hp_technology(int(u.unit)):
 		var applied := int(u.get("tech_hp_bonus", 0))
-		var want_hp := 400 * level
+		var want_hp := int(Technology.hp_per_level()) * level
 		var delta := want_hp - applied
 		# 原版只把“当前 HP”+400；最大 HP 仍取类型基础值（可超过上限，界面按当前值显示）。
 		u["maxhp"] = base_max
@@ -383,7 +384,7 @@ func _apply_tech_bonuses(u: Dictionary) -> void:
 		u.attack_b_bonus = _combat_tech_value("bow", 3, category, owner)
 		u.defence_bonus = _combat_tech_value("armor", 9, category, owner)
 		u.defence_b_bonus = u.defence_bonus
-	if int(u.unit) in [34,47]:
+	if int(u.unit) == 34 or Roles.is_transport(int(u.unit)):
 		# 两类均没有普通家族档位，按用户补充与现有规格的槽−1规则读取各研究列。
 		u.attack_bonus = 0.0
 		u.attack_b_bonus = _catapult_tech_value(owner) if int(u.unit) == 34 else _combat_tech_value("weapon", 6, 3, owner)
@@ -395,32 +396,28 @@ func _apply_tech_bonuses(u: Dictionary) -> void:
 		var armored := int(state.get("ship_def", 0)) > 0
 		match int(u.unit):
 			46:
-				u.attack_b_bonus = float(Config.TECH_TABLE[20].v[4]) if ship_level >= 1 else 0.0
-				u.defence_bonus = float(Config.TECH_TABLE[22].v[4]) if armored else 0.0
+				u.attack_b_bonus = float(Technology.table()[20].v[4]) if ship_level >= 1 else 0.0
+				u.defence_bonus = float(Technology.table()[22].v[4]) if armored else 0.0
 			48:
-				u.attack_b_bonus = float(Config.TECH_TABLE[21].v[4]) if ship_level >= 2 else 0.0
-				u.defence_bonus = float(Config.TECH_TABLE[22].v[5]) if armored else 0.0
+				u.attack_b_bonus = float(Technology.table()[21].v[4]) if ship_level >= 2 else 0.0
+				u.defence_bonus = float(Technology.table()[22].v[5]) if armored else 0.0
 			49:
 				# 用户确认的相邻字段规则：连船B攻取投石车研究，防取战船研究。
 				u.attack_b_bonus = _catapult_tech_value(owner)
-				u.defence_bonus = float(Config.TECH_TABLE[21].v[4]) if ship_level >= 2 else 0.0
+				u.defence_bonus = float(Technology.table()[21].v[4]) if ship_level >= 2 else 0.0
 		u.defence_b_bonus = u.defence_bonus
 
 func _catapult_tech_value(owner := -1) -> float:
 	if owner < 0: owner = battle.player_owner
 	var level := clampi(int(_tech_for(owner).get("catapult", 0)), 0, 2)
-	return float(Config.TECH_TABLE[17+level].v[4]) if level > 0 else 0.0
+	return float(Technology.table()[17+level].v[4]) if level > 0 else 0.0
 
 func _combat_tech_category(unit_id: int) -> int:
-	if unit_id in [32,36,45,46]: return 0
-	if unit_id in [37,38,39,48]: return 1
-	if unit_id in [40,41,42]: return 2
-	if unit_id in [43,44]: return 3
-	return -1
+	return Roles.technology_category(unit_id)
 
 func _combat_tech_value(key: String, first_row: int, category: int, owner := -1) -> float:
 	if owner < 0: owner = battle.player_owner
 	var level := clampi(int(_tech_for(owner).get(key, 0)), 0, 3)
 	if level == 0: return 0.0
-	var raw := int(Config.TECH_TABLE[first_row + level - 1].v[4 + category]) & 255
+	var raw := int(Technology.table()[first_row + level - 1].v[4 + category]) & 255
 	return float(raw - 256 if raw >= 128 else raw)

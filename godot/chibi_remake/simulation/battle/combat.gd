@@ -1,7 +1,7 @@
 extends RefCounted
+const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## combat: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
-const Config = preload("res://simulation/battle_config.gd")
 const REQUIRED_SERVICES := {"abilities": ["_reset_jimou"], "battle_simulation": ["_fade_unit", "_finish_death", "_set_frame"], "command_groups": ["_commander_for", "_nav_layer"], "interaction_paths": ["_footprint_cells"], "movement": ["_cell_of_px"], "officer_teams": ["_grant_officer_exp", "_unassign_officer"], "spatial_index": ["_index_ensure_current", "_index_forget", "_target_forget", "unit_by_uid"]}
 var battle: State
 var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
@@ -11,7 +11,7 @@ func _init(data: State) -> void:
 	battle = data
 
 func _damage(a: Dictionary, d: Dictionary) -> float:
-	return preload("res://simulation/systems/combat_rules.gd").damage(a, d, int(a.get("unit", -1)) in preload("res://simulation/systems/combat_rules.gd").B_ATTACK_TYPES)
+	return preload("res://simulation/systems/combat_rules.gd").damage(a, d, Roles.uses_channel_b(int(a.get("unit", -1))))
 
 func _fire_attack(attacker: Dictionary, target: Dictionary) -> void:
 	if battle.effects != null and (int(attacker.get("owner", -1)) == battle.player_owner or battle.visibility.is_visible(Vector2(float(attacker.ax), float(attacker.ay)))):
@@ -19,7 +19,7 @@ func _fire_attack(attacker: Dictionary, target: Dictionary) -> void:
 	var kind := int(attacker.unit)
 	if preload("res://simulation/systems/combat_rules.gd").ambush(attacker):battle.projectiles.launch(attacker,target,"ambush")
 	elif kind == 34: battle.projectiles.launch(attacker,target,"stone")
-	elif kind in preload("res://simulation/systems/combat_rules.gd").B_ATTACK_TYPES: battle.projectiles.launch(attacker,target,"arrow")
+	elif Roles.uses_channel_b(kind): battle.projectiles.launch(attacker,target,"arrow")
 	else: _apply_hit(target,_damage(attacker,target),int(attacker.uid))
 
 func _apply_hit(target: Dictionary, damage: float, source_uid: int) -> void:
@@ -124,7 +124,7 @@ func _kill(u: Dictionary, by: Dictionary = {}) -> void:
 			battle.trainings.erase(order) # 建筑销毁当tick释放训练预约，不退款。
 	if int(u.unit) in [16, 17]: battle.nav.remove_gate(u)
 	# 运输船被击沉：船上的被载单位一并死亡/移除（原版：船失效 → 被载单位收模式 0x12）。
-	if int(u.get("unit", -1)) == Config.TRANSPORT_UNIT:
+	if int(u.get("unit", -1)) == Roles.transport_id():
 		for p in battle.transports.passengers(u): _kill(p, by)
 		u["carry_n"] = 0
 		u["carry_hp"] = 0.0

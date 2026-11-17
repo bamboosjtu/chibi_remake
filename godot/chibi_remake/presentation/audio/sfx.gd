@@ -1,4 +1,5 @@
 extends Node
+const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## 原版 WAVE.EXP 音效播放。媒体导出为 8-bit/11025Hz 单声道 WAV；
 ## 运行期直接解析 RIFF，避免依赖每个 wav 的 .import 缓存（发布 PCK 内同样可用）。
 
@@ -115,7 +116,7 @@ func play_attack(unit: Dictionary) -> void:
 	var id := int(unit.get("unit", -1))
 	var names: Array = []
 	if id == 34: names = _bank_files("throw")
-	elif int(unit.get("atk_range", 1)) > 1 or id in [45, 46, 47, 48, 49, 52]: names = _bank_files("arrow")
+	elif int(unit.get("atk_range", 1)) > 1 or (id == 45 or Roles.is_naval(id)): names = _bank_files("arrow")
 	else: names = _bank_files("fight")
 	if names.is_empty(): return
 	play(names[_rng.randi() % names.size()], -7.0)

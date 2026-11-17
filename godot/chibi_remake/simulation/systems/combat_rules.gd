@@ -1,12 +1,11 @@
 extends RefCounted
 const Progression = preload("res://simulation/systems/officer_progression.gd")
 
-const HERO_TYPES: Array = [29,31,33,35,52]
-const B_ATTACK_TYPES: Array = [18,19,33,34,39,42,44,45,46,48,49,52]
+const Roles = preload("res://simulation/definitions/unit_roles.gd")
 
 static func can_attack(unit: Dictionary) -> bool:
 	# 研究只改变计算值，不能给无武装的运输船增加攻击动作。
-	if int(unit.get("unit", -1)) == 47: return false
+	if Roles.is_transport(int(unit.get("unit", -1))): return false
 	return float(unit.get("atk_range", 0)) > 0 and (float(unit.get("attack", 0)) > 0 or float(unit.get("attack_b", 0)) > 0)
 
 static func ambush(unit:Dictionary) -> bool:
@@ -21,7 +20,7 @@ static func grade(officer: Dictionary) -> int:
 	return int(Progression.cell(officer).grade)
 
 static func hero(unit: Dictionary) -> bool:
-	return int(unit.get("unit", -1)) in HERO_TYPES and not unit.get("officer", {}).is_empty()
+	return Roles.is_hero(int(unit.get("unit", -1))) and not unit.get("officer", {}).is_empty()
 
 static func attack(unit: Dictionary, channel_b: bool = false) -> float:
 	var base := float(unit.get("attack_b" if channel_b else "attack", 0))

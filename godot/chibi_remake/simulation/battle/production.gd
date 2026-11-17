@@ -1,4 +1,6 @@
 extends RefCounted
+const Roles = preload("res://simulation/definitions/unit_roles.gd")
+const Balance = preload("res://simulation/definitions/balance_rules.gd")
 ## production: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
@@ -59,9 +61,9 @@ func _queue_train(owner: int, building: Dictionary, uid: int) -> bool:
 	var roster := train_types_for(int(building.unit), owner)
 	if not roster.any(func(opt): return int(opt.unit) == uid): return false
 	if services.technology._building_work_busy(building): return false
-	if owner != battle.player_owner and uid in [46,47] and battle.trainings.any(func(tr):return int(tr.get("owner",tr.b.owner))==owner and int(tr.unit) in [46,47]): return false
+	if owner != battle.player_owner and (uid == 46 or Roles.is_transport(uid)) and battle.trainings.any(func(tr):return int(tr.get("owner",tr.b.owner))==owner and (int(tr.unit) == 46 or Roles.is_transport(int(tr.unit)))): return false
 	var reserved := battle.trainings.filter(func(tr): return int(tr.get("owner", tr.b.owner)) == owner).size()
-	if _army_count(owner) + reserved >= 200: return false
+	if _army_count(owner) + reserved >= Balance.army_cap(): return false
 	var cost: Dictionary = services.ai_economy.ai_unit_cost(uid)
 	if not battle.economy.pay(owner, cost): return false
 	var hp := int(battle.map_data.units[str(uid)].hp)
