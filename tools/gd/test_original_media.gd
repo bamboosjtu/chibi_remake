@@ -53,9 +53,9 @@ func run() -> void:
 		await create_timer(0.05,true).timeout
 		if not media.active:break
 	assert(not media.active and callbacks==3 and not paused,"actual decoder end resumes game once")
-	paused=true
+	var prior: int=root.get_node("Game").pauses.acquire(b,"prior pause fixture")
 	assert(media.play_media("res://media/videos/LISHI.AVI"));media._finish_media();assert(paused)
-	paused=false
+	root.get_node("Game").pauses.release(prior)
 	assert(not media.play_media("res://media/videos/absent.AVI") and not paused)
 	print("ORIGINAL MEDIA LIFECYCLE PASS original LDAN result spans / natural finish / skip / one callback / load cancels / prior pause / missing file")
 	b.free();done=true;await process_frame;quit()

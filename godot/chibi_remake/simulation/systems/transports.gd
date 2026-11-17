@@ -25,19 +25,29 @@ func ship_for(unit: Dictionary) -> Dictionary:
 		if int(ship.uid)==uid and int(ship.unit)==Roles.transport_id():return ship
 	return {}
 
+## Derived carrier fields are projected without modifying authoritative unit records.
+static func snapshot_fields(units: Array) -> Dictionary:
+	var totals := {}; var fields := {}
+	for unit in units:
+		if not bool(unit.get("attached",false)): continue
+		if not bool(unit.get("alive",false)) or float(unit.get("die_t",-1)) >= 0:
+			fields[int(unit.uid)] = {"aboard_uid":-1}; continue
+		var uid := int(unit.get("aboard_uid",-1))
+		if not totals.has(uid): totals[uid] = {"n":0,"hp":0.0}
+		totals[uid].n += 1; totals[uid].hp += float(unit.hp)
+	for unit in units:
+		if not Roles.is_transport(int(unit.get("unit",-1))): continue
+		var total: Dictionary = totals.get(int(unit.uid),{"n":0,"hp":0.0})
+		if not fields.has(int(unit.uid)): fields[int(unit.uid)] = {}
+		fields[int(unit.uid)].merge({"carry_n":int(total.n),"carry_hp":float(total.hp),"loaded":int(total.n)>0})
+	return fields
+
 func reconcile() -> void:
-	var totals:={}
+	var fields := snapshot_fields(host.units)
 	for unit in host.units:
-		if not bool(unit.get("attached",false)):continue
-		if not bool(unit.alive) or float(unit.die_t)>=0:
-			unit.aboard_uid=-1;continue # 隐藏的死亡对象不保留船引用。
-		var uid:=int(unit.get("aboard_uid",-1))
-		if not totals.has(uid):totals[uid]={"n":0,"hp":0.0}
-		totals[uid].n+=1;totals[uid].hp+=float(unit.hp)
-	for ship in host.units:
-		if int(ship.unit)!=Roles.transport_id():continue
-		var total: Dictionary=totals.get(int(ship.uid),{"n":0,"hp":0.0})
-		ship.carry_n=int(total.n);ship.carry_hp=float(total.hp);ship.loaded=int(total.n)>0
+		var uid := int(unit.uid)
+		if not fields.has(uid): continue
+		for key in fields[uid]: unit[key] = fields[uid][key]
 
 func restore() -> void:
 	reconcile()

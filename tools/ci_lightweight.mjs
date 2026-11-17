@@ -6,7 +6,7 @@ import {runChecks} from './lib/ci_checks.mjs';
 const groups = {
   architecture: ['rule_constants_check', 'test_rule_constants_check', 'architecture_check', 'test_architecture_check', 'port_inventory', 'battle_access_inventory', 'test_battle_access_inventory'],
   registry: ['registry_check', 'test_registry_check'],
-  data: ['unit_schema_check', 'rules_manifest', 'data_check', 'test_scenario_generator', 'test_map_export_navigation', 'test_opening_forces'],
+  data: ['level_index', 'test_level_index', 'unit_schema_check', 'rules_manifest', 'data_check', 'test_scenario_generator', 'test_map_export_navigation', 'test_opening_forces'],
   docs: ['docs_lint', 'test_docs_lint', 'test_markdown_anchors'],
   repository: ['syntax_check', 'suite_check', 'test_suite_check', 'test_repository_policy', 'test_ci_checks'],
   tooling: ['test_engine_integrity', 'test_bootstrap', 'powershell_encoding', 'test_powershell_encoding',

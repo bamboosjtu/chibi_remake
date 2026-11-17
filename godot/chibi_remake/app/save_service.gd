@@ -5,10 +5,6 @@ var last_load_error := ""
 var last_load_source := "none"
 var _content_revision_cache := ""
 const UnitSchema = preload("res://simulation/definitions/unit_schema.gd")
-const ActionClock = preload("res://simulation/systems/action_clock.gd")
-const TickTimers = preload("res://simulation/systems/tick_timers.gd")
-const TechnologyState = preload("res://simulation/systems/technology_state.gd")
-
 func _init(h: Object) -> void:
 	host = h
 
@@ -142,8 +138,7 @@ func _valid_integer(value: Variant) -> bool:
 
 # ------------------------------------------------------------------- save ----
 ## 存档的"额外字段"（main.gd 的 `_save_extra()` 转发到这里）
-func save_extra(reconcile := true) -> Dictionary:
-	if reconcile: host.transports.reconcile()
+func save_extra() -> Dictionary:
 	var decor := {}
 	for key in host.decor_cells:
 		var target: Dictionary = host.decor_cells[key]
@@ -166,7 +161,7 @@ func save_extra(reconcile := true) -> Dictionary:
 
 ## Supplementary full-state digest; historical simulation baselines stay intact.
 func continuation_snapshot(game: Node) -> Dictionary:
-	var payload: Dictionary = game.snapshot(host.units,{"gold":host.gold,"wood":host.wood,"food":host.food,"stone":host.stone},save_extra(false))
+	var payload: Dictionary = game.snapshot(host.units,{"gold":host.gold,"wood":host.wood,"food":host.food,"stone":host.stone},save_extra())
 	for key in ["checksum","savedAt","saveName"]: payload.erase(key)
 	payload.simulation.erase("accumulator") # Wall-clock dispatch remainder, not per-tick state.
 	var occupied := {}

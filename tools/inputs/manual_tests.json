@@ -186,6 +186,12 @@
       "category": "wrapper",
       "reason": "Expected startup refusal and exit 1; isolated catalog faults must run through the wrapper.",
       "command": "node tools/test_rule_startup.mjs"
+    },
+    {
+      "script": "test_app_startup_failure",
+      "category": "wrapper",
+      "reason": "Expected application startup refusal and exit 1; run through isolated startup wrappers.",
+      "command": "node tools/test_portable_startup.mjs"
     }
   ]
 }

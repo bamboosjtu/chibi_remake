@@ -61,6 +61,24 @@
       "args": [
         "--noview"
       ]
+    },
+    {
+      "script": "test_pause_ownership",
+      "markers": [
+        "PAUSE OWNERSHIP PASS"
+      ],
+      "args": [
+        "--pause-unit-only"
+      ]
+    },
+    {
+      "script": "test_app_boundaries",
+      "markers": [
+        "APP BOUNDARIES PASS"
+      ],
+      "args": [
+        "--noview"
+      ]
     }
   ]
 }

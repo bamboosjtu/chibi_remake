@@ -12,11 +12,9 @@ var ports := Dependencies.new()
 const SceneServices = preload("res://app/battle_scene_state.gd")
 var scene: SceneServices
 var node: Node2D
-const RemasterArt = preload("res://presentation/battle/art_catalog.gd")
-const SaveSvc = preload("res://app/save_service.gd")    # ARCH-006：存档/读档编排
 const View = preload("res://presentation/battle/battle_view.gd")        # ARCH-013：表现层（HUD/相机/单位外观/框选）
 
-func _init(data: State, services: SceneServices, surface: Node2D) -> void:
+func _init(services: SceneServices, surface: Node2D) -> void:
 	scene = services
 	node = surface
 
@@ -114,7 +112,7 @@ func _save_game(slot := 0, title := "") -> bool:
 
 func _return_to_menu_after_load_failure() -> void:
 	if node.is_inside_tree():
-		node.get_tree().change_scene_to_file("res://menu.tscn")
+		Game.return_to_menu()
 
 func _schedule_failed_load_return() -> void:
 	scene.ready_to_save = false
@@ -135,7 +133,7 @@ func load_slot(slot: int) -> Dictionary:
 
 func _load_other_map(slot: int, map_id: String) -> Dictionary:
 	var tree: SceneTree = node.get_tree()
-	var previous := [Game.current_map,Game.pending_load,Game.pending_load_slot,Game.last_load_error,tree.paused]
+	var previous := [Game.current_map,Game.pending_load,Game.pending_load_slot,Game.last_load_error]
 	var candidate = load("res://main.tscn").instantiate()
 	candidate.scene.load_staging = true; candidate.scene.requested_map = map_id
 	Game.current_map = map_id; Game.pending_load = true; Game.pending_load_slot = slot
@@ -143,7 +141,7 @@ func _load_other_map(slot: int, map_id: String) -> Dictionary:
 	if not candidate.scene.ready_to_save:
 		var error := str(Game.last_load_error)
 		candidate.free()
-		Game.current_map = previous[0]; Game.pending_load = previous[1]; Game.pending_load_slot = previous[2]; Game.last_load_error = previous[3]; tree.paused = previous[4]
+		Game.current_map = previous[0]; Game.pending_load = previous[1]; Game.pending_load_slot = previous[2]; Game.last_load_error = previous[3]
 		return {"ok":false,"error":error if not error.is_empty() else "目标战场无法恢复；当前战场已保留。"}
 	candidate.scene.load_staging = false
 	scene.ready_to_save = false
@@ -151,7 +149,7 @@ func _load_other_map(slot: int, map_id: String) -> Dictionary:
 	if battle.player_commands != null: battle.player_commands.clear()
 	battle.effects.invalidate()
 	if scene.view != null and scene.view.event_view != null: scene.view.event_view.restore_history()
-	tree.current_scene = candidate; tree.paused = false
+	tree.current_scene = candidate; Game.pauses.release_scope(node)
 	node.queue_free()
 	return {"ok":true,"cross_map":true}
 

@@ -10,11 +10,10 @@ var ports := Dependencies.new()
 const SceneServices = preload("res://app/battle_scene_state.gd")
 var scene: SceneServices
 var node: Node2D
-const RemasterArt = preload("res://presentation/battle/art_catalog.gd")
 const SaveSvc = preload("res://app/save_service.gd")    # ARCH-006：存档/读档编排
 const View = preload("res://presentation/battle/battle_view.gd")        # ARCH-013：表现层（HUD/相机/单位外观/框选）
 
-func _init(data: State, services: SceneServices, surface: Node2D) -> void:
+func _init(services: SceneServices, surface: Node2D) -> void:
 	scene = services
 	node = surface
 

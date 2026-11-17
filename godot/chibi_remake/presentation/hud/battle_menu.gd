@@ -5,6 +5,7 @@ var overlay: ColorRect
 var status: Label
 var buttons: Array[Button] = []
 var is_open := false
+var pause_token := 0
 var leave_button: Button
 var panel: PanelContainer
 var menu_font: SystemFont
@@ -94,7 +95,7 @@ func open() -> void:
 	status.text = ""
 	leave_button.hide()
 	buttons[0].disabled = not Game.has_save()
-	get_tree().paused = true
+	if pause_token == 0: pause_token = Game.pauses.acquire(self, "battle menu")
 	buttons[0].grab_focus()
 
 func close() -> void:
@@ -102,12 +103,12 @@ func close() -> void:
 	_close_settings()
 	is_open = false
 	overlay.hide()
-	get_tree().paused = false
+	Game.pauses.release(pause_token); pause_token = 0
 
 func _input(event: InputEvent) -> void:
 	if host.view.briefing!=null and host.view.briefing.is_open:return
 	if is_instance_valid(slots_dialog) and slots_dialog.overlay.visible:return
-	if is_open and event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+	if is_open and Game.pauses.is_top(pause_token) and event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 		if settings_panel.visible: _close_settings()
 		else: close()
 		get_viewport().set_input_as_handled()
@@ -205,11 +206,8 @@ func quit_game() -> void:
 
 func _leave() -> void:
 	# change_scene removes the old scene immediately; do not call get_tree on it afterwards.
-	var tree := get_tree()
-	tree.paused = false
-	var error := tree.change_scene_to_file("res://menu.tscn")
+	var error := Game.return_to_menu()
 	if error != OK:
-		tree.paused = true
 		status.text = "无法返回主菜单（%d），请重试。" % error
 		return
 

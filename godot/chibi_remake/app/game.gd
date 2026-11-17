@@ -7,6 +7,7 @@ var campaign := CampaignSession.new()
 var repository := Repository.new(is_valid_save, can_rotate_save)
 var slot_catalog := Catalog.new(repository.read_slot, save_slot_path, SAVE_SLOTS)
 var startup_valid := false
+var pauses: Node
 var _rule_errors: Array = []
 
 var current_map: String:
@@ -61,8 +62,10 @@ func _init() -> void:
 	# Godot constructs the main scene before autoload _ready callbacks.
 	_rule_errors = preload("res://app/rules/rule_loader.gd").initialize()
 	if _rule_errors.is_empty(): _rule_errors = preload("res://app/rules/native_backend.gd").initialize()
+	if _rule_errors.is_empty(): _rule_errors = campaign.catalog.initialize()
 
 func _ready() -> void:
+	pauses = preload("res://app/pause_stack.gd").new(); add_child(pauses)
 	var acceptance := preload("res://app/acceptance_storage.gd").configure(storage, OS.get_cmdline_user_args())
 	if not acceptance.valid:
 		push_error(acceptance.error); get_tree().quit(1); return
@@ -117,6 +120,7 @@ func save_game(units: Array, resources: Dictionary = {}, extra: Dictionary = {},
 	return ok
 
 func snapshot(units: Array, resources: Dictionary, extra: Dictionary) -> Dictionary:
+	var derived := preload("res://simulation/systems/transports.gd").snapshot_fields(units)
 	var recs := []
 	var by_uid := {}
 	for unit in units: by_uid[int(unit.uid)] = unit
@@ -125,6 +129,7 @@ func snapshot(units: Array, resources: Dictionary, extra: Dictionary) -> Diction
 		var unregistered := UnitSchema.omissions(u)
 		assert(unregistered.is_empty(), "Register new unit fields before saving: " + str(unregistered))
 		var simulation := UnitSchema.snapshot_scalars(u)
+		simulation.merge(derived.get(int(u.uid),{}),true)
 		simulation["targetUid"] = int(u.target.get("uid", -1)) if u.get("target") is Dictionary else -1
 		# REQ-001：采集目标用**稳定引用**（单位 uid / 饰物格），不裸存对象。
 		var gobj = u.get("gather_obj", null)
@@ -297,9 +302,14 @@ func next_level(map_id: String) -> Dictionary:
 	return campaign.next_level(map_id)
 
 func advance_campaign(map_id: String) -> bool:
-	if not campaign.advance(map_id): return false
-	get_tree().paused=false
-	return get_tree().change_scene_to_file("res://main.tscn") == OK
+	var entry := campaign.next_level(map_id)
+	return not entry.is_empty() and change_battle(str(entry.map)) == OK
+
+func change_battle(map_id: String, slot := -1) -> Error:
+	return campaign.transition(map_id, get_tree().change_scene_to_file.bind("res://main.tscn"), slot)
+
+func return_to_menu() -> Error:
+	return campaign.leave(get_tree().change_scene_to_file.bind("res://menu.tscn"))
 
 func _exit_tree() -> void:
 	preload("res://simulation/native/math_kernel.gd").shutdown()

@@ -28,8 +28,12 @@ try {
             & node tools/godot_export.mjs godot/chibi_remake --map $med.BaseName --hd --hd-sprites
             if ($LASTEXITCODE -ne 0) { throw 'Level export failed' }
         }
+        & node tools/level_index.mjs --write
+        if ($LASTEXITCODE -ne 0) { throw 'Level index generation failed' }
         $sourceDirty=$sourceDirty -or @(& git -C $BuildRoot status --porcelain 2>$null).Count -gt 0
     }
+    & node tools/level_index.mjs
+    if ($LASTEXITCODE -ne 0) { throw 'Level index is stale' }
     $id=(Get-Date -Format 'yyyyMMdd_HHmmss')+'_'+[Guid]::NewGuid().ToString('N').Substring(0,8)
     & node tools/build_terrain.mjs --engine $godot
     if ($LASTEXITCODE -ne 0) { throw "Terrain source rebuild failed" }

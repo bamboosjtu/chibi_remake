@@ -1,5 +1,7 @@
 # 质量基线、状态与架构治理交付
 
+应用生命周期、暂停与保存查询整改见 `session-boundaries.md`、`session-boundaries-acceptance.json`；该记录区分本轮完成与仍保留的 P2。
+
 日期：2026-11-16（Asia/Shanghai）。工程起点：`23f112b7b89ebf939ee95d03ce6a82d4c3eddb27`。评审依据为 `tmp/review.md`，按本轮用户指定的 P0 → P1 → P2 → P3 顺序执行。
 
 本文件保留首轮基线；后续六项修复与新的验收记录见 `followup.md`、`followup-acceptance.json`。

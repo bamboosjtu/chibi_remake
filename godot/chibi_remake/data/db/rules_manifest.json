@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "files": {
-    "res://app/battle/bootstrap.gd": "c714235a14d29f177242a5d94737361ea5ee5f6bba0e4f940f09d7ce6fcd76b2",
+    "res://app/battle/bootstrap.gd": "c323438a83f8d82dd802199390ff23c55f82c13a1b334fd0e048595fa0936b99",
     "res://simulation/battle/abilities.gd": "9db696b3da7affb9bde2a813d32d013839fd4c9f7ec8fb10d65278dca1e643de",
     "res://simulation/battle/ai_economy.gd": "bcc7a8c95b0e1d81ca6b7a03a3214a6ea391fa66250fce383d36314b841aab92",
     "res://simulation/battle/ai_orders.gd": "9b4e4ca7f57f7c95743a17ac314b51cb2c73c7a38bb872aab68224af183e3e0a",
@@ -96,7 +96,7 @@
     "res://simulation/systems/stratagem_rules.gd": "8392a9342c8659ea38270a1f2c97397afe5ab2de236d0dba8d6d788ecf908449",
     "res://simulation/systems/technology_state.gd": "65def32b6d41e1ef393800bfb3de9f3f0179dd6d3e3fc0894f530c076a969a67",
     "res://simulation/systems/tick_timers.gd": "4c9e7378e905bb92b8bf7400dee5dadac66fa0d2b10d4a2e0dfafd4ef3c19608",
-    "res://simulation/systems/transports.gd": "cc059b3d181c4143b928a1280e93861efad92090e8581e3d27656db85232c3d6",
+    "res://simulation/systems/transports.gd": "cf27508b9dd95c396c367887fa715f389601dccdb64fb9b31c37d26e877bbfd1",
     "res://simulation/systems/unit_footprint.gd": "f4da18011f0aa614126f9334c460127044cd659f5633f55f60027c81ed459224",
     "res://simulation/systems/unit_rules.gd": "339710eff2ae84ffbaad0f17d6cdc2cba93d5606df10874814b9717d742cfca7"
   }

@@ -18,18 +18,46 @@ static func directories() -> Array[String]:
 
 ## Explicit opt-in: `<exe dir>/portable.txt` or `--portable` on the command line.
 static func portable_dir() -> String:
-	if "--storage-mode=system" in OS.get_cmdline_user_args(): return ""
+	var configured := portable_configuration()
+	if not configured.valid or str(configured.root).is_empty(): return ""
+	var username := OS.get_environment("USERNAME").validate_filename()
+	if username in ["", ".", ".."]: username = "player"
+	return str(configured.root).path_join(username)
+
+static func configuration_error() -> String:
+	var configured := portable_configuration()
+	return "" if configured.valid else str(configured.error)
+
+static func portable_configuration() -> Dictionary:
+	if "--storage-mode=system" in OS.get_cmdline_user_args(): return {"valid":true,"root":""}
 	var exe_dir := OS.get_executable_path().get_base_dir()
 	var root := ""
 	for argument in Array(OS.get_cmdline_user_args()) + Array(OS.get_cmdline_args()):
-		if str(argument).begins_with("--portable-root="): root = str(argument).substr(16)
+		if str(argument).begins_with("--portable-root="):
+			root = str(argument).substr(16)
+			if root.strip_edges().is_empty(): return {"valid":false,"error":"Portable root is empty"}
 	if root.is_empty() and FileAccess.file_exists(exe_dir.path_join("portable.txt")):
-		var configured := FileAccess.get_file_as_string(exe_dir.path_join("portable.txt")).strip_edges()
-		root = exe_dir.path_join(configured if not configured.is_empty() else "userdata").simplify_path()
+		root = FileAccess.get_file_as_string(exe_dir.path_join("portable.txt")).trim_prefix("\ufeff").strip_edges()
+		if root.is_empty(): root = "userdata"
 	if root.is_empty() and ("--portable" in OS.get_cmdline_user_args() or "--portable" in OS.get_cmdline_args()): root = exe_dir.path_join("userdata")
-	if root.is_empty(): return ""
-	var username := OS.get_environment("USERNAME").validate_filename()
-	return root.path_join(username if not username.is_empty() else "player")
+	return {"valid":true,"root":""} if root.is_empty() else resolve_portable_root(root,exe_dir)
+
+static func resolve_portable_root(value: String, executable_dir: String) -> Dictionary:
+	var normalized := value.strip_edges().replace("\\", "/")
+	var invalid := {"valid":false,"error":"Invalid portable root: use a local absolute path or an executable-relative directory without '..'"}
+	if normalized.is_empty() or normalized.begins_with("//") or normalized.contains("://"): return invalid
+	if normalized.split("/").has(".."): return invalid
+	for index in range(normalized.length()):
+		if normalized.unicode_at(index) < 32: return invalid
+	for character in ["<", ">", "\"", "|", "?", "*"]:
+		if normalized.contains(character): return invalid
+	var drive := RegEx.new(); drive.compile("^[A-Za-z]:/")
+	if normalized.contains(":") and (drive.search(normalized) == null or normalized.substr(2).contains(":")): return invalid
+	if executable_dir.length() > 1 and executable_dir[1] == ":" and normalized.begins_with("/"): return invalid
+	var resolved := normalized if normalized.is_absolute_path() else executable_dir.replace("\\", "/").path_join(normalized)
+	resolved = resolved.simplify_path().trim_suffix("/")
+	if resolved.is_empty() or resolved == "/" or (resolved.length() == 2 and resolved[1] == ":"): return invalid
+	return {"valid":true,"root":resolved}
 
 static func writable(directory: String) -> bool:
 	# Probe the nearest existing ancestor. Only JsonStore.commit creates the

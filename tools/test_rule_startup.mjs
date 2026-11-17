@@ -21,6 +21,7 @@ for(const file of files){
 }
 const names=['unit_definitions','production_units','buildings','unit_tuning','officers','officer_progression','command_variants','scenario_rules','native_math','tech','unit_roles','balance'];
 const original=Object.fromEntries(names.map(name=>[name,fs.readFileSync(path.join(source,'data/db',name+'.json'))]));
+const levelIndex=fs.readFileSync(path.join(source,'data/db/level_index.json'));
 const nativeFile='simulation/native/bin/ChibiSimulationMath.dll';
 const nativeAvailable=process.platform==='win32'&&fs.existsSync(path.join(source,nativeFile));
 const digest=bytes=>crypto.createHash('sha256').update(bytes).digest('hex');
@@ -28,6 +29,7 @@ const nativeDigest=nativeAvailable?digest(fs.readFileSync(path.join(source,nativ
 const write=(name,value)=>fs.writeFileSync(path.join(project,'data/db',name+'.json'),value);
 const restore=()=>{
  for(const [name,bytes] of Object.entries(original))write(name,bytes);
+ write('level_index',levelIndex);
  if(nativeAvailable){
   const target=path.join(project,nativeFile);
   if(fs.existsSync(target))fs.unlinkSync(target);
@@ -44,6 +46,10 @@ const cases=[
  {name:'cross-reference',change:()=>{const value=JSON.parse(original.unit_roles);value.workers.push(999);write('unit_roles',JSON.stringify(value));},errors:['invalid unit or officer reference']},
  {name:'scene-refuses-invalid',scene:'res://main.tscn',change:()=>write('unit_tuning','{}'),
   markers:['Rule startup failed:','unit_tuning.json: invalid required gameplay fields'],errors:['Rule startup failed:']},
+ {name:'level-index-missing',script:'test_app_startup_failure',change:()=>fs.unlinkSync(path.join(project,'data/db/level_index.json')),
+  markers:['APP STARTUP FAILURE PASS','level_index.json: invalid'],errors:['level_index.json: invalid']},
+ {name:'level-index-invalid',script:'test_app_startup_failure',change:()=>write('level_index','{"schemaVersion":1,"levels":[],"order":[]}'),
+  markers:['APP STARTUP FAILURE PASS','level_index.json: invalid'],errors:['level_index.json: invalid']},
 ];
 if(nativeAvailable)cases.push({name:'script-fallback',script:'test_rule_catalog',markers:['RULE CATALOG PASS'],
  args:['--rules-expect-script'],change:()=>fs.unlinkSync(path.join(project,nativeFile))},{
@@ -69,5 +75,6 @@ for(const test of cases){
 restore();
 for(const [name,bytes] of Object.entries(original))assert.equal(digest(fs.readFileSync(path.join(source,'data/db',name+'.json'))),digest(bytes),'Source rules modified: '+name);
 if(nativeAvailable)assert.equal(digest(fs.readFileSync(path.join(source,nativeFile))),nativeDigest,'Source backend modified');
+assert.equal(digest(fs.readFileSync(path.join(source,'data/db/level_index.json'))),digest(levelIndex),'Source level index modified');
 assert(results.every(result=>result.ok),'Rule startup fixture failed; inspect '+directory);
 console.log('RULE STARTUP PASS isolated startup faults / aggregate diagnostics / no partial publication / files removed after startup / original catalogs unchanged');

@@ -2,12 +2,10 @@ extends Node2D
 ## Battle composition root. Rules and state live in composed services.
 const Config = preload("res://simulation/battle_config.gd")
 const CombatRules = preload("res://simulation/systems/combat_rules.gd")
-const SPEED = Config.SPEED
-const ActionClock = preload("res://simulation/systems/action_clock.gd")
 const UnitFootprint = preload("res://simulation/systems/unit_footprint.gd")
+const SPEED = Config.SPEED
 const SIM_DT = Config.SIM_DT
 const SIM_MAX_CATCHUP = Config.SIM_MAX_CATCHUP
-const Progression = preload("res://simulation/systems/officer_progression.gd")
 const PRODUCE_BY_BUILDING = Config.PRODUCE_BY_BUILDING
 const DEPOSIT_UNITS = Config.DEPOSIT_UNITS
 const GATHER_TICKS = Config.GATHER_TICKS
@@ -76,10 +74,10 @@ func _init() -> void:
 
 func _wire_world() -> void:
 	_modules = world.module_view().duplicate()
-	if not _application_services.has("bootstrap"): _application_services["bootstrap"] = preload("res://app/battle/bootstrap.gd").new(state, scene, self)
-	if not _application_services.has("cheat_controller"): _application_services["cheat_controller"] = preload("res://app/battle/cheat_controller.gd").new(state, scene, self)
-	if not _application_services.has("duel_controller"): _application_services["duel_controller"] = preload("res://app/battle/duel_controller.gd").new(state, scene, self)
-	if not _application_services.has("scene_controller"): _application_services["scene_controller"] = preload("res://app/battle/scene_controller.gd").new(state, scene, self)
+	if not _application_services.has("bootstrap"): _application_services["bootstrap"] = preload("res://app/battle/bootstrap.gd").new(scene, self)
+	if not _application_services.has("cheat_controller"): _application_services["cheat_controller"] = preload("res://app/battle/cheat_controller.gd").new(scene, self)
+	if not _application_services.has("duel_controller"): _application_services["duel_controller"] = preload("res://app/battle/duel_controller.gd").new(scene, self)
+	if not _application_services.has("scene_controller"): _application_services["scene_controller"] = preload("res://app/battle/scene_controller.gd").new(scene, self)
 	_modules.merge(_application_services)
 	_modules.make_read_only()
 	var report: Dictionary = world.connect_services("main", commands.port_objects(), _application_services)

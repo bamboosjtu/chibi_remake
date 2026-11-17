@@ -244,6 +244,19 @@
         "CONTEXT READ MODELS PASS"
       ],
       "timeout": 120
+    },
+    {
+      "script": "test_pause_ownership",
+      "markers": [
+        "PAUSE OWNERSHIP PASS",
+        "PAUSE MODALS PASS"
+      ]
+    },
+    {
+      "script": "test_app_boundaries",
+      "markers": [
+        "APP BOUNDARIES PASS"
+      ]
     }
   ]
 }

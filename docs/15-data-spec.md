@@ -12,6 +12,7 @@
 | `data/db/officers.json` | 117 名武将 |
 | `data/db/officer_progression.json` | 武将经验阈值、官职品级、53 类经验/士气奖励 |
 | `data/db/command_variants.json` | 将本体、成员、未编组与运输船的面板分型 |
+| `data/db/level_index.json` | 从关卡与任务表生成的菜单名称、对象数和战役顺序；不参与模拟规则指纹 |
 | `data/db/startup_briefings.json` | 34 关 MISSION.EXT 任务标题与开场白 |
 | `data/db/commands.json` | 命令注册表、面板槽位、热键、图标帧 |
 | `data/db/cursors.json` | 光标图集、热点、状态与动画 |

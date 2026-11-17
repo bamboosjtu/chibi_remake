@@ -14,7 +14,7 @@ var text := ""
 var matched := 0
 var console: CanvasLayer
 
-func _init(data: State, services: Services, surface: Node2D) -> void:
+func _init(services: Services, surface: Node2D) -> void:
 	scene = services
 	node = surface
 
@@ -96,11 +96,7 @@ func _cheat_level(direction: int) -> void:
 	if target == "":
 		ports.feedback("当前战役没有%s关" % ("上一" if direction < 0 else "下一"))
 		return
-	game.current_map = target
-	game.pending_load = false
-	game.pending_load_slot = 0
-	node.get_tree().paused = false
-	node.get_tree().change_scene_to_file.call_deferred("res://main.tscn")
+	game.change_battle.call_deferred(target)
 
 func _cheat_adjacent_level(levels: Array, current: String, direction: int) -> String:
 	for i in range(levels.size()):

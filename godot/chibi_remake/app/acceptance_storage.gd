@@ -1,6 +1,9 @@
 extends RefCounted
 ## Acceptance runs can only write a child namespace of the resolved save root.
 static func configure(storage: RefCounted, args: PackedStringArray) -> Dictionary:
+	if storage.has_method("configuration_error"):
+		var error: String = storage.configuration_error()
+		if not error.is_empty(): return {"valid":false,"error":error}
 	var testing := "--selftest" in args
 	var test_id := ""
 	for argument in args:

@@ -7,6 +7,7 @@ var startup_map_consumed := false
 var startup_load_consumed := false
 var startup_video_seen := false
 var last_load_error := ""
+var catalog := preload("res://app/level_catalog.gd").new()
 
 static func campaign_caption(id: String) -> String:
 	var campaign := "刘备战役" if id.begins_with("chibil") else "曹操战役"
@@ -34,43 +35,36 @@ static func is_level_doc(d) -> bool:
 	return true
 
 func list_levels() -> Array:
-	var out := []
-	var da := DirAccess.open("res://data")
-	if da == null:
-		return out
-	for fn in da.get_files():
-		if not fn.ends_with(".json"):
-			continue
-		var f := FileAccess.open("res://data/" + fn, FileAccess.READ)
-		if f == null:
-			continue
-		var head = JSON.parse_string(f.get_as_text())
-		f.close()
-		# ARCH-005：坏 JSON / 数据库文件 / 缺图字段一律不能成为可点击关卡
-		if not is_level_doc(head):
-			push_warning("list_levels: 跳过 data/%s（不是有效关卡）" % fn)
-			continue
-		out.append({
-			"id": fn.get_basename(),
-			"name": str(head.get("name", fn)),
-			"objects": (head.get("objects", []) as Array).size(),
-		})
-	out.sort_custom(func(a, b): return str(a.id) < str(b.id))
-	return out
+	return catalog.levels()
 
-## BATTLE.EXP order, including both Liu Bei 7a/7b chapters. Never cross campaigns.
+## Campaign progression follows the generated BATTLE.EXP order, including 7a/7b.
 func next_level(map_id: String) -> Dictionary:
-	var catalog: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/db/startup_briefings.json"))
-	var levels: Array = catalog.get("levels", [])
-	for i in range(levels.size()-1):
-		if str(levels[i].map) == map_id and str(levels[i].campaign) == str(levels[i+1].campaign):
-			return levels[i+1]
-	return {}
+	return catalog.next_level(map_id)
 
 func advance(map_id: String) -> bool:
 	var entry := next_level(map_id)
 	if entry.is_empty(): return false
-	current_map=str(entry.map)
-	pending_load=false
-	pending_load_slot=0
+	_select(str(entry.map), -1)
 	return true
+
+func transition(map_id: String, change_scene: Callable, slot := -1) -> Error:
+	if not catalog.contains(map_id): return ERR_INVALID_PARAMETER
+	return _change(map_id,change_scene,slot)
+
+func leave(change_scene: Callable) -> Error:
+	return _change(current_map,change_scene,-1,false)
+
+func _change(map_id: String, change_scene: Callable, slot: int, clear_error := true) -> Error:
+	if not change_scene.is_valid(): return ERR_INVALID_PARAMETER
+	var previous := [current_map, pending_load, pending_load_slot, last_load_error]
+	_select(map_id, slot)
+	if clear_error: last_load_error = ""
+	var error := int(change_scene.call())
+	if error != OK:
+		current_map = previous[0]; pending_load = previous[1]
+		pending_load_slot = previous[2]; last_load_error = previous[3]
+	return error as Error
+
+func _select(map_id: String, slot: int) -> void:
+	current_map = map_id; pending_load = slot >= 0
+	pending_load_slot = maxi(0, slot)

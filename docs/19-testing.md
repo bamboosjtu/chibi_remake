@@ -78,10 +78,11 @@ SIMTEST: 15.0s tick=450 digest=<FNV-1a>
 | 研究规则集成 | `test_research_rules`：三层指令、34 关开场白、1170 组武将属性、奖励/晋升边界、存读档 |
 | 移动质量 | `test_movement_quality`：完整步长、避墙/避资源的直线路径、显示插值、动画节拍、队伍独立落点 |
 | AI | `test_ai_planning`、`test_ai_policy`、`test_ai_slots`、`test_l1_assault`、`test_ai_research` |
-| 水战与载员 | `test_transports`、`test_unload_state`、`test_naval_casualty_save` |
+| 水战与载员 | `test_transports`（核心交互）、`test_transport_worlds`（11 图）、`test_unload_state`、`test_naval_casualty_save` |
 | 战斗与弹体 | `test_projectiles`、`test_action_clock`、`test_action_lifecycle`、`test_duel`、`test_visibility_rules` |
 | 导航与占格 | `test_spatial_rules`、`test_unit_footprint`、`test_unit_collision`、`test_unit_index`、`test_nav_invalidation`、`test_automatic_gates` |
 | 任务与胜负 | `test_scenario_end`、`test_architecture` |
+| 应用生命周期 | `test_pause_ownership`、`test_app_boundaries`、`test_portable_startup.mjs`：暂停所有权、退出清理、世界回滚、索引缓存、场景切换失败、只读快照与便携配置拒绝 |
 | 存档与时钟 | `test_architecture`、`test_tick_timers`、`test_clock`、`test_clock_ui`、`test_m0` |
 | 界面与光标 | `test_input_research`、`test_cmd_paging`、`test_battle_interaction`、`test_hud_metrics` |
 | 表现与素材 | `test_texture_states`、`test_chibil1_presentation`、`verify_full_art`、`verify_architecture_view` |
@@ -91,9 +92,9 @@ SIMTEST: 15.0s tick=450 digest=<FNV-1a>
 
 ## 6. 人工验收与候选冒烟
 
-构建会在导出后自动对候选包运行下面的四项冒烟、全部地图加载及两档确定性基线，失败即构建失败；发布重新校验证据覆盖与产物哈希，不会把它标记为人工验收通过。画面、手感与关卡的最终验收仍由人工完成。
+构建会在导出后自动对候选包运行下面的基础冒烟、全部已登记 release 用例、全部地图加载及两档确定性基线，失败即构建失败；发布重新校验证据覆盖与产物哈希，不会把它标记为人工验收通过。画面、手感与关卡的最终验收仍由人工完成。
 
-`release_tests.json` 的四项冒烟：
+`release_tests.json` 的基础冒烟入口：
 
 | 脚本 | 范围 |
 |---|---|

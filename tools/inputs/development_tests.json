@@ -36,12 +36,10 @@
         "TRANSPORT AI PASS carried units excluded from assault-intercept-rally / focus and threats / manifest remains valid",
         "TRANSPORT LAND PASS water-layer sailing / mixed selection / occupied coast / pending unload save / retry / partial save /16 unique land cells / cargo retained",
         "TRANSPORT TECH-HP PASS upgraded hp>maxhp boards / damaged / in-cargo upgrade / inflight HP rejected",
-        "TRANSPORT SNAPSHOT PASS current manifest atomic / exact counts / HQ HP sync / passenger death / sink all / ship removed / no resurrection",
-        "TRANSPORT MAP PASS",
-        "TRANSPORT WORLDS PASS 11 naval maps / actual coastline / board / loaded snapshot / unique landing"
+        "TRANSPORT SNAPSHOT PASS current manifest atomic / exact counts / HQ HP sync / passenger death / sink all / ship removed / no resurrection"
       ],
       "args": [],
-      "timeout": 190
+      "timeout": 90
     },
     {
       "script": "test_projectiles",
@@ -657,6 +655,24 @@
       "args": [
         "--noview"
       ]
+    },
+    {
+      "script": "test_transport_worlds",
+      "markers": [
+        "TRANSPORT MAP PASS chibic10",
+        "TRANSPORT MAP PASS chibic11",
+        "TRANSPORT MAP PASS chibic12",
+        "TRANSPORT MAP PASS chibic13",
+        "TRANSPORT MAP PASS chibic16",
+        "TRANSPORT MAP PASS chibic17",
+        "TRANSPORT MAP PASS chibil10",
+        "TRANSPORT MAP PASS chibil11",
+        "TRANSPORT MAP PASS chibil12",
+        "TRANSPORT MAP PASS chibil13",
+        "TRANSPORT MAP PASS chibil16",
+        "TRANSPORT WORLDS PASS"
+      ],
+      "timeout": 100
     }
   ]
 }

@@ -339,10 +339,7 @@ func _on_history() -> void:
 	if _ui.media_view!=null:_ui.media_view.play_media("res://media/videos/LISHI.AVI")
 
 func _on_level(id: String) -> void:
-	Game.current_map = id
-	Game.pending_load = false
-	Game.pending_load_slot = 0
-	surface.get_tree().change_scene_to_file("res://main.tscn")
+	if Game.change_battle(id) != OK: surface._show_toast("关卡无法载入，请重试。")
 
 func _on_load() -> void:
 	if _ui.slots_dialog==null:
@@ -359,9 +356,4 @@ func _load_slot(slot: int, _title: String) -> void:
 	if not FileAccess.file_exists("res://data/%s.json" % id):
 		_ui.slots_dialog.show_error("存档对应的关卡已不存在")
 		return
-	if int(d.get("v", 1)) < 2:
-		_show_toast("旧版存档（v%d），正在尽量恢复……" % int(d.get("v", 1)))
-	Game.current_map = id
-	Game.pending_load = true
-	Game.pending_load_slot = slot
-	surface.get_tree().change_scene_to_file("res://main.tscn")
+	if Game.change_battle(id,slot) != OK: surface._show_toast("进度无法载入，当前菜单已保留。")

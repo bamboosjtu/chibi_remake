@@ -5,9 +5,11 @@ var done:=false
 const MAPS:=["chibic10","chibic11","chibic12","chibic13","chibic16","chibic17","chibil10","chibil11","chibil12","chibil13","chibil16"]
 
 func _initialize() -> void:
-	create_timer(180).timeout.connect(func():
+	create_timer(case_timeout()).timeout.connect(func():
 		if not done:quit(1))
 	run.call_deferred()
+
+func case_timeout() -> float: return 90.0
 
 func open_battle(map_id: String) -> void:
 	if b!=null:b.free()
@@ -279,17 +281,17 @@ func run() -> void:
 	var sunk:=snapshot();assert(b.saver.apply_snapshot(sunk))
 	assert(people.slice(0,16).all(func(uid):return find(uid).die_t>=0 or not find(uid).alive))
 	print("TRANSPORT SNAPSHOT PASS current manifest atomic / exact counts / HQ HP sync / passenger death / sink all / ship removed / no resurrection")
-	# 所有11张有初始水军的地图都跑岸边装载/卸载与存读，不将单图测试称为全水战通关。
-	for map_id in MAPS:
-		open_battle(map_id);pair=shore_pair();sea=pair[0];land=pair[1]
-		ship=spawn(47,b.nav.anchor_of(sea.x,sea.y));ship_uid=int(ship.uid)
-		var unit:=spawn(32,b.nav.anchor_of(land.x,land.y));var uid: int=unit.uid
-		b.selected=[unit];assert(b.commands.orders._order_board(ship)==1);b.commands.orders._step_unit(unit,b.SIM_DT)
-		assert(unit.attached and b.saver.apply_snapshot(snapshot()))
-		ship=find(ship_uid);unit=find(uid)
-		assert(b.commands.orders._order_unload(ship,b.nav.anchor_of(land.x,land.y))==1)
-		for tick in range(4): b.commands.orders._step_unit(ship,b.SIM_DT)
-		assert(not unit.attached)
-		print("TRANSPORT MAP PASS ",map_id)
-	print("TRANSPORT WORLDS PASS 11 naval maps / actual coastline / board / loaded snapshot / unique landing")
 	done=true;b.queue_free();await process_frame;quit(0)
+
+func check_world(map_id: String) -> void:
+	open_battle(map_id)
+	var pair := shore_pair(); var sea: Vector2i = pair[0]; var land: Vector2i = pair[1]
+	var ship := spawn(47,b.nav.anchor_of(sea.x,sea.y)); var ship_uid := int(ship.uid)
+	var unit := spawn(32,b.nav.anchor_of(land.x,land.y)); var uid := int(unit.uid)
+	b.selected=[unit];assert(b.commands.orders._order_board(ship)==1);b.commands.orders._step_unit(unit,b.SIM_DT)
+	assert(unit.attached and b.saver.apply_snapshot(snapshot()))
+	ship=find(ship_uid);unit=find(uid)
+	assert(b.commands.orders._order_unload(ship,b.nav.anchor_of(land.x,land.y))==1)
+	for tick in range(4): b.commands.orders._step_unit(ship,b.SIM_DT)
+	assert(not unit.attached)
+	print("TRANSPORT MAP PASS ",map_id)
