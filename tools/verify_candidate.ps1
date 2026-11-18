@@ -26,8 +26,6 @@ try {
     if ($LASTEXITCODE -ne 0) { throw "Candidate map loading failed: $output" }
     . (Join-Path $PSScriptRoot 'engine_environment.ps1')
     $sourceEngine=Resolve-ChibiEngine $projectRoot
-    & node (Join-Path $PSScriptRoot 'verify_engine.mjs') --engine $sourceEngine
-    if ($LASTEXITCODE -ne 0) { throw 'Candidate debug engine integrity check failed' }
     Copy-Item -LiteralPath $sourceEngine -Destination $engine
     # Assertions enabled; native DLLs resolve beside this owned temporary engine.
     & node (Join-Path $PSScriptRoot 'run_regressions.mjs') --engine $engine --pack $pack --suite (Join-Path $PSScriptRoot 'inputs/release_tests.json') --baselines --output (Join-Path $output 'regressions')

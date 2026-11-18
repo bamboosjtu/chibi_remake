@@ -21,11 +21,8 @@ if (!$SkipArtCheck -and (Test-Path 'godot/chibi_remake/art/full/manifest.json'))
 $env:APPDATA=Join-Path $root '_work/ci/appdata'
 $env:LOCALAPPDATA=Join-Path $root '_work/ci/localappdata'
 New-Item -ItemType Directory -Force $env:APPDATA,$env:LOCALAPPDATA | Out-Null
-$godot=Join-Path $root 'Godot_v4.7.2-stable_win64.exe'
-if (!(Test-Path -LiteralPath $godot)) { $godot=(Get-Command godot.exe -ErrorAction Stop).Source }
-node tools/verify_engine.mjs --engine $godot
-if ($LASTEXITCODE -ne 0) { throw 'Engine integrity check failed' }
-if (!(Test-Path $godot)) { throw '缺少 Godot 引擎：Godot_v4.7.2-stable_win64_console.exe' }
+. (Join-Path $PSScriptRoot 'engine_environment.ps1')
+$godot=Resolve-ChibiEngine $root
 
 foreach ($test in @('test_package_safety.ps1','test_package_join.ps1','test_publish.ps1','test_candidate_lock.ps1','test_benchmark_evidence.ps1')) {
     & (Join-Path $PSScriptRoot $test)

@@ -20,7 +20,7 @@ GitHub Actions 的 `contracts` 把架构、注册表、数据、文档、仓库�
 
 ```powershell
 $env:APPDATA = (Resolve-Path "_work\godot_appdata").Path
-.\Godot_v4.7.2-stable_win64_console.exe --headless --path godot/chibi_remake `
+.\Godot_v4.7.2-stable_win64.exe --headless --path godot/chibi_remake `
   res://main.tscn -- --map=CHIBIC1 --selftest
 ```
 
@@ -36,7 +36,7 @@ $env:APPDATA = (Resolve-Path "_work\godot_appdata").Path
 ## 3. 模拟摘要
 
 ```powershell
-.\Godot_v4.7.2-stable_win64_console.exe --headless --path godot/chibi_remake `
+.\Godot_v4.7.2-stable_win64.exe --headless --path godot/chibi_remake `
   res://main.tscn -- --map=chibic1 --simtest=15
 ```
 
@@ -54,7 +54,7 @@ SIMTEST: 15.0s tick=450 digest=<FNV-1a>
 ## 4. 独立回归
 
 ```powershell
-.\Godot_v4.7.2-stable_win64_console.exe --headless --path godot/chibi_remake `
+.\Godot_v4.7.2-stable_win64.exe --headless --path godot/chibi_remake `
   --script tools/gd/test_economy_rules.gd -- --no-intro --noview
 ```
 

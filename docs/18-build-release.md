@@ -84,7 +84,7 @@ release/
 
 ## 7. 本地试玩与发布打包
 
-GitHub Actions 运行两个工作流：`contracts` 做不依赖引擎与 LFS 的静态契约（注册表、分层、素材白名单），`ci` 做语法校验和不依赖 LFS 的 Godot 第一关冒烟；两者都不构建、不打包、不发布。统一入口 `tools/release.ps1` 提供两个模式：
+GitHub Actions 配置三个工作流。`contracts` 检查静态契约和输入声明。`ci` 检查语法、34 图启动、固定摘要、存档和四图续跑，并为地形冒烟检查拉取两项 LFS 源图。按需触发的 `release-regressions` 使用运行素材执行发布套件。统一入口 `tools/release.ps1` 提供两个模式。
 
 ```powershell
 # 试玩：构建并安装到 release/versions，允许未提交改动

@@ -35,8 +35,6 @@ if (!$DeveloperSource -and !$ReleasePack) {
     $ReleasePack=Join-Path (Join-Path $root 'release') ($pointer.directory+'/ChibiRTS.pck')
 }
 $engine = Resolve-ChibiEngine $root
-& node tools/verify_engine.mjs --engine $engine
-if ($LASTEXITCODE -ne 0) { throw 'Unreviewed benchmark engine' }
 $output = if ($Output) { [IO.Path]::GetFullPath($Output) } else { Join-Path $root ('_work/bench/full-battle-' + (Get-Date -Format 'yyyyMMdd-HHmmss') + '.json') }
 New-Item -ItemType Directory -Force (Split-Path $output -Parent) | Out-Null
 $arguments = '--path godot/chibi_remake --script "' + (Join-Path $root 'tools/gd/bench_full_battle.gd') + '" -- --no-intro --save-test-id=full-battle-bench --bench-map=' + $Map + ' --bench-units=' + $Units + ' --bench-engage=' + $Engage + ' --bench-ticks=' + $Ticks + ' --bench-frames=' + $Frames + ' --bench-output="' + $output + '"'

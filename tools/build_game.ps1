@@ -15,8 +15,6 @@ try {
     if ($NoOriginalMedia) { $env:CHIBI_NO_ORIGINAL_MEDIA='1' } else { Remove-Item Env:CHIBI_NO_ORIGINAL_MEDIA -ErrorAction SilentlyContinue }
     . (Join-Path $PSScriptRoot 'engine_environment.ps1')
     $godot=Resolve-ChibiEngine $BuildRoot
-    & node tools/verify_engine.mjs --engine $godot
-    if ($LASTEXITCODE -ne 0) { throw 'Engine integrity check failed' }
     & node tools/verify_engine.mjs --platform win32_release --engine (Join-Path $BuildRoot '_work/build/roaming/Godot/export_templates/4.7.2.stable/windows_release_x86_64.exe')
     if ($LASTEXITCODE -ne 0) { throw 'Export template integrity check failed' }
     if (!$SkipData) {

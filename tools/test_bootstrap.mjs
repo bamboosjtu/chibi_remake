@@ -6,6 +6,7 @@
 //   · 构建参数不合法/不存在 → 非零（绝不静默装作构建成功）
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 
 const REPO = process.cwd();
@@ -15,12 +16,17 @@ fs.rmSync(sandbox, { recursive: true, force: true });
 fs.mkdirSync(sandbox, { recursive: true });
 
 // 复制仓库侧的 bootstrap + manifest，沙箱内摆结果目录结构
-fs.copyFileSync(BOOT, path.join(sandbox, 'bootstrap.mjs'));
 fs.mkdirSync(path.join(sandbox, 'tools/inputs'), { recursive: true });
+fs.copyFileSync(BOOT, path.join(sandbox, 'tools/bootstrap.mjs'));
 fs.copyFileSync(path.join(REPO, 'tools/inputs/manifest.json'), path.join(sandbox, 'tools/inputs/manifest.json'));
 
-// 引擎桩：沙箱里放一个假 Godot exe，避免依赖本机安装
-fs.writeFileSync(path.join(sandbox, 'Godot_v4.7.2-stable_win64_console.exe'), 'stub');
+fs.mkdirSync(path.join(sandbox, 'tools/lib'), { recursive: true });
+fs.copyFileSync(path.join(REPO, 'tools/lib/reviewed_engine.mjs'), path.join(sandbox, 'tools/lib/reviewed_engine.mjs'));
+const engineName = process.platform === 'win32' ? 'Godot_v4.7.2-stable_win64.exe' : 'Godot_v4.7.2-stable_linux.x86_64';
+const engine = path.join(sandbox, engineName);
+fs.writeFileSync(engine, 'stub');
+const sha256 = crypto.createHash('sha256').update('stub').digest('hex');
+fs.writeFileSync(path.join(sandbox, 'tools/inputs/engines.json'), JSON.stringify({version:'fixture', sha256:{[process.platform]:sha256}}));
 
 function fabricate() {
 	fs.mkdirSync(path.join(sandbox, 'tools/inputs'), { recursive: true });
@@ -41,10 +47,10 @@ function fabricate() {
 
 fabricate();
 fs.writeFileSync(path.join(sandbox,'tools/inputs/runtime_assets.sha256'),'fixture\n');
-function run(args) {
-	const r = spawnSync(process.execPath, ['bootstrap.mjs', ...args], {
+function run(args, engineOverride = '') {
+	const r = spawnSync(process.execPath, ['tools/bootstrap.mjs', ...args], {
 		cwd: sandbox, encoding: 'utf8',
-		env: { ...process.env, CHIBI_GODOT_TEMPLATES: path.join(REPO, '_tools/template_stub') },
+		env: { ...process.env, CHIBI_GODOT_ENGINE: engineOverride, CHIBI_GODOT_TEMPLATES: path.join(REPO, '_tools/template_stub') },
 	});
 	return { code: r.status, out: (r.stdout || '') + (r.stderr || '') };
 }
@@ -60,6 +66,12 @@ const expect = (cond, msg) => { if (!cond) { ok = false; console.error('TEST FAI
 let r = run(['--check']);
 expect(r.code === 0, '输入齐全应为 0：' + r.out);
 expect(r.out.includes('BOOTSTRAP OK: 全部输入就位'), '应有全绿行');
+expect(run(['--check'], engine).code === 0, '审核引擎允许通过环境变量提供');
+expect(run(['--check'], 'missing-engine').code !== 0, '显式无效的引擎路径必须被拒绝');
+fs.writeFileSync(engine, 'tampered');
+r = run(['--check']);
+expect(r.code !== 0 && r.out.includes('Engine differs'), '引擎字节必须通过哈希验证');
+fs.writeFileSync(engine, 'stub');
 
 // 2) 缺 hd → 非零 + MISSING 行带指引
 fs.rmSync(path.join(sandbox, '_work/hd'), { recursive: true, force: true });

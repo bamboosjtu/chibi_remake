@@ -5,9 +5,9 @@
     {
       "id": "godot",
       "kind": "engine",
-      "path": "Godot_v4.7.2-stable_win64_console.exe",
+      "path": "Godot_v4.7.2-stable_win64.exe",
       "role": "provide",
-      "hint": "仓库根目录的 Godot 4.7.2 控制台版引擎（编辑器/导出/自检共用）。"
+      "hint": "Godot 4.7.2 引擎须匹配 engines.json。依次查找 CHIBI_GODOT_ENGINE、仓库根目录和 PATH。"
     },
     {
       "id": "templates",

@@ -15,6 +15,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import {resolveEngine, verifyEngine} from './lib/reviewed_engine.mjs';
 
 const ROOT = process.cwd();
 const MANIFEST = 'tools/inputs/manifest.json';
@@ -76,7 +77,16 @@ for (const entry of manifest.inputs) {
 		continue;
 	}
 	let entryOk = fs.existsSync(path.join(ROOT, base));
-	if (entryOk) {
+	if (entry.kind === 'engine') {
+		try {
+			hit = resolveEngine(ROOT);
+			console.log(verifyEngine(hit));
+			entryOk = true;
+		} catch (error) {
+			console.error('BOOTSTRAP CHECK: ' + error.message);
+			entryOk = false;
+		}
+	} else if (entryOk) {
 		if (entry.requireFile) {
 			hit = fs.existsSync(path.join(ROOT, base, entry.requireFile)) ? entry.requireFile : null;
 			entryOk = hit !== null;
@@ -87,9 +97,6 @@ for (const entry of manifest.inputs) {
 			hit = matchAny(base, entry.requireAnyDir, true);
 			entryOk = hit !== null;
 		}
-	} else if (entry.kind === 'engine') {
-		hit = 'engine exe';
-		entryOk = fs.existsSync(path.join(ROOT, 'Godot_v4.7.2-stable_win64_console.exe'));
 	}
 	// dec：有快照则强校验（内容哈希，防外部工件悄悄变味——R-04）
 	if (entry.id === 'dec' && entry.hashFile && fs.existsSync(path.join(ROOT, entry.hashFile)) && entryOk) {		const snapshot = fs.readFileSync(path.join(ROOT, entry.hashFile), 'utf8').trim().split(/\r?\n/);

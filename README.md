@@ -13,7 +13,7 @@
 ## 运行
 
 ```powershell
-.\Godot_v4.7.2-stable_win64_console.exe --path godot/chibi_remake
+.\Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake
 ```
 
 双击 `release/ChibiRTS.exe` 启动已发布版本（启动器读取版本指针）。工程入口为 `godot/chibi_remake/project.godot`，默认窗口 1920×1080。
@@ -76,7 +76,7 @@ Godot 引擎和导出模板仍需安装到上文指定位置。`-SkipData` 使�
 
 `tools/inputs/runtime_assets.sha256` 是最小运行素材及必要导入配置的白名单。`node tools/runtime_assets.mjs --check` 核对打包输入和文件大小，追加 `--hash` 校验 SHA-256；新增运行素材后执行 `--write` 更新快照和忽略规则白名单。`node tools/audit_clone_inputs.mjs --index` 检查所有必需素材已跟踪、LFS 指针匹配快照且没有参考图或未声明素材；不带参数时检查本地运行输入。地形源输入位于 `source/terrain`（65 个声明输入，PNG 使用 LFS）。构建自动生成整图和分块到 `_work/terrain`；派生物不再跟踪 Git。开发工程执行 `node tools/build_terrain.mjs --dev` 准备资源。重新导出 MED 层数据才需要原始光盘输入。
 
-首次从源码运行前，执行 `Godot_v4.7.2-stable_win64_console.exe --headless --path godot/chibi_remake --import` 导入运行素材和原生扩展。地形分块目录通过 `.gdignore` 跳过纹理导入，运行时直接解码；构建暂存不复制这个标记，编译后的分块仍正常进入发布包。
+首次从源码运行前，执行 `Godot_v4.7.2-stable_win64.exe --headless --path godot/chibi_remake --import` 导入运行素材和原生扩展。地形分块目录通过 `.gdignore` 跳过纹理导入，运行时直接解码；构建暂存不复制这个标记，编译后的分块仍正常进入发布包。
 
 ## 发布产物
 
@@ -101,17 +101,17 @@ release/
 $env:APPDATA = (Resolve-Path "_work\godot_appdata").Path
 
 # 断言式自检
-.\Godot_v4.7.2-stable_win64_console.exe --headless --path godot/chibi_remake `
+.\Godot_v4.7.2-stable_win64.exe --headless --path godot/chibi_remake `
   res://main.tscn -- --map=CHIBIC1 --selftest
 
 # 固定 tick 摘要
-.\Godot_v4.7.2-stable_win64_console.exe --headless --path godot/chibi_remake `
+.\Godot_v4.7.2-stable_win64.exe --headless --path godot/chibi_remake `
   res://main.tscn -- --map=chibic1 --simtest=15
 ```
 
 - 自检通过输出 `SELFTEST RESULT: PASS` 且退出码 0。
 - 摘要与 `tools/inputs/baselines.json` 比较；修改模拟或通行数据后必须显式更新基线。
-- GitHub Actions 运行两个工作流：`contracts` 执行资源/LFS 输入与地形源清单审计、历史地形清单检查以及 `tools/ci_lightweight.mjs`（注册表、分层、素材白名单、发布套件形状，不需要引擎或 LFS），`ci` 运行 `tools/syntax_check.mjs`、PowerShell 语法解析，以及不依赖 LFS 的 Godot 轻量门禁（`check_runtime_scripts` 编译运行脚本，`test_architecture --noview` 加载第一关并验证核心模拟）；完整发布回归、构建、分卷和发布都在本地执行，入口见[测试与验收](docs/19-testing.md)与[构建发布](docs/18-build-release.md)。
+- GitHub Actions 包含 `contracts`、`ci` 和按需触发的 `release-regressions`。`contracts` 检查静态契约与素材声明。`ci` 运行语法、34 图启动、固定摘要、存档和四图续跑，地形烟测拉取两项 LFS 源图。`release-regressions` 拉取运行素材并运行发布源码回归。正式打包和发布在 Windows 本地执行。详见[测试与验收](docs/19-testing.md)与[构建发布](docs/18-build-release.md)。
 
 ## 目录
 
