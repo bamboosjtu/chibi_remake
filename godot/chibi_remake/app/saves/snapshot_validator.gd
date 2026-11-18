@@ -2,6 +2,9 @@ extends RefCounted
 const Technology = preload("res://simulation/definitions/technology_rules.gd")
 ## Validate the complete snapshot before constructing or modifying any world.
 var host: Object
+const BattleState = preload("res://simulation/battle_state.gd")
+var battle: BattleState:
+	get: return host.state
 var content_revision: Callable
 var _valid_cost: Callable
 var _valid_integer: Callable
@@ -54,17 +57,17 @@ func _reject(stage: String) -> Dictionary:
 
 func _index_units(arr: Array, simulation: Dictionary) -> Dictionary:
 	var ids := {}
-	if not host.visibility.valid_snapshot(simulation.get("explored", "")):
+	if not battle.visibility.valid_snapshot(simulation.get("explored", "")):
 		return {}
 	# 在修改世界前验证完整快照。
 	for rec in arr:
 		if not rec is Dictionary or not rec.get("simulation") is Dictionary:
 			return {}
 		if not preload("res://simulation/definitions/unit_schema.gd").valid_record(rec): return {}
-		if not Semantics.valid_unit(rec,host.map_data): return {}
+		if not Semantics.valid_unit(rec,battle.map_data): return {}
 		if not preload("res://app/saves/save_envelope.gd").integer(rec.get("uid")): return {}
 		var uid := int(rec.uid)
-		if ids.has(uid) or not host.map_data.units.has(str(int(rec.get("unit", -1)))):
+		if ids.has(uid) or not battle.map_data.units.has(str(int(rec.get("unit", -1)))):
 			return {}
 		if host.commands.world._sheet_ref_for(int(rec.unit), int(rec.get("owner", -1))) == "":
 			return {}
@@ -82,8 +85,8 @@ func _index_units(arr: Array, simulation: Dictionary) -> Dictionary:
 	return {"ids":ids}
 
 func _valid_terrain(simulation: Dictionary) -> bool:
-	var rows_n := int(host.map_data.rows)
-	var cols_n := int(host.map_data.cols)
+	var rows_n := int(battle.map_data.rows)
+	var cols_n := int(battle.map_data.cols)
 	var tch = simulation.get("terrainChanges", {})
 	if not tch is Dictionary:
 		return false
@@ -148,7 +151,7 @@ func _production_buildings(d: Dictionary, ids: Dictionary) -> Dictionary:
 			for field in ["buildingUid", "unit"]:
 				if not _valid_integer.call(tr0.get(field, -1)): return {}
 			var building_uid := int(tr0.buildingUid)
-			if not ids.has(building_uid) or production_buildings.has(building_uid) or not host.map_data.units.has(str(int(tr0.unit))): return {}
+			if not ids.has(building_uid) or production_buildings.has(building_uid) or not battle.map_data.units.has(str(int(tr0.unit))): return {}
 			var building: Dictionary = ids[building_uid]
 			if not bool(building.get("building", false)): return {}
 			# 订单归属独立保存，不能擅自按建筑当前归属改写（旧档跨势力生产契约）。
@@ -169,8 +172,8 @@ func _valid_technology(simulation: Dictionary, ids: Dictionary, arr: Array, prod
 	for key in army_tech:
 		if not str(key).is_valid_int() or str(int(key)) != str(key): return false
 		var owner := int(key)
-		if owner <= 0 or owner == host.player_owner: return false
-		if host.scenario_sides.all(func(side): return int(side.owner) != owner) and arr.all(func(unit): return int(unit.owner) != owner): return false
+		if owner <= 0 or owner == battle.player_owner: return false
+		if battle.scenario_sides.all(func(side): return int(side.owner) != owner) and arr.all(func(unit): return int(unit.owner) != owner): return false
 		if not TechnologyState.valid(army_tech[key]): return false
 	var jobs = simulation.get("researchJobs",[])
 	if not jobs is Array: return false
@@ -185,7 +188,7 @@ func _valid_technology(simulation: Dictionary, ids: Dictionary, arr: Array, prod
 		if not bool(building.get("building",false)) or int(building.owner) != owner or not bool(building.get("alive",false)) or float(building.get("dieT",-1)) >= 0 or bool(building.get("simulation",{}).get("site",false)): return false
 		var line: String = host.commands.technology._tech_line_of(idx)
 		var lines: Array = Technology.building_lines(int(building.unit))
-		if owner != host.player_owner and int(building.unit) in [4,5]: lines = ["bow"]
+		if owner != battle.player_owner and int(building.unit) in [4,5]: lines = ["bow"]
 		if not lines.has(line) or not _valid_cost.call(job.get("cost",{})): return false
 		var key := "%d/%d" % [owner,idx]
 		if not host.commands.technology.tech_is_sell(idx) and researching.has(key): return false
@@ -201,7 +204,7 @@ func _valid_unit_states(d: Dictionary, arr: Array, ids: Dictionary) -> bool:
 		if not preload("res://simulation/definitions/unit_schema.gd").valid_snapshot(st2): return false
 		if not TickTimers.valid_snapshot(st2) or not ActionClock.valid_snapshot(st2): return false
 		if not preload("res://simulation/systems/locomotion.gd").valid_snapshot(st2): return false
-		if not host.stratagems.valid_snapshot(st2):return false
+		if not battle.stratagems.valid_snapshot(st2):return false
 		# R01：统一“基础上限 + 科技当前兵力”的合法范围；升级部队 hp > maxhp 是契约内状态。
 		# 只约束仍在场的单位：淡出中的尸体允许保留负 HP（击杀结算不夹到 0）。
 		if bool(rec2.get("alive", false)) and float(rec2.get("dieT", -1.0)) < 0.0:
@@ -251,16 +254,16 @@ func _complete_plan(d: Dictionary, simulation: Dictionary, ids: Dictionary) -> D
 	if not decor_snapshot is Dictionary: return {}
 	for key in decor_snapshot:
 		var entry = decor_snapshot[key]
-		if not entry is Dictionary or not host.decor_cells.has(str(key)): return {}
+		if not entry is Dictionary or not battle.decor_cells.has(str(key)): return {}
 		var stock = entry.get("stock", -1)
 		if not (stock is int or stock is float) or not is_finite(float(stock)) or float(stock) < 0: return {}
-		var base: Dictionary = host.decor_cells[str(key)]
+		var base: Dictionary = battle.decor_cells[str(key)]
 		if int(base.unit) in [100,102] and float(stock) > 200: return {}
-	if not host.projectiles.valid_snapshot(simulation.get("projectiles",[])): return {}
-	if not host.fire_fields.valid_snapshot(simulation.get("fireFields",[])):return {}
-	if not host.transports.valid_snapshot(ids):return {}
-	if not host.construction.valid_snapshot(ids): return {}
-	if host.ai != null and not host.ai.valid_snapshot(simulation.get("ai",{}),ids,d.get("trainings",[]),int(d.get("nextUid",0))): return {}
+	if not battle.projectiles.valid_snapshot(simulation.get("projectiles",[])): return {}
+	if not battle.fire_fields.valid_snapshot(simulation.get("fireFields",[])):return {}
+	if not battle.transports.valid_snapshot(ids):return {}
+	if not battle.construction.valid_snapshot(ids): return {}
+	if battle.ai != null and not battle.ai.valid_snapshot(simulation.get("ai",{}),ids,d.get("trainings",[]),int(d.get("nextUid",0))): return {}
 	var speed = simulation.get("speedIndex",2)
 	if not Semantics.valid_timing(simulation): return {}
 	return {"simulation": simulation, "ids": ids, "speed": speed, "decor": decor_snapshot}

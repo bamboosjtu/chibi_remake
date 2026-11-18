@@ -6,11 +6,6 @@ func _feedback(msg: String) -> void:
 	if provider == null: return
 	provider._feedback(msg)
 
-func _group_assign(n: int) -> void:
-	var provider = _require(_provider_command_groups, "command_groups")
-	if provider == null: return
-	provider._group_assign(n)
-
 func _group_recall(n: int) -> bool:
 	var provider = _require(_provider_command_groups, "command_groups")
 	if provider == null: return false
@@ -20,11 +15,6 @@ func _nearest_enemy(u: Dictionary, max_d: float) -> Dictionary:
 	var provider = _require(_provider_combat, "combat")
 	if provider == null: return {}
 	return provider._nearest_enemy(u, max_d)
-
-func _order_gather(target_obj: Dictionary) -> int:
-	var provider = _require(_provider_harvest_orders, "harvest_orders")
-	if provider == null: return 0
-	return provider._order_gather(target_obj)
 
 func _resource_at(pos: Vector2) -> Dictionary:
 	var provider = _require(_provider_harvest_orders, "harvest_orders")
@@ -66,7 +56,7 @@ func handle_cheat_input(event: InputEvent) -> bool:
 	if provider == null: return false
 	return provider.handle_cheat_input(event)
 
-const CONTRACTS := {"battle_simulation": ["_feedback", "_resources", "_sim_step", "_state_digest"], "cheat_controller": ["handle_cheat_input"], "combat": ["_nearest_enemy"], "command_groups": ["_group_assign", "_group_recall"], "harvest_orders": ["_order_gather", "_resource_at"], "selection": ["_select_box", "_select_click"], "world_orders": ["submit_point_order", "cmd_pending_kind"]}
+const CONTRACTS := {"battle_simulation": ["_feedback", "_resources", "_sim_step", "_state_digest"], "cheat_controller": ["handle_cheat_input"], "combat": ["_nearest_enemy"], "command_groups": ["_group_recall"], "harvest_orders": ["_resource_at"], "selection": ["_select_box", "_select_click"], "world_orders": ["submit_point_order", "cmd_pending_kind"]}
 var _provider_battle_simulation: WeakRef
 var _provider_cheat_controller: WeakRef
 var _provider_combat: WeakRef

@@ -550,14 +550,12 @@
         "command_groups": {
           "file": "simulation/battle/command_groups.gd",
           "methods": [
-            "_group_assign",
             "_group_recall"
           ]
         },
         "harvest_orders": {
           "file": "simulation/battle/harvest_orders.gd",
           "methods": [
-            "_order_gather",
             "_resource_at"
           ]
         },
@@ -589,15 +587,6 @@
           ]
         },
         {
-          "name": "_group_assign",
-          "category": "cross-layer",
-          "provider": "command_groups",
-          "forwarded": "_group_assign",
-          "mechanical": true,
-          "privateContract": true,
-          "nameMatches": []
-        },
-        {
           "name": "_group_recall",
           "category": "cross-layer",
           "provider": "command_groups",
@@ -618,15 +607,6 @@
           "nameMatches": [
             "app/battle/scene_controller.gd"
           ]
-        },
-        {
-          "name": "_order_gather",
-          "category": "cross-layer",
-          "provider": "harvest_orders",
-          "forwarded": "_order_gather",
-          "mechanical": true,
-          "privateContract": true,
-          "nameMatches": []
         },
         {
           "name": "_resource_at",
@@ -2729,15 +2709,8 @@
         "command_groups": {
           "file": "simulation/battle/command_groups.gd",
           "methods": [
-            "_cancel_unit_command",
             "_construction_workers",
             "_is_hero_unit"
-          ]
-        },
-        "movement": {
-          "file": "simulation/battle/movement.gd",
-          "methods": [
-            "_path_to"
           ]
         },
         "production": {
@@ -2771,17 +2744,6 @@
           "privateContract": true,
           "nameMatches": [
             "simulation/systems/ai_training_slots.gd"
-          ]
-        },
-        {
-          "name": "_cancel_unit_command",
-          "category": "private-contract",
-          "provider": "command_groups",
-          "forwarded": "_cancel_unit_command",
-          "mechanical": true,
-          "privateContract": true,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
           ]
         },
         {
@@ -2829,12 +2791,8 @@
           ]
         },
         {
-          "name": "_path_to",
-          "category": "private-contract",
-          "provider": "movement",
-          "forwarded": "_path_to",
-          "mechanical": true,
-          "privateContract": true,
+          "name": "move_order",
+          "category": "module-capability",
           "nameMatches": [
             "simulation/systems/ai_decisions.gd"
           ]

@@ -4,18 +4,11 @@ const Cursor = preload("res://presentation/hud/software_cursor.gd")
 const Metrics = preload("res://presentation/hud/hud_metrics.gd")
 var battle: Node2D
 var done := false
-var executions := []
 
 func _initialize() -> void:
 	create_timer(70).timeout.connect(func():
 		if not done: quit(1))
 	run.call_deferred()
-
-func record() -> void:
-	executions.append(battle.selected.map(func(u):return int(u.uid)))
-
-func charge() -> void:
-	battle.gold-=100
 
 func key(code: int, pressed := true) -> InputEventKey:
 	var event := InputEventKey.new();event.keycode=code;event.pressed=pressed;return event

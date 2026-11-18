@@ -308,10 +308,7 @@ func _retreat_step(owner: int) -> Dictionary:
 	for unit in _ai_state.host.units:
 		if int(unit.owner)!=owner or unit.is_building or not unit.alive or unit.die_t>=0 or bool(unit.get("attached",false)): continue
 		if int(unit.get("site_inside_uid",-1))>=0 or not unit.get("target") is Dictionary: continue
-		var path: Array = _ai_state.host._path_to(unit,destination,true)
-		if path.is_empty(): continue
-		_ai_state.host._cancel_unit_command(unit)
-		unit.state = "move"; unit.path = path; unit.pi = 0
+		if not _ai_state.host.move_order(owner, int(unit.uid), destination): continue
 		var group: int = _ai_state.host.ai_group_of(unit)
 		if group>=0: active[group] = 1
 	if not active.is_empty(): _ai_state._retreat[owner] = active

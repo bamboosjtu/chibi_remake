@@ -35,11 +35,6 @@ func _cancel_training(building: Dictionary) -> bool:
 	if provider == null: return false
 	return provider._cancel_training(building)
 
-func _cancel_unit_command(u: Dictionary) -> void:
-	var provider = _require(_provider_command_groups, "command_groups")
-	if provider == null: return
-	provider._cancel_unit_command(u)
-
 func _construction_workers(commander: Dictionary) -> Array:
 	var provider = _require(_provider_command_groups, "command_groups")
 	if provider == null: return []
@@ -60,10 +55,8 @@ func _naval_research_gate(_owner: int) -> bool:
 	if provider == null: return false
 	return provider._naval_research_gate(_owner)
 
-func _path_to(u: Dictionary, target_px: Vector2, exact: bool) -> Array:
-	var provider = _require(_provider_movement, "movement")
-	if provider == null: return []
-	return provider._path_to(u, target_px, exact)
+func move_order(owner: int, uid: int, target: Vector2) -> bool:
+	return battle.player_commands.apply_autonomous("move", owner, uid, -1, -1, "", target)
 
 func _queue_research(owner: int, building: Dictionary, idx: int, _ai_dispatch := false) -> bool:
 	return not building.is_empty() and battle.player_commands.apply_autonomous("research", owner, int(building.uid), -1, idx)
@@ -214,12 +207,11 @@ func ai_worker_count(owner: int) -> int:
 	if provider == null: return 0
 	return provider.ai_worker_count(owner)
 
-const CONTRACTS := {"ai_economy": ["_naval_research_gate", "ai_behavior", "ai_building_kinds", "ai_can_afford", "ai_can_build", "ai_construction_commander", "ai_construction_kinds", "ai_enqueue_train", "ai_force_units", "ai_gift", "ai_gold", "ai_group_of", "ai_level", "ai_owners", "ai_production_building", "ai_queue_hq_upgrade", "ai_research_building", "ai_set_gold", "ai_unit_cost", "ai_worker_count"], "ai_orders": ["ai_focus_unit", "ai_order_assault", "ai_order_assault_l1", "ai_order_intercept", "ai_order_rally"], "combat": ["_hostile_owners"], "command_groups": ["_cancel_unit_command", "_construction_workers", "_is_hero_unit"], "movement": ["_path_to"], "production": ["_cancel_training"], "technology": ["_tech_line_of", "_tech_line_pos", "_tech_line_progress", "ai_tech_gate"]}
+const CONTRACTS := {"ai_economy": ["_naval_research_gate", "ai_behavior", "ai_building_kinds", "ai_can_afford", "ai_can_build", "ai_construction_commander", "ai_construction_kinds", "ai_enqueue_train", "ai_force_units", "ai_gift", "ai_gold", "ai_group_of", "ai_level", "ai_owners", "ai_production_building", "ai_queue_hq_upgrade", "ai_research_building", "ai_set_gold", "ai_unit_cost", "ai_worker_count"], "ai_orders": ["ai_focus_unit", "ai_order_assault", "ai_order_assault_l1", "ai_order_intercept", "ai_order_rally"], "combat": ["_hostile_owners"], "command_groups": ["_construction_workers", "_is_hero_unit"], "production": ["_cancel_training"], "technology": ["_tech_line_of", "_tech_line_pos", "_tech_line_progress", "ai_tech_gate"]}
 var _provider_ai_economy: WeakRef
 var _provider_ai_orders: WeakRef
 var _provider_combat: WeakRef
 var _provider_command_groups: WeakRef
-var _provider_movement: WeakRef
 var _provider_production: WeakRef
 var _provider_technology: WeakRef
 
@@ -229,7 +221,6 @@ func connect_services(services: Dictionary) -> Array:
 	_provider_ai_orders = weakref(services["ai_orders"]) if services.get("ai_orders") != null else null
 	_provider_combat = weakref(services["combat"]) if services.get("combat") != null else null
 	_provider_command_groups = weakref(services["command_groups"]) if services.get("command_groups") != null else null
-	_provider_movement = weakref(services["movement"]) if services.get("movement") != null else null
 	_provider_production = weakref(services["production"]) if services.get("production") != null else null
 	_provider_technology = weakref(services["technology"]) if services.get("technology") != null else null
 	for provider in CONTRACTS:
@@ -242,6 +233,5 @@ func disconnect_services() -> void:
 	_provider_ai_orders = null
 	_provider_combat = null
 	_provider_command_groups = null
-	_provider_movement = null
 	_provider_production = null
 	_provider_technology = null

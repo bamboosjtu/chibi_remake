@@ -1,6 +1,9 @@
 extends RefCounted
 ## Validate a current-format archive, then atomically install its candidate world.
 var host: Object
+const BattleState = preload("res://simulation/battle_state.gd")
+var battle: BattleState:
+	get: return host.state
 var last_load_error := ""
 var last_load_source := "none"
 var _content_revision_cache := ""
@@ -12,7 +15,7 @@ func _init(h: Object) -> void:
 # ------------------------------------------------------------------- load ----
 func apply() -> bool:
 	var loaded: Dictionary = Game.repository.read_slot(Game.pending_load_slot)
-	return Game.campaign.restore_battle(str(host.map_id), apply_loaded.bind(loaded))
+	return Game.campaign.restore_battle(str(battle.map_id), apply_loaded.bind(loaded))
 
 func apply_loaded(loaded: Dictionary, cross_map := false) -> bool:
 	var applied := _apply_other_map(loaded.data) if cross_map else apply_snapshot(loaded.data)
@@ -27,7 +30,7 @@ func _apply_other_map(d: Dictionary) -> bool:
 	if not last_load_error.is_empty():
 		candidate.dispose()
 		return false
-	candidate.state.cli_mode = host.state.cli_mode
+	candidate.state.cli_mode = battle.cli_mode
 	var plan: Dictionary = candidate.saver._validation_plan(d, d.units)
 	if plan.is_empty() or not candidate.saver.restore_candidate(d, d.units, plan):
 		last_load_error = candidate.saver.last_load_error
@@ -60,7 +63,7 @@ func _apply_snapshot(d: Dictionary) -> bool:
 	if not envelope.valid_header(d) or not envelope.valid_collections(d):
 		last_load_error = "存档头部、资源或生产队列字段不兼容；当前战场已保留。"
 		return false
-	if str(d.get("map", "")) != str(host.map_id):
+	if str(d.get("map", "")) != str(battle.map_id):
 		last_load_error = "存档关卡与当前战场不匹配。"
 		return false
 	var arr = d.get("units", null)
@@ -70,7 +73,7 @@ func _apply_snapshot(d: Dictionary) -> bool:
 		return false
 	var applied := _restore_current(d,arr)
 	if applied:
-		host.player_commands.clear()
+		battle.player_commands.clear()
 		host.commands.world._rebuild_unit_index()
 	return applied
 
@@ -120,7 +123,7 @@ func _apply_unit_record(u: Dictionary, rec: Dictionary) -> void:
 	var anchor := Vector2(float(UnitSchema.record_value(rec,"ax",u.ax)),float(UnitSchema.record_value(rec,"ay",u.ay)))
 	u.ax = anchor.x
 	u.ay = anchor.y
-	var cell: Vector2i=host.nav.cell_of_px(u.ax,u.ay)
+	var cell: Vector2i=battle.nav.cell_of_px(u.ax,u.ay)
 	u.A=cell.x;u.B=cell.y
 	var dying := float(UnitSchema.record_value(rec, "die_t", -1.0)) >= 0.0
 	var recorded_alive := bool(UnitSchema.record_value(rec, "alive", true))
@@ -145,21 +148,19 @@ func _apply_unit_record(u: Dictionary, rec: Dictionary) -> void:
 			u["officer_might"] = float(o.get("might", 0))
 			u["officer_intellect"] = float(o.get("intellect", 0))
 	host.commands.world._place_unit(u)            # 表现层 + R13 占格索引（视图缺席时也同步索引）
-	if host.view != null:
-		host.view.apply_loaded_unit(u)
 
 func _restore_resources(d: Dictionary) -> void:
-	for key in preload("res://app/saves/save_envelope.gd").RESOURCE_KEYS: host.set(key,float(d.resources[key]))
+	for key in preload("res://app/saves/save_envelope.gd").RESOURCE_KEYS: battle.set(key,float(d.resources[key]))
 
 func _restore_trainings(d: Dictionary) -> void:
 	var by_uid := {}
-	for unit in host.units: by_uid[int(unit.uid)] = unit
-	host.trainings.clear()
+	for unit in battle.units: by_uid[int(unit.uid)] = unit
+	battle.trainings.clear()
 	for record in d.trainings:
 		var order := {"owner":int(record.owner),"b":by_uid[int(record.buildingUid)],"unit":int(record.unit),"t":float(record.t),"cost":record.cost.duplicate(true),"ticks":true}
 		for field in ["aiSlot","aiToken","navalSlot","navalToken"]:
 			if record.has(field): order[field] = int(record[field])
-		host.trainings.append(order)
+		battle.trainings.append(order)
 
 func _valid_cost(value: Variant) -> bool:
 	return preload("res://simulation/definitions/resource_cost.gd").valid(value)
@@ -171,33 +172,33 @@ func _valid_integer(value: Variant) -> bool:
 ## 存档的"额外字段"（main.gd 的 `_save_extra()` 转发到这里）
 func save_extra() -> Dictionary:
 	var decor := {}
-	for key in host.decor_cells:
-		var target: Dictionary = host.decor_cells[key]
+	for key in battle.decor_cells:
+		var target: Dictionary = battle.decor_cells[key]
 		if int(target.unit) in [100,102,104]: decor[key] = {"stock": float(target.get("stock", 0))}
-	var extra := {"mapId": str(host.map_id), "nextUid": int(host.next_uid), "trainings": host.trainings, "gameEnd": int(host.game_end), "simulation": {
-		"rngState": str(host.simulation_rng.state), "contentRevision": content_revision(), "rulesRevision":preload("res://app/saves/rules_identity.gd").current(), "tick": host.sim_tick, "accumulator": host.sim_acc, "speedIndex": host.clock.speed_index,
-		"explored": host.visibility.snapshot(), "projectiles":host.projectiles.snapshot(), "fireFields":host.fire_fields.snapshot(), "decorResources": decor,
-		"aiResources": host.ai_res, "groups": host.control_groups,
-		"taskLatches": host.task_latches, "officerProgress": host.officer_progress, "terrainChanges": host.terrain_changes, "taskEvents": host.task_events, "objectiveDone": host.objective_done,
+	var extra := {"mapId": str(battle.map_id), "nextUid": int(battle.next_uid), "trainings": battle.trainings, "gameEnd": int(battle.game_end), "simulation": {
+		"rngState": str(battle.simulation_rng.state), "contentRevision": content_revision(), "rulesRevision":preload("res://app/saves/rules_identity.gd").current(), "tick": battle.sim_tick, "accumulator": battle.sim_acc, "speedIndex": battle.clock.speed_index,
+		"explored": battle.visibility.snapshot(), "projectiles":battle.projectiles.snapshot(), "fireFields":battle.fire_fields.snapshot(), "decorResources": decor,
+		"aiResources": battle.ai_res, "groups": battle.control_groups,
+		"taskLatches": battle.task_latches, "officerProgress": battle.officer_progress, "terrainChanges": battle.terrain_changes, "taskEvents": battle.task_events, "objectiveDone": battle.objective_done,
 		"officerPool": host.commands.military._officer_pool_state(),
 		# 科技树：等级表（player_tech）与研究队列。
-		"playerTech": host.player_tech.duplicate(true),
-		"armyTech": host.army_tech.duplicate(true),
-		"researchJobs": host.research_jobs.duplicate(true),
-		"ai": host.ai.snapshot() if host.ai != null else {},
+		"playerTech": battle.player_tech.duplicate(true),
+		"armyTech": battle.army_tech.duplicate(true),
+		"researchJobs": battle.research_jobs.duplicate(true),
+		"ai": battle.ai.snapshot() if battle.ai != null else {},
 	}}
-	if host.auto_control: extra.simulation["autoControl"] = true
-	extra["pendingDuels"] = host.effects.pending_duels().size()
+	if battle.auto_control: extra.simulation["autoControl"] = true
+	extra["pendingDuels"] = battle.effects.pending_duels().size()
 	return extra
 
 ## Supplementary full-state digest; historical simulation baselines stay intact.
 func continuation_snapshot(game: Node) -> Dictionary:
-	var payload: Dictionary = game.snapshot(host.units,{"gold":host.gold,"wood":host.wood,"food":host.food,"stone":host.stone},save_extra())
+	var payload: Dictionary = game.snapshot(battle.units,{"gold":battle.gold,"wood":battle.wood,"food":battle.food,"stone":battle.stone},save_extra())
 	for key in ["checksum","savedAt","saveName"]: payload.erase(key)
 	payload.simulation.erase("accumulator") # Wall-clock dispatch remainder, not per-tick state.
 	var occupied := {}
-	for cell in host.nav.state.occupancy:
-		if int(host.nav.state.occupancy[cell]) > 0: occupied[cell] = host.nav.state.occupancy[cell]
-	payload["navigation"] = {"resources":host.nav.state.resource_cells.duplicate(),"blocked":host.nav.state.blocked_cells.duplicate(),"occupancy":occupied}
-	payload["pendingDuels"] = host.effects.duel_snapshot()
+	for cell in battle.nav.state.occupancy:
+		if int(battle.nav.state.occupancy[cell]) > 0: occupied[cell] = battle.nav.state.occupancy[cell]
+	payload["navigation"] = {"resources":battle.nav.state.resource_cells.duplicate(),"blocked":battle.nav.state.blocked_cells.duplicate(),"occupancy":occupied}
+	payload["pendingDuels"] = battle.effects.duel_snapshot()
 	return payload
