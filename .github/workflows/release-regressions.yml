@@ -9,6 +9,17 @@ permissions:
   contents: read
 
 jobs:
+  windows-safety:
+    runs-on: windows-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Packaging, candidate locks and publication safety
+        shell: powershell
+        run: ./tools/ci_windows.ps1 -ReleaseSafetyOnly
   release-suite:
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -25,7 +36,7 @@ jobs:
           node tools/audit_clone_inputs.mjs --index
           node tools/runtime_assets.mjs --check --hash --versioned-only
       - name: Source engine release suite
-        run: node tools/run_regressions.mjs --engine "$GODOT_ENGINE" --suite tools/inputs/release_tests.json --output _work/hosted-release
+        run: node tools/run_regressions.mjs --engine "$GODOT_ENGINE" --suite tools/inputs/release_tests.json --selftest-failures --output _work/hosted-release
       - name: Missing presentation resources and terrain budget recovery
         if: ${{ !cancelled() }}
         run: node tools/test_missing_presentation.mjs --engine "$GODOT_ENGINE" --output _work/hosted-presentation-failures

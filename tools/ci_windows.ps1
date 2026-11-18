@@ -1,10 +1,16 @@
-﻿param([switch]$SkipArtCheck,[switch]$FullRegression)
+﻿param([switch]$SkipArtCheck,[switch]$FullRegression,[switch]$ReleaseSafetyOnly)
 # Windows CI: minimal smoke by default; full gameplay checks are opt-in.
 # Requires the local Godot engine and declared runtime assets, not art masters.
 # Godot may write a certificate warning to stderr; every native result is checked below.
 $ErrorActionPreference='Continue'
 $root=Split-Path $PSScriptRoot -Parent
 Set-Location -LiteralPath $root
+
+foreach ($test in @('test_package_safety.ps1','test_package_join.ps1','test_publish.ps1','test_candidate_lock.ps1','test_benchmark_evidence.ps1')) {
+    & (Join-Path $PSScriptRoot $test)
+    if (!$?) { throw ('Windows tool regression failed: '+$test) }
+}
+if ($ReleaseSafetyOnly) { Write-Host 'WINDOWS RELEASE SAFETY PASS'; return }
 
 Write-Host '== docs lint (links + spec purity + appendix) =='
 node tools/docs_lint.mjs
@@ -23,11 +29,6 @@ $env:LOCALAPPDATA=Join-Path $root '_work/ci/localappdata'
 New-Item -ItemType Directory -Force $env:APPDATA,$env:LOCALAPPDATA | Out-Null
 . (Join-Path $PSScriptRoot 'engine_environment.ps1')
 $godot=Resolve-ChibiEngine $root
-
-foreach ($test in @('test_package_safety.ps1','test_package_join.ps1','test_publish.ps1','test_candidate_lock.ps1','test_benchmark_evidence.ps1')) {
-    & (Join-Path $PSScriptRoot $test)
-    if (!$?) { throw ('Windows tool regression failed: '+$test) }
-}
 
 Write-Host '== architecture boundaries and regression suites =='
 node tools/architecture_check.mjs

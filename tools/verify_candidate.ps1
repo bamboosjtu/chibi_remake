@@ -28,7 +28,9 @@ try {
     $sourceEngine=Resolve-ChibiEngine $projectRoot
     Copy-Item -LiteralPath $sourceEngine -Destination $engine
     # Assertions enabled; native DLLs resolve beside this owned temporary engine.
-    & node (Join-Path $PSScriptRoot 'run_regressions.mjs') --engine $engine --pack $pack --suite (Join-Path $PSScriptRoot 'inputs/release_tests.json') --baselines --output (Join-Path $output 'regressions')
+    $nativeWorldArgs=@()
+    if (Get-ChildItem -LiteralPath $candidate -Recurse -File -Filter 'ChibiSimulationMath.dll') { $nativeWorldArgs+= '--require-native-world' }
+    & node (Join-Path $PSScriptRoot 'run_regressions.mjs') --engine $engine --pack $pack --suite (Join-Path $PSScriptRoot 'inputs/release_tests.json') --baselines --output (Join-Path $output 'regressions') @nativeWorldArgs
     if ($LASTEXITCODE -ne 0) { throw "Candidate smoke failed: $output" }
     & node (Join-Path $PSScriptRoot 'verify_native_save.mjs') --exe $Executable --output (Join-Path $output 'native')
     if ($LASTEXITCODE -ne 0) { throw "Native EXE save/restart acceptance failed: $output" }

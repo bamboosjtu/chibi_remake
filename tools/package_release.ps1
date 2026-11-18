@@ -93,7 +93,9 @@ Write-Utf8NoBom (Join-Path $OutputDirectory 'release-files.json') ((@{schemaVers
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'join_release.ps1') -Destination (Join-Path $OutputDirectory 'join-release.ps1')
 $joinCmd = @'
 @echo off
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0join-release.ps1" %*
+setlocal
+set "PSModulePath="
+"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File "%~dp0join-release.ps1" %*
 exit /b %errorlevel%
 '@
 Write-Utf8NoBom (Join-Path $OutputDirectory 'join-release.cmd') $joinCmd

@@ -17,6 +17,23 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Require evidence for baseline changes
+        if: github.event_name != 'workflow_dispatch'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [ -n "$BASE_SHA" ] && [ "$BASE_SHA" != "0000000000000000000000000000000000000000" ] &&
+             ! git diff --quiet "$BASE_SHA" HEAD -- tools/inputs/baselines.json; then
+            evidence=research/architecture-governance/rts-baselines.md
+            if git diff --quiet "$BASE_SHA" HEAD -- "$evidence"; then
+              echo "Baseline changes require a reviewed update to $evidence."
+              exit 1
+            fi
+            checksum=$(sha256sum tools/inputs/baselines.json | cut -d ' ' -f 1)
+            grep -Fq "$checksum" "$evidence"
+          fi
       - uses: actions/setup-node@v4
         with:
           node-version: '22'

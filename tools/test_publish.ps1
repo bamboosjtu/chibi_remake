@@ -39,6 +39,7 @@ $baselinePath=Join-Path $PSScriptRoot 'inputs/baselines.json'
 $names=@((Get-Content -Raw -Encoding UTF8 $suitePath | ConvertFrom-Json).tests | ForEach-Object { $_.script })
 $names+=@(Get-ChildItem -LiteralPath (Join-Path $root 'godot/chibi_remake/data') -Filter 'chibi*.json' -File | ForEach-Object { 'load-'+$_.BaseName })
 $names+=@((Get-Content -Raw -Encoding UTF8 $baselinePath | ConvertFrom-Json).simtest | ForEach-Object { 'sim-'+$_.map+'-'+$_.seconds })
+$names+=@('test_native_world')
 $names+=@('native-save-green-write','native-save-green-read','native-save-system-write','native-save-system-read','native-isolation-write','native-isolation-selftest','native-isolation-reject-dir','native-isolation-reject-id')
 $evidence=@{
     schemaVersion=1
@@ -86,7 +87,8 @@ if ((Get-FileHash -LiteralPath (Join-Path $release 'current.json')).Hash -ne $be
 & (Join-Path $PSScriptRoot 'publish_release.ps1') -Executable $exe -ReleaseRoot $release
 $pointer=Get-Content -Raw (Join-Path $release 'current.json') | ConvertFrom-Json
 $publishedInfo=Get-Content -Raw (Join-Path (Join-Path $release $pointer.directory) 'release-info.json') | ConvertFrom-Json
-if ($publishedInfo.verification -ne 'candidate-smoke' -or $publishedInfo.verifiedMaps.Count -ne 34 -or $publishedInfo.verifiedBaselines.Count -ne 2) { throw 'Publish must preserve machine verification coverage' }
+$expectedBaselines = @($names | Where-Object { $_ -like 'sim-*' }).Count
+if ($publishedInfo.verification -ne 'candidate-smoke' -or $publishedInfo.verifiedMaps.Count -ne 34 -or $publishedInfo.verifiedBaselines.Count -ne $expectedBaselines) { throw 'Publish must preserve machine verification coverage' }
 $copied=Join-Path (Join-Path $release $pointer.directory) 'FFmpegPlayer.dll'
 if (!(Test-Path -LiteralPath $copied) -or (Get-FileHash -LiteralPath $copied).Hash -ne (Get-FileHash -LiteralPath $nativeFile).Hash) { throw 'Native dependency was not published intact' }
 $versionRoot=Join-Path $release $pointer.directory
