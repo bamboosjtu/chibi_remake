@@ -67,13 +67,20 @@ func _cell_unit_in(layer: int, cell: Vector2i, exclude_uid: int) -> Dictionary:
 
 func nearby_units(first: Vector2i, second: Vector2i, radius: int, layer: int) -> Array:
 	_index_ensure_current()
-	var table: Dictionary=battle._cell_index.get(layer,{})
+	var table: Dictionary = battle._cell_index.get(layer, {})
+	if table.is_empty(): return []
+	var rows := int(battle.map_data.rows)
+	var cols := int(battle.map_data.cols)
 	var found := {}
-	for center in [first,second]:
-		for x in range(maxi(0,center.x-radius),mini(int(battle.map_data.rows),center.x+radius+1)):
-			for y in range(maxi(0,center.y-radius),mini(int(battle.map_data.cols),center.y+radius+1)):
-				var bucket: Dictionary=table.get(Vector2i(x,y),{})
-				for uid in bucket:found[uid]=bucket[uid]
+	for center: Vector2i in [first, second]:
+		var y_min := maxi(0, center.y - radius)
+		var y_end := mini(cols, center.y + radius + 1)
+		for x in range(maxi(0, center.x - radius), mini(rows, center.x + radius + 1)):
+			for y in range(y_min, y_end):
+				var bucket = table.get(Vector2i(x, y))
+				if bucket == null: continue
+				for uid in bucket:
+					found[uid] = bucket[uid]
 	return found.values()
 
 func _index_eligible(u: Dictionary) -> bool:

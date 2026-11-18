@@ -1,7 +1,7 @@
 extends RefCounted
 ## ai economy: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
-const REQUIRED_SERVICES := {"command_groups": ["_commander_for", "_construction_workers"], "construction_orders": ["building_block_reason"], "production": ["train_types_for"], "technology": ["_ai_side", "_building_work_busy", "_combat_member_count", "_tech_for", "_tech_line_of", "ai_tech_gate"]}
+const REQUIRED_SERVICES := {"command_groups": ["_commander_for", "_construction_workers"], "construction_orders": ["building_block_reason"], "production": ["find_training_building"], "technology": ["_ai_side", "_building_work_busy", "_combat_member_count", "_tech_for", "_tech_line_of", "ai_tech_gate"]}
 var battle: State
 var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
 
@@ -165,13 +165,12 @@ func ai_force_units(owner: int) -> int:
 	return n
 
 func ai_production_building(owner: int, requested_unit := -1) -> Dictionary:
-	var services := ports.acquire(["technology", "production"])
+	var services := ports.acquire(["production"])
 	if services.is_empty(): return {}
+	if requested_unit >= 0:
+		return services.production.find_training_building(owner, requested_unit)
 	for u in battle.units:
 		if u.is_building and int(u.owner) == owner and u.alive and u.die_t < 0 and not bool(u.get("site", false)):
-			if requested_unit >= 0:
-				if services.technology._building_work_busy(u): continue
-				if not services.production.train_types_for(int(u.unit), owner).any(func(opt): return int(opt.unit) == requested_unit): continue
 			return u
 	return {}
 

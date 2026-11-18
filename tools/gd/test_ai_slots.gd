@@ -44,7 +44,7 @@ func run() -> void:
 	b=load("res://main.tscn").instantiate();root.add_child(b)
 	b.set_process(false);b.cli_mode=true;owner=int(b.commands.economy.ai_owners()[0])
 	while not b.units.is_empty():b.commands.world._free_unit_at(b.units.size()-1)
-	var arch:=spawn(14);spawn(14);var inf:=spawn(12);spawn(6);spawn(8);spawn(20)
+	var arch:=spawn(14);var second_arch:=spawn(14);var inf:=spawn(12);spawn(6);spawn(8);spawn(20)
 	b.nav.rebuild_buildings(b.units)
 	b.ai=AI.new(b);b.army_tech[owner]=Technology.initial();b.commands.technology._ai_side(owner).init=[0,1];funds()
 	b.gold=9999
@@ -54,6 +54,9 @@ func run() -> void:
 	for tick in range(40):b.ai.tick()
 	assert(b.trainings.is_empty());b.ai.tick()
 	assert(b.trainings.size()==1 and b.trainings[0].unit==45 and rec(0).members.is_empty())
+	assert(is_same(b.trainings[0].b, arch), "production search must preserve building order")
+	var ai_access: RefCounted = b.simulation_access("ai")
+	assert(is_same(ai_access.ai_production_building(owner, 45), second_arch), "production search must see work queued within the same tick")
 	assert(not b.ai.slots.dispatch(owner,3,b.ai.army_for(owner)),"one archery line even with two buildings")
 	var paid: Dictionary=b.economy.balance(owner).duplicate()
 	var disabled:=[]
