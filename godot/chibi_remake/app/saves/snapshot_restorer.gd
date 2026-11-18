@@ -8,6 +8,7 @@ var _numeric_keys: Callable
 const ActionClock = preload("res://simulation/systems/action_clock.gd")
 const TickTimers = preload("res://simulation/systems/tick_timers.gd")
 const UnitSchema = preload("res://simulation/definitions/unit_schema.gd")
+const Relations = preload("res://app/saves/unit_relations.gd")
 const Envelope = preload("res://app/saves/save_envelope.gd")
 
 func _init(battle: Object, record: Callable, resources: Callable, trainings: Callable, keys: Callable) -> void:
@@ -114,11 +115,6 @@ func _restore_units(d: Dictionary, arr: Array, simulation: Dictionary) -> bool:
 		u["map_index"] = int(UnitSchema.record_value(rec, "map_index", -1))
 		var state: Dictionary = rec.simulation
 		_restore_scalars(u,rec,state)
-		u.path = []
-		for point in state.path:
-			u.path.append(Vector2(float(point[0]),float(point[1])))
-		u.pi = int(state.pi)
-		if state.has("repathTo"): u["repath_to"] = Vector2(state.repathTo[0],state.repathTo[1])
 		TickTimers.restore(state,u)
 		host.stratagems.restore(state,u)
 		ActionClock.restore(state,u)
@@ -131,16 +127,7 @@ func _restore_units(d: Dictionary, arr: Array, simulation: Dictionary) -> bool:
 	for rec in arr:
 		var u: Dictionary = by_uid[int(rec.uid)]
 		if not by_uid.has(int(u.get("join_target_uid",-1))): u.join_target_uid = -1
-		u.target = by_uid.get(int(rec.simulation.get("targetUid", -1)))
-		for field in ["build_target", "repair_target", "board_target"]:
-			u[field] = by_uid.get(int(rec.simulation.get(field + "Uid", -1)))
-		var reference: Dictionary = rec.simulation.get("gatherRef", {})
-		if str(reference.get("kind", "")) == "decor":
-			u.gather_obj = host.decor_cells.get(str(reference.get("cell", "")))
-		elif str(reference.get("kind", "")) == "unit":
-			u.gather_obj = by_uid.get(int(reference.get("uid", -1)))
-		elif str(reference.get("kind", "")) == "spent":
-			u.gather_obj = {"unit":int(reference.unit),"ax":float(reference.x),"ay":float(reference.y),"alive":false,"die_t":0.0}
+		Relations.restore(u, rec.simulation, by_uid, host.decor_cells)
 	return true
 
 func _refresh_view() -> void:

@@ -56,6 +56,8 @@ const SAVE_VERSION = preload("res://app/saves/save_format.gd").VERSION
 const SAVE_SLOTS = Repository.SAVE_SLOTS
 const Store = preload("res://app/json_store.gd")
 const UnitSchema = preload("res://simulation/definitions/unit_schema.gd")
+const Relations = preload("res://app/saves/unit_relations.gd")
+const Envelope = preload("res://app/saves/save_envelope.gd")
 
 func _init() -> void:
 	repository.changed.connect(slot_catalog.invalidate)
@@ -113,41 +115,33 @@ func _install_cjk_font() -> void:
 func save_game(units: Array, resources: Dictionary = {}, extra: Dictionary = {}, slot := 0) -> bool:
 	if not repository.begin_save(slot, int(extra.get("pendingDuels",0))): return false
 	var path := save_slot_path(slot)
-	var payload := snapshot(units, resources, extra)
+	var payload := snapshot(units, resources, extra, slot)
+	if payload.is_empty(): return false
+	if not Envelope.valid_new(payload):
+		last_save_error = {"stage":"snapshot envelope", "slot":slot, "code":ERR_INVALID_DATA}
+		return false
 	var ok := _atomic_write(path, JSON.stringify(payload, "", true, true))
 	if ok:
 		print("gamesaved: %s units=%d trainings=%d nextUid=%d" % [path, payload.units.size(), payload.trainings.size(), int(extra.get("nextUid", 0))])
 	return ok
 
-func snapshot(units: Array, resources: Dictionary, extra: Dictionary) -> Dictionary:
+func snapshot(units: Array, resources: Dictionary, extra: Dictionary, slot := -1) -> Dictionary:
+	for unit in units:
+		var unregistered := UnitSchema.omissions(unit)
+		if not unregistered.is_empty():
+			var error := {"stage":"snapshot unit fields", "code":ERR_INVALID_DATA, "slot":slot,
+				"uid":int(unit.get("uid", -1)), "fields":unregistered}
+			if slot >= 0: last_save_error = error
+			push_warning("Save snapshot rejected: " + str(error))
+			return {}
 	var derived := preload("res://simulation/systems/transports.gd").snapshot_fields(units)
 	var recs := []
 	var by_uid := {}
 	for unit in units: by_uid[int(unit.uid)] = unit
-	var contains_ref := func(value): return value is Dictionary and is_same(by_uid.get(int(value.get("uid",-1))),value)
 	for u in units:
-		var unregistered := UnitSchema.omissions(u)
-		assert(unregistered.is_empty(), "Register new unit fields before saving: " + str(unregistered))
 		var simulation := UnitSchema.snapshot_scalars(u)
 		simulation.merge(derived.get(int(u.uid),{}),true)
-		simulation["targetUid"] = int(u.target.get("uid", -1)) if u.get("target") is Dictionary else -1
-		# REQ-001：采集目标用**稳定引用**（单位 uid / 饰物格），不裸存对象。
-		var gobj = u.get("gather_obj", null)
-		if gobj is Dictionary and not (gobj as Dictionary).is_empty():
-			if bool((gobj as Dictionary).get("decor", false)):
-				simulation["gatherRef"] = {"kind": "decor", "cell": str((gobj as Dictionary).get("cell", ""))}
-			elif not contains_ref.call(gobj):
-				# 采尽的矿/民居可在工人返程中被清理；保留转采所需的种类和原位置。
-				simulation["gatherRef"] = {"kind":"spent", "unit":int(gobj.unit), "x":float(gobj.ax), "y":float(gobj.ay)}
-			else:
-				simulation["gatherRef"] = {"kind": "unit", "uid": int((gobj as Dictionary).get("uid", -1))}
-		for field in ["build_target", "repair_target", "board_target"]:
-			var reference = u.get(field)
-			simulation[field + "Uid"] = int(reference.uid) if reference is Dictionary and not reference.is_empty() and contains_ref.call(reference) else -1
-		simulation["path"] = []
-		for point in UnitSchema.navigation_path(u.get("path",[]),int(u.get("pi",0))):
-			simulation.path.append([point.x, point.y])
-		if u.get("repath_to") is Vector2: simulation["repathTo"] = [u.repath_to.x,u.repath_to.y]
+		simulation.merge(Relations.encode(u, by_uid), true)
 		var record := UnitSchema.snapshot_record(u)
 		record["simulation"] = simulation
 		recs.append(record)
@@ -156,7 +150,7 @@ func snapshot(units: Array, resources: Dictionary, extra: Dictionary) -> Diction
 		"v": SAVE_VERSION,
 		"simulation": extra.get("simulation", {}),
 		"kind": "save",
-		"map": current_map,
+		"map": str(extra.get("mapId", current_map)),
 		"nextUid": int(extra.get("nextUid", 0)),
 		"gameEnd": int(extra.get("gameEnd", 0)),
 		"units": recs,
@@ -263,7 +257,7 @@ static func verify_save_checksum(d: Dictionary) -> bool:
 	return ok
 
 static func is_valid_save(d: Dictionary) -> bool:
-	if not preload("res://app/saves/save_envelope.gd").valid(d): return false
+	if not Envelope.valid(d): return false
 	return verify_save_checksum(d)
 
 static func can_rotate_save(d: Dictionary) -> bool:

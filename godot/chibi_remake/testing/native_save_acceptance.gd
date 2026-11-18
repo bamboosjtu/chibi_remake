@@ -26,6 +26,13 @@ func run(battle: Node2D, phase: String) -> void:
 		var record: Dictionary = game.load_save(20)
 		if record.is_empty() or float(record.resources.gold) != 1234:
 			print("NATIVE SAVE FAIL ", JSON.stringify(game.last_save_error)); tree.quit(1); return
+		var slot_path: String = game.save_slot_path(20)
+		var previous := FileAccess.get_sha256(slot_path)
+		battle.units[0]["unregistered_snapshot_field"] = true
+		var rejected: bool = not battle.commands.session._save_game(20)
+		battle.units[0].erase("unregistered_snapshot_field")
+		if not rejected or game.last_save_error.get("stage") != "snapshot unit fields" or FileAccess.get_sha256(slot_path) != previous:
+			print("NATIVE SAVE FAIL unknown unit field was not rejected before writing"); tree.quit(1); return
 		menu.slots_dialog.dismiss()
 		menu.panel.show()
 		menu.buttons[5].pressed.emit() # End battle persists the automatic slot.

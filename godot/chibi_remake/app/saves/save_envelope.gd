@@ -4,6 +4,7 @@ const Format = preload("res://app/saves/save_format.gd")
 const Schema = preload("res://simulation/definitions/unit_schema.gd")
 const Cost = preload("res://simulation/definitions/resource_cost.gd")
 const Semantics = preload("res://app/saves/snapshot_semantics.gd")
+const Relations = preload("res://app/saves/unit_relations.gd")
 const RESOURCE_KEYS = Cost.KEYS
 
 static func integer(value, minimum := 0) -> bool:
@@ -47,4 +48,15 @@ static func known_world_fields(simulation: Dictionary) -> bool:
 		if key not in Format.WORLD_FIELDS: return false
 	for key in ["contentRevision","rulesRevision"]:
 		if not simulation.get(key) is String or simulation[key].length()!=64: return false
+	return true
+
+static func valid_new(data: Dictionary) -> bool:
+	if not valid(data): return false
+	var world: Dictionary = data.simulation
+	for field in Format.WORLD_FIELDS:
+		if field != "autoControl" and not world.has(field): return false
+	if not world.objectiveDone is bool or not world.explored is String: return false
+	if not world.decorResources is Dictionary or not world.officerPool is Dictionary: return false
+	for record in data.units:
+		if not Relations.required_on_write(record.simulation): return false
 	return true
