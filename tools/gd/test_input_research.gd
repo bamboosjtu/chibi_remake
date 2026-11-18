@@ -74,6 +74,13 @@ func run() -> void:
 	assert(view._handle_cmd_key(key(KEY_D)))
 	assert(battle.player_commands.pending_commands()[0].kind=="rest","same slot key and mouse mode")
 	view._handle_cmd_key(key(KEY_D,false));battle.player_commands.clear()
+	var alternate := key(KEY_J)
+	InputMap.action_add_event("battle_slot_6", alternate)
+	assert(view._handle_cmd_key(alternate))
+	assert(battle.player_commands.pending_commands()[0].kind == "rest")
+	view._handle_cmd_key(key(KEY_J, false))
+	battle.player_commands.clear()
+	InputMap.action_erase_event("battle_slot_6", alternate)
 	# Real input captures actor identity and applies at the next simulation tick.
 	battle.selected=workers.slice(0,2)
 	assert(battle.commands.session.submit_command("assign_group", -1, 9)==2)

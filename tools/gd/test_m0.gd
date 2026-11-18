@@ -41,7 +41,7 @@ func run() -> void:
 	b.view.event_view.restore_history()
 	assert(b.view._command_icon(34).region == Rect2(1294,825,190,229), "HD command atlas uses measured separators")
 	root.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
-	for dimensions in [Vector2i(1920, 1080), Vector2i(1560, 1440), Vector2i(640, 480)]:
+	for dimensions in [Vector2i(1920, 1080), Vector2i(1560, 1440), Vector2i(1280, 720), Vector2i(640, 480)]:
 		root.size = dimensions
 		await process_frame
 		b.view.update_panel()
