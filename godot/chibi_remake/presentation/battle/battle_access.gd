@@ -55,6 +55,14 @@ func unit_views() -> Array:
 	var data = preload("res://named_port.gd").require_provider(_data,"unit values")
 	return _unit_projection.units(data) if data != null else []
 
+func renderable_unit_count() -> int:
+	var data = preload("res://named_port.gd").require_provider(_data, "unit count")
+	return data.units.size() if data != null else 0
+
+func renderable_units(context: Dictionary) -> Array:
+	var data = preload("res://named_port.gd").require_provider(_data, "visible unit values")
+	return _unit_projection.renderable(data, context) if data != null else []
+
 func world_identity() -> int:
 	var data = preload("res://named_port.gd").require_provider(_data, "world identity")
 	return data.world.get_instance_id() if data != null else -1

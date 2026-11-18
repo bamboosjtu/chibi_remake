@@ -16,6 +16,7 @@ var _last_context := {}
 var _last_world := -1
 var _moving := {}
 var _visible_mobiles := {}
+var _drawn := {}
 
 
 func queue_visual(unit: Dictionary) -> void:
@@ -36,8 +37,15 @@ func flush_visuals(interpolating := false) -> void:
 	if full:
 		_moving.clear()
 		_visible_mobiles.clear()
-		for unit in _ui.host.unit_views():
-			_sync_visual(unit, context)
+		candidates_checked += _ui.host.renderable_unit_count()
+		var previous := _drawn
+		_drawn = {}
+		for unit in _ui.host.renderable_units(context):
+			_sync_visual(unit, context, true)
+		for uid in previous:
+			if _drawn.has(uid): continue
+			var nodes: Dictionary = _ui._nodes_by_uid.get(uid, {})
+			if not nodes.is_empty(): _hide_culled(nodes)
 	else:
 		for uid in pending_visuals:
 			var unit: Dictionary = _ui.host.roster_unit(uid)
@@ -46,20 +54,22 @@ func flush_visuals(interpolating := false) -> void:
 	_world_dirty = false
 	sync_microseconds += Time.get_ticks_usec() - begin
 
-func _sync_visual(unit: Dictionary, context: Dictionary) -> void:
-	candidates_checked += 1
+func _sync_visual(unit: Dictionary, context: Dictionary, projected := false) -> void:
+	if not projected: candidates_checked += 1
 	var uid := int(unit.uid)
 	var nodes: Dictionary = _ui._nodes_by_uid.get(uid, {})
 	if nodes.is_empty(): return
-	if not _visible(unit, context):
+	if not projected and not _visible(unit, context):
 		_moving.erase(uid)
+		_drawn.erase(uid)
 		_visible_mobiles.erase(uid)
 		_hide_culled(nodes)
 		return
 	visible_checks += 1
 	if not unit.is_building: _visible_mobiles[uid] = true
-	var value: Dictionary = _ui.host.visual_unit(uid)
+	var value: Dictionary = unit if projected else _ui.host.visual_unit(uid)
 	if value.is_empty(): return
+	_drawn[uid] = true
 	var selected: bool = context.selected.has(uid)
 	if nodes.get("draw_visible", false) and nodes.get("visual_value") == value and nodes.get("visual_selected") == selected:
 		if context.interpolating and not value.is_building and value.alive and value.moved:
@@ -150,6 +160,7 @@ func attach_unit(u: Dictionary, ob: Dictionary, w: int, h: int, k: float) -> voi
 
 func free_unit(u: Dictionary) -> void:
 	_moving.erase(int(u.uid))
+	_drawn.erase(int(u.uid))
 	_visible_mobiles.erase(int(u.uid))
 	for key in ["spr", "diamond", "hbar"]:
 		var n = unit_nodes(u).get(key, null)
@@ -272,10 +283,13 @@ func update_visual(u: Dictionary, context: Dictionary = {}) -> void:
 	var nodes := unit_nodes(u)
 	nodes.erase("visual_value")
 	if not _visible(u, context):
+		_drawn.erase(int(u.uid))
 		_hide_culled(nodes)
 		return
 	var value: Dictionary = _ui.host.visual_unit(int(u.uid))
-	if not value.is_empty(): _apply_visual(value, nodes, context)
+	if not value.is_empty():
+		_drawn[int(u.uid)] = true
+		_apply_visual(value, nodes, context)
 
 func _apply_visual(u: Dictionary, nodes: Dictionary, context: Dictionary) -> void:
 	nodes["draw_visible"] = true

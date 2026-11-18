@@ -89,13 +89,34 @@ func visual(data: Object, uid: int) -> Dictionary:
 	var source: Dictionary = data.units[index]
 	if int(source.uid) != uid:
 		invalidate(); return visual(data,uid)
-	var result := _scalars(source,VISUAL_FIELDS)
-	result.clips = _sprite(source)
-	var footprint := _footprint(data,source)
+	var result := _visual_record(data, source)
+	_visuals[uid] = result
+	return result
+
+func renderable(data: Object, context: Dictionary) -> Array:
+	_ensure(data)
+	var result := []
+	for unit: Dictionary in data.units:
+		if not context.sides.get(int(unit.owner), true): continue
+		if unit.is_building:
+			if not context.buildings: continue
+		elif not context.units or unit.get("attached", false) or int(unit.get("site_inside_uid", -1)) >= 0:
+			continue
+		if context.camera:
+			var position := Vector2(float(unit.ax) - float(unit.w) * 0.5, float(unit.ay) - float(unit.h))
+			if not (context.area as Rect2).intersects(Rect2(position, Vector2(unit.w, unit.h))): continue
+		if int(unit.owner) != int(context.player) and not data.visibility.is_visible(Vector2(unit.ax, unit.ay)): continue
+		result.append(_visual_record(data, unit))
+	return result
+
+func _visual_record(data: Object, unit: Dictionary) -> Dictionary:
+	var result := _scalars(unit,VISUAL_FIELDS)
+	result.clips = _sprite(unit)
+	var footprint := _footprint(data,unit)
 	result.occupied_cells = footprint.cells
 	result.footprint_outline = footprint.outline
 	result.make_read_only()
-	_visuals[uid] = result; metrics.visualBuilds += 1
+	metrics.visualBuilds += 1
 	return result
 
 func _scalars(unit: Dictionary, fields: Array) -> Dictionary:
