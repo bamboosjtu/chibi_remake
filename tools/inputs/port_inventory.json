@@ -1,5 +1,6 @@
 {
   "schemaVersion": 3,
+  "mechanicalForwarders": 459,
   "safeForAutomatedDeletion": false,
   "receiverResolution": "partial",
   "method": "Internal scopes verify a restricted literal acquire/guard/direct-receiver form against the composition manifest. Other adapters retain method-name hints only: positive matches may refer to another object, and zero matches do not prove dead code because signals/Callables and inherited adapters exist. This is not a general syntax-tree call graph or deletion evidence.",

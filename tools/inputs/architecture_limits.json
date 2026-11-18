@@ -1,4 +1,5 @@
 {
+  "mechanicalForwarders": 459,
   "description": "Migrated long functions retain their reviewed size as an incremental budget; new functions over 80 lines require review. Module limits apply to all runtime scripts. `violations` records layer breaches that existed when the rule was added: each entry is <file>::<rule>, new breaches fail, and entries should be removed once the breach is fixed.",
   "files": {
     "main.gd": 250,

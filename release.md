@@ -186,3 +186,16 @@ gh release upload v0.1.1 dist/package/* --clobber
 ```
 
 下载包后先运行 `join-release.ps1` 合并并校验，再启动 `ChibiRTS.exe`。
+
+## 9. 存档、验收包与签名
+
+此版本读取 v9 存档。v1–v8 在读取界面显示“格式不支持或数据无效”。损坏主档与可用备份分别保留，清理隔离文件需要在存档界面确认。
+
+本地验收驱动写入独立的 `ChibiAcceptance.testpack`。配套脚本在验收进程中启用该包，玩家 PCK 的资源清单排除 `testing/`。正式候选须使用实际 EXE/PCK 连续三轮通过标准性能检查，安装和分卷都读取同一份凭据。
+
+构建从 `project.godot` 取得 Windows 文件版本。默认分卷状态为未签名。维护者提供发布证书后，可为分卷校验清单生成分离签名，并用可信的证书指纹核验。
+
+```powershell
+pwsh -NoProfile -File tools/sign_release_checksums.ps1 -ChecksumFile dist/package/SHA256SUMS.txt -Thumbprint <发布证书指纹>
+pwsh -NoProfile -File tools/sign_release_checksums.ps1 -ChecksumFile dist/package/SHA256SUMS.txt -Thumbprint <可信发布证书指纹> -Verify
+```

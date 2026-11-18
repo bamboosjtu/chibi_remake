@@ -40,7 +40,7 @@ $names=@((Get-Content -Raw -Encoding UTF8 $suitePath | ConvertFrom-Json).tests |
 $names+=@(Get-ChildItem -LiteralPath (Join-Path $root 'godot/chibi_remake/data') -Filter 'chibi*.json' -File | ForEach-Object { 'load-'+$_.BaseName })
 $names+=@((Get-Content -Raw -Encoding UTF8 $baselinePath | ConvertFrom-Json).simtest | ForEach-Object { 'sim-'+$_.map+'-'+$_.seconds })
 $names+=@('test_native_world')
-$names+=@('native-save-green-write','native-save-green-read','native-save-system-write','native-save-system-read','native-isolation-write','native-isolation-selftest','native-isolation-reject-dir','native-isolation-reject-id')
+$names+=@('native-save-green-write','native-save-green-read','native-save-system-write','native-save-system-read','native-isolation-write','native-isolation-selftest','native-isolation-reject-dir','native-isolation-reject-id','native-isolation-player-export','native-isolation-player-reject')
 $evidence=@{
     schemaVersion=1
     suiteSha256=(Get-FileHash -LiteralPath $suitePath).Hash
@@ -72,6 +72,14 @@ Write-FixtureEvidence
 try { & (Join-Path $PSScriptRoot 'write_build_manifest.ps1') -Executable $exe -SourceCommit $head -Verification candidate-smoke; throw 'Incomplete verification accepted' }
 catch { if ($_.Exception.Message -notmatch 'coverage is incomplete') { throw } }
 $evidence.results=$complete
+Write-FixtureEvidence
+try { & (Join-Path $PSScriptRoot 'write_build_manifest.ps1') -Executable $exe -SourceCommit $head -Verification candidate-smoke; throw 'Missing performance accepted' }
+catch { if ($_.Exception.Message -notmatch 'Incomplete standard performance') { throw } }
+if ((Get-FileHash -LiteralPath (Join-Path $release 'current.json')).Hash -ne $before) { throw 'Performance rejection changed current pointer' }
+. (Join-Path $PSScriptRoot 'performance_fixture.ps1')
+$performance = New-StandardPerformanceFixture (Get-FileHash -LiteralPath ([IO.Path]::ChangeExtension($exe,'.pck'))).Hash (Get-FileHash -LiteralPath $exe).Hash
+$evidence.performanceContract = $performance.performanceContract
+$evidence.standardPerformance = $performance.standardPerformance
 Write-FixtureEvidence
 & (Join-Path $PSScriptRoot 'write_build_manifest.ps1') -Executable $exe -SourceCommit $head -SourceDirty:$false -Verification candidate-smoke
 Move-Item -LiteralPath $evidencePath -Destination ($evidencePath+'.missing')
@@ -149,8 +157,10 @@ foreach ($relative in @('LICENSE','NOTICE.md')) {
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'publish_release.ps1') -Destination $changedTools
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'candidate_verification.ps1') -Destination $changedTools
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'native_dependencies.ps1') -Destination $changedTools
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'compile_launcher.ps1') -Destination $changedTools
 $declarationTarget=Join-Path $fixture 'godot/chibi_remake/addons/ffmpegplayer'
 New-Item -ItemType Directory -Force $declarationTarget | Out-Null
+Copy-Item -LiteralPath (Join-Path $root 'godot/chibi_remake/project.godot') -Destination (Join-Path $fixture 'godot/chibi_remake')
 Copy-Item -LiteralPath (Join-Path $root 'godot/chibi_remake/addons/ffmpegplayer/FFmpegPlayer.gdextension') -Destination $declarationTarget
 $mathDeclarationTarget=Join-Path $fixture 'godot/chibi_remake/simulation/native'
 New-Item -ItemType Directory -Force $mathDeclarationTarget | Out-Null

@@ -6,13 +6,41 @@ class ProjectionProbe extends RefCounted:
 	var nav: Object
 	var visibility: Object
 	var player_owner := 0
+	var trainings := []
+	var research_jobs := []
+class ProjectionGeometry extends RefCounted:
+	var geometry_revision := 0
+	var revision := 0
 var done := false
+
+func _detached_building_work() -> void:
+	var probe := ProjectionProbe.new()
+	probe.nav = ProjectionGeometry.new()
+	probe.visibility = ProjectionGeometry.new()
+	var building := {"uid":12, "owner":0, "is_building":true, "site":false}
+	probe.units = [building]
+	var projection := preload("res://app/read_models/unit_projection.gd").new()
+	assert(not projection.work(probe, 12).busy)
+	probe.trainings.append({"b":building, "unit":30, "t":50.0})
+	var first := projection.work(probe, 12)
+	assert(first.busy and first.training.t == 50.0 and first.training.is_read_only())
+	probe.trainings.clear()
+	probe.research_jobs.append({"buildingUid":12, "tech":1, "t":20, "owner":0})
+	var research := projection.work(probe, 12)
+	assert(research.training.is_empty() and research.research.tech == 1)
+	assert(first.training.t == 50.0)
+	probe.world = RefCounted.new()
+	probe.research_jobs.clear()
+	var replaced := projection.work(probe, 12)
+	assert(replaced.world_id != first.world_id and not replaced.busy)
+
 func _initialize() -> void:
 	create_timer(120).timeout.connect(func():
 		if not done: quit(1))
 	run.call_deferred()
 
 func run() -> void:
+	_detached_building_work()
 	var game: Node=root.get_node("Game");game.current_map="chibic1"
 	var battle=load("res://main.tscn").instantiate();root.add_child(battle);battle.set_process(false)
 	battle.view.event_view.restore_history();battle.view.flush_visuals()

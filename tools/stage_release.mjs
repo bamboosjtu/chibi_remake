@@ -25,7 +25,7 @@ function add(file){
 // （simulation/、presentation/ 等嵌套脚本）必须进入打包，否则 PCK 缺脚本。
 function walkScripts(dir, prefix) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (entry.name.startsWith('.')) continue;
+    if (entry.name.startsWith('.') || (!prefix && entry.name === 'testing')) continue;
     const rel = prefix ? prefix + '/' + entry.name : entry.name;
     if (entry.isDirectory()) { walkScripts(dir + '/' + entry.name, rel); continue; }
     if (/\.(gd|tscn|godot|gdextension)$/.test(entry.name)) add(rel);
@@ -96,6 +96,9 @@ for(const file of selected){
 }
 
 let cfg=fs.readFileSync(source+'/export_presets.cfg','utf8').replace(/include_filter="[^"]*"/g,'include_filter="*.json,*.txt,*.otf,*.bin,*.AVI"');
+const version=fs.readFileSync(source+'/project.godot','utf8').match(/^config\/version="(\d+\.\d+\.\d+)"$/m)?.[1];
+if(!version) throw Error('Missing project version');
+cfg=cfg.replace(/^application\/(?:file_version|product_version)="[^"]*"/gm, setting=>setting.replace(/"[^"]*"/, '"'+version+'.0"'));
 fs.writeFileSync(stage+'/export_presets.cfg',cfg);
 const bytes=[...selected].reduce((sum,file)=>sum+fs.statSync(resolveInput(file)).size,0);
 const runtimeFiles=[...selected].map(file=>file.startsWith('art/full/terrain_chunks/')&&file.endsWith('.jpg')?file.replace(/\.jpg$/,'.bin'):file);

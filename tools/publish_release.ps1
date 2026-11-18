@@ -49,7 +49,10 @@ foreach ($relative in $requiredNotices) {
 }
 $entry=Join-Path $ReleaseRoot 'ChibiRTS.exe' 
 $launcherSource=Join-Path $PSScriptRoot 'launcher.cs'
-$launcherSourceHash=(Get-FileHash -LiteralPath $launcherSource).Hash
+$projectVersion=Select-String -LiteralPath (Join-Path $projectRoot 'godot/chibi_remake/project.godot') -Pattern '^config/version="'
+$launcherInputs=[Text.Encoding]::UTF8.GetBytes((Get-FileHash -LiteralPath $launcherSource).Hash + (Get-FileHash -LiteralPath (Join-Path $PSScriptRoot 'compile_launcher.ps1')).Hash + $projectVersion.Line)
+$sha=[Security.Cryptography.SHA256]::Create()
+try { $launcherSourceHash=[BitConverter]::ToString($sha.ComputeHash($launcherInputs)).Replace('-','') } finally { $sha.Dispose() }
 $reuseLauncher=$false
 # An active launcher waits for its game and Windows locks its executable.
 # Reuse it only when the prior release records the exact same launcher source.
@@ -120,12 +123,8 @@ $info=[ordered]@{
 $infoJson=$info | ConvertTo-Json -Depth 8
 [IO.File]::WriteAllText((Join-Path $versionDir 'release-info.json'), $infoJson, (New-Object System.Text.UTF8Encoding $false))
 $launcher=Join-Path $ReleaseRoot 'launcher.new.exe'
-$compiler=Join-Path $env:WINDIR 'Microsoft.NET/Framework64/v4.0.30319/csc.exe'
 if (!$reuseLauncher) {
-    # launcher.cs is UTF-8 without BOM; csc otherwise decodes it with the system
-    # code page and the Chinese strings land in the binary as mojibake.
-    & $compiler /nologo /codepage:65001 /target:winexe /reference:System.Runtime.Serialization.dll /reference:System.Windows.Forms.dll "/out:$launcher" $launcherSource
-    if ($LASTEXITCODE -ne 0) { throw 'Launcher compiler failed' }
+    & (Join-Path $PSScriptRoot 'compile_launcher.ps1') -Output $launcher
 }
 if ($FailBeforeCommit) { throw 'Injected failure: current version not touched' }
 # Install a changed launcher before committing current.json; a locked executable

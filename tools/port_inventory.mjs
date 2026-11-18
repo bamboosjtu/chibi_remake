@@ -30,7 +30,12 @@ const internalScopes=Object.entries(registry.internalScopes).map(([file,entry])=
  const declared=JSON.parse(sources[file].match(/^const REQUIRED_SERVICES := (.+)$/m)[1]);
  return {file,host:entry.host,category:'module-capability',providers:declared,resolvedCalls:validateInternalScope(file,sources[file],declared)};
 });
-const report = {schemaVersion:3, safeForAutomatedDeletion:false, receiverResolution:"partial", method:'Internal scopes verify a restricted literal acquire/guard/direct-receiver form against the composition manifest. Other adapters retain method-name hints only: positive matches may refer to another object, and zero matches do not prove dead code because signals/Callables and inherited adapters exist. This is not a general syntax-tree call graph or deletion evidence.', ports,internalScopes};
+const mechanicalForwarders = ports.flatMap(port => port.methods).filter(method => method.mechanical).length;
+const limits = JSON.parse(fs.readFileSync('tools/inputs/architecture_limits.json', 'utf8'));
+if (mechanicalForwarders > limits.mechanicalForwarders) {
+  throw Error('Mechanical forwarders increased to ' + mechanicalForwarders + ' (limit ' + limits.mechanicalForwarders + ')');
+}
+const report = {schemaVersion:3, mechanicalForwarders, safeForAutomatedDeletion:false, receiverResolution:"partial", method:'Internal scopes verify a restricted literal acquire/guard/direct-receiver form against the composition manifest. Other adapters retain method-name hints only: positive matches may refer to another object, and zero matches do not prove dead code because signals/Callables and inherited adapters exist. This is not a general syntax-tree call graph or deletion evidence.', ports,internalScopes};
 const target = 'tools/inputs/port_inventory.json', text = JSON.stringify(report,null,2)+'\n';
 if (process.argv.includes('--write')) fs.writeFileSync(target,text);
 else if (!fs.existsSync(target) || fs.readFileSync(target,'utf8') !== text) throw Error('Port inventory stale; review and run node tools/port_inventory.mjs --write');

@@ -56,6 +56,8 @@ try {
     & node (Join-Path $PSScriptRoot 'godot_cli.mjs') $godot --headless --path $stage --export-release 'Windows HD Art' $exe *> (Join-Path $candidate 'export.log')
     if ($LASTEXITCODE -ne 0) { throw 'Export failed' }
     [IO.File]::WriteAllText((Join-Path $candidate 'portable.txt'), 'userdata', (New-Object System.Text.UTF8Encoding $false))
+    & node (Join-Path $PSScriptRoot 'godot_cli.mjs') $godot --headless --path (Join-Path $BuildRoot 'godot/chibi_remake') --script (Join-Path $PSScriptRoot 'gd/pack_acceptance.gd') -- (Join-Path $BuildRoot 'godot/chibi_remake/testing') (Join-Path $candidate 'ChibiAcceptance.testpack')
+    if ($LASTEXITCODE -ne 0) { throw 'Acceptance companion packaging failed' }
     # Launch the candidate before it can be published. A build that exports but
     # cannot load a map must fail here, not at the player's first click.
     $verification='unverified'; $verificationNote=''

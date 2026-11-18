@@ -8,9 +8,12 @@ param(
     [string]$Map = "chibic17",
     [string]$Output = "",
     [string]$ReleasePack = "",
+    [string]$ReleaseExecutable = "",
     [string]$RunnerDirectory = "",
     [switch]$DeveloperSource,
     [switch]$ProfileUnits,
+    [switch]$FrameDiagnostics,
+    [switch]$PanCamera,
     [switch]$CpuMinimap,
     [ValidateSet('project','gl_compatibility','mobile','forward_plus')][string]$RenderingMethod = 'project',
     [int]$MaxSeconds = 1800
@@ -41,12 +44,19 @@ $arguments = '--path godot/chibi_remake --script "' + (Join-Path $root 'tools/gd
 if ($ReleasePack) {
     $packPath=[IO.Path]::GetFullPath($ReleasePack)
     if (!(Test-Path -LiteralPath $packPath -PathType Leaf)) { throw ('Missing release PCK: '+$packPath) }
-    $template=Join-Path $root '_work/build/roaming/Godot/export_templates/4.7.2.stable/windows_release_x86_64.exe'
-    & node tools/verify_engine.mjs --platform win32_release --engine $template
-    if ($LASTEXITCODE -ne 0) { throw 'Unreviewed release template' }
+    if ($ReleaseExecutable) {
+        $template=[IO.Path]::GetFullPath($ReleaseExecutable)
+        if ([IO.Path]::ChangeExtension($template,'.pck') -ne $packPath) { throw 'Candidate EXE and PCK must be adjacent and share a filename stem' }
+    } else {
+        $template=Join-Path $root '_work/build/roaming/Godot/export_templates/4.7.2.stable/windows_release_x86_64.exe'
+        & node tools/verify_engine.mjs --platform win32_release --engine $template
+        if ($LASTEXITCODE -ne 0) { throw 'Unreviewed release template' }
+    }
     $nativeDirectory=if ($RunnerDirectory) { [IO.Path]::GetFullPath($RunnerDirectory) } else { Join-Path (Split-Path $output -Parent) ('native-bench-'+[Guid]::NewGuid().ToString('N')) }
     $engine=Join-Path $nativeDirectory 'ChibiBench.exe'
     $inputs=@{'ChibiBench.exe'=$template;'ChibiBench.pck'=$packPath}
+    $companion=Join-Path (Split-Path $packPath -Parent) 'ChibiAcceptance.testpack'
+    if (Test-Path -LiteralPath $companion -PathType Leaf) { $inputs['ChibiAcceptance.testpack']=$companion }
     $sidecars=Join-Path (Split-Path $packPath -Parent) 'addons'
     if (Test-Path -LiteralPath $sidecars -PathType Container) {
         foreach ($file in @(Get-ChildItem -LiteralPath $sidecars -File -Recurse)) { $inputs['addons/'+$file.FullName.Substring($sidecars.Length+1).Replace('\','/')]=$file.FullName }
@@ -72,6 +82,8 @@ if ($ReleasePack) {
 }
 if ($CapacityStress) { $arguments += ' --bench-capacity' }
 if ($ProfileUnits) { $arguments += ' --bench-profile' }
+if ($FrameDiagnostics -or $PanCamera) { $arguments += ' --bench-frame-diagnostics' }
+if ($PanCamera) { $arguments += ' --bench-pan-camera' }
 if ($CpuMinimap) { $arguments += ' --cpu-minimap' }
 if ($RenderingMethod -ne 'project') {
     $driver=if ($RenderingMethod -eq 'gl_compatibility') { 'opengl3' } else { 'vulkan' }
@@ -87,6 +99,8 @@ $benchmarkProfile=Join-Path (Split-Path $output -Parent) ([IO.Path]::GetFileName
 New-Item -ItemType Directory -Force $benchmarkProfile | Out-Null
 $start.EnvironmentVariables['APPDATA']=$benchmarkProfile
 $start.EnvironmentVariables['LOCALAPPDATA']=$benchmarkProfile
+$start.EnvironmentVariables['CHIBI_ACCEPTANCE']='1'
+$start.EnvironmentVariables['CHIBI_ACCEPTANCE_OUTPUT']=Split-Path $output -Parent
 $process = [Diagnostics.Process]::Start($start)
 $stdoutTask=$process.StandardOutput.ReadToEndAsync()
 $stderrTask=$process.StandardError.ReadToEndAsync()
@@ -110,7 +124,8 @@ if ($timedOut -or $process.ExitCode -ne 0 -or !(Test-Path -LiteralPath $output))
 if ([IO.File]::GetLastWriteTimeUtc($output) -lt $benchmarkStarted) { throw 'Stale benchmark report was not produced by this run' }
 $report = Get-Content -Raw -Encoding UTF8 $output | ConvertFrom-Json
 if (!$DeveloperSource -and $report.engineBuild -ne 'release') { throw 'Acceptance requires a release template' }
-$report | Add-Member -NotePropertyName acceptanceRun -NotePropertyValue (!$DeveloperSource -and !$ProfileUnits -and !$CpuMinimap -and $RenderingMethod -eq 'project') -Force
+$report | Add-Member -NotePropertyName runId -NotePropertyValue ([Guid]::NewGuid().ToString('N')) -Force
+$report | Add-Member -NotePropertyName acceptanceRun -NotePropertyValue (!$DeveloperSource -and !$ProfileUnits -and !$FrameDiagnostics -and !$PanCamera -and !$CpuMinimap -and $RenderingMethod -eq 'project') -Force
 if ($RenderingMethod -ne 'project' -and $report.renderingMethod -ne $RenderingMethod) { throw 'Requested rendering method was not active' }
 $report | Add-Member -NotePropertyName engineSha256 -NotePropertyValue (Get-FileHash -LiteralPath $engine).Hash.ToLowerInvariant() -Force
 if ($ReleasePack) {

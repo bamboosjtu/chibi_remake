@@ -4,6 +4,11 @@ name: release-regressions
 # Native Windows EXE, GPU, packaging and performance acceptance remain separate.
 on:
   workflow_dispatch:
+  pull_request:
+  push:
+    branches: ['release/**']
+  schedule:
+    - cron: '20 19 * * *'
 
 permissions:
   contents: read
@@ -17,10 +22,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Compile launcher
+        shell: powershell
+        run: ./tools/compile_launcher.ps1 -Output (Join-Path $env:RUNNER_TEMP 'ChibiLauncher.exe')
       - name: Packaging, candidate locks and publication safety
         shell: powershell
         run: ./tools/ci_windows.ps1 -ReleaseSafetyOnly
   release-suite:
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:

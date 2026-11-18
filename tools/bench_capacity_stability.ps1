@@ -21,6 +21,9 @@ $shell = (Get-Process -Id $PID).Path
 $bench = Join-Path $PSScriptRoot 'bench_full_battle.ps1'
 $runner = Join-Path $directory 'runner'
 $pckHash = (Get-FileHash -LiteralPath $pack).Hash.ToLowerInvariant()
+$exe = [IO.Path]::ChangeExtension($pack, '.exe')
+$runtimeArgs = @()
+if (Test-Path -LiteralPath $exe -PathType Leaf) { $runtimeArgs = @('-ReleaseExecutable', $exe) }
 
 function Test-CapacityRound($report) {
     if ($null -eq $report -or $report.engineBuild -ne 'release' -or $report.acceptanceRun -ne $true -or
@@ -29,11 +32,11 @@ function Test-CapacityRound($report) {
         $report.frameInitialTick -ne 360 -or !$report.frameInitialStateChecksum -or
         $report.packSha256 -ne $pckHash -or $report.unitsMeasured -ne 460 -or
         $report.pausedAtEnd -ne $false -or $report.gameEnd -ne 0) { return $false }
-    foreach ($name in @('logicP95Ms','commandLatencyP95Ms','ticksPerSecond','targetTicksPerSecond','simAccumulatorBegin','simAccumulatorEnd')) {
+    foreach ($name in @('fps','logicP95Ms','commandLatencyP95Ms','ticksPerSecond','targetTicksPerSecond','simAccumulatorBegin','simAccumulatorEnd')) {
         if ($null -eq $report.$name -or [double]::IsNaN([double]$report.$name) -or
             [double]::IsInfinity([double]$report.$name) -or [double]$report.$name -lt 0) { return $false }
     }
-    return ($report.logicP95Ms -le 30 -and $report.commandLatencyP95Ms -le 100 -and
+    return ($report.fps -ge 30 -and $report.logicP95Ms -le 30 -and $report.commandLatencyP95Ms -le 100 -and
             $report.targetTicksPerSecond -ge 33.3333 -and
             $report.ticksPerSecond -ge 0.95*$report.targetTicksPerSecond -and
             $report.simAccumulatorEnd -le [Math]::Max(0.2, [double]$report.simAccumulatorBegin+0.1))
@@ -45,7 +48,7 @@ foreach ($round in 1..5) {
     $code = $null
     if (!$SummarizeOnly) {
         if (Test-Path -LiteralPath $output) { throw 'Choose a new evidence directory' }
-        & $shell -NoProfile -File $bench -ReleasePack $pack -RunnerDirectory $runner -CapacityStress -Output $output
+        & $shell -NoProfile -File $bench -ReleasePack $pack -RunnerDirectory $runner -CapacityStress -Output $output @runtimeArgs
         $code = $LASTEXITCODE
     }
     $report = if (Test-Path -LiteralPath $output) { Get-Content -Raw -LiteralPath $output | ConvertFrom-Json }
@@ -63,7 +66,7 @@ $stable = @($rounds | Where-Object { $_.pass }).Count -eq 5 -and $starts.Count -
 $synthetic = $null
 if ($IncludeSynthetic -and !$SummarizeOnly) {
     $output = Join-Path $directory 'synthetic-660.json'
-    & $shell -NoProfile -File $bench -ReleasePack $pack -RunnerDirectory $runner -Stress -Output $output
+    & $shell -NoProfile -File $bench -ReleasePack $pack -RunnerDirectory $runner -Stress -Output $output @runtimeArgs
     $synthetic = @{exitCode=$LASTEXITCODE; report=(Split-Path $output -Leaf)}
 } elseif ($SummarizeOnly -and (Test-Path -LiteralPath (Join-Path $directory 'synthetic-660.json'))) {
     $synthetic = @{report='synthetic-660.json'}

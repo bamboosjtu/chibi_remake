@@ -12,7 +12,9 @@ $engine=Join-Path $candidate ('_validation-engine-'+[Guid]::NewGuid().ToString('
 $output=Join-Path $projectRoot ('_work/candidate-smoke/'+[Guid]::NewGuid().ToString('N'))
 . (Join-Path $PSScriptRoot 'candidate_lock.ps1')
 $validationLock=Enter-CandidateValidationLock $candidate
+$priorAcceptance = $env:CHIBI_ACCEPTANCE
 try {
+$env:CHIBI_ACCEPTANCE = '1'
 $evidencePath=Join-Path $candidate 'verification.json'
 if (Test-Path -LiteralPath $evidencePath) {
     Copy-Item -LiteralPath $evidencePath -Destination ($evidencePath+'.previous') -Force
@@ -40,7 +42,7 @@ try {
     $hostShell=(Get-Process -Id $PID).Path
     foreach ($round in 1..3) {
         $performancePath=Join-Path $output ('performance/standard-'+$round+'.json')
-        & $hostShell -NoProfile -File (Join-Path $PSScriptRoot 'bench_full_battle.ps1') -ReleasePack $pack -RunnerDirectory (Join-Path $output 'performance/runner') -Output $performancePath
+        & $hostShell -NoProfile -File (Join-Path $PSScriptRoot 'bench_full_battle.ps1') -ReleasePack $pack -ReleaseExecutable $Executable -RunnerDirectory (Join-Path $output 'performance/runner') -Output $performancePath
         if ($LASTEXITCODE -ne 0) { throw ('Candidate release performance failed in round '+$round+': '+$performancePath) }
         $standardPerformance+=Get-Content -Raw -LiteralPath $performancePath | ConvertFrom-Json
     }
@@ -50,15 +52,19 @@ try {
         schemaVersion=1; verifiedAt=(Get-Date).ToUniversalTime().ToString('o')
         suiteSha256=(Get-FileHash -LiteralPath (Join-Path $PSScriptRoot 'inputs/release_tests.json')).Hash
         baselineSha256=(Get-FileHash -LiteralPath (Join-Path $PSScriptRoot 'inputs/baselines.json')).Hash
-        performanceContract="release-standard-3-runs-v1"; standardPerformance=@($standardPerformance)
+        performanceContract="release-standard-3-runs-v2"; standardPerformance=@($standardPerformance)
         stressRealtime="not-certified-by-standard-gate"
         artifacts=$artifacts
         results=@($results | Select-Object name,ok,code,timedOut,missing)
     }
+    Assert-StandardPerformanceEvidence $evidence (Get-FileHash -LiteralPath $pack).Hash (Get-FileHash -LiteralPath $Executable).Hash
     [IO.File]::WriteAllText($evidencePath,($evidence | ConvertTo-Json -Depth 8),(New-Object System.Text.UTF8Encoding $false))
     $null=Assert-CandidateVerification $candidate $null
     Write-Output "CANDIDATE SMOKE PASS maps / release suite / baselines: $output"
 } finally {
     if (Test-Path -LiteralPath $engine) { Remove-Item -LiteralPath $engine -Force }
 }
-} finally { $validationLock.Dispose() }
+} finally {
+    $env:CHIBI_ACCEPTANCE = $priorAcceptance
+    $validationLock.Dispose()
+}

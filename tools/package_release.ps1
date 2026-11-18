@@ -24,7 +24,11 @@ if ($OutputDirectory.TrimEnd('\','/') -eq $VersionDirectory.TrimEnd('\','/')) { 
 # This directory is deleted recursively below; never accept a path outside the
 # project's own dist/ tree, and never accept the tree root itself.
 $distRoot = [IO.Path]::GetFullPath((Join-Path $root 'dist')) + [IO.Path]::DirectorySeparatorChar
-if (!$OutputDirectory.StartsWith($distRoot, [StringComparison]::OrdinalIgnoreCase)) { throw ('OutputDirectory must live under ' + $distRoot) }
+$workspaceOutput = [IO.Path]::GetFullPath((Join-Path $root '_work/package-outputs')) + [IO.Path]::DirectorySeparatorChar
+if (!$OutputDirectory.StartsWith($distRoot, [StringComparison]::OrdinalIgnoreCase) -and
+    !$OutputDirectory.StartsWith($workspaceOutput, [StringComparison]::OrdinalIgnoreCase)) {
+    throw 'OutputDirectory must live under dist or _work/package-outputs'
+}
 if ($VersionDirectory.StartsWith($OutputDirectory.TrimEnd('\','/')+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) { throw 'OutputDirectory must not contain VersionDirectory' }
 # Lexical containment is insufficient when a parent is a junction/symlink.
 $ancestor=$OutputDirectory
@@ -33,6 +37,11 @@ while ($ancestor -and $ancestor.StartsWith($root,[StringComparison]::OrdinalIgno
     if ($ancestor -eq $root) { break }
     $ancestor=Split-Path $ancestor -Parent
 }
+$manifestPath = Join-Path $VersionDirectory 'build-manifest.json'
+if (!(Test-Path -LiteralPath $manifestPath -PathType Leaf)) { throw 'Published build manifest is missing' }
+$manifest = Get-Content -Raw -Encoding UTF8 -LiteralPath $manifestPath | ConvertFrom-Json
+. (Join-Path $PSScriptRoot 'candidate_verification.ps1')
+$null = Assert-CandidateVerification $VersionDirectory $manifest
 if ($PartMiB -ge 1024 -or $PartMiB -lt 1) { throw 'PartMiB must be between 1 and 1023' }
 $limit = [int64]$PartMiB * 1MB
 if (Test-Path -LiteralPath $OutputDirectory) { Remove-Item -LiteralPath $OutputDirectory -Recurse -Force }
