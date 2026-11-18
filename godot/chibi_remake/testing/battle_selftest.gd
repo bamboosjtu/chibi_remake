@@ -321,9 +321,7 @@ func _selftest_production() -> void:
 		var button: Button = host.view.hot_buttons[0].btn
 		self._check(not button.disabled,"生产按钮可用")
 		if not button.disabled: button.pressed.emit()
-	await host.get_tree().process_frame
-	# process_frame is emitted before node processing; allow the queued command's frame pump to run.
-	await host.get_tree().process_frame
+	await host.commands.session.wait_command_boundary()
 	print("SELFTEST train: queued %d -> %d (生产按钮 生效=%s)" % [before_train, host.trainings.size(), str(host.trainings.size() > before_train)])
 	if train_bldg.is_empty():
 		self._skip("生产按钮 生产（B1）：本图我方没有建筑，前提不成立")
