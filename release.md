@@ -160,7 +160,7 @@ Copy-Item -LiteralPath (Join-Path $releaseRoot 'current.json.bak') -Destination 
 
 ## 8. 本地试玩与发布打包
 
-GitHub Actions 运行静态契约（`contracts`）与语法/第一关冒烟（`ci`），不做构建与发布；构建、试玩安装、分卷和上传都在本地执行。统一入口是 `tools/release.ps1`，包含 `preview` 与 `release` 两个模式。
+GitHub Actions 检查静态契约、语法和启动冒烟。PR 另行编译 Windows 启动器并验证发布安全。完整源码发布回归可手动触发，也在夜间及发布分支运行。参考机性能验收、安装、分卷和上传在本地执行。统一入口为 `tools/release.ps1`，包含 `preview` 与 `release` 两个模式。
 
 ```powershell
 # 试玩：构建并安装到 release/versions，允许未提交改动
