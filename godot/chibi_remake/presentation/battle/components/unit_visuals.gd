@@ -10,6 +10,13 @@ var pending_visuals := {}
 var _world_dirty := false
 var sync_calls := 0
 var sync_microseconds := 0
+var candidates_checked := 0
+var visible_checks := 0
+var _last_context := {}
+var _last_world := -1
+var _moving := {}
+var _visible_mobiles := {}
+
 
 func queue_visual(unit: Dictionary) -> void:
 	pending_visuals[int(unit.uid)]=true
@@ -18,23 +25,59 @@ func queue_world_visuals() -> void:
 	_world_dirty=true
 
 func flush_visuals(interpolating := false) -> void:
-	if not _world_dirty and pending_visuals.is_empty():return
-	var begin:=Time.get_ticks_usec()
-	# Resolve UIDs against the current world: queued old-world dictionaries must
-	# never survive a load/rollback and overwrite the new presentation.
-	var context:=_visual_context();context["interpolating"]=interpolating
-	for unit in _ui.host.unit_views():
-		if _world_dirty or pending_visuals.has(int(unit.uid)):
-			update_visual(unit,context)
-			# The following interpolation pass writes the final mobile transform.
-			# Avoid dirtying that subtree at the current position first.
-			if not interpolating or bool(unit.is_building):place_unit(unit)
-			sync_calls+=1
-	pending_visuals.clear();_world_dirty=false
-	sync_microseconds+=Time.get_ticks_usec()-begin
+	var context := _visual_context()
+	var world: int = _ui.host.world_identity()
+	var full := _world_dirty or world != _last_world or context != _last_context
+	if not full and pending_visuals.is_empty(): return
+	_last_world = world
+	_last_context = context.duplicate()
+	context["interpolating"] = interpolating
+	var begin := Time.get_ticks_usec()
+	if full:
+		_moving.clear()
+		_visible_mobiles.clear()
+		for unit in _ui.host.unit_views():
+			_sync_visual(unit, context)
+	else:
+		for uid in pending_visuals:
+			var unit: Dictionary = _ui.host.roster_unit(uid)
+			if not unit.is_empty(): _sync_visual(unit, context)
+	pending_visuals.clear()
+	_world_dirty = false
+	sync_microseconds += Time.get_ticks_usec() - begin
+
+func _sync_visual(unit: Dictionary, context: Dictionary) -> void:
+	candidates_checked += 1
+	var uid := int(unit.uid)
+	var nodes: Dictionary = _ui._nodes_by_uid.get(uid, {})
+	if nodes.is_empty(): return
+	if not _visible(unit, context):
+		_moving.erase(uid)
+		_visible_mobiles.erase(uid)
+		_hide_culled(nodes)
+		return
+	visible_checks += 1
+	if not unit.is_building: _visible_mobiles[uid] = true
+	var value: Dictionary = _ui.host.visual_unit(uid)
+	if value.is_empty(): return
+	var selected: bool = context.selected.has(uid)
+	if nodes.get("draw_visible", false) and nodes.get("visual_value") == value and nodes.get("visual_selected") == selected:
+		if context.interpolating and not value.is_building and value.alive and value.moved:
+			_moving[uid] = value
+		return
+	nodes["visual_value"] = value
+	nodes["visual_selected"] = selected
+	_apply_visual(value, nodes, context)
+	if context.interpolating and not value.is_building and value.alive and value.moved:
+		_moving[uid] = value
+	else:
+		_moving.erase(uid)
+		place_unit(value)
+	sync_calls += 1
 
 func performance_counters() -> Dictionary:
-	return {"syncCalls":sync_calls,"syncMicroseconds":sync_microseconds}
+	return {"syncCalls":sync_calls,"syncMicroseconds":sync_microseconds,
+		"candidatesChecked":candidates_checked,"visibleChecks":visible_checks,"movingVisuals":_moving.size()}
 
 const FRAME_TICKS = preload("res://simulation/definitions/action_visual.gd").FRAME_TICKS # Presentation sampling; simulation owns gait state.
 
@@ -106,6 +149,8 @@ func attach_unit(u: Dictionary, ob: Dictionary, w: int, h: int, k: float) -> voi
 	unit_nodes(u)["hfill"] = fill
 
 func free_unit(u: Dictionary) -> void:
+	_moving.erase(int(u.uid))
+	_visible_mobiles.erase(int(u.uid))
 	for key in ["spr", "diamond", "hbar"]:
 		var n = unit_nodes(u).get(key, null)
 		if n != null and is_instance_valid(n):
@@ -122,7 +167,10 @@ func place_unit(u: Dictionary) -> void:
 		if s.position!=point:s.position=point
 
 func capture_motion() -> void:
-	for unit: Dictionary in _ui.host.motion_views():
+	var filter = _visible_mobiles if _last_world == _ui.host.world_identity() else null
+	_ui._motion_previous.clear()
+	_ui._gait_previous.clear()
+	for unit: Dictionary in _ui.host.motion_views(filter):
 		var uid:=int(unit.uid)
 		var nodes: Dictionary=_ui._nodes_by_uid.get(int(unit.uid),{})
 		# Hidden units have no interpolated pixels; first reveal starts at the
@@ -136,12 +184,10 @@ func capture_motion() -> void:
 
 func interpolate_motion(alpha: float) -> void:
 	var tile_width: float=_ui.host.tile_w;var half_height: float=_ui.host.tile_hh
-	for row in _ui.host.unit_views():
-		if bool(row.is_building) or not row.alive:continue
-		var nodes:=unit_nodes(row)
-		if nodes.get("spr")==null or not nodes.spr.visible:continue
-		var unit: Dictionary=_ui.host.visual_unit(int(row.uid))
-		if unit.is_empty():continue
+	for uid in _moving:
+		var nodes: Dictionary = _ui._nodes_by_uid.get(uid, {})
+		if nodes.get("spr") == null or not nodes.spr.visible: continue
+		var unit: Dictionary = _moving[uid]
 		var current:=Vector2(float(unit.ax),float(unit.ay))
 		var previous: Vector2=_ui._motion_previous.get(int(unit.uid),current)
 		# Embarking, unloading and explicit relocation must snap, not slide through walls.
@@ -201,40 +247,46 @@ func _visual_context() -> Dictionary:
 	if has_camera:
 		var size: Vector2=surface.get_viewport_rect().size/camera.zoom
 		area=Rect2(camera.position-size*0.5,size).grow(128)
-	return {"selected":selected,"player":int(_ui.host.player_owner),"buildings":bool(_ui.host.show_buildings),"units":bool(_ui.host.show_units),"sides":_ui.host.sec_visible,"camera":has_camera,"area":area,"halfHeight":float(_ui.host.tile_hh)}
+	return {"selected":selected,"player":int(_ui.host.player_owner),"buildings":bool(_ui.host.show_buildings),"units":bool(_ui.host.show_units),"sides":_ui.host.sec_visible.duplicate(),"camera":has_camera,"area":area,"halfHeight":float(_ui.host.tile_hh)}
 
-func update_visual(u: Dictionary, context: Dictionary={}) -> void:
-	if context.is_empty():context=_visual_context()
-	var nodes:=unit_nodes(u)
-	var vis: bool
-	if bool(u.is_building):
-		vis = context.buildings and bool(context.sides.get(u.owner,true))
-	else:
-		vis = context.units and bool(context.sides.get(u.owner,true))
-		# 装载中的单位（模式 0xC）不在图上：由运输船携带，不画精灵/选中框/血条。
-		if bool(u.get("attached", false)) or int(u.get("site_inside_uid", -1)) >= 0:
-			vis = false
-	if int(u.owner)!=int(context.player):
-		vis=vis and (bool(u.visible) if u.has("visible") else _ui.host.point_visible(Vector2(u.ax,u.ay)))
-	if vis and not bool(u.is_building) and context.camera:
-		vis=(context.area as Rect2).has_point(Vector2(float(u.ax),float(u.ay)-float(u.h)*0.5))
-	if not vis:
-		if bool(nodes.get("draw_visible",true)):
-			for key in ["spr","diamond","hbar"]:
-				if nodes.get(key)!=null:nodes[key].visible=false
-		nodes["draw_visible"]=false
-		return # Invisible geometry/poses are sampled when the unit becomes visible.
-	u = _ui.host.visual_unit(int(u.uid))
-	if u.is_empty(): return
-	nodes["draw_visible"]=true
+func _visible(u: Dictionary, context: Dictionary) -> bool:
+	if not bool(context.sides.get(u.owner, true)): return false
+	if u.is_building:
+		if not context.buildings: return false
+	elif not context.units or bool(u.get("attached", false)) or int(u.get("site_inside_uid", -1)) >= 0:
+		return false
+	if int(u.owner) != context.player:
+		if not (bool(u.visible) if u.has("visible") else _ui.host.point_visible(Vector2(u.ax,u.ay))): return false
+	if not context.camera: return true
+	var position := Vector2(float(u.ax) - float(u.w) * 0.5, float(u.ay) - float(u.h))
+	return (context.area as Rect2).intersects(Rect2(position, Vector2(u.w, u.h)))
+
+func _hide_culled(nodes: Dictionary) -> void:
+	if bool(nodes.get("draw_visible", true)):
+		for key in ["spr", "diamond", "hbar"]:
+			if nodes.get(key) != null: nodes[key].hide()
+	nodes["draw_visible"] = false
+
+func update_visual(u: Dictionary, context: Dictionary = {}) -> void:
+	if context.is_empty(): context = _visual_context()
+	var nodes := unit_nodes(u)
+	nodes.erase("visual_value")
+	if not _visible(u, context):
+		_hide_culled(nodes)
+		return
+	var value: Dictionary = _ui.host.visual_unit(int(u.uid))
+	if not value.is_empty(): _apply_visual(value, nodes, context)
+
+func _apply_visual(u: Dictionary, nodes: Dictionary, context: Dictionary) -> void:
+	nodes["draw_visible"] = true
 
 	var spr = nodes.get("spr", null)
 	if spr != null:
-		spr.visible = vis
+		spr.visible = true
 		if spr.z_index!=int(u.ay):spr.z_index=int(u.ay) # 按底边排序：单位与建筑统一
 	var dia = nodes.get("diamond", null)
 	if dia != null:
-		dia.visible = vis and context.selected.has(int(u.uid))
+		dia.visible = context.selected.has(int(u.uid))
 		var outline_point:=Vector2(float(u.ax), float(u.ay) - float(context.halfHeight))
 		if not bool(u.is_building) and dia.position!=outline_point:dia.position=outline_point
 		if dia.z_index!=int(u.ay)-1:dia.z_index=int(u.ay)-1
@@ -245,9 +297,6 @@ func update_visual(u: Dictionary, context: Dictionary={}) -> void:
 			if cells!=dia.get_meta("footprint",[]):
 				var outline := PackedVector2Array(u.footprint_outline)
 				dia.points=outline;dia.set_meta("footprint",cells.duplicate())
-	if not bool(u.is_building) and not vis:
-		if nodes.get("hbar")!=null:nodes.hbar.visible=false
-		return # Fogged/offscreen units must not load unseen HD animation pages.
 	if float(u.get("die_t",-1)) >= 0:
 		var rule = preload("res://simulation/definitions/death_visual.gd")
 		var frame: int = rule.frame(u,float(u.die_t))
@@ -269,7 +318,7 @@ func update_visual(u: Dictionary, context: Dictionary={}) -> void:
 	var hurt: bool = float(u.hp) < float(u.maxhp) - 0.5
 	var bar = nodes.get("hbar", null)
 	if bar != null:
-		bar.visible = vis and hurt
+		bar.visible = hurt
 		if hurt:
 			var bar_point:=Vector2(float(u.ax) - 11, float(u.ay) - float(u.h) - 9)
 			if not context.get("interpolating",false) or bool(u.is_building):

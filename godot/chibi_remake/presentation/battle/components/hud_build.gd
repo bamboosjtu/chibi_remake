@@ -103,7 +103,7 @@ func _mk_label(parent: Node, size: float, col: Color, align: HorizontalAlignment
 
 func _mk_button(parent: Node, size: float) -> Button:
 	var b := Button.new()
-	b.focus_mode = Control.FOCUS_NONE
+	b.focus_mode = Control.FOCUS_ALL
 	b.mouse_filter = Control.MOUSE_FILTER_STOP
 	b.clip_text = true
 	b.add_theme_font_size_override("font_size", maxi(8, int(round(size))))
@@ -137,7 +137,8 @@ func _build_top_bar(ui: CanvasLayer) -> void:
 	var hdr_l := _ui_tex("hud_top_left")
 	var hdr_r := _ui_tex("hud_top_right")
 	var hdr_tile := _ui_tex("hud_bar_tile")
-	if hdr_l != null and hdr_r != null and hdr_tile != null:
+	var layout := str(ProjectSettings.get_setting("application/config/chibi_hud_layout", "painted"))
+	if layout == "painted" and hdr_l != null and hdr_r != null and hdr_tile != null:
 		_build_top_bar_original(ui, hdr_l, hdr_r, hdr_tile)
 		return
 	_ui.top_bar = ColorRect.new()

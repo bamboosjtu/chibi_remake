@@ -44,3 +44,27 @@ func commit(filename: String, text: String) -> bool:
 	else: last_error=Store.last_error.duplicate(true)
 	return ok
 
+
+
+func damaged_files() -> Dictionary:
+	var result := {"names":PackedStringArray(), "bytes":0}
+	var folder := path.get_base_dir()
+	var pattern := RegEx.new()
+	pattern.compile("^(?:save|slot-[0-9]{2})[.]json[.]damaged-[0-9]+-[0-9]+$")
+	for name in DirAccess.get_files_at(folder):
+		if pattern.search(name) == null: continue
+		var file := FileAccess.open(folder.path_join(name), FileAccess.READ)
+		if file == null: continue
+		result.names.append(name)
+		result.bytes += file.get_length()
+		file.close()
+	return result
+
+func remove_damaged_files(reviewed: PackedStringArray) -> int:
+	var current: PackedStringArray = damaged_files().names
+	var directory := DirAccess.open(path.get_base_dir())
+	if directory == null: return 0
+	var removed := 0
+	for name in reviewed:
+		if current.has(name) and directory.remove(name) == OK: removed += 1
+	return removed

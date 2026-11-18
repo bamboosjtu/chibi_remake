@@ -114,7 +114,7 @@ func _ready() -> void:
 		return
 	for argument in args:
 		if argument.begins_with("--native-save="):
-			await preload("res://testing/native_save_acceptance.gd").new().run(node, argument.substr(14))
+			await load("res://testing/native_save_acceptance.gd").new().run(node, argument.substr(14))
 			return
 
 	if "--demo" in args:
@@ -122,11 +122,11 @@ func _ready() -> void:
 		return
 	if "--diag-nav" in args:
 		await node.get_tree().create_timer(0.5).timeout
-		preload("res://testing/navigation_checks.gd").new(node, null)._diag_nav()
+		load("res://testing/navigation_checks.gd").new(node, null)._diag_nav()
 		node.get_tree().quit(0)
 		return
 	if "--selftest" in args:
-		await preload("res://testing/battle_selftest.gd").new(node).run()
+		await load("res://testing/battle_selftest.gd").new(node).run()
 		return
 	if "--screenshot" in args:
 		await node.get_tree().create_timer(1.2).timeout

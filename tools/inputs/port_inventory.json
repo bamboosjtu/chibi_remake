@@ -1050,13 +1050,6 @@
             "_minimap_navigate"
           ]
         },
-        "command_actions": {
-          "file": "presentation/battle/components/command_actions.gd",
-          "methods": [
-            "_on_cmd",
-            "_on_hotkey"
-          ]
-        },
         "command_art": {
           "file": "presentation/battle/components/command_art.gd",
           "methods": [
@@ -1065,44 +1058,14 @@
             "_set_art_state"
           ]
         },
-        "command_model": {
-          "file": "presentation/battle/components/command_model.gd",
-          "methods": [
-            "_on_cmd_page"
-          ]
-        },
         "selection_info": {
           "file": "presentation/battle/components/selection_info.gd",
           "methods": [
-            "_act_close_officer_pick",
-            "_act_open_officer_pick",
             "_sel_state_text"
           ]
         }
       },
       "methods": [
-        {
-          "name": "_act_close_officer_pick",
-          "category": "private-contract",
-          "provider": "selection_info",
-          "forwarded": "_act_close_officer_pick",
-          "mechanical": true,
-          "privateContract": true,
-          "nameMatches": [
-            "presentation/battle/components/hud_input.gd"
-          ]
-        },
-        {
-          "name": "_act_open_officer_pick",
-          "category": "private-contract",
-          "provider": "selection_info",
-          "forwarded": "_act_open_officer_pick",
-          "mechanical": true,
-          "privateContract": true,
-          "nameMatches": [
-            "presentation/battle/components/hud_input.gd"
-          ]
-        },
         {
           "name": "_close_art_sub",
           "category": "private-contract",
@@ -1130,39 +1093,6 @@
           "category": "private-contract",
           "provider": "camera_controller",
           "forwarded": "_minimap_navigate",
-          "mechanical": true,
-          "privateContract": true,
-          "nameMatches": [
-            "presentation/battle/components/hud_input.gd"
-          ]
-        },
-        {
-          "name": "_on_cmd",
-          "category": "private-contract",
-          "provider": "command_actions",
-          "forwarded": "_on_cmd",
-          "mechanical": true,
-          "privateContract": true,
-          "nameMatches": [
-            "presentation/battle/components/hud_input.gd"
-          ]
-        },
-        {
-          "name": "_on_cmd_page",
-          "category": "private-contract",
-          "provider": "command_model",
-          "forwarded": "_on_cmd_page",
-          "mechanical": true,
-          "privateContract": true,
-          "nameMatches": [
-            "presentation/battle/components/hud_input.gd"
-          ]
-        },
-        {
-          "name": "_on_hotkey",
-          "category": "private-contract",
-          "provider": "command_actions",
-          "forwarded": "_on_hotkey",
           "mechanical": true,
           "privateContract": true,
           "nameMatches": [
@@ -7310,6 +7240,12 @@
           "_grant_officer_exp",
           "_unassign_officer"
         ],
+        "production": [
+          "cancel_destroyed_building"
+        ],
+        "technology": [
+          "cancel_destroyed_building"
+        ],
         "spatial_index": [
           "_index_ensure_current",
           "_index_forget",
@@ -7385,6 +7321,30 @@
         {
           "file": "simulation/battle/combat.gd",
           "caller": "_kill",
+          "provider": "technology",
+          "method": "cancel_destroyed_building",
+          "line": 121,
+          "argumentCount": 1
+        },
+        {
+          "file": "simulation/battle/combat.gd",
+          "caller": "_kill",
+          "provider": "production",
+          "method": "cancel_destroyed_building",
+          "line": 122,
+          "argumentCount": 1
+        },
+        {
+          "file": "simulation/battle/combat.gd",
+          "caller": "_kill",
+          "provider": "command_groups",
+          "method": "_commander_for",
+          "line": 140,
+          "argumentCount": 1
+        },
+        {
+          "file": "simulation/battle/combat.gd",
+          "caller": "_kill",
           "provider": "command_groups",
           "method": "_commander_for",
           "line": 142,
@@ -7393,17 +7353,9 @@
         {
           "file": "simulation/battle/combat.gd",
           "caller": "_kill",
-          "provider": "command_groups",
-          "method": "_commander_for",
-          "line": 144,
-          "argumentCount": 1
-        },
-        {
-          "file": "simulation/battle/combat.gd",
-          "caller": "_kill",
           "provider": "officer_teams",
           "method": "_grant_officer_exp",
-          "line": 146,
+          "line": 144,
           "argumentCount": 2
         },
         {
@@ -7411,7 +7363,7 @@
           "caller": "_kill",
           "provider": "officer_teams",
           "method": "_unassign_officer",
-          "line": 155,
+          "line": 153,
           "argumentCount": 1
         },
         {
@@ -7419,7 +7371,7 @@
           "caller": "_kill",
           "provider": "spatial_index",
           "method": "_index_forget",
-          "line": 160,
+          "line": 158,
           "argumentCount": 1
         },
         {
@@ -7427,7 +7379,7 @@
           "caller": "_kill",
           "provider": "spatial_index",
           "method": "_target_forget",
-          "line": 161,
+          "line": 159,
           "argumentCount": 1
         },
         {
@@ -7435,7 +7387,7 @@
           "caller": "_die_step",
           "provider": "battle_simulation",
           "method": "_finish_death",
-          "line": 171,
+          "line": 169,
           "argumentCount": 1
         },
         {
@@ -7443,7 +7395,7 @@
           "caller": "_die_step",
           "provider": "battle_simulation",
           "method": "_set_frame",
-          "line": 172,
+          "line": 170,
           "argumentCount": 2
         },
         {
@@ -7451,7 +7403,7 @@
           "caller": "_die_step",
           "provider": "battle_simulation",
           "method": "_fade_unit",
-          "line": 173,
+          "line": 171,
           "argumentCount": 2
         }
       ]
@@ -9151,7 +9103,7 @@
           "caller": "_process_trainings",
           "provider": "entity_factory",
           "method": "_spawn_unit",
-          "line": 112,
+          "line": 121,
           "argumentCount": 4
         },
         {
@@ -9159,7 +9111,7 @@
           "caller": "_process_trainings",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 115,
+          "line": 124,
           "argumentCount": 1
         },
         {
@@ -9167,7 +9119,7 @@
           "caller": "_process_trainings",
           "provider": "campaign",
           "method": "_unit_name",
-          "line": 115,
+          "line": 124,
           "argumentCount": 1
         }
       ]
@@ -9300,15 +9252,7 @@
           "caller": "_start_tech",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 278,
-          "argumentCount": 1
-        },
-        {
-          "file": "simulation/battle/technology.gd",
-          "caller": "_start_tech",
-          "provider": "battle_simulation",
-          "method": "_feedback",
-          "line": 280,
+          "line": 281,
           "argumentCount": 1
         },
         {
@@ -9324,7 +9268,7 @@
           "caller": "_start_tech",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 285,
+          "line": 286,
           "argumentCount": 1
         },
         {
@@ -9332,7 +9276,15 @@
           "caller": "_start_tech",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 286,
+          "line": 288,
+          "argumentCount": 1
+        },
+        {
+          "file": "simulation/battle/technology.gd",
+          "caller": "_start_tech",
+          "provider": "battle_simulation",
+          "method": "_feedback",
+          "line": 289,
           "argumentCount": 1
         },
         {
@@ -9340,7 +9292,7 @@
           "caller": "_apply_tech_effects",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 320,
+          "line": 323,
           "argumentCount": 1
         },
         {
@@ -9348,7 +9300,7 @@
           "caller": "_cancel_tech",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 329,
+          "line": 332,
           "argumentCount": 1
         }
       ]

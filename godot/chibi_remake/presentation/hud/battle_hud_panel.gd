@@ -190,8 +190,9 @@ func _sync_building_work(u: Dictionary) -> void:
 	rank_label.text = ["一级", "二级", "三级", "四级"][level]
 	progress_bar.visible = site
 	progress_bar.value = 100.0 * float(u.hp) / maxf(1.0, float(u.maxhp)) if site else 0.0
-	for training in host.training_views():
-		if int(training.buildingUid) != int(u.uid): continue
+	var work: Dictionary = host.building_work(int(u.uid))
+	var training: Dictionary = work.training
+	if not training.is_empty():
 		var capacity: float = host.unit_capacity(int(training.unit))
 		work_icon.texture = host.remaster_art.unit_icon(int(training.unit))
 		work_icon.material = portrait.material
@@ -200,8 +201,7 @@ func _sync_building_work(u: Dictionary) -> void:
 		work_badge.show()
 		progress_bar.show()
 		progress_bar.value = 100.0 * (1.0 - float(training.t) / maxf(1.0, float(capacity)))
-		break
-	var research: Dictionary = host.building_work(int(u.uid)).research
+	var research: Dictionary = work.research
 	if not research.is_empty():
 		var selling: bool = host.commands.technology.tech_is_sell(int(research.tech))
 		work_icon.texture = view.command_catalog.work_icon(host.commands.technology.tech_row(int(research.tech))) if selling else view._unit_icon(u)

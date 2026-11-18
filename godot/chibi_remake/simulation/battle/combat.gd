@@ -2,7 +2,7 @@ extends RefCounted
 const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## combat: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
-const REQUIRED_SERVICES := {"abilities": ["_reset_jimou"], "battle_simulation": ["_fade_unit", "_finish_death", "_set_frame"], "command_groups": ["_commander_for", "_nav_layer"], "interaction_paths": ["_footprint_cells"], "movement": ["_cell_of_px"], "officer_teams": ["_grant_officer_exp", "_unassign_officer"], "spatial_index": ["_index_ensure_current", "_index_forget", "_target_forget", "unit_by_uid"]}
+const REQUIRED_SERVICES := {"abilities": ["_reset_jimou"], "battle_simulation": ["_fade_unit", "_finish_death", "_set_frame"], "command_groups": ["_commander_for", "_nav_layer"], "interaction_paths": ["_footprint_cells"], "movement": ["_cell_of_px"], "officer_teams": ["_grant_officer_exp", "_unassign_officer"], "production": ["cancel_destroyed_building"], "technology": ["cancel_destroyed_building"], "spatial_index": ["_index_ensure_current", "_index_forget", "_target_forget", "unit_by_uid"]}
 var battle: State
 var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
 var _contact_cache: Dictionary={}
@@ -106,7 +106,7 @@ func officer_rank_name(off: Dictionary) -> String:
 	return str(preload("res://simulation/systems/officer_progression.gd").cell(off).rank)
 
 func _kill(u: Dictionary, by: Dictionary = {}) -> void:
-	var services := ports.acquire(["abilities", "command_groups", "officer_teams", "spatial_index"])
+	var services := ports.acquire(["abilities", "command_groups", "officer_teams", "production", "technology", "spatial_index"])
 	if services.is_empty(): return
 	if u.die_t >= 0 or not u.alive: return
 	_contact_cache.erase(int(u.uid))
@@ -117,11 +117,9 @@ func _kill(u: Dictionary, by: Dictionary = {}) -> void:
 	if is_same(battle.jimou_caster, u):
 		services.abilities._reset_jimou()
 	# 同步移除失效引用，避免暂停在死亡当tick后保存出悬空研究订单。
-	battle.research_jobs = battle.research_jobs.filter(func(job):return int(job.buildingUid) != int(u.uid))
-	for order in battle.trainings.duplicate():
-		if is_same(order.b,u):
-			if battle.ai != null: battle.ai.slots.cancelled(order); battle.ai.naval.cancelled(order)
-			battle.trainings.erase(order) # 建筑销毁当tick释放训练预约，不退款。
+	if u.is_building:
+		services.technology.cancel_destroyed_building(int(u.uid))
+		services.production.cancel_destroyed_building(u)
 	if int(u.unit) in [16, 17]: battle.nav.remove_gate(u)
 	# 运输船被击沉：船上的被载单位一并死亡/移除（原版：船失效 → 被载单位收模式 0x12）。
 	if int(u.get("unit", -1)) == Roles.transport_id():

@@ -3,6 +3,8 @@ extends RefCounted
 const UIState = preload("res://presentation/battle/components/battle_view_state.gd")
 var _ui: UIState
 var surface: Node2D
+var _armed_button: WeakRef
+var _armed_world := -1
 var ports = preload("res://presentation/battle/components/ports/hud_input_dependencies.gd").new()
 func _init(data: UIState, node: Node2D) -> void:
 	_ui = data
@@ -24,7 +26,7 @@ func draw_hover_at(mp: Vector2) -> void:
 	for item in _ui.art_buttons:
 		var index: int=item.idx
 		if not item.btn.visible:continue
-		var held: bool=(_ui._hud_press_pool=="art" and _ui._hud_press_idx==index and not _ui._hud_press_cancelled) or _ui._hot_pressed==index
+		var held: bool=item.control.is_pressed() or _ui._hot_pressed==index
 		var hover: bool=not hit.is_empty() and str(hit.pool)=="art" and int(hit.idx)==index
 		ports._set_art_state(index,1 if held else (2 if hover else 0))
 	if not hit.is_empty() and str(hit.pool)=="art" and nm!="":
@@ -39,15 +41,7 @@ func draw_hover_at(mp: Vector2) -> void:
 		_ui.art_tip.text = "  %s  " % nm
 		_ui.info.visible = nm == "" and _ui.info.text != ""
 
-func _cancel_press_on_motion(event: InputEvent) -> void:
-	if event is InputEventMouseMotion and _ui._hud_press_pool!="":
-		var current: Dictionary=_hud_button_at(event.position)
-		if current.is_empty() or str(current.pool)!=_ui._hud_press_pool or int(current.idx)!=_ui._hud_press_idx:
-			_ui._hud_press_cancelled=true
-			if _ui._hud_press_pool=="art":ports._set_art_state(_ui._hud_press_idx,0)
-
 func _clear_console_capture() -> void:
-	if _ui._hud_press_pool == "art": ports._set_art_state(_ui._hud_press_idx,0)
 	if _ui._hot_pressed >= 0: ports._set_art_state(_ui._hot_pressed,0)
 	_ui._hud_press_pool = ""
 	_ui._hud_press_idx = -1
@@ -63,7 +57,6 @@ func _input(event: InputEvent) -> void:
 		_clear_console_capture()
 		surface.get_viewport().set_input_as_handled()
 		return
-	_cancel_press_on_motion(event)
 	if event is InputEventMouseMotion and _ui._minimap_drag:
 		ports._minimap_navigate(event.position)
 		surface.get_viewport().set_input_as_handled()
@@ -78,11 +71,11 @@ func _input(event: InputEvent) -> void:
 			ports._minimap_navigate(event.position)
 			surface.get_viewport().set_input_as_handled()
 			return
-	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE and (_ui.art_sub != "" or _ui.build_menu):
+	if event.is_action_pressed("battle_cancel") and (_ui.art_sub != "" or _ui.build_menu):
 		ports._close_art_sub()
 		surface.get_viewport().set_input_as_handled()
 		return
-	if event is InputEventKey and ports._handle_cmd_key(event as InputEventKey):
+	if _navigate_focus(event) or ports._handle_cmd_key(event):
 		surface.get_viewport().set_input_as_handled()
 		return
 	if not (event is InputEventMouseButton):
@@ -97,83 +90,53 @@ func _input(event: InputEvent) -> void:
 		if mb.pressed and _hud_panel_at(mb.position):
 			surface.get_viewport().set_input_as_handled()
 		return
-	var hit: Dictionary = _hud_button_at(mb.position)
-	if mb.pressed:
-		if hit.is_empty():
-			if _hud_panel_at(mb.position):
-				_ui._hud_panel_capture = true
-				surface.get_viewport().set_input_as_handled()
-			return                     # 没按在按钮上：交给世界（框选就是从世界里起手的）
+	if not mb.pressed and _ui.host.selecting:
+		_ui.host.commands.session.unhandled_input(mb)
 		surface.get_viewport().set_input_as_handled()
-		_ui._hud_press_pool = str(hit.pool)
-		_ui._hud_press_idx = int(hit.idx)
-		_ui._hud_press_cancelled=false
-		if _ui.host.sfx!=null:_ui.host.sfx.play("click.wav")
-		if str(hit.pool) in ["art", "menu"]:
-			if str(hit.pool)=="art":ports._set_art_state(int(hit.idx),1)
-			return
-		var pb: Button = hit.btn
-		pb.button_pressed = true       # 只为视觉：按下态（非 toggle，不会发 toggled）
 		return
-	# ---- 松开 ----
-	if _ui._hud_panel_capture:
+	if not mb.pressed and _ui._hud_panel_capture:
 		_ui._hud_panel_capture = false
 		surface.get_viewport().set_input_as_handled()
 		return
-	var pool: String = _ui._hud_press_pool
-	var idx: int = _ui._hud_press_idx
-	if pool == "":
-		return                         # 这次按下不是从 HUD 按钮起手的 → 松开必须交给世界，
-		                               # 否则框选拖到按钮上松开就永远结束不了（_select_box 收不到松手）
-	surface.get_viewport().set_input_as_handled()
-	_ui._hud_press_pool = ""
-	_ui._hud_press_idx = -1
-	if pool == "menu":
-		if not hit.is_empty() and str(hit.pool) == "menu":
-			_ui.battle_menu.open()
-		return
-	if pool == "art":
-		ports._set_art_state(idx,0)
-		if _ui._hud_press_cancelled:return
-		if hit.is_empty():
-			return
-		if str(hit.pool) != "art" or int(hit.idx) != idx:
-			return
-		if idx >= 0 and idx < _ui.art_actions.size():
-			var act: Callable = _ui.art_actions[idx]
-			if act.is_valid():
-				act.call()
-		return
-	if pool=="aux":
-		[_ui.worker_button,_ui.join_button][idx].button_pressed=false
-		if not _ui._hud_press_cancelled and not hit.is_empty() and str(hit.pool)=="aux" and int(hit.idx)==idx:
-			if idx==0:ports._act_open_officer_pick()
-			else:_ui.host.commands.session.begin_target("join")
-		return
-	var pressed_btn: Button = null
-	if pool == "cmd" and idx >= 0 and idx < _ui.cmd_buttons.size():
-		pressed_btn = _ui.cmd_buttons[idx]
-	elif pool == "hot" and idx >= 0 and idx < _ui.hot_buttons.size():
-		pressed_btn = (_ui.hot_buttons[idx] as Dictionary).btn
-	elif pool == "pager" and idx >= 0 and idx < 3:
-		pressed_btn = [_ui.cmd_prev, _ui.cmd_next, _ui.back_button][idx]
-	if pressed_btn != null:
-		pressed_btn.button_pressed = false
-	if _ui._hud_press_cancelled:return
-	if hit.is_empty():
-		return                         # 按下在按钮上、松在别处 → 不算一次点击（标准按钮语义）
-	if str(hit.pool) != pool or int(hit.idx) != idx:
-		return
-	var btn: Button = hit.btn
-	if btn.disabled:
-		return
-	if pool == "cmd":
-		ports._on_cmd(idx)
-	elif pool == "pager":
-		if idx == 2: ports._act_close_officer_pick()
-		else: ports._on_cmd_page(-1 if idx == 0 else 1)
-	else:
-		ports._on_hotkey(idx)
+	if not mb.pressed: return
+	var hit := _hud_button_at(mb.position)
+	if hit.get("pool") == "menu":
+		_ui.battle_menu.open()
+		surface.get_viewport().set_input_as_handled()
+	elif hit.is_empty() and _hud_panel_at(mb.position):
+		_ui._hud_panel_capture = true
+		surface.get_viewport().set_input_as_handled()
+
+func _navigate_focus(event: InputEvent) -> bool:
+	if event.is_action_pressed("battle_confirm"):
+		var focused := surface.get_viewport().gui_get_focus_owner()
+		if focused is Button and not focused.disabled and _ui.ui_layer.is_ancestor_of(focused):
+			_armed_button = weakref(focused)
+			_armed_world = _ui.host.world_identity()
+			return true
+	elif event.is_action_released("battle_confirm") and _armed_button != null:
+		var button = _armed_button.get_ref()
+		_armed_button = null
+		if is_instance_valid(button) and button.has_focus() and button.is_visible_in_tree() and not button.disabled and _armed_world == _ui.host.world_identity():
+			button.pressed.emit()
+		return true
+	for direction in [["left", SIDE_LEFT], ["up", SIDE_TOP], ["right", SIDE_RIGHT], ["down", SIDE_BOTTOM]]:
+		if not event.is_action_pressed("battle_focus_" + direction[0]): continue
+		var focused := surface.get_viewport().gui_get_focus_owner()
+		if is_instance_valid(focused) and _ui.ui_layer.is_ancestor_of(focused):
+			var next := focused.find_valid_focus_neighbor(direction[1])
+			if next is Button and not next.disabled: next.grab_focus()
+			return true
+		for entry in _ui.art_buttons:
+			if entry.control.is_visible_in_tree() and not entry.control.disabled:
+				entry.control.grab_focus()
+				return true
+		for button in _ui.cmd_buttons:
+			if button.is_visible_in_tree() and not button.disabled:
+				button.grab_focus()
+				return true
+		return false
+	return false
 
 func _dismiss_ability_menu(event: InputEvent) -> bool:
 	if not event is InputEventMouseButton or event.button_index != MOUSE_BUTTON_LEFT or not event.pressed:

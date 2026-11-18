@@ -102,7 +102,18 @@ func _add_art_button(cell: int, name: String, sub: String, act: Callable) -> voi
 	tr.set_meta("cmd_name", name)
 	tr.set_meta("source_frame",cell+98 if cell<9 else (cell+104 if cell<19 else cell+135))
 	_ui.art_panel.add_child(tr)
-	_ui.art_buttons.append({"btn": tr, "sub": sub, "idx": _ui.art_buttons.size()})
+	var control := Button.new()
+	control.flat = true
+	control.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	tr.add_child(control)
+	control.button_down.connect(func(): control.set_meta("activation_cancelled", false))
+	control.mouse_exited.connect(func():
+		if control.is_pressed(): control.set_meta("activation_cancelled", true))
+	control.pressed.connect(func():
+		if not bool(control.get_meta("activation_cancelled", false)) and not bool(tr.get_meta("cmd_disabled", false)):
+			if _ui.host.sfx != null: _ui.host.sfx.play("click.wav")
+			act.call())
+	_ui.art_buttons.append({"btn": tr, "control": control, "sub": sub, "idx": _ui.art_buttons.size()})
 	_ui.art_actions.append(act)
 
 func _panel_specs() -> Array:
@@ -279,6 +290,7 @@ func _refresh_cmd_art_core() -> void:
 	var specs_now: Array = _panel_specs()
 	for e in _ui.art_buttons:
 		var tr2: TextureRect = e.btn
+		e.control.disabled = bool(tr2.get_meta("cmd_disabled", false))
 		if str(e.sub) == "" and (int(e.idx) >= specs_now.size() or str(specs_now[int(e.idx)].get("n",""))==""):
 			tr2.visible = false                  # 工人组第 9 格为空（原版就是空位）
 			continue
@@ -373,36 +385,40 @@ func _on_art_form(i: int) -> void:
 	_ui.art_sub = ""
 	_refresh_cmd_art()
 
-func _handle_cmd_key(k: InputEventKey) -> bool:
-	if k.echo:return false
-	if not k.pressed:
-		if _ui._hot_pressed>=0 and _ui._hot_keycode==k.keycode:
+func _handle_cmd_key(k: InputEvent) -> bool:
+	if k.is_echo():return false
+	if not k.is_pressed():
+		if _ui._hot_pressed>=0 and k.is_action_released("battle_slot_%d" % _ui._hot_keycode):
 			_set_art_state(_ui._hot_pressed,0);_ui._hot_pressed=-1;_ui._hot_keycode=0;return true
 		return false
-	if k.keycode == KEY_PAGEUP:
+	if k.is_action_pressed("battle_page_previous"):
 		if _ui.art_sub == "form_more": _formation_page(false); return true
 		return ports._on_cmd_page(-1)
-	if k.keycode == KEY_PAGEDOWN:
+	if k.is_action_pressed("battle_page_next"):
 		if _ui.art_sub == "form" and _unlocked_indices(true).has(9): _formation_page(true); return true
 		return ports._on_cmd_page(1)
 	if _ui.officer_pick:
-		if k.keycode == KEY_ESCAPE:
+		if k.is_action_pressed("battle_cancel"):
 			ports._act_close_officer_pick()
 			return true
-		if k.keycode >= KEY_1 and k.keycode <= KEY_6:
+		if k is InputEventKey and k.keycode >= KEY_1 and k.keycode <= KEY_6:
 			var slot := int(k.keycode) - int(KEY_1)
 			var idx := _ui.cmd_page * CMD_PAGE + slot
 			if idx < _ui.cmd_capsules.size() and bool((_ui.cmd_capsules[idx] as Dictionary).get("enabled", false)):
 				ports._on_cmd(slot)          # 与按钮同一路径：槽位动作 + 页内偏移
 				return true
-	var hot_slot: int=_ui.command_catalog.hotkeys.find(OS.get_keycode_string(k.keycode))
+	var hot_slot := -1
+	for slot in range(9):
+		if k.is_action_pressed("battle_slot_%d" % (slot + 1)):
+			hot_slot = slot
+			break
 	if art_panel_active() and hot_slot>=0:
 		var button_index: int=hot_slot+(9 if _ui.art_sub=="hot" else (18 if _ui.art_sub=="form" else 0))
 		if _ui.art_sub == "form" and hot_slot == 8: button_index = 29
 		elif _ui.art_sub == "form_more": button_index = 30 if hot_slot == 8 else (26 + hot_slot if hot_slot < 2 else -1)
 		if button_index<0 or button_index>=_ui.art_buttons.size() or not _ui.art_buttons[button_index].btn.visible or bool(_ui.art_buttons[button_index].btn.get_meta("cmd_disabled",false)):return false
 		_ui._hot_pressed=button_index
-		_ui._hot_keycode=k.keycode
+		_ui._hot_keycode=hot_slot+1
 		if _ui.art_sub=="hot":_on_art_hot(hot_slot)
 		elif button_index >= 29: _formation_page(button_index == 29)
 		elif _ui.art_sub.begins_with("form"):_on_art_form(button_index - 18)

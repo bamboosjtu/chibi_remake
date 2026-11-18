@@ -13,10 +13,10 @@ func _initialize() -> void:
 func key(code: int, pressed := true) -> InputEventKey:
 	var event := InputEventKey.new();event.keycode=code;event.pressed=pressed;return event
 
-func mouse(view, point: Vector2, pressed: bool) -> void:
+func mouse(_view, point: Vector2, pressed: bool) -> void:
 	var event := InputEventMouseButton.new()
 	event.position=point;event.button_index=MOUSE_BUTTON_LEFT;event.pressed=pressed
-	view._input(event)
+	root.push_input(event, true)
 
 func aim(point: Vector2) -> Vector2:
 	var view = battle.view
@@ -46,11 +46,25 @@ func run() -> void:
 	assert(view._handle_cmd_key(key(KEY_Q,false)))
 	assert(view.art_buttons[0].btn.get_meta("visual_state")==0)
 	battle.commands.orders._clear_pending()
+	var dpad := InputEventJoypadButton.new()
+	dpad.button_index = JOY_BUTTON_DPAD_RIGHT
+	dpad.pressed = true
+	root.push_input(dpad, true)
+	var focused := root.gui_get_focus_owner()
+	assert(is_instance_valid(focused) and focused == view.art_buttons[0].control)
+	var accept := InputEventJoypadButton.new()
+	accept.button_index = JOY_BUTTON_A
+	accept.pressed = true
+	root.push_input(accept, true)
+	accept.pressed = false
+	root.push_input(accept, true)
+	assert(battle.commands.orders.cmd_pending_kind() == "move")
+	battle.commands.orders._clear_pending()
 	var button: Control=view.art_buttons[5].btn
 	var point := button.get_global_rect().get_center()
 	mouse(view,point,true)
 	assert(battle.player_commands.pending_commands().is_empty(),"mouse down must only press")
-	var motion := InputEventMouseMotion.new();motion.position=Vector2(200,200);view._input(motion)
+	var motion := InputEventMouseMotion.new();motion.position=Vector2(200,200);motion.button_mask=MOUSE_BUTTON_MASK_LEFT;root.push_input(motion, true)
 	mouse(view,point,false)
 	assert(battle.player_commands.pending_commands().is_empty(),"leaving a pressed button cancels even after returning")
 	mouse(view,point,true);mouse(view,point,false)

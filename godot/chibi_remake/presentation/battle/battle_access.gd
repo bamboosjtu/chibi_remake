@@ -55,13 +55,21 @@ func unit_views() -> Array:
 	var data = preload("res://named_port.gd").require_provider(_data,"unit values")
 	return _unit_projection.units(data) if data != null else []
 
+func world_identity() -> int:
+	var data = preload("res://named_port.gd").require_provider(_data, "world identity")
+	return data.world.get_instance_id() if data != null else -1
+
+func roster_unit(uid: int) -> Dictionary:
+	var data = preload("res://named_port.gd").require_provider(_data, "unit values")
+	return _unit_projection.roster(data, uid) if data != null else {}
+
 func visual_unit(uid: int) -> Dictionary:
 	var data = preload("res://named_port.gd").require_provider(_data,"unit values")
 	return _unit_projection.visual(data,uid) if data != null else {}
 
-func motion_views() -> Array:
+func motion_views(visible = null) -> Array:
 	var data = preload("res://named_port.gd").require_provider(_data,"motion values")
-	return _unit_projection.motion(data) if data != null else []
+	return _unit_projection.motion(data, visible) if data != null else []
 
 func training_views() -> Array:
 	var data = preload("res://named_port.gd").require_provider(_data,"production values")

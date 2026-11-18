@@ -188,39 +188,8 @@ func focus_group(n: int) -> bool:
 func _battle_input(event: InputEvent) -> void:
 	if scene.cam == null:
 		return                      # B5：加载失败后不要在这里空指针
-	if event is InputEventKey and event.pressed and not event.echo:
-		scene.ev_count += 1
-		# --- 编队（原版左侧 1..10 那条按钮就是干这个的）---
-		# Ctrl+数字 = 编入该组；数字 = 呼出该组。
-		var _numb := -1
-		if event.keycode >= KEY_1 and event.keycode <= KEY_9:
-			_numb = event.keycode - KEY_1 + 1
-		if _numb > 0:
-			if event.ctrl_pressed:
-				submit_command("assign_group", -1, _numb)
-				return
-			focus_group(_numb)
-			return
-		match event.keycode:
-			KEY_B:
-				scene.show_buildings = not scene.show_buildings
-			KEY_U:
-				scene.show_units = not scene.show_units
-			KEY_F:
-				_fit_view()
-			KEY_F3:
-				if event.ctrl_pressed: scene.show_debug = not scene.show_debug
-			KEY_M:
-				if scene.view != null: scene.view.battle_menu.open()
-			KEY_F12:
-				_screenshot()          # 协程，这里不 await（截图结果会自己打印）
-			KEY_ESCAPE:
-				# 战场 Esc = 打开暂停菜单（不直接退出）。退出走菜单里的“保存并退出”，
-				# 关窗由 Node.NOTIFICATION_WM_CLOSE_REQUEST 先保存再退。
-				if scene.view != null and scene.view.battle_menu != null:
-					scene.view.battle_menu.open()
-				elif scene.view == null:
-					node.get_tree().quit()
+	if event is InputEventKey or event is InputEventJoypadButton:
+		_battle_action(event)
 	elif event is InputEventMouseButton:
 		var mbe := event as InputEventMouseButton
 		if mbe.pressed:
@@ -269,6 +238,35 @@ func _battle_input(event: InputEvent) -> void:
 			scene.sel_end = node.get_canvas_transform().affine_inverse() * mme.position
 			var r := _sel_rect()
 			_marquee_update(r)
+
+func _battle_action(event: InputEvent) -> void:
+	if not event.is_pressed() or event.is_echo(): return
+	scene.ev_count += 1
+	for group in range(1, 10):
+		if event.is_action_pressed("battle_assign_group_%d" % group, false, true):
+			submit_command("assign_group", -1, group)
+			return
+		if event.is_action_pressed("battle_group_%d" % group, false, true):
+			focus_group(group)
+			return
+	if event.is_action_pressed("battle_toggle_buildings"):
+		scene.show_buildings = not scene.show_buildings
+	elif event.is_action_pressed("battle_toggle_units"):
+		scene.show_units = not scene.show_units
+	elif event.is_action_pressed("battle_overview"):
+		_fit_view()
+	elif event.is_action_pressed("battle_pause") or event.is_action_pressed("battle_cancel"):
+		if scene.view != null and scene.view.battle_menu != null:
+			scene.view.battle_menu.open()
+		elif event.is_action_pressed("battle_cancel"):
+			node.get_tree().quit()
+	elif event.is_action_pressed("battle_confirm"):
+		var point := node.get_canvas_transform().affine_inverse() * node.get_viewport_rect().get_center()
+		if ports.cmd_pending_kind().is_empty(): select_at(point, false)
+		else: submit_point_order(point, false)
+	elif event is InputEventKey:
+		if event.keycode == KEY_F3 and event.ctrl_pressed: scene.show_debug = not scene.show_debug
+		elif event.keycode == KEY_F12: _screenshot()
 
 func _sel_rect() -> Rect2:
 	return Rect2(scene.sel_start, scene.sel_end - scene.sel_start).abs()

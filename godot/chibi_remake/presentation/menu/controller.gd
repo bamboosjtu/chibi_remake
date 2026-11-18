@@ -204,23 +204,9 @@ func _ready() -> void:
 			await surface.get_tree().process_frame
 			ports._refresh_campaign_cursor()
 			ports._report_campaign_dialog()
-		if "--screenshot" in args:
-			var shot_path := ""
-			for a2 in args:
-				if a2.begins_with("--shot="):
-					shot_path = a2.substr(7)
-			await RenderingServer.frame_post_draw
-			var tex := surface.get_viewport().get_texture()
-			if tex != null:
-				var img := tex.get_image()
-				if img != null:
-					if shot_path == "":
-						img.save_png("user://chibi_shot.png")
-						print("screenshot saved: ", OS.get_user_data_dir(), "/chibi_shot.png")
-					else:
-						img.save_png(shot_path)
-						print("screenshot saved: ", shot_path)
-			surface.get_tree().quit()
+		if "--screenshot" in args: await _save_menu_screenshot(args)
+		surface.get_tree().quit()
+		return
 
 	if Game.last_load_error != "":
 		var load_msg := Game.last_load_error
@@ -357,3 +343,16 @@ func _load_slot(slot: int, _title: String) -> void:
 		_ui.slots_dialog.show_error("存档对应的关卡已不存在")
 		return
 	if Game.change_battle(id,slot) != OK: surface._show_toast("进度无法载入，当前菜单已保留。")
+
+
+func _save_menu_screenshot(args: PackedStringArray) -> void:
+	var path := "user://chibi_shot.png"
+	for argument in args:
+		if argument.begins_with("--shot="):
+			path = Game.diagnostic_path(argument.substr(7))
+			if path.is_empty(): return
+	await RenderingServer.frame_post_draw
+	var texture := surface.get_viewport().get_texture()
+	if texture != null:
+		var image := texture.get_image()
+		if image != null: image.save_png(path)

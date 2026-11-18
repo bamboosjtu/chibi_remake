@@ -21,6 +21,8 @@ Game="*res://app/game.gd"
 config/name="三国赤壁 高清重制"
 config/description="非官方社区 MOD；致敬 1997《三国赤壁》与 1994《三国演义》。"
 run/main_scene="res://menu.tscn"
+config/version="0.1.1"
+config/chibi_hud_layout="painted"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 
 [display]
@@ -29,6 +31,182 @@ window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
+
+[input]
+
+battle_slot_1={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":81)]
+}
+battle_slot_2={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":87)]
+}
+battle_slot_3={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":69)]
+}
+battle_slot_4={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":65)]
+}
+battle_slot_5={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":83)]
+}
+battle_slot_6={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":68)]
+}
+battle_slot_7={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":90)]
+}
+battle_slot_8={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":88)]
+}
+battle_slot_9={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":67)]
+}
+battle_group_1={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":49)]
+}
+battle_group_2={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":50)]
+}
+battle_group_3={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":51)]
+}
+battle_group_4={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":52)]
+}
+battle_group_5={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":53)]
+}
+battle_group_6={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":54)]
+}
+battle_group_7={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":55)]
+}
+battle_group_8={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":56)]
+}
+battle_group_9={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":57)]
+}
+battle_assign_group_1={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"ctrl_pressed":true,"keycode":49)]
+}
+battle_assign_group_2={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"ctrl_pressed":true,"keycode":50)]
+}
+battle_assign_group_3={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"ctrl_pressed":true,"keycode":51)]
+}
+battle_assign_group_4={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"ctrl_pressed":true,"keycode":52)]
+}
+battle_assign_group_5={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"ctrl_pressed":true,"keycode":53)]
+}
+battle_assign_group_6={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"ctrl_pressed":true,"keycode":54)]
+}
+battle_assign_group_7={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"ctrl_pressed":true,"keycode":55)]
+}
+battle_assign_group_8={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"ctrl_pressed":true,"keycode":56)]
+}
+battle_assign_group_9={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"ctrl_pressed":true,"keycode":57)]
+}
+battle_page_previous={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":4194323), Object(InputEventJoypadButton,"button_index":9)]
+}
+battle_page_next={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":4194324), Object(InputEventJoypadButton,"button_index":10)]
+}
+battle_cancel={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":4194305), Object(InputEventJoypadButton,"button_index":1)]
+}
+battle_pause={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":77), Object(InputEventJoypadButton,"button_index":6)]
+}
+battle_confirm={
+"deadzone": 0.35,
+"events": [Object(InputEventJoypadButton,"button_index":0)]
+}
+battle_camera_left={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":4194319), Object(InputEventJoypadMotion,"axis":2,"axis_value":-1.0)]
+}
+battle_camera_up={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":4194320), Object(InputEventJoypadMotion,"axis":3,"axis_value":-1.0)]
+}
+battle_camera_right={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":4194321), Object(InputEventJoypadMotion,"axis":2,"axis_value":1.0)]
+}
+battle_camera_down={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":4194322), Object(InputEventJoypadMotion,"axis":3,"axis_value":1.0)]
+}
+battle_overview={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":70)]
+}
+battle_toggle_units={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":85)]
+}
+battle_toggle_buildings={
+"deadzone": 0.35,
+"events": [Object(InputEventKey,"keycode":66)]
+}
+
+battle_focus_up={
+"deadzone": 0.5,
+"events": [Object(InputEventJoypadButton,"button_index":11)]
+}
+battle_focus_down={
+"deadzone": 0.5,
+"events": [Object(InputEventJoypadButton,"button_index":12)]
+}
+battle_focus_left={
+"deadzone": 0.5,
+"events": [Object(InputEventJoypadButton,"button_index":13)]
+}
+battle_focus_right={
+"deadzone": 0.5,
+"events": [Object(InputEventJoypadButton,"button_index":14)]
+}
 
 [rendering]
 

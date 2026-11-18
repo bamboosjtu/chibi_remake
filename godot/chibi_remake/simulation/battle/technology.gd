@@ -252,6 +252,9 @@ func _selected_research_building(actors = null) -> Dictionary:
 			return building
 	return {}
 
+func cancel_destroyed_building(uid: int) -> void:
+	battle.research_jobs = battle.research_jobs.filter(func(job): return int(job.buildingUid) != uid)
+
 func _building_work_busy(building: Dictionary) -> bool:
 	return bool(building.get("site",false)) or battle.trainings.any(func(tr):return is_same(tr.b,building)) or not _research_for_building(building).is_empty()
 

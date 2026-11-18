@@ -13,6 +13,7 @@ var surface_cache := {}
 var settings_panel: PanelContainer
 var speed_buttons: Array[Button] = []
 var slots_dialog: CanvasLayer
+var previous_focus: WeakRef
 
 func _init(h: Node2D) -> void:
 	host = h
@@ -82,6 +83,8 @@ func _ready() -> void:
 func open() -> void:
 	if host.view.briefing!=null and host.view.briefing.is_open:host.view.briefing.close()
 	await host.commands.session.wait_command_boundary()
+	if not is_open:
+		previous_focus = weakref(get_viewport().gui_get_focus_owner())
 	slots_dialog.dismiss()
 	_close_settings()
 	var vp := get_viewport().get_visible_rect().size
@@ -103,12 +106,17 @@ func close() -> void:
 	_close_settings()
 	is_open = false
 	overlay.hide()
-	Game.pauses.release(pause_token); pause_token = 0
+	Game.pauses.release(pause_token)
+	pause_token = 0
+	var focus = previous_focus.get_ref() if previous_focus != null else null
+	if not get_tree().paused and is_instance_valid(focus) and focus.is_visible_in_tree():
+		focus.grab_focus()
+	previous_focus = null
 
 func _input(event: InputEvent) -> void:
 	if host.view.briefing!=null and host.view.briefing.is_open:return
 	if is_instance_valid(slots_dialog) and slots_dialog.overlay.visible:return
-	if is_open and Game.pauses.is_top(pause_token) and event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+	if is_open and Game.pauses.is_top(pause_token) and event.is_action_pressed("battle_cancel"):
 		if settings_panel.visible: _close_settings()
 		else: close()
 		get_viewport().set_input_as_handled()

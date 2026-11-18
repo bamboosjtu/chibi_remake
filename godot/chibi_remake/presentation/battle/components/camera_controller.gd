@@ -129,11 +129,7 @@ func edge_scroll(delta: float) -> void:
 
 func scroll_from_pointer(pointer: Vector2, delta: float) -> void:
 	if _ui.cam == null or _ui.host.cheat_input_open: return
-	var v := edge_direction(pointer)
-	if Input.is_key_pressed(KEY_LEFT): v.x -= 1.0
-	if Input.is_key_pressed(KEY_RIGHT): v.x += 1.0
-	if Input.is_key_pressed(KEY_UP): v.y -= 1.0
-	if Input.is_key_pressed(KEY_DOWN): v.y += 1.0
+	var v := edge_direction(pointer) + Input.get_vector("battle_camera_left", "battle_camera_right", "battle_camera_up", "battle_camera_down")
 	if v != Vector2.ZERO:
 		var speed := clampf(520.0 / maxf(_ui.cam.zoom.x, ZOOM_MIN), 0.0, PAN_MAX)
 		_ui.cam.position += v.normalized() * speed * delta

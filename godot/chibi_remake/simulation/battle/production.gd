@@ -85,6 +85,15 @@ func _order_train(unit_id: int, actors: Array) -> bool:
 	services.battle_simulation._feedback("先选中已建成的生产建筑")
 	return false
 
+func cancel_destroyed_building(building: Dictionary) -> void:
+	# A destroyed building releases its work and reservations without refunding costs.
+	for order in battle.trainings.duplicate():
+		if not is_same(order.b, building): continue
+		if battle.ai != null:
+			battle.ai.slots.cancelled(order)
+			battle.ai.naval.cancelled(order)
+		battle.trainings.erase(order)
+
 func _cancel_training(building: Dictionary) -> bool:
 	for i in range(battle.trainings.size()):
 		if battle.trainings[i].b == building:

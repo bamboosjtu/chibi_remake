@@ -8,7 +8,7 @@ const FIELDS := ["uid","unit","owner","name","alive","die_t","is_building","ax",
 	"site","gate_open","carry","carry_kind","carry_n","carry_hp","group_officer","officer_might",
 	"officer_intellect","mou","status_173","attack","defence","atk_range","vision"]
 const OFFICER_FIELDS := ["index","name","tier","level","exp","hasExp","might","intellect","heroType"]
-const ROSTER_FIELDS := ["uid","unit","owner","name","alive","die_t","is_building","ax","ay","A","B","hp","maxhp","w","h","attached","site_inside_uid","group_officer"]
+const ROSTER_FIELDS := ["uid","unit","owner","name","alive","die_t","is_building","ax","ay","A","B","hp","maxhp","w","h","attached","site_inside_uid","group_officer","site"]
 const VISUAL_FIELDS := ["uid","unit","owner","alive","die_t","is_building","ax","ay","hp","maxhp","w","h","k","grid","count","build_frame","state","dir","moved","walk_tick","move_facing","action_phase","attached","site_inside_uid","site","gate_open","carry","carry_kind"]
 var _world := -1
 var _revision := 0
@@ -76,6 +76,11 @@ func selection(data: Object) -> Array:
 	_selected_key = key; _selected = result; metrics.selectionBuilds += 1
 	return result
 
+func roster(data: Object, uid: int) -> Dictionary:
+	var rows := units(data)
+	var index: int = _indices.get(uid, -1)
+	return rows[index] if index >= 0 else {}
+
 func visual(data: Object, uid: int) -> Dictionary:
 	units(data) # Rebuild scalar UID -> array-index lookup at the same boundary.
 	if _visuals.has(uid): return _visuals[uid]
@@ -132,9 +137,10 @@ func _footprint(data: Object, unit: Dictionary) -> Dictionary:
 	_footprints[uid] = {"key":key,"value":value}
 	return value
 
-func motion(data: Object) -> Array:
+func motion(data: Object, visible = null) -> Array:
 	var result := []
 	for unit: Dictionary in data.units:
+		if visible != null and not visible.has(int(unit.uid)): continue
 		result.append({"uid":int(unit.uid),"is_building":bool(unit.is_building),"ax":float(unit.ax),"ay":float(unit.ay),"walk_tick":float(unit.get("walk_tick",0))})
 	Frozen.freeze(result)
 	return result
@@ -147,12 +153,19 @@ func training(data: Object) -> Array:
 	return result
 
 func work(data: Object, uid: int) -> Dictionary:
-	for source: Dictionary in data.units:
-		if int(source.uid) != uid: continue
-		var research: Dictionary = data.commands.technology._research_for_building(source)
-		var result := {"busy":bool(data.commands.technology._building_work_busy(source)),"research":{}}
-		for field in ["tech","t","owner"]:
-			if research.has(field): result.research[field] = research[field]
-		Frozen.freeze(result)
-		return result
-	return Frozen.copy({"busy":false,"research":{}})
+	_ensure(data)
+	# Queue reads share a single world and tick. Values contain no live entity references.
+	var result := {"world_id":_world, "revision":int(data.sim_tick), "busy":false, "training":{}, "research":{}}
+	var building := roster(data, uid)
+	if not building.is_empty() and building.is_building:
+		for order in data.trainings:
+			if int(order.b.uid) != uid: continue
+			result.training = {"buildingUid":uid,"unit":int(order.unit),"t":float(order.t)}
+			break
+		for job in data.research_jobs:
+			if int(job.buildingUid) != uid: continue
+			result.research = {"tech":int(job.tech),"t":int(job.t),"owner":int(job.owner)}
+			break
+		result.busy = bool(building.get("site", false)) or not result.training.is_empty() or not result.research.is_empty()
+	Frozen.freeze(result)
+	return result

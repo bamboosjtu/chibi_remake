@@ -92,7 +92,14 @@ func _draw() -> void:
 	else:terrain.hide()
 	overlay.queue_redraw()
 
+var draw_microseconds := 0
+
 func _draw_overlay() -> void:
+	var started := Time.get_ticks_usec()
+	_draw_markers()
+	draw_microseconds += Time.get_ticks_usec() - started
+
+func _draw_markers() -> void:
 	if world_rect.size.x<=0:return
 	var k: float=world_rect.size.x/host.camera_bounds().x
 	var off:=world_rect.position

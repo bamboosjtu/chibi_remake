@@ -19,6 +19,8 @@ var script_kernel := false
 var capacity_stress := false
 var profile_only := false
 var profile_units := false
+var frame_diagnostics := false
+var pan_camera := false
 var done := false
 var map_id := "chibic17"
 var target_units := 800
@@ -44,12 +46,18 @@ func _initialize() -> void:
 		elif arg.begins_with("--bench-engage="): engage = maxi(0, int(arg.substr(15)))
 		elif arg == "--bench-script-kernel": script_kernel=true
 		elif arg == "--bench-capacity": capacity_stress=true
+		elif arg == "--bench-frame-diagnostics": frame_diagnostics = true
+		elif arg == "--bench-pan-camera": pan_camera = true
 		elif arg == "--bench-profile": profile_units=true
 		elif arg == "--bench-logic-only": profile_only=true
 		elif arg == "--bench-profile-only": profile_only=true;profile_units=true
 		elif arg == "--bench-no-ai": use_ai = false
 		elif arg == "--bench-no-view": use_view = false
 		elif arg.begins_with("--bench-output="): output_path = arg.substr(15)
+	output_path = root.get_node("Game").diagnostic_path(output_path)
+	if output_path.is_empty():
+		_invalid("Benchmark output must be inside the acceptance directory")
+		return
 	if "--no-intro" not in OS.get_cmdline_user_args():
 		_invalid("Benchmark requires --no-intro");return
 	if not Array(OS.get_cmdline_user_args()).any(func(arg):return str(arg).begins_with("--save-test-id=")):
@@ -196,29 +204,7 @@ func run() -> void:
 		report["diagnosticOnly"]=true
 		var diagnostic:=FileAccess.open(output_path,FileAccess.WRITE);diagnostic.store_string(JSON.stringify(report,"  "));diagnostic.close()
 		battle.scene.ready_to_save=false;battle.free();done=true;quit();return
-	if not await _start_live_measurement(battle,report):return
-	if not workload_valid(battle):_invalid("Rendering phase has no running gameplay process");return
-	visual_begin=battle.view.performance_counters() if battle.view!=null else {}
-	path_begin=battle.nav.performance_counters()
-	var simulation_begin: int=battle._modules.battle_simulation.tick_microseconds
-	var view_time: int=battle._modules.scene_controller.view_microseconds;var hud_time: int=battle._modules.scene_controller.hud_microseconds;var interpolate_time: int=battle._modules.scene_controller.interpolation_microseconds
-	var tick_begin: int=battle.sim_tick;var backlog_begin: float=battle.sim_acc;var backlog_max:=backlog_begin
-	var at:=Time.get_ticks_usec();var previous:=at;var durations: Array=[]
-	for i in range(frames):
-		if i%5==0:_progress("frames",i,battle)
-		if i%10==0 and not _probe_command(battle): _invalid("Benchmark command admission failed"); return
-		await process_frame
-		if not workload_valid(battle):_invalid("Gameplay paused or ended during frame sampling");return
-		var now:=Time.get_ticks_usec();durations.append(float(now-previous)/1000.0);previous=now
-		backlog_max=maxf(backlog_max,float(battle.sim_acc))
-	var seconds:=float(Time.get_ticks_usec()-at)/1000000.0
-	var advanced: int=battle.sim_tick-tick_begin;durations.sort();command_latencies.sort()
-	if advanced<=0 or command_latencies.size()<ceili(float(frames)/10.0):_invalid("Frames were produced without all simulation/input work");return
-	visual_end=battle.view.performance_counters() if battle.view!=null else {}
-	path_end=battle.nav.performance_counters()
-	report.merge({"frameSimulationMsPerTick":float(battle._modules.battle_simulation.tick_microseconds-simulation_begin)/advanced/1000.0,"frameSimulationMsPerFrame":float(battle._modules.battle_simulation.tick_microseconds-simulation_begin)/frames/1000.0,"cameraHoverMsPerFrame":float(battle._modules.scene_controller.view_microseconds-view_time)/frames/1000.0,"hudMsPerFrame":float(battle._modules.scene_controller.hud_microseconds-hud_time)/frames/1000.0,"interpolationMsPerFrame":float(battle._modules.scene_controller.interpolation_microseconds-interpolate_time)/frames/1000.0,"realtimeLogicBudgetMs":battle.clock.period()*1000.0,"framePathCallsPerTick":float(path_end.calls-path_begin.calls)/advanced,"framePathMsPerTick":float(path_end.microseconds-path_begin.microseconds)/advanced/1000.0,"updateVisualMsPerFrame":float(visual_end.get("syncMicroseconds",0)-visual_begin.get("syncMicroseconds",0))/frames/1000.0,"fogUpdateMsPerFrame":float(visual_end.get("fogMicroseconds",0)-visual_begin.get("fogMicroseconds",0))/frames/1000.0,"visualSyncsPerFrame":float(visual_end.get("syncCalls",0)-visual_begin.get("syncCalls",0))/frames})
-	report.merge({"validWorkload":true,"frames":frames,"fps":frames/maxf(seconds,0.001),"frameP50Ms":_percentile(durations,0.5),"frameP95Ms":_percentile(durations,0.95),"frameMaxMs":durations.back(),"simulationTicksAdvanced":advanced,"measurementSeconds":seconds,"ticksPerSecond":advanced/seconds,"targetTicksPerSecond":1.0/battle.clock.period(),"simAccumulatorBegin":backlog_begin,"simAccumulatorEnd":battle.sim_acc,"simAccumulatorMax":backlog_max,"wallClockBehindSeconds":maxf(0.0,seconds-advanced*battle.clock.period()),"unitsAtFrameEnd":_mobile_count(battle),"commandSamples":command_latencies.size(),"commandLatencyP95Ms":_percentile(command_latencies,0.95),"commandLatencyScope":"in-game command queue; OS input delivery excluded","pausedAtEnd":paused,"gameEnd":battle.game_end})
-	report.merge({"memoryStaticBytes":Performance.get_monitor(Performance.MEMORY_STATIC),"memoryStaticMaxBytes":Performance.get_monitor(Performance.MEMORY_STATIC_MAX),"videoMemoryBytes":Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED),"renderObjects":Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME),"drawCalls":Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)})
+	if not await _measure_frames(battle, report): return
 	var file:=FileAccess.open(output_path,FileAccess.WRITE)
 	if file==null:_invalid("Cannot write benchmark report");return
 	file.store_string(JSON.stringify(report,"  "));file.close()
@@ -266,4 +252,61 @@ func _start_live_measurement(battle: Node2D, report: Dictionary) -> bool:
 	battle.nav.set_profiling(true)
 	battle.player_commands.command_finished.connect(_command_finished)
 	battle.sim_acc=0;battle.set_process(true)
+	return true
+
+func _frame_counters(battle: Node2D) -> Dictionary:
+	var controller = battle._modules.scene_controller
+	var visuals: Dictionary = battle.view.performance_counters()
+	return {
+		"tick":battle.sim_tick, "simulationUsec":battle._modules.battle_simulation.tick_microseconds,
+		"visualUsec":visuals.syncMicroseconds, "hudUsec":controller.hud_microseconds,
+		"interpolationUsec":controller.interpolation_microseconds, "minimapUsec":visuals.minimapMicroseconds,
+		"visualsChecked":visuals.candidatesChecked, "visibleChecks":visuals.visibleChecks,
+		"visualsSynced":visuals.syncCalls, "movingVisuals":visuals.movingVisuals,
+		"units":battle.units.size(), "drawCalls":Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME),
+		"renderSetupCpuMs":RenderingServer.get_frame_setup_time_cpu(),
+	}
+
+func _measure_frames(battle: Node2D, report: Dictionary) -> bool:
+	if not await _start_live_measurement(battle,report):return false
+	if not workload_valid(battle):_invalid("Rendering phase has no running gameplay process");return false
+	var visual_begin: Dictionary = battle.view.performance_counters() if battle.view!=null else {}
+	var path_begin: Dictionary = battle.nav.performance_counters()
+	var simulation_begin: int=battle._modules.battle_simulation.tick_microseconds
+	var view_time: int=battle._modules.scene_controller.view_microseconds;var hud_time: int=battle._modules.scene_controller.hud_microseconds;var interpolate_time: int=battle._modules.scene_controller.interpolation_microseconds
+	var tick_begin: int=battle.sim_tick;var backlog_begin: float=battle.sim_acc;var backlog_max:=backlog_begin
+	var at:=Time.get_ticks_usec();var previous:=at;var durations: Array=[]
+	var samples := []
+	var viewport: RID = root.get_viewport_rid()
+	var gpu_timing := frame_diagnostics and DisplayServer.get_name() != "headless" and RenderingServer.get_current_rendering_method() != "gl_compatibility"
+	if gpu_timing: RenderingServer.viewport_set_measure_render_time(viewport, true)
+	for i in range(frames):
+		var frame_start := _frame_counters(battle) if frame_diagnostics else {}
+		if pan_camera: battle.view.pan_by(Vector2(3 if i < frames / 2 else -3, 0))
+		if i%5==0:_progress("frames",i,battle)
+		if i%10==0 and not _probe_command(battle): _invalid("Benchmark command admission failed"); return false
+		await process_frame
+		if not workload_valid(battle):_invalid("Gameplay paused or ended during frame sampling");return false
+		var now:=Time.get_ticks_usec();durations.append(float(now-previous)/1000.0);previous=now
+		if frame_diagnostics:
+			var sample := _frame_counters(battle)
+			for field in ["tick","simulationUsec","visualUsec","hudUsec","interpolationUsec","minimapUsec","visualsChecked","visibleChecks","visualsSynced"]:
+				sample[field] -= frame_start[field]
+			sample["wallMs"] = durations.back()
+			sample["viewportCpuMs"] = RenderingServer.viewport_get_measured_render_time_cpu(viewport) if gpu_timing else null
+			sample["viewportGpuMs"] = RenderingServer.viewport_get_measured_render_time_gpu(viewport) if gpu_timing else null
+			samples.append(sample)
+		backlog_max=maxf(backlog_max,float(battle.sim_acc))
+	var seconds:=float(Time.get_ticks_usec()-at)/1000000.0
+	var advanced: int=battle.sim_tick-tick_begin;durations.sort();command_latencies.sort()
+	if advanced<=0 or command_latencies.size()<ceili(float(frames)/10.0):_invalid("Frames were produced without all simulation/input work");return false
+	var visual_end: Dictionary = battle.view.performance_counters() if battle.view!=null else {}
+	var path_end: Dictionary = battle.nav.performance_counters()
+	report.merge({"frameSimulationMsPerTick":float(battle._modules.battle_simulation.tick_microseconds-simulation_begin)/advanced/1000.0,"frameSimulationMsPerFrame":float(battle._modules.battle_simulation.tick_microseconds-simulation_begin)/frames/1000.0,"cameraHoverMsPerFrame":float(battle._modules.scene_controller.view_microseconds-view_time)/frames/1000.0,"hudMsPerFrame":float(battle._modules.scene_controller.hud_microseconds-hud_time)/frames/1000.0,"interpolationMsPerFrame":float(battle._modules.scene_controller.interpolation_microseconds-interpolate_time)/frames/1000.0,"realtimeLogicBudgetMs":battle.clock.period()*1000.0,"framePathCallsPerTick":float(path_end.calls-path_begin.calls)/advanced,"framePathMsPerTick":float(path_end.microseconds-path_begin.microseconds)/advanced/1000.0,"updateVisualMsPerFrame":float(visual_end.get("syncMicroseconds",0)-visual_begin.get("syncMicroseconds",0))/frames/1000.0,"fogUpdateMsPerFrame":float(visual_end.get("fogMicroseconds",0)-visual_begin.get("fogMicroseconds",0))/frames/1000.0,"visualSyncsPerFrame":float(visual_end.get("syncCalls",0)-visual_begin.get("syncCalls",0))/frames})
+	report.merge({"validWorkload":true,"frames":frames,"fps":frames/maxf(seconds,0.001),"frameP50Ms":_percentile(durations,0.5),"frameP95Ms":_percentile(durations,0.95),"frameP99Ms":_percentile(durations,0.99),"frameMaxMs":durations.back(),"simulationTicksAdvanced":advanced,"measurementSeconds":seconds,"ticksPerSecond":advanced/seconds,"targetTicksPerSecond":1.0/battle.clock.period(),"simAccumulatorBegin":backlog_begin,"simAccumulatorEnd":battle.sim_acc,"simAccumulatorMax":backlog_max,"wallClockBehindSeconds":maxf(0.0,seconds-advanced*battle.clock.period()),"unitsAtFrameEnd":_mobile_count(battle),"commandSamples":command_latencies.size(),"commandLatencyP95Ms":_percentile(command_latencies,0.95),"commandLatencyScope":"in-game command queue; OS input delivery excluded","pausedAtEnd":paused,"gameEnd":battle.game_end})
+	report.merge({"memoryStaticBytes":Performance.get_monitor(Performance.MEMORY_STATIC),"memoryStaticMaxBytes":Performance.get_monitor(Performance.MEMORY_STATIC_MAX),"videoMemoryBytes":Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED),"renderObjects":Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME),"drawCalls":Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)})
+	if frame_diagnostics:
+		report["frameSamples"] = samples
+		report["diagnosticOnly"] = true
+		report["cameraMotion"] = "pan" if pan_camera else "static"
 	return true

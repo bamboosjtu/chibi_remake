@@ -2,6 +2,12 @@
   "description": "Explicit non-suite ownership. Manual/packaged entries are not a claim of automated CI coverage. Every tools/gd script must occur in a suite or here.",
   "tests": [
     {
+      "script": "pack_acceptance",
+      "category": "tool",
+      "reason": "Builds the validation companion outside the player pack.",
+      "command": "tools/build_game.ps1"
+    },
+    {
       "script": "bake_full_terrain",
       "category": "tool",
       "reason": "Offline asset/review artifact producer; writes outputs and requires declared source assets.",

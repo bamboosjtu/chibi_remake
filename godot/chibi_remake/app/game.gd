@@ -59,7 +59,14 @@ const UnitSchema = preload("res://simulation/definitions/unit_schema.gd")
 const Relations = preload("res://app/saves/unit_relations.gd")
 const Envelope = preload("res://app/saves/save_envelope.gd")
 
+var acceptance_enabled := false
+
 func _init() -> void:
+	acceptance_enabled = OS.is_debug_build()
+	if OS.get_environment("CHIBI_ACCEPTANCE") == "1":
+		var pack := OS.get_executable_path().get_base_dir().path_join("ChibiAcceptance.testpack")
+		if FileAccess.file_exists(pack):
+			acceptance_enabled = ProjectSettings.load_resource_pack(pack, false) or acceptance_enabled
 	repository.changed.connect(slot_catalog.invalidate)
 	# Godot constructs the main scene before autoload _ready callbacks.
 	_rule_errors = preload("res://app/rules/rule_loader.gd").initialize()
@@ -67,8 +74,18 @@ func _init() -> void:
 	if _rule_errors.is_empty(): _rule_errors = campaign.catalog.initialize()
 
 func _ready() -> void:
+	var args := OS.get_cmdline_user_args()
+	if "--check-player-export" in args:
+		var isolated := not acceptance_enabled and not DirAccess.dir_exists_absolute("res://testing")
+		if isolated: print("PLAYER EXPORT PASS acceptance scripts absent")
+		get_tree().quit(0 if isolated else 1)
+		return
+	if not acceptance_enabled and _has_acceptance_args(args):
+		push_error("Automation requires the acceptance companion")
+		get_tree().quit(1)
+		return
 	pauses = preload("res://app/pause_stack.gd").new(); add_child(pauses)
-	var acceptance := preload("res://app/acceptance_storage.gd").configure(storage, OS.get_cmdline_user_args())
+	var acceptance := preload("res://app/acceptance_storage.gd").configure(storage, args)
 	if not acceptance.valid:
 		push_error(acceptance.error); get_tree().quit(1); return
 	if not _rule_errors.is_empty():
@@ -85,6 +102,22 @@ func _ready() -> void:
 	if f != null:
 		f.store_string("boot %s\nargs=%s\n" % [Time.get_datetime_string_from_system(), str(OS.get_cmdline_user_args())])
 		f.close()
+
+func _has_acceptance_args(args: PackedStringArray) -> bool:
+	for arg in args:
+		if arg in ["--full-battle-bench","--selftest","--screenshot","--demo","--smoketest","--diag-nav","--levels","--keytest","--mousetest"]:
+			return true
+		for prefix in ["--bench-","--shot=","--simtest=","--selftest-fault=","--save-test-","--native-save=","--hud-click","--hud-select","--hud-hot"]:
+			if arg.begins_with(prefix): return true
+	return false
+
+func diagnostic_path(path: String) -> String:
+	if OS.is_debug_build(): return path
+	var directory := OS.get_environment("CHIBI_ACCEPTANCE_OUTPUT").replace("\\","/").simplify_path()
+	var target := path.replace("\\","/").simplify_path()
+	if acceptance_enabled and directory.is_absolute_path() and target.begins_with(directory.trim_suffix("/") + "/"):
+		return target
+	return ""
 
 ## 内置中文字体：运行时直接加载 OTF，不依赖编辑器导入缓存（新克隆/无 .godot 也能跑）。
 ## 导出包通过 include_filter="*.otf" 带上原始字体；失败时退回系统字体并留警告。

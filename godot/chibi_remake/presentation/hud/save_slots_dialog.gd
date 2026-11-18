@@ -12,6 +12,9 @@ var confirm_button: Button
 var entries := []
 var selected_slot := -1
 var saving := false
+var cleanup_button: Button
+var cleanup_prompt: ConfirmationDialog
+var reviewed_damage := PackedStringArray()
 
 func _init() -> void:
 	layer=70;process_mode=Node.PROCESS_MODE_ALWAYS
@@ -42,6 +45,12 @@ func _ready() -> void:
 	actions.add_theme_constant_override("separation",24);list.add_child(actions)
 	confirm_button=_button("确定",_confirm);actions.add_child(confirm_button)
 	actions.add_child(_button("取消",close))
+	cleanup_button = _button("清理损坏进度", _confirm_damage_cleanup)
+	actions.add_child(cleanup_button)
+	cleanup_prompt = ConfirmationDialog.new()
+	cleanup_prompt.title = "清理损坏进度"
+	cleanup_prompt.confirmed.connect(_clean_reviewed_damage)
+	add_child(cleanup_prompt)
 	get_viewport().size_changed.connect(_fit)
 	overlay.hide()
 
@@ -69,6 +78,7 @@ func open(for_save: bool, default_title := "") -> void:
 	if preferred>=0:
 		records.select(preferred);records.ensure_current_is_visible();_selected(preferred)
 	else:confirm_button.disabled=true;status.text="没有可读取的进度"
+	_refresh_damage_button()
 	overlay.show();_fit();records.grab_focus()
 
 func _selected(index: int) -> void:
@@ -91,11 +101,39 @@ func close() -> void:
 func dismiss() -> void:overlay.hide()
 func show_error(message: String) -> void:status.text=message
 
+func _refresh_damage_button() -> void:
+	var damage: Dictionary = Game.repository.damaged_files()
+	cleanup_button.visible = not damage.names.is_empty()
+	cleanup_button.tooltip_text = "损坏进度占用 %.2f MiB" % (float(damage.bytes) / 1048576.0)
+
+func _confirm_damage_cleanup() -> void:
+	var damage: Dictionary = Game.repository.damaged_files()
+	reviewed_damage = damage.names
+	if reviewed_damage.is_empty(): return
+	cleanup_prompt.dialog_text = "删除 %d 个已隔离的损坏文件，共 %.2f MiB？" % [reviewed_damage.size(), float(damage.bytes) / 1048576.0]
+	cleanup_prompt.popup_centered()
+
+func _clean_reviewed_damage() -> void:
+	var count: int = Game.repository.remove_damaged_files(reviewed_damage)
+	reviewed_damage.clear()
+	_refresh_damage_button()
+	status.text = "已清理 %d 个损坏文件" % count
+
 func _input(event: InputEvent) -> void:
-	if not is_instance_valid(overlay) or not overlay.visible:return
-	if event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode==KEY_ESCAPE:close();get_viewport().set_input_as_handled()
-		elif event.keycode==KEY_ENTER or event.keycode==KEY_KP_ENTER:_confirm();get_viewport().set_input_as_handled()
+	if not is_instance_valid(overlay) or not overlay.visible or cleanup_prompt.visible: return
+	if event.is_action_pressed("battle_cancel"):
+		close()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("battle_confirm"):
+		var focused := get_viewport().gui_get_focus_owner()
+		if focused is Button and not focused.disabled: focused.pressed.emit()
+		elif focused == records: _confirm()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("ui_accept") and not event.is_echo():
+		var focused := get_viewport().gui_get_focus_owner()
+		if focused is Button: return
+		_confirm()
+		get_viewport().set_input_as_handled()
 
 func _fit() -> void:
 	if not is_inside_tree():return

@@ -102,19 +102,13 @@ func _refresh_cmd_panel() -> void:
 			for i in range(tts.size()):
 				var tt: Dictionary = tts[i]
 				var ok: bool = ports._can_afford(tt) and not busy
-				var training: Dictionary = {}
-				for order in _ui.host.training_views():
-					if int(order.buildingUid) == int(b.uid) and int(order.unit) == int(tt.unit): training = order; break
-				var progress := clampi(int(100.0 * (1.0 - float(training.get("t", 0)) / maxf(1.0, _ui.host.unit_capacity(int(tt.unit))))), 0, 100)
+				var name := "训练%s" % str(tt.name)
 				specs.append({
-					"text": ("训练%s %d%%" % [str(tt.name), progress]) if not training.is_empty() else ("训练%s" % str(tt.name)),
-					"icon": _ui.host.remaster_art.unit_icon(int(tt.unit)),
-					"production": true,
-					"progress_label": ("%d%%" % progress) if not training.is_empty() else "%d人" % int(_ui.host.unit_capacity(int(tt.unit))),
-					"hover": "训练%s：%s%s" % [str(tt.name), ports._cost_text(tt), (" · %d%%" % progress) if not training.is_empty() else ""],
-					"enabled": ok,
-					"tip": "生产%s：%s\n快捷键 %d%s" % [str(tt.name), ports._cost_text(tt), i + 1, "；建筑工作中，请先取消或等待" if busy else ("" if ok else "；资源不足")],
-					"act": ports._act_train.bind(i),
+					"text":name, "icon":_ui.host.remaster_art.unit_icon(int(tt.unit)), "production":true,
+					"progress_label":"%d人" % int(_ui.host.unit_capacity(int(tt.unit))),
+					"hover":"%s：%s" % [name, ports._cost_text(tt)], "enabled":ok,
+					"tip":"%s：%s\n快捷键 %d%s" % [name, ports._cost_text(tt), i + 1, "" if ok else "；资源不足"],
+					"act":ports._act_train.bind(i),
 				})
 			# 科技树（§11.3–§11.4）：建筑类型决定可研线（帅帐 0-2 / 弓兵所 3-5 /
 			# 武器库 6-11 / 钱庄卖资源 12-17 / 车兵所 18-19 / 船坞 20-22）。
@@ -177,7 +171,7 @@ func _cancel_spec(title: String, action: Callable) -> Dictionary:
 		"enabled":true, "tip":title + "，返还已付费用的75%", "act":action}
 
 func _cancel_work_spec(building: Dictionary) -> Dictionary:
-	if _ui.host.training_views().any(func(tr): return int(tr.buildingUid) == int(building.uid)):
+	if not _ui.host.building_work(int(building.uid)).training.is_empty():
 		return _cancel_spec("取消生产", ports._act_cancel_train.bind(building))
 	return _cancel_spec("取消出售" if int(building.unit) == 23 else "取消研究", ports._act_cancel_research)
 
