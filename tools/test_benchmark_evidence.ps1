@@ -30,3 +30,37 @@ foreach ($failure in @('fps','paused','debug','missingRound','tick','latency','m
     if (!$rejected) { throw ('Accepted invalid performance evidence: '+$failure) }
 }
 Write-Output 'BENCHMARK EVIDENCE PASS three release rounds / FPS / active workload / throughput / latency rejection'
+
+$root = Split-Path $PSScriptRoot -Parent
+$fixture = Join-Path $root ('_work/capacity-evidence-tests/'+[Guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Path $fixture | Out-Null
+$pack = Join-Path $fixture 'fixture.pck'
+Set-Content -LiteralPath $pack -Value 'fixture'
+$packHash = (Get-FileHash -LiteralPath $pack).Hash.ToLowerInvariant()
+$shell = (Get-Process -Id $PID).Path
+foreach ($case in @('logic-pass','unstable','different-start','throughput')) {
+    $rounds = Join-Path $fixture $case
+    New-Item -ItemType Directory -Path $rounds | Out-Null
+    foreach ($round in 1..5) {
+        $report = @{
+            engineBuild='release'; acceptanceRun=$true; validWorkload=$true; protocolVersion=4
+            workloadMode='scenario-capacity'; renderWarmupPreservedSimulation=$true; frameInitialTick=360
+            frameInitialStateChecksum='same'; packSha256=$packHash; unitsMeasured=460; pausedAtEnd=$false
+            gameEnd=0; logicP95Ms=25; commandLatencyP95Ms=5; ticksPerSecond=33
+            targetTicksPerSecond=33.3333333333333; simAccumulatorBegin=0; simAccumulatorEnd=0.03
+            fps=17; peakWorkingSetBytes=1000000; videoMemoryBytes=1000000; qualityPassed=$false
+        }
+        if ($round -eq 5) {
+            switch ($case) {
+                'unstable' { $report.logicP95Ms=29 }
+                'different-start' { $report.frameInitialStateChecksum='different' }
+                'throughput' { $report.ticksPerSecond=30 }
+            }
+        }
+        $report | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $rounds "capacity-$round.json")
+    }
+    & $shell -NoProfile -File (Join-Path $PSScriptRoot 'bench_capacity_stability.ps1') -ReleasePack $pack -OutputDirectory $rounds -SummarizeOnly
+    $expected = if ($case -eq 'logic-pass') { 0 } else { 1 }
+    if ($LASTEXITCODE -ne $expected) { throw ('Unexpected capacity evidence verdict: '+$case) }
+}
+Write-Output 'CAPACITY EVIDENCE PASS five identical starts / tick variability / FPS retained as a measurement'

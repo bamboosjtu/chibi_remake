@@ -295,7 +295,7 @@ pwsh -NoProfile -File tools/bench_full_battle.ps1 -ReleasePack <候选目录>/Ch
 
 `test_command_determinism` 从战场输入入口提交采集命令，比较不同帧批次和速度的规范化快照，涵盖目标耗尽、暂停保存拒绝及 v9 续跑。固定摘要覆盖四张代表地图和 450、1800 tick，保留整数与分段摘要，并校验规范化完整快照。自检的存档写入、读取失败使用 `node tools/run_regressions.mjs --selftest-failures` 验证退出码。
 
-用 `pwsh -NoProfile -File tools/bench_capacity_stability.ps1 -ReleasePack <候选目录>/ChibiRTS.pck` 执行 460 单位的五轮专项验证。各轮使用相同 PCK 和初始摘要，要求 tick P95≤30 ms、吞吐≥95%、命令延迟 P95≤100 ms，积压符合完整战场检查，同时核对五轮 P95 极差低于中位数的 15%。报告保留每轮、最低 FPS 和内存峰值。加 `-IncludeSynthetic` 时另跑一次 660 单位诊断。
+用 `pwsh -NoProfile -File tools/bench_capacity_stability.ps1 -ReleasePack <候选目录>/ChibiRTS.pck` 执行 460 单位的五轮专项验证。各轮使用相同 PCK 和初始摘要，要求 tick P95≤30 ms、吞吐≥95%、命令延迟 P95≤100 ms，积压符合完整战场检查，同时核对五轮 P95 极差低于中位数的 15%。报告保留每轮、最低 FPS 和内存峰值。加 `-IncludeSynthetic` 时另跑一次 660 单位诊断。对完整报告目录可用 `-OutputDirectory <报告目录> -SummarizeOnly` 复核逻辑验收条件。
 
 ## 测试归属与门禁结果
 
