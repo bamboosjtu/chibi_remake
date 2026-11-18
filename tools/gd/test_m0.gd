@@ -113,9 +113,18 @@ func run() -> void:
 	await process_frame;await process_frame
 	assert(current_scene is Node2D and current_scene.map_id=="chibic1" and current_scene.gold==5678)
 	var loaded_menu=current_scene.view.battle_menu
-	loaded_menu.open();loaded_menu.load_game();choose(loaded_menu.slots_dialog,2);loaded_menu.slots_dialog._confirm()
+	var shell: Node = current_scene
+	var old_world_id: int = current_scene.world.get_instance_id()
+	var transaction = load("res://app/saves/world_transaction.gd")
+	loaded_menu.open();loaded_menu.load_game();choose(loaded_menu.slots_dialog,2)
+	transaction.force_view_failure_after_attach = true
+	loaded_menu.slots_dialog._confirm()
+	transaction.force_view_failure_after_attach = false
+	assert(current_scene == shell and current_scene.world.get_instance_id() == old_world_id)
+	assert(game.current_map == "chibic1" and paused and loaded_menu.slots_dialog.overlay.visible)
+	loaded_menu.slots_dialog._confirm()
 	await process_frame;await process_frame
-	assert(current_scene.map_id=="chibil1" and current_scene.gold==2345 and not paused)
+	assert(current_scene == shell and current_scene.map_id=="chibil1" and current_scene.gold==2345 and not paused)
 	print("SAVE SLOTS CROSS MAP PASS main menu / last record reachable / battle menu / correct campaign and resources")
 	print("M0 MENU PASS: save, failure preservation, explicit leave, main menu")
 	done = true

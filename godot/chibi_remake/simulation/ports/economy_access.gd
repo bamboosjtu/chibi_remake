@@ -10,7 +10,6 @@ func _init(data: State) -> void:
 	_state = weakref(data)
 
 
-const CARRY_CAPACITY = Config.CARRY_CAPACITY
 
 var ai_res:
 	get: return battle.ai_res

@@ -27,7 +27,6 @@ func run() -> void:
 	root.get_node("Game").current_map = "chibil1"
 	b = load("res://main.tscn").instantiate(); root.add_child(b)
 	b.set_process(false); b.cli_mode = true; b.ai = null
-	b.player_commands.set_process(false)
 	await process_frame; await process_frame
 	var leader: Dictionary = b.selected[0]
 	var worker: Dictionary = b.units.filter(func(u): return int(u.unit) == 30 and int(u.get("group_officer", -1)) == int(leader.officer.index))[0]
@@ -49,7 +48,7 @@ func run() -> void:
 	await capture("bank-selling")
 	assert(panel.work_icon.visible and panel.progress_bar.visible and panel.progress_bar.value == 40)
 	assert(b.view.cmd_capsules.size() == 1 and b.view.cmd_buttons[0].icon != null)
-	b.view._on_cmd(0); b.player_commands.pump()
+	b.view._on_cmd(0); b.player_commands.apply_tick(b.sim_tick + 1)
 	assert(not b.commands.technology.tech_research_active())
 	var hq: Dictionary = b.units.filter(func(u): return int(u.unit) == 0 and int(u.owner) == b.player_owner)[0]
 	b.selected = [hq]; assert(b.commands.economy._queue_train(b.player_owner, hq, 30))

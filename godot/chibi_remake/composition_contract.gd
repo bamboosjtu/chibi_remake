@@ -2,7 +2,7 @@ extends RefCounted
 ## Explicit named-provider contracts. There is no method registration/dispatch table.
 static var reports: Dictionary = {}
 
-static func wire(services: Dictionary, label: String, access: Dictionary = {}) -> Dictionary:
+static func wire(services: Dictionary, label: String, access: Dictionary = {}, fail_fast := true) -> Dictionary:
 	var missing: Array = []
 	var scripts := {}
 	var required := {}
@@ -26,7 +26,7 @@ static func wire(services: Dictionary, label: String, access: Dictionary = {}) -
 		for provider in access[key].CONTRACTS:
 			for method in access[key].CONTRACTS[provider]: required[provider + "." + method] = provider
 	reports[label] = {"services": scripts, "owners": required, "methods": required.keys(), "missing": missing}
-	abort_if_broken(label, missing)
+	if fail_fast: abort_if_broken(label, missing)
 	return reports[label]
 
 static func abort_if_broken(label: String, missing: Array) -> bool:

@@ -44,7 +44,7 @@ func run() -> void:
 	event.position=b.get_canvas_transform()*destination
 	dirty(w,"build",enemy);b._unhandled_input(event)
 	assert(w.state=="build", "input must enqueue rather than execute in the event callback")
-	b.player_commands.pump();assert(clean(w));assert(w.state=="move")
+	b.player_commands.apply_tick(b.sim_tick + 1);assert(clean(w));assert(w.state=="move")
 	shift=shift.duplicate();shift.pressed=false;Input.parse_input_event(shift)
 	print("COMMAND REPLACE PASS 8 old actions x move-attack / Shift right-click / cargo preserved")
 	# 共享工地被重新派工的工人放下；其他工人继续施工，无退款、无销毁。

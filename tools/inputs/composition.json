@@ -26,7 +26,8 @@
       "bootstrap": "app/battle/bootstrap.gd",
       "cheat_controller": "app/battle/cheat_controller.gd",
       "duel_controller": "app/battle/duel_controller.gd",
-      "scene_controller": "app/battle/scene_controller.gd"
+      "scene_controller": "app/battle/scene_controller.gd",
+      "player_commands": "simulation/systems/player_commands.gd"
     },
     "view": {
       "controller": "presentation/battle/components/controller.gd",
@@ -139,9 +140,6 @@
     "simulation/ports/harvesting_access.gd": {
       "host": "main"
     },
-    "simulation/ports/player_commands_access.gd": {
-      "host": "main"
-    },
     "simulation/ports/projectiles_access.gd": {
       "host": "main"
     },
@@ -233,6 +231,9 @@
     },
     "simulation/navigation/path_queries.gd": {
       "host": "nav"
+    },
+    "simulation/systems/player_commands.gd": {
+      "host": "main"
     }
   }
 }

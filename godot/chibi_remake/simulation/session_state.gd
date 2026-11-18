@@ -6,4 +6,11 @@ var cheat_invulnerable := false
 var cheat_reveal := false
 var cli_mode := false           # --demo/--selftest/--screenshot 时关掉边缘滚屏，保证出图可复现
 var simtest_seconds := 0.0      # --simtest=秒：跑固定模拟时长后打印状态摘要并退出
-var _input_command := false
+
+## Selection and armed pointer modes belong to the interaction session.
+var selected: Array = []
+var jimou_pending: int = -1
+var jimou_caster: Dictionary = {}
+var duel_pending: bool = false
+var cmd_pending: String = ""
+var cmd_pending_data: Dictionary = {}

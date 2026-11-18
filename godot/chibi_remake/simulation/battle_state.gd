@@ -1,5 +1,5 @@
 extends RefCounted
-const PROXY_FIELDS := ["session", "effects", "units", "selected", "_officer_pool", "player_owner", "cheats_enabled", "auto_control", "cheat_build_any", "cheat_invulnerable", "cheat_reveal", "economy", "trainings", "player_tech", "research_jobs", "army_tech", "scenario_sides", "game_end", "clock", "_officer_initial_state", "nav", "visibility", "map_data", "map_id", "gold", "wood", "food", "stone", "projectiles", "fire_fields", "transports", "harvesting", "construction", "resource_revision", "sheet_by_unit", "train_types", "build_types", "next_uid", "_cell_index", "_cell_index_cell", "_cell_index_layer", "_cell_index_cells", "_index_unit_id", "_foot_cache", "_targets", "_target_owner", "_index_units_ref", "_index_units_size", "cnt_player", "cnt_enemy", "tile_w", "tile_hw", "tile_hh", "scenario_source", "scenario_mission", "scenario_avi", "ai", "ai_res", "sim_acc", "simulation_rng", "sim_tick", "simtest_seconds", "cnt_enemy_buildings", "task_latches", "terrain_changes", "terrain_base", "officer_progress", "rules", "task_events", "objective_done", "officer_policy", "cli_mode", "command_rules", "stratagems", "jimou_pending", "jimou_caster", "duel_pending", "cmd_pending", "cmd_pending_data", "decor_targets", "decor_cells", "control_groups", "_input_command", "automatic_gates", "player_commands"]
+const PROXY_FIELDS := ["session", "effects", "units", "selected", "_officer_pool", "player_owner", "cheats_enabled", "auto_control", "cheat_build_any", "cheat_invulnerable", "cheat_reveal", "economy", "trainings", "player_tech", "research_jobs", "army_tech", "scenario_sides", "game_end", "clock", "_officer_initial_state", "nav", "visibility", "map_data", "map_id", "gold", "wood", "food", "stone", "projectiles", "fire_fields", "transports", "harvesting", "construction", "resource_revision", "sheet_by_unit", "train_types", "build_types", "next_uid", "_cell_index", "_cell_index_cell", "_cell_index_layer", "_cell_index_cells", "_index_unit_id", "_foot_cache", "_targets", "_target_owner", "_index_units_ref", "_index_units_size", "cnt_player", "cnt_enemy", "tile_w", "tile_hw", "tile_hh", "scenario_source", "scenario_mission", "scenario_avi", "ai", "ai_res", "sim_acc", "simulation_rng", "sim_tick", "simtest_seconds", "cnt_enemy_buildings", "task_latches", "terrain_changes", "terrain_base", "officer_progress", "rules", "task_events", "objective_done", "officer_policy", "cli_mode", "command_rules", "stratagems", "jimou_pending", "jimou_caster", "duel_pending", "cmd_pending", "cmd_pending_data", "decor_targets", "decor_cells", "control_groups", "automatic_gates", "player_commands"]
 ## Single owner of battle data. No scene nodes or rendering handles.
 const CombatRules = preload("res://simulation/systems/combat_rules.gd")
 const TechnologyState = preload("res://simulation/systems/technology_state.gd")
@@ -19,22 +19,11 @@ const ScenarioRules = preload("res://simulation/systems/scenario_rules.gd")
 const Progression = preload("res://simulation/systems/officer_progression.gd")
 const PRODUCE_BY_BUILDING = preload("res://simulation/battle_config.gd").PRODUCE_BY_BUILDING
 const RESOURCE_YIELD = preload("res://simulation/battle_config.gd").RESOURCE_YIELD
-const DEPOSIT_UNITS = preload("res://simulation/battle_config.gd").DEPOSIT_UNITS
 const FOOD_BUILDINGS = preload("res://simulation/battle_config.gd").FOOD_BUILDINGS
 const STOCK_UNITS = preload("res://simulation/battle_config.gd").STOCK_UNITS
-const GATHER_TICKS = preload("res://simulation/battle_config.gd").GATHER_TICKS
-const CARRY_CAPACITY = preload("res://simulation/battle_config.gd").CARRY_CAPACITY
-const GATHER_SECONDS = preload("res://simulation/battle_config.gd").GATHER_SECONDS
-const REST_TICKS = preload("res://simulation/battle_config.gd").REST_TICKS
-const REPAIR_HP = preload("res://simulation/battle_config.gd").REPAIR_HP
-const REPAIR_COST = preload("res://simulation/battle_config.gd").REPAIR_COST
-const BUILD_STEP_TICKS = preload("res://simulation/battle_config.gd").BUILD_STEP_TICKS
-const BUILD_STEP_HP = preload("res://simulation/battle_config.gd").BUILD_STEP_HP
-const JIMOU_COST = preload("res://simulation/battle_config.gd").JIMOU_COST
 const JIMOU_NAMES = preload("res://simulation/battle_config.gd").JIMOU_NAMES
 const JIMOU_SIDE = preload("res://simulation/battle_config.gd").JIMOU_SIDE
 const JIMOU_LV_MASK = preload("res://simulation/battle_config.gd").JIMOU_LV_MASK
-const JIMOU_RANGE_CELLS = preload("res://simulation/battle_config.gd").JIMOU_RANGE_CELLS
 const FORM_NAMES = preload("res://simulation/battle_config.gd").FORM_NAMES
 const FORM_OFFSETS = preload("res://simulation/battle_config.gd").FORM_OFFSETS
 const GATHER_REACH = preload("res://simulation/battle_config.gd").GATHER_REACH
@@ -48,7 +37,9 @@ var session = preload("res://simulation/session_state.gd").new()
 var effects = preload("res://simulation/battle_effects.gd").new()
 var units: Array = []
 
-var selected: Array = []
+var selected: Array:
+	get: return session.selected
+	set(value): session.selected = value
 
 var _officer_pool: Array = [[], [], [], []]   # DATA.EXP 第 5 段的 4 个阵营块
 
@@ -237,18 +228,28 @@ var command_rules: RefCounted
 
 var stratagems: RefCounted
 
-var jimou_pending: int = -1
+var jimou_pending: int:
+	get: return session.jimou_pending
+	set(value): session.jimou_pending = value
 
-var jimou_caster: Dictionary = {}
+var jimou_caster: Dictionary:
+	get: return session.jimou_caster
+	set(value): session.jimou_caster = value
 
-var duel_pending: bool = false
+var duel_pending: bool:
+	get: return session.duel_pending
+	set(value): session.duel_pending = value
 
 ## 待选目标的命令（原版 UI 模型：**先点面板按钮，再点地图目标**，随后命令块带上目标下发）。
 ## 与 jimou_pending / duel_pending 同一套模型；`cmd_pending_kind()` 给出当前待选命令。
 
-var cmd_pending := ""              # "" / "move" / "attack" / "transport" / "build" / "repair" / "board"
+var cmd_pending: String:
+	get: return session.cmd_pending
+	set(value): session.cmd_pending = value
 
-var cmd_pending_data: Dictionary = {}
+var cmd_pending_data: Dictionary:
+	get: return session.cmd_pending_data
+	set(value): session.cmd_pending_data = value
 
 var decor_targets: Array = []          # 全部饰物伪对象（载入时一次性构建）
 
@@ -256,9 +257,6 @@ var decor_cells: Dictionary = {}       # "行_列" → 伪对象（按格命中�
 
 var control_groups := {}
 
-var _input_command: bool:
-	get: return session._input_command
-	set(value): session._input_command = value
 
 var automatic_gates = preload("res://simulation/navigation/automatic_gates.gd").new()
 

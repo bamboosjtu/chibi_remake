@@ -67,7 +67,7 @@ func catalog_contract() -> void:
 	assert(magics.skills.size()==9)
 	for skill in magics.skills:
 		assert(Config.JIMOU_NAMES[int(skill.order)]==str(skill.name))
-		assert(Config.JIMOU_COST[int(skill.order)]==int(skill.cost))
+		assert(preload("res://simulation/definitions/balance_rules.gd").abilities().cost[int(skill.order)]==int(skill.cost))
 	for level in range(10):
 		var mask := int(Config.JIMOU_LV_MASK[mini(level,Config.JIMOU_LV_MASK.size()-1)])
 		assert(mask==([0,1,385,449,457,463,495,511,511,511][level]))

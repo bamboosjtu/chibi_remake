@@ -30,7 +30,6 @@ func run() -> void:
 	root.get_node("Game").current_map = "chibil1"
 	b = load("res://main.tscn").instantiate(); root.add_child(b)
 	b.set_process(false); b.cli_mode = true; b.ai = null
-	b.player_commands.set_process(false)
 	await process_frame; await process_frame
 	var leader: Dictionary = b.selected[0]
 	leader.team_kind = "combat"; leader.mou = 10000
@@ -78,7 +77,7 @@ func run() -> void:
 		event.button_index = MOUSE_BUTTON_LEFT; event.position = view.battle_rect().get_center(); event.pressed = true
 		root.push_input(event, true); await process_frame
 		event.pressed = false; root.push_input(event, true); await process_frame
-		assert(view.art_sub == "" and b.selected == [leader] and b.player_commands.batches.is_empty())
+		assert(view.art_sub == "" and b.selected == [leader] and b.player_commands.pending_commands().is_empty())
 	view.art_sub = "form"; view._refresh_cmd_art(); await capture("level2-formations")
 	leader.officer.level = 6
 	view.art_sub = "form"; view._refresh_cmd_art(); await capture("level6-formations-first")

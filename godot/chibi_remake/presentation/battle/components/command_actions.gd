@@ -9,13 +9,13 @@ func _init(data: UIState, node: Node2D) -> void:
 	surface = node
 
 func _order_stop(_hold: bool) -> void:
-	_ui.host.commands.military.stop_selected()
+	_ui.host.commands.session.submit_command("stop")
 
 func _act_build(idx: int) -> void:
 	var bts: Array = _ui.host.build_options()
 	if idx < 0 or idx >= bts.size():
 		return
-	_ui.host.commands.economy._start_build(bts[idx])
+	_ui.host.commands.session.begin_target("build", int(bts[idx].unit))
 	# 已进入"点空地"状态 → 关掉建造清单，回到图标面板（下一步是地图点击）
 	if _ui.host.commands.orders.cmd_pending_kind() == "build":
 		_ui.build_menu = false
@@ -34,45 +34,45 @@ func _act_train(i: int) -> void:
 	var tts: Array = _ui.host.commands.economy.train_types_for(int(b.unit)) if not b.is_empty() else []
 	if i < 0 or i >= tts.size():
 		return
-	_ui.host.commands.session.submit_command(16,_ui.host.commands.economy._start_train.bind(tts[i]),Vector2.ZERO,-1,int(tts[i].unit))
+	_ui.host.commands.session.submit_command("train", -1, int(tts[i].unit))
 
 func _act_research(idx: int) -> void:
-	_ui.host.commands.session.submit_command(17,_ui.host.commands.technology._start_tech.bind(idx),Vector2.ZERO,-1,idx)
+	_ui.host.commands.session.submit_command("research", -1, idx)
 	ports._refresh_cmd_panel()
 
 func _act_cancel_research() -> void:
-	_ui.host.commands.session.submit_command(24,_ui.host.commands.technology._cancel_tech)
+	_ui.host.commands.session.submit_command("cancel_research")
 	ports._refresh_cmd_panel()
 
 func _act_group(n: int) -> void:
 	_ui.host.commands.session.focus_group(n)
 
 func _act_move() -> void:
-	_ui.host.commands.military._cmd_begin("move")
+	_ui.host.commands.session.begin_target("move")
 
 func _act_attack() -> void:
-	_ui.host.commands.military._cmd_begin("attack")
+	_ui.host.commands.session.begin_target("attack")
 
 func _act_transport() -> void:
-	_ui.host.commands.military._cmd_begin("transport")
+	_ui.host.commands.session.begin_target("transport")
 
 func _act_repair() -> void:
-	_ui.host.commands.military._cmd_begin("repair")
+	_ui.host.commands.session.begin_target("repair")
 
 func _act_board() -> void:
-	_ui.host.commands.military._cmd_begin("board")
+	_ui.host.commands.session.begin_target("board")
 
 func _act_watch() -> void:
-	_ui.host.commands.session.submit_command(3,_ui.host.commands.military._cmd_watch)
+	_ui.host.commands.session.submit_command("watch")
 
 func _act_rest() -> void:
-	_ui.host.commands.session.submit_command(4,_ui.host.commands.military._cmd_rest)
+	_ui.host.commands.session.submit_command("rest")
 
 func _act_disband() -> void:
-	_ui.host.commands.session.submit_command(6,_ui.host.commands.military._cmd_disband)
+	_ui.host.commands.session.submit_command("disband")
 
 func _act_duel() -> void:
-	_ui.host.commands.military._duel_begin()
+	_ui.host.commands.session.begin_target("duel")
 
 func _act_form_menu() -> void:
 	_ui.art_sub = "" if _ui.art_sub == "form" else "form"

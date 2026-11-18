@@ -3,6 +3,7 @@ extends RefCounted
 const UIState = preload("res://presentation/battle/components/battle_view_state.gd")
 var _ui: UIState
 var surface: Node2D
+var terrain: Node2D
 var ports = preload("res://presentation/battle/components/ports/world_layers_dependencies.gd").new()
 func _init(data: UIState, node: Node2D) -> void:
 	_ui = data
@@ -10,20 +11,32 @@ func _init(data: UIState, node: Node2D) -> void:
 
 func build_terrain() -> void:
 	# Visual streaming must finish while the opening briefing pauses the simulation.
-	var fog: Sprite2D=load("res://presentation/battle/battle_fog.gd").new(_ui.host.visibility_view)
+	var fog: Sprite2D=load("res://presentation/battle/battle_fog.gd").new(_ui.host.visibility_view, _ui.host.visibility_planes)
 	_ui.fog_sprite=fog
 	fog.process_mode=Node.PROCESS_MODE_ALWAYS
 	surface.add_child(fog)
 	_ui.resource_layer = load("res://presentation/battle/battle_resources.gd").new(_ui.host)
 	_ui.resource_layer.process_mode=Node.PROCESS_MODE_ALWAYS
 	surface.add_child(_ui.resource_layer)
-	var chunk_path := "res://art/full/terrain_chunks/%s/manifest.json" % str(_ui.host.map_id)
-	if not FileAccess.file_exists(chunk_path):
-		push_error("Missing HD terrain: " + str(_ui.host.map_id))
-		return
-	var terrain: Node2D=load("res://presentation/battle/terrain_stream.gd").new(_ui.host, str(_ui.host.map_id))
+	var map_id := str(_ui.host.map_id)
+	var plan := terrain_plan(map_id)
+	if plan.is_empty():
+		push_error("Missing HD terrain: " + map_id)
+	else: install_terrain(map_id, plan)
+
+func terrain_plan(map_id: String) -> Dictionary:
+	return preload("res://presentation/battle/terrain_stream.gd").read_manifest(map_id)
+
+func install_terrain(map_id: String, plan: Dictionary, preflight := false) -> bool:
+	release_terrain()
+	terrain = preload("res://presentation/battle/terrain_stream.gd").new(_ui.host, map_id, plan)
 	terrain.process_mode=Node.PROCESS_MODE_ALWAYS
 	surface.add_child(terrain)
+	return not preflight or terrain.load_opening_view()
+
+func release_terrain() -> void:
+	if is_instance_valid(terrain): terrain.free()
+	terrain = null
 
 func build_marquee() -> void:
 	_ui.sel_box_fill = ColorRect.new()

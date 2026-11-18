@@ -1,6 +1,7 @@
 extends Sprite2D
 ## 遮罩只消费模拟层探索数据；HUD 不受遮罩影响。
 var _read_visibility: Callable
+var _read_planes: Callable
 var _key: Array = []
 var _target: SubViewport
 var _quad: ColorRect
@@ -8,8 +9,9 @@ var _current_texture: ImageTexture
 var _explored_texture: ImageTexture
 var upload_microseconds := 0
 
-func _init(read_visibility: Callable) -> void:
+func _init(read_visibility: Callable, read_planes: Callable) -> void:
 	_read_visibility = read_visibility
+	_read_planes = read_planes
 	centered = false
 	scale = Vector2(22, 11)
 	z_index = 4095
@@ -18,10 +20,10 @@ func _init(read_visibility: Callable) -> void:
 func _process(_delta: float) -> void:
 	var values: Dictionary = _read_visibility.call()
 	if values.is_empty() or values.key == _key: return
+	var state: Dictionary = _read_planes.call(values.key)
+	if state.is_empty(): return
 	_key = values.key
 	scale = values.cell
-	var state := {"width":values.size.x,"height":values.size.y,
-		"current":Marshalls.base64_to_raw(values.current),"explored":Marshalls.base64_to_raw(values.explored)}
 	var begin:=Time.get_ticks_usec()
 	if DisplayServer.get_name()=="headless":
 		_cpu_mask(state) # Assertion-enabled, non-rendering tests can still inspect alpha.

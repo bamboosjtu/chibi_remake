@@ -79,6 +79,15 @@
       "args": [
         "--noview"
       ]
+    },
+    {
+      "script": "test_command_determinism",
+      "markers": [
+        "COMMAND DETERMINISM PASS"
+      ],
+      "args": [
+        "--noview"
+      ]
     }
   ]
 }

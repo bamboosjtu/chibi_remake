@@ -3,7 +3,7 @@ const Balance = preload("res://simulation/definitions/balance_rules.gd")
 const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## command groups: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
-const REQUIRED_SERVICES := {"abilities": ["_reset_jimou"], "battle_simulation": ["_feedback"], "officer_teams": ["_order_disband"], "technology": ["_is_worker_unit"], "transport_orders": ["_unload_selected"], "world_orders": ["_clear_pending"]}
+const REQUIRED_SERVICES := {"abilities": ["_reset_jimou"], "battle_simulation": ["_feedback"], "officer_teams": ["_order_disband"], "technology": ["_is_worker_unit"], "world_orders": ["_clear_pending"]}
 var battle: State
 var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
 
@@ -38,9 +38,9 @@ func control_group_work_site(n: int) -> Dictionary:
 			if battle.construction.active(site): return site
 	return {}
 
-func _group_assign(n: int) -> void:
+func _group_assign(n: int, actors = null) -> void:
 	var ids: Array = []
-	for u in battle.selected:
+	for u in battle.selected if actors == null else actors:
 		if u.alive and u.die_t<0 and int(u.owner)==battle.player_owner and not bool(u.get("attached",false)):ids.append(int(u.uid))
 	battle.control_groups[n] = ids
 	print("编队 %d：%d 个单位" % [n, ids.size()])
@@ -62,11 +62,11 @@ func _group_recall(n: int) -> bool:
 	print("呼出编队 %d：%d 个单位" % [n, g.size()])
 	return true
 
-func _cmd_watch() -> void:
+func _cmd_watch(actors = null) -> void:
 	var services := ports.acquire(["battle_simulation"])
 	if services.is_empty(): return
 	var n := 0
-	for u in _command_units():
+	for u in _command_units(actors):
 		if u.is_building or not u.alive or u.die_t>=0 or int(u.owner)!=battle.player_owner or bool(u.get("attached",false)):
 			continue
 		_cancel_unit_command(u)
@@ -107,11 +107,11 @@ func _cancel_unit_command(u: Dictionary) -> void:
 func _order_hold() -> void:
 	_cmd_watch()
 
-func _cmd_rest() -> void:
+func _cmd_rest(actors = null) -> void:
 	var services := ports.acquire(["battle_simulation"])
 	if services.is_empty(): return
 	var n := 0
-	for u in battle.selected:
+	for u in battle.selected if actors == null else actors:
 		if u.is_building or not u.alive or u.die_t >= 0.0 or int(u.owner)!=battle.player_owner or bool(u.get("attached",false)):
 			continue
 		if not _is_hero_unit(u):
@@ -121,7 +121,7 @@ func _cmd_rest() -> void:
 		u["rest_t"] = 0
 		n += 1
 	if n > 0:
-		services.battle_simulation._feedback("休息：%d 支将部队原地休整（每 10 tick +1 兵力）" % n)
+		services.battle_simulation._feedback("休息：%d 支将部队原地休整（每 %d tick +%s 兵力）" % [n, int(Balance.work().restTicks), str(Balance.work().restHp)])
 	else:
 		services.battle_simulation._feedback("只有武将部队可以休整")
 
@@ -131,9 +131,9 @@ func _is_hero_unit(u: Dictionary) -> bool:
 func _construction_workers(commander: Dictionary) -> Array:
 	return preload("res://simulation/queries/construction_roster.gd").new(battle.units).construction_workers(commander)
 
-func _selected_construction_workers() -> Array:
+func _selected_construction_workers(actors = null) -> Array:
 	var workers := []
-	for unit in battle.selected:
+	for unit in battle.selected if actors == null else actors:
 		if not unit.alive or unit.die_t >= 0 or unit.owner != battle.player_owner or unit.get("attached", false): continue
 		if unit.get("officer",{}).is_empty():continue
 		for worker in _construction_workers(_commander_for(unit)):
@@ -157,14 +157,14 @@ func _nav_layer(u: Dictionary) -> int:
 	return 1 if _is_naval(u) and battle.nav.has_water else 0
 
 func _cmd_begin(kind: String, data: Dictionary = {}) -> void:
-	var services := ports.acquire(["battle_simulation", "world_orders", "transport_orders", "abilities"])
+	var services := ports.acquire(["battle_simulation", "world_orders", "abilities"])
 	if services.is_empty(): return
 	if battle.selected.is_empty():
 		services.battle_simulation._feedback("先选择部队")
 		return
 	if kind=="unload":
 		services.world_orders._clear_pending()
-		battle.player_commands.submit(13,services.transport_orders._unload_selected)
+		battle.player_commands.submit("unload", battle.selected)
 		return
 	if battle.cmd_pending == kind:
 		services.world_orders._clear_pending()
@@ -178,16 +178,16 @@ func _cmd_begin(kind: String, data: Dictionary = {}) -> void:
 		"move": services.battle_simulation._feedback("移动：点击目的地")
 		"attack": services.battle_simulation._feedback("攻击：点击敌方单位")
 		"transport": services.battle_simulation._feedback("运输：点击资源点（铁矿／民居／树林／粮堆）")
-		"repair": services.battle_simulation._feedback("修理：点击我方单位或建筑（四资源各 −16）")
+		"repair": services.battle_simulation._feedback("修理：点击我方单位或建筑")
 		"build": services.battle_simulation._feedback("建造：点击空地放下工地（%s）" % str(data.get("name", "?")))
 		"board": services.battle_simulation._feedback("上船：点击我方运输船（陆军靠近后自动装载）")
 		"join": services.battle_simulation._feedback("加入：点击我方带将队伍，工人靠近后编入（每队最多15名成员）")
 		_: services.battle_simulation._feedback("选择目标")
 
-func _cmd_disband() -> void:
+func _cmd_disband(actors = null) -> void:
 	var services := ports.acquire(["officer_teams", "battle_simulation"])
 	if services.is_empty(): return
-	var n: int = services.officer_teams._order_disband()
+	var n: int = services.officer_teams._order_disband(actors)
 	if n <= 0:
 		services.battle_simulation._feedback("请选择武将部队")
 
@@ -198,33 +198,34 @@ func _commander_for(u: Dictionary) -> Dictionary:
 		if other.alive and other.die_t < 0 and int(other.owner) == int(u.owner) and int(other.get("officer", {}).get("index", -2)) == index: return other
 	return {}
 
-func _command_units() -> Array:
-	var result: Array=battle.selected.duplicate()
+func _command_units(actors = null) -> Array:
+	var selected: Array = battle.selected if actors == null else actors
+	var result: Array = selected.duplicate()
 	var seen := {}
 	for unit in result: seen[int(unit.uid)] = true
-	for leader in battle.selected:
+	for leader in selected:
 		if leader.get("officer",{}).is_empty():continue
 		for member in battle.units:
 			if member.alive and member.die_t<0 and int(member.owner)==int(leader.owner) and int(member.get("group_officer",-1))==int(leader.officer.index) and not seen.has(int(member.uid)):
 				result.append(member); seen[int(member.uid)] = true
 	return result
 
-func _return_selected_cargo() -> void:
+func _return_selected_cargo(actors = null) -> void:
 	var services := ports.acquire(["technology", "battle_simulation"])
 	if services.is_empty(): return
 	var count:=0
-	for worker in battle.selected:
+	for worker in battle.selected if actors == null else actors:
 		if not services.technology._is_worker_unit(worker) or float(worker.get("carry",0))<=0:continue
 		var resource=worker.get("gather_obj")
 		_cancel_unit_command(worker)
 		worker.gather_obj=resource;worker.state="deliver";count+=1
 	services.battle_simulation._feedback("%d 名工人返回入库" % count)
 
-func stop_selected() -> void:
+func stop_selected(actors = null) -> void:
 	var services := ports.acquire(["battle_simulation"])
 	if services.is_empty(): return
 	var count := 0
-	for u in battle.selected:
+	for u in battle.selected if actors == null else actors:
 		if not u.alive or u.is_building:
 			continue
 		_cancel_unit_command(u)

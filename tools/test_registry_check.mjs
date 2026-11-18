@@ -21,7 +21,7 @@ try{copy('godot/chibi_remake');assert.equal(run().status,0);
   ['simulation/battle/technology.gd',s=>s.replace('if services.is_empty(): return','if false: return')],
   ['simulation/battle/technology.gd',s=>s.replace('services.battle_simulation._feedback','services.combat._feedback')],
   ['simulation/battle/technology.gd',s=>s.replace('ports.acquire(["battle_simulation"])','ports.acquire(["combat"])')],
-  ['simulation/battle/cheat_rules.gd',s=>s.replace('services.command_groups._cancel_unit_command(unit)','services.command_groups._cancel_unit_command(unit, target)')],
+  ['simulation/battle/world_orders.gd',s=>s.replace('services.command_groups._cancel_unit_command(unit)','services.command_groups._cancel_unit_command(unit, target)')],
   ['app/battle/ports/scene_controller_dependencies.gd',s=>s.replace('if provider == null: return','# if provider == null: return')],
   ['app/battle/ports/scene_controller_dependencies.gd',s=>s.replace('if provider == null: return','if provider == null:\n\treturn')],
   ['app/battle/ports/scene_controller_dependencies.gd',s=>s.replace('if provider == null: return\n\tprovider._feedback(msg)','provider._feedback(msg)\n\tif provider == null: return')],

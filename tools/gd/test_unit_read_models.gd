@@ -106,11 +106,11 @@ func _work_and_worlds(game: Node, battle: Node2D, reader: Node2D) -> void:
 	assert(is_same(reader,battle.view.host) and reader.unit_views()[0].world_id!=old_epoch and _values(retained))
 	# A retained UI callback has the same UID but an obsolete world identity.
 	action.call()
-	assert(battle.player_commands.pump()==0 and battle.trainings.size()==1)
+	assert(battle.player_commands.apply_tick(battle.sim_tick + 1)==0 and battle.trainings.size()==1)
 	battle.selected=[battle.units.filter(func(unit):return int(unit.uid)==uid)[0]]
 	battle.view.update_panel()
 	(battle.view.cmd_capsules[0].act as Callable).call()
-	assert(battle.player_commands.pump()==1 and battle.trainings.is_empty())
+	assert(battle.player_commands.apply_tick(battle.sim_tick + 1)==1 and battle.trainings.is_empty())
 
 func _values(value) -> bool:
 	if value is Array:

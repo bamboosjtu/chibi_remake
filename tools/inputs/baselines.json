@@ -1,8 +1,8 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "engine": "4.7.2.stable",
-  "updatedAt": "2026-11-15",
-  "note": "2026-11-15：实时性修复调整 AI tick 相位、寻路采样与近战/可见性/城门更新顺序，15 秒 ai、60 秒 ai/combat/world 摘要随确定性行为变化；economy/scenario 未变，世界摘要同步更新。",
+  "updatedAt": "2026-11-18",
+  "note": "在 7ddf81a 的审核引擎上对四图录制 450/1800 tick，保留 chibic1 原整数和分段摘要，新增规范化续跑快照摘要。",
   "selftest": {
     "maps": [
       "chibic1",
@@ -23,7 +23,8 @@
         "scenario": "67d9273e3bda883e0d9f876027bac9ee7d18ffec1461e78353a66e41df9f1ce4",
         "total": "766cd1b011b7360834d835d02bb198b333f6c05f7e8864af97e8f4ae27ba355d",
         "world": "4392aeb41da6665d15029558e9aa56658b976967cb8abf25d55fae10527c1d7d"
-      }
+      },
+      "full": "cdf6a961c3ea3a1d482b46a1fb7d685d6ebb9ed65d2446832a408fd17c75c8b7"
     },
     {
       "map": "chibic1",
@@ -37,7 +38,98 @@
         "scenario": "67d9273e3bda883e0d9f876027bac9ee7d18ffec1461e78353a66e41df9f1ce4",
         "total": "2592526defc533e3dbc2ebce47f83f10afe2f93ca29b5a59dad472b0f35e2026",
         "world": "5ebb172932e58140b12468e3910059a8f98d3f802abefa903a74f984d00eb4f8"
-      }
+      },
+      "full": "fde82df8273b602b0ca0561d5041e07793040320b497022231f07a91220acb56"
+    },
+    {
+      "map": "chibil1",
+      "seconds": 15,
+      "tick": 450,
+      "digest": "5687121321625847009",
+      "subsystems": {
+        "ai": "3c93bf52b2b56cbd8c063ccfb4c7fc5391dd65d1d98754ade1de5422091df730",
+        "combat": "d2a340f635b7a8846af7a2674c0b7b390c8d5d6416f8bb2a6058ced498e1c374",
+        "economy": "b70894b73549ba8075146261fe347535d31466c3229a0586284612502c4724ba",
+        "scenario": "67d9273e3bda883e0d9f876027bac9ee7d18ffec1461e78353a66e41df9f1ce4",
+        "total": "83ae7e392cdd0d6913dca0bbae1a498b65da76032b74b1a807a2f71501454b76",
+        "world": "5ba87deb382f91931830365f533032fecfe3f18d71fccf67914f7c9de5d70b7b"
+      },
+      "full": "8fb701c9a603f70aecb5dfc75dbec355e4d6decc2870662dd25d1e8ec5dfb1d9"
+    },
+    {
+      "map": "chibil1",
+      "seconds": 60,
+      "tick": 1800,
+      "digest": "5687121321625847009",
+      "subsystems": {
+        "ai": "f6c0dd8d84f650228997ab52a55b27dfdb8f71ee509067b5e6421b24c5d2a154",
+        "combat": "d2a340f635b7a8846af7a2674c0b7b390c8d5d6416f8bb2a6058ced498e1c374",
+        "economy": "b70894b73549ba8075146261fe347535d31466c3229a0586284612502c4724ba",
+        "scenario": "67d9273e3bda883e0d9f876027bac9ee7d18ffec1461e78353a66e41df9f1ce4",
+        "total": "3aa9d0ee3dcf422ca749cd71cab4260c48120a260180d66568b103e9ef6d9712",
+        "world": "5ba87deb382f91931830365f533032fecfe3f18d71fccf67914f7c9de5d70b7b"
+      },
+      "full": "cf67725d1fe5691517ce618faaa6e553d4f54b1147b16076e7596d3c4725658c"
+    },
+    {
+      "map": "chibic10",
+      "seconds": 15,
+      "tick": 450,
+      "digest": "756393460821595832",
+      "subsystems": {
+        "ai": "64c8ef04a43349d9628a034047a1d45474c4daf014fb0008d2a3a5397946740b",
+        "combat": "eaf889b7a9ed52c9fd5b5ddf056a9ba62b8e938e57890d00af0d61e4ac407f18",
+        "economy": "c36701ab164ec959fbc6370238abcd3ae528af9748bac14ca94071b271a42411",
+        "scenario": "67d9273e3bda883e0d9f876027bac9ee7d18ffec1461e78353a66e41df9f1ce4",
+        "total": "738fc9711d710ca16bd50466f156b1fabd70700e9cafb0a9963b13c2d0888f19",
+        "world": "90e878c0cc9afb0321e259be3d48f2a666192a3c78a06b82d9c316bc8f67f9e3"
+      },
+      "full": "5f0f2076b7502d82e278f20e140ec1e9d040bcb9efdf66f257d35ab4988ad766"
+    },
+    {
+      "map": "chibic10",
+      "seconds": 60,
+      "tick": 1800,
+      "digest": "80482320890684679",
+      "subsystems": {
+        "ai": "bd8d5ae98a47a6b3167808522061aed92e84c019ba129233eac6f50550a4ebe1",
+        "combat": "6d4c4c09550fa0dce15db7196e54afd3e1fbb93c9b4dcb8f82417dba70ec7d8b",
+        "economy": "8f3ca6b14ef84a59a6ebd940a552cd5dc560393c4cfb02e370fad3f3fba29b14",
+        "scenario": "67d9273e3bda883e0d9f876027bac9ee7d18ffec1461e78353a66e41df9f1ce4",
+        "total": "f089f2d96d120956c4c0fa40a3295d85002e03c077e5a5b0f3b60bed1a64e36c",
+        "world": "9ad77a133ee5aff2384e2a4488fc144f0bfbced1365a500ffd9db35fa2d9acbf"
+      },
+      "full": "d779969ba3acf26b1ceb5f897d639f17867b64d34fc6fd78507475acb79d7be4"
+    },
+    {
+      "map": "chibic17",
+      "seconds": 15,
+      "tick": 450,
+      "digest": "4817841055524442326",
+      "subsystems": {
+        "ai": "7fd66d7e26153932228c7d488d5f6c4986ed7dd650a733011de178853241af0b",
+        "combat": "d059bafb04f0f5d92138dcb72c9b2dcb2eca0ad37ab29adbfd947a9b9cc95e63",
+        "economy": "a16f174bff140656f9d8c21dd37da54bac1262597a20e138f8292b4f2e0a0413",
+        "scenario": "67d9273e3bda883e0d9f876027bac9ee7d18ffec1461e78353a66e41df9f1ce4",
+        "total": "5c28e2e98b449b94f62c19798b581fc5e21610a61f32832f04dd9d97f5dcc45c",
+        "world": "006f6fe70e7b55d23dbdb91114cca12e03c5d4781b50a3a8b769ccbe3c028b4d"
+      },
+      "full": "2677e4bfb5b8dc3c1c5453e4fa9b0b74c874bda7c9f119ccc456d0e5da92d5b7"
+    },
+    {
+      "map": "chibic17",
+      "seconds": 60,
+      "tick": 1800,
+      "digest": "4179184756481360859",
+      "subsystems": {
+        "ai": "758c243745549d6de7b028a79184a03b4cc60ede19e321e458a478472cf1e0c6",
+        "combat": "e31120210c79abe7d5cea05e41ed67bbc924dc1e94a0c375c74bec748f3cdf8d",
+        "economy": "e88b62608c555f33430f677d72d80e73832ace3a88ab32199637bccf1deb2393",
+        "scenario": "67d9273e3bda883e0d9f876027bac9ee7d18ffec1461e78353a66e41df9f1ce4",
+        "total": "530c3374c1828a6ae4298e1394168906b0660ea8cd35f13c33b1a518e202a8ff",
+        "world": "41c957582bfe85c6888c7db7b31c78b04928a3d637be311fe95ee1b1955ca32f"
+      },
+      "full": "6887fa8462764a8ce6ba39983ae962267194ecf6b600a6ad20b50237ebc540d4"
     }
   ]
 }

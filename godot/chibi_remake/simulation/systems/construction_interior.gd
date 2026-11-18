@@ -1,4 +1,5 @@
 extends RefCounted
+const Balance = preload("res://simulation/definitions/balance_rules.gd")
 ## Workers and their commander leave the battlefield while working inside a site.
 const Access = preload("res://simulation/ports/construction_interior_access.gd")
 var host: Access
@@ -65,8 +66,8 @@ func step(unit: Dictionary) -> bool:
 			return not leave(unit)
 		if host._is_worker_unit(unit):
 			unit.build_t = int(unit.get("build_t", 0)) + 1
-			if int(unit.build_t) >= host.BUILD_STEP_TICKS:
-				unit.build_t = 0; site.hp = float(site.hp) + host.BUILD_STEP_HP
+			if int(unit.build_t) >= int(Balance.work().buildTicks):
+				unit.build_t = 0; site.hp = float(site.hp) + float(Balance.work().buildHp)
 			if float(site.hp) >= float(site.maxhp): host._complete_site(site)
 		return true
 	var follow := int(unit.get("site_follow_uid", -1))

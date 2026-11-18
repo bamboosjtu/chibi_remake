@@ -8,3 +8,13 @@ static func team_max_members() -> int:
 	return int(Catalog.get_catalog("balance.json").teamMaxMembers)
 static func transport_capacity() -> int:
 	return int(Catalog.get_catalog("balance.json").transportCapacity)
+
+
+static func harvest() -> Dictionary:
+	return Catalog.get_catalog("balance.json").harvest
+
+static func work() -> Dictionary:
+	return Catalog.get_catalog("balance.json").work
+
+static func abilities() -> Dictionary:
+	return Catalog.get_catalog("balance.json").abilities

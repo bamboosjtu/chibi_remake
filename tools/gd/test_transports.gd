@@ -126,7 +126,7 @@ func run() -> void:
 		var unload_buttons:Array=b.view.art_buttons.filter(func(slot):return slot.btn.get_meta("cmd_name")=="下船")
 		assert(unload_buttons.size()==1)
 		click(unload_buttons[0].btn.get_global_rect().get_center())
-		b.player_commands.pump()
+		b.player_commands.apply_tick(b.sim_tick + 1)
 		assert(b.cmd_pending=="" and ship.unload_active)
 		for tick in range(64):
 			b.commands.orders._step_unit(ship,b.SIM_DT)

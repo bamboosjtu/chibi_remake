@@ -1,4 +1,5 @@
 extends RefCounted
+const Balance = preload("res://simulation/definitions/balance_rules.gd")
 ## 用户确认：每格树/粮200；采尽保留残迹，自动寻找附近同类资源。
 ## R15：自动转采以**工人当前位置**为心、**有效视野**为半径收集候选，按**实际路径长度**
 ## 选最近，同距按格坐标先 y 后 x 稳定排序；不再按旧资源位置或直线距离。
@@ -46,12 +47,13 @@ func extract(worker: Dictionary, target: Dictionary) -> void:
 	# 接近完成后按逻辑tick计时；每4tick轮询，100tick装货。
 	worker.gather_ticks = int(worker.get("gather_ticks", 0)) + 1
 	worker.gather_t = float(worker.gather_ticks) * host.SIM_DT # 旧存档/状态栏兼容字段。
-	if int(worker.gather_ticks) < 100 or int(worker.gather_ticks) % 4 != 0: return
+	var rule := Balance.harvest()
+	if int(worker.gather_ticks) < int(rule.periodTicks) or int(worker.gather_ticks) % int(rule.pollTicks) != 0: return
 	var kind: String = host._yield_of(int(target.unit))
 	var granary := int(target.unit) in [10,11] and not bool(target.get("decor", false))
 	var stock := float(target.get("stock", 0))
 	if granary: stock = float(host.economy.balance(int(target.owner)).food)
-	var amount := minf(host.CARRY_CAPACITY, maxf(0, stock))
+	var amount := minf(float(rule.extractAmount), maxf(0, stock))
 	if amount > 0:
 		if granary:
 			var pool: Dictionary = host.economy.balance(int(target.owner))

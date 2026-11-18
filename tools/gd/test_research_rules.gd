@@ -18,7 +18,7 @@ func run() -> void:
 	b=load("res://main.tscn").instantiate();root.add_child(b)
 	b.set_process(false);b.cli_mode=true;b.ai=null
 	await process_frame;await process_frame
-	b.view.event_view.restore_history();b.player_commands.set_process(false)
+	b.view.event_view.restore_history()
 	var leader: Dictionary=b.selected[0]
 	var workers: Array=b.units.filter(func(u):return u.alive and int(u.owner)==b.player_owner and int(u.unit)==30)
 	var worker: Dictionary=workers[0]
@@ -66,10 +66,10 @@ func run() -> void:
 	b.selected=[leader];var leader_ids:Array=b.command_rules.describe().ids
 	b.control_groups[7]=[int(workers[1].uid),int(leader.uid),int(worker.uid)]
 	assert(b.commands.military._group_recall(7) and b.command_rules.describe().ids==leader_ids)
-	var executed:Array=[]
-	for mode in [5,10,11]:
-		assert(b.player_commands.submit(mode,func():executed.append(int(b.selected[0].uid)))==1)
-		b.player_commands.pump();assert(executed.back()==int(leader.uid))
+	for kind in ["jimou", "formation", "duel"]:
+		assert(b.player_commands.submit(kind, b.selected)==1)
+		assert(b.player_commands.pending_commands()[0].actors == [int(leader.uid)])
+		b.player_commands.clear()
 	b.selected=[worker];assert(b.command_rules.describe().kind=="worker_member")
 	b.selected=[leader,worker,soldier];assert(b.command_rules.describe().kind in ["combat_member","ungrouped"])
 	print("TEAM SLOT COMMAND PASS member-first slot / commander panel / member-only limits / unrelated mixed selection")

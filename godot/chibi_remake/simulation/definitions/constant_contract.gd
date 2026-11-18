@@ -85,7 +85,30 @@ static func roles(data: Dictionary) -> bool:
 static func balance(data: Dictionary) -> bool:
 	for field in ["armyCap", "commanderCap", "teamMaxMembers", "transportCapacity"]:
 		if not whole(data.get(field), 1): return false
-	return data.commanderCap <= data.armyCap and data.teamMaxMembers <= data.armyCap
+	if data.commanderCap > data.armyCap or data.teamMaxMembers > data.armyCap: return false
+	for group in ["harvest", "work", "abilities"]:
+		if not data.get(group) is Dictionary: return false
+	var harvest: Dictionary = data.harvest
+	if not whole(harvest.get("periodTicks"), 1) or not whole(harvest.get("pollTicks"), 1): return false
+	if harvest.pollTicks > harvest.periodTicks: return false
+	if not _positive(harvest.get("carryCapacity")) or not _positive(harvest.get("extractAmount")): return false
+	if harvest.extractAmount > harvest.carryCapacity: return false
+	if not harvest.get("deposits") is Dictionary or harvest.deposits.size() != 4: return false
+	for resource in ["gold", "wood", "food", "stone"]:
+		if not id_list(harvest.deposits.get(resource)): return false
+	var work: Dictionary = data.work
+	if not whole(work.get("restTicks"), 1) or not whole(work.get("buildTicks"), 1): return false
+	for field in ["restHp", "repairHp", "buildHp"]:
+		if not _positive(work.get(field)): return false
+	var cost = work.get("repairCost")
+	if not preload("res://simulation/definitions/resource_cost.gd").valid(cost) or cost.size() != 4: return false
+	var abilities: Dictionary = data.abilities
+	if not _positive(abilities.get("rangeCells")): return false
+	if not abilities.get("cost") is Array or abilities.cost.size() != 9: return false
+	return abilities.cost.all(func(value): return whole(value))
+
+static func _positive(value) -> bool:
+	return (value is int or value is float) and is_finite(float(value)) and value > 0.0
 
 static func references(documents: Dictionary) -> bool:
 	var known := {}
@@ -102,4 +125,7 @@ static func references(documents: Dictionary) -> bool:
 			if not roles.officers.any(func(id): return int(id) == int(officer.heroType)): return false
 	for key in documents["tech.json"].buildingLines:
 		if not known.has(int(key)): return false
+	for row in documents["balance.json"].harvest.deposits.values():
+		for id in row:
+			if not known.has(int(id)): return false
 	return true

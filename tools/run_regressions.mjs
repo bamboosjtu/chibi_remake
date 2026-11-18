@@ -31,14 +31,27 @@ for (let i = 0; i < args.length; i++) {
 if (args.includes('--selftests')) for (const map of ['chibic1', 'chibil1', 'chibic17']) jobs.push({
   name: 'selftest-' + map, markers: ['SELFTEST RESULT: PASS'],
   args: ['--headless', ...targetArgs, ...battleScene, '--', '--no-intro', '--map=' + map, '--selftest']});
+if (args.includes('--selftest-failures')) {
+  for (const [fault, label] of [['write', '阵亡快照写入成功'], ['read', '阵亡快照主档可读']]) {
+    jobs.push({
+      name: 'selftest-failure-' + fault, markers: ['SELFTEST RESULT: FAIL', 'FAIL  ' + label], expectSelftestFailure: true,
+      args: ['--headless', ...targetArgs, ...battleScene, '--', '--no-intro', '--map=chibic1', '--selftest', '--selftest-fault=' + fault],
+    });
+  }
+}
 const baseline = JSON.parse(fs.readFileSync('tools/inputs/baselines.json', 'utf8'));
 if (args.includes('--baselines')) for (const test of baseline.simtest) jobs.push({
   name: `sim-${test.map}-${test.seconds}`, baseline: test,
+  timeout: 600,
   args: ['--headless', ...targetArgs, ...battleScene, '--', '--no-intro', '--map=' + test.map, '--simtest=' + test.seconds]});
+if (args.includes('--require-native-world')) jobs.push({
+  name: 'test_native_world', markers: ['NATIVE WORLD PASS'], timeout: 300,
+  args: ['--headless', ...targetArgs, '--script', path.join(scripts, 'test_native_world.gd'), '--', '--no-intro', '--noview'],
+});
 if (args.includes('--maps')) for (const file of fs.readdirSync(project + '/data').filter(f => /^chibi.*\.json$/.test(f))) jobs.push({
   name: 'load-' + file.slice(0, -5), markers: ['ARCH-013: view=false'],
   args: ['--headless', ...targetArgs, ...battleScene, '--', '--no-intro', '--map=' + file.slice(0, -5), '--noview', '--smoketest']});
-if (!jobs.length) throw new Error('Specify --suite <json>, --selftests, --baselines or --maps');
+if (!jobs.length) throw new Error('Specify --suite <json>, --selftests, --selftest-failures, --baselines or --maps');
 const results = [];
 for (const job of jobs) {
 	// Portable markers override APPDATA; every regression also needs a save
@@ -68,6 +81,9 @@ for (const job of jobs) {
     if (expected.subsystems) {
       const actual = sections ? JSON.parse(sections[1]) : {};
       result.ok &&= Object.entries(expected.subsystems).every(([key, digest]) => actual[key] === digest);
+    }
+    if (expected.full) {
+      result.ok &&= result.output.match(/SIMULATION FULL DIGEST: ([a-f0-9]{64})/)?.[1] === expected.full;
     }
   }
   const {output, ...summary} = result;

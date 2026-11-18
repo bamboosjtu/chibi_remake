@@ -1,4 +1,5 @@
 extends RefCounted
+const Balance = preload("res://simulation/definitions/balance_rules.gd")
 ## 四资源唯一记账入口。玩家/AI使用同一校验、扣费和退款规则。
 const KINDS := ["gold", "wood", "food", "stone"]
 const Access = preload("res://simulation/ports/economy_access.gd")
@@ -30,7 +31,7 @@ func refund(owner: int, cost: Dictionary, percent := 75) -> void:
 func deposit(worker: Dictionary) -> bool:
 	var kind := str(worker.get("carry_kind", ""))
 	var amount := float(worker.get("carry", 0))
-	if not is_finite(amount) or amount <= 0 or amount > host.CARRY_CAPACITY or kind not in KINDS: return false
+	if not is_finite(amount) or amount <= 0 or amount > float(Balance.harvest().carryCapacity) or kind not in KINDS: return false
 	var nearby := false
 	for depot in host._deposits_for(worker, kind):
 		if host._deposit_ready(worker, depot):

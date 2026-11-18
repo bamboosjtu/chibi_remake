@@ -16,7 +16,6 @@ func _init() -> void:
 	_access["economy"] = preload("res://simulation/ports/economy_access.gd").new(state)
 	_access["fire_fields"] = preload("res://simulation/ports/fire_fields_access.gd").new(state)
 	_access["harvesting"] = preload("res://simulation/ports/harvesting_access.gd").new(state)
-	_access["player_commands"] = preload("res://simulation/ports/player_commands_access.gd").new(state)
 	_access["projectiles"] = preload("res://simulation/ports/projectiles_access.gd").new(state)
 	_access["scenario_rules"] = preload("res://simulation/ports/scenario_rules_access.gd").new(state)
 	_access["stratagem_rules"] = preload("res://simulation/ports/stratagem_rules_access.gd").new(state)
@@ -51,7 +50,8 @@ func _init() -> void:
 	_modules["unit_actions"] = preload("res://simulation/battle/unit_actions.gd").new(state)
 	_modules["world_orders"] = preload("res://simulation/battle/world_orders.gd").new(state)
 	state.command_rules = preload("res://simulation/systems/command_rules.gd").new(self)
-	state.player_commands = preload("res://simulation/systems/player_commands.gd").new(self)
+	_modules["player_commands"] = preload("res://simulation/systems/player_commands.gd").new(state, get_instance_id())
+	state.player_commands = _modules["player_commands"]
 	state.rules = preload("res://simulation/systems/scenario_rules.gd").new(self)
 	set_ai_enabled(true)
 
@@ -76,7 +76,7 @@ func connect_services(label: String, access_overrides: Dictionary = {}, applicat
 	services.merge(application_services)
 	var access := _access.duplicate()
 	access.merge(access_overrides, true)
-	var report: Dictionary=preload("res://composition_contract.gd").wire(services, label, access)
+	var report: Dictionary=preload("res://composition_contract.gd").wire(services, label, access, activate_native)
 	if report.missing.is_empty() and activate_native:_modules.battle_simulation.connect_native()
 	return report
 

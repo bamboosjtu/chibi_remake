@@ -240,9 +240,9 @@ func _step_rest(u: Dictionary, delta: float) -> void:
 		u.state = "idle"; u.rest_t = 0
 	else:
 		u.rest_t = int(u.get("rest_t", 0)) + 1
-		if int(u.rest_t) >= Config.REST_TICKS:
+		if int(u.rest_t) >= int(Balance.work().restTicks):
 			u.rest_t = 0
-			u.hp = minf(float(u.maxhp), float(u.hp) + 1.0)
+			u.hp = minf(float(u.maxhp), float(u.hp) + float(Balance.work().restHp))
 		if float(u.hp) >= float(u.maxhp):
 			u.state = "idle"; u.rest_t = 0
 
@@ -254,7 +254,7 @@ func _step_repair(u: Dictionary, delta: float) -> void:
 		services.command_groups._cancel_unit_command(u)
 	elif float(rt.hp) >= float(rt.maxhp):
 		services.command_groups._cancel_unit_command(u)
-	elif not battle.economy.can_pay(int(u.owner),{"gold":Config.REPAIR_COST,"wood":Config.REPAIR_COST,"food":Config.REPAIR_COST,"stone":Config.REPAIR_COST}):
+	elif not battle.economy.can_pay(int(u.owner),Balance.work().repairCost):
 		services.command_groups._cancel_unit_command(u); services.battle_simulation._feedback("修理：四种资源都须多于15")
 	elif services.interaction_paths._dist_to_obj(u,rt) > Config.GATHER_REACH:
 		preload("res://simulation/systems/action_clock.gd").reset(u)

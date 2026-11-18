@@ -4,7 +4,7 @@ const Roles = preload("res://simulation/definitions/unit_roles.gd")
 const State = preload("res://simulation/battle_state.gd")
 const AUTO_PERIOD := preload("res://simulation/systems/ai_config.gd").THINK_PERIOD
 var battle: State
-const REQUIRED_SERVICES := {"abilities": ["_jimou_caster_for_selection"], "combat": ["_nearest_enemy"], "command_groups": ["_cancel_unit_command"], "officer_pool": ["_sync_officer_to_pool"]}
+const REQUIRED_SERVICES := {"abilities": ["_jimou_caster_for_selection"], "combat": ["_nearest_enemy"], "officer_pool": ["_sync_officer_to_pool"]}
 var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
 
 func _init(data: State) -> void:
@@ -49,7 +49,7 @@ func _cheat_switch(enabled: bool) -> String:
 	return "开启" if enabled else "关闭"
 
 func _step_auto_control() -> void:
-	var services := ports.acquire(["combat", "command_groups"])
+	var services := ports.acquire(["combat"])
 	if services.is_empty(): return
 	if not battle.auto_control or battle.sim_tick % AUTO_PERIOD != 0: return
 	# The original F2 strategic policy is not fully recovered. Limit delegation to
@@ -63,7 +63,4 @@ func _step_auto_control() -> void:
 		if battle.stratagems.active(unit) or not unit.get("effect_tasks", []).is_empty(): continue
 		var target: Dictionary = services.combat._nearest_enemy(unit, extent)
 		if not target.is_empty():
-			services.command_groups._cancel_unit_command(unit)
-			unit.target = target
-			unit.state = "attack"
-			unit.repath = 0.0
+			battle.player_commands.apply_autonomous("attack", battle.player_owner, int(unit.uid), int(target.uid))

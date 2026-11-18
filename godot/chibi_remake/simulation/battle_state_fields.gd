@@ -52,7 +52,7 @@ const INPUTS := [
 	"control_groups",
 ]
 ## Pending command references and input execution context belong to the old session.
-const RESET := ["jimou_pending", "jimou_caster", "duel_pending", "cmd_pending", "cmd_pending_data", "_input_command"]
+const RESET := ["jimou_pending", "jimou_caster", "duel_pending", "cmd_pending", "cmd_pending_data"]
 const RESTORED := [
 	"units",
 	"selected",

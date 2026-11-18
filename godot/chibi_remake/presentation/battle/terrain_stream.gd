@@ -32,7 +32,7 @@ class DecodeJob extends RefCounted:
 		var bytes:=FileAccess.get_file_as_bytes(path)
 		if bytes.is_empty():error=ERR_FILE_CANT_READ;return
 		error=decoded.load_jpg_from_buffer(bytes) if path.ends_with(".bin") or path.ends_with(".jpg") else decoded.load_png_from_buffer(bytes)
-func _init(h: Node2D, map_id: String) -> void:
+func _init(h: Node2D, map_id: String, manifest: Dictionary = {}) -> void:
 	host = h
 	var patches := FileAccess.open("res://art/full/terrain_events/manifest.json", FileAccess.READ)
 	if patches != null:
@@ -42,11 +42,35 @@ func _init(h: Node2D, map_id: String) -> void:
 	gate_material.shader = preload("res://art/full/gate_apertures.gdshader")
 	_add_gate_patches(map_id)
 	_setup_gate_apertures.call_deferred(map_id)
-	var f := FileAccess.open("res://art/full/terrain_chunks/%s/manifest.json" % map_id, FileAccess.READ)
-	if f != null:
-		var data: Dictionary = JSON.parse_string(f.get_as_text())
+	var data := manifest if not manifest.is_empty() else read_manifest(map_id)
+	if not data.is_empty():
 		chunks = data.chunks
 		budget = int(data.budgetBytes)
+
+static func read_manifest(map_id: String) -> Dictionary:
+	var file := FileAccess.open("res://art/full/terrain_chunks/%s/manifest.json" % map_id, FileAccess.READ)
+	if file == null: return {}
+	var data = JSON.parse_string(file.get_as_text())
+	if not data is Dictionary or not data.get("chunks") is Array or data.chunks.is_empty(): return {}
+	if not data.get("budgetBytes") is float or data.budgetBytes <= 0: return {}
+	for chunk in data.chunks:
+		if not chunk is Dictionary or not chunk.get("rect") is Array or chunk.rect.size() != 4: return {}
+		if not chunk.rect.all(func(value): return value is float) or not chunk.get("lods") is Dictionary: return {}
+		for lod in ["1", "2", "4"]:
+			var tile = chunk.lods.get(lod)
+			if not tile is Dictionary or not tile.get("bytes") is float or tile.bytes <= 0: return {}
+			if not tile.get("texture") is String or tile.texture.is_empty(): return {}
+	return data
+
+func load_opening_view() -> bool:
+	if host.cam == null: return false
+	last_rect = _visible_rect()
+	update_visible(last_rect)
+	return loading_error.is_empty() and not active.is_empty()
+
+func _visible_rect() -> Rect2:
+	var size: Vector2 = get_viewport_rect().size / host.cam.zoom
+	return Rect2(host.cam.position - size * 0.5, size).grow(256)
 
 func _add_gate_patches(map_id: String) -> void:
 	var file := FileAccess.open("res://art/full/gate_terrain/manifest.json",FileAccess.READ)
@@ -112,8 +136,7 @@ func _process(_delta: float) -> void:
 			add_child(event_patch)
 	if host.cam == null:
 		return
-	var size: Vector2 = get_viewport_rect().size / host.cam.zoom
-	var visible_rect := Rect2(host.cam.position - size * 0.5, size).grow(256)
+	var visible_rect := _visible_rect()
 	if visible_rect != last_rect:
 		last_rect = visible_rect
 		update_visible(visible_rect,false)
@@ -182,7 +205,9 @@ func _finish_requests(blocking: bool) -> void:
 		if not blocking:break
 
 func _install_chunk(key: String, job: DecodeJob) -> void:
-	if job.error!=OK or job.decoded==null:push_error("Invalid terrain chunk: "+job.path);return
+	if job.error != OK or job.decoded == null:
+		_stop_loading("Invalid terrain chunk: " + job.path)
+		return
 	var entry: Dictionary=chunks[_wanted[key]]
 	var lod:=int(key.get_slice("/",1))
 	var weight:=maxi(int(entry.lods[str(lod)].bytes),job.decoded.get_width()*job.decoded.get_height()*4)

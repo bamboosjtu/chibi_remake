@@ -18,9 +18,14 @@ func visibility(data: Object) -> Dictionary:
 	var key := [data.world.get_instance_id(),service.get_instance_id(),service.revision,service.width,service.height]
 	if _same("visibility",key): return _cache.visibility.value
 	metrics.visibilityBuilds += 1
-	# Strings are immutable. Packed arrays inside read-only dictionaries are not.
-	return _store("visibility",key,{"key":key,"size":Vector2i(service.width,service.height),"cell":Vector2(service.CELL),
-		"current":Marshalls.raw_to_base64(service.current),"explored":Marshalls.raw_to_base64(service.explored)})
+	return _store("visibility",key,{"key":key,"size":Vector2i(service.width,service.height),"cell":Vector2(service.CELL)})
+
+func visibility_planes(data: Object, key: Array) -> Dictionary:
+	var meta := visibility(data)
+	if meta.key != key: return {}
+	# Per-consumer copies are needed only when a new texture revision is uploaded.
+	return {"width":meta.size.x, "height":meta.size.y,
+		"current":data.visibility.current.duplicate(), "explored":data.visibility.explored.duplicate()}
 
 func clock(data: Object) -> Dictionary:
 	var key := [data.world.get_instance_id(),data.clock.get_instance_id(),data.clock.speed_index]

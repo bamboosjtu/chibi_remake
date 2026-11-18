@@ -2,7 +2,7 @@ extends RefCounted
 ## ai orders: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
-const REQUIRED_SERVICES := {"ai_economy": ["_ai_forming", "_working_construction_team", "ai_group_of", "ai_production_building"], "combat": ["_hostile_owners"], "command_groups": ["_cancel_unit_command"], "harvest_orders": ["_yield_of"], "movement": ["_path_to"]}
+const REQUIRED_SERVICES := {"ai_economy": ["_ai_forming", "_working_construction_team", "ai_group_of", "ai_production_building"], "combat": ["_hostile_owners"], "harvest_orders": ["_yield_of"]}
 const Targets = preload("res://simulation/systems/ai_targets.gd")
 var battle: State
 var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
@@ -11,7 +11,7 @@ func _init(data: State) -> void:
 	battle = data
 
 func ai_order_rally(owner: int, skip_groups: Array = []) -> void:
-	var services := ports.acquire(["ai_economy", "movement", "command_groups"])
+	var services := ports.acquire(["ai_economy"])
 	if services.is_empty(): return
 	var b: Dictionary = services.ai_economy.ai_production_building(owner)
 	if b.is_empty():
@@ -24,13 +24,7 @@ func ai_order_rally(owner: int, skip_groups: Array = []) -> void:
 		if u.state != "idle":
 			continue
 		if Vector2(u.ax, u.ay).distance_to(Vector2(b.ax, b.ay)) > 900.0:
-			var pts: Array = services.movement._path_to(u, Vector2(b.ax, b.ay), true)
-			if pts.is_empty():
-				continue
-			services.command_groups._cancel_unit_command(u)
-			u.state = "move"
-			u.path = pts
-			u.pi = 0
+			battle.player_commands.apply_autonomous("move", owner, int(u.uid), -1, -1, "", Vector2(b.ax, b.ay))
 
 func ai_order_assault_l1(owner: int, skip_groups: Array = []) -> void:
 	# Kept for older command clients; all maps now use the same confirmed policy.
@@ -52,7 +46,7 @@ func _l1_target(player: int) -> Dictionary:
 	return {}
 
 func ai_order_assault(owner: int, skip_groups: Array = []) -> void:
-	var services := ports.acquire(["ai_economy", "command_groups"])
+	var services := ports.acquire(["ai_economy"])
 	if services.is_empty(): return
 	# 先扫一遍：有任何单位正忙 → 整体放弃（原版行为）。撤退中的群不参与该判定。
 	for u in battle.units:
@@ -71,19 +65,13 @@ func ai_order_assault(owner: int, skip_groups: Array = []) -> void:
 		if skip_groups.has(services.ai_economy.ai_group_of(u)): continue   # R10：撤退中的群不进攻
 		if services.ai_economy._working_construction_team(u) or services.ai_economy._ai_forming(u) or bool(u.get("attached",false)): continue
 		var e := Targets.select(battle.units,u,battle.player_owner,battle.scenario_mission,int(battle.map_data.cols))
-		if not e.is_empty():
-			services.command_groups._cancel_unit_command(u)
-			u.state = "attack"
-			u.target = e
-			u.repath = 0.0
-			u.path = []
-			u.pi = 0
+		if not e.is_empty() and battle.player_commands.apply_autonomous("attack", owner, int(u.uid), int(e.uid)):
 			sent += 1
 	if sent > 0:
 		print("AI 进攻：owner %d 投入 %d 个单位" % [owner, sent])
 
 func ai_order_intercept(owner: int, focus: Dictionary, radius: float, skip_groups: Array = []) -> void:
-	var services := ports.acquire(["ai_economy", "command_groups"])
+	var services := ports.acquire(["ai_economy"])
 	if services.is_empty(): return
 	# The focus supplies an existing combat target, not an omniscient map query.
 	var target = focus.get("target")
@@ -103,9 +91,7 @@ func ai_order_intercept(owner: int, focus: Dictionary, radius: float, skip_group
 			continue
 		if not Targets.ordinary_attacker(u): continue
 		if absf(float(u.ax)-fp.x) > radius or absf(float(u.ay)-fp.y) > radius: continue
-		services.command_groups._cancel_unit_command(u)
-		u.state = "attack"
-		u.target = target
+		battle.player_commands.apply_autonomous("attack", owner, int(u.uid), int(target.uid))
 
 func ai_focus_unit(owner: int) -> Dictionary:
 	for u in battle.units:

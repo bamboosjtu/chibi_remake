@@ -4,6 +4,7 @@ var host: Object
 var last_load_error := ""
 var last_load_source := "none"
 var _content_revision_cache := ""
+var _content_revision_world := 0
 const UnitSchema = preload("res://simulation/definitions/unit_schema.gd")
 func _init(h: Object) -> void:
 	host = h
@@ -11,10 +12,34 @@ func _init(h: Object) -> void:
 # ------------------------------------------------------------------- load ----
 func apply() -> bool:
 	var loaded: Dictionary = Game.repository.read_slot(Game.pending_load_slot)
-	var applied := apply_snapshot(loaded.data)
+	return Game.campaign.restore_battle(str(host.map_id), apply_loaded.bind(loaded))
+
+func apply_loaded(loaded: Dictionary, cross_map := false) -> bool:
+	var applied := _apply_other_map(loaded.data) if cross_map else apply_snapshot(loaded.data)
 	last_load_source = loaded.source if applied else "none"
 	if applied and last_load_source == "backup": host.commands.world._feedback("主记录无法读取，已从备份恢复进度。")
 	return applied
+
+func _apply_other_map(d: Dictionary) -> bool:
+	last_load_error = ""
+	var candidate := preload("res://app/saves/candidate_world.gd").new()
+	last_load_error = candidate.prepare_map_id(str(d.map))
+	if not last_load_error.is_empty():
+		candidate.dispose()
+		return false
+	candidate.state.cli_mode = host.state.cli_mode
+	var plan: Dictionary = candidate.saver._validation_plan(d, d.units)
+	if plan.is_empty() or not candidate.saver.restore_candidate(d, d.units, plan):
+		last_load_error = candidate.saver.last_load_error
+		if last_load_error.is_empty(): last_load_error = "目标进度无法恢复，当前战场已保留。"
+		candidate.dispose()
+		return false
+	var transaction := preload("res://app/saves/world_transaction.gd").new()
+	if not transaction.install(host, candidate, true):
+		last_load_error = "目标战场画面无法安装，当前战场已保留。"
+		return false
+	host.commands.world._rebuild_unit_index()
+	return true
 
 func apply_snapshot(d: Dictionary) -> bool:
 	last_load_error = ""
@@ -50,23 +75,29 @@ func _apply_snapshot(d: Dictionary) -> bool:
 	return applied
 
 func _restore_current(d: Dictionary, arr: Array) -> bool:
+	var plan := _validation_plan(d, arr)
+	if plan.is_empty(): return false
+	var transaction = preload("res://app/saves/world_transaction.gd").new()
+	return transaction.apply(host, d, arr, plan)
+
+func _validation_plan(d: Dictionary, arr: Array) -> Dictionary:
 	var validator = preload("res://app/saves/snapshot_validator.gd").new(host, content_revision, _valid_cost, _valid_integer)
 	var plan: Dictionary = validator.prepare(d, arr)
 	if plan.is_empty():
 		last_load_error = validator.compatibility_error if not validator.compatibility_error.is_empty() else "存档内容版本、字段或对象引用不兼容；当前战场已保留。"
-		return false
-	var transaction = preload("res://app/saves/world_transaction.gd").new()
-	return transaction.apply(host, d, arr, plan)
+	return plan
 
 func restore_candidate(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 	var restorer = preload("res://app/saves/snapshot_restorer.gd").new(host, _apply_unit_record, _restore_resources, _restore_trainings, _numeric_keys)
 	return restorer.restore(d, arr, plan)
 
 func content_revision() -> String:
-	if _content_revision_cache.is_empty():
+	var world_id: int = host.world.get_instance_id()
+	if _content_revision_cache.is_empty() or world_id != _content_revision_world:
 		var data: Dictionary=host.world.definition.duplicate(true)
 		var projection:=_map_projection(data)
 		_content_revision_cache=("battle-content-v3:"+preload("res://app/saves/rules_identity.gd").catalog_hash(JSON.stringify(projection))).sha256_text()
+		_content_revision_world = world_id
 	return _content_revision_cache
 
 func _map_projection(data: Dictionary) -> Dictionary:
@@ -143,7 +174,7 @@ func save_extra() -> Dictionary:
 	for key in host.decor_cells:
 		var target: Dictionary = host.decor_cells[key]
 		if int(target.unit) in [100,102,104]: decor[key] = {"stock": float(target.get("stock", 0))}
-	var extra := {"nextUid": int(host.next_uid), "trainings": host.trainings, "gameEnd": int(host.game_end), "simulation": {
+	var extra := {"mapId": str(host.map_id), "nextUid": int(host.next_uid), "trainings": host.trainings, "gameEnd": int(host.game_end), "simulation": {
 		"rngState": str(host.simulation_rng.state), "contentRevision": content_revision(), "rulesRevision":preload("res://app/saves/rules_identity.gd").current(), "tick": host.sim_tick, "accumulator": host.sim_acc, "speedIndex": host.clock.speed_index,
 		"explored": host.visibility.snapshot(), "projectiles":host.projectiles.snapshot(), "fireFields":host.fire_fields.snapshot(), "decorResources": decor,
 		"aiResources": host.ai_res, "groups": host.control_groups,

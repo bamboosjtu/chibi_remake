@@ -52,7 +52,7 @@ func _has_own_transport() -> bool:
 			return true
 	return false
 
-func _order_board(ship: Dictionary) -> int:
+func _order_board(ship: Dictionary, actors = null) -> int:
 	var services := ports.acquire(["battle_simulation", "command_groups"])
 	if services.is_empty(): return 0
 	if not battle.transports.valid_ship(ship) or int(ship.owner)!=battle.player_owner or str(ship.state)=="unload":
@@ -63,7 +63,7 @@ func _order_board(ship: Dictionary) -> int:
 		services.battle_simulation._feedback("运输船已满（%d）" % Balance.transport_capacity())
 		return 0
 	var n := 0
-	for u in services.command_groups._command_units():
+	for u in services.command_groups._command_units(actors):
 		if not battle.transports.valid_unit(u) or bool(u.is_building) or int(u.owner)!=battle.player_owner:
 			continue
 		if services.command_groups._is_naval(u) or bool(u.get("attached", false)):
@@ -137,8 +137,8 @@ func _detach_from_ship(u: Dictionary, ship: Dictionary) -> bool:
 		ship["loaded"] = false
 	return true
 
-func _unload_selected() -> void:
-	for ship in battle.selected:
+func _unload_selected(actors = null) -> void:
+	for ship in battle.selected if actors == null else actors:
 		if int(ship.unit)==Roles.transport_id():_order_unload(ship)
 
 func _order_unload(ship: Dictionary, _pos:=Vector2.ZERO) -> int:

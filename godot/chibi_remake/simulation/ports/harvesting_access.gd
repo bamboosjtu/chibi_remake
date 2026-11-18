@@ -10,7 +10,6 @@ func _init(data: State) -> void:
 	_state = weakref(data)
 
 
-const CARRY_CAPACITY = Config.CARRY_CAPACITY
 
 const SIM_DT = Config.SIM_DT
 

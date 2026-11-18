@@ -25,7 +25,7 @@ func _grant_officer_exp(u: Dictionary, amount: float) -> void:
 		if battle.effects != null:battle.effects.sound("play_id", [106])
 	if battle.effects != null:battle.effects.visual("update_panel", [])
 
-func _form_hero_unit(u: Dictionary, idx: int) -> bool:
+func _form_hero_unit(u: Dictionary, idx: int, actors = null) -> bool:
 	var services := ports.acquire(["production", "officer_pool", "entity_factory", "spatial_index", "technology", "battle_simulation"])
 	if services.is_empty(): return false
 	if services.production._army_count(int(u.owner)) >= Balance.army_cap() or services.production._commander_count(int(u.owner)) >= Balance.commander_cap(): return false
@@ -36,7 +36,7 @@ func _form_hero_unit(u: Dictionary, idx: int) -> bool:
 	var meta: Dictionary = battle.map_data.units.get(str(hero_type), {})
 	if meta.is_empty() or services.entity_factory._sheet_ref_for(hero_type, int(u.owner)) == "": return false
 	var members: Array = []
-	for member in battle.selected:
+	for member in battle.selected if actors == null else actors:
 		if member.alive and member.die_t < 0.0 and not member.is_building and member.owner == u.owner and member.get("officer", {}).is_empty() and int(member.get("group_officer", -1)) < 0:
 			members.append(member)
 			if members.size() == Balance.team_max_members(): break
@@ -56,18 +56,19 @@ func _form_hero_unit(u: Dictionary, idx: int) -> bool:
 	commander.maxhp = commander.base_maxhp; commander.hp = commander.base_maxhp
 	services.technology._apply_tech_bonuses(commander)
 	battle.units.append(commander)
-	battle.selected = [commander]
+	if actors == null or battle.selected == actors: battle.selected = [commander]
 	for member in members:
 		member.group_officer = idx
 	services.battle_simulation._place_unit(commander)
 	return true
 
-func _order_disband() -> int:
+func _order_disband(actors = null) -> int:
 	var services := ports.acquire(["command_groups", "battle_simulation", "abilities"])
 	if services.is_empty(): return 0
+	var selection_unchanged: bool = actors == null or battle.selected == actors
 	var leaders: Array = []
 	var detached := 0
-	for unit in battle.selected:
+	for unit in battle.selected if actors == null else actors:
 		if not battle.units.any(func(current): return is_same(current,unit)): continue
 		if unit.alive and unit.die_t<0 and int(unit.owner)==battle.player_owner and unit.get("officer",{}).is_empty() and int(unit.get("group_officer",-1))>=0:
 			unit.group_officer=-1
@@ -88,13 +89,13 @@ func _order_disband() -> int:
 			services.abilities._reset_jimou()
 		leader.alive = false
 		services.battle_simulation._free_unit_at(position)
-	battle.selected = []                                   # 原版：解散即清空选择
+	if selection_unchanged: battle.selected = []
 	if not leaders.is_empty():
 		services.battle_simulation._feedback("部队已解散（%d 队），成员保留，可重新组建" % leaders.size())
 	if detached>0:services.battle_simulation._feedback("%d 名成员已解除编组" % detached)
 	return leaders.size()+detached
 
-func _order_join(target: Dictionary) -> int:
+func _order_join(target: Dictionary, actors = null) -> int:
 	var services := ports.acquire(["command_groups", "battle_simulation", "interaction_paths"])
 	if services.is_empty(): return 0
 	var leader: Dictionary = target if not target.get("officer", {}).is_empty() else services.command_groups._commander_for(target)
@@ -105,7 +106,7 @@ func _order_join(target: Dictionary) -> int:
 	var members: Array = battle.units.filter(func(u): return bool(u.alive) and u.die_t < 0 and int(u.owner) == battle.player_owner and int(u.get("group_officer", -1)) == idx)
 	var room := Balance.team_max_members() - members.size()
 	var count := 0
-	for member in battle.selected.duplicate():
+	for member in (battle.selected if actors == null else actors).duplicate():
 		if room <= 0: break
 		if not bool(member.alive) or member.is_building or member.die_t >= 0 or int(member.owner) != battle.player_owner or bool(member.get("attached", false)) or not member.get("officer", {}).is_empty() or int(member.get("group_officer", -1)) >= 0: continue
 		var path: Array = services.interaction_paths._edge_interaction_path(member, leader)
@@ -173,12 +174,12 @@ func _unassign_officer(u: Dictionary) -> void:
 	u["officer_might"] = 0.0
 	u["officer_intellect"] = 0.0
 
-func _order_form_up(officer_index: int) -> void:
+func _order_form_up(officer_index: int, actors = null) -> void:
 	var done := 0
-	for u in battle.selected.duplicate():
+	for u in (battle.selected if actors == null else actors).duplicate():
 		if u.is_building or not u.alive:
 			continue
-		if _form_hero_unit(u, officer_index):
+		if _form_hero_unit(u, officer_index, actors):
 			done += 1
 			break          # 一个武将只带一支部队（占用位唯一）
 	if done == 0:

@@ -15,6 +15,14 @@ const CATALOG_FIELDS := {
 	"unit_roles.json": ["workers", "heroes", "naval", "transports", "officers", "meleeTechnology", "navalTechnology", "mobileHpTechnology", "technologyCategories", "channelBAttack"],
 	"balance.json": ["armyCap", "commanderCap", "teamMaxMembers", "transportCapacity"],
 }
+## Frozen comparison values from v9 before tuning moved into balance.json.
+const V9_TUNING := {
+	"harvest": {"periodTicks":100, "pollTicks":4, "carryCapacity":200, "extractAmount":200,
+		"deposits":{"wood":[4,5,0,1], "food":[10,11,0,1], "stone":[2,3,0,1], "gold":[23,0,1]}},
+	"work": {"restTicks":10, "restHp":1, "repairHp":16, "buildTicks":4, "buildHp":2,
+		"repairCost":{"gold":16, "wood":16, "food":16, "stone":16}},
+	"abilities": {"cost":[50,100,100,100,200,100,100,10,100], "rangeCells":10},
+}
 const METADATA := ["name", "heroTypeName", "description", "source", "sourceSha256", "provenance", "sheet", "sheetK", "spriteName", "rank", "message", "message_id", "sound_id"]
 static var _current := ""
 static func current() -> String:
@@ -50,6 +58,11 @@ static func fingerprint(records: Dictionary) -> String:
 static func rule_projection(name: String, data: Dictionary) -> Dictionary:
 	var result := {}
 	for key in CATALOG_FIELDS.get(name, []): result[key] = _rule_value(data.get(key))
+	if name == "balance.json":
+		var tuning := {}
+		for key in V9_TUNING: tuning[key] = data.get(key)
+		if catalog_hash(JSON.stringify(tuning)) != catalog_hash(JSON.stringify(V9_TUNING)):
+			result.merge(tuning)
 	if name == "unit_roles.json":
 		for key in result:
 			if key == "technologyCategories":

@@ -12,6 +12,7 @@ var ports := Dependencies.new()
 const SceneServices = preload("res://app/battle_scene_state.gd")
 var scene: SceneServices
 var node: Node2D
+var _waiting_for_commands := false
 const View = preload("res://presentation/battle/battle_view.gd")        # ARCH-013：表现层（HUD/相机/单位外观/框选）
 
 func _init(services: SceneServices, surface: Node2D) -> void:
@@ -19,27 +20,39 @@ func _init(services: SceneServices, surface: Node2D) -> void:
 	node = surface
 
 func cancel_work(kind: String, uid: int, epoch: int) -> bool:
-	if epoch != node.world.get_instance_id() or kind not in ["site","training"]: return false
-	var action := _cancel_work_now.bind(kind,uid,epoch)
-	return battle.player_commands.submit(22 if kind == "site" else 23,action,Vector2.ZERO,uid) > 0
+	if epoch != node.world.get_instance_id() or kind not in ["site", "training"]: return false
+	return submit_command("cancel_site" if kind == "site" else "cancel_train", uid) > 0
 
-func submit_command(mode: int, action: Callable, target := Vector2.ZERO, uid := -1, parameter := 0) -> int:
-	if not action.is_valid(): return 0
-	return battle.player_commands.submit(mode,_execute_command.bind(node.world.get_instance_id(),action),target,uid,parameter)
+func submit_command(kind: String, uid := -1, parameter := -1) -> int:
+	if not scene.ready_to_save or node.get_tree().paused or _waiting_for_commands: return 0
+	return battle.player_commands.submit(kind, battle.selected, Vector2.ZERO, uid, parameter)
 
-func _execute_command(epoch: int, action: Callable) -> void:
-	if node.world.get_instance_id()==epoch and action.is_valid(): action.call()
+func begin_target(kind: String, parameter := -1) -> void:
+	if not scene.ready_to_save or node.get_tree().paused or _waiting_for_commands: return
+	match kind:
+		"jimou": node.commands.military._jimou_begin(parameter)
+		"duel": node.commands.military._duel_begin()
+		"build":
+			for option in battle.build_types:
+				if int(option.unit) == parameter:
+					node.commands.economy._start_build(option)
+					break
+		"move", "attack", "transport", "repair", "board", "join", "unload":
+			node.commands.military._cmd_begin(kind)
 
-func pump_commands() -> int:
-	return battle.player_commands.pump()
+func submit_point_order(position: Vector2, context: bool) -> int:
+	if not scene.ready_to_save or node.get_tree().paused or _waiting_for_commands: return 0
+	return ports.submit_point_order(position, context)
 
-func _cancel_work_now(kind: String, uid: int, epoch: int) -> void:
-	if epoch != node.world.get_instance_id(): return
-	for unit: Dictionary in battle.units:
-		if int(unit.uid) != uid: continue
-		if kind == "site": node.commands.economy._cancel_site(unit)
-		else: node.commands.economy._cancel_training(unit)
-		return
+func select_at(position: Vector2, add: bool) -> void:
+	ports._select_click(position, add)
+
+func wait_command_boundary() -> void:
+	_waiting_for_commands = true
+	var tree := node.get_tree()
+	while battle.player_commands.has_pending() and battle.game_end == 0 and node.is_processing() and not tree.paused:
+		await tree.process_frame
+	_waiting_for_commands = false
 
 func _write_smoke(ok: bool, why: String) -> void:
 	var f := FileAccess.open("user://smoke.json", FileAccess.WRITE)
@@ -103,8 +116,13 @@ func _save_game(slot := 0, title := "") -> bool:
 	if not scene.ready_to_save:
 		Game.last_save_error = {"stage":"battle not initialized", "code":ERR_UNCONFIGURED}
 		return false
-	# Dispatch before taking any snapshot, so costs and production belong to the same battle.
-	if battle.player_commands != null: battle.player_commands.pump()
+	var unregistered := preload("res://simulation/battle_state_fields.gd").omissions(battle)
+	if not unregistered.is_empty():
+		Game.last_save_error = {"stage":"snapshot world fields", "code":ERR_INVALID_DATA, "slot":slot, "fields":unregistered}
+		return false
+	if battle.player_commands.has_pending():
+		Game.last_save_error = {"stage":"指令尚未结算，请返回战场后重试", "code":ERR_BUSY, "slot":slot}
+		return false
 	node.commands.military._settle_pending_duels()
 	var extra := _save_extra()
 	extra.saveName=title
@@ -118,49 +136,32 @@ func _schedule_failed_load_return() -> void:
 	scene.ready_to_save = false
 	node.set_process(false)
 	node.set_process_unhandled_input(false)
-	if not scene.load_staging: _return_to_menu_after_load_failure.call_deferred()
+	_return_to_menu_after_load_failure.call_deferred()
 
 func load_slot(slot: int) -> Dictionary:
-	var data: Dictionary = Game.load_save(slot)
+	var loaded: Dictionary = Game.repository.read_slot(slot)
+	var data: Dictionary = loaded.data
 	var map_id := str(data.get("map",""))
-	if data.is_empty() or not FileAccess.file_exists("res://data/%s.json" % map_id): return {"ok":false,"error":"所选进度无法读取，原有记录已保留。"}
-	if map_id != str(battle.map_id): return _load_other_map(slot,map_id)
+	if data.is_empty() or not Game.campaign.catalog.contains(map_id):
+		return {"ok":false,"error":"所选进度无法读取，原有记录已保留。"}
+	var cross_map := map_id != str(battle.map_id)
 	var selection: Array = battle.selected.map(func(unit): return int(unit.uid))
-	if not scene.saver.apply_snapshot(data): return {"ok":false,"error":scene.saver.last_load_error}
-	for unit in battle.units:
-		if int(unit.uid) in selection: battle.selected.append(unit)
-	return {"ok":true,"cross_map":false}
-
-func _load_other_map(slot: int, map_id: String) -> Dictionary:
-	var tree: SceneTree = node.get_tree()
-	var previous := [Game.current_map,Game.pending_load,Game.pending_load_slot,Game.last_load_error]
-	var candidate = load("res://main.tscn").instantiate()
-	candidate.scene.load_staging = true; candidate.scene.requested_map = map_id
-	Game.current_map = map_id; Game.pending_load = true; Game.pending_load_slot = slot
-	tree.root.add_child(candidate)
-	if not candidate.scene.ready_to_save:
-		var error := str(Game.last_load_error)
-		candidate.free()
-		Game.current_map = previous[0]; Game.pending_load = previous[1]; Game.pending_load_slot = previous[2]; Game.last_load_error = previous[3]
-		return {"ok":false,"error":error if not error.is_empty() else "目标战场无法恢复；当前战场已保留。"}
-	candidate.scene.load_staging = false
-	scene.ready_to_save = false
-	node.set_process(false); node.set_process_unhandled_input(false)
-	if battle.player_commands != null: battle.player_commands.clear()
-	battle.effects.invalidate()
-	if scene.view != null and scene.view.event_view != null: scene.view.event_view.restore_history()
-	tree.current_scene = candidate; Game.pauses.release_scope(node)
-	node.queue_free()
-	return {"ok":true,"cross_map":true}
+	if not Game.campaign.restore_battle(map_id, scene.saver.apply_loaded.bind(loaded, cross_map)):
+		return {"ok":false,"error":scene.saver.last_load_error}
+	if not cross_map:
+		for unit in battle.units:
+			if int(unit.uid) in selection: battle.selected.append(unit)
+	return {"ok":true,"cross_map":cross_map,"source":scene.saver.last_load_source}
 
 func _notification(what: int) -> void:
 	if what != Node.NOTIFICATION_WM_CLOSE_REQUEST:
 		return
 	if scene.ready_to_save and scene.saver != null:
 		if scene.view != null and scene.view.battle_menu != null:
-			scene.view.battle_menu.open()
+			await scene.view.battle_menu.open()
 			scene.view.battle_menu.quit_game()
 			return
+		await wait_command_boundary()
 		if not _save_game():
 			ports._feedback("保存失败，未退出，请重试")
 			return
@@ -170,9 +171,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if ports.handle_cheat_input(event):
 		node.get_viewport().set_input_as_handled()
 		return
-	battle._input_command = true
-	_battle_input(event)
-	battle._input_command = false
+	if not _waiting_for_commands: _battle_input(event)
 
 func focus_group(n: int) -> bool:
 	if not ports._group_recall(n):
@@ -198,7 +197,7 @@ func _battle_input(event: InputEvent) -> void:
 			_numb = event.keycode - KEY_1 + 1
 		if _numb > 0:
 			if event.ctrl_pressed:
-				ports._group_assign(_numb)
+				submit_command("assign_group", -1, _numb)
 				return
 			focus_group(_numb)
 			return
@@ -246,7 +245,7 @@ func _battle_input(event: InputEvent) -> void:
 				var clicked := scene.sel_start.distance_to(world_pos) <= 7.0
 				if clicked and ports.cmd_pending_kind() != "":
 					# 原版模型：先点面板按钮、再点地图目标 —— 待选命令用**左键**落到目标上。
-					ports._order_at(world_pos)
+					submit_point_order(world_pos, false)
 				elif not clicked:
 					ports._select_box(_sel_rect(), add)
 				else:
@@ -256,9 +255,9 @@ func _battle_input(event: InputEvent) -> void:
 					if rclick.is_empty() or bool(rclick.get("is_building",false)) or not battle.command_rules.allows_context(16138):
 						ports._select_click(world_pos, add)
 					else:
-						battle.player_commands.submit(7,ports._order_gather.bind(rclick),world_pos,int(rclick.uid))
+						battle.player_commands.submit("gather", battle.selected, world_pos, int(rclick.uid), -1, str(rclick.get("cell", "")))
 		elif mbe.button_index == MOUSE_BUTTON_RIGHT and mbe.pressed:
-			ports._order_context(node.get_canvas_transform().affine_inverse() * mbe.position)
+			submit_point_order(node.get_canvas_transform().affine_inverse() * mbe.position, true)
 	elif event is InputEventMouseMotion:
 		var mme := event as InputEventMouseMotion
 		if scene.drag_pan:
@@ -307,7 +306,7 @@ func _process(delta: float) -> void:
 	var steps := 0
 	var period: float = battle.clock.period()
 	var target_tick := ceili(battle.simtest_seconds * Config.SIM_HZ) if battle.simtest_seconds > 0.0 else -1
-	while battle.game_end == 0 and battle.sim_acc + 0.000000001 >= period and steps < Config.SIM_MAX_CATCHUP and (target_tick < 0 or battle.sim_tick < target_tick):
+	while battle.game_end == 0 and not node.get_tree().paused and battle.sim_acc + 0.000000001 >= period and steps < Config.SIM_MAX_CATCHUP and (target_tick < 0 or battle.sim_tick < target_tick):
 		battle.sim_acc = maxf(0.0,battle.sim_acc-period)
 		steps += 1
 		ports._sim_step(Config.SIM_DT)
@@ -317,6 +316,7 @@ func _process(delta: float) -> void:
 		# The digest module stays free of the scene tree; the app layer supplies
 		# the hasher it needs.
 		print("SIMULATION DIGESTS: ", JSON.stringify(preload("res://simulation/systems/state_digest.gd").sections(node, node.get_node("/root/Game"))))
+		print("SIMULATION FULL DIGEST: ", Game.save_checksum(scene.saver.continuation_snapshot(Game)))
 		node.get_tree().quit()
 		return
 	scene.hud_acc += delta

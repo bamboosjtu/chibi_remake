@@ -257,6 +257,15 @@
       "markers": [
         "APP BOUNDARIES PASS"
       ]
+    },
+    {
+      "script": "test_command_determinism",
+      "markers": [
+        "COMMAND DETERMINISM PASS"
+      ],
+      "args": [
+        "--noview"
+      ]
     }
   ]
 }

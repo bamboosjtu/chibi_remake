@@ -10,9 +10,7 @@ func _init(data: State) -> void:
 	_state = weakref(data)
 
 
-const BUILD_STEP_HP = Config.BUILD_STEP_HP
 
-const BUILD_STEP_TICKS = Config.BUILD_STEP_TICKS
 
 const EDGE_DISTANCE = Config.EDGE_DISTANCE
 

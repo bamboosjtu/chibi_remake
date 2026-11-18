@@ -139,8 +139,8 @@ powershell -NoProfile -File tools/ci_windows.ps1 -FullRegression
 
 | 职责 | 文件 |
 |---|---|
-| 自检 | `main.gd::_selftest_*` |
-| 摘要 | `main.gd::_state_digest` |
+| 自检 | `testing/battle_selftest.gd` |
+| 摘要 | `simulation/battle/battle_simulation.gd::_state_digest`、`simulation/systems/state_digest.gd` |
 | 回归脚本 | `tools/gd/test_*.gd` |
 | 数据测试 | `tools/test_*.mjs` |
 | 发布测试清单 | `tools/inputs/release_tests.json` |
@@ -293,9 +293,13 @@ pwsh -NoProfile -File tools/bench_full_battle.ps1 -ReleasePack <候选目录>/Ch
 协议 v4 将 FPS 测量起点固定在预热 60 + 逻辑采样 300 = 360 tick。随后 30 个渲染预热帧保持自动模拟关闭，并比较完整快照摘要；确认状态未变化后，才开启正常逐帧处理并测量 FPS、真实 tick 吞吐和命令延迟。手动逻辑采样的渲染帧同步显示模型，防止新增单位长期保留初始化可见性。报告包含 `frameInitialTick`、`frameInitialStateChecksum`、`renderWarmupPreservedSimulation`；候选门禁核对固定起点。历史 v2/v3 的 FPS 数字保留，但不与 v4 结果当作同一初始状态直接比较。
 
 
+`test_command_determinism` 从战场输入入口提交采集命令，比较不同帧批次和速度的规范化快照，涵盖目标耗尽、暂停保存拒绝及 v9 续跑。固定摘要覆盖四张代表地图和 450、1800 tick，保留整数与分段摘要，并校验规范化完整快照。自检的存档写入、读取失败使用 `node tools/run_regressions.mjs --selftest-failures` 验证退出码。
+
+用 `pwsh -NoProfile -File tools/bench_capacity_stability.ps1 -ReleasePack <候选目录>/ChibiRTS.pck` 执行 460 单位的五轮专项验证。各轮使用相同 PCK 和初始摘要，要求 tick P95≤30 ms、吞吐≥95%、命令延迟 P95≤100 ms，积压符合完整战场检查，同时核对五轮 P95 极差低于中位数的 15%。报告保留每轮、最低 FPS 和内存峰值。加 `-IncludeSynthetic` 时另跑一次 660 单位诊断。
+
 ## 测试归属与门禁结果
 
-`node tools/suite_check.mjs` 检查 `tools/gd` 下全部 GDScript：自动套件必须有成功标记，非自动入口必须在 `manual_tests.json` 中声明类别、前提与运行方式。CI/save 套件是主套件的覆盖子集；主套件间不能重复归属。新增脚本未登记、条目失效或手工排除缺少理由均阻止门禁。开局兵力测试声明 `opening-forces` fixture，runner 先从规格文档生成并校验输入；准备失败单独记为失败并继续其他测试。
+`node tools/suite_check.mjs` 检查 `tools/gd` 下全部 GDScript：自动套件必须有成功标记，非自动入口必须在 `manual_tests.json` 中声明类别、前提与运行方式。CI 和存档套件各自声明运行范围，发布与开发主套件之间保持唯一归属。新增脚本未登记、条目失效或手工排除缺少理由均阻止门禁。开局兵力测试声明 `opening-forces` fixture，runner 先从规格文档生成并校验输入；准备失败单独记为失败并继续其他测试。
 
 `node tools/ci_lightweight.mjs` 执行全部检查并汇总；`--group architecture|registry|data|docs|repository|tooling` 执行对应组，均把机器可读结果写入 `_work/lightweight`。退出非零表示至少一项失败，不允许用后续成功覆盖失败。架构体积预算与边界豁免必须有 owner、reason、reviewBy；到期阻止门禁。端口关系清单由 `node tools/port_inventory.mjs --write` 更新，默认只校验新鲜度，不自动删除接口。
 

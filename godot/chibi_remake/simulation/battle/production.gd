@@ -71,20 +71,19 @@ func _queue_train(owner: int, building: Dictionary, uid: int) -> bool:
 	return true
 
 func _start_train(opt: Dictionary) -> void:
-	if battle._input_command and not battle.player_commands.executing:
-		battle.player_commands.submit(16,_execute_start_train.bind(opt),Vector2.ZERO,-1,int(opt.unit));return
-	_execute_start_train(opt)
+	_order_train(int(opt.unit), battle.selected)
 
-func _execute_start_train(opt: Dictionary) -> void:
+func _order_train(unit_id: int, actors: Array) -> bool:
 	var services := ports.acquire(["battle_simulation"])
-	if services.is_empty(): return
-	if battle.game_end != 0: return
-	for building in battle.selected:
+	if services.is_empty(): return false
+	if battle.game_end != 0: return false
+	for building in actors:
 		if building.is_building and int(building.owner) == battle.player_owner:
-			if not _queue_train(battle.player_owner, building, int(opt.unit)):
-				services.battle_simulation._feedback("无法生产：检查建筑、科技、资源、生产进度与200单位上限")
-			return
+			if _queue_train(battle.player_owner, building, unit_id): return true
+			services.battle_simulation._feedback("无法生产：检查建筑、科技、资源、生产进度与单位上限")
+			return false
 	services.battle_simulation._feedback("先选中已建成的生产建筑")
+	return false
 
 func _cancel_training(building: Dictionary) -> bool:
 	for i in range(battle.trainings.size()):

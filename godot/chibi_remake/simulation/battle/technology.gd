@@ -245,8 +245,9 @@ func _research_for_building(building: Dictionary) -> Dictionary:
 		if int(job.buildingUid) == int(building.uid): return job
 	return {}
 
-func _selected_research_building() -> Dictionary:
-	for building in battle.selected:
+func _selected_research_building(actors = null) -> Dictionary:
+	var selected: Array = battle.selected if actors == null else actors
+	for building in selected:
 		if building is Dictionary and battle.units.any(func(u):return is_same(u,building)) and building.is_building and int(building.owner) == battle.player_owner:
 			return building
 	return {}
@@ -268,11 +269,11 @@ func _queue_research(owner: int, building: Dictionary, idx: int, ai_dispatch := 
 	battle.research_jobs.append({"buildingUid":int(building.uid),"owner":owner,"tech":idx,"t":0,"cost":cost})
 	return true
 
-func _start_tech(idx: int) -> bool:
+func _start_tech(idx: int, actors = null) -> bool:
 	var services := ports.acquire(["battle_simulation"])
 	if services.is_empty(): return false
 	if battle.game_end != 0: return false
-	var building := _selected_research_building()
+	var building := _selected_research_building(actors)
 	if building.is_empty():
 		services.battle_simulation._feedback("先选中已建成的科技建筑"); return false
 	if _building_work_busy(building):
@@ -319,10 +320,10 @@ func _apply_tech_effects(idx: int, owner := -1) -> void:
 	if owner == battle.player_owner: services.battle_simulation._feedback("研究完成：%s" % str(tech_row(idx).get("name", "?")))
 	print("TECH: owner%d completed %d 「%s」 %s" % [owner,idx,str(tech_row(idx).get("name", "?")),str(state)])
 
-func _cancel_tech() -> bool:
+func _cancel_tech(actors = null) -> bool:
 	var services := ports.acquire(["battle_simulation"])
 	if services.is_empty(): return false
-	var job := _research_for_building(_selected_research_building())
+	var job := _research_for_building(_selected_research_building(actors))
 	if not job.is_empty():
 		battle.economy.refund(int(job.owner),job.cost); battle.research_jobs.erase(job)
 		services.battle_simulation._feedback("已取消研究，返还75%费用"); return true

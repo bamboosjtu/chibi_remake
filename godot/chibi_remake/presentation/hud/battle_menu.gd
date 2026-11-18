@@ -81,7 +81,7 @@ func _ready() -> void:
 
 func open() -> void:
 	if host.view.briefing!=null and host.view.briefing.is_open:host.view.briefing.close()
-	host.commands.session.pump_commands()
+	await host.commands.session.wait_command_boundary()
 	slots_dialog.dismiss()
 	_close_settings()
 	var vp := get_viewport().get_visible_rect().size
@@ -185,9 +185,8 @@ func _slot_confirmed(slot: int, title: String) -> void:
 	var result: Dictionary = host.commands.session.load_slot(slot)
 	if not result.ok:
 		slots_dialog.show_error(str(result.error)); return
-	if not result.cross_map:
-		close()
-		host.view.update_panel()
+	close()
+	host.view.update_panel()
 
 func return_to_menu() -> void:
 	if not host.commands.session._save_game():

@@ -7,10 +7,6 @@ const SPEED = Config.SPEED
 const SIM_DT = Config.SIM_DT
 const SIM_MAX_CATCHUP = Config.SIM_MAX_CATCHUP
 const PRODUCE_BY_BUILDING = Config.PRODUCE_BY_BUILDING
-const DEPOSIT_UNITS = Config.DEPOSIT_UNITS
-const GATHER_TICKS = Config.GATHER_TICKS
-const CARRY_CAPACITY = Config.CARRY_CAPACITY
-const GATHER_SECONDS = Config.GATHER_SECONDS
 const GATHER_REACH = Config.GATHER_REACH
 const EDGE_DISTANCE = Config.EDGE_DISTANCE
 const DEPOSIT_EDGE_PX = Config.DEPOSIT_EDGE_PX
@@ -80,6 +76,8 @@ func _wire_world() -> void:
 	if not _application_services.has("scene_controller"): _application_services["scene_controller"] = preload("res://app/battle/scene_controller.gd").new(scene, self)
 	_modules.merge(_application_services)
 	_modules.make_read_only()
+	if not state.player_commands.commands_applied.is_connected(_commands_applied):
+		state.player_commands.commands_applied.connect(_commands_applied, CONNECT_DEFERRED)
 	var report: Dictionary = world.connect_services("main", commands.port_objects(), _application_services)
 	_api_missing = report.missing
 	if not state.effects.visual_requested.is_connected(_on_visual): state.effects.visual_requested.connect(_on_visual)
@@ -178,8 +176,6 @@ func exchange_world(next_world: RefCounted) -> RefCounted:
 	var previous: RefCounted = world
 	world = next_world
 	_wire_world()
-	if state.player_commands != null:
-		if not state.player_commands.commands_applied.is_connected(_commands_applied): state.player_commands.commands_applied.connect(_commands_applied)
 	return previous
 
 func _commands_applied() -> void:

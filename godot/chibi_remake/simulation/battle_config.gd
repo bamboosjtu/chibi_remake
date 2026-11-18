@@ -43,14 +43,6 @@ const RESOURCE_YIELD := {
 	104: "stone",               # 矿石堆（L0 类 2，相位 4；全库仅 1 格）
 }
 
-## **交付点**（原版 `FUN_00426890`：「最近己方对应建筑」）：
-## 木→木材场(4/5)、食→粮仓(10/11)、铁→武器库(2/3)、金→钱庄(23)。
-## **大本营 0/1 是通用卸货点**：早期关卡开局只有帅帐，没有对应仓库；
-## 若不允许大本营收货，工人会把货扣在手里、看起来“不往返”（用户实机反馈）。
-
-const DEPOSIT_UNITS := {
-	"wood": [4, 5, 0, 1], "food": [10, 11, 0, 1], "stone": [2, 3, 0, 1], "gold": [23, 0, 1],
-}
 ## 粮食容量建筑（帅帐 0/1、粮仓 10/11）：粮食上限 = 该数 × 10000（`FUN_004262f0`）。
 
 const FOOD_BUILDINGS: Array = [0, 1, 10, 11]
@@ -61,27 +53,18 @@ const STOCK_UNITS: Array = [22, 24, 25]
 ## 采集节拍与载重（原版 `FUN_00421a20`）：每 **100 tick** 提取一次，载重上限 **200**（字节 0xC8）。
 ## 提取量也是 200（不足则装剩余）；节点存量 < 1 → 节点 HP 归 0 并转模式 0x12（被移除）。
 
-const GATHER_TICKS := 100
 
-const CARRY_CAPACITY := 200.0
 
-const GATHER_SECONDS := 100.0 * SIM_DT   # = 100 tick（保留旧名，自检与状态机仍引用）
 ## 休息（模式 4，`FUN_004602e0`）：**每 10 tick HP +1**，满编即结束。
 
-const REST_TICKS := 10
 ## 修理（模式 9，`FUN_00421dc0`）：目标 +16 HP、四资源各 −16；前置 = 四资源**均 > 15**。
 
-const REPAIR_HP := 16.0
 
-const REPAIR_COST := 16.0
 ## 建造（模式 8/0x13，`FUN_0045c320`）：每个工人 **每 4 tick 给工地 +2 HP**（多工人叠加）。
 
-const BUILD_STEP_TICKS := 4
 
-const BUILD_STEP_HP := 2.0
 ## 状态效果（原版状态位：计时 > 799 自动清除，即 **800 tick**）。
 
-const JIMOU_COST: Array = [50, 100, 100, 100, 200, 100, 100, 10, 100]
 
 const JIMOU_NAMES: Array = ["激励", "加速", "减速", "远视", "混乱", "滚木", "埋伏", "恢复", "火攻"]
 ## 目标方（REA FUN_0045f8b0/FUN_00429480 实证）：激励/加速/远视/滚木/埋伏/恢复=己方，
@@ -96,7 +79,6 @@ const JIMOU_LV_MASK: Array = [0, 1, 0x181, 0x1c1, 0x1c9, 0x1cf, 0x1ef, 0x1ff, 0x
 ## This logical mask excludes page arrows and includes both final formations.
 const FORM_LV_MASK: Array = [7, 7, 7, 0x3f, 0x3f, 0xff, 0x3ff, 0x3ff, 0x3ff, 0x3ff]
 
-const JIMOU_RANGE_CELLS := 10.0
 ## 谋略池上限 = 2 × 智力 + 15（原版 `FUN_0045b410` 被动恢复上限），一次施放按 JIMOU_COST 扣。
 ##
 ## **十阵法（帧 113..122 顺序）＝纯队形几何，没有任何攻/防/速修正**（REMAKE-GAP §1）。

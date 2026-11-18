@@ -45,6 +45,13 @@ void fragment() {
 	camera_overlay=Control.new();camera_overlay.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	camera_overlay.draw.connect(_draw_camera);overlay.add_child(camera_overlay)
 
+func reload_map_terrain() -> void:
+	terrain_error = ""
+	tooltip_text = ""
+	map_texture = ImageTexture.create_from_image(_terrain_image())
+	terrain.texture = map_texture
+	queue_redraw()
+
 func _terrain_image() -> Image:
 	if catalog.is_empty():
 		var file := FileAccess.open("res://data/db/minimap_terrain.json",FileAccess.READ)

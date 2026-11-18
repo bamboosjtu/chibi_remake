@@ -23,9 +23,10 @@ func zoom_x() -> float:
 	return 1.0
 
 func setup_camera() -> void:
-	_ui.cam = Camera2D.new()
-	surface.add_child(_ui.cam)
-	_ui.cam.make_current()
+	if _ui.cam == null:
+		_ui.cam = Camera2D.new()
+		surface.add_child(_ui.cam)
+		_ui.cam.make_current()
 	_ui.cam.position = _ui.host.opening_camera_position()
 	_ui.cam.zoom = Vector2.ONE * _ui.ui_scale
 	var opening_target := battle_rect().position + battle_rect().size * Vector2(0.625, 0.5)

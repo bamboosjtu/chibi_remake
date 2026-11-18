@@ -24,9 +24,10 @@ var _empty_geometry := Frozen.copy({"cells":[],"outline":[]})
 var metrics := {"unitBuilds":0,"selectionBuilds":0,"spriteBuilds":0,"visualBuilds":0}
 
 func invalidate() -> void:
-	if _units_key.is_empty(): return
+	if _units_key.is_empty() and _selected_key.is_empty(): return
 	_revision += 1
 	_units_key = []
+	_selected_key = []
 	_visuals.clear()
 
 func _ensure(data: Object) -> void:
@@ -62,11 +63,12 @@ func selection(data: Object) -> Array:
 	_ensure(data)
 	# Selection/health may change while paused, outside a simulation update.
 	# Compare only displayed scalars; never key a cache with source dictionaries.
-	var key: Array = [_world,data.nav.get_instance_id(),data.nav.geometry_revision]
+	var key: Array = [_world,_revision,data.sim_tick,data.nav.get_instance_id(),data.nav.geometry_revision]
 	for unit: Dictionary in data.selected:
-		for field in FIELDS: key.append(unit.get(field))
-		for field in OFFICER_FIELDS: key.append(unit.get("officer",{}).get(field))
-		key.append(unit.get("path",[]).size())
+		var officer: Dictionary = unit.get("officer", {})
+		key.append_array([unit.uid,unit.hp,unit.maxhp,unit.alive,unit.die_t,unit.state,unit.get("site"),
+			unit.get("carry"),unit.get("carry_n"),unit.get("group_officer"),officer.get("index"),
+			officer.get("tier"),officer.get("level"),officer.get("exp"),officer.get("hasExp")])
 	if key == _selected_key: return _selected
 	var result := []
 	for unit: Dictionary in data.selected: result.append(_record(data,unit))

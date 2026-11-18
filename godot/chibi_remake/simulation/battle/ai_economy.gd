@@ -1,7 +1,7 @@
 extends RefCounted
 ## ai economy: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
-const REQUIRED_SERVICES := {"command_groups": ["_commander_for", "_construction_workers"], "construction_orders": ["building_block_reason"], "production": ["_queue_train", "train_types_for"], "technology": ["_ai_side", "_building_work_busy", "_combat_member_count", "_queue_research", "_tech_for", "_tech_line_of", "ai_tech_gate"]}
+const REQUIRED_SERVICES := {"command_groups": ["_commander_for", "_construction_workers"], "construction_orders": ["building_block_reason"], "production": ["train_types_for"], "technology": ["_ai_side", "_building_work_busy", "_combat_member_count", "_tech_for", "_tech_line_of", "ai_tech_gate"]}
 var battle: State
 var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
 
@@ -145,7 +145,7 @@ func ai_queue_hq_upgrade(owner: int) -> bool:
 	var state: Dictionary = services.technology._tech_for(owner)
 	if level == 2 and (int(state.get("bow",0)) < 2 or int(state.get("weapon",0)) < 2): return false
 	var building := ai_research_building(owner,level)
-	return not building.is_empty() and services.technology._queue_research(owner,building,level,true)
+	return not building.is_empty() and battle.player_commands.apply_autonomous("research", owner, int(building.uid), -1, level)
 
 func ai_level(owner: int) -> int:
 	var services := ports.acquire(["technology"])
@@ -184,9 +184,7 @@ func ai_can_afford(owner: int, cost: Dictionary) -> bool:
 	return battle.economy.can_pay(owner, cost)
 
 func ai_enqueue_train(owner: int, b: Dictionary, unit_id: int, _cost: Dictionary) -> bool:
-	var services := ports.acquire(["production"])
-	if services.is_empty(): return false
-	return services.production._queue_train(owner, b, unit_id)
+	return not b.is_empty() and battle.player_commands.apply_autonomous("train", owner, int(b.uid), -1, unit_id)
 
 func ai_disband_slot(owner: int, slot: int) -> void:
 	if battle.ai != null and owner != battle.player_owner and slot>=0 and slot<4:

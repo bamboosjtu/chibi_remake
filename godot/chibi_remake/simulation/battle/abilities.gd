@@ -1,4 +1,5 @@
 extends RefCounted
+const Balance = preload("res://simulation/definitions/balance_rules.gd")
 const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## abilities: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
@@ -10,8 +11,8 @@ var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SE
 func _init(data: State) -> void:
 	battle = data
 
-func _jimou_caster_for_selection() -> Dictionary:
-	for u in battle.selected:
+func _jimou_caster_for_selection(actors = null) -> Dictionary:
+	for u in battle.selected if actors == null else actors:
 		if battle.units.any(func(unit): return is_same(unit, u)) and bool(u.get("alive", false)) and u.die_t < 0 and int(u.owner) == battle.player_owner and not u.get("attached", false) and not bool(u.is_building) and not (u.get("officer", {}) as Dictionary).is_empty():
 			return u
 	return {}
@@ -34,7 +35,7 @@ func _jimou_begin(idx: int) -> void:
 	if (mask & (1 << idx)) == 0:
 		services.battle_simulation._feedback("级别不够没有可用计谋")
 		return
-	if float(caster.get("mou", 0.0)) < float(Config.JIMOU_COST[idx]):
+	if float(caster.get("mou", 0.0)) < float(Balance.abilities().cost[idx]):
 		services.battle_simulation._feedback("谋略值不够无法使用该计谋")
 		return
 	if battle.jimou_pending == idx:
@@ -43,9 +44,9 @@ func _jimou_begin(idx: int) -> void:
 		return
 	battle.jimou_pending = idx
 	battle.jimou_caster = caster
-	services.battle_simulation._feedback("%s（耗谋略 %d）：选%s目标（10 格内）" % [
-		Config.JIMOU_NAMES[idx], int(Config.JIMOU_COST[idx]),
-		"地面" if str(Config.JIMOU_SIDE[idx]) == "ground" else ("我方" if str(Config.JIMOU_SIDE[idx]) == "own" else "敌方")])
+	services.battle_simulation._feedback("%s（耗谋略 %d）：选%s目标（%s 格内）" % [
+		Config.JIMOU_NAMES[idx], int(Balance.abilities().cost[idx]),
+		"地面" if str(Config.JIMOU_SIDE[idx]) == "ground" else ("我方" if str(Config.JIMOU_SIDE[idx]) == "own" else "敌方"), str(Balance.abilities().rangeCells)])
 
 func _jimou_caster_invalid(caster: Dictionary, idx: int) -> String:
 	if idx < 0 or idx >= Config.JIMOU_NAMES.size(): return "计谋编号无效"
@@ -59,19 +60,20 @@ func _jimou_caster_invalid(caster: Dictionary, idx: int) -> String:
 	var lv := int(officer.get("level", 0))
 	var mask := int(Config.JIMOU_LV_MASK[mini(lv, Config.JIMOU_LV_MASK.size() - 1)])
 	if (mask & (1 << idx)) == 0: return "级别不够没有可用计谋"
-	if float(caster.get("mou", 0.0)) < float(Config.JIMOU_COST[idx]): return "谋略值不够无法使用该计谋"
+	if float(caster.get("mou", 0.0)) < float(Balance.abilities().cost[idx]): return "谋略值不够无法使用该计谋"
 	return ""
 
 func _jimou_cast_at(pos: Vector2) -> void:
-	var services := ports.acquire(["battle_simulation", "selection", "command_groups"])
-	if services.is_empty(): return
 	var idx := battle.jimou_pending
-	var caster: Dictionary = battle.jimou_caster
-	var invalid := _jimou_caster_invalid(caster, idx)
-	if invalid != "":
+	if _cast_jimou(pos, idx, battle.jimou_caster, jimou_target_at(pos, idx)):
 		_reset_jimou()
-		services.battle_simulation._feedback(invalid)
-		return
+	elif _jimou_caster_invalid(battle.jimou_caster, idx) != "":
+		_reset_jimou()
+
+func jimou_target_at(pos: Vector2, idx: int) -> Dictionary:
+	if idx < 0 or idx >= Config.JIMOU_SIDE.size(): return {}
+	var services := ports.acquire(["selection"])
+	if services.is_empty(): return {}
 	var side := str(Config.JIMOU_SIDE[idx])
 	var tgt: Dictionary = {}
 	if side == "ground":
@@ -80,16 +82,26 @@ func _jimou_cast_at(pos: Vector2) -> void:
 		tgt = services.selection._player_at(pos)
 	else:
 		tgt = services.selection._enemy_at(pos)
+	return tgt
+
+func _cast_jimou(pos: Vector2, idx: int, caster: Dictionary, tgt: Dictionary) -> bool:
+	var services := ports.acquire(["battle_simulation", "command_groups"])
+	if services.is_empty(): return false
+	var invalid := _jimou_caster_invalid(caster, idx)
+	if invalid != "":
+		services.battle_simulation._feedback(invalid)
+		return false
+	var side := str(Config.JIMOU_SIDE[idx])
 	if tgt.is_empty() or bool(tgt.get("is_building", false)):
 		services.battle_simulation._feedback("计谋只能用于己方或敌军部队")
-		return
+		return false
 	var d := Vector2(float(caster.ax), float(caster.ay)).distance_to(Vector2(float(tgt.ax), float(tgt.ay)))
-	if d > Config.JIMOU_RANGE_CELLS * battle.tile_w:
-		services.battle_simulation._feedback("目标须在视野（10 格）内")
-		return
+	if d > float(Balance.abilities().rangeCells) * battle.tile_w:
+		services.battle_simulation._feedback("目标超出计谋射程")
+		return false
 	# FUN_00424980: the clicked unit's team, including distant members, capped at15.
 	var affected:Array=[tgt] if side=="ground" else battle.stratagems.target_team(tgt)
-	if affected.is_empty():services.battle_simulation._feedback("目标部队已不在战场");return
+	if affected.is_empty():services.battle_simulation._feedback("目标部队已不在战场");return false
 	var msg := ""
 	match idx:
 		0:  # 状态1：每100tick恢复谋略，不直接增加士气。
@@ -122,22 +134,22 @@ func _jimou_cast_at(pos: Vector2) -> void:
 			msg = "埋伏：%d 支部队就绪，步兵与弓兵获得特殊攻击" % affected.size()
 		7:  # 恢复：+50 封顶（原版 +0x32 实证）
 			var commander:Dictionary=services.command_groups._commander_for(tgt)
-			if commander.is_empty():services.battle_simulation._feedback("恢复需要有主将的部队");return
+			if commander.is_empty():services.battle_simulation._feedback("恢复需要有主将的部队");return false
 			commander.hp=minf(float(commander.maxhp),float(commander.hp)+50.0)
 			msg = "恢复：主将兵力 +50"
 		8:  # 地面单格火场，5/9/.../97 更新各扣10，100更新结束。
-			if not battle.fire_fields.ignite(pos):services.battle_simulation._feedback("此处无法施放火攻");return
+			if not battle.fire_fields.ignite(pos):services.battle_simulation._feedback("此处无法施放火攻");return false
 			msg = "火攻：地面单格起火，注意避开友军"
-	caster["mou"] = maxf(0.0, float(caster.get("mou", 0.0)) - float(Config.JIMOU_COST[idx]))
-	_reset_jimou()
+	caster["mou"] = maxf(0.0, float(caster.get("mou", 0.0)) - float(Balance.abilities().cost[idx]))
 	services.battle_simulation._feedback(msg)
+	return true
 
-func _set_formation(idx: int) -> void:
+func _set_formation(idx: int, actors = null) -> void:
 	var services := ports.acquire(["battle_simulation", "movement"])
 	if services.is_empty(): return
 	if battle.game_end != 0 or idx < 0 or idx >= Config.FORM_OFFSETS.size():
 		return
-	var caster := _jimou_caster_for_selection()
+	var caster := _jimou_caster_for_selection(actors)
 	var group: Array = _formation_group(caster)
 	if group.is_empty():
 		services.battle_simulation._feedback("没有可变换阵型的部队")
@@ -250,23 +262,26 @@ func _write_force_pct(u: Dictionary, pct: float) -> void:
 		u["hp"] = 0.0
 
 func _duel_at(pos: Vector2) -> void:
-	var services := ports.acquire(["selection", "battle_simulation"])
+	var services := ports.acquire(["selection"])
 	if services.is_empty(): return
 	if not battle.duel_pending: return
-	battle.duel_pending = false # 一次目标确认只消费一次，不重放随机结算。
-	if battle.game_end != 0: return
-	var caster := _jimou_caster_for_selection()
-	var target: Dictionary = services.selection._enemy_at(pos)
+	battle.duel_pending = false
+	_start_duel(_jimou_caster_for_selection(), services.selection._enemy_at(pos))
+
+func _start_duel(caster: Dictionary, target: Dictionary) -> bool:
+	var services := ports.acquire(["battle_simulation"])
+	if services.is_empty(): return false
+	if battle.game_end != 0: return false
 	if caster.is_empty() or target.is_empty() or (target.get("officer", {}) as Dictionary).is_empty():
 		services.battle_simulation._feedback("单挑目标必须是将领部队")
-		return
+		return false
 	if int(caster.get("unit", -1)) == 0x34 or int(target.get("unit", -1)) == 0x34:
 		services.battle_simulation._feedback("旗舰不参与单挑")
-		return
+		return false
 	var d := Vector2(float(caster.ax), float(caster.ay)).distance_to(Vector2(float(target.ax), float(target.ay)))
-	if d > Config.JIMOU_RANGE_CELLS * battle.tile_w:
-		services.battle_simulation._feedback("单挑对象须在视野（10 格）内")
-		return
+	if d > float(Balance.abilities().rangeCells) * battle.tile_w:
+		services.battle_simulation._feedback("单挑对象超出范围")
+		return false
 	var onm: String = str((caster.get("officer", {}) as Dictionary).get("name", "我军将军")).replace(" ", "")
 	var enm: String = str((target.get("officer", {}) as Dictionary).get("name", "敌将")).replace(" ", "")
 	var hp_a := _force_pct(caster)
@@ -277,13 +292,14 @@ func _duel_at(pos: Vector2) -> void:
 	var st_b := stb * 100.0 / 120.0
 	if not _duel_accept(hp_a, st_a, hp_b, st_b):
 		services.battle_simulation._feedback("%s将军拒绝单挑" % enm)
-		return
+		return false
 	var damage := _roll_duel_damage(hp_a, hp_b, sta, stb)
 	var dmg_a := int(damage[0])
 	var dmg_b := int(damage[1])
 	var outcome := "win" if float(dmg_a) >= hp_b else ("loss" if float(dmg_b) >= hp_a else "draw")
 	var ticket: int = battle.effects.reserve_duel({"caster":int(caster.uid),"target":int(target.uid),"hp_a":hp_a,"hp_b":hp_b,"dmg_a":dmg_a,"dmg_b":dmg_b,"onm":onm,"enm":enm})
 	if not battle.effects.duel(outcome, onm, enm, ticket): _resolve_duel(ticket)
+	return true
 
 func _resolve_duel(ticket: int) -> void:
 	var record: Dictionary = battle.effects.take_duel(ticket)

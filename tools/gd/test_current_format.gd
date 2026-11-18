@@ -29,5 +29,35 @@ func run() -> void:
 	for unit in battle.units: assert(unit.has("stock")==stock_presence[int(unit.uid)],"Optional resource capability must preserve presence")
 	assert(game.save_checksum(battle.saver.continuation_snapshot(game))==before)
 	battle.scene.ready_to_save=false;battle.free()
+	_verify_head_fixtures(game)
 	print("CURRENT FORMAT PASS v9 only / retired versions rejected / exact rule and map identity / checksum required / isolated replacement")
 	quit()
+
+func _verify_head_fixtures(game: Node) -> void:
+	var path: String = get_script().resource_path.get_base_dir().path_join("../inputs/save-v9-7ddf81a.json")
+	var data = JSON.parse_string(FileAccess.get_file_as_string(path))
+	assert(data is Dictionary and data.fixtures.size() == 2)
+	game.current_map = "chibic1"
+	var battle = load("res://main.tscn").instantiate()
+	root.add_child(battle)
+	current_scene = battle
+	battle.set_process(false)
+	for fixture in data.fixtures:
+		var raw := Marshalls.base64_to_raw(fixture.gzip).decompress(int(fixture.length), FileAccess.COMPRESSION_GZIP)
+		var text := raw.get_string_from_utf8()
+		assert(text.sha256_text() == fixture.sha256)
+		var snapshot = JSON.parse_string(text)
+		assert(game.is_valid_save(snapshot))
+		var slot := 20 if fixture.map == "chibic1" else 19
+		var slot_path: String = game.save_slot_path(slot)
+		if slot == 19: slot_path += ".bak"
+		assert(game.Store.commit(slot_path, text, game.is_valid_save))
+		var result: Dictionary = battle.commands.session.load_slot(slot)
+		assert(result.ok and result.cross_map == (slot == 19))
+		assert(result.source == ("backup" if slot == 19 else "primary"))
+		assert(current_scene == battle and battle.map_id == fixture.map and game.current_map == fixture.map)
+		assert(game.save_checksum(battle.saver.continuation_snapshot(game)) == fixture.at31)
+		for tick in range(7): battle.commands.world._sim_step(battle.SIM_DT)
+		assert(game.save_checksum(battle.saver.continuation_snapshot(game)) == fixture.at38)
+	battle.free()
+	print("HEAD V9 FIXTURES PASS same map / cross map / backup / seven tick continuation")

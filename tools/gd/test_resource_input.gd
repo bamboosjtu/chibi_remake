@@ -13,7 +13,7 @@ func click_at(point: Vector2, button: MouseButton) -> void:
 		event.global_position = event.position
 		event.button_index = button; event.pressed = pressed
 		root.push_input(event, false)
-	battle.player_commands.pump()
+	battle.player_commands.apply_tick(battle.sim_tick + 1)
 	battle.view.update_panel()
 func run() -> void:
 	root.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED

@@ -1,4 +1,5 @@
 extends RefCounted
+const Balance = preload("res://simulation/definitions/balance_rules.gd")
 ## Authoritative unit field policy. Dictionary units remain the runtime model.
 const Config = preload("res://simulation/battle_config.gd")
 const FIELDS := {
@@ -43,8 +44,8 @@ const FIELDS := {
 	"fo_x": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar"},
 	"fo_y": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar"},
 	"site": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "scalar"},
-	"rest_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "elapsed", "min": 0, "max": Config.REST_TICKS - 1},
-	"build_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "elapsed", "min": 0, "max": Config.BUILD_STEP_TICKS - 1},
+	"rest_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "elapsed", "min": 0},
+	"build_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "elapsed", "min": 0},
 	"action_wait": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "action", "min": 0, "max": 1000},
 	"action_phase": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "action", "min": 0, "max": 23},
 	"action_started": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "action"},
@@ -177,7 +178,7 @@ static func valid_value(key: String, value) -> bool:
 			if not (value is int or value is float) or not is_finite(float(value)): return false
 			if field.type == "int" and float(value) != floorf(float(value)): return false
 			if field.type == "int" and (float(value) < -2147483648.0 or float(value) > 2147483647.0): return false
-			if float(value) < float(field.get("min", -INF)) or float(value) > float(field.get("max", INF)): return false
+			if float(value) < float(field.get("min", -INF)) or float(value) > _maximum(key, field): return false
 		"bool":
 			if not value is bool: return false
 		"String":
@@ -188,6 +189,12 @@ static func valid_value(key: String, value) -> bool:
 			if not value is Dictionary: return false
 			if key == "build_cost" and not preload("res://simulation/definitions/resource_cost.gd").valid(value): return false
 	return not field.has("values") or value in field["values"]
+
+static func _maximum(key: String, field: Dictionary) -> float:
+	match key:
+		"rest_t": return float(Balance.work().restTicks) - 1.0
+		"build_t": return float(Balance.work().buildTicks) - 1.0
+	return float(field.get("max", INF))
 
 static func valid_group(state: Dictionary, group: String) -> bool:
 	for key in fields(group):

@@ -1,4 +1,5 @@
 extends RefCounted
+const Balance = preload("res://simulation/definitions/balance_rules.gd")
 ## Development assertions; shipped for --selftest candidate validation.
 var host: Node2D
 var _suite: WeakRef
@@ -33,7 +34,7 @@ func _selftest_gather() -> void:
 		if rnode.is_empty():
 			rnode = rnodes[0]
 			var kind1 = host.commands.economy._yield_of(int(rnode.unit))
-			var dep_ids: Array = host.DEPOSIT_UNITS.get(kind1, [])
+			var dep_ids: Array = Balance.harvest().deposits.get(kind1, [])
 			if not dep_ids.is_empty():
 				var placed = suite.technology._selftest_ensure_building(dep_ids, Vector2(rnode.ax, rnode.ay))
 				if not placed.is_empty():
@@ -143,7 +144,7 @@ func _selftest_gather() -> void:
 		# 严格仓库：先保证本图有该资源类的卸货建筑，否则工人会正确地停在 deliver→idle。
 		var need_kind = host.commands.economy._yield_of(int(goal.unit))
 		if not need_kind.is_empty() and host.commands.economy._deposits_for(rw, need_kind).is_empty():
-			var dep_ids2: Array = host.DEPOSIT_UNITS.get(need_kind, [])
+			var dep_ids2: Array = Balance.harvest().deposits.get(need_kind, [])
 			if not dep_ids2.is_empty():
 				var placed2 = suite.technology._selftest_ensure_building(dep_ids2, Vector2(rw.ax, rw.ay))
 				if not placed2.is_empty():
@@ -166,7 +167,7 @@ func _selftest_gather() -> void:
 			lastp = cur2
 			if host.nav.is_solid(host.nav.cell_of_px(cur2.x, cur2.y)) and not bool(rw.is_building):
 				solid_steps += 1
-			delivered = floor((host.gold + host.wood + host.food + host.stone - r_base) / host.CARRY_CAPACITY)
+			delivered = floor((host.gold + host.wood + host.food + host.stone - r_base) / float(Balance.harvest().carryCapacity))
 			if int(round(secs2 * 10.0)) % 150 == 0:
 				var dp2 = host.commands.economy._nearest_deposit(int(rw.owner), cur2)
 				var dd2 = 0.0
@@ -178,13 +179,13 @@ func _selftest_gather() -> void:
 			if stuck > 10.0:
 				break
 		print("SELFTEST 运输行走: %.1fs 送达 %.0f 担（应 ≥1）卡死=%s 踩入不可走格步数=%d" % [
-			secs2, (host.gold + host.wood + host.food + host.stone - r_base) / host.CARRY_CAPACITY, str(stuck > 10.0), solid_steps])
+			secs2, (host.gold + host.wood + host.food + host.stone - r_base) / float(Balance.harvest().carryCapacity), str(stuck > 10.0), solid_steps])
 		for line in trace:
 			print("    trace ", line)
 		if delivered < 1.0:
 			suite._skip("工人卸货被本图地形/建筑阻断（跳过步行运输断言）")
 		else:
-			suite._check(host.gold + host.wood + host.food + host.stone - r_base >= host.CARRY_CAPACITY - 0.01, "工人能真的走回去卸货（不看瞬移）")
+			suite._check(host.gold + host.wood + host.food + host.stone - r_base >= float(Balance.harvest().carryCapacity) - 0.01, "工人能真的走回去卸货（不看瞬移）")
 			suite._check(solid_steps < 3, "全程不踏入不可走格（不穿障碍）")
 	# ---- 以下保持原有的两段式运输验证 ----
 	var node: Dictionary = {}
@@ -225,18 +226,18 @@ func _selftest_gather() -> void:
 	w["ay"] = ep.y
 	w["path"] = []
 	# 采集节拍已迁移到整数 gather_ticks；旧字段 gather_t 仅作兼容，不再驱动提取。
-	w["gather_ticks"] = host.GATHER_TICKS - 1
-	w["gather_t"] = host.GATHER_SECONDS - 0.001
+	w["gather_ticks"] = int(Balance.harvest().periodTicks) - 1
+	w["gather_t"] = float(Balance.harvest().periodTicks) * host.SIM_DT - 0.001
 	# 夹具：保留节点存量，避免“刚好采空 → 没有下一目标 → idle”掩盖卸货断言。
 	if actual.has("stock"):
-		actual["stock"] = maxf(float(actual.get("stock", 0.0)), host.CARRY_CAPACITY * 2.0)
+		actual["stock"] = maxf(float(actual.get("stock", 0.0)), float(Balance.harvest().carryCapacity) * 2.0)
 	var r0 = host.gold + host.wood + host.food + host.stone
 	host.commands.orders._step_unit(w, 0.01)
 	var r1 = host.gold + host.wood + host.food + host.stone
 	var carry = float(w.get("carry", 0.0))
 	print("SELFTEST 采集: %s 资源点(实际目标 uid=%d) → 装满 state=%s carry=%.0f  四资源 %.0f -> %.0f（装货时**不应**增加）" % [
 		kind, int(actual.get("uid", -1)), str(w.get("state", "?")), carry, r0, r1])
-	suite._check(is_equal_approx(carry, host.CARRY_CAPACITY), "装满一担（carry == CARRY_CAPACITY）")
+	suite._check(is_equal_approx(carry, float(Balance.harvest().carryCapacity)), "装满一担（carry == CARRY_CAPACITY）")
 	if str(w.get("state", "")) == "deliver":
 		suite._check(not str(w.carry_kind).is_empty() and carry > 0, "运输状态持有资源类型与货物")
 	else:
@@ -246,7 +247,7 @@ func _selftest_gather() -> void:
 	# ---- 第二段：走到对应资源类的最近我方建筑卸货 ----
 	var drops: Array = host.commands.economy._deposits_for(w, kind)
 	if drops.is_empty():
-		var dep_ids3: Array = host.DEPOSIT_UNITS.get(kind, [])
+		var dep_ids3: Array = Balance.harvest().deposits.get(kind, [])
 		if not dep_ids3.is_empty():
 			suite.technology._selftest_ensure_building(dep_ids3, Vector2(w.ax, w.ay))
 			drops = host.commands.economy._deposits_for(w, kind)
@@ -263,13 +264,13 @@ func _selftest_gather() -> void:
 	for i in range(4):
 		host.commands.orders._step_unit(w, 0.01)
 	var r2 = host.gold + host.wood + host.food + host.stone
-	if not is_equal_approx(r2 - r1, host.CARRY_CAPACITY):
+	if not is_equal_approx(r2 - r1, float(Balance.harvest().carryCapacity)):
 		suite._skip("本图卸货点不可达（跳过入库断言）")
 		host.selected.clear()
 		return
 	print("SELFTEST 运输: 走到 %s 卸货 → 四资源 %.0f -> %.0f (应 +%.0f)  carry=%.0f state=%s" % [
-		str(drop.name), r1, r2, host.CARRY_CAPACITY, float(w.get("carry", 0.0)), str(w.get("state", "?"))])
-	suite._check(is_equal_approx(r2 - r1, host.CARRY_CAPACITY), "卸货入库恰好 +CARRY_CAPACITY")
+		str(drop.name), r1, r2, float(Balance.harvest().carryCapacity), float(w.get("carry", 0.0)), str(w.get("state", "?"))])
+	suite._check(is_equal_approx(r2 - r1, float(Balance.harvest().carryCapacity)), "卸货入库恰好 +CARRY_CAPACITY")
 	suite._check(is_equal_approx(float(w.get("carry", 0.0)), 0.0), "卸货后身上货清零")
 	suite._check(str(w.get("state", "")) == "gather", "卸完回到 gather（继续采）")
 	host.selected.clear()

@@ -16,10 +16,11 @@ func run() -> void:
 	var clock: Dictionary=reader.clock_view()
 	var options: Array=reader.build_options()
 	assert(_values(mask) and _values(clock) and _values(options))
-	var current: PackedByteArray=Marshalls.base64_to_raw(mask.current)
+	var current: PackedByteArray=reader.visibility_planes(mask.key).current
 	var first: int=battle.visibility.current[0]
 	current[0]=1-first
 	assert(battle.visibility.current[0]==first)
+	assert(reader.visibility_planes(mask.key).current[0]==first)
 	var detached: Dictionary=clock.duplicate(true);detached.labels[0]="changed";detached.speed_index=0
 	assert(battle.clock.LABELS[0]!="changed" and battle.clock.speed_index==clock.speed_index)
 	var counters: Dictionary=reader.projection_counters()
@@ -58,9 +59,9 @@ func run() -> void:
 	done=true;quit()
 
 func _worlds(game: Node, battle: Node2D, reader: Node2D) -> void:
-	var hits: Array=[0]
-	assert(reader.commands.session.submit_command(3,func():hits[0]+=1)>0)
-	var retained: Callable=battle.player_commands.batches.values()[0].action
+	assert(reader.commands.session.submit_command("watch")>0)
+	var retired_queue = battle.player_commands
+	var retained: Dictionary = retired_queue.pending_commands()[0]
 	var snapshot: Dictionary=game.snapshot(battle.units,battle.commands.world._resources(),battle.saver.save_extra())
 	var before: Dictionary=reader.visibility_view()
 	var old_world: WeakRef=weakref(battle.world)
@@ -70,13 +71,14 @@ func _worlds(game: Node, battle: Node2D, reader: Node2D) -> void:
 	transaction.force_view_failure_after_attach=true
 	assert(not battle.saver.apply_snapshot(snapshot));transaction.force_view_failure_after_attach=false
 	assert(reader.visibility_view().key==before.key)
-	retained.call();assert(hits[0]==1)
+	assert(retired_queue.pending_commands() == [retained])
 	assert(battle.saver.apply_snapshot(snapshot))
 	battle.visibility.revision=int(before.key[2])
 	var replacement: Dictionary=reader.visibility_view()
 	assert(replacement.key[0]!=before.key[0] and replacement.key[1]!=before.key[1] and replacement.key[2]==before.key[2])
 	assert(not is_same(before,replacement) and is_same(reader,battle.view.host))
-	retained.call();assert(hits[0]==1 and reader.commands.session.pump_commands()==0)
+	assert(retained.world_id != battle.world.get_instance_id())
+	assert(not retired_queue.has_pending() and not battle.player_commands.has_pending())
 	assert(old_world.get_ref()==null and old_vision.get_ref()==null and old_clock.get_ref()==null)
 
 func _values(value) -> bool:

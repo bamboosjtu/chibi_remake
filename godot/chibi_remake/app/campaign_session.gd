@@ -51,6 +51,12 @@ func transition(map_id: String, change_scene: Callable, slot := -1) -> Error:
 	if not catalog.contains(map_id): return ERR_INVALID_PARAMETER
 	return _change(map_id,change_scene,slot)
 
+func restore_battle(map_id: String, install: Callable) -> bool:
+	if not catalog.contains(map_id) or not install.call(): return false
+	_select(map_id, -1)
+	last_load_error = ""
+	return true
+
 func leave(change_scene: Callable) -> Error:
 	return _change(current_map,change_scene,-1,false)
 

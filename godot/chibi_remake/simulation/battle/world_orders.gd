@@ -2,7 +2,7 @@ extends RefCounted
 ## world orders: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
-const REQUIRED_SERVICES := {"abilities": ["_duel_at", "_formation_target_cell", "_jimou_cast_at", "_reset_jimou"], "battle_simulation": ["_feedback"], "command_groups": ["_cancel_unit_command", "_command_units", "_nav_layer"], "construction_orders": ["_build_site_at", "_order_build", "_order_repair"], "harvest_orders": ["_order_gather", "_resource_at"], "movement": ["_anchor_of_cell", "_cell_of_px", "_march_destination", "_path_to"], "officer_teams": ["_order_join"], "selection": ["_attack_target_at", "_enemy_at", "_neutral_object_at", "_own_object_at"], "technology": ["_is_worker_unit"], "transport_orders": ["_cmd_board_at", "_cmd_unload_at"]}
+const REQUIRED_SERVICES := {"abilities": ["jimou_target_at", "_duel_at", "_formation_target_cell", "_jimou_cast_at", "_reset_jimou"], "battle_simulation": ["_feedback"], "command_groups": ["_cancel_unit_command", "_command_units", "_nav_layer"], "construction_orders": ["_build_site_at", "_order_build", "_order_repair"], "harvest_orders": ["_order_gather", "_resource_at"], "movement": ["_anchor_of_cell", "_cell_of_px", "_march_destination", "_path_to"], "officer_teams": ["_order_join"], "selection": ["_attack_target_at", "_enemy_at", "_neutral_object_at", "_own_object_at"], "technology": ["_is_worker_unit"], "transport_orders": ["_cmd_board_at", "_cmd_unload_at", "_own_ship_at"]}
 var battle: State
 var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
 
@@ -25,8 +25,6 @@ func _clear_pending() -> void:
 	battle.duel_pending = false
 
 func _order_context(pos: Vector2) -> void:
-	if battle._input_command and not battle.player_commands.executing:
-		_queue_world_order(pos,true);return
 	_execute_order_context(pos)
 
 func _execute_order_context(pos: Vector2) -> void:
@@ -44,8 +42,6 @@ func _execute_order_context(pos: Vector2) -> void:
 	_order_at(pos)
 
 func _order_at(pos: Vector2) -> void:
-	if battle._input_command and not battle.player_commands.executing:
-		_queue_world_order(pos,false);return
 	_execute_order_at(pos)
 
 func _execute_order_at(pos: Vector2) -> void:
@@ -143,30 +139,47 @@ func _selected_has_nonworker_attacker() -> bool:
 		if not (u.get("officer", {}) as Dictionary).is_empty() or int(u.get("group_officer", -1)) >= 0: return true
 	return false
 
-func _attack_selected(tgt: Dictionary) -> int:
+func _attack_selected(tgt: Dictionary, selected = null) -> int:
 	var services := ports.acquire(["battle_simulation", "command_groups"])
 	if services.is_empty(): return 0
 	if tgt.is_empty():
 		services.battle_simulation._feedback("这里没有敌方单位")
 		return 0
-	var n := 0
-	for u in services.command_groups._command_units():
-		if not bool(u.get("alive", false)) or u.die_t >= 0 or bool(u.is_building) or bool(u.get("attached", false)) or int(u.owner) != battle.player_owner:
-			continue
-		if not preload("res://simulation/systems/combat_rules.gd").can_attack(u): continue
-		services.command_groups._cancel_unit_command(u)
-		u["hold"] = false
-		u["state"] = "attack"
-		u["target"] = tgt
-		u["repath"] = 0.0
-		n += 1
-	if n == 0: services.battle_simulation._feedback("所选单位没有可用的攻击能力")
-	return n
+	var count := _attack_units(services.command_groups._command_units(selected), tgt, battle.player_owner)
+	if count == 0: services.battle_simulation._feedback("所选单位没有可用的攻击能力")
+	return count
 
-func _move_selected_to(pos: Vector2) -> void:
+func _attack_units(actors: Array, target: Dictionary, owner: int) -> int:
+	var services := ports.acquire(["command_groups"])
+	if services.is_empty(): return 0
+	if target.is_empty() or not target.alive or target.die_t >= 0 or target.owner == owner: return 0
+	if target.get("attached", false) or int(target.get("site_inside_uid", -1)) >= 0: return 0
+	var count := 0
+	for unit in actors:
+		if not unit.alive or unit.die_t >= 0 or unit.is_building or unit.get("attached", false) or int(unit.owner) != owner:
+			continue
+		if not preload("res://simulation/systems/combat_rules.gd").can_attack(unit): continue
+		services.command_groups._cancel_unit_command(unit)
+		unit["state"] = "attack"
+		unit["target"] = target
+		count += 1
+	return count
+
+func _move_autonomous(unit: Dictionary, position: Vector2) -> bool:
+	var services := ports.acquire(["movement", "command_groups"])
+	if services.is_empty(): return false
+	if unit.is_building or unit.get("attached", false): return false
+	var path: Array = services.movement._path_to(unit, position, true)
+	if path.is_empty(): return false
+	services.command_groups._cancel_unit_command(unit)
+	unit.state = "move"
+	unit.path = path
+	return true
+
+func _move_selected_to(pos: Vector2, selected = null) -> int:
 	var services := ports.acquire(["command_groups", "movement", "abilities", "battle_simulation"])
-	if services.is_empty(): return
-	var actors: Array = services.command_groups._command_units()
+	if services.is_empty(): return 0
+	var actors: Array = services.command_groups._command_units(selected)
 	var shared: Array = []
 	var shared_from := Vector2i(-9999, -9999)
 	var shared_layer := -1
@@ -220,6 +233,7 @@ func _move_selected_to(pos: Vector2) -> void:
 		services.battle_simulation._feedback("无法到达那里")
 	elif fail_count > 0:
 		services.battle_simulation._feedback("%d 个单位无法到达" % fail_count)
+	return ok_count
 
 func _context_mode(pos: Vector2, use_pending := true) -> int:
 	var services := ports.acquire(["selection", "harvest_orders"])
@@ -232,33 +246,56 @@ func _context_mode(pos: Vector2, use_pending := true) -> int:
 	if not services.harvest_orders._resource_at(pos).is_empty() and battle.command_rules.allows_context(16138): return 7
 	return 1 if not services.selection._attack_target_at(pos).is_empty() and battle.command_rules.allows_context(16131) else 2
 
-func _queue_world_order(pos: Vector2, context: bool) -> void:
-	var services := ports.acquire(["selection", "harvest_orders"])
-	if services.is_empty(): return
-	var mode := _context_mode(pos,not context)
-	var target: Dictionary={}
-	if mode==7:
-		var site: Dictionary = services.selection._own_object_at(pos)
-		if bool(site.get("site",false)):mode=8
-	match mode:
-		1:target=services.selection._attack_target_at(pos)
-		7:target=services.harvest_orders._resource_at(pos)
-		8,9,15:target=services.selection._own_object_at(pos)
-	if mode==8 and not bool(target.get("site",false)):target={}
-	var action: Callable=(_execute_order_context if context else _execute_order_at).bind(pos)
-	if not target.is_empty():action=_execute_target_command.bind(mode,target)
-	battle.player_commands.submit(mode,action,pos,int(target.get("uid",-1)))
-
-func _execute_target_command(mode: int, target: Dictionary) -> void:
-	var services := ports.acquire(["officer_teams", "harvest_orders", "construction_orders"])
-	if services.is_empty(): return
-	if not bool(target.get("alive",true)) or float(target.get("die_t",-1))>=0:return
-	if mode==15:
-		if services.officer_teams._order_join(target)>0:_clear_pending()
-		return
-	_clear_pending()
-	match mode:
-		1:_attack_selected(target)
-		7:services.harvest_orders._order_gather(target)
-		8:services.construction_orders._order_build(target)
-		9:services.construction_orders._order_repair(target)
+func submit_point_order(pos: Vector2, context: bool) -> int:
+	var services := ports.acquire(["selection", "harvest_orders", "transport_orders", "abilities", "battle_simulation"])
+	if services.is_empty(): return 0
+	var pending := "" if context else cmd_pending_kind()
+	var kind := pending
+	var target: Dictionary = {}
+	var parameter := -1
+	var actors: Array = battle.selected
+	match pending:
+		"build": parameter = int(battle.cmd_pending_data.get("unit", -1))
+		"attack": target = services.selection._attack_target_at(pos)
+		"repair", "join": target = services.selection._own_object_at(pos)
+		"transport":
+			target = services.selection._own_object_at(pos)
+			if target.get("site", false): kind = "continue_build"
+			else:
+				kind = "gather"
+				target = services.harvest_orders._resource_at(pos)
+		"board": target = services.transport_orders._own_ship_at(pos)
+		"jimou":
+			parameter = battle.jimou_pending
+			actors = [battle.jimou_caster] if not battle.jimou_caster.is_empty() else []
+			target = services.abilities.jimou_target_at(pos, parameter)
+		"duel": target = services.selection._enemy_at(pos)
+		"":
+			var site: Dictionary = services.selection._own_object_at(pos)
+			var resource: Dictionary = services.harvest_orders._resource_at(pos)
+			var enemy: Dictionary = services.selection._enemy_at(pos)
+			if not context and not enemy.is_empty() and battle.command_rules.allows_context(16131):
+				kind = "attack"; target = enemy
+			elif bool(site.get("site", false)) and battle.command_rules.allows_context(16139):
+				kind = "continue_build"; target = site
+			elif context and not resource.is_empty() and battle.command_rules.allows_context(16138):
+				kind = "gather"; target = resource
+			elif not enemy.is_empty() and battle.command_rules.allows_context(16131):
+				kind = "attack"; target = enemy
+			elif battle.command_rules.allows_context(16131) and _selected_has_nonworker_attacker() and not _selected_has_worker():
+				target = services.selection._neutral_object_at(pos)
+				kind = "move" if target.is_empty() else "attack"
+			if kind in ["", "move"]:
+				if not resource.is_empty() and battle.command_rules.allows_context(16138):
+					kind = "gather"; target = resource
+				else: kind = "move"
+	if kind in ["attack", "repair", "join", "board", "duel", "jimou", "gather", "continue_build"] and target.is_empty():
+		services.battle_simulation._feedback("请选择有效目标")
+		if kind in ["board", "duel"]: _clear_pending()
+		return 0
+	if pending in ["build", "jimou", "join"] and battle.player_commands.pending_commands().any(
+			func(command): return command.kind == kind and int(command.parameter) == parameter):
+		return 0
+	var accepted: int = battle.player_commands.submit(kind, actors, pos, int(target.get("uid", -1)), parameter, str(target.get("cell", "")))
+	if accepted > 0 and (context or pending not in ["build", "jimou", "join"]): _clear_pending()
+	return accepted

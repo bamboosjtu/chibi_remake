@@ -36,7 +36,6 @@ func run() -> void:
 	battle=load("res://main.tscn").instantiate();root.add_child(battle)
 	battle.set_process(false);battle.cli_mode=true
 	await process_frame;await process_frame
-	battle.player_commands.set_process(false)
 	var view = battle.view
 	view.event_view.restore_history()
 	var workers: Array=battle.units.filter(func(u):return u.alive and int(u.owner)==battle.player_owner and int(u.unit)==30)
@@ -57,45 +56,51 @@ func run() -> void:
 	var button: Control=view.art_buttons[5].btn
 	var point := button.get_global_rect().get_center()
 	mouse(view,point,true)
-	assert(battle.player_commands.batches.is_empty(),"mouse down must only press")
+	assert(battle.player_commands.pending_commands().is_empty(),"mouse down must only press")
 	var motion := InputEventMouseMotion.new();motion.position=Vector2(200,200);view._input(motion)
 	mouse(view,point,false)
-	assert(battle.player_commands.batches.is_empty(),"leaving a pressed button cancels even after returning")
+	assert(battle.player_commands.pending_commands().is_empty(),"leaving a pressed button cancels even after returning")
 	mouse(view,point,true);mouse(view,point,false)
-	assert(battle.player_commands.batches.size()==1)
-	assert(battle.player_commands.queues[battle.player_owner][0].words[2]==4)
+	assert(battle.player_commands.pending_commands().size()==1)
+	assert(battle.player_commands.pending_commands()[0].kind=="rest")
 	battle.player_commands.clear()
 	assert(view._handle_cmd_key(key(KEY_D)))
-	assert(battle.player_commands.queues[battle.player_owner][0].words[2]==4,"same slot key and mouse mode")
+	assert(battle.player_commands.pending_commands()[0].kind=="rest","same slot key and mouse mode")
 	view._handle_cmd_key(key(KEY_D,false));battle.player_commands.clear()
-	# Inputs capture their actors, then execute on the frame pump, independently of later selection.
+	# Real input captures actor identity and applies at the next simulation tick.
 	battle.selected=workers.slice(0,2)
-	assert(battle.player_commands.submit(2,record,Vector2(123,456),789)==2)
-	assert(executions.is_empty())
-	var words: PackedInt64Array=battle.player_commands.queues[battle.player_owner][0].words
-	assert(words.size()==8 and words[3]==123 and words[4]==456 and words[5]==789)
+	assert(battle.commands.session.submit_command("assign_group", -1, 9)==2)
+	var command: Dictionary = battle.player_commands.pending_commands()[0]
+	assert(command.actors == [int(workers[0].uid), int(workers[1].uid)] and command.tick == battle.sim_tick + 1)
+	assert(command.is_read_only() and command.actors.is_read_only())
 	battle.selected=[workers[2]]
-	assert(battle.player_commands.pump()==1)
-	assert(executions.back()==[workers[0].uid,workers[1].uid] and battle.selected==[workers[2]])
-	for mode in [5,10,11]:
+	assert(battle.player_commands.apply_tick(battle.sim_tick)==0 and not battle.control_groups.has(9))
+	battle.commands.world._sim_step(battle.SIM_DT)
+	assert(battle.control_groups[9] == command.actors and battle.selected == [workers[2]])
+	for kind in ["jimou", "formation", "duel"]:
 		battle.selected=workers.slice(0,2)
-		assert(battle.player_commands.submit(mode,record)==1)
-		battle.player_commands.pump()
-		assert(executions.back()==[workers[0].uid] and battle.selected.size()==2)
+		assert(battle.player_commands.submit(kind, battle.selected)==1)
+		assert(battle.player_commands.pending_commands()[0].actors == [int(workers[0].uid)])
+		battle.player_commands.clear()
 	var many := []
 	for i in range(65):
 		var unit: Dictionary=workers[0].duplicate();unit.uid=900000+i;many.append(unit)
 	battle.selected=many
-	assert(battle.player_commands.submit(2,record)==64)
-	assert(battle.player_commands.queues[battle.player_owner].size()==64)
-	assert(battle.player_commands.submit(2,record)==0)
-	battle.player_commands.clear();battle.selected=workers;view.update_panel()
+	assert(battle.commands.session.submit_command("stop")==64)
+	assert(battle.player_commands.pending_commands()[0].actors.size()==64)
+	assert(battle.commands.session.submit_command("stop")==0)
+	battle.player_commands.clear()
+	battle.selected = battle.units.filter(func(u): return int(u.owner) == battle.player_owner and int(u.unit) in [0, 1]).slice(0, 1)
+	assert(battle.commands.session.submit_command("train", -1, 30)==1)
+	assert(not battle.commands.session._save_game() and root.get_node("Game").last_save_error.code == ERR_BUSY)
 	var before_gold: float=battle.gold
-	assert(battle.player_commands.submit(16,charge)>0)
+	battle.commands.world._sim_step(battle.SIM_DT)
+	assert(battle.trainings.size()==1 and battle.gold < before_gold)
 	assert(battle.commands.session._save_game())
 	var saved: Dictionary=root.get_node("Game").load_save()
-	assert(battle.gold==before_gold-100 and float(saved.resources.gold)==battle.gold,"pending cost and saved resources must be one snapshot")
-	print("COMMAND RESEARCH PASS registry / 15 slots / three states / release and cancel / QWE-ASD-ZXC / frame queue / first actor / 64 slots")
+	assert(float(saved.resources.gold)==battle.gold and before_gold - battle.gold == battle.trainings[0].cost.gold)
+	print("COMMAND RESEARCH PASS registry / 15 slots / three states / release and cancel / QWE-ASD-ZXC / fixed tick / first actor / 64 slots")
+	battle.selected = workers
 	var cursor = Cursor.new();root.add_child(cursor);cursor.set_process(false)
 	assert(cursor.data.artMode=="painted-hd")
 	if FileAccess.file_exists("res://release_inputs.json"):

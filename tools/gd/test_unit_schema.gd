@@ -36,14 +36,14 @@ func run() -> void:
 		var invalid := saved.duplicate(true); invalid[key] = {"invalid":true} if Schema.FIELDS[key].type != "Dictionary" else "invalid"
 		assert(not Schema.valid_snapshot(invalid) or not Timers.valid_snapshot(invalid), "Validator omitted " + key)
 	var snapshot: Dictionary = game.snapshot(battle.units, battle.commands.world._resources(), battle.saver.save_extra())
-	battle.selecting=true; battle.drag_pan=true; battle.feedback_text="old world"; battle.cmd_pending="build"; battle.cmd_pending_data={"old":true}; battle._input_command=true
+	battle.selecting=true; battle.drag_pan=true; battle.feedback_text="old world"; battle.cmd_pending="build"; battle.cmd_pending_data={"old":true}; battle.duel_pending=true
 	var transaction = load("res://app/saves/world_transaction.gd")
 	transaction.force_view_failure=true
-	assert(not battle.saver.apply_snapshot(snapshot) and battle.selecting and battle.drag_pan and battle._input_command)
+	assert(not battle.saver.apply_snapshot(snapshot) and battle.selecting and battle.drag_pan and battle.duel_pending)
 	transaction.force_view_failure=false
 	assert(battle.saver.apply_snapshot(snapshot))
 	assert(not battle.selecting and not battle.drag_pan and battle.feedback_text.is_empty())
-	assert(battle.cmd_pending.is_empty() and battle.cmd_pending_data.is_empty() and not battle._input_command)
+	assert(battle.cmd_pending.is_empty() and battle.cmd_pending_data.is_empty() and not battle.duel_pending)
 	assert("selecting" not in battle.state.PROXY_FIELDS and "feedback_text" not in battle.state.PROXY_FIELDS)
 	battle.scene.ready_to_save=false; battle.free()
 	print("UNIT SCHEMA PASS registered runtime keys / every scalar serialized-validated-restored / transient reset")

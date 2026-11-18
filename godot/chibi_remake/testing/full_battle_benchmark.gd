@@ -28,6 +28,7 @@ var engage := 240
 var use_ai := true
 var use_view := true
 var command_latencies: Array=[]
+var command_submissions := {}
 var engaged_actual := 0
 var last_progress_usec := 0
 var output_path := "user://full-battle-bench.json"
@@ -121,9 +122,18 @@ func _invalid(reason: String) -> void:
 	if file!=null:file.store_string(JSON.stringify({"validWorkload":false,"error":reason}));file.close()
 	push_error(reason);done=true;quit(1)
 
-func _probe_command(battle: Node2D) -> void:
+func _probe_command(battle: Node2D) -> bool:
 	var at:=Time.get_ticks_usec()
-	battle.player_commands.submit(5,func():command_latencies.append(float(Time.get_ticks_usec()-at)/1000.0))
+	if battle.commands.session.submit_command("assign_group", -1, 10) <= 0: return false
+	command_submissions[int(battle.player_commands.sequence)] = at
+	return true
+
+func _command_finished(command: Dictionary, result: String) -> void:
+	var id := int(command.sequence)
+	if not command_submissions.has(id): return
+	if result == "applied":
+		command_latencies.append(float(Time.get_ticks_usec() - int(command_submissions[id])) / 1000.0)
+	command_submissions.erase(id)
 
 func _progress(phase: String, sample: int, battle: Node2D) -> void:
 	var now:=Time.get_ticks_usec()
@@ -196,7 +206,7 @@ func run() -> void:
 	var at:=Time.get_ticks_usec();var previous:=at;var durations: Array=[]
 	for i in range(frames):
 		if i%5==0:_progress("frames",i,battle)
-		if i%10==0:_probe_command(battle)
+		if i%10==0 and not _probe_command(battle): _invalid("Benchmark command admission failed"); return
 		await process_frame
 		if not workload_valid(battle):_invalid("Gameplay paused or ended during frame sampling");return
 		var now:=Time.get_ticks_usec();durations.append(float(now-previous)/1000.0);previous=now
@@ -254,5 +264,6 @@ func _start_live_measurement(battle: Node2D, report: Dictionary) -> bool:
 	report["renderWarmupPreservedSimulation"]=true
 	battle._modules.battle_simulation.timing_enabled=true
 	battle.nav.set_profiling(true)
+	battle.player_commands.command_finished.connect(_command_finished)
 	battle.sim_acc=0;battle.set_process(true)
 	return true

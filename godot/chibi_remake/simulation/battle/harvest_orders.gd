@@ -1,4 +1,5 @@
 extends RefCounted
+const Balance = preload("res://simulation/definitions/balance_rules.gd")
 ## harvest orders: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
@@ -69,18 +70,20 @@ func _nearest_deposit(owner: int, pos: Vector2) -> Dictionary:
 			best = u
 	return best
 
-func _selected_workers() -> Array:
+func _selected_workers(actors = null, owner := -1) -> Array:
+	var selected: Array = battle.selected if actors == null else actors
+	if owner < 0: owner = battle.player_owner
 	var services := ports.acquire(["technology"])
 	if services.is_empty(): return []
 	var result: Array = []
 	var leaders := {}
-	for u in battle.selected:
-		if int(u.get("owner", -1)) != battle.player_owner: continue
+	for u in selected:
+		if int(u.get("owner", -1)) != owner: continue
 		var oi := int(u.get("officer", {}).get("index", -1))
 		if oi >= 0: leaders[oi] = true
 	for u in battle.units:
-		if not u.alive or u.die_t >= 0.0 or u.is_building or u.owner != battle.player_owner or bool(u.get("attached", false)): continue
-		if services.technology._is_worker_unit(u) and (u in battle.selected or leaders.has(int(u.get("group_officer", -1)))):
+		if not u.alive or u.die_t >= 0.0 or u.is_building or u.owner != owner or bool(u.get("attached", false)): continue
+		if services.technology._is_worker_unit(u) and (u in selected or leaders.has(int(u.get("group_officer", -1)))):
 			result.append(u)
 	return result
 
@@ -114,17 +117,18 @@ func _begin_gather(worker: Dictionary, obj: Dictionary, path: Array) -> void:
 	worker.pi = 0
 	worker.target = null
 
-func _order_gather(target_obj: Dictionary) -> int:
+func _order_gather(target_obj: Dictionary, actors = null, owner := -1) -> int:
+	if owner < 0: owner = battle.player_owner
 	var services := ports.acquire(["battle_simulation", "technology", "interaction_paths"])
 	if services.is_empty(): return 0
 	if not target_obj.get("alive", false) or _yield_of(int(target_obj.get("unit", -1))) == "": return 0
-	if int(target_obj.unit) in [10,11] and int(target_obj.owner) == battle.player_owner:
+	if int(target_obj.unit) in [10,11] and int(target_obj.owner) == owner:
 		services.battle_simulation._feedback("己方粮仓是交付点")
 		return 0
 	var count := 0
 	var reserved := {}
 	var assigned := {}
-	for worker in _selected_workers():
+	for worker in _selected_workers(actors, owner):
 		if not worker.alive or worker.die_t >= 0.0 or not services.technology._is_worker_unit(worker): continue
 		var choice: Dictionary = services.interaction_paths._edge_interaction_choice(worker, target_obj, reserved)
 		if choice.is_empty():
@@ -241,7 +245,7 @@ func _nearby_same_resource(origin_obj: Dictionary, worker: Dictionary, reserved:
 	return found.get("object", {})
 
 func _deposits_for(u: Dictionary, kind: String) -> Array:
-	var ids: Array = Config.DEPOSIT_UNITS.get(kind, [])
+	var ids: Array = Balance.harvest().deposits.get(kind, [])
 	var preferred: Array = []
 	for b in battle.units:
 		if not bool(b.get("alive", false)) or b.die_t >= 0 or not bool(b.is_building) or int(b.get("owner", -1)) != int(u.get("owner", -1)):

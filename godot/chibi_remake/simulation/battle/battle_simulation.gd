@@ -76,6 +76,7 @@ func _sim_step(dt: float) -> void:
 	battle.visibility.update(battle.units, battle.player_owner)
 	if profile_enabled:phase=_profile_time("visibilityBegin",phase)
 	battle.sim_tick += 1
+	battle.player_commands.apply_tick(battle.sim_tick)
 	ports._step_auto_control()
 	battle.projectiles.step() # 本tick新击发的弹体从下一个逻辑tick推进。
 	if profile_enabled:phase=_profile_time("projectiles",phase)

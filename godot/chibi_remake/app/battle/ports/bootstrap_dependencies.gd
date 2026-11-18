@@ -6,16 +6,6 @@ func _apply_save() -> bool:
 	if provider == null: return false
 	return provider._apply_save()
 
-func _attach_officer(u: Dictionary, o: Dictionary) -> void:
-	var provider = _require(_provider_entity_factory, "entity_factory")
-	if provider == null: return
-	provider._attach_officer(u, o)
-
-func _build_decor_targets() -> void:
-	var provider = _require(_provider_harvest_orders, "harvest_orders")
-	if provider == null: return
-	provider._build_decor_targets()
-
 func _build_terrain() -> void:
 	var provider = _require(_provider_scene_controller, "scene_controller")
 	if provider == null: return
@@ -36,36 +26,6 @@ func _fatal(msg: String) -> void:
 	if provider == null: return
 	provider._fatal(msg)
 
-func _group_assign(n: int) -> void:
-	var provider = _require(_provider_command_groups, "command_groups")
-	if provider == null: return
-	provider._group_assign(n)
-
-func _make_unit(ob: Dictionary, is_map_object: bool) -> Dictionary:
-	var provider = _require(_provider_entity_factory, "entity_factory")
-	if provider == null: return {}
-	return provider._make_unit(ob, is_map_object)
-
-func _officer_by_index(idx: int) -> Dictionary:
-	var provider = _require(_provider_officer_pool, "officer_pool")
-	if provider == null: return {}
-	return provider._officer_by_index(idx)
-
-func _officer_pool_state() -> Dictionary:
-	var provider = _require(_provider_officer_pool, "officer_pool")
-	if provider == null: return {}
-	return provider._officer_pool_state()
-
-func _rebuild_unit_index() -> void:
-	var provider = _require(_provider_spatial_index, "spatial_index")
-	if provider == null: return
-	provider._rebuild_unit_index()
-
-func _resolve_navigation_overlaps() -> void:
-	var provider = _require(_provider_movement, "movement")
-	if provider == null: return
-	provider._resolve_navigation_overlaps()
-
 func _screenshot() -> void:
 	var provider = _require(_provider_scene_controller, "scene_controller")
 	if provider == null: return
@@ -76,68 +36,32 @@ func _setup_camera() -> void:
 	if provider == null: return
 	provider._setup_camera()
 
-func _sheet_ref_for(unit_id: int, owner: int) -> String:
-	var provider = _require(_provider_entity_factory, "entity_factory")
-	if provider == null: return ""
-	return provider._sheet_ref_for(unit_id, owner)
-
 func _show_end(kind: int) -> void:
 	var provider = _require(_provider_campaign, "campaign")
 	if provider == null: return
 	provider._show_end(kind)
-
-func _spawn_unit(unit_id: int, owner: int, ax: float, ay: float, restoring := false) -> bool:
-	var provider = _require(_provider_entity_factory, "entity_factory")
-	if provider == null: return false
-	return provider._spawn_unit(unit_id, owner, ax, ay, restoring)
-
-func _update_gates() -> void:
-	var provider = _require(_provider_battle_simulation, "battle_simulation")
-	if provider == null: return
-	provider._update_gates()
 
 func _write_smoke(ok: bool, why: String) -> void:
 	var provider = _require(_provider_scene_controller, "scene_controller")
 	if provider == null: return
 	provider._write_smoke(ok, why)
 
-const CONTRACTS := {"battle_simulation": ["_update_gates"], "campaign": ["_show_end"], "command_groups": ["_group_assign"], "entity_factory": ["_attach_officer", "_make_unit", "_sheet_ref_for", "_spawn_unit"], "harvest_orders": ["_build_decor_targets"], "movement": ["_resolve_navigation_overlaps"], "officer_pool": ["_officer_by_index", "_officer_pool_state"], "scene_controller": ["_apply_save", "_build_terrain", "_build_ui", "_demo", "_fatal", "_screenshot", "_setup_camera", "_write_smoke", "_schedule_failed_load_return"], "spatial_index": ["_rebuild_unit_index"]}
-var _provider_battle_simulation: WeakRef
+const CONTRACTS := {"campaign": ["_show_end"], "scene_controller": ["_apply_save", "_build_terrain", "_build_ui", "_demo", "_fatal", "_screenshot", "_setup_camera", "_write_smoke", "_schedule_failed_load_return"]}
 var _provider_campaign: WeakRef
-var _provider_command_groups: WeakRef
-var _provider_entity_factory: WeakRef
-var _provider_harvest_orders: WeakRef
-var _provider_movement: WeakRef
-var _provider_officer_pool: WeakRef
 var _provider_scene_controller: WeakRef
-var _provider_spatial_index: WeakRef
 
 func connect_services(services: Dictionary) -> Array:
 	var missing: Array = []
-	_provider_battle_simulation = weakref(services["battle_simulation"]) if services.get("battle_simulation") != null else null
 	_provider_campaign = weakref(services["campaign"]) if services.get("campaign") != null else null
-	_provider_command_groups = weakref(services["command_groups"]) if services.get("command_groups") != null else null
-	_provider_entity_factory = weakref(services["entity_factory"]) if services.get("entity_factory") != null else null
-	_provider_harvest_orders = weakref(services["harvest_orders"]) if services.get("harvest_orders") != null else null
-	_provider_movement = weakref(services["movement"]) if services.get("movement") != null else null
-	_provider_officer_pool = weakref(services["officer_pool"]) if services.get("officer_pool") != null else null
 	_provider_scene_controller = weakref(services["scene_controller"]) if services.get("scene_controller") != null else null
-	_provider_spatial_index = weakref(services["spatial_index"]) if services.get("spatial_index") != null else null
 	for provider in CONTRACTS:
 		for method in CONTRACTS[provider]:
 			if services.get(provider) == null or not services[provider].has_method(method): missing.append({"provider":provider,"method":method})
 	return missing
 
 func disconnect_services() -> void:
-	_provider_battle_simulation = null
 	_provider_campaign = null
-	_provider_command_groups = null
-	_provider_entity_factory = null
-	_provider_harvest_orders = null
-	_provider_movement = null
-	_provider_officer_pool = null
 	_provider_scene_controller = null
-	_provider_spatial_index = null
 
 func _schedule_failed_load_return() -> void:
 	var provider = _require(_provider_scene_controller, "scene_controller")

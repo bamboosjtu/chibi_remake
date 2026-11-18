@@ -1,7 +1,7 @@
 extends RefCounted
 const Technology = preload("res://simulation/definitions/technology_rules.gd")
 ## Validate the complete snapshot before constructing or modifying any world.
-var host: Node2D
+var host: Object
 var content_revision: Callable
 var _valid_cost: Callable
 var _valid_integer: Callable
@@ -11,7 +11,7 @@ const TickTimers = preload("res://simulation/systems/tick_timers.gd")
 const TechnologyState = preload("res://simulation/systems/technology_state.gd")
 const Semantics = preload("res://app/saves/snapshot_semantics.gd")
 
-func _init(battle: Node2D, revision: Callable, cost: Callable, integer: Callable) -> void:
+func _init(battle: Object, revision: Callable, cost: Callable, integer: Callable) -> void:
 	host = battle
 	content_revision = revision
 	_valid_cost = cost

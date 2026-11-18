@@ -17,7 +17,7 @@ func _click(point: Vector2) -> void:
 		event.position = point * scale_factor; event.global_position = event.position
 		event.button_index = MOUSE_BUTTON_LEFT; event.pressed = pressed
 		root.push_input(event, false)
-	battle.player_commands.pump()
+	battle.player_commands.apply_tick(battle.sim_tick + 1)
 	battle.view.update_panel()
 func _run() -> void:
 	root.get_node("Game").current_map = "chibil1"

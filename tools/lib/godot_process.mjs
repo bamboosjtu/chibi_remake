@@ -5,7 +5,7 @@ import path from 'node:path';
 export const isEngineFailure = output => /SCRIPT ERROR:|Parse Error:|SELFTEST RESULT: FAIL|ERROR: (?:Error calling (?:deferred method|from signal)|Corrupted header|(?:Error: )?Couldn't load project data|Couldn't save project\.binary)/.test(output);
 
 /** Run one isolated engine process. Drain both pipes while enforcing a deadline. */
-export async function runGodot({engine, args, directory, name, markers = [], timeout = 120, env = {}}) {
+export async function runGodot({engine, args, directory, name, markers = [], timeout = 120, env = {}, expectSelftestFailure = false}) {
   fs.mkdirSync(directory, {recursive: true});
   const profile = path.resolve(directory, name + '-profile');
   fs.mkdirSync(profile, {recursive: true});
@@ -23,11 +23,12 @@ export async function runGodot({engine, args, directory, name, markers = [], tim
     else child.kill();
   };
   const log = path.join(directory, name + '.log');
+  const failed = () => isEngineFailure(expectSelftestFailure ? output.replaceAll('SELFTEST RESULT: FAIL', '') : output);
   fs.writeFileSync(log, "");
   const append = chunk => {
     output += chunk;
     fs.appendFileSync(log, chunk);
-    if (isEngineFailure(output) && !errorTimer) errorTimer = setTimeout(stop, 25);
+    if (failed() && !errorTimer) errorTimer = setTimeout(stop, 25);
   };
   child.stdout.setEncoding('utf8');
   child.stderr.setEncoding('utf8');
@@ -42,6 +43,6 @@ export async function runGodot({engine, args, directory, name, markers = [], tim
   }).finally(() => { clearTimeout(timer); clearTimeout(errorTimer); });
   fs.writeFileSync(log, output);
   const missing = markers.filter(marker => !output.includes(marker));
-  const ok = !timedOut && code === 0 && !isEngineFailure(output) && !missing.length;
+  const ok = !timedOut && code === (expectSelftestFailure ? 1 : 0) && !failed() && !missing.length;
   return {name, ok, code, timedOut, missing, seconds: (Date.now() - started) / 1000, log, output};
 }

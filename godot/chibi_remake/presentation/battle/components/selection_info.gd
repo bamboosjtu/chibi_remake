@@ -185,7 +185,7 @@ func _dominant(sel: Array) -> Dictionary:
 	return {"unit": best_id, "n": best, "sample": sample[best_id]}
 
 func _act_assign_officer(idx: int) -> void:
-	_ui.host.commands.session.submit_command(14,_ui.host.commands.military._order_form_up.bind(idx),Vector2.ZERO,-1,idx)
+	_ui.host.commands.session.submit_command("assign_officer", -1, idx)
 	_ui.officer_pick = false
 	ports._refresh_cmd_panel()
 

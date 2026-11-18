@@ -29,16 +29,16 @@ func building_block_reason(bid: int, owner: int = -1) -> String:
 	if not missing.is_empty(): return "需先建成"+"、".join(missing)
 	return ""
 
-func _order_repair(target: Dictionary) -> int:
+func _order_repair(target: Dictionary, actors = null) -> int:
 	var services := ports.acquire(["battle_simulation", "harvest_orders", "technology", "command_groups", "interaction_paths"])
 	if services.is_empty(): return 0
 	if bool(target.get("site", false)):
-		return _order_build(target)
+		return _order_build(target, actors)
 	if target.is_empty() or not bool(target.get("alive", false)) or float(target.get("die_t", -1)) >= 0 or bool(target.get("attached", false)) or int(target.get("owner", -1)) != battle.player_owner:
 		services.battle_simulation._feedback("修理对象必须是我方单位或建筑")
 		return 0
 	var n := 0
-	for w in services.harvest_orders._selected_workers():
+	for w in services.harvest_orders._selected_workers(actors):
 		if not w.alive or w.die_t >= 0.0 or not services.technology._is_worker_unit(w):
 			continue
 		services.command_groups._cancel_unit_command(w)
@@ -60,12 +60,12 @@ func _do_repair(w: Dictionary, t: Dictionary) -> bool:
 	if not bool(w.get("alive", false)) or float(w.get("die_t", -1)) >= 0 or not services.technology._is_worker_unit(w): return false
 	if not bool(t.get("alive", false)) or float(t.get("die_t", -1)) >= 0 or bool(t.get("attached", false)) or bool(t.get("site", false)) or int(t.get("owner", -1)) != int(w.owner): return false
 	if float(t.hp) >= float(t.maxhp): return false
-	if not battle.economy.pay(int(w.owner), {"gold":Config.REPAIR_COST,"wood":Config.REPAIR_COST,"food":Config.REPAIR_COST,"stone":Config.REPAIR_COST}):
-		services.battle_simulation._feedback("修理：四种资源都须多于 15")
+	if not battle.economy.pay(int(w.owner), Balance.work().repairCost):
+		services.battle_simulation._feedback("修理：资源不足")
 		return false
 	var before := float(t.get("hp", 0.0))
 	var cap := float(t.get("maxhp", before))
-	t["hp"] = minf(cap, before + Config.REPAIR_HP)
+	t["hp"] = minf(cap, before + float(Balance.work().repairHp))
 	services.battle_simulation._feedback("修理「%s」：+%d 兵力（%.0f/%.0f）" % [
 		str(t.get("name", "?")), int(float(t["hp"]) - before), float(t["hp"]), cap])
 
@@ -85,7 +85,7 @@ func _site_entry_path(unit: Dictionary, site: Dictionary, future_cells: Array = 
 		if not path.is_empty() and battle.nav.cell_of_px(path.back().x, path.back().y) == cell: return path
 	return []
 
-func build_placement_at(pos: Vector2, opt: Dictionary) -> Dictionary:
+func build_placement_at(pos: Vector2, opt: Dictionary, actors = null) -> Dictionary:
 	var services := ports.acquire(["movement", "production", "ai_economy", "spatial_index", "command_groups"])
 	if services.is_empty(): return {}
 	var bid := int(opt.get("unit", -1))
@@ -105,7 +105,7 @@ func build_placement_at(pos: Vector2, opt: Dictionary) -> Dictionary:
 	if not battle.nav.can_place(cells): return result
 	for c in cells:
 		if not services.spatial_index._cell_unit(c, -1, 0).is_empty(): result.reason = "这里有部队，无法建造"; return result
-	var workers: Array = services.command_groups._selected_construction_workers()
+	var workers: Array = services.command_groups._selected_construction_workers(actors)
 	if workers.is_empty(): result.reason = "需要带工人的武将队伍"; return result
 	if not battle.economy.can_pay(battle.player_owner, services.ai_economy.ai_unit_cost(bid)): result.reason = "资源不足"; return result
 	var probe := {"unit":bid,"is_building":true,"occupied_cells":cells,"ax":point.x,"ay":point.y,"w":meta.w,"h":meta.h}
@@ -135,22 +135,22 @@ func _valid_build_worker(worker: Dictionary, site: Dictionary) -> bool:
 	if worker not in services.command_groups._construction_workers(services.command_groups._commander_for(worker)): return false
 	return bool(site.get("alive", false)) and float(site.get("die_t", -1)) < 0 and bool(site.get("is_building", false)) and bool(site.get("site", false)) and int(worker.get("owner", -1)) == int(site.get("owner", -2))
 
-func _order_build(site: Dictionary) -> int:
+func _order_build(site: Dictionary, actors = null) -> int:
 	var services := ports.acquire(["command_groups", "battle_simulation"])
 	if services.is_empty(): return 0
 	if int(site.get("owner", -1)) != battle.player_owner: return 0
 	var count := 0
-	var workers: Array = services.command_groups._selected_construction_workers()
+	var workers: Array = services.command_groups._selected_construction_workers(actors)
 	for worker in workers:
 		if _assign_build_worker(worker, site): count += 1
 	if count > 0: battle.construction.order_commander(site, workers)
 	services.battle_simulation._feedback("武将已派出 %d 名工人继续建造「%s」" % [count, str(site.get("name", "?"))] if count > 0 else "需选择带工人队伍的武将，并确保工地可达")
 	return count
 
-func _build_site_at(pos: Vector2, opt: Dictionary) -> bool:
+func _build_site_at(pos: Vector2, opt: Dictionary, actors = null) -> bool:
 	var services := ports.acquire(["battle_simulation", "command_groups", "ai_economy", "production"])
 	if services.is_empty(): return false
-	var placement := build_placement_at(pos, opt)
+	var placement := build_placement_at(pos, opt, actors)
 	if not bool(placement.valid): services.battle_simulation._feedback(str(placement.reason)); return false
 	var bid := int(opt.get("unit", -1))
 	var blocked := building_block_reason(bid)
@@ -158,7 +158,7 @@ func _build_site_at(pos: Vector2, opt: Dictionary) -> bool:
 		services.battle_simulation._feedback(blocked)
 		return false
 	if not battle.build_types.any(func(entry): return int(entry.unit) == bid): return false
-	var workers: Array = services.command_groups._selected_construction_workers()
+	var workers: Array = services.command_groups._selected_construction_workers(actors)
 	var cost: Dictionary = services.ai_economy.ai_unit_cost(bid) # 执行入口使用定义造价，不信任UI传入价格。
 	if services.production._army_count(battle.player_owner) >= Balance.army_cap() or workers.is_empty() or not battle.economy.pay(battle.player_owner, cost):
 		services.battle_simulation._feedback("无法建造：需带工人的武将队伍、足够资源且未达%d单位上限" % Balance.army_cap())
@@ -174,7 +174,7 @@ func _build_site_at(pos: Vector2, opt: Dictionary) -> bool:
 		if _assign_build_worker(w, site): n += 1
 	if n > 0:
 		battle.construction.order_commander(site, workers)
-		battle.selected = [site]
+		if actors == null or battle.selected == actors: battle.selected = [site]
 	services.battle_simulation._feedback("开工：「%s」工地已放下，%d 名工人前往建造" % [str(opt.get("name", "?")), n])
 	return true
 

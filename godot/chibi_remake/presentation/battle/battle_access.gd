@@ -1,13 +1,13 @@
 extends Node2D
 ## Explicit battle read model and command surface for presentation components.
 ## Data owner is weak and guarded. Scene/session and domain ports share subtree lifetime.
-const ActionClock = preload("res://simulation/definitions/action_visual.gd")
 const Progression = preload("res://simulation/definitions/officer_grades.gd")
 var _data: WeakRef
 var _scene: RefCounted
 var commands: RefCounted
 var _unit_projection := preload("res://app/read_models/unit_projection.gd").new()
 var _context_projection := preload("res://app/read_models/context_projection.gd").new()
+var _resource_projection := preload("res://app/read_models/resource_projection.gd").new()
 
 func _init(data: Object, services: RefCounted, commands: RefCounted) -> void:
 	_data = weakref(data)
@@ -101,6 +101,10 @@ func projection_counters() -> Dictionary:
 func visibility_view() -> Dictionary:
 	var data = preload("res://named_port.gd").require_provider(_data,"visibility values")
 	return _context_projection.visibility(data) if data != null else {}
+
+func visibility_planes(key: Array) -> Dictionary:
+	var data = preload("res://named_port.gd").require_provider(_data, "visibility planes")
+	return _context_projection.visibility_planes(data,key) if data != null else {}
 
 func visibility_geometry() -> Vector2:
 	var data = preload("res://named_port.gd").require_provider(_data,"visibility geometry")
@@ -235,18 +239,7 @@ func resource_layer_key(viewport: Rect2) -> Array:
 
 func resource_layer_projection(viewport: Rect2) -> Array:
 	var data = preload("res://named_port.gd").require_provider(_data, "resource layer")
-	if data == null: return []
-	var result := []
-	var decor: Array = data.map_data.get("decor", [])
-	for index in range(decor.size()):
-		var cell: Array = decor[index]
-		var anchor: Vector2 = data.nav.anchor_of(int(cell[0]),int(cell[1]))
-		if not viewport.intersects(Rect2(anchor-Vector2(22,60),Vector2(44,60))): continue
-		var source: Dictionary = data.decor_cells.get("%d_%d" % [int(cell[0]),int(cell[1])], {})
-		result.append({"index":index,"anchor":anchor,"phase":int(source.get("phase",cell[2]))})
-	# Only visible scalar/vector descriptors; no retained decor, source dictionary or nav.
-	preload("res://simulation/definitions/frozen_data.gd").freeze(result)
-	return result
+	return _resource_projection.visible(data, viewport) if data != null else []
 
 var ev_count:
 	get: return _scene.ev_count

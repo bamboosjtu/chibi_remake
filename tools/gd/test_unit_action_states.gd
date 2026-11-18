@@ -10,7 +10,7 @@ func run() -> void:
 		var unit:=make(1,3,30,Vector2i(10,10));install([unit])
 		unit.state=state;unit.hold=true;unit.anim=0.0
 		unit.attached=state=="boarded"
-		unit.rest_t=preload("res://simulation/battle_config.gd").REST_TICKS-1;unit.hp=999.0
+		unit.rest_t=int(preload("res://simulation/definitions/balance_rules.gd").work().restTicks)-1;unit.hp=999.0
 		sim._modules.unit_actions._step_unit_inner(unit,sim.SIM_DT)
 		var expected: String=state if state in ["idle","unload","boarded","dead"] else "idle"
 		assert(unit.state==expected,"Dispatch failed for "+state)

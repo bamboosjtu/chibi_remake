@@ -97,7 +97,7 @@ func run() -> void:
 	for tick in range(3):b.commands.orders._step_unit(ship,b.SIM_DT)
 	assert(ship.carry_n==2 and ship.unload_t%4==3)
 	var stored:=snap();assert(b.saver.apply_snapshot(stored));ship=find(ship_id);near=find(near_id);large=find(large_id)
-	b.selected=[ship];b.commands.military._cmd_begin("unload");b.player_commands.pump()
+	b.selected=[ship];b.commands.military._cmd_begin("unload");b.player_commands.apply_tick(b.sim_tick + 1)
 	assert(b.cmd_pending=="" and ship.unload_t%4==3)
 	b.commands.orders._step_unit(ship,b.SIM_DT);assert(ship.carry_n==1 and not near.attached and large.attached)
 	assert(b.transports.adjacent(near,ship) and not b.nav.is_solid(b.commands.world._unit_cell(near),0))

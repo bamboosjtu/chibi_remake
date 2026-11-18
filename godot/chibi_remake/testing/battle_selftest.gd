@@ -175,24 +175,9 @@ func run() -> void:
 			victim = u
 			break
 	if not victim.is_empty():
-		var vuid = int(victim.uid)
-		victim.alive = false
-		victim.die_t = 99.0
-		host.commands.world._prune_dead()
-		var n_before = host.units.size()
-		var saved_ok = host.commands.session._save_game()
-		var next_before = host.next_uid
-		host.commands.session._apply_save()
-		var resurrected = false
-		for u in host.units:
-			if int(u.uid) == vuid:
-				resurrected = true
-		print("SELFTEST tombstone: saved=%s units %d->%d  victim uid %d resurrected=%s  nextUid %d->%d" % [
-			str(saved_ok), n_before, host.units.size(), vuid, str(resurrected), next_before, host.next_uid])
-		self._check(not resurrected, "阵亡单位读档后不复活（ARCH-001）")
-		self._check(int(host.next_uid) == int(next_before), "nextUid 从存档恢复（ARCH-002）")
-	host.commands.session._save_game()
-	print("SELFTEST: save written, has_save=%s" % str(Game.has_save()))
+		_check_tombstone_roundtrip(victim)
+	if _check(host.commands.session._save_game(), "自检自动槽写入成功"):
+		_check(Game.repository.read_slot(0).source == "primary", "自检自动槽主档可读")
 	# --- #5：原版胜负判定（单位 **与建筑** 都要清空；资源 1 为 0 也判负）---
 	if host.scenario_mission in host.SPECIAL_OBJECTIVE_MISSIONS:
 		print("SELFTEST endrule: mission %d 是特殊关，跳过默认判定断言" % host.scenario_mission)
@@ -293,6 +278,30 @@ func run() -> void:
 	await host.commands.session._screenshot()
 	self._selftest_summary()      # 按失败数决定退出码（不再是永远退出 0）
 	return
+
+func _check_tombstone_roundtrip(victim: Dictionary) -> void:
+	var uid := int(victim.uid)
+	victim.alive = false
+	victim.die_t = 99.0
+	host.commands.world._prune_dead()
+	var args := OS.get_cmdline_user_args()
+	Game.force_save_failure = "--selftest-fault=write" in args
+	var saved: bool = host.commands.session._save_game(0)
+	Game.force_save_failure = false
+	if not _check(saved, "阵亡快照写入成功"): return
+	var validator: Callable = Game.repository.validate
+	if "--selftest-fault=read" in args:
+		Game.repository.validate = func(_record): return false
+	var loaded: Dictionary = Game.repository.read_slot(0)
+	Game.repository.validate = validator
+	if not _check(loaded.source == "primary", "阵亡快照主档可读"): return
+	var next_uid := int(host.next_uid)
+	host.next_uid = next_uid + 1
+	if not _check(host.saver.apply_loaded(loaded), "阵亡快照恢复成功"):
+		host.next_uid = next_uid
+		return
+	_check(not host.units.any(func(unit): return int(unit.uid) == uid), "阵亡单位读档后不复活（ARCH-001）")
+	_check(int(host.next_uid) == next_uid, "nextUid 从存档恢复（ARCH-002）")
 
 func _selftest_production() -> void:
 	# B1 断言：选中**能生产**的建筑后生产按钮 必须真的排队生产

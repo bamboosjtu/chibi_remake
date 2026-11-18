@@ -393,6 +393,22 @@ func _sheet(p: String) -> Texture2D:
 	return _components["unit_visuals"]._sheet(p)
 func build_terrain() -> void:
 	_components["world_layers"].build_terrain()
+
+func prepare_map_terrain(map_id: String) -> Dictionary:
+	return _components["world_layers"].terrain_plan(map_id)
+
+func switch_map_terrain(map_id: String, plan: Dictionary) -> bool:
+	setup_camera()
+	return _components["world_layers"].install_terrain(map_id, plan, DisplayServer.get_name() != "headless")
+
+func rollback_map_terrain(map_id: String, plan: Dictionary, position: Vector2, zoom: Vector2) -> void:
+	cam.position = position
+	cam.zoom = zoom
+	_components["world_layers"].install_terrain(map_id, plan)
+
+func finish_map_change() -> void:
+	marquee_hide()
+	if _ui.minimap != null: _ui.minimap.reload_map_terrain()
 func attach_unit(u: Dictionary, ob: Dictionary, w: int, h: int, k: float) -> void:
 	_components["unit_visuals"].attach_unit(u, ob, w, h, k)
 func free_unit(u: Dictionary) -> void:
