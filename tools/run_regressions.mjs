@@ -28,6 +28,20 @@ for (let i = 0; i < args.length; i++) {
       args: ['--headless', ...targetArgs, '--script', path.join(scripts, test.script + '.gd'), '--', '--no-intro', ...(test.args ?? [])]});
   }
 }
+// Selftests attach unit visuals, so they need the declared runtime art. A checkout
+// with LFS pointers fails inside snapshot restore with a misleading
+// "FAIL 阵亡快照恢复成功"; refuse up front instead of reporting a rule failure.
+const runtimeAssetsReady = () => {
+  const lines = fs.readFileSync('tools/inputs/runtime_assets.sha256', 'utf8').split('\n').filter(Boolean);
+  const line = lines.find(entry => entry.includes('.png')) ?? lines[0];
+  if (!line) return false;
+  const [, size, relative] = line.split('\t');
+  const asset = path.join('godot/chibi_remake', relative);
+  return fs.existsSync(asset) && fs.statSync(asset).size === Number(size);
+};
+if (args.includes('--selftests') || args.includes('--selftest-failures')) {
+  if (!runtimeAssetsReady()) throw new Error('--selftests/--selftest-failures require materialized runtime assets (git lfs pull, or tools/ci_windows.ps1 -FullRegression)');
+}
 if (args.includes('--selftests')) for (const map of ['chibic1', 'chibil1', 'chibic17']) jobs.push({
   name: 'selftest-' + map, markers: ['SELFTEST RESULT: PASS'],
   args: ['--headless', ...targetArgs, ...battleScene, '--', '--no-intro', '--map=' + map, '--selftest']});
@@ -92,3 +106,11 @@ for (const job of jobs) {
   console.log(`${result.ok ? 'PASS' : result.knownFailure ? 'KNOWN FAILURE' : 'FAIL'} ${job.name} (${result.seconds.toFixed(1)}s) ${result.log}`);
 }
 if (results.some(result => !result.ok && !result.knownFailure)) process.exitCode = 1;
+const failed = results.filter(result => !result.ok && !result.knownFailure);
+if (failed.length) {
+  console.error(`REGRESSIONS FAILED ${failed.length}/${results.length}:`);
+  for (const result of failed) {
+    console.error(`  ${result.name} code=${result.code} timedOut=${result.timedOut} missing=${JSON.stringify(result.missing ?? [])} log=${result.log}`);
+  }
+}
+console.log(`REGRESSIONS ${failed.length ? 'FAIL' : 'PASS'} ${results.length - failed.length}/${results.length} jobs`);

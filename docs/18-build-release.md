@@ -84,7 +84,7 @@ release/
 
 ## 7. 本地试玩与发布打包
 
-GitHub Actions 只有一个 `ci` 工作流、四个作业：`contracts`（静态契约、克隆输入声明、PowerShell 解析）、`simulation`（确定性基线、34 图启动、存档套件、三图引擎自检）、`engine`（Godot 脚本套件、组合注册表、启动拒绝负例、地形管线）、`continuation`（四图续跑矩阵）。完整源码发布套件、缺表现资源恢复、热路径预算、Windows 启动器编译与打包安全套件属于发布验收，由本地 `tools/ci_windows.ps1 -FullRegression`、`tools/release.ps1` 与 `verify_candidate.ps1` 执行；CI 不拉取美术母版。统一入口 `tools/release.ps1` 提供两个模式。
+GitHub Actions 只有一个 `ci` 工作流、四个作业：`contracts`（静态契约、克隆输入声明、工作流自检、PowerShell 解析）、`simulation`（确定性基线、34 图启动、存档套件）、`engine`（Godot 脚本套件、组合注册表、启动拒绝负例、地形管线）、`continuation`（四图续跑矩阵）。引擎自检、完整源码发布套件、缺表现资源恢复、热路径预算、Windows 启动器编译与打包安全套件属于发布验收，由本地 `tools/ci_windows.ps1 -FullRegression`、`tools/release.ps1` 与 `verify_candidate.ps1` 执行；CI 不拉取美术母版。统一入口 `tools/release.ps1` 提供两个模式。
 
 ```powershell
 # 试玩：构建并安装到 release/versions，允许未提交改动

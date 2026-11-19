@@ -14,7 +14,7 @@
 | 本地 CI | `tools/ci_windows.ps1` | 默认文档、素材清单、架构与最小冒烟；`-FullRegression` 扩展到完整回归 |
 | 托管门禁 | `.github/workflows/ci.yml` | 单一工作流四个作业：`contracts` 聚合 `tools/ci_lightweight.mjs` 六组契约；`simulation`/`engine`/`continuation` 跑无素材依赖的引擎门禁 |
 
-GitHub Actions 只有一个 `ci` 工作流，四个作业都随推送与拉取请求执行：`contracts` 把架构、注册表、数据、文档、仓库完整性和工具检查交给 `tools/ci_lightweight.mjs` 聚合成一次运行（单项失败不跳过后续检查，最终 job 保留失败状态），并补克隆输入声明与 PowerShell 解析；`simulation` 在无 LFS 美术的条件下执行完整已登记模拟基线、34 张地图启动、存档/Schema 回归与三图引擎自检；`engine` 执行 Godot 脚本套件、组合注册表、三组"必须拒绝启动"的负例，并拉取两张地形源图运行地形管线；`continuation` 以四图矩阵各起一个独立进程跑 0/31/120/450/900/1800 tick 的续跑。完整源码发布套件、缺表现资源恢复、热路径预算、Windows 启动器与打包安全属于发布验收，由本地 `tools/ci_windows.ps1 -FullRegression`、`tools/release.ps1` 与 `verify_candidate.ps1` 执行；CI 不代替 Windows EXE、GPU、性能和打包验收。
+GitHub Actions 只有一个 `ci` 工作流，四个作业都随推送与拉取请求执行：`contracts` 把架构、注册表、数据、文档、仓库完整性和工具检查交给 `tools/ci_lightweight.mjs` 聚合成一次运行（单项失败不跳过后续检查，最终 job 保留失败状态），并补克隆输入声明、工作流自检与 PowerShell 解析；`simulation` 在无 LFS 美术的条件下执行完整已登记模拟基线、34 张地图启动与存档/Schema 回归；`engine` 执行 Godot 脚本套件、组合注册表、三组"必须拒绝启动"的负例，并拉取两张地形源图运行地形管线；`continuation` 以四图矩阵各起一个独立进程跑 0/31/120/450/900/1800 tick 的续跑。**引擎自检（`--selftests`）不在托管 CI 运行**：自检会挂载单位表现，缺少运行素材时恢复阶段会因缺图集失败；它由 `tools/ci_windows.ps1 -FullRegression` 与发布候选验证在具备运行素材的环境执行，`run_regressions.mjs` 也会在素材仍是 LFS 指针时拒绝该参数。完整源码发布套件、缺表现资源恢复、热路径预算、Windows 启动器与打包安全属于发布验收，由本地 `tools/ci_windows.ps1 -FullRegression`、`tools/release.ps1` 与 `verify_candidate.ps1` 执行；CI 不代替 Windows EXE、GPU、性能和打包验收。
 
 ## 2. 引擎自检
 
@@ -303,7 +303,7 @@ pwsh -NoProfile -File tools/bench_full_battle.ps1 -ReleasePack <候选目录>/Ch
 
 `node tools/suite_check.mjs` 检查 `tools/gd` 下全部 GDScript：自动套件必须有成功标记，非自动入口必须在 `manual_tests.json` 中声明类别、前提与运行方式。CI 和存档套件各自声明运行范围，发布与开发主套件之间保持唯一归属。新增脚本未登记、条目失效或手工排除缺少理由均阻止门禁。开局兵力测试声明 `opening-forces` fixture，runner 先从规格文档生成并校验输入；准备失败单独记为失败并继续其他测试。
 
-`node tools/ci_lightweight.mjs` 执行全部检查并汇总；`--group architecture|registry|data|docs|repository|tooling` 执行对应组，均把机器可读结果写入 `_work/lightweight`。退出非零表示至少一项失败，不允许用后续成功覆盖失败。架构体积预算与边界豁免必须有 owner、reason、reviewBy；到期阻止门禁。`node tools/port_inventory.mjs` 检查已退役的依赖适配器、提供者字段和作用域调用。
+`node tools/ci_lightweight.mjs` 执行全部检查并汇总；`--group architecture|registry|data|docs|repository|tooling` 执行对应组，均把机器可读结果写入 `_work/lightweight`。退出非零表示至少一项失败，不允许用后续成功覆盖失败。`repository` 组包含 `node tools/workflow_check.mjs`：工作流必须唯一、每个作业都有超时、引用的脚本/输入/本地 action/LFS 夹具必须存在，续跑矩阵必须与 `test_continuation_coverage.mjs` 支持的地图一致——避免托管流水线在推送后才发现引用了已删除的脚本。架构体积预算与边界豁免必须有 owner、reason、reviewBy；到期阻止门禁。`node tools/port_inventory.mjs` 检查已退役的依赖适配器、提供者字段和作用域调用。
 
 单位字段检查同时使用 `unit_schema_check.mjs` 的工厂/常见字面量写入检查、`test_unit_schema.gd` 的逐字段保存/校验/恢复，以及真实快照和续跑样本。静态扫描无法证明任意动态键表达式的完整性，新增动态字段必须补充真实场景样本。Schema 不替代载员、科技、生产、AI 和引用的语义验证。
 

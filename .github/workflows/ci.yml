@@ -6,8 +6,8 @@ name: ci
 #   contracts     static contracts (architecture, registry, data, docs,
 #                 repository inventory, tooling), clone-input declarations and
 #                 PowerShell parsing. No engine.
-#   simulation    deterministic baselines, all 34 map startups, the save suite
-#                 and engine selftests.
+#   simulation    deterministic baselines, all 34 map startups and the save
+#                 suite. Selftests need runtime art and stay local.
 #   engine        Godot script suite, runtime composition registry, four
 #                 "must refuse to start" negatives and the terrain pipeline.
 #   continuation  four-map state/AI continuation matrix (one process per map).
@@ -105,13 +105,18 @@ jobs:
           node-version: '22'
       - uses: ./.github/actions/setup-reviewed-godot
       # One invocation, sequential engine runs: baselines (tick + digest +
-      # subsystems + full), 34 map startups, save suite and the engine selftest
-      # across three representative maps. A failing group does not skip later
-      # groups; the final exit code is the aggregate.
-      - name: Deterministic baselines, map startups, save suite and selftests
+      # subsystems + full), 34 map startups and the save suite. A failing group
+      # does not skip later groups; the final exit code is the aggregate.
+      #
+      # --selftests is deliberately absent: the selftest attaches unit visuals,
+      # and this job runs without LFS art, so restore fails on missing atlases.
+      # Selftests run in tools/ci_windows.ps1 -FullRegression and candidate
+      # verification, where runtime assets are materialized. The runner also
+      # refuses --selftests when the declared assets are still LFS pointers.
+      - name: Deterministic baselines, map startups and save suite
         run: |
           node tools/run_regressions.mjs --engine "$GODOT_ENGINE" \
-            --baselines --maps --selftests \
+            --baselines --maps \
             --suite tools/inputs/save_tests.json \
             --output _work/ci-simulation
       - name: Upload simulation evidence

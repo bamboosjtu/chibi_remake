@@ -8,7 +8,7 @@ const groups = {
   registry: ['registry_check', 'test_registry_check'],
   data: ['level_index', 'test_level_index', 'unit_schema_check', 'rules_manifest', 'data_check', 'test_scenario_generator', 'test_map_export_navigation', 'test_opening_forces'],
   docs: ['docs_lint', 'test_docs_lint', 'test_markdown_anchors'],
-  repository: ['syntax_check', 'suite_check', 'test_suite_check', 'test_repository_policy', 'test_ci_checks'],
+  repository: ['syntax_check', 'suite_check', 'test_suite_check', 'test_repository_policy', 'test_ci_checks', 'workflow_check'],
   tooling: ['test_engine_integrity', 'test_bootstrap', 'powershell_encoding', 'test_powershell_encoding',
     'test_godot_process', 'test_regression_result', 'test_terrain_dedup', 'test_terrain_equivalence', 'test_runtime_assets']
 };
