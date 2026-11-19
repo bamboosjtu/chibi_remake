@@ -1,11 +1,13 @@
-extends RefCounted
+extends Object
 ## hud input: presentation component.
 const UIState = preload("res://presentation/battle/components/battle_view_state.gd")
 var _ui: UIState
 var surface: Node2D
 var _armed_button: WeakRef
 var _armed_world := -1
-var ports = preload("res://presentation/battle/components/ports/hud_input_dependencies.gd").new()
+var _dep_camera_controller: Object
+var _dep_command_art: Object
+var _dep_selection_info: Object
 func _init(data: UIState, node: Node2D) -> void:
 	_ui = data
 	surface = node
@@ -28,7 +30,7 @@ func draw_hover_at(mp: Vector2) -> void:
 		if not item.btn.visible:continue
 		var held: bool=item.control.is_pressed() or _ui._hot_pressed==index
 		var hover: bool=not hit.is_empty() and str(hit.pool)=="art" and int(hit.idx)==index
-		ports._set_art_state(index,1 if held else (2 if hover else 0))
+		_dep_command_art._set_art_state(index,1 if held else (2 if hover else 0))
 	if not hit.is_empty() and str(hit.pool)=="art" and nm!="":
 		var entry: Dictionary=_ui.art_buttons[int(hit.idx)]
 		var slot: int=int(hit.idx)-(9 if str(entry.sub)=="hot" else (18 if str(entry.sub)=="form" else 0))
@@ -42,7 +44,7 @@ func draw_hover_at(mp: Vector2) -> void:
 		_ui.info.visible = nm == "" and _ui.info.text != ""
 
 func _clear_console_capture() -> void:
-	if _ui._hot_pressed >= 0: ports._set_art_state(_ui._hot_pressed,0)
+	if _ui._hot_pressed >= 0: _dep_command_art._set_art_state(_ui._hot_pressed,0)
 	_ui._hud_press_pool = ""
 	_ui._hud_press_idx = -1
 	_ui._hud_press_cancelled = true
@@ -53,12 +55,12 @@ func _clear_console_capture() -> void:
 
 func _input(event: InputEvent) -> void:
 	if _dismiss_ability_menu(event): return
-	if _ui.host.commands.session.handle_cheat_input(event):
+	if _ui.host.actions.handle_cheat_input(event):
 		_clear_console_capture()
 		surface.get_viewport().set_input_as_handled()
 		return
 	if event is InputEventMouseMotion and _ui._minimap_drag:
-		ports._minimap_navigate(event.position)
+		_dep_camera_controller._minimap_navigate(event.position)
 		surface.get_viewport().set_input_as_handled()
 		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
@@ -68,14 +70,14 @@ func _input(event: InputEvent) -> void:
 			return
 		if event.pressed and _ui.minimap != null and _ui.minimap.get_global_rect().has_point(event.position):
 			_ui._minimap_drag = true
-			ports._minimap_navigate(event.position)
+			_dep_camera_controller._minimap_navigate(event.position)
 			surface.get_viewport().set_input_as_handled()
 			return
 	if event.is_action_pressed("battle_cancel") and (_ui.art_sub != "" or _ui.build_menu):
-		ports._close_art_sub()
+		_dep_command_art._close_art_sub()
 		surface.get_viewport().set_input_as_handled()
 		return
-	if _navigate_focus(event) or ports._handle_cmd_key(event):
+	if _navigate_focus(event) or _dep_command_art._handle_cmd_key(event):
 		surface.get_viewport().set_input_as_handled()
 		return
 	if not (event is InputEventMouseButton):
@@ -91,7 +93,7 @@ func _input(event: InputEvent) -> void:
 			surface.get_viewport().set_input_as_handled()
 		return
 	if not mb.pressed and _ui.host.selecting:
-		_ui.host.commands.session.unhandled_input(mb)
+		_ui.host.actions.unhandled_input(mb)
 		surface.get_viewport().set_input_as_handled()
 		return
 	if not mb.pressed and _ui._hud_panel_capture:
@@ -112,12 +114,12 @@ func _navigate_focus(event: InputEvent) -> bool:
 		var focused := surface.get_viewport().gui_get_focus_owner()
 		if focused is Button and not focused.disabled and _ui.ui_layer.is_ancestor_of(focused):
 			_armed_button = weakref(focused)
-			_armed_world = _ui.host.world_identity()
+			_armed_world = _ui.host.queries.world_identity()
 			return true
 	elif event.is_action_released("battle_confirm") and _armed_button != null:
 		var button = _armed_button.get_ref()
 		_armed_button = null
-		if is_instance_valid(button) and button.has_focus() and button.is_visible_in_tree() and not button.disabled and _armed_world == _ui.host.world_identity():
+		if is_instance_valid(button) and button.has_focus() and button.is_visible_in_tree() and not button.disabled and _armed_world == _ui.host.queries.world_identity():
 			button.pressed.emit()
 		return true
 	for direction in [["left", SIDE_LEFT], ["up", SIDE_TOP], ["right", SIDE_RIGHT], ["down", SIDE_BOTTOM]]:
@@ -142,7 +144,7 @@ func _dismiss_ability_menu(event: InputEvent) -> bool:
 	if not event is InputEventMouseButton or event.button_index != MOUSE_BUTTON_LEFT or not event.pressed:
 		return false
 	if _ui.art_sub == "" or not surface.battle_rect().has_point(event.position): return false
-	ports._close_art_sub()
+	_dep_command_art._close_art_sub()
 	_ui._hud_panel_capture = true
 	surface.get_viewport().set_input_as_handled()
 	return true
@@ -189,8 +191,8 @@ func _hud_panel_at(win_pos: Vector2) -> bool:
 func _hud_select_hook(want_building: bool) -> void:
 	await surface.get_tree().create_timer(0.9).timeout
 	var target: Dictionary = {}
-	for u in _ui.host.unit_views():
-		if not bool(u.alive) or int(u.owner) != int(_ui.host.player_owner):
+	for u in _ui.host.queries.unit_views():
+		if not bool(u.alive) or int(u.owner) != int(_ui.host.queries.player_owner):
 			continue
 		if bool(u.is_building) == want_building:
 			target = u
@@ -210,12 +212,12 @@ func _hud_select_hook(want_building: bool) -> void:
 	await surface.get_tree().process_frame
 	var read_back: Vector2 = surface.get_global_mouse_position()
 	var path: String = "合成鼠标事件"
-	if _ui.host.selection_views().is_empty():
-		_ui.host.commands.session.select_at(world, false)          # 宿主的真实选择入口（main._input 点击时调的就是它）
+	if _ui.host.queries.selection_views().is_empty():
+		_ui.host.actions.select_at(world, false)          # 宿主的真实选择入口（main._input 点击时调的就是它）
 		path = "退化：直接调 main._select_click"
 	print("HUD: --hud-select 点选「%s」 世界=%s 注入画布=%s 回读世界=%s 偏差=%.1f 路径=%s 已选=%d" % [
 		str(target.name), str(world), str(canvas_pos), str(read_back),
-		read_back.distance_to(world), path, _ui.host.selection_views().size()])
+		read_back.distance_to(world), path, _ui.host.queries.selection_views().size()])
 
 func _send_click(canvas_pos: Vector2) -> void:
 	var down := InputEventMouseButton.new()
@@ -265,9 +267,9 @@ func _hud_click_hook(idx: int, hot: bool) -> void:
 	var hov_name: String = "null"
 	if hov != null:
 		hov_name = "%s(%s)" % [str(hov.name), hov.get_class()]
-	var before_train: int = _ui.host.training_views().size()
+	var before_train: int = _ui.host.queries.training_views().size()
 	var before_fb: String = str(_ui.host.feedback_text)
-	var st_before: String = ports._sel_state_text()
+	var st_before: String = _dep_selection_info._sel_state_text()
 	_ui._click_probe = 0
 	b.pressed.connect(_on_click_probe)
 	# 真·点击：位置用**窗口坐标**（已实测：GUI 命中测试与 Viewport 预处理都用窗口坐标，
@@ -276,19 +278,24 @@ func _hud_click_hook(idx: int, hot: bool) -> void:
 	# 合成事件要等一帧才派发，所以这里必须 await 再判定。
 	_send_click(win_pos)
 	await surface.get_tree().process_frame
-	var st_after: String = ports._sel_state_text()
+	var st_after: String = _dep_selection_info._sel_state_text()
 	var probe_n: int = _ui._click_probe
-	var fired: bool = (_ui.host.training_views().size() > before_train) or (str(_ui.host.feedback_text) != before_fb) or (st_after != st_before)
+	var fired: bool = (_ui.host.queries.training_views().size() > before_train) or (str(_ui.host.feedback_text) != before_fb) or (st_after != st_before)
 	var path: String = "真实点击（本模块 _input 接管）"
 	if not fired:
 		b.emit_signal("pressed")                     # 兜底：直接触发按钮信号
-		st_after = ports._sel_state_text()
+		st_after = _dep_selection_info._sel_state_text()
 		path = "退化：emit_signal(pressed)"
 	if b.pressed.is_connected(_on_click_probe):
 		b.pressed.disconnect(_on_click_probe)
 	print("HUD: --hud-click%s=%d 「%s」 按钮矩形=%s 光标画布=%s 命中=%s gui悬停=%s 路径=%s 按钮信号次数=%d | trainings %d->%d 反馈=\"%s\"->\"%s\" 选中状态 %s -> %s" % [
 		"/hot" if hot else "", idx, b.text, str(rect), str(mouse_canvas), str(inside), hov_name, path, probe_n,
-		before_train, _ui.host.training_views().size(), before_fb, str(_ui.host.feedback_text), st_before, st_after])
+		before_train, _ui.host.queries.training_views().size(), before_fb, str(_ui.host.feedback_text), st_before, st_after])
 
 func _on_click_probe() -> void:
 	_ui._click_probe += 1
+
+func bind_dependencies(components: Object) -> void:
+	_dep_camera_controller = components.camera_controller
+	_dep_command_art = components.command_art
+	_dep_selection_info = components.selection_info

@@ -1,4 +1,5 @@
 extends CanvasLayer
+const SessionActions = preload("res://app/session_actions.gd")
 var host: Node2D
 var entries := {}
 var overlay: ColorRect
@@ -39,19 +40,19 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_fit);overlay.hide()
 
 func open() -> void:
-	var entry: Dictionary=entries.get(str(host.map_id),{})
-	if entry.is_empty():push_error("Missing opening briefing: "+str(host.map_id));return
-	if not is_open: pause_token = Game.pauses.acquire(self, "mission briefing")
+	var entry: Dictionary=entries.get(str(host.queries.map_id),{})
+	if entry.is_empty():push_error("Missing opening briefing: "+str(host.queries.map_id));return
+	if not is_open: pause_token = SessionActions.pause(self, "mission briefing")
 	title.text=str(entry.title);body.text="　　"+str(entry.briefing)
 	is_open=true;opened_frame=Engine.get_process_frames()
 	overlay.show();_fit();done_button.grab_focus()
 
 func close() -> void:
 	if not is_open:return
-	is_open=false;overlay.hide();Game.pauses.release(pause_token);pause_token=0
+	is_open=false;overlay.hide();SessionActions.resume(pause_token);pause_token=0
 
 func _input(event: InputEvent) -> void:
-	if not is_open or not Game.pauses.is_top(pause_token) or opened_frame==Engine.get_process_frames():return
+	if not is_open or not SessionActions.owns_pause(pause_token) or opened_frame==Engine.get_process_frames():return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_ENTER,KEY_KP_ENTER,KEY_SPACE,KEY_ESCAPE]:
 		close();get_viewport().set_input_as_handled()
 

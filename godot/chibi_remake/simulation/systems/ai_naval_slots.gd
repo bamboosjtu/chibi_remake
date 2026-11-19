@@ -2,13 +2,16 @@ extends RefCounted
 const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## CONF-18E 水军槽：0/1 槽快船各 8，3 槽运输船 1；2 槽不参与。
 ## 只在行为档位 1 驱动；四槽“在途”全 0 才派下一艘。
-const Access = preload("res://simulation/ports/ai_access.gd")
-var host: Access
+var ai_economy: Object
+var player_commands: RefCounted
+var state: RefCounted
 var records := {}
 var serial := 0
 
 func _init(h: Object) -> void:
-	host = h.simulation_access("ai") if h.has_method("simulation_access") else h
+	ai_economy = h.ai_economy
+	player_commands = h.player_commands
+	state = h.state
 
 static func capacity(slot: int) -> int:
 	if slot == 3: return 1
@@ -35,7 +38,7 @@ func refresh(owner: int) -> void:
 		var live: Array = []
 		for uid in rec.members:
 			var found := false
-			for u in host.units:
+			for u in state.units:
 				if int(u.get("uid", -1)) == int(uid) and bool(u.get("alive", false)) and float(u.get("die_t", -1)) < 0.0:
 					found = true; break
 			if found: live.append(uid)
@@ -45,7 +48,7 @@ func refresh(owner: int) -> void:
 		rec.ready = live.size() >= capacity(slot)
 
 func step(owner: int, allowed: Array) -> void:
-	if int(host.ai_behavior(owner)) != 1: return
+	if int(ai_economy.ai_behavior(owner)) != 1: return
 	refresh(owner)
 	var any_transit := false
 	for slot in [0, 1, 3]:
@@ -59,11 +62,11 @@ func step(owner: int, allowed: Array) -> void:
 			continue
 		if bool(rec.pending) or any_transit: continue
 		var unit := unit_for(slot)
-		var building: Dictionary = host.ai_production_building(owner, unit)
+		var building: Dictionary = ai_economy.ai_production_building(owner, unit)
 		if building.is_empty(): continue
-		if not host._queue_train(owner, building, unit): continue
+		if not player_commands._queue_train(owner, building, unit): continue
 		serial += 1
-		var order: Dictionary = host.trainings.back()
+		var order: Dictionary = state.trainings.back()
 		order.navalSlot = slot
 		order.navalToken = serial
 		rec.pending = true
@@ -122,7 +125,7 @@ func valid_snapshot(value: Variant, ids: Dictionary, orders: Array, next_uid: in
 	if not value.get("records", {}) is Dictionary: return false
 	var table: Dictionary = value.get("records", {})
 	var serial_value := int(value.get("serial", 0))
-	var owners: Array = host.ai_owners()
+	var owners: Array = ai_economy.ai_owners()
 	var members := {}
 	var tokens := {}
 	for key in table:

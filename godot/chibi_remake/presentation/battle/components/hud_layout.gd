@@ -1,9 +1,11 @@
-extends RefCounted
+extends Object
 ## hud layout: presentation component.
 const UIState = preload("res://presentation/battle/components/battle_view_state.gd")
 var _ui: UIState
 var surface: Node2D
-var ports = preload("res://presentation/battle/components/ports/hud_layout_dependencies.gd").new()
+var _dep_camera_controller: Object
+var _dep_command_art: Object
+var _dep_legacy_layout: Object
 func _init(data: UIState, node: Node2D) -> void:
 	_ui = data
 	surface = node
@@ -44,10 +46,10 @@ func _apply_metrics() -> void:
 	# 原版是 640x480；用「视口高 / 480」做等比刻度，HUD 各元素即按原版像素等比放大。
 	var s: float = clampf(minf(vp.y / 480.0, vp.x / 640.0), 0.5, 3.0)
 	_ui.ui_scale = s
-	if _ui.cam != null: ports.set_zoom()
-	ports._layout_cmd_art()
+	if _ui.cam != null: _dep_camera_controller.set_zoom()
+	_dep_command_art._layout_cmd_art()
 	if _ui._topbar_original:
-		ports._apply_metrics_original(vp, s)
+		_dep_legacy_layout._apply_metrics_original(vp, s)
 		return
 
 	var bar_h: float = 40.0 * s
@@ -240,3 +242,8 @@ func _draw_ornament() -> void:
 	_ui.ornament.draw_polyline(PackedVector2Array([
 		Vector2(w * 0.12, h * 0.90), Vector2(w * 0.60, h * 0.26), Vector2(w * 0.74, h * 0.48),
 		Vector2(w * 0.34, h * 0.98)]), Color(0.9, 0.8, 0.4), 1.5 * s)
+
+func bind_dependencies(components: Object) -> void:
+	_dep_camera_controller = components.camera_controller
+	_dep_command_art = components.command_art
+	_dep_legacy_layout = components.legacy_layout

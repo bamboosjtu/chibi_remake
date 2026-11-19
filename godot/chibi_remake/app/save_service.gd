@@ -20,7 +20,7 @@ func apply() -> bool:
 func apply_loaded(loaded: Dictionary, cross_map := false) -> bool:
 	var applied := _apply_other_map(loaded.data) if cross_map else apply_snapshot(loaded.data)
 	last_load_source = loaded.source if applied else "none"
-	if applied and last_load_source == "backup": host.commands.world._feedback("主记录无法读取，已从备份恢复进度。")
+	if applied and last_load_source == "backup": host.world.effects.feedback("主记录无法读取，已从备份恢复进度。")
 	return applied
 
 func _apply_other_map(d: Dictionary) -> bool:
@@ -41,7 +41,7 @@ func _apply_other_map(d: Dictionary) -> bool:
 	if not transaction.install(host, candidate, true):
 		last_load_error = "目标战场画面无法安装，当前战场已保留。"
 		return false
-	host.commands.world._rebuild_unit_index()
+	host.world.spatial_index._rebuild_unit_index()
 	return true
 
 func apply_snapshot(d: Dictionary) -> bool:
@@ -73,8 +73,8 @@ func _apply_snapshot(d: Dictionary) -> bool:
 		return false
 	var applied := _restore_current(d,arr)
 	if applied:
-		battle.player_commands.clear()
-		host.commands.world._rebuild_unit_index()
+		host.world.player_commands.clear()
+		host.world.spatial_index._rebuild_unit_index()
 	return applied
 
 func _restore_current(d: Dictionary, arr: Array) -> bool:
@@ -123,7 +123,7 @@ func _apply_unit_record(u: Dictionary, rec: Dictionary) -> void:
 	var anchor := Vector2(float(UnitSchema.record_value(rec,"ax",u.ax)),float(UnitSchema.record_value(rec,"ay",u.ay)))
 	u.ax = anchor.x
 	u.ay = anchor.y
-	var cell: Vector2i=battle.nav.cell_of_px(u.ax,u.ay)
+	var cell: Vector2i=host.world.nav.cell_of_px(u.ax,u.ay)
 	u.A=cell.x;u.B=cell.y
 	var dying := float(UnitSchema.record_value(rec, "die_t", -1.0)) >= 0.0
 	var recorded_alive := bool(UnitSchema.record_value(rec, "alive", true))
@@ -142,12 +142,12 @@ func _apply_unit_record(u: Dictionary, rec: Dictionary) -> void:
 	var oi := int(UnitSchema.record_value(rec, "officer", -1))
 	u["officer"] = {}
 	if oi >= 0:
-		var o: Dictionary = host.commands.military._officer_by_index(oi)
+		var o: Dictionary = host.world.officer_pool._officer_by_index(oi)
 		if not o.is_empty():
 			u["officer"] = o
 			u["officer_might"] = float(o.get("might", 0))
 			u["officer_intellect"] = float(o.get("intellect", 0))
-	host.commands.world._place_unit(u)            # 表现层 + R13 占格索引（视图缺席时也同步索引）
+	host.world.battle_simulation._place_unit(u)            # 表现层 + R13 占格索引（视图缺席时也同步索引）
 
 func _restore_resources(d: Dictionary) -> void:
 	for key in preload("res://app/saves/save_envelope.gd").RESOURCE_KEYS: battle.set(key,float(d.resources[key]))
@@ -176,19 +176,18 @@ func save_extra() -> Dictionary:
 		var target: Dictionary = battle.decor_cells[key]
 		if int(target.unit) in [100,102,104]: decor[key] = {"stock": float(target.get("stock", 0))}
 	var extra := {"mapId": str(battle.map_id), "nextUid": int(battle.next_uid), "trainings": battle.trainings, "gameEnd": int(battle.game_end), "simulation": {
-		"rngState": str(battle.simulation_rng.state), "contentRevision": content_revision(), "rulesRevision":preload("res://app/saves/rules_identity.gd").current(), "tick": battle.sim_tick, "accumulator": battle.sim_acc, "speedIndex": battle.clock.speed_index,
-		"explored": battle.visibility.snapshot(), "projectiles":battle.projectiles.snapshot(), "fireFields":battle.fire_fields.snapshot(), "decorResources": decor,
+		"rngState": str(battle.simulation_rng.state), "contentRevision": content_revision(), "rulesRevision":preload("res://app/saves/rules_identity.gd").current(), "tick": battle.sim_tick, "accumulator": battle.sim_acc, "speedIndex": host.world.clock.speed_index,
+		"explored": host.world.visibility.snapshot(), "projectiles":host.world.projectiles.snapshot(), "fireFields":host.world.fire_fields.snapshot(), "decorResources": decor,
 		"aiResources": battle.ai_res, "groups": battle.control_groups,
 		"taskLatches": battle.task_latches, "officerProgress": battle.officer_progress, "terrainChanges": battle.terrain_changes, "taskEvents": battle.task_events, "objectiveDone": battle.objective_done,
-		"officerPool": host.commands.military._officer_pool_state(),
+		"officerPool": host.world.officer_pool._officer_pool_state(),
 		# 科技树：等级表（player_tech）与研究队列。
 		"playerTech": battle.player_tech.duplicate(true),
 		"armyTech": battle.army_tech.duplicate(true),
 		"researchJobs": battle.research_jobs.duplicate(true),
-		"ai": battle.ai.snapshot() if battle.ai != null else {},
+		"ai": host.world.ai.snapshot() if host.world.ai != null else {},
 	}}
 	if battle.auto_control: extra.simulation["autoControl"] = true
-	extra["pendingDuels"] = battle.effects.pending_duels().size()
 	return extra
 
 ## Supplementary full-state digest; historical simulation baselines stay intact.
@@ -197,8 +196,8 @@ func continuation_snapshot(game: Node) -> Dictionary:
 	for key in ["checksum","savedAt","saveName"]: payload.erase(key)
 	payload.simulation.erase("accumulator") # Wall-clock dispatch remainder, not per-tick state.
 	var occupied := {}
-	for cell in battle.nav.state.occupancy:
-		if int(battle.nav.state.occupancy[cell]) > 0: occupied[cell] = battle.nav.state.occupancy[cell]
-	payload["navigation"] = {"resources":battle.nav.state.resource_cells.duplicate(),"blocked":battle.nav.state.blocked_cells.duplicate(),"occupancy":occupied}
-	payload["pendingDuels"] = battle.effects.duel_snapshot()
+	for cell in host.world.nav.state.occupancy:
+		if int(host.world.nav.state.occupancy[cell]) > 0: occupied[cell] = host.world.nav.state.occupancy[cell]
+	payload["navigation"] = {"resources":host.world.nav.state.resource_cells.duplicate(),"blocked":host.world.nav.state.blocked_cells.duplicate(),"occupancy":occupied}
+	payload["pendingDuels"] = {} # Canonical continuation digest for v9.
 	return payload

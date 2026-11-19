@@ -40,12 +40,12 @@ func restored_mask() -> void:
 	var unknown:=hidden_land(points)
 	var scout: Dictionary={"uid":999999,"alive":true,"die_t":-1,"owner":battle.player_owner,"is_building":false,"ax":remembered.x,"ay":remembered.y,"vision":1}
 	battle.visibility.update(battle.units+[scout],battle.player_owner)
-	hero.ax=visible.x;hero.ay=visible.y;battle.commands.world._place_unit(hero)
+	hero.ax=visible.x;hero.ay=visible.y;battle.world.battle_simulation._place_unit(hero)
 	battle.visibility.update(battle.units,battle.player_owner)
-	assert(battle.commands.session._save_game())
+	assert(battle.session_actions.save_game())
 	var saved: Dictionary=root.get_node("Game").load_save()
 	# A fresh entry world has never seen the saved army's distant position.
-	hero.ax=home.x;hero.ay=home.y;battle.commands.world._place_unit(hero)
+	hero.ax=home.x;hero.ay=home.y;battle.world.battle_simulation._place_unit(hero)
 	battle.visibility.setup(Vector2(battle.map_data.terrainW,battle.map_data.terrainH))
 	battle.visibility.update(battle.units,battle.player_owner)
 	battle.view.fog_sprite._process(0)
@@ -60,7 +60,7 @@ func restored_mask() -> void:
 	var previous: RefCounted=battle.visibility
 	paused=true
 	assert(battle.saver.apply_snapshot(saved))
-	assert(not is_same(previous,battle.visibility) and battle.view.host.visibility_view().key[1]==battle.visibility.get_instance_id())
+	assert(not is_same(previous,battle.visibility) and battle.view.host.queries.visibility_view().key[1]==battle.visibility.get_instance_id())
 	battle.view.fog_sprite._process(0)
 	if DisplayServer.get_name()!="headless":await RenderingServer.frame_post_draw
 	assert(is_zero_approx(mask_alpha(visible)),"loaded army must clear the real rendered mask")
@@ -83,7 +83,7 @@ func direction_poses() -> void:
 		var kind: int=[29,31,33,35,32,45][row]
 		var regions: Dictionary={}
 		for direction in range(8):
-			assert(battle.commands.world._spawn_unit(kind,battle.player_owner,800,2000,true))
+			assert(battle.world.entity_factory._spawn_unit(kind,battle.player_owner,800,2000,true))
 			var unit: Dictionary=battle.units.back()
 			unit.moved=true;unit.state="attack";unit.dir=direction;unit.move_facing=direction;unit.walk_tick=0
 			var pose: Dictionary=battle.view.mobile_pose(unit)

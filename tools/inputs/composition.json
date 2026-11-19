@@ -27,7 +27,21 @@
       "cheat_controller": "app/battle/cheat_controller.gd",
       "duel_controller": "app/battle/duel_controller.gd",
       "scene_controller": "app/battle/scene_controller.gd",
-      "player_commands": "simulation/systems/player_commands.gd"
+      "player_commands": "simulation/systems/player_commands.gd",
+      "economy": "simulation/systems/economy.gd",
+      "projectiles": "simulation/systems/projectiles.gd",
+      "fire_fields": "simulation/systems/fire_fields.gd",
+      "transports": "simulation/systems/transports.gd",
+      "harvesting": "simulation/systems/harvesting.gd",
+      "construction": "simulation/systems/construction_interior.gd",
+      "stratagems": "simulation/systems/stratagem_rules.gd",
+      "command_rules": "simulation/systems/command_rules.gd",
+      "rules": "simulation/systems/scenario_rules.gd",
+      "nav": "simulation/navigation/nav.gd",
+      "visibility": "simulation/systems/battle_visibility.gd",
+      "automatic_gates": "simulation/navigation/automatic_gates.gd",
+      "clock": "simulation/systems/battle_clock.gd",
+      "effects": "simulation/battle_effects.gd"
     },
     "view": {
       "controller": "presentation/battle/components/controller.gd",
@@ -44,7 +58,6 @@
       "legacy_layout": "presentation/battle/components/legacy_layout.gd"
     },
     "menu": {
-      "automation_driver": "presentation/menu/automation_driver.gd",
       "controller": "presentation/menu/controller.gd",
       "menu_styles": "presentation/menu/menu_styles.gd",
       "campaign_dialog": "presentation/menu/campaign_dialog.gd",
@@ -53,187 +66,6 @@
     "nav": {
       "grid": "simulation/navigation/navigation_grid.gd",
       "paths": "simulation/navigation/path_queries.gd"
-    }
-  },
-  "ports": {
-    "simulation/ports/battle_simulation_dependencies.gd": {
-      "host": "main"
-    },
-    "app/battle/ports/bootstrap_dependencies.gd": {
-      "host": "main"
-    },
-    "app/battle/ports/cheat_controller_dependencies.gd": {
-      "host": "main"
-    },
-    "app/battle/ports/duel_controller_dependencies.gd": {
-      "host": "main"
-    },
-    "app/battle/ports/scene_controller_dependencies.gd": {
-      "host": "main"
-    },
-    "presentation/battle/components/ports/controller_dependencies.gd": {
-      "host": "view"
-    },
-    "presentation/battle/components/ports/unit_visuals_dependencies.gd": {
-      "host": "view"
-    },
-    "presentation/battle/components/ports/camera_controller_dependencies.gd": {
-      "host": "view"
-    },
-    "presentation/battle/components/ports/hud_build_dependencies.gd": {
-      "host": "view"
-    },
-    "presentation/battle/components/ports/hud_layout_dependencies.gd": {
-      "host": "view"
-    },
-    "presentation/battle/components/ports/world_layers_dependencies.gd": {
-      "host": "view"
-    },
-    "presentation/battle/components/ports/hud_input_dependencies.gd": {
-      "host": "view"
-    },
-    "presentation/battle/components/ports/selection_info_dependencies.gd": {
-      "host": "view"
-    },
-    "presentation/battle/components/ports/command_art_dependencies.gd": {
-      "host": "view"
-    },
-    "presentation/battle/components/ports/command_model_dependencies.gd": {
-      "host": "view"
-    },
-    "presentation/battle/components/ports/command_actions_dependencies.gd": {
-      "host": "view"
-    },
-    "presentation/battle/components/ports/legacy_layout_dependencies.gd": {
-      "host": "view"
-    },
-    "presentation/menu/ports/automation_driver_dependencies.gd": {
-      "host": "menu"
-    },
-    "presentation/menu/ports/controller_dependencies.gd": {
-      "host": "menu"
-    },
-    "presentation/menu/ports/menu_styles_dependencies.gd": {
-      "host": "menu"
-    },
-    "presentation/menu/ports/campaign_dialog_dependencies.gd": {
-      "host": "menu"
-    },
-    "presentation/menu/ports/level_dialog_dependencies.gd": {
-      "host": "menu"
-    },
-    "simulation/ports/ai_access.gd": {
-      "host": "main"
-    },
-    "simulation/ports/command_rules_access.gd": {
-      "host": "main"
-    },
-    "simulation/ports/construction_interior_access.gd": {
-      "host": "main"
-    },
-    "simulation/ports/economy_access.gd": {
-      "host": "main"
-    },
-    "simulation/ports/fire_fields_access.gd": {
-      "host": "main"
-    },
-    "simulation/ports/harvesting_access.gd": {
-      "host": "main"
-    },
-    "simulation/ports/projectiles_access.gd": {
-      "host": "main"
-    },
-    "simulation/ports/scenario_rules_access.gd": {
-      "host": "main"
-    },
-    "simulation/ports/stratagem_rules_access.gd": {
-      "host": "main"
-    },
-    "simulation/ports/transports_access.gd": {
-      "host": "main"
-    },
-    "app/commands/world_commands.gd": {
-      "host": "main"
-    },
-    "app/commands/technology_commands.gd": {
-      "host": "main"
-    },
-    "app/commands/military_commands.gd": {
-      "host": "main"
-    },
-    "app/commands/session_commands.gd": {
-      "host": "main"
-    },
-    "app/commands/orders_commands.gd": {
-      "host": "main"
-    },
-    "app/commands/economy_commands.gd": {
-      "host": "main"
-    }
-  },
-  "internalScopes": {
-    "simulation/battle/abilities.gd": {
-      "host": "main"
-    },
-    "simulation/battle/ai_economy.gd": {
-      "host": "main"
-    },
-    "simulation/battle/ai_orders.gd": {
-      "host": "main"
-    },
-    "simulation/battle/cheat_rules.gd": {
-      "host": "main"
-    },
-    "simulation/battle/combat.gd": {
-      "host": "main"
-    },
-    "simulation/battle/command_groups.gd": {
-      "host": "main"
-    },
-    "simulation/battle/construction_orders.gd": {
-      "host": "main"
-    },
-    "simulation/battle/entity_factory.gd": {
-      "host": "main"
-    },
-    "simulation/battle/harvest_orders.gd": {
-      "host": "main"
-    },
-    "simulation/battle/interaction_paths.gd": {
-      "host": "main"
-    },
-    "simulation/battle/movement.gd": {
-      "host": "main"
-    },
-    "simulation/battle/officer_teams.gd": {
-      "host": "main"
-    },
-    "simulation/battle/production.gd": {
-      "host": "main"
-    },
-    "simulation/battle/selection.gd": {
-      "host": "main"
-    },
-    "simulation/battle/spatial_index.gd": {
-      "host": "main"
-    },
-    "simulation/battle/technology.gd": {
-      "host": "main"
-    },
-    "simulation/battle/transport_orders.gd": {
-      "host": "main"
-    },
-    "simulation/battle/unit_actions.gd": {
-      "host": "main"
-    },
-    "simulation/battle/world_orders.gd": {
-      "host": "main"
-    },
-    "simulation/navigation/path_queries.gd": {
-      "host": "nav"
-    },
-    "simulation/systems/player_commands.gd": {
-      "host": "main"
     }
   }
 }

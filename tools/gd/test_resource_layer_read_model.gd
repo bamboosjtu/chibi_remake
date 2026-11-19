@@ -15,16 +15,16 @@ func run() -> void:
 	game=root.get_node("Game"); game.current_map="chibil1"
 	battle=load("res://main.tscn").instantiate(); root.add_child(battle)
 	battle.set_process(false); battle.cli_mode=true; battle.ai=null
-	for unit in battle.units: battle.commands.military._cancel_unit_command(unit); unit.hold=true
+	for unit in battle.units: battle.world.command_groups._cancel_unit_command(unit); unit.hold=true
 	layer=battle.view.resource_layer; layer.set_process(false); reader=battle.view.host
 	var definition: Dictionary = battle.map_data.duplicate(true)
 	definition.decor=[[10,10,0],[12,10,2],[14,10,4],[45,45,0]]
 	battle.map_data=definition
-	battle.commands.economy._build_decor_targets()
+	battle.world.harvest_orders._build_decor_targets()
 	layer.update_visible(viewport)
 	assert(layer.projection.size()==3 and layer.active.size()==3)
 	assert(layer.get_property_list().all(func(property): return str(property.name)!="entries"))
-	assert(reader.get_property_list().all(func(property): return str(property.name)!="decor_cells"))
+	assert(reader.queries.get_property_list().all(func(property): return str(property.name)!="decor_cells"))
 	var retained: Array = layer.projection
 	assert(_frozen_values_only(retained) and _frozen_values_only(layer.signature))
 	for descriptor in retained:
@@ -40,7 +40,7 @@ func run() -> void:
 	assert(layer.projection_builds==builds and is_same(layer.projection,retained))
 	assert(game.save_checksum(battle.saver.continuation_snapshot(game))==before)
 	_viewport_and_geometry()
-	var healthy: Dictionary = game.snapshot(battle.units,battle.commands.world._resources(),battle.saver.save_extra())
+	var healthy: Dictionary = game.snapshot(battle.units,battle.world.economy.player_resources(),battle.saver.save_extra())
 	_phases()
 	_manual_exchange_and_rollback()
 	_transaction_rollback(healthy)
@@ -84,7 +84,7 @@ func _phases() -> void:
 	for fixture in [["10_10",0,1],["12_10",1,3],["14_10",2,5]]:
 		var old: WeakRef = weakref(layer.active[int(fixture[1])])
 		var revision: int = battle.resource_revision
-		battle.commands.economy._remove_decor(battle.decor_cells[fixture[0]])
+		battle.world.harvest_orders._remove_decor(battle.decor_cells[fixture[0]])
 		assert(battle.resource_revision>revision)
 		layer.update_visible(viewport)
 		assert(layer.projection[int(fixture[1])].phase==int(fixture[2]) and old.get_ref()==null)
@@ -95,22 +95,22 @@ func _phases() -> void:
 	assert(cached[0].phase==0 and cached[1].phase==2 and cached[2].phase==4)
 
 func _manual_exchange_and_rollback() -> void:
-	var snapshot: Dictionary = game.snapshot(battle.units,battle.commands.world._resources(),battle.saver.save_extra())
+	var snapshot: Dictionary = game.snapshot(battle.units,battle.world.economy.player_resources(),battle.saver.save_extra())
 	snapshot.simulation.decorResources["10_10"].stock=200
 	var validator = load("res://app/saves/snapshot_validator.gd").new(battle,battle.saver.content_revision,battle.saver._valid_cost,battle.saver._valid_integer)
 	var plan: Dictionary = validator.prepare(snapshot,snapshot.units); assert(not plan.is_empty())
 	var candidate = load("res://app/saves/candidate_world.gd").new()
-	assert(candidate.prepare(battle.state,battle.world.definition) and candidate.saver.restore_candidate(snapshot,snapshot.units,plan))
+	assert(candidate.prepare(battle.world,battle.world.definition) and candidate.saver.restore_candidate(snapshot,snapshot.units,plan))
 	var old_key: Array = layer.signature
-	candidate.state.resource_revision=int(old_key[2]); candidate.state.nav.geometry_revision=int(old_key[3])
+	candidate.state.resource_revision=int(old_key[2]); candidate.world.nav.geometry_revision=int(old_key[3])
 	var previous: RefCounted = battle.exchange_world(candidate.world)
-	var key: Array = reader.resource_layer_key(viewport)
+	var key: Array = reader.queries.resource_layer_key(viewport)
 	assert(key.slice(2)==old_key.slice(2) and key[0]!=old_key[0] and key[1]!=old_key[1])
 	layer.update_visible(viewport)
 	var rejected_projection: Array = layer.projection
 	assert(rejected_projection[0].phase==0 and layer.active[0].get_meta("phase")==0)
 	var rejected_world: WeakRef = weakref(candidate.world)
-	var rejected_nav: WeakRef = weakref(candidate.state.nav)
+	var rejected_nav: WeakRef = weakref(candidate.world.nav)
 	var discarded: RefCounted = battle.exchange_world(previous)
 	previous=null
 	layer.update_visible(viewport)
@@ -145,7 +145,7 @@ func _restore_new_world(snapshot: Dictionary) -> void:
 	var builds: int = layer.projection_builds
 	assert(battle.saver.apply_snapshot(snapshot))
 	battle.resource_revision=int(old_key[2]); battle.nav.geometry_revision=int(old_key[3])
-	var key: Array = reader.resource_layer_key(viewport)
+	var key: Array = reader.queries.resource_layer_key(viewport)
 	assert(key.slice(2)==old_key.slice(2) and key[0]!=old_key[0] and key[1]!=old_key[1])
 	layer.update_visible(viewport)
 	assert(layer.projection_builds==builds+1 and not is_same(layer.projection,retained))

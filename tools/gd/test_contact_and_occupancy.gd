@@ -21,10 +21,10 @@ func make(uid: int, owner: int, kind: int, cell: Vector2i) -> Dictionary:
 	var point: Vector2=sim.nav.anchor_of(cell.x,cell.y);unit.ax=point.x;unit.ay=point.y;unit.A=cell.x;unit.B=cell.y
 	return unit
 func install(units: Array) -> void:
-	sim.units=units;sim.commands.world._rebuild_unit_index();sim.visibility.update(units,3)
+	sim.units=units;sim.world.spatial_index._rebuild_unit_index();sim.visibility.update(units,3)
 func fight(a: Dictionary, b: Dictionary, ticks: int=8) -> void:
 	a.state="attack";a.target=b
-	for i in range(ticks):sim.projectiles.step();sim.commands.orders._step_unit_inner(a,sim.SIM_DT)
+	for i in range(ticks):sim.projectiles.step();sim.world.unit_actions._step_unit_inner(a,sim.SIM_DT)
 func run() -> void:
 	root.get_node("Game").current_map="chibic1"
 	var scene=load("res://main.tscn").instantiate();root.add_child(scene);scene.set_process(false)
@@ -41,9 +41,9 @@ func run() -> void:
 	blank();var a:=make(1,3,32,Vector2i(10,10));var b:=make(2,2,32,Vector2i(10,14))
 	var cells: Array=sim.nav.building_footprint(1,sim.nav.anchor_of(11,13),144)
 	sim.nav.occupy(cells,1);install([a,b])
-	assert(not sim._modules.combat._melee_line_clear(a,b),"Building fixture must obstruct the initial ray")
+	assert(not sim.world.combat._melee_line_clear(a,b),"Building fixture must obstruct the initial ray")
 	for i in range(8):
-		var blocked: bool=not sim._modules.combat._melee_line_clear(a,b);var hp: float=b.hp
+		var blocked: bool=not sim.world.combat._melee_line_clear(a,b);var hp: float=b.hp
 		fight(a,b,1)
 		if blocked:assert(b.hp==hp,"A melee strike cannot cross the building; walking around it remains legal")
 	sim.nav.occupy(cells,-1);fight(a,b,16);assert(b.hp<1000.)
@@ -60,20 +60,20 @@ func occupancy() -> void:
 	install([leader,worker,passenger,ship]);sim.selected=[leader];sim.build_types=[{"unit":11}]
 	sim.gold=100000.;sim.food=100000.;sim.wood=100000.;sim.stone=100000.
 	var site_point: Vector2=sim.nav.anchor_of(20,20)
-	assert(not sim.commands.economy.build_placement_at(site_point,{"unit":11}).valid)
-	assert(sim.commands.orders._attach_to_ship(passenger,ship),"Actual boarding transition")
-	assert(sim.commands.world._cell_unit(Vector2i(20,20),-1,0).is_empty())
-	assert(sim.commands.economy.build_placement_at(site_point,{"unit":11}).valid)
-	var site: Dictionary=sim.commands.economy._place_building(3,11,site_point,true,[],true)
+	assert(not sim.world.construction_orders.build_placement_at(site_point,{"unit":11}).valid)
+	assert(sim.world.transport_orders._attach_to_ship(passenger,ship),"Actual boarding transition")
+	assert(sim.world.spatial_index._cell_unit(Vector2i(20,20),-1,0).is_empty())
+	assert(sim.world.construction_orders.build_placement_at(site_point,{"unit":11}).valid)
+	var site: Dictionary=sim.world.construction_orders._place_building(3,11,site_point,true,[],true)
 	assert(not site.is_empty(),"Commit uses the same occupancy query as preview")
-	assert(sim.commands.orders._order_unload(ship)==1)
-	for tick in range(4):sim.commands.orders._step_unit(ship,sim.SIM_DT)
+	assert(sim.world.transport_orders._order_unload(ship)==1)
+	for tick in range(4):sim.world.unit_actions._step_unit(ship,sim.SIM_DT)
 	assert(not passenger.attached)
 	var landed: Vector2i=sim.nav.cell_of_px(passenger.ax,passenger.ay)
-	assert(sim.commands.world._cell_unit(landed,-1,0).uid==passenger.uid)
-	sim.commands.military._kill(passenger)
-	assert(sim.commands.world._cell_unit(landed,-1,0).is_empty())
+	assert(sim.world.spatial_index._cell_unit(landed,-1,0).uid==passenger.uid)
+	sim.world.combat._kill(passenger)
+	assert(sim.world.spatial_index._cell_unit(landed,-1,0).is_empty())
 	worker.state="build";worker.build_target=site;sim.construction.enter(worker,site)
-	assert(not sim.commands.world._index_eligible(worker))
-	assert(sim.construction.leave(worker) and sim.commands.world._index_eligible(worker))
+	assert(not sim.world.spatial_index._index_eligible(worker))
+	assert(sim.construction.leave(worker) and sim.world.spatial_index._index_eligible(worker))
 	print("OCCUPANCY PASS boarded unit absent / preview=commit / disembark reindexes / death removes / site enter-leave contract")

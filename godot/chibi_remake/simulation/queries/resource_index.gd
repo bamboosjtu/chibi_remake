@@ -9,19 +9,19 @@ var _hits: Dictionary = {}
 var _hits_ready := false
 var metrics := {"patchBuilds":0,"patchHits":0,"hitBuilds":0,"hitCandidates":0}
 
-func _ensure(data: RefCounted) -> void:
-	var key := [data.nav.get_instance_id(), data.nav.state.geometry_revision, data.resource_revision]
+func _ensure(data: RefCounted, nav: RefCounted) -> void:
+	var key := [nav.get_instance_id(), nav.state.geometry_revision, data.resource_revision]
 	if key == _key: return
 	_key = key
 	_patches.clear()
 	_hits.clear()
 	_hits_ready = false
 
-func patch(data: RefCounted, target: Dictionary) -> Dictionary:
-	_ensure(data)
+func patch(data: RefCounted, nav: RefCounted, target: Dictionary) -> Dictionary:
+	_ensure(data, nav)
 	var kind: String = YIELDS.get(int(target.get("unit", -1)), "")
 	if not target.get("decor", false) or kind not in ["food", "wood"]: return {}
-	var start: Vector2i = data.nav.cell_of_px(float(target.ax), float(target.ay))
+	var start: Vector2i = nav.cell_of_px(float(target.ax), float(target.ay))
 	var root := Vector3i(start.x, start.y, 0 if kind == "wood" else 1)
 	if _patches.has(root):
 		metrics.patchHits += 1
@@ -71,8 +71,8 @@ func describe(cells: Array) -> Dictionary:
 	result.make_read_only()
 	return result
 
-func hit_candidates(data: RefCounted, point: Vector2) -> Array:
-	_ensure(data)
+func hit_candidates(data: RefCounted, nav: RefCounted, point: Vector2) -> Array:
+	_ensure(data, nav)
 	if not _hits_ready:
 		for index in range(data.decor_targets.size()):
 			var source: Dictionary = data.decor_targets[index]

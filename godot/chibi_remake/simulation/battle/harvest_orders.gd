@@ -1,11 +1,18 @@
-extends RefCounted
+extends Object
+const NavRuntime = preload("res://simulation/navigation/nav.gd")
+var _nav: NavRuntime
+const EffectsRuntime = preload("res://simulation/battle_effects.gd")
+var _effects: EffectsRuntime
+var _economy: RefCounted
 const Balance = preload("res://simulation/definitions/balance_rules.gd")
 ## harvest orders: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
-const REQUIRED_SERVICES := {"battle_simulation": ["_feedback"], "command_groups": ["_cancel_unit_command"], "interaction_paths": ["_edge_interaction_choice", "_reachable_resource_for", "_resource_patch_cells", "_resource_patch_interaction_choice"], "spatial_index": ["_unit_cell"], "technology": ["_is_worker_unit"]}
 var battle: State
-var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
+var _dep_command_groups: Object
+var _dep_interaction_paths: Object
+var _dep_spatial_index: Object
+var _dep_technology: Object
 var resource_index := preload("res://simulation/queries/resource_index.gd").new()
 
 func _init(data: State) -> void:
@@ -36,7 +43,7 @@ func _build_decor_targets() -> void:
 		}
 		battle.decor_targets.append(obj)
 		battle.decor_cells["%d_%d" % [a, b]] = obj
-	battle.nav.set_resources(battle.decor_targets)
+	_nav.set_resources(battle.decor_targets)
 
 func _nearest_resource(pos: Vector2) -> Dictionary:
 	var best: Dictionary = {}
@@ -73,8 +80,6 @@ func _nearest_deposit(owner: int, pos: Vector2) -> Dictionary:
 func _selected_workers(actors = null, owner := -1) -> Array:
 	var selected: Array = battle.selected if actors == null else actors
 	if owner < 0: owner = battle.player_owner
-	var services := ports.acquire(["technology"])
-	if services.is_empty(): return []
 	var result: Array = []
 	var leaders := {}
 	for u in selected:
@@ -83,31 +88,27 @@ func _selected_workers(actors = null, owner := -1) -> Array:
 		if oi >= 0: leaders[oi] = true
 	for u in battle.units:
 		if not u.alive or u.die_t >= 0.0 or u.is_building or u.owner != owner or bool(u.get("attached", false)): continue
-		if services.technology._is_worker_unit(u) and (u in selected or leaders.has(int(u.get("group_officer", -1)))):
+		if _dep_technology._is_worker_unit(u) and (u in selected or leaders.has(int(u.get("group_officer", -1)))):
 			result.append(u)
 	return result
 
 func _order_gather_nearest() -> int:
-	var services := ports.acquire(["technology", "interaction_paths", "battle_simulation"])
-	if services.is_empty(): return 0
 	var count := 0
 	var reserved := {}
 	for worker in _selected_workers():
-		if worker.alive and worker.die_t < 0.0 and services.technology._is_worker_unit(worker):
-			var candidate: Dictionary = services.interaction_paths._reachable_resource_for(worker, reserved)
+		if worker.alive and worker.die_t < 0.0 and _dep_technology._is_worker_unit(worker):
+			var candidate: Dictionary = _dep_interaction_paths._reachable_resource_for(worker, reserved)
 			if not candidate.is_empty():
 				var path: Array = candidate.path
 				if not path.is_empty():
-					reserved[battle.nav.cell_of_px(path[path.size() - 1].x, path[path.size() - 1].y)] = true
+					reserved[_nav.cell_of_px(path[path.size() - 1].x, path[path.size() - 1].y)] = true
 				_begin_gather(worker, candidate.object, path)
 				count += 1
-	services.battle_simulation._feedback("已派出 %d 名工人采集" % count if count > 0 else "没有可达的资源点")
+	_effects.feedback("已派出 %d 名工人采集" % count if count > 0 else "没有可达的资源点")
 	return count
 
 func _begin_gather(worker: Dictionary, obj: Dictionary, path: Array) -> void:
-	var services := ports.acquire(["command_groups"])
-	if services.is_empty(): return
-	services.command_groups._cancel_unit_command(worker)
+	_dep_command_groups._cancel_unit_command(worker)
 	worker.state = "deliver" if float(worker.carry) > 0.0 else "gather"
 	worker.gather_obj = obj
 	worker.hold = false
@@ -119,18 +120,16 @@ func _begin_gather(worker: Dictionary, obj: Dictionary, path: Array) -> void:
 
 func _order_gather(target_obj: Dictionary, actors = null, owner := -1) -> int:
 	if owner < 0: owner = battle.player_owner
-	var services := ports.acquire(["battle_simulation", "technology", "interaction_paths"])
-	if services.is_empty(): return 0
 	if not target_obj.get("alive", false) or _yield_of(int(target_obj.get("unit", -1))) == "": return 0
 	if int(target_obj.unit) in [10,11] and int(target_obj.owner) == owner:
-		services.battle_simulation._feedback("己方粮仓是交付点")
+		_effects.feedback("己方粮仓是交付点")
 		return 0
 	var count := 0
 	var reserved := {}
 	var assigned := {}
 	for worker in _selected_workers(actors, owner):
-		if not worker.alive or worker.die_t >= 0.0 or not services.technology._is_worker_unit(worker): continue
-		var choice: Dictionary = services.interaction_paths._edge_interaction_choice(worker, target_obj, reserved)
+		if not worker.alive or worker.die_t >= 0.0 or not _dep_technology._is_worker_unit(worker): continue
+		var choice: Dictionary = _dep_interaction_paths._edge_interaction_choice(worker, target_obj, reserved)
 		if choice.is_empty():
 			# Explicitly clicking a dense field orders its reachable edge, even when
 			# the crew is still far away. Automatic retargeting keeps its vision limit.
@@ -142,18 +141,16 @@ func _order_gather(target_obj: Dictionary, actors = null, owner := -1) -> int:
 		var obj: Dictionary = choice.object
 		var path: Array = choice.path
 		assigned[int(obj.get("uid", 0))] = true
-		reserved[battle.nav.cell_of_px(path[path.size() - 1].x, path[path.size() - 1].y)] = true
+		reserved[_nav.cell_of_px(path[path.size() - 1].x, path[path.size() - 1].y)] = true
 		_begin_gather(worker, obj, path)
 		count += 1
-	services.battle_simulation._feedback("已派出 %d 名工人采集" % count if count > 0 else "无法到达该资源点")
+	_effects.feedback("已派出 %d 名工人采集" % count if count > 0 else "无法到达该资源点")
 	return count
 
 func _clicked_harvest_patch(target: Dictionary, worker: Dictionary, reserved: Dictionary) -> Dictionary:
-	var services := ports.acquire(["spatial_index", "interaction_paths"])
-	if services.is_empty(): return {}
 	if not bool(target.get("decor", false)): return {}
 	var kind := _yield_of(int(target.unit))
-	var start := battle.nav.cell_of_px(float(target.ax), float(target.ay))
+	var start := _nav.cell_of_px(float(target.ax), float(target.ay))
 	var queue: Array = [start]
 	var seen := {start:true}
 	var candidates: Array = []
@@ -171,17 +168,15 @@ func _clicked_harvest_patch(target: Dictionary, worker: Dictionary, reserved: Di
 	candidates.sort_custom(func(a,b): return click.distance_squared_to(Vector2(a.ax,a.ay)) < click.distance_squared_to(Vector2(b.ax,b.ay)))
 	var checked_patches := {}
 	for candidate in candidates:
-		var cell: Vector2i = services.spatial_index._unit_cell(candidate)
+		var cell: Vector2i = _dep_spatial_index._unit_cell(candidate)
 		if checked_patches.has(cell):continue
-		var cells: Array = services.interaction_paths._resource_patch_cells(candidate)
+		var cells: Array = _dep_interaction_paths._resource_patch_cells(candidate)
 		for member_cell in cells:checked_patches[member_cell]=true
-		var choice: Dictionary = services.interaction_paths._resource_patch_interaction_choice(worker,candidate,reserved,cells)
+		var choice: Dictionary = _dep_interaction_paths._resource_patch_interaction_choice(worker,candidate,reserved,cells)
 		if not choice.is_empty(): return choice
 	return {}
 
 func _nearest_harvest_by_path(worker: Dictionary, kind: String, reserved: Dictionary = {}, exclude: Array = []) -> Dictionary:
-	var services := ports.acquire(["spatial_index", "interaction_paths"])
-	if services.is_empty(): return {}
 	var radius := maxf(0.0, preload("res://simulation/systems/battle_visibility.gd").effective_vision(worker)) * float(battle.tile_w)
 	var here := Vector2(float(worker.ax), float(worker.ay))
 	var candidates: Array = []
@@ -204,8 +199,8 @@ func _nearest_harvest_by_path(worker: Dictionary, kind: String, reserved: Dictio
 		if here.distance_to(Vector2(float(target.ax), float(target.ay))) > radius: continue
 		candidates.append(target)
 	candidates.sort_custom(func(a, b):
-		var ca := battle.nav.cell_of_px(float(a.ax), float(a.ay))
-		var cb := battle.nav.cell_of_px(float(b.ax), float(b.ay))
+		var ca := _nav.cell_of_px(float(a.ax), float(a.ay))
+		var cb := _nav.cell_of_px(float(b.ax), float(b.ay))
 		if ca.y != cb.y: return ca.y < cb.y
 		return ca.x < cb.x)
 	var best: Dictionary = {}
@@ -214,14 +209,14 @@ func _nearest_harvest_by_path(worker: Dictionary, kind: String, reserved: Dictio
 	for target in candidates:
 		var choice: Dictionary
 		if bool(target.get("decor",false)):
-			var cell: Vector2i = services.spatial_index._unit_cell(target)
+			var cell: Vector2i = _dep_spatial_index._unit_cell(target)
 			if checked_patches.has(cell):continue
 			# Every source in one connected field resolves the same border query.
 			# Search it once, retaining the original candidate order and path costs.
-			var cells: Array = services.interaction_paths._resource_patch_cells(target)
+			var cells: Array = _dep_interaction_paths._resource_patch_cells(target)
 			for member_cell in cells:checked_patches[member_cell]=true
-			choice=services.interaction_paths._resource_patch_interaction_choice(worker,target,reserved,cells)
-		else:choice=services.interaction_paths._edge_interaction_choice(worker,target,reserved)
+			choice=_dep_interaction_paths._resource_patch_interaction_choice(worker,target,reserved,cells)
+		else:choice=_dep_interaction_paths._edge_interaction_choice(worker,target,reserved)
 		if choice.is_empty(): continue
 		var length := _path_travel_length(worker, choice.path)
 		if length < best_length:          # 严格小于 → 同距保留先 y 后 x 的稳定顺序
@@ -268,22 +263,20 @@ func _food_capacity(owner: int) -> float:
 	return float(n) * 10000.0
 
 func _deposit_carry(u: Dictionary) -> bool:
-	return battle.economy.deposit(u)
+	return _economy.deposit(u)
 
 func _remove_decor(obj: Dictionary) -> void:
-	var services := ports.acquire(["spatial_index"])
-	if services.is_empty(): return
 	obj["alive"] = false
 	obj["stock"] = 0.0
 	obj["phase"] = mini(5, int(obj.phase) | 1)
-	battle.nav.clear_resource(services.spatial_index._unit_cell(obj))
+	_nav.clear_resource(_dep_spatial_index._unit_cell(obj))
 	battle.resource_revision += 1
 
 func _resource_at(pos: Vector2) -> Dictionary:
 	# 饰物（树/粮）：44×60 精灵矩形判定（点树冠也算，比格中心宽容）。
 	var best_dec: Dictionary = {}
 	var bd_dec := INF
-	for index in resource_index.hit_candidates(battle, pos):
+	for index in resource_index.hit_candidates(battle, _nav, pos):
 		var o: Dictionary = battle.decor_targets[index]
 		if not o.alive or _yield_of(int(o.unit)) == "": continue
 		var ddx := float(o.ax)
@@ -305,3 +298,12 @@ func _resource_at(pos: Vector2) -> Dictionary:
 		if absf(pos.x - cx) <= float(u.w) * 0.5 + 6.0 and absf(pos.y - cy) <= float(u.h) * 0.5 + 6.0:
 			return u
 	return {}
+
+func bind_dependencies(world: Object) -> void:
+	_dep_command_groups = world.command_groups
+	_dep_interaction_paths = world.interaction_paths
+	_dep_spatial_index = world.spatial_index
+	_dep_technology = world.technology
+	_economy = world.economy
+	_effects = world.effects
+	_nav = world.nav

@@ -1,4 +1,4 @@
-extends RefCounted
+extends Object
 ## research/meta: exact lowercase character matcher and battle-only hotkeys.
 const State = preload("res://simulation/battle_state.gd")
 const Services = preload("res://app/battle_scene_state.gd")
@@ -9,7 +9,8 @@ var battle: State:
 	get: return node.state
 var scene: Services
 var node: Node2D
-var ports = preload("res://app/battle/ports/cheat_controller_dependencies.gd").new()
+var _dep_cheat_rules: Object
+var _dep_scene_controller: Object
 var text := ""
 var matched := 0
 var console: CanvasLayer
@@ -30,7 +31,7 @@ func handle_cheat_input(event: InputEvent) -> bool:
 			_set_cheat_input(true)
 			return true
 		KEY_F11:
-			ports.screenshot()
+			_dep_scene_controller._screenshot()
 			return true
 		KEY_P:
 			_cheat_camera_enemy()
@@ -39,8 +40,8 @@ func handle_cheat_input(event: InputEvent) -> bool:
 			if battle.cheats_enabled: _cheat_level(-1 if event.keycode == KEY_BRACKETLEFT else 1)
 			return battle.cheats_enabled
 	if event.keycode >= KEY_F2 and event.keycode <= KEY_F10:
-		var message := ports.action(str(CHEAT_ACTIONS.get(event.keycode, "")))
-		if message != "": ports.feedback(message)
+		var message = _dep_cheat_rules._cheat_action(str(CHEAT_ACTIONS.get(event.keycode, "")))
+		if message != "": node.world.effects.feedback(message)
 		if scene.view != null:
 			scene.view.update_panel()
 			if event.keycode == KEY_F8:
@@ -75,7 +76,7 @@ func _cheat_type(event: InputEventKey) -> void:
 		matched = matched + 1 if matched < 7 and character == "eternal"[matched] else 0
 		if matched == 5:
 			battle.cheats_enabled = not battle.cheats_enabled
-			ports.feedback("秘籍已开启" if battle.cheats_enabled else "秘籍已关闭")
+			node.world.effects.feedback("秘籍已开启" if battle.cheats_enabled else "秘籍已关闭")
 	if is_instance_valid(console): console.update_input(text)
 
 func _cheat_camera_enemy() -> void:
@@ -86,7 +87,7 @@ func _cheat_camera_enemy() -> void:
 		scene.cam.position = Vector2(unit.ax, unit.ay)
 		if scene.view != null: scene.view.clamp_camera()
 		return
-	ports.feedback("当前战场没有敌军")
+	node.world.effects.feedback("当前战场没有敌军")
 
 func _cheat_level(direction: int) -> void:
 	var game := node.get_node("/root/Game")
@@ -94,7 +95,7 @@ func _cheat_level(direction: int) -> void:
 	var levels: Array = catalog.get("levels", [])
 	var target := _cheat_adjacent_level(levels, battle.map_id, direction)
 	if target == "":
-		ports.feedback("当前战役没有%s关" % ("上一" if direction < 0 else "下一"))
+		node.world.effects.feedback("当前战役没有%s关" % ("上一" if direction < 0 else "下一"))
 		return
 	game.change_battle.call_deferred(target)
 
@@ -104,3 +105,7 @@ func _cheat_adjacent_level(levels: Array, current: String, direction: int) -> St
 		var next := i + direction
 		if next >= 0 and next < levels.size() and str(levels[i].campaign) == str(levels[next].campaign): return str(levels[next].map)
 	return ""
+
+func bind_dependencies(scene_root: Object) -> void:
+	_dep_cheat_rules = scene_root.world.cheat_rules
+	_dep_scene_controller = scene_root.scene_controller

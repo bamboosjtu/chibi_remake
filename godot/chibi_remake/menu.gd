@@ -40,7 +40,12 @@ const ARROW_STEP := 135                 # ▲▼ 一次滚 3 行
 # ── 调色板（原版是暗石头 + 木 + 金，这里全部按截图取近似色）──
 
 var _ui = preload("res://presentation/menu/menu_state.gd").new()
-var _components: Dictionary = {}
+var controller: Object
+var menu_styles: Object
+var campaign_dialog: Object
+var level_dialog: Object
+var automation_driver: Object
+var _disposed := false
 var _fields: Dictionary = {}
 var _api_missing: Array = []
 var media_view: CanvasLayer:
@@ -118,12 +123,18 @@ var sb_gold_focus: StyleBoxFlat:
 
 func _init() -> void:
 	for field in _ui.PROXY_FIELDS: _fields[field] = true
-	_components["automation_driver"] = preload("res://presentation/menu/automation_driver.gd").new(_ui, self)
-	_components["controller"] = preload("res://presentation/menu/controller.gd").new(_ui, self)
-	_components["menu_styles"] = preload("res://presentation/menu/menu_styles.gd").new(_ui, self)
-	_components["campaign_dialog"] = preload("res://presentation/menu/campaign_dialog.gd").new(_ui, self)
-	_components["level_dialog"] = preload("res://presentation/menu/level_dialog.gd").new(_ui, self)
-	var report := preload("res://composition_contract.gd").wire(_components, "menu")
+	var probe := Array(OS.get_cmdline_user_args()).any(func(arg: String):
+		return arg in ["--levels", "--screenshot", "--keytest", "--mousetest", "--mouseclick"] or arg.begins_with("--mouseclick="))
+	if probe:
+		automation_driver = load("res://app/automation/menu_driver.gd").new(_ui, self)
+	controller = preload("res://presentation/menu/controller.gd").new(_ui, self)
+	menu_styles = preload("res://presentation/menu/menu_styles.gd").new(_ui, self)
+	campaign_dialog = preload("res://presentation/menu/campaign_dialog.gd").new(_ui, self)
+	level_dialog = preload("res://presentation/menu/level_dialog.gd").new(_ui, self)
+	var components := _owned_components()
+	for component in components.values():
+		if component != null and component.has_method("bind_dependencies"): component.bind_dependencies(self)
+	var report := preload("res://composition_contract.gd").wire(components, "menu")
 	_api_missing = report.missing
 
 func _get(key: StringName):
@@ -139,16 +150,6 @@ func _set(key: StringName, value) -> bool:
 func contract_abort() -> bool:
 	return preload("res://composition_contract.gd").abort_if_broken("menu", _api_missing)
 
-func _flat(bg: Color, border: Color, width: int, radius: int) -> StyleBoxFlat:
-	return _components["menu_styles"]._flat(bg, border, width, radius)
-func _bevel(bg: Color, rim: Color, dark: Color, rim_px: int, drop: int, radius: int, pad: Vector4) -> StyleBoxFlat:
-	return _components["menu_styles"]._bevel(bg, rim, dark, rim_px, drop, radius, pad)
-func _highlight(bg: Color, rim: Color, pad: Vector4) -> StyleBoxFlat:
-	return _components["menu_styles"]._highlight(bg, rim, pad)
-func _sunk(bg: Color, rim: Color, rim_px: int, radius: int, pad: Vector4) -> StyleBoxFlat:
-	return _components["menu_styles"]._sunk(bg, rim, rim_px, radius, pad)
-func _build_styles() -> void:
-	_components["menu_styles"]._build_styles()
 func _ready() -> void:
 	if Game.acceptance_enabled and "--full-battle-bench" in OS.get_cmdline_user_args():
 		get_tree().root.add_child.call_deferred(load("res://testing/full_battle_benchmark.gd").new())
@@ -156,116 +157,30 @@ func _ready() -> void:
 	# An ambiguous composition dispatches calls to the wrong component; never
 	# build the menu on top of that. Contract rejection also runs in exported builds.
 	if contract_abort(): return
-	await _components["controller"]._ready()
+	await controller._ready()
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_PREDELETE and not _disposed: _dispose_components()
 	if what != Node.NOTIFICATION_WM_CLOSE_REQUEST: return
-	_components["controller"]._notification(what)
-func _build_level_dialog() -> void:
-	_components["level_dialog"]._build_level_dialog()
-func _make_arrow_button(glyph: String, delta: int) -> Button:
-	return _components["level_dialog"]._make_arrow_button(glyph, delta)
-func _make_level_row(d: Dictionary, chapter: int, alt: bool) -> Button:
-	return _components["level_dialog"]._make_level_row(d, chapter, alt)
-func _level_key(id: String) -> Array:
-	return _components["level_dialog"]._level_key(id)
-func _is_digit(ch: String) -> bool:
-	return _components["level_dialog"]._is_digit(ch)
-func _level_before(a: Dictionary, b: Dictionary) -> bool:
-	return _components["level_dialog"]._level_before(a, b)
-func _fill_level_list() -> void:
-	_components["level_dialog"]._fill_level_list()
-func _add_rows(arr: Array) -> void:
-	_components["level_dialog"]._add_rows(arr)
-func _campaign_title_text() -> String:
-	return _components["level_dialog"]._campaign_title_text()
-func _first_row() -> Button:
-	return _components["level_dialog"]._first_row()
-func _scroll_by(delta: int) -> void:
-	_components["level_dialog"]._scroll_by(delta)
-func _scroll_to(pos: int) -> void:
-	_components["level_dialog"]._scroll_to(pos)
-func _focus_row(n: int) -> void:
-	_components["level_dialog"]._focus_row(n)
-func _report_scroll_state() -> void:
-	_components["automation_driver"]._report_scroll_state()
-func _report_level_dialog() -> void:
-	_components["automation_driver"]._report_level_dialog()
-func _arrow_wiring(glyph: String) -> String:
-	return _components["level_dialog"]._arrow_wiring(glyph)
+	controller._notification(what)
 func _unhandled_key_input(event: InputEvent) -> void:
-	_components["controller"]._unhandled_key_input(event)
-func _show_toast(msg: String) -> void:
-	await _components["controller"]._show_toast(msg)
-func _hide_toast() -> void:
-	_components["controller"]._hide_toast()
-func _on_start() -> void:
-	_components["controller"]._on_start()
-func _on_campaign_confirm() -> void:
-	_components["controller"]._on_campaign_confirm()
-func _on_back() -> void:
-	_components["controller"]._on_back()
-func _on_skirmish() -> void:
-	_components["controller"]._on_skirmish()
-func _on_history() -> void:
-	_components["controller"]._on_history()
-func _on_level(id: String) -> void:
-	_components["controller"]._on_level(id)
-func _on_load() -> void:
-	_components["controller"]._on_load()
-func _load_slot(slot: int, _title: String) -> void:
-	_components["controller"]._load_slot(slot, _title)
-func _campaign_alias(s: String) -> String:
-	return _components["campaign_dialog"]._campaign_alias(s)
-func _wood_frame(sel: bool, pad: int) -> StyleBoxFlat:
-	return _components["menu_styles"]._wood_frame(sel, pad)
-func _wood_plate() -> StyleBoxFlat:
-	return _components["menu_styles"]._wood_plate()
-func _gold_button(text: String, w: float, h: float, fs: int, cb: Callable) -> Button:
-	return _components["menu_styles"]._gold_button(text, w, h, fs, cb)
-func _load_portrait(camp: String) -> Texture2D:
-	return _components["campaign_dialog"]._load_portrait(camp)
-func _make_faction_slot(camp: String) -> Control:
-	return _components["campaign_dialog"]._make_faction_slot(camp)
-func _on_slot_input(event: InputEvent, camp: String) -> void:
-	_components["campaign_dialog"]._on_slot_input(event, camp)
-func _set_campaign(camp: String, refresh: bool) -> void:
-	_components["campaign_dialog"]._set_campaign(camp, refresh)
-func _move_campaign(d: int) -> void:
-	_components["campaign_dialog"]._move_campaign(d)
-func _refresh_campaign_cursor() -> void:
-	_components["campaign_dialog"]._refresh_campaign_cursor()
-func _build_campaign_dialog() -> void:
-	_components["campaign_dialog"]._build_campaign_dialog()
-func _set_title_visible(v: bool) -> void:
-	_components["campaign_dialog"]._set_title_visible(v)
-func _release_focus() -> void:
-	_components["campaign_dialog"]._release_focus()
-func _portrait_status(camp: String) -> String:
-	return _components["campaign_dialog"]._portrait_status(camp)
-func _report_campaign_dialog() -> void:
-	_components["automation_driver"]._report_campaign_dialog()
-func _count_rows() -> int:
-	return _components["automation_driver"]._count_rows()
-func _push_key(code: int) -> void:
-	await _components["automation_driver"]._push_key(code)
-func _run_keytest() -> void:
-	await _components["automation_driver"]._run_keytest()
-func _mouse_click_point_for(target: String) -> Dictionary:
-	return _components["automation_driver"]._mouse_click_point_for(target)
-func _find_gold_button(text: String) -> Button:
-	return _components["automation_driver"]._find_gold_button(text)
-func _push_mouse_click(point: Vector2) -> void:
-	await _components["automation_driver"]._push_mouse_click(point)
-func _run_mouse_matrix() -> void:
-	await _components["automation_driver"]._run_mouse_matrix()
-func _mouse_click_slot(idx: int) -> void:
-	await _components["automation_driver"]._mouse_click_slot(idx)
-func _run_mouse_click(target: String) -> void:
-	await _components["automation_driver"]._run_mouse_click(target)
+	controller._unhandled_key_input(event)
 
-func _exit_tree() -> void:
-	for component in _components.values(): component.ports.disconnect_services()
-	_components.clear()
+func _dispose_components() -> void:
+	if _disposed: return
+	_disposed = true
+	for component in _owned_components().values():
+		if is_instance_valid(component): component.free()
 	for property in _ui.get_property_list():
 		var value = _ui.get(property.name)
 		if value is Array or value is Dictionary: value.clear()
+
+
+func _owned_components() -> Dictionary:
+	var components := {
+		"controller": controller,
+		"menu_styles": menu_styles,
+		"campaign_dialog": campaign_dialog,
+		"level_dialog": level_dialog,
+	}
+	if automation_driver != null: components["automation_driver"] = automation_driver
+	return components

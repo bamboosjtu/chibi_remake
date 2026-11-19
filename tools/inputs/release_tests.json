@@ -119,9 +119,6 @@
       "markers": [
         "CURRENT FORMAT PASS"
       ],
-      "args": [
-        "--noview"
-      ],
       "timeout": 240
     },
     {

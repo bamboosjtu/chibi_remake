@@ -1,9 +1,10 @@
-extends RefCounted
+extends Object
 ## level dialog: presentation component.
 const UIState = preload("res://presentation/menu/menu_state.gd")
 var _ui: UIState
 var surface: Control
-var ports = preload("res://presentation/menu/ports/level_dialog_dependencies.gd").new()
+var _dep_controller: Object
+var _dep_menu_styles: Object
 const CAMPAIGN_TITLE := {"chibic": "曹操线", "chibil": "刘备线"}
 
 const ROW_H := 42                       # 木条行高
@@ -146,9 +147,9 @@ func _build_level_dialog() -> void:
 		track.content_margin_top = 0
 		track.content_margin_bottom = 0
 		bar.add_theme_stylebox_override("scroll", track)
-		bar.add_theme_stylebox_override("grabber", ports._flat(Color("8d7a4e"), Color("c9b273"), 1, 2))
-		bar.add_theme_stylebox_override("grabber_highlight", ports._flat(Color("b39a5f"), Color("e0c98a"), 1, 2))
-		bar.add_theme_stylebox_override("grabber_pressed", ports._flat(Color("6f6039"), Color("a08a4e"), 1, 2))
+		bar.add_theme_stylebox_override("grabber", _dep_menu_styles._flat(Color("8d7a4e"), Color("c9b273"), 1, 2))
+		bar.add_theme_stylebox_override("grabber_highlight", _dep_menu_styles._flat(Color("b39a5f"), Color("e0c98a"), 1, 2))
+		bar.add_theme_stylebox_override("grabber_pressed", _dep_menu_styles._flat(Color("6f6039"), Color("a08a4e"), 1, 2))
 
 	# ── 底栏：金色凸起「返回」 ──
 	var foot := HBoxContainer.new()
@@ -168,7 +169,7 @@ func _build_level_dialog() -> void:
 	_ui.level_back.add_theme_stylebox_override("hover", _ui.sb_gold_hover)
 	_ui.level_back.add_theme_stylebox_override("pressed", _ui.sb_gold_press)
 	_ui.level_back.add_theme_stylebox_override("focus", _ui.sb_gold_focus)
-	_ui.level_back.pressed.connect(ports._on_back)
+	_ui.level_back.pressed.connect(_dep_controller._on_back)
 	foot.add_child(_ui.level_back)
 
 func _make_arrow_button(glyph: String, delta: int) -> Button:
@@ -205,7 +206,7 @@ func _make_level_row(d: Dictionary, chapter: int, alt: bool) -> Button:
 	b.add_theme_stylebox_override("hover", _ui.sb_row_hover)
 	b.add_theme_stylebox_override("pressed", _ui.sb_row_press)
 	b.add_theme_stylebox_override("focus", _ui.sb_row_focus)
-	b.pressed.connect(ports._on_level.bind(id))
+	b.pressed.connect(_dep_controller._on_level.bind(id))
 	return b
 
 func _level_key(id: String) -> Array:
@@ -318,3 +319,7 @@ func _arrow_wiring(glyph: String) -> String:
 		var cb: Callable = cn["callable"]
 		desc += "%s%s " % [str(cb.get_method()), str(cb.get_bound_arguments())]
 	return "%s->%s" % [glyph, desc.strip_edges()]
+
+func bind_dependencies(components: Object) -> void:
+	_dep_controller = components.controller
+	_dep_menu_styles = components.menu_styles

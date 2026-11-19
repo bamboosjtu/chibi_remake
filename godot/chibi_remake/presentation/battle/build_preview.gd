@@ -18,12 +18,12 @@ func _process(_delta: float) -> void:
 	update_at(get_global_mouse_position(), host.view.hud_metrics.battle_rect.has_point(get_viewport().get_mouse_position()))
 
 func update_at(world: Vector2, on_battle := true) -> void:
-	var key: Array = host.construction_preview_key(world) if on_battle else []
+	var key: Array = host.queries.construction_preview_key(world) if on_battle else []
 	if key.is_empty():
 		visible = false; signature = []; placement = {}; return
 	if key == signature: return
 	signature = key
-	placement = host.construction_preview_at(world)
+	placement = host.queries.construction_preview_at(world)
 	projection_builds += 1
 	if placement.is_empty(): visible = false; return
 	var bid := int(placement.unit)

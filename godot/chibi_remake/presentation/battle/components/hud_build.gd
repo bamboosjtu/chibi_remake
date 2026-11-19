@@ -1,9 +1,14 @@
-extends RefCounted
+extends Object
 ## hud build: presentation component.
 const UIState = preload("res://presentation/battle/components/battle_view_state.gd")
 var _ui: UIState
 var surface: Node2D
-var ports = preload("res://presentation/battle/components/ports/hud_build_dependencies.gd").new()
+var _dep_command_actions: Object
+var _dep_command_model: Object
+var _dep_controller: Object
+var _dep_hud_input: Object
+var _dep_hud_layout: Object
+var _dep_selection_info: Object
 const Textures = preload("res://presentation/battle/runtime_textures.gd")
 
 func _init(data: UIState, node: Node2D) -> void:
@@ -23,7 +28,7 @@ func _ui_tex(name: String) -> Texture2D:
 func build_ui() -> void:
 	_ui.event_view = load("res://presentation/media/event_view.gd").new(_ui.host)
 	surface.add_child(_ui.event_view)
-	_ui.event_view.media_finished.connect(ports._intro_finished)
+	_ui.event_view.media_finished.connect(_dep_controller._intro_finished)
 	var ui := CanvasLayer.new()
 	_ui.ui_layer = ui
 	surface.add_child(ui)
@@ -64,20 +69,20 @@ func build_ui() -> void:
 	ui.add_child(_ui.end_label)
 
 	# ARCH-011：右面板钉在**右边缘**（_apply_metrics 里也只按右边缘偏移算）
-	ports._apply_metrics()
+	_dep_hud_layout._apply_metrics()
 	print("HUD: 视口=%s UI缩放=%.2f 资源图标=%d/4（0=全部占位）" % [
 		str(surface.get_viewport_rect().size), _ui.ui_scale, _ui._icons_real])
 	# 截图钩子：合成一次真实点击把单位选上，好让截图里命令面板有内容（默认关，见 _hud_select_hook）
 	for a in OS.get_cmdline_user_args():
 		var s: String = str(a)
 		if s == "--hud-select" or s == "--hud-select=mobile":
-			ports._hud_select_hook(false)
+			_dep_hud_input._hud_select_hook(false)
 		elif s == "--hud-select=building":
-			ports._hud_select_hook(true)
+			_dep_hud_input._hud_select_hook(true)
 		elif s.begins_with("--hud-click="):
-			ports._hud_click_hook(int(s.substr(12)), false)
+			_dep_hud_input._hud_click_hook(int(s.substr(12)), false)
 		elif s.begins_with("--hud-hot="):
-			ports._hud_click_hook(int(s.substr(10)), true)     # 左缘 1..10 热键条
+			_dep_hud_input._hud_click_hook(int(s.substr(10)), true)     # 左缘 1..10 热键条
 
 func _mk_panel(parent: Node, bg: Color, border: Color, bw: float) -> Panel:
 	var p := Panel.new()
@@ -175,7 +180,7 @@ func _build_top_bar(ui: CanvasLayer) -> void:
 		var kind: String = str(kinds[i])
 		var slot: Panel = _mk_panel(ui, _ui.c_bar_bg, _ui.c_bar_edge, 1.0)
 		var icon: Control = null
-		var ip: String = ports._res_icon_path(kind)
+		var ip: String = _dep_controller._res_icon_path(kind)
 		if ip != "":
 			var tr := TextureRect.new()
 			tr.texture = load(ip)
@@ -342,7 +347,7 @@ func _build_right_panel(ui: CanvasLayer) -> void:
 	_ui.cmd_view.clear()
 	for i in range(6):
 		var b: Button = _mk_button(ui, 14.0)
-		b.pressed.connect(ports._on_cmd.bind(i))
+		b.pressed.connect(_dep_command_actions._on_cmd.bind(i))
 		b.visible = false
 		_ui.cmd_buttons.append(b)
 		_ui.cmd_actions.append(Callable())
@@ -351,17 +356,17 @@ func _build_right_panel(ui: CanvasLayer) -> void:
 	_ui.back_button = _mk_button(ui, 13.0)
 	_ui.back_button.text = "返回"
 	_ui.back_button.visible = false
-	_ui.back_button.pressed.connect(ports._act_close_officer_pick)
+	_ui.back_button.pressed.connect(_dep_selection_info._act_close_officer_pick)
 	_ui.cmd_prev = _mk_button(ui, 12.0)
 	_ui.cmd_prev.text = "◀ 上页"
 	_ui.cmd_prev.visible = false
-	_ui.cmd_prev.pressed.connect(ports._on_cmd_page.bind(-1))
+	_ui.cmd_prev.pressed.connect(_dep_command_model._on_cmd_page.bind(-1))
 	_ui.cmd_page_label = _mk_label(ui, 11.0, _ui.c_dim, HORIZONTAL_ALIGNMENT_CENTER)
 	_ui.cmd_page_label.visible = false
 	_ui.cmd_next = _mk_button(ui, 12.0)
 	_ui.cmd_next.text = "下页 ▶"
 	_ui.cmd_next.visible = false
-	_ui.cmd_next.pressed.connect(ports._on_cmd_page.bind(1))
+	_ui.cmd_next.pressed.connect(_dep_command_model._on_cmd_page.bind(1))
 	_ui.panel_label = _mk_label(ui, 12.0, _ui.c_dim, HORIZONTAL_ALIGNMENT_LEFT)
 	_ui.panel_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_ui.panel_label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
@@ -397,7 +402,7 @@ func _build_hot_strip(ui: CanvasLayer) -> void:
 	for i in range(10):
 		var b: Button = _mk_button(ui, 12.0)
 		b.text = "10" if i == 9 else str(i + 1)
-		b.pressed.connect(ports._on_hotkey.bind(i))
+		b.pressed.connect(_dep_command_actions._on_hotkey.bind(i))
 		var pip := ColorRect.new()
 		pip.color = _ui.c_no
 		pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -429,5 +434,13 @@ func _build_ornament(ui: CanvasLayer) -> void:
 	_ui.ornament = Control.new()
 	_ui.ornament.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_ui.ornament.tooltip_text = "自绘装饰（原版这张图在 BMP.LWC，res:// 内没有）"
-	_ui.ornament.draw.connect(ports._draw_ornament)
+	_ui.ornament.draw.connect(_dep_hud_layout._draw_ornament)
 	ui.add_child(_ui.ornament)
+
+func bind_dependencies(components: Object) -> void:
+	_dep_command_actions = components.command_actions
+	_dep_command_model = components.command_model
+	_dep_controller = components.controller
+	_dep_hud_input = components.hud_input
+	_dep_hud_layout = components.hud_layout
+	_dep_selection_info = components.selection_info

@@ -1,5 +1,5 @@
 extends RefCounted
-const PROXY_FIELDS := ["host", "_think", "_plan", "_build_clock", "_assault", "_assault_period", "_intercept", "_research_cursor", "_retreat", "_retreat_clock", "_retreat_points", "plan", "slots", "naval"]
+const PROXY_FIELDS := ["ai_economy", "ai_orders", "combat", "command_groups", "player_commands", "state", "technology", "_think", "_plan", "_build_clock", "_assault", "_assault_period", "_intercept", "_research_cursor", "_retreat", "_retreat_clock", "_retreat_points", "plan", "slots", "naval"]
 ## AI counters, plans and training slots.
 const Settings = preload("res://simulation/systems/ai_config.gd")
 const THINK_PERIOD = Settings.THINK_PERIOD
@@ -16,12 +16,17 @@ const HUMAN_GOLD_FOR_ASSAULT = Settings.HUMAN_GOLD_FOR_ASSAULT
 const ARMY_BY_TIER = Settings.ARMY_BY_TIER
 const HUMAN_WEAK_UNITS = Settings.HUMAN_WEAK_UNITS
 const INTERCEPT_RADIUS = Settings.INTERCEPT_RADIUS
-const Access = Settings.Access
 const PLAN_TO_BUILDING = Settings.PLAN_TO_BUILDING
 const PLAN_PAIR = Settings.PLAN_PAIR
 const BUILD_PRIORITY_KINDS = Settings.BUILD_PRIORITY_KINDS
 
-var host: Access
+var ai_economy: Object
+var ai_orders: Object
+var combat: Object
+var command_groups: Object
+var player_commands: RefCounted
+var state: RefCounted
+var technology: Object
 
 var _think := {}                  # owner -> 计数
 

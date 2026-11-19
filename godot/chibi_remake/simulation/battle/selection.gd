@@ -1,24 +1,25 @@
-extends RefCounted
+extends Object
+const VisibilityRuntime = preload("res://simulation/systems/battle_visibility.gd")
+var _visibility: VisibilityRuntime
+const EffectsRuntime = preload("res://simulation/battle_effects.gd")
+var _effects: EffectsRuntime
 ## selection: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
-const REQUIRED_SERVICES := {"harvest_orders": ["_yield_of"]}
 var battle: State
-var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
+var _dep_harvest_orders: Object
 
 func _init(data: State) -> void:
 	battle = data
 
 func _neutral_object_at(pos: Vector2) -> Dictionary:
-	var services := ports.acquire(["harvest_orders"])
-	if services.is_empty(): return {}
 	var best: Dictionary = {}
 	var bd := INF
 	for o in battle.units:
 		if not bool(o.get("alive", false)) or float(o.get("die_t", -1)) >= 0.0 or int(o.get("owner", -1)) != 0:
 			continue
-		if not bool(o.get("is_building", false)) and services.harvest_orders._yield_of(int(o.get("unit", -1))) == "": continue
+		if not bool(o.get("is_building", false)) and _dep_harvest_orders._yield_of(int(o.get("unit", -1))) == "": continue
 		if float(o.get("hp", 0.0)) <= 0.0: continue
-		if not battle.visibility.is_visible(Vector2(o.ax, o.ay)): continue
+		if not _visibility.is_visible(Vector2(o.ax, o.ay)): continue
 		var c := Vector2(float(o.ax), float(o.ay) - float(o.h) * 0.5)
 		if absf(pos.x - c.x) > float(o.w) * 0.5 + 8.0 or absf(pos.y - c.y) > float(o.h) * 0.5 + 8.0: continue
 		var d := pos.distance_to(c)
@@ -53,7 +54,7 @@ func _enemy_at(pos: Vector2) -> Dictionary:
 	for u in battle.units:
 		if not u.alive or u.owner == battle.player_owner or u.owner == 0 or u.die_t >= 0.0 or u.get("attached", false) or int(u.get("site_inside_uid", -1)) >= 0:
 			continue
-		if not battle.visibility.is_visible(Vector2(u.ax, u.ay)): continue
+		if not _visibility.is_visible(Vector2(u.ax, u.ay)): continue
 		var d := pos.distance_to(Vector2(u.ax, u.ay - u.h * 0.5))
 		if (bool(u.is_building) and _building_hit(u,pos)) or (not bool(u.is_building) and d < bd):
 			bd = d
@@ -89,9 +90,9 @@ func _select_click(pos: Vector2, add: bool) -> void:
 		battle.selected.clear()
 	if not u.is_empty() and not (u in battle.selected):
 		battle.selected.append(u)
-	if battle.effects != null:
-		if not u.is_empty(): battle.effects.sound("play_select", [[u]])
-		elif not battle.selected.is_empty(): battle.effects.sound("play_select", [battle.selected])
+	if _effects != null:
+		if not u.is_empty(): _effects.sound("play_select", [[u]])
+		elif not battle.selected.is_empty(): _effects.sound("play_select", [battle.selected])
 
 func _select_box(rect: Rect2, add: bool) -> void:
 	if not add:
@@ -104,17 +105,22 @@ func _select_box(rect: Rect2, add: bool) -> void:
 		if rect.has_point(Vector2(u.ax, u.ay - 8)):
 			if not (u in battle.selected):
 				battle.selected.append(u)
-	if not battle.selected.is_empty() and battle.effects != null:
-		battle.effects.sound("play_select", [battle.selected])
+	if not battle.selected.is_empty() and _effects != null:
+		_effects.sound("play_select", [battle.selected])
 
 func _hover_unit(pos: Vector2) -> Dictionary:
 	var best: Dictionary = {}
 	var bd := 36.0
 	for u in battle.units:
-		if not u.alive or int(u.get("site_inside_uid", -1)) >= 0 or (int(u.owner) != battle.player_owner and not battle.visibility.is_visible(Vector2(u.ax, u.ay))):
+		if not u.alive or int(u.get("site_inside_uid", -1)) >= 0 or (int(u.owner) != battle.player_owner and not _visibility.is_visible(Vector2(u.ax, u.ay))):
 			continue
 		var d := pos.distance_to(Vector2(u.ax, u.ay - u.h * 0.5))
 		if (bool(u.is_building) and _building_hit(u,pos)) or (not bool(u.is_building) and d < bd):
 			bd = d
 			best = u
 	return best
+
+func bind_dependencies(world: Object) -> void:
+	_dep_harvest_orders = world.harvest_orders
+	_effects = world.effects
+	_visibility = world.visibility

@@ -5,7 +5,7 @@ func _initialize() -> void:
 func run() -> void:
 	var game: Node=root.get_node("Game")
 	var battle=load("res://main.tscn").instantiate();root.add_child(battle);battle.set_process(false)
-	var current: Dictionary=game.snapshot(battle.units,battle.commands.world._resources(),battle.saver.save_extra())
+	var current: Dictionary=game.snapshot(battle.units,battle.world.economy.player_resources(),battle.saver.save_extra())
 	assert(int(current.v)==9 and game.is_valid_save(current))
 	assert(not battle.saver.has_method("restore_legacy") and not preload("res://app/saves/rules_identity.gd").new().has_method("approved_migration"))
 	var identity: int=battle.state.get_instance_id()
@@ -24,7 +24,7 @@ func run() -> void:
 		invalid.simulation.erase(field);assert(not battle.saver.apply_snapshot(invalid))
 	var unverified: Dictionary=current.duplicate(true);unverified.erase("checksum")
 	assert(not game.is_valid_save(unverified))
-	assert(battle.commands.world._spawn_unit(32,battle.player_owner,1500,1500,true))
+	assert(battle.world.entity_factory._spawn_unit(32,battle.player_owner,1500,1500,true))
 	assert(battle.saver.apply_snapshot(current))
 	for unit in battle.units: assert(unit.has("stock")==stock_presence[int(unit.uid)],"Optional resource capability must preserve presence")
 	assert(game.save_checksum(battle.saver.continuation_snapshot(game))==before)
@@ -52,12 +52,24 @@ func _verify_head_fixtures(game: Node) -> void:
 		var slot_path: String = game.save_slot_path(slot)
 		if slot == 19: slot_path += ".bak"
 		assert(game.Store.commit(slot_path, text, game.is_valid_save))
-		var result: Dictionary = battle.commands.session.load_slot(slot)
+		if slot == 19 and battle.view != null:
+			var epoch: int = battle.world.get_instance_id()
+			var position: Vector2 = battle.cam.position
+			var zoom: Vector2 = battle.cam.zoom
+			var terrain: Node2D = battle.view.world_layers.terrain
+			var swap: Script = load("res://app/saves/world_transaction.gd")
+			swap.force_view_failure_after_attach = true
+			var rejected: Dictionary = battle.session_actions.load_slot(slot)
+			swap.force_view_failure_after_attach = false
+			assert(not rejected.ok and battle.world.get_instance_id() == epoch)
+			assert(battle.view.world_layers.terrain == terrain and is_instance_valid(terrain))
+			assert(battle.cam.position == position and battle.cam.zoom == zoom)
+		var result: Dictionary = battle.session_actions.load_slot(slot)
 		assert(result.ok and result.cross_map == (slot == 19))
 		assert(result.source == ("backup" if slot == 19 else "primary"))
 		assert(current_scene == battle and battle.map_id == fixture.map and game.current_map == fixture.map)
 		assert(game.save_checksum(battle.saver.continuation_snapshot(game)) == fixture.at31)
-		for tick in range(7): battle.commands.world._sim_step(battle.SIM_DT)
+		for tick in range(7): battle.world.battle_simulation._sim_step(battle.SIM_DT)
 		assert(game.save_checksum(battle.saver.continuation_snapshot(game)) == fixture.at38)
 	battle.free()
 	print("HEAD V9 FIXTURES PASS same map / cross map / backup / seven tick continuation")

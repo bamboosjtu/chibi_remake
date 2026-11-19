@@ -5,8 +5,8 @@ func _initialize() -> void:
 	create_timer(90).timeout.connect(func():quit(1))
 	run.call_deferred()
 func capture(name: String) -> void:
-	for unit in b.units:b.commands.world._update_visual(unit)
-	b.view.update_panel();b.commands.session._view_hud()
+	for unit in b.units:b.world.battle_simulation._update_visual(unit)
+	b.view.update_panel();b.scene_controller._view_hud()
 	await process_frame;await process_frame;await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(output.path_join(name+".png"))
 func run() -> void:
@@ -45,16 +45,16 @@ func run() -> void:
 	b.cam.force_update_scroll()
 	await capture("worker-leader-eight")
 	b.selected=[workers[0]];await capture("worker-member-three")
-	assert(b.commands.world._spawn_unit(32,b.player_owner,float(leader.ax)+120,float(leader.ay)+80,true))
+	assert(b.world.entity_factory._spawn_unit(32,b.player_owner,float(leader.ax)+120,float(leader.ay)+80,true))
 	var soldier: Dictionary=b.units.back()
 	b.selected=[soldier];await capture("soldier-ungrouped-four")
-	var roster: Array=b.commands.military.available_officers(b.player_owner)
-	b.commands.military._order_form_up(int(roster[0].index))
+	var roster: Array=b.world.officer_pool.available_officers(b.player_owner)
+	b.world.officer_teams._order_form_up(int(roster[0].index))
 	var commander: Dictionary=b.selected[0]
 	await capture("combat-leader-nine")
 	b.selected=[soldier];await capture("soldier-member-four")
 	b.selected=[commander];commander.officer.level=0;commander.officer.exp=199
-	b.commands.military._grant_officer_exp(soldier,1)
+	b.world.officer_teams._grant_officer_exp(soldier,1)
 	await capture("officer-promotion")
 	print("RESEARCH VISUAL PASS automatic video skip -> briefing / three window sizes / selection panels / promotion")
 	b.free();quit()

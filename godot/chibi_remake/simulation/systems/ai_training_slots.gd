@@ -1,12 +1,17 @@
 extends RefCounted
 ## 陆军待命槽。仅成功出生回调计数；UID历史保留到整队死亡或显式解散。
-const Access = preload("res://simulation/ports/ai_access.gd")
-var host: Access
+var ai_economy: Object
+var player_commands: RefCounted
+var production: Object
+var state: RefCounted
 var records := {}
 var serial := 0
 
 func _init(h: Object) -> void:
-	host = h.simulation_access("ai") if h.has_method("simulation_access") else h
+	ai_economy = h.ai_economy
+	player_commands = h.player_commands
+	production = h.production
+	state = h.state
 
 static func key_for(owner: int, slot: int) -> String:
 	return "%d/%d" % [owner,slot]
@@ -38,13 +43,13 @@ func refresh(owner: int) -> void:
 		if not records.has(key): continue
 		var rec: Dictionary = records[key]
 		if rec.members.is_empty(): continue
-		var live: bool = host.units.any(func(u): return rec.members.has(int(u.uid)) and bool(u.alive) and float(u.die_t)<0)
+		var live: bool = state.units.any(func(u): return rec.members.has(int(u.uid)) and bool(u.alive) and float(u.die_t)<0)
 		if not live and int(rec.pendingUid)<0:
 			# 已付费订单仍属于本批；等待到位/取消，不把后半段步兵错当下一批首员。
 			rec.members.clear();rec.ready=false
 
 func line_busy(owner: int, unit: int) -> bool:
-	return host.trainings.any(func(tr): return int(tr.get("owner",tr.b.owner))==owner and family(int(tr.unit))==family(unit))
+	return state.trainings.any(func(tr): return int(tr.get("owner",tr.b.owner))==owner and family(int(tr.unit))==family(unit))
 
 func forming(u: Dictionary) -> bool:
 	for key in records:
@@ -56,22 +61,22 @@ func dispatch(owner: int, slot: int, army: Array) -> bool:
 	refresh(owner)
 	var rec := record(owner,slot)
 	if bool(rec.ready) or int(rec.pendingUid)>=0: return false
-	var have: Array=host.ai_building_kinds(owner)
+	var have: Array=ai_economy.ai_building_kinds(owner)
 	if slot in [0,3] and (not have.has(12) or not have.has(14)): return false
 	if slot==1 and not have.has(6): return false
 	if slot==2 and not have.has(8): return false
 	var count: int=rec.members.size()
 	var unit: int=int(army[0 if count<4 else 1]) if slot in [0,3] else (int(army[2]) if slot==1 else (34 if count<2 else int(army[1])))
 	if line_busy(owner,unit): return false
-	var building: Dictionary=host.ai_production_building(owner,unit)
+	var building: Dictionary=ai_economy.ai_production_building(owner,unit)
 	if building.is_empty(): return false
-	var cost: Dictionary=host.ai_unit_cost(unit)
-	if not host.ai_can_afford(owner,cost):
-		host.ai_gift(owner,1000.0,1500.0,1000.0)
+	var cost: Dictionary=ai_economy.ai_unit_cost(unit)
+	if not ai_economy.ai_can_afford(owner,cost):
+		ai_economy.ai_gift(owner,1000.0,1500.0,1000.0)
 		return false
-	if not host._queue_train(owner,building,unit): return false
+	if not player_commands._queue_train(owner,building,unit): return false
 	serial+=1
-	var order: Dictionary=host.trainings.back()
+	var order: Dictionary=state.trainings.back()
 	order.aiSlot=slot;order.aiToken=serial
 	rec.pendingUid=int(building.uid);rec.pendingToken=serial
 	return true
@@ -99,9 +104,9 @@ func disband(owner: int, slot: int) -> void:
 	var key := key_for(owner,slot)
 	if not records.has(key): return
 	var rec: Dictionary=records[key]
-	for order in host.trainings.duplicate():
+	for order in state.trainings.duplicate():
 		if int(order.get("owner",-1))==owner and int(order.get("aiSlot",-1))==slot:
-			host._cancel_training(order.b)
+			production._cancel_training(order.b)
 	# 成员仍存活并保留身份/生命，不删除或自动占将。
 	rec.members.clear();rec.ready=false;rec.pendingUid=-1;rec.pendingToken=0
 
@@ -126,7 +131,7 @@ func valid_snapshot(value: Variant, ids: Dictionary, orders: Array, next_uid: in
 		var parts := str(key).split("/")
 		if parts.size()!=2 or not parts[0].is_valid_int() or not parts[1].is_valid_int(): return false
 		var owner:=int(parts[0]);var slot:=int(parts[1])
-		if str(key)!=key_for(owner,slot) or not host.ai_owners().has(owner) or slot<0 or slot>3: return false
+		if str(key)!=key_for(owner,slot) or not ai_economy.ai_owners().has(owner) or slot<0 or slot>3: return false
 		var rec=table[key]
 		if not rec is Dictionary or not rec.get("members") is Array or not rec.get("ready") is bool: return false
 		if rec.members.size()>capacity(slot) or bool(rec.ready)!=(rec.members.size()==capacity(slot)): return false

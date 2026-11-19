@@ -1,9 +1,11 @@
-extends RefCounted
+extends Object
 ## automation driver: presentation component.
 const UIState = preload("res://presentation/menu/menu_state.gd")
 var _ui: UIState
 var surface: Control
-var ports = preload("res://presentation/menu/ports/automation_driver_dependencies.gd").new()
+var _dep_campaign_dialog: Object
+var _dep_controller: Object
+var _dep_level_dialog: Object
 const CAMPAIGN_CAO := "chibic"             # 左格：曹操（关卡 id 前缀也是它）
 
 const CAMPAIGN_LIU := "chibil"             # 右格：刘备
@@ -87,7 +89,7 @@ func _report_level_dialog() -> void:
 			rowids_arr.append(rid)
 	print("LEVELS rowids: %s" % ",".join(rowids_arr))
 	# 悬停/聚焦到底有没有接上：把第一行解析出来的三种样式底色打出来（不一致才算接上）
-	var first := ports._first_row()
+	var first = _dep_level_dialog._first_row()
 	if first != null:
 		var n := first.get_theme_stylebox("normal") as StyleBoxFlat
 		var h := first.get_theme_stylebox("hover") as StyleBoxFlat
@@ -97,7 +99,7 @@ func _report_level_dialog() -> void:
 			str(n.bg_color != h.bg_color),
 		])
 	# ▲▼ 有没有真的接到 _scroll_by（把连接和绑定的像素步长打出来）
-	print("LEVELS arrows: %s / %s" % [ports._arrow_wiring("▲"), ports._arrow_wiring("▼")])
+	print("LEVELS arrows: %s / %s" % [_dep_level_dialog._arrow_wiring("▲"), _dep_level_dialog._arrow_wiring("▼")])
 
 func _report_campaign_dialog() -> void:
 	if _ui.campaign_panel == null:
@@ -124,7 +126,7 @@ func _report_campaign_dialog() -> void:
 	])
 	print("CAMPAIGN slot_rects: %s" % slots_txt)
 	print("CAMPAIGN arrow: visible=%s at=(%.0f,%.0f)" % [str(arrow_shown), ap.x, ap.y])
-	print("CAMPAIGN portraits: %s %s" % [ports._portrait_status(CAMPAIGN_CAO), ports._portrait_status(CAMPAIGN_LIU)])
+	print("CAMPAIGN portraits: %s %s" % [_dep_campaign_dialog._portrait_status(CAMPAIGN_CAO), _dep_campaign_dialog._portrait_status(CAMPAIGN_LIU)])
 
 func _count_rows() -> int:
 	var n := 0
@@ -149,7 +151,7 @@ func _push_key(code: int) -> void:
 
 func _run_keytest() -> void:
 	if not _ui.campaign_panel.visible:
-		ports._on_start()
+		_dep_controller._on_start()
 	await surface.get_tree().create_timer(0.4).timeout
 	_report_campaign_dialog()
 	var b0: Button = _ui.main_buttons[0]
@@ -171,7 +173,7 @@ func _run_keytest() -> void:
 		str(_ui.level_panel.visible), str(_ui.scrim != null and _ui.scrim.visible),
 		str(_ui.title_label != null and _ui.title_label.visible), str(b0.visible),
 	])
-	ports._on_start()
+	_dep_controller._on_start()
 	await surface.get_tree().process_frame
 	await _push_key(KEY_ESCAPE)
 	print("KEYTEST esc-campaign: campaign_visible=%s scrim=%s main_button0=%s" % [
@@ -254,7 +256,7 @@ func _run_mouse_matrix() -> void:
 		print("MOUSECLICK: target=unspecified result=error=no-panel ok=false")
 		return
 	if not _ui.campaign_panel.visible:
-		ports._on_start()
+		_dep_controller._on_start()
 	await surface.get_tree().create_timer(0.4).timeout
 	_report_campaign_dialog()
 	var b0: Button = _ui.main_buttons[0] if _ui.main_buttons.size() > 0 else null
@@ -272,7 +274,7 @@ func _run_mouse_matrix() -> void:
 	])
 	# 4) Esc 收掉列表 → 重开势力框 → 点面板外固定点：选择不能变，框也不能关
 	await _push_key(KEY_ESCAPE)
-	ports._on_start()
+	_dep_controller._on_start()
 	await surface.get_tree().process_frame
 	await surface.get_tree().process_frame
 	var out_choice := _ui.campaign_choice
@@ -285,9 +287,9 @@ func _run_mouse_matrix() -> void:
 	# 5) 点金凸「确定」→ 鼠标也能确认（和第 3 步的 Enter 同结局）
 	await _mouse_click_slot(2)
 	# 6) 最后收尾：重新开一下势力框再点「取消」，验证「取消」这个金凸也是活的
-	ports._on_back()
+	_dep_controller._on_back()
 	await surface.get_tree().process_frame
-	ports._on_start()
+	_dep_controller._on_start()
 	await surface.get_tree().process_frame
 	await _mouse_click_slot(3)
 	print("MOUSETEST done: campaign=%s choice=%s level_visible=%s b0=%s" % [
@@ -332,7 +334,7 @@ func _run_mouse_click(target: String) -> void:
 		print("MOUSECLICK: target=%s result=error=no-panel ok=false" % target)
 		return
 	if not _ui.campaign_panel.visible:
-		ports._on_start()
+		_dep_controller._on_start()
 	# 无论框是不是这条命令刚开的，都要等布局稳定再取格子矩形 ——
 	# 不然 get_global_rect 可能还是排版中的中间值，点会落在错位的地方。
 	await surface.get_tree().create_timer(0.4).timeout
@@ -368,3 +370,8 @@ func _run_mouse_click(target: String) -> void:
 			label, p.x, p.y, _ui.campaign_choice, str(_ui.campaign_choice != before),
 			str(_ui.campaign_panel.visible), str(confirmable), str(ok),
 		])
+
+func bind_dependencies(components: Object) -> void:
+	_dep_campaign_dialog = components.campaign_dialog
+	_dep_controller = components.controller
+	_dep_level_dialog = components.level_dialog

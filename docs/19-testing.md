@@ -103,7 +103,7 @@ SIMTEST: 15.0s tick=450 digest=<FNV-1a>
 | `test_review_contracts` | 随机数续跑、存档校验与状态摘要 |
 | `test_save_roundtrip` | 六个带 AI 的采样点保存、恢复及续跑摘要；字段登记、原子拒绝与生命周期 |
 
-另以实际发行 EXE 执行绿色配置与隔离系统目录两种模式的保存、自动槽、结束进程及重启菜单读档；全部使用显式条件判定，不依赖发布版会移除的 assert。`test_world_exchange` 验证显示暂存失败回滚、稳定访问入口、旧世界释放和过期单挑票据。
+另以实际发行 EXE 执行绿色配置与隔离系统目录两种模式的保存、自动槽、结束进程及重启菜单读档；全部使用显式条件判定，不依赖发布版会移除的 assert。`test_world_exchange` 验证显示暂存失败回滚、稳定访问入口、旧世界及其服务释放和过期操作拒绝。
 
 其余玩法、媒体、画面和性能测试归入 `development_tests.json`，不删除测试实现。全地图、自检、固定 tick 摘要仍可按需运行。
 
@@ -172,7 +172,7 @@ powershell -NoProfile -File tools/ci_windows.ps1 -FullRegression
 
 ### 遭遇接战、章节推进与单挑
 
-`test_encounter_campaign`、`test_duel` 验证双方自动接战、工人队伍及工作/行军/警戒优先、隐蔽和中立过滤、34 关次序与终章边界、倒计时切换新世界、单挑合法性/接受公式/平局及胜负一次结算、自然播放和跳过。`capture_duel_review` 完整播放 28 秒影片，截取交锋/尾段/下一章界面并断言延迟结算。
+`test_encounter_campaign`、`test_duel` 验证双方自动接战、工人队伍及工作/行军/警戒优先、隐蔽和中立过滤、34 关次序与终章边界、倒计时切换新世界、单挑合法性/接受公式/平局及胜负一次结算、自然播放和跳过。`capture_duel_review` 完整播放 28 秒影片，截取交锋/尾段/下一章界面并检查影片期间已提交的伤害和结束时的兵力。
 
 ### 移动
 
@@ -303,7 +303,7 @@ pwsh -NoProfile -File tools/bench_full_battle.ps1 -ReleasePack <候选目录>/Ch
 
 `node tools/suite_check.mjs` 检查 `tools/gd` 下全部 GDScript：自动套件必须有成功标记，非自动入口必须在 `manual_tests.json` 中声明类别、前提与运行方式。CI 和存档套件各自声明运行范围，发布与开发主套件之间保持唯一归属。新增脚本未登记、条目失效或手工排除缺少理由均阻止门禁。开局兵力测试声明 `opening-forces` fixture，runner 先从规格文档生成并校验输入；准备失败单独记为失败并继续其他测试。
 
-`node tools/ci_lightweight.mjs` 执行全部检查并汇总；`--group architecture|registry|data|docs|repository|tooling` 执行对应组，均把机器可读结果写入 `_work/lightweight`。退出非零表示至少一项失败，不允许用后续成功覆盖失败。架构体积预算与边界豁免必须有 owner、reason、reviewBy；到期阻止门禁。端口关系清单由 `node tools/port_inventory.mjs --write` 更新，默认只校验新鲜度，不自动删除接口。
+`node tools/ci_lightweight.mjs` 执行全部检查并汇总；`--group architecture|registry|data|docs|repository|tooling` 执行对应组，均把机器可读结果写入 `_work/lightweight`。退出非零表示至少一项失败，不允许用后续成功覆盖失败。架构体积预算与边界豁免必须有 owner、reason、reviewBy；到期阻止门禁。`node tools/port_inventory.mjs` 检查已退役的依赖适配器、提供者字段和作用域调用。
 
 单位字段检查同时使用 `unit_schema_check.mjs` 的工厂/常见字面量写入检查、`test_unit_schema.gd` 的逐字段保存/校验/恢复，以及真实快照和续跑样本。静态扫描无法证明任意动态键表达式的完整性，新增动态字段必须补充真实场景样本。Schema 不替代载员、科技、生产、AI 和引用的语义验证。
 

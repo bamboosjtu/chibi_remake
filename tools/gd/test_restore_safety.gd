@@ -15,35 +15,35 @@ func run() -> void:
 	var victim: Dictionary = battle.units.filter(func(u):return u.owner!=battle.player_owner and int(u.owner)>0 and not u.is_building)[0]
 	var victim_id: int = victim.uid
 	victim.hp = -12
-	battle.commands.military._kill(victim)
+	battle.world.combat._kill(victim)
 	victim.die_t = 0.25
-	assert(battle.saver.apply_snapshot(game.snapshot(battle.units,battle.commands.world._resources(),battle.commands.session._save_extra())))
+	assert(battle.saver.apply_snapshot(game.snapshot(battle.units,battle.world.economy.player_resources(),battle.scene_controller._save_extra())))
 	victim = battle.units.filter(func(u):return int(u.uid)==victim_id)[0]
 	assert(victim.alive and victim.hp == -12 and victim.die_t == 0.25,"Dying units must retain their remaining animation and exact HP")
-	assert(battle.commands.session._save_game())
+	assert(battle.session_actions.save_game())
 	var primary_hash := FileAccess.get_sha256(game.SAVE_PATH)
 	var snapshot: Dictionary = game.load_save()
 	var resources: Dictionary = battle.nav.state.resource_cells.duplicate()
 	assert(not resources.is_empty())
-	assert(battle.commands.session.load_slot(0).ok)
+	assert(battle.session_actions.load_slot(0).ok)
 	assert(battle.nav.state.resource_cells == resources,"Forest blockers must survive restore")
 	var resource: Dictionary = battle.decor_targets.filter(func(d):return bool(d.alive))[0]
-	battle.commands.economy._remove_decor(resource)
+	battle.world.harvest_orders._remove_decor(resource)
 	resources = battle.nav.state.resource_cells.duplicate()
-	assert(battle.commands.session._save_game(2))
-	assert(battle.commands.session.load_slot(2).ok)
+	assert(battle.session_actions.save_game(2))
+	assert(battle.session_actions.load_slot(2).ok)
 	assert(battle.nav.state.resource_cells == resources,"Depleted cells must remain walkable")
 	var invalid := snapshot.duplicate(true)
 	invalid.simulation.contentRevision = "retired-build"
 	invalid.erase("checksum"); invalid.checksum = game.save_checksum(invalid)
 	assert(game.Store.commit(game.save_slot_path(1),JSON.stringify(invalid),game.verify_save_checksum))
 	var state_id: int = battle.state.get_instance_id()
-	var rejected: Dictionary = battle.commands.session.load_slot(1)
+	var rejected: Dictionary = battle.session_actions.load_slot(1)
 	assert(not rejected.ok and not str(rejected.error).is_empty())
 	assert(battle.state.get_instance_id() == state_id)
 	invalid.map = "chibil2"; invalid.erase("checksum"); invalid.checksum = game.save_checksum(invalid)
 	assert(game.Store.commit(game.save_slot_path(1),JSON.stringify(invalid),game.verify_save_checksum))
-	rejected = battle.commands.session.load_slot(1)
+	rejected = battle.session_actions.load_slot(1)
 	assert(not rejected.ok and current_scene == battle and battle.state.get_instance_id() == state_id)
 	assert(game.current_map == "chibil1" and FileAccess.get_sha256(game.SAVE_PATH) == primary_hash)
 	# Start a rejected load, then try every save command before its deferred return.
@@ -52,7 +52,7 @@ func run() -> void:
 	var failed = load("res://main.tscn").instantiate()
 	root.add_child(failed); current_scene = failed
 	assert(not failed.scene.ready_to_save and not failed.is_processing())
-	assert(not failed.commands.session._save_game())
+	assert(not failed.session_actions.save_game())
 	assert(FileAccess.get_sha256(game.SAVE_PATH) == primary_hash)
 	await process_frame; await process_frame
 	assert(current_scene.scene_file_path == "res://menu.tscn")

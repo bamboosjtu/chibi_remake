@@ -1,10 +1,10 @@
-extends RefCounted
+extends Object
 const ViewMath = preload("res://presentation/battle/view_math.gd")
 ## unit visuals: presentation component.
 const UIState = preload("res://presentation/battle/components/battle_view_state.gd")
 var _ui: UIState
 var surface: Node2D
-var ports = preload("res://presentation/battle/components/ports/unit_visuals_dependencies.gd").new()
+
 const Textures = preload("res://presentation/battle/runtime_textures.gd")
 var pending_visuals := {}
 var _world_dirty := false
@@ -19,15 +19,15 @@ var _visible_mobiles := {}
 var _drawn := {}
 
 
-func queue_visual(unit: Dictionary) -> void:
-	pending_visuals[int(unit.uid)]=true
+func queue_visual(uid: int) -> void:
+	pending_visuals[uid]=true
 
 func queue_world_visuals() -> void:
 	_world_dirty=true
 
 func flush_visuals(interpolating := false) -> void:
 	var context := _visual_context()
-	var world: int = _ui.host.world_identity()
+	var world: int = _ui.host.queries.world_identity()
 	var full := _world_dirty or world != _last_world or context != _last_context
 	if not full and pending_visuals.is_empty(): return
 	_last_world = world
@@ -37,10 +37,10 @@ func flush_visuals(interpolating := false) -> void:
 	if full:
 		_moving.clear()
 		_visible_mobiles.clear()
-		candidates_checked += _ui.host.renderable_unit_count()
+		candidates_checked += _ui.host.queries.renderable_unit_count()
 		var previous := _drawn
 		_drawn = {}
-		for unit in _ui.host.renderable_units(context):
+		for unit in _ui.host.queries.renderable_units(context):
 			_sync_visual(unit, context, true)
 		for uid in previous:
 			if _drawn.has(uid): continue
@@ -48,7 +48,7 @@ func flush_visuals(interpolating := false) -> void:
 			if not nodes.is_empty(): _hide_culled(nodes)
 	else:
 		for uid in pending_visuals:
-			var unit: Dictionary = _ui.host.roster_unit(uid)
+			var unit: Dictionary = _ui.host.queries.roster_unit(uid)
 			if not unit.is_empty(): _sync_visual(unit, context)
 	pending_visuals.clear()
 	_world_dirty = false
@@ -67,7 +67,7 @@ func _sync_visual(unit: Dictionary, context: Dictionary, projected := false) -> 
 		return
 	visible_checks += 1
 	if not unit.is_building: _visible_mobiles[uid] = true
-	var value: Dictionary = unit if projected else _ui.host.visual_unit(uid)
+	var value: Dictionary = unit if projected else _ui.host.queries.visual_unit(uid)
 	if value.is_empty(): return
 	_drawn[uid] = true
 	var selected: bool = context.selected.has(uid)
@@ -103,14 +103,14 @@ func _sheet(p: String) -> Texture2D:
 		_ui.sheet_tex[p] = Textures.load_texture(p, ResourceLoader.CACHE_MODE_REUSE, declared)
 	return _ui.sheet_tex[p]
 
-func attach_unit(u: Dictionary, ob: Dictionary, w: int, h: int, k: float) -> void:
+func attach_unit(u: Dictionary, sheet: String, w: int, h: int, k: float) -> void:
 	unit_nodes(u).erase("health_ratio");unit_nodes(u).erase("draw_visible")
 	var ax: float = float(u.ax)
 	var ay: float = float(u.ay)
 	var spr := Sprite2D.new()
 	# 正式高清覆盖的帧不上传旧的整张 4× 图集（工人原表单张即约 32 MiB）。
 	# 未重绘兵种和明确的 original 回退帧才装载原图。
-	unit_nodes(u)["source_sheet"] = str(ob.sheet)
+	unit_nodes(u)["source_sheet"] = sheet
 	spr.region_enabled = true
 	spr.centered = false
 	spr.region_rect = Rect2(0, 0, w * k, h * k)
@@ -118,11 +118,11 @@ func attach_unit(u: Dictionary, ob: Dictionary, w: int, h: int, k: float) -> voi
 	spr.position = Vector2(ax - w * 0.5, ay - h)
 	surface.add_child(spr)
 	unit_nodes(u)["spr"] = spr
-	var color_slot := 0 if int(ob.owner) == int(_ui.host.player_owner) else int(ob.owner)
-	unit_nodes(u)["skin"] = _ui.host.remaster_art.create_unit_skin(spr, int(ob.unit), color_slot, Vector2i(int(w * k), int(h * k)))
+	var color_slot := 0 if int(u.owner) == int(_ui.host.queries.player_owner) else int(u.owner)
+	unit_nodes(u)["skin"] = _ui.host.remaster_art.create_unit_skin(spr, int(u.unit), color_slot, Vector2i(int(w * k), int(h * k)))
 	if int(u.unit) in [16,17] and unit_nodes(u).skin != null:
-		var offset: Vector2 = _ui.host.remaster_art.gate_wall_offset(str(_ui.host.map_id),Vector2i(int(u.A),int(u.B)))
-		var foundation: float = _ui.host.remaster_art.gate_foundation_drop(str(_ui.host.map_id),Vector2i(int(u.A),int(u.B)))
+		var offset: Vector2 = _ui.host.remaster_art.gate_wall_offset(str(_ui.host.queries.map_id),Vector2i(int(u.A),int(u.B)))
+		var foundation: float = _ui.host.remaster_art.gate_foundation_drop(str(_ui.host.queries.map_id),Vector2i(int(u.A),int(u.B)))
 		var module = load("res://presentation/battle/gate_module.gd").new(int(u.unit),unit_nodes(u).skin.texture,unit_nodes(u).skin.material,foundation)
 		module.scale = Vector2(k,k)
 		module.position = offset*k
@@ -131,15 +131,15 @@ func attach_unit(u: Dictionary, ob: Dictionary, w: int, h: int, k: float) -> voi
 		unit_nodes(u)["gate_interior"] = module.recess
 		unit_nodes(u).skin.visible = false
 	if unit_nodes(u).skin == null:
-		spr.texture = _sheet(str(ob.sheet))
+		spr.texture = _sheet(sheet)
 		# 早期单张建筑替换需要原图内容框，完整图集路径不需要。
-		unit_nodes(u)["skin"] = _ui.host.remaster_art.create_unit_skin(spr, int(ob.unit), color_slot, Vector2i(int(w * k), int(h * k)))
+		unit_nodes(u)["skin"] = _ui.host.remaster_art.create_unit_skin(spr, int(u.unit), color_slot, Vector2i(int(w * k), int(h * k)))
 	var dia := Line2D.new()
 	dia.width = 1.6
 	dia.default_color = Color(0.2, 1.0, 0.2, 0.9)
 	dia.points = PackedVector2Array([
 		Vector2(0, -11), Vector2(22, 0), Vector2(0, 11), Vector2(-22, 0), Vector2(0, -11)])
-	dia.position = Vector2(ax, ay - float(_ui.host.tile_hh))
+	dia.position = Vector2(ax, ay - float(_ui.host.queries.tile_hh))
 	dia.z_index = 4000
 	dia.visible = false
 	surface.add_child(dia)
@@ -178,10 +178,10 @@ func place_unit(u: Dictionary) -> void:
 		if s.position!=point:s.position=point
 
 func capture_motion() -> void:
-	var filter = _visible_mobiles if _last_world == _ui.host.world_identity() else null
+	var filter = _visible_mobiles if _last_world == _ui.host.queries.world_identity() else null
 	_ui._motion_previous.clear()
 	_ui._gait_previous.clear()
-	for unit: Dictionary in _ui.host.motion_views(filter):
+	for unit: Dictionary in _ui.host.queries.motion_views(filter):
 		var uid:=int(unit.uid)
 		var nodes: Dictionary=_ui._nodes_by_uid.get(int(unit.uid),{})
 		# Hidden units have no interpolated pixels; first reveal starts at the
@@ -194,7 +194,7 @@ func capture_motion() -> void:
 			_ui._motion_previous.erase(uid);_ui._gait_previous.erase(uid)
 
 func interpolate_motion(alpha: float) -> void:
-	var tile_width: float=_ui.host.tile_w;var half_height: float=_ui.host.tile_hh
+	var tile_width: float=_ui.host.queries.tile_w;var half_height: float=_ui.host.queries.tile_hh
 	for uid in _moving:
 		var nodes: Dictionary = _ui._nodes_by_uid.get(uid, {})
 		if nodes.get("spr") == null or not nodes.spr.visible: continue
@@ -253,12 +253,12 @@ func set_unit_attached(u: Dictionary, attached: bool) -> void:
 
 func _visual_context() -> Dictionary:
 	var selected: Dictionary={}
-	for unit in _ui.host.selection_views():selected[int(unit.uid)]=true
+	for unit in _ui.host.queries.selection_views():selected[int(unit.uid)]=true
 	var camera=_ui.host.cam;var area:=Rect2();var has_camera: bool=camera!=null
 	if has_camera:
 		var size: Vector2=surface.get_viewport_rect().size/camera.zoom
 		area=Rect2(camera.position-size*0.5,size).grow(128)
-	return {"selected":selected,"player":int(_ui.host.player_owner),"buildings":bool(_ui.host.show_buildings),"units":bool(_ui.host.show_units),"sides":_ui.host.sec_visible.duplicate(),"camera":has_camera,"area":area,"halfHeight":float(_ui.host.tile_hh)}
+	return {"selected":selected,"player":int(_ui.host.queries.player_owner),"buildings":bool(_ui.host.show_buildings),"units":bool(_ui.host.show_units),"sides":_ui.host.sec_visible,"camera":has_camera,"area":area,"halfHeight":float(_ui.host.queries.tile_hh)}
 
 func _visible(u: Dictionary, context: Dictionary) -> bool:
 	if not bool(context.sides.get(u.owner, true)): return false
@@ -267,7 +267,7 @@ func _visible(u: Dictionary, context: Dictionary) -> bool:
 	elif not context.units or bool(u.get("attached", false)) or int(u.get("site_inside_uid", -1)) >= 0:
 		return false
 	if int(u.owner) != context.player:
-		if not (bool(u.visible) if u.has("visible") else _ui.host.point_visible(Vector2(u.ax,u.ay))): return false
+		if not (bool(u.visible) if u.has("visible") else _ui.host.queries.point_visible(Vector2(u.ax,u.ay))): return false
 	if not context.camera: return true
 	var position := Vector2(float(u.ax) - float(u.w) * 0.5, float(u.ay) - float(u.h))
 	return (context.area as Rect2).intersects(Rect2(position, Vector2(u.w, u.h)))
@@ -286,7 +286,7 @@ func update_visual(u: Dictionary, context: Dictionary = {}) -> void:
 		_drawn.erase(int(u.uid))
 		_hide_culled(nodes)
 		return
-	var value: Dictionary = _ui.host.visual_unit(int(u.uid))
+	var value: Dictionary = _ui.host.queries.visual_unit(int(u.uid))
 	if not value.is_empty():
 		_drawn[int(u.uid)] = true
 		_apply_visual(value, nodes, context)

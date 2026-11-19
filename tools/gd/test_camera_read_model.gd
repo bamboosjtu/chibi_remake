@@ -14,7 +14,7 @@ class Data extends RefCounted:
 
 func _initialize() -> void:
 	var data := Data.new()
-	var reader = load("res://presentation/battle/battle_access.gd").new(data,RefCounted.new(),RefCounted.new())
+	var reader = load("res://app/read_models/battle_queries.gd").new(data)
 	var bounds: Vector2 = reader.camera_bounds()
 	var center: Vector2 = reader.opening_camera_position()
 	var tiles: Vector3 = reader.camera_tile_geometry()
@@ -25,6 +25,5 @@ func _initialize() -> void:
 	assert(reader.camera_bounds()==Vector2(640,240) and reader.opening_camera_position()==Vector2(17,18))
 	data.units.clear()
 	assert(reader.opening_camera_position()==Vector2(320,120))
-	reader.free()
 	print("CAMERA READ MODEL PASS detached values / current world data / opening filter / empty army fallback")
 	quit()

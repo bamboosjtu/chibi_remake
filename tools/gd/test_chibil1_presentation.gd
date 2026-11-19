@@ -34,7 +34,7 @@ func _run() -> void:
 			var menu: String = str(spec[0])
 			leader.officer.level = int(spec[1])
 			view.art_sub = menu
-			view._refresh_cmd_art()
+			view.command_art._refresh_cmd_art()
 			var visible: Array = view.art_buttons.filter(func(entry): return entry.btn.visible and str(entry.sub) != "back")
 			assert(visible.size() == int(spec[2]), "menu=%s level=%d visible=%d expected=%d" % [menu, int(spec[1]), visible.size(), int(spec[2])])
 			var columns := {}
@@ -45,7 +45,7 @@ func _run() -> void:
 				columns[str(roundf(rect.position.x))] = true
 			assert(columns.size() == (0 if int(spec[2]) == 0 else 3), "menu=%s columns=%d" % [menu, columns.size()])
 			assert(not view.art_back.visible)
-		view._close_art_sub()
+		view.command_art._close_art_sub()
 		var hero: Dictionary = battle.selected[0]
 		assert(battle.view.unit_nodes(hero).spr.texture == null, "covered source atlas must not be uploaded")
 		view.set_frame(hero, 29) # 原辅助轮廓也使用独立高清切片。
@@ -58,21 +58,21 @@ func _run() -> void:
 		var ramp: GradientTexture1D = colour.get_shader_parameter("team_ramp")
 		var tint := ramp.gradient.sample(0.6)
 		assert(tint.r > tint.g and tint.b > tint.g, "magenta team ramp")
-		battle.commands.orders._select_click(Vector2(hero.ax, hero.ay - hero.h * 0.5), false)
+		battle.world.selection._select_click(Vector2(hero.ax, hero.ay - hero.h * 0.5), false)
 		assert(battle.selected.size() == 1 and int(battle.selected[0].officer.index) == 42)
 		var fog: RefCounted = battle.visibility
 		var position := Vector2(hero.ax, hero.ay)
 		assert(fog.is_visible(position) and not fog.is_visible(Vector2(3500, 100)))
 		var explored: String = fog.snapshot()
 		assert(not fog.valid_snapshot("bad-base64") and not fog.valid_snapshot(3))
-		var snapshot: Dictionary = battle.commands.session._save_extra()
-		assert(root.get_node("Game").save_game(battle.units, battle.commands.world._resources(), snapshot))
+		var snapshot: Dictionary = battle.scene_controller._save_extra()
+		assert(root.get_node("Game").save_game(battle.units, battle.world.economy.player_resources(), snapshot))
 		var corrupt: Dictionary = root.get_node("Game").load_save()
 		corrupt.simulation.explored = "wrong-size"
-		var digest: int = battle.commands.world._state_digest()
+		var digest: int = battle.world.battle_simulation._state_digest()
 		assert(not battle.saver.apply_snapshot(corrupt))
-		assert(digest == battle.commands.world._state_digest() and fog.snapshot() == explored)
-		battle.commands.military._unassign_officer(hero)
+		assert(digest == battle.world.battle_simulation._state_digest() and fog.snapshot() == explored)
+		battle.world.officer_teams._unassign_officer(hero)
 		for member in battle.units:
 			if member.owner == battle.player_owner: assert(int(member.get("group_officer", -1)) != 42, "released commander must not retain followers")
 		print("PRESENTATION PASS ", dimensions, " zoom=", expected, " HQ fraction=", composition, " skills / palette / group / fog / rejected-load unchanged")

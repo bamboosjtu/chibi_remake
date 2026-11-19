@@ -1,9 +1,9 @@
-extends RefCounted
+extends Object
 ## menu styles: presentation component.
 const UIState = preload("res://presentation/menu/menu_state.gd")
 var _ui: UIState
 var surface: Control
-var ports = preload("res://presentation/menu/ports/menu_styles_dependencies.gd").new()
+
 const ROW_GAP := 3                      # 木条之间的暗缝
 
 func _init(data: UIState, node: Control) -> void:

@@ -1,59 +1,33 @@
-extends RefCounted
+extends Object
 var view_microseconds := 0
 var hud_microseconds := 0
 var interpolation_microseconds := 0
 ## scene controller: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
-const Dependencies = preload("res://app/battle/ports/scene_controller_dependencies.gd")
 var battle: State:
 	get: return node.state
-var ports := Dependencies.new()
+var _dep_battle_simulation: Object
+var _dep_cheat_controller: Object
+var _dep_combat: Object
+var _dep_command_groups: Object
+var _dep_harvest_orders: Object
+var _dep_selection: Object
+var _dep_world_orders: Object
 const SceneServices = preload("res://app/battle_scene_state.gd")
 var scene: SceneServices
 var node: Node2D
-var _waiting_for_commands := false
 const View = preload("res://presentation/battle/battle_view.gd")        # ARCH-013：表现层（HUD/相机/单位外观/框选）
 
 func _init(services: SceneServices, surface: Node2D) -> void:
 	scene = services
 	node = surface
 
-func cancel_work(kind: String, uid: int, epoch: int) -> bool:
-	if epoch != node.world.get_instance_id() or kind not in ["site", "training"]: return false
-	return submit_command("cancel_site" if kind == "site" else "cancel_train", uid) > 0
 
-func submit_command(kind: String, uid := -1, parameter := -1) -> int:
-	if not scene.ready_to_save or node.get_tree().paused or _waiting_for_commands: return 0
-	return battle.player_commands.submit(kind, battle.selected, Vector2.ZERO, uid, parameter)
 
-func begin_target(kind: String, parameter := -1) -> void:
-	if not scene.ready_to_save or node.get_tree().paused or _waiting_for_commands: return
-	match kind:
-		"jimou": node.commands.military._jimou_begin(parameter)
-		"duel": node.commands.military._duel_begin()
-		"build":
-			for option in battle.build_types:
-				if int(option.unit) == parameter:
-					node.commands.economy._start_build(option)
-					break
-		"move", "attack", "transport", "repair", "board", "join", "unload":
-			node.commands.military._cmd_begin(kind)
 
-func submit_point_order(position: Vector2, context: bool) -> int:
-	if not scene.ready_to_save or node.get_tree().paused or _waiting_for_commands: return 0
-	return ports.submit_point_order(position, context)
 
-func select_at(position: Vector2, add: bool) -> void:
-	ports._select_click(position, add)
-	_view_hud()
 
-func wait_command_boundary() -> void:
-	_waiting_for_commands = true
-	var tree := node.get_tree()
-	while battle.player_commands.has_pending() and battle.game_end == 0 and node.is_processing() and not tree.paused:
-		await tree.process_frame
-	_waiting_for_commands = false
 
 func _write_smoke(ok: bool, why: String) -> void:
 	var f := FileAccess.open("user://smoke.json", FileAccess.WRITE)
@@ -105,7 +79,7 @@ func _build_terrain() -> void:
 func _sheet(p: String) -> Texture2D:
 	if scene.view == null:
 		return null
-	return scene.view._sheet(p)
+	return scene.view.unit_visuals._sheet(p)
 
 func _apply_save() -> bool:
 	return scene.saver.apply()
@@ -113,21 +87,6 @@ func _apply_save() -> bool:
 func _save_extra() -> Dictionary:
 	return scene.saver.save_extra()
 
-func _save_game(slot := 0, title := "") -> bool:
-	if not scene.ready_to_save:
-		Game.last_save_error = {"stage":"battle not initialized", "code":ERR_UNCONFIGURED}
-		return false
-	var unregistered := preload("res://simulation/battle_state_fields.gd").omissions(battle)
-	if not unregistered.is_empty():
-		Game.last_save_error = {"stage":"snapshot world fields", "code":ERR_INVALID_DATA, "slot":slot, "fields":unregistered}
-		return false
-	if battle.player_commands.has_pending():
-		Game.last_save_error = {"stage":"指令尚未结算，请返回战场后重试", "code":ERR_BUSY, "slot":slot}
-		return false
-	node.commands.military._settle_pending_duels()
-	var extra := _save_extra()
-	extra.saveName=title
-	return Game.save_game(battle.units,ports._resources(),extra,slot)
 
 func _return_to_menu_after_load_failure() -> void:
 	if node.is_inside_tree():
@@ -139,20 +98,6 @@ func _schedule_failed_load_return() -> void:
 	node.set_process_unhandled_input(false)
 	_return_to_menu_after_load_failure.call_deferred()
 
-func load_slot(slot: int) -> Dictionary:
-	var loaded: Dictionary = Game.repository.read_slot(slot)
-	var data: Dictionary = loaded.data
-	var map_id := str(data.get("map",""))
-	if data.is_empty() or not Game.campaign.catalog.contains(map_id):
-		return {"ok":false,"error":"所选进度无法读取，原有记录已保留。"}
-	var cross_map := map_id != str(battle.map_id)
-	var selection: Array = battle.selected.map(func(unit): return int(unit.uid))
-	if not Game.campaign.restore_battle(map_id, scene.saver.apply_loaded.bind(loaded, cross_map)):
-		return {"ok":false,"error":scene.saver.last_load_error}
-	if not cross_map:
-		for unit in battle.units:
-			if int(unit.uid) in selection: battle.selected.append(unit)
-	return {"ok":true,"cross_map":cross_map,"source":scene.saver.last_load_source}
 
 func _notification(what: int) -> void:
 	if what != Node.NOTIFICATION_WM_CLOSE_REQUEST:
@@ -162,30 +107,18 @@ func _notification(what: int) -> void:
 			await scene.view.battle_menu.open()
 			scene.view.battle_menu.quit_game()
 			return
-		await wait_command_boundary()
-		if not _save_game():
-			ports._feedback("保存失败，未退出，请重试")
+		if not await node.session_actions.wait_command_boundary(): return
+		if not node.session_actions.save_game():
+			node.world.effects.feedback("保存失败，未退出，请重试")
 			return
 	node.get_tree().quit()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if ports.handle_cheat_input(event):
+	if _dep_cheat_controller.handle_cheat_input(event):
 		node.get_viewport().set_input_as_handled()
 		return
-	if not _waiting_for_commands: _battle_input(event)
+	if not node.session_actions.waiting_for_commands: _battle_input(event)
 
-func focus_group(n: int) -> bool:
-	if not ports._group_recall(n):
-		return false
-	if battle.selected.is_empty():
-		return true
-	var leader: Dictionary = battle.selected[0]
-	if scene.cam != null:
-		scene.cam.position = Vector2(float(leader.ax), float(leader.ay))
-		if scene.view != null:
-			scene.view.clamp_camera()
-	_view_hud()
-	return true
 
 func _battle_input(event: InputEvent) -> void:
 	if scene.cam == null:
@@ -214,22 +147,22 @@ func _battle_input(event: InputEvent) -> void:
 				var add := Input.is_key_pressed(KEY_SHIFT)
 				var world_pos := node.get_canvas_transform().affine_inverse() * mbe.position
 				var clicked := scene.sel_start.distance_to(world_pos) <= 7.0
-				if clicked and ports.cmd_pending_kind() != "":
+				if clicked and _dep_world_orders.cmd_pending_kind() != "":
 					# 原版模型：先点面板按钮、再点地图目标 —— 待选命令用**左键**落到目标上。
-					submit_point_order(world_pos, false)
+					node.actions.submit_point_order(world_pos, false)
 				elif not clicked:
-					ports._select_box(_sel_rect(), add)
+					_dep_selection._select_box(_sel_rect(), add)
 					_view_hud()
 				else:
 					# 选中工人队后直接左键资源也下采集令：资源点本来就不能被“选中”，
 					# 不应当清空选择让玩家以为点击无效（右键仍然同样生效）。
-					var rclick := ports._resource_at(world_pos)
-					if rclick.is_empty() or bool(rclick.get("is_building",false)) or not battle.command_rules.allows_context(16138):
-						select_at(world_pos, add)
+					var rclick = _dep_harvest_orders._resource_at(world_pos)
+					if rclick.is_empty() or bool(rclick.get("is_building",false)) or not node.world.command_rules.allows_context(16138):
+						node.actions.select_at(world_pos, add)
 					else:
-						battle.player_commands.submit("gather", battle.selected, world_pos, int(rclick.uid), -1, str(rclick.get("cell", "")))
+						node.world.player_commands.submit("gather", battle.selected, world_pos, int(rclick.uid), -1, str(rclick.get("cell", "")))
 		elif mbe.button_index == MOUSE_BUTTON_RIGHT and mbe.pressed:
-			submit_point_order(node.get_canvas_transform().affine_inverse() * mbe.position, true)
+			node.actions.submit_point_order(node.get_canvas_transform().affine_inverse() * mbe.position, true)
 	elif event is InputEventMouseMotion:
 		var mme := event as InputEventMouseMotion
 		if scene.drag_pan:
@@ -247,10 +180,10 @@ func _battle_action(event: InputEvent) -> void:
 	scene.ev_count += 1
 	for group in range(1, 10):
 		if event.is_action_pressed("battle_assign_group_%d" % group, false, true):
-			submit_command("assign_group", -1, group)
+			node.actions.submit_command("assign_group", -1, group)
 			return
 		if event.is_action_pressed("battle_group_%d" % group, false, true):
-			focus_group(group)
+			node.actions.focus_group(group)
 			return
 	if event.is_action_pressed("battle_toggle_buildings"):
 		scene.show_buildings = not scene.show_buildings
@@ -265,8 +198,8 @@ func _battle_action(event: InputEvent) -> void:
 			node.get_tree().quit()
 	elif event.is_action_pressed("battle_confirm"):
 		var point := node.get_canvas_transform().affine_inverse() * node.get_viewport_rect().get_center()
-		if ports.cmd_pending_kind().is_empty(): select_at(point, false)
-		else: submit_point_order(point, false)
+		if _dep_world_orders.cmd_pending_kind().is_empty(): node.actions.select_at(point, false)
+		else: node.actions.submit_point_order(point, false)
 	elif event is InputEventKey:
 		if event.keycode == KEY_F3 and event.ctrl_pressed: scene.show_debug = not scene.show_debug
 		elif event.keycode == KEY_F12: _screenshot()
@@ -305,15 +238,15 @@ func _process(delta: float) -> void:
 	# 模拟层：固定步长推进（ARCH-010）
 	battle.sim_acc = battle.sim_acc + delta if battle.game_end == 0 else 0.0
 	var steps := 0
-	var period: float = battle.clock.period()
+	var period: float = node.world.clock.period()
 	var target_tick := ceili(battle.simtest_seconds * Config.SIM_HZ) if battle.simtest_seconds > 0.0 else -1
 	while battle.game_end == 0 and not node.get_tree().paused and battle.sim_acc + 0.000000001 >= period and steps < Config.SIM_MAX_CATCHUP and (target_tick < 0 or battle.sim_tick < target_tick):
 		battle.sim_acc = maxf(0.0,battle.sim_acc-period)
 		steps += 1
-		ports._sim_step(Config.SIM_DT)
+		_dep_battle_simulation._sim_step(Config.SIM_DT)
 	# 达到每帧预算后保留欠下的tick，下一帧继续；不能丢弃计时导致低帧率少结算。
 	if target_tick >= 0 and (battle.sim_tick >= target_tick or battle.game_end != 0):
-		print("SIMTEST: %.1fs tick=%d digest=%d" % [battle.simtest_seconds, battle.sim_tick, ports._state_digest()])
+		print("SIMTEST: %.1fs tick=%d digest=%d" % [battle.simtest_seconds, battle.sim_tick, _dep_battle_simulation._state_digest()])
 		# The digest module stays free of the scene tree; the app layer supplies
 		# the hasher it needs.
 		print("SIMULATION DIGESTS: ", JSON.stringify(preload("res://simulation/systems/state_digest.gd").sections(node, node.get_node("/root/Game"))))
@@ -381,7 +314,7 @@ func _demo() -> void:
 	var n := 0
 	for u in battle.units:
 		if u.owner == battle.player_owner and not u.is_building and u.alive:
-			var e = ports._nearest_enemy(u, 99999.0)
+			var e = _dep_combat._nearest_enemy(u, 99999.0)
 			if not e.is_empty():
 				u.state = "attack"
 				u.target = e
@@ -412,3 +345,12 @@ func _demo() -> void:
 			break
 	print("DEMO DONE t=%.1f" % t)
 	node.get_tree().quit()
+
+func bind_dependencies(scene_root: Object) -> void:
+	_dep_battle_simulation = scene_root.world.battle_simulation
+	_dep_cheat_controller = scene_root.cheat_controller
+	_dep_combat = scene_root.world.combat
+	_dep_command_groups = scene_root.world.command_groups
+	_dep_harvest_orders = scene_root.world.harvest_orders
+	_dep_selection = scene_root.world.selection
+	_dep_world_orders = scene_root.world.world_orders

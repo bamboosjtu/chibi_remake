@@ -12,7 +12,7 @@ func run() -> void:
 	assert(game.save_canonical_text({2:"two",10:"ten"}) == '{"10":"ten","2":"two"}', "Integer dictionary keys retain string ordering")
 	var battle = load("res://main.tscn").instantiate()
 	root.add_child(battle); battle.set_process(false)
-	var good: Dictionary = game.snapshot(battle.units, battle.commands.world._resources(), battle.saver.save_extra())
+	var good: Dictionary = game.snapshot(battle.units, battle.world.economy.player_resources(), battle.saver.save_extra())
 	assert(game.verify_save_checksum(good) and game.is_valid_save(good))
 	_required_fields(game, battle)
 	var empty_world := good.duplicate(true); empty_world.units=[]; empty_world.erase("checksum")
@@ -55,8 +55,8 @@ func run() -> void:
 
 func _required_fields(game: Node, battle: Node2D) -> void:
 	var hq: Dictionary = battle.units.filter(func(unit): return int(unit.owner) == battle.player_owner and int(unit.unit) in [0,1])[0]
-	assert(battle.commands.economy._queue_train(battle.player_owner, hq, 30))
-	var complete: Dictionary = game.snapshot(battle.units, battle.commands.world._resources(), battle.saver.save_extra())
+	assert(battle.world.production._queue_train(battle.player_owner, hq, 30))
+	var complete: Dictionary = game.snapshot(battle.units, battle.world.economy.player_resources(), battle.saver.save_extra())
 	assert(not complete.trainings.is_empty())
 	var before: String = game.save_checksum(battle.saver.continuation_snapshot(game))
 	var state_id: int = battle.state.get_instance_id()

@@ -1,4 +1,5 @@
 extends CanvasLayer
+const SessionActions = preload("res://app/session_actions.gd")
 signal media_finished
 var pause_token := 0
 var host:Node
@@ -19,7 +20,7 @@ var segment_index:=0
 
 func _init(h:Node) -> void:
 	host=h
-	if host.has_method("is_battle_context"):cursor=host.event_count()
+	if host.has_method("is_battle_context"):cursor=host.queries.event_count()
 	events=JSON.parse_string(FileAccess.get_file_as_string("res://data/db/events.json")).events
 	catalog=JSON.parse_string(FileAccess.get_file_as_string("res://data/db/video_catalog.json")).files
 
@@ -60,10 +61,10 @@ func _layout_video(path:String) -> void:
 func restore_history() -> void:
 	if host.has_method("is_battle_context"):
 		if host.view!=null:host.view.opening_pending=false
-		cursor=host.event_count()
+		cursor=host.queries.event_count()
 	active=false;completion=Callable();ending_caption="";segments=[];caption.hide()
 	player.stop();player.stream=null;player.hide();backdrop.hide();text.text=""
-	Game.pauses.release(pause_token);pause_token=0
+	SessionActions.resume(pause_token);pause_token=0
 
 ## AVI bytes are read by the native decoder. No intermediate video is produced.
 func play_media(path:String,completed:=Callable(),heading:="",ending:="",ending_start:=-1.0,spans:Array=[]) -> bool:
@@ -73,7 +74,7 @@ func play_media(path:String,completed:=Callable(),heading:="",ending:="",ending_
 	player.stream=stream
 	if player.get_video_texture()==null:player.stream=null;return false
 	active=true;completion=completed;media_path=path;segments=spans.duplicate(true);segment_index=0
-	ending_caption=ending;ending_at=ending_start;pause_token=Game.pauses.acquire(self,"media playback")
+	ending_caption=ending;ending_at=ending_start;pause_token=SessionActions.pause(self,"media playback")
 	text.text="";caption.text=heading;caption.visible=not heading.is_empty()
 	_layout_video(path);backdrop.show();player.show();player.play()
 	if not segments.is_empty():player.stream_position=float(segments[0][0])
@@ -84,12 +85,12 @@ func _finish_media() -> void:
 	active=false
 	var finished:=completion;completion=Callable();segments=[]
 	player.stop();player.stream=null;player.hide();backdrop.hide();caption.hide()
-	Game.pauses.release(pause_token);pause_token=0
+	SessionActions.resume(pause_token);pause_token=0
 	if finished.is_valid():finished.call()
 	media_finished.emit()
 
 func _input(event:InputEvent) -> void:
-	if not active or not Game.pauses.is_top(pause_token):return
+	if not active or not SessionActions.owns_pause(pause_token):return
 	var skip:bool=(event is InputEventMouseButton and event.pressed) or (event is InputEventKey and event.pressed and not event.echo)
 	if skip:_finish_media();get_viewport().set_input_as_handled()
 
@@ -102,8 +103,8 @@ func _process(_delta:float) -> void:
 		if not ending_caption.is_empty() and ((not segments.is_empty() and segment_index>0) or (segments.is_empty() and ending_at>=0 and player.stream_position>=ending_at)):
 			caption.text=ending_caption;caption.show()
 		return
-	if not host.has_method("is_battle_context") or get_tree().paused or cursor>=host.event_count():return
-	var entry:Dictionary=events.get(str(int(host.task_event_id(cursor))),{})
+	if not host.has_method("is_battle_context") or get_tree().paused or cursor>=host.queries.event_count():return
+	var entry:Dictionary=events.get(str(int(host.queries.task_event_id(cursor))),{})
 	cursor+=1
 	if entry.has("video") and FileAccess.file_exists(entry.video):play_media(str(entry.video))
 	elif entry.has("text"):text.text=str(entry.text)

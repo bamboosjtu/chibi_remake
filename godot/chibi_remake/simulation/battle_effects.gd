@@ -9,28 +9,16 @@ func visual(action: String, arguments: Array = []) -> void:
 	if simulating and COALESCED_VISUALS.has(action):return
 	visual_requested.emit(action, arguments)
 
+func feedback(message: String) -> void:
+	visual("feedback", [message])
+
 func sound(action: String, arguments: Array = []) -> void:
 	sound_requested.emit(action, arguments)
 
 
-signal duel_requested(outcome: String, onm: String, enm: String, ticket: int)
-var _duels: Dictionary = {}
-var _next_ticket := 0
-func reserve_duel(record: Dictionary) -> int:
-	_next_ticket += 1
-	_duels[_next_ticket] = record.duplicate(true)
-	return _next_ticket
-func take_duel(ticket: int) -> Dictionary:
-	var record: Dictionary = _duels.get(ticket,{})
-	_duels.erase(ticket)
-	return record
-func pending_duels() -> Array:
-	return _duels.keys()
-func duel_snapshot() -> Dictionary:
-	return _duels.duplicate(true)
-func duel(outcome: String, onm: String, enm: String, ticket: int) -> bool:
-	if duel_requested.get_connections().is_empty(): return false
-	duel_requested.emit(outcome,onm,enm,ticket)
-	return true
-func invalidate() -> void:
-	_duels.clear()
+signal duel_requested(outcome: String, onm: String, enm: String)
+
+func close() -> void:
+	for event: Signal in [visual_requested, sound_requested, duel_requested]:
+		for connection in event.get_connections():
+			event.disconnect(connection.callable)

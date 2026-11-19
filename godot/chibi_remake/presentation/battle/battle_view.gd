@@ -1,19 +1,19 @@
 extends Node2D
 
 func queue_world_visuals() -> void:
-	_components["unit_visuals"].queue_world_visuals()
-func queue_visual(unit: Dictionary) -> void:
-	_components["unit_visuals"].queue_visual(unit)
+	unit_visuals.queue_world_visuals()
+func queue_visual(uid: int) -> void:
+	unit_visuals.queue_visual(uid)
 func flush_visuals(interpolating := false) -> void:
-	_components["unit_visuals"].flush_visuals(interpolating)
+	unit_visuals.flush_visuals(interpolating)
 func performance_counters() -> Dictionary:
-	var counters: Dictionary=_components["unit_visuals"].performance_counters()
+	var counters: Dictionary=unit_visuals.performance_counters()
 	counters["fogMicroseconds"]=_ui.fog_sprite.upload_microseconds if _ui.fog_sprite!=null else 0
 	counters["minimapMicroseconds"] = _ui.minimap.draw_microseconds if _ui.minimap != null else 0
 	return counters
 
 func prepare_opening_layers() -> void:
-	_components["world_layers"].prepare_opening_layers()
+	world_layers.prepare_opening_layers()
 ## Composition root; presentation components own their specific behavior.
 const GRID_FALLBACK := 8
 
@@ -25,16 +25,16 @@ func rollback_world_nodes(token: Dictionary) -> void: _world_nodes.rollback(toke
 func commit_world_nodes(token: Dictionary) -> void: _world_nodes.commit(token)
 func world_nodes_complete(units: Array) -> bool: return _world_nodes.complete(units)
 
-func attach_loaded_world(units: Array, sheets: Dictionary) -> bool:
-	for unit in units:
-		var sheet: String = str(sheets.get("%d_%d" % [int(unit.unit),int(unit.owner)],""))
-		attach_unit(unit,{"sheet":sheet,"unit":unit.unit,"owner":unit.owner},int(unit.w),int(unit.h),float(unit.k))
-	return world_nodes_complete(units)
+func attach_loaded_world(rows: Array) -> bool:
+	for row: Dictionary in rows:
+		var unit: Dictionary = row.visual
+		attach_unit(unit, row.sheet, int(unit.w), int(unit.h), float(unit.k))
+	return _world_nodes.complete(rows.map(func(row): return row.visual))
 
-func finish_loaded_world(units: Array, ended: int) -> void:
+func finish_loaded_world(rows: Array, ended: int) -> void:
 	capture_motion()
 	if _ui.event_view != null: _ui.event_view.restore_history()
-	for unit in units: update_visual(unit)
+	for row in rows: update_visual(row.visual)
 	if _ui.completion != null:
 		_ui.completion.reset(); _ui.end_label.hide()
 		if ended != 0: show_end(ended)
@@ -42,8 +42,20 @@ func finish_loaded_world(units: Array, ended: int) -> void:
 	if cmd_box_ready(): update_panel()
 
 func apply_loaded_unit(unit: Dictionary) -> void:
-	_components["unit_visuals"].apply_loaded_unit(unit)
-var _components: Dictionary = {}
+	unit_visuals.apply_loaded_unit(unit)
+var controller: Object
+var unit_visuals: Object
+var camera_controller: Object
+var hud_build: Object
+var hud_layout: Object
+var world_layers: Object
+var hud_input: Object
+var selection_info: Object
+var command_art: Object
+var command_model: Object
+var command_actions: Object
+var legacy_layout: Object
+var _disposed := false
 var _fields: Dictionary = {}
 var _api_missing: Array = []
 var worker_button: Button:
@@ -131,28 +143,29 @@ var art_back: TextureRect:
 	get: return _ui.art_back
 	set(value): _ui.art_back = value
 
-func _init(battle: Node2D) -> void:
-	var access := preload("res://presentation/battle/battle_access.gd").new(battle, battle.scene, battle.commands)
-	battle.add_child(access)
+func _init(access: Node2D) -> void:
 	_ui.host = access
 	_ui.projectile_view = preload("res://presentation/battle/projectile_view.gd").new(access)
 	add_child(_ui.projectile_view)
 	_ui.construction_preview = preload("res://presentation/battle/build_preview.gd").new(access)
 	add_child(_ui.construction_preview)
 	for field in _ui.PROXY_FIELDS: _fields[field] = true
-	_components["controller"] = preload("res://presentation/battle/components/controller.gd").new(_ui, self)
-	_components["unit_visuals"] = preload("res://presentation/battle/components/unit_visuals.gd").new(_ui, self)
-	_components["camera_controller"] = preload("res://presentation/battle/components/camera_controller.gd").new(_ui, self)
-	_components["hud_build"] = preload("res://presentation/battle/components/hud_build.gd").new(_ui, self)
-	_components["hud_layout"] = preload("res://presentation/battle/components/hud_layout.gd").new(_ui, self)
-	_components["world_layers"] = preload("res://presentation/battle/components/world_layers.gd").new(_ui, self)
-	_components["hud_input"] = preload("res://presentation/battle/components/hud_input.gd").new(_ui, self)
-	_components["selection_info"] = preload("res://presentation/battle/components/selection_info.gd").new(_ui, self)
-	_components["command_art"] = preload("res://presentation/battle/components/command_art.gd").new(_ui, self)
-	_components["command_model"] = preload("res://presentation/battle/components/command_model.gd").new(_ui, self)
-	_components["command_actions"] = preload("res://presentation/battle/components/command_actions.gd").new(_ui, self)
-	_components["legacy_layout"] = preload("res://presentation/battle/components/legacy_layout.gd").new(_ui, self)
-	var report := preload("res://composition_contract.gd").wire(_components, "view")
+	controller = preload("res://presentation/battle/components/controller.gd").new(_ui, self)
+	unit_visuals = preload("res://presentation/battle/components/unit_visuals.gd").new(_ui, self)
+	camera_controller = preload("res://presentation/battle/components/camera_controller.gd").new(_ui, self)
+	hud_build = preload("res://presentation/battle/components/hud_build.gd").new(_ui, self)
+	hud_layout = preload("res://presentation/battle/components/hud_layout.gd").new(_ui, self)
+	world_layers = preload("res://presentation/battle/components/world_layers.gd").new(_ui, self)
+	hud_input = preload("res://presentation/battle/components/hud_input.gd").new(_ui, self)
+	selection_info = preload("res://presentation/battle/components/selection_info.gd").new(_ui, self)
+	command_art = preload("res://presentation/battle/components/command_art.gd").new(_ui, self)
+	command_model = preload("res://presentation/battle/components/command_model.gd").new(_ui, self)
+	command_actions = preload("res://presentation/battle/components/command_actions.gd").new(_ui, self)
+	legacy_layout = preload("res://presentation/battle/components/legacy_layout.gd").new(_ui, self)
+	var components := _owned_components()
+	for component in components.values():
+		if component != null and component.has_method("bind_dependencies"): component.bind_dependencies(self)
+	var report := preload("res://composition_contract.gd").wire(components, "view")
 	_api_missing = report.missing
 
 func contract_abort() -> bool:
@@ -168,289 +181,105 @@ func _set(key: StringName, value) -> bool:
 	preload("res://property_contract.gd").reject(self,key)
 	return false
 
-func maybe_play_intro(md: Dictionary) -> void:
-	_components["controller"].maybe_play_intro(md)
-func _intro_finished() -> void:
-	_components["controller"]._intro_finished()
-func _ui_tex(name: String) -> Texture2D:
-	return _components["hud_build"]._ui_tex(name)
+func maybe_play_intro(avi: String) -> void:
+	controller.maybe_play_intro(avi)
 func build_ui() -> void:
-	_components["hud_build"].build_ui()
-func _mk_panel(parent: Node, bg: Color, border: Color, bw: float) -> Panel:
-	return _components["hud_build"]._mk_panel(parent, bg, border, bw)
-func _mk_label(parent: Node, size: float, col: Color, align: HorizontalAlignment) -> Label:
-	return _components["hud_build"]._mk_label(parent, size, col, align)
-func _mk_button(parent: Node, size: float) -> Button:
-	return _components["hud_build"]._mk_button(parent, size)
-func _place_left(c: Control, x: float, y: float, w: float, h: float) -> void:
-	_components["hud_layout"]._place_left(c, x, y, w, h)
-func _pin_right(c: Control, dist_right: float, w: float, top: float, h: float) -> void:
-	_components["hud_layout"]._pin_right(c, dist_right, w, top, h)
-func _pin_bottom_right(c: Control, dist_right: float, w: float, h: float) -> void:
-	_components["hud_layout"]._pin_bottom_right(c, dist_right, w, h)
-func _res_icon_path(kind: String) -> String:
-	return _components["controller"]._res_icon_path(kind)
-func _build_top_bar(ui: CanvasLayer) -> void:
-	_components["hud_build"]._build_top_bar(ui)
-func _build_top_bar_original(ui: CanvasLayer, tl: Texture2D, tr: Texture2D, tile: Texture2D) -> void:
-	_components["hud_build"]._build_top_bar_original(ui, tl, tr, tile)
-func _build_right_panel(ui: CanvasLayer) -> void:
-	_components["hud_build"]._build_right_panel(ui)
-func _build_hot_strip(ui: CanvasLayer) -> void:
-	_components["hud_build"]._build_hot_strip(ui)
-func _build_status(ui: CanvasLayer) -> void:
-	_components["hud_build"]._build_status(ui)
-func _build_ornament(ui: CanvasLayer) -> void:
-	_components["hud_build"]._build_ornament(ui)
-func _apply_metrics() -> void:
-	_components["hud_layout"]._apply_metrics()
-func _decorate_frame(panel: Panel, border: float) -> void:
-	_components["hud_layout"]._decorate_frame(panel, border)
-func _apply_metrics_original(vp: Vector2, s: float) -> void:
-	_components["legacy_layout"]._apply_metrics_original(vp, s)
-func _layout_status_labels(vp: Vector2, s: float) -> void:
-	_components["hud_layout"]._layout_status_labels(vp, s)
-func _refresh_metrics() -> void:
-	_components["hud_layout"]._refresh_metrics()
-func _draw_ornament() -> void:
-	_components["hud_layout"]._draw_ornament()
+	hud_build.build_ui()
 func zoom_x() -> float:
-	return _components["camera_controller"].zoom_x()
+	return camera_controller.zoom_x()
 func update_hud_text() -> void:
-	_components["selection_info"].update_hud_text()
-func _refresh_res_slots() -> void:
-	_components["selection_info"]._refresh_res_slots()
+	selection_info.update_hud_text()
 func show_end(kind: int) -> void:
-	_components["controller"].show_end(kind)
+	controller.show_end(kind)
 func update_panel() -> void:
-	_components["command_model"].update_panel()
+	command_model.update_panel()
 func panel_kind() -> String:
-	return _components["command_model"].panel_kind()
-func _officer_selection() -> Dictionary:
-	return _components["selection_info"]._officer_selection()
-func _build_cmd_art() -> void:
-	_components["command_art"]._build_cmd_art()
-func _command_icon(cell: int) -> Texture2D:
-	return _components["command_art"]._command_icon(cell)
-func _set_art_state(index: int, state: int) -> void:
-	_components["command_art"]._set_art_state(index, state)
-func _add_art_button(cell: int, name: String, sub: String, act: Callable) -> void:
-	_components["command_art"]._add_art_button(cell, name, sub, act)
-func _panel_specs() -> Array:
-	return _components["command_art"]._panel_specs()
-func _apply_panel_type() -> void:
-	_components["command_art"]._apply_panel_type()
-func _close_art_sub() -> void:
-	_components["command_art"]._close_art_sub()
-func _layout_cmd_art() -> void:
-	_components["command_art"]._layout_cmd_art()
-func _art_visible(sub: String) -> bool:
-	return _components["command_art"]._art_visible(sub)
+	return command_model.panel_kind()
 func art_panel_active() -> bool:
-	return _components["command_art"].art_panel_active()
-func _refresh_cmd_art() -> void:
-	_components["command_art"]._refresh_cmd_art()
-func _on_panel_slot(i: int) -> void:
-	_components["command_art"]._on_panel_slot(i)
-func _open_build_menu() -> void:
-	_components["command_art"]._open_build_menu()
+	return command_art.art_panel_active()
 func _process(_delta: float) -> void:
 	flush_visuals()
-	_components["hud_input"]._process(_delta)
+	hud_input._process(_delta)
 func draw_hover_at(mp: Vector2) -> void:
-	_components["hud_input"].draw_hover_at(mp)
-func _on_art_hot(i: int) -> void:
-	_components["command_art"]._on_art_hot(i)
-func _on_art_form(i: int) -> void:
-	_components["command_art"]._on_art_form(i)
+	hud_input.draw_hover_at(mp)
 func _input(event: InputEvent) -> void:
-	_components["hud_input"]._input(event)
-func _hud_canvas_pos(win_pos: Vector2) -> Vector2:
-	return _components["hud_input"]._hud_canvas_pos(win_pos)
-func _handle_cmd_key(k: InputEvent) -> bool:
-	return _components["command_art"]._handle_cmd_key(k)
-func _hud_button_at(win_pos: Vector2) -> Dictionary:
-	return _components["hud_input"]._hud_button_at(win_pos)
-func _hud_panel_at(win_pos: Vector2) -> bool:
-	return _components["hud_input"]._hud_panel_at(win_pos)
-func _refresh_banner() -> void:
-	_components["selection_info"]._refresh_banner()
-func _unit_icon(u: Dictionary) -> Texture2D:
-	return _components["selection_info"]._unit_icon(u)
-func _refresh_sel_frame() -> void:
-	_components["selection_info"]._refresh_sel_frame()
-func _refresh_troop() -> void:
-	_components["selection_info"]._refresh_troop()
-func _dominant(sel: Array) -> Dictionary:
-	return _components["selection_info"]._dominant(sel)
-func _act_assign_officer(idx: int) -> void:
-	_components["selection_info"]._act_assign_officer(idx)
-func _act_open_officer_pick() -> void:
-	_components["selection_info"]._act_open_officer_pick()
-func _act_close_officer_pick() -> void:
-	_components["selection_info"]._act_close_officer_pick()
-func _refresh_cmd_panel() -> void:
-	_components["command_model"]._refresh_cmd_panel()
-func _apply_cmd_specs(specs: Array, hint: String) -> void:
-	_components["command_model"]._apply_cmd_specs(specs, hint)
-func _apply_cmd_page() -> void:
-	_components["command_model"]._apply_cmd_page()
-func _on_cmd_page(dir: int) -> bool:
-	return _components["command_model"]._on_cmd_page(dir)
+	hud_input._input(event)
 func cmd_box_ready() -> bool:
-	return _components["command_model"].cmd_box_ready()
-func _refresh_hotkeys() -> void:
-	_components["command_model"]._refresh_hotkeys()
-func _order_stop(_hold: bool) -> void:
-	_components["command_actions"]._order_stop(_hold)
-func _act_build(idx: int) -> void:
-	_components["command_actions"]._act_build(idx)
-func _act_cancel_site(site: Dictionary) -> void:
-	_components["command_actions"]._act_cancel_site(site)
-func _act_cancel_train(building: Dictionary) -> void:
-	_components["command_actions"]._act_cancel_train(building)
-func _act_train(i: int) -> void:
-	_components["command_actions"]._act_train(i)
-func _act_research(idx: int) -> void:
-	_components["command_actions"]._act_research(idx)
-func _act_cancel_research() -> void:
-	_components["command_actions"]._act_cancel_research()
-func _add_tech_specs(specs: Array, bid: int) -> void:
-	_components["command_model"]._add_tech_specs(specs, bid)
-func _act_group(n: int) -> void:
-	_components["command_actions"]._act_group(n)
-func _act_move() -> void:
-	_components["command_actions"]._act_move()
-func _act_attack() -> void:
-	_components["command_actions"]._act_attack()
-func _act_transport() -> void:
-	_components["command_actions"]._act_transport()
-func _act_repair() -> void:
-	_components["command_actions"]._act_repair()
-func _act_board() -> void:
-	_components["command_actions"]._act_board()
-func _act_watch() -> void:
-	_components["command_actions"]._act_watch()
-func _act_rest() -> void:
-	_components["command_actions"]._act_rest()
-func _act_disband() -> void:
-	_components["command_actions"]._act_disband()
-func _act_duel() -> void:
-	_components["command_actions"]._act_duel()
-func _act_form_menu() -> void:
-	_components["command_actions"]._act_form_menu()
-func _act_hot_menu() -> void:
-	_components["command_actions"]._act_hot_menu()
-func _on_cmd(i: int) -> void:
-	_components["command_actions"]._on_cmd(i)
-func _on_hotkey(i: int) -> void:
-	_components["command_actions"]._on_hotkey(i)
-func _selected_building() -> Dictionary:
-	return _components["selection_info"]._selected_building()
-func _selected_site() -> Dictionary:
-	return _components["selection_info"]._selected_site()
-func _worker_count(sel: Array) -> int:
-	return _components["selection_info"]._worker_count(sel)
-func _mobile_count(sel: Array) -> int:
-	return _components["selection_info"]._mobile_count(sel)
-func _can_afford(tt: Dictionary) -> bool:
-	return _components["selection_info"]._can_afford(tt)
-func _cost_text(tt: Dictionary) -> String:
-	return _components["selection_info"]._cost_text(tt)
-func _rebuild_stats_text() -> void:
-	_components["selection_info"]._rebuild_stats_text()
-func _hud_select_hook(want_building: bool) -> void:
-	await _components["hud_input"]._hud_select_hook(want_building)
-func _send_click(canvas_pos: Vector2) -> void:
-	_components["hud_input"]._send_click(canvas_pos)
-func _hud_click_hook(idx: int, hot: bool) -> void:
-	await _components["hud_input"]._hud_click_hook(idx, hot)
-func _on_click_probe() -> void:
-	_components["hud_input"]._on_click_probe()
-func _sel_state_text() -> String:
-	return _components["selection_info"]._sel_state_text()
+	return command_model.cmd_box_ready()
 func update_hover() -> void:
-	_components["selection_info"].update_hover()
+	selection_info.update_hover()
 func setup_camera() -> void:
-	_components["camera_controller"].setup_camera()
+	camera_controller.setup_camera()
 func set_zoom() -> void:
-	_components["camera_controller"].set_zoom()
+	camera_controller.set_zoom()
 func pan_by(pixels: Vector2) -> void:
-	_components["camera_controller"].pan_by(pixels)
+	camera_controller.pan_by(pixels)
 func battle_rect() -> Rect2:
-	return _components["camera_controller"].battle_rect()
+	return camera_controller.battle_rect()
 func clamp_camera() -> void:
-	_components["camera_controller"].clamp_camera()
+	camera_controller.clamp_camera()
 func apply_cli_view() -> void:
-	_components["camera_controller"].apply_cli_view()
+	camera_controller.apply_cli_view()
 func fit_view() -> void:
-	_components["camera_controller"].fit_view()
+	camera_controller.fit_view()
 func edge_direction(mouse: Vector2) -> Vector2:
-	return _components["camera_controller"].edge_direction(mouse)
-func _minimap_navigate(screen_position: Vector2) -> void:
-	_components["camera_controller"]._minimap_navigate(screen_position)
+	return camera_controller.edge_direction(mouse)
 func edge_scroll(delta: float) -> void:
-	_components["camera_controller"].edge_scroll(delta)
+	camera_controller.edge_scroll(delta)
 func scroll_from_pointer(pointer: Vector2, delta: float) -> void:
-	_components["camera_controller"].scroll_from_pointer(pointer, delta)
-func _sheet(p: String) -> Texture2D:
-	return _components["unit_visuals"]._sheet(p)
+	camera_controller.scroll_from_pointer(pointer, delta)
 func build_terrain() -> void:
-	_components["world_layers"].build_terrain()
+	world_layers.build_terrain()
 
 func prepare_map_terrain(map_id: String) -> Dictionary:
-	return _components["world_layers"].terrain_plan(map_id)
+	return world_layers.terrain_plan(map_id)
 
-func switch_map_terrain(map_id: String, plan: Dictionary) -> bool:
+func stage_map_terrain(map_id: String, plan: Dictionary) -> Node2D:
 	setup_camera()
-	return _components["world_layers"].install_terrain(map_id, plan, DisplayServer.get_name() != "headless")
+	return world_layers.stage_terrain(map_id, plan, DisplayServer.get_name() != "headless")
 
-func rollback_map_terrain(map_id: String, plan: Dictionary, position: Vector2, zoom: Vector2) -> void:
-	cam.position = position
-	cam.zoom = zoom
-	_components["world_layers"].install_terrain(map_id, plan)
+func commit_map_terrain(staged: Node2D) -> void:
+	world_layers.commit_terrain(staged)
 
 func finish_map_change() -> void:
 	marquee_hide()
 	if _ui.minimap != null: _ui.minimap.reload_map_terrain()
-func attach_unit(u: Dictionary, ob: Dictionary, w: int, h: int, k: float) -> void:
-	_components["unit_visuals"].attach_unit(u, ob, w, h, k)
+func attach_unit(u: Dictionary, sheet: String, w: int, h: int, k: float) -> void:
+	unit_visuals.attach_unit(u, sheet, w, h, k)
 func free_unit(u: Dictionary) -> void:
-	_components["unit_visuals"].free_unit(u)
+	unit_visuals.free_unit(u)
 func place_unit(u: Dictionary) -> void:
-	host.invalidate_unit_views()
-	_components["unit_visuals"].place_unit(u)
+	host.queries.invalidate_unit_views()
+	unit_visuals.place_unit(u)
 func capture_motion() -> void:
-	host.invalidate_unit_views()
-	_components["unit_visuals"].capture_motion()
+	host.queries.invalidate_unit_views()
+	unit_visuals.capture_motion()
 func interpolate_motion(alpha: float) -> void:
-	_components["unit_visuals"].interpolate_motion(alpha)
+	unit_visuals.interpolate_motion(alpha)
 func hide_unit(u: Dictionary) -> void:
-	_components["unit_visuals"].hide_unit(u)
+	unit_visuals.hide_unit(u)
 func fade_unit(u: Dictionary, alpha: float) -> void:
-	_components["unit_visuals"].fade_unit(u, alpha)
+	unit_visuals.fade_unit(u, alpha)
 func set_unit_attached(u: Dictionary, attached: bool) -> void:
-	_components["unit_visuals"].set_unit_attached(u, attached)
+	unit_visuals.set_unit_attached(u, attached)
 func update_visual(u: Dictionary) -> void:
-	host.invalidate_unit_views()
-	_components["unit_visuals"].update_visual(u)
+	host.queries.invalidate_unit_views()
+	unit_visuals.update_visual(u)
 
 func domain_changed() -> void:
-	host.invalidate_unit_views()
+	host.queries.invalidate_unit_views()
 func mobile_pose(u: Dictionary, gait_tick := -1.0) -> Dictionary:
-	return _components["unit_visuals"].mobile_pose(u, gait_tick)
-func _apply_mobile_pose(u: Dictionary, gait_tick := -1.0) -> void:
-	_components["unit_visuals"]._apply_mobile_pose(u, gait_tick)
+	return unit_visuals.mobile_pose(u, gait_tick)
 func set_frame(u: Dictionary, f: int) -> void:
-	_components["unit_visuals"].set_frame(u, f)
+	unit_visuals.set_frame(u, f)
 func build_marquee() -> void:
-	_components["world_layers"].build_marquee()
+	world_layers.build_marquee()
 func marquee_hide() -> void:
-	_components["world_layers"].marquee_hide()
+	world_layers.marquee_hide()
 func marquee_update(r: Rect2) -> void:
-	_components["world_layers"].marquee_update(r)
+	world_layers.marquee_update(r)
 func unit_nodes(u: Dictionary) -> Dictionary:
-	return _components["unit_visuals"].unit_nodes(u)
+	return unit_visuals.unit_nodes(u)
 
 static func screenshot(node: Node) -> void:
 	if DisplayServer.get_name() == "headless":
@@ -479,9 +308,11 @@ static func clip_frame(u: Dictionary, clip: String, dir: int, step: int) -> int:
 
 # ------------------------------------------------- selection marquee (E) ----
 
-func _exit_tree() -> void:
-	for component in _components.values(): component.ports.disconnect_services()
-	_components.clear()
+func _dispose_components() -> void:
+	if _disposed: return
+	_disposed = true
+	for component in _owned_components().values():
+		if is_instance_valid(component): component.free()
 	for property in _ui.get_property_list():
 		var value = _ui.get(property.name)
 		if value is Array or value is Dictionary: value.clear()
@@ -491,3 +322,23 @@ func rekey_unit(unit: Dictionary, new_uid: int) -> void:
 	if old_uid == new_uid or not _ui._nodes_by_uid.has(old_uid): return
 	_ui._nodes_by_uid[new_uid] = _ui._nodes_by_uid[old_uid]
 	_ui._nodes_by_uid.erase(old_uid)
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PREDELETE and not _disposed: _dispose_components()
+
+func _owned_components() -> Dictionary:
+	var components := {
+		"controller": controller,
+		"unit_visuals": unit_visuals,
+		"camera_controller": camera_controller,
+		"hud_build": hud_build,
+		"hud_layout": hud_layout,
+		"world_layers": world_layers,
+		"hud_input": hud_input,
+		"selection_info": selection_info,
+		"command_art": command_art,
+		"command_model": command_model,
+		"command_actions": command_actions,
+		"legacy_layout": legacy_layout,
+	}
+	return components

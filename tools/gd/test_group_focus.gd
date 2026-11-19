@@ -31,9 +31,9 @@ func run() -> void:
 	battle.selected.clear()
 	if not other.is_empty(): battle.selected.append(other)
 	battle.selected.append(hero)
-	battle.commands.military._group_assign(9)
+	battle.world.command_groups._group_assign(9)
 	battle.selected.clear()
-	var ok: bool = battle.commands.session.focus_group(9)
+	var ok: bool = battle.actions.focus_group(9)
 	if not ok or battle.selected.is_empty():
 		push_error("GROUP FOCUS FAIL: recall returned no selection")
 		quit(1)
@@ -56,7 +56,7 @@ func run() -> void:
 	# The left-edge HUD button uses the presentation action path instead of the
 	# keyboard path; both must select and center through the same service.
 	battle.selected.clear()
-	battle.view._act_group(9)
+	battle.view.command_actions._act_group(9)
 	if battle.selected.is_empty() or int(battle.selected[0].get("uid", -1)) != int(hero.uid):
 		push_error("GROUP FOCUS FAIL: HUD group action did not select the officer")
 		quit(1)

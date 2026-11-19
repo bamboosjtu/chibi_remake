@@ -28,16 +28,16 @@ func resource_workload() -> void:
 	blank();var decor:=[]
 	for x in range(7,37):
 		for y in range(2,38): decor.append([x,y,0])
-	sim.map_data.decor=decor;sim.commands.economy._build_decor_targets()
+	sim.map_data.decor=decor;sim.world.harvest_orders._build_decor_targets()
 	var workers:=[]
 	for index in range(8): workers.append(make(index+1,3,30,Vector2i(3,10+index*2)))
 	install(workers);sim.selected=workers.duplicate()
 	var target: Dictionary=sim.decor_cells["24_20"]
-	measure("forest8Workers",func(): assert(sim.commands.economy._order_gather(target)==8))
+	measure("forest8Workers",func(): assert(sim.world.harvest_orders._order_gather(target)==8))
 	results.forest8Workers.cells=decor.size()
 	results.forest8Workers.signature=workers.map(func(w):return {"source":w.gather_obj.uid,"path":w.path.map(func(p):return [p.x,p.y])})
 	var point:=Vector2(target.ax,target.ay-30)
-	measure("decorHit",func(): assert(sim.commands.economy._resource_at(point).uid==target.uid))
+	measure("decorHit",func(): assert(sim.world.harvest_orders._resource_at(point).uid==target.uid))
 	results.decorHit.sources=decor.size()
 
 func ai_workload() -> void:
@@ -50,7 +50,7 @@ func ai_workload() -> void:
 	install(units)
 	var ai=load("res://simulation/systems/ai.gd").new(sim.world)
 	measure("aiConstruction600",func():
-		assert(sim.commands.economy.ai_construction_commander(3).is_empty())
+		assert(sim.world.ai_economy.ai_construction_commander(3).is_empty())
 		assert(ai._spare_construction_officer(3).is_empty()))
 	results.aiConstruction600.units=units.size()
 
@@ -61,7 +61,7 @@ func blocked_workload() -> void:
 	var calls:=int(sim.nav.performance_counters().calls)
 	measure("blockedDestination",func():
 		actor.state="move";actor.path=[goal];actor.pi=0;actor.blocked_n=0;actor.erase("blocked_cursor");actor.erase("repath_to")
-		assert(not sim.commands.orders._follow(actor,sim.SIM_DT)))
+		assert(not sim.world.movement._follow(actor,sim.SIM_DT)))
 	results.blockedDestination.queriesPerInvocation=(int(sim.nav.performance_counters().calls)-calls)/float(rounds+3)
 
 func preview_workload() -> void:
@@ -73,5 +73,5 @@ func preview_workload() -> void:
 	install(units);sim.selected=[leader];sim.build_types=[{"unit":11}]
 	sim.gold=100000.;sim.food=100000.;sim.wood=100000.;sim.stone=100000.
 	var point: Vector2=sim.nav.anchor_of(25,25)
-	assert(sim.commands.economy.build_placement_at(point,{"unit":11}).valid)
-	measure("buildPlacement",func(): assert(sim.commands.economy.build_placement_at(point,{"unit":11}).valid))
+	assert(sim.world.construction_orders.build_placement_at(point,{"unit":11}).valid)
+	measure("buildPlacement",func(): assert(sim.world.construction_orders.build_placement_at(point,{"unit":11}).valid))

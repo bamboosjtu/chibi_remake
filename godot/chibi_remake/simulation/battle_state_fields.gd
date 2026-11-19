@@ -1,7 +1,7 @@
 extends RefCounted
 ## All BattleState fields must be assigned a policy before a snapshot can load.
 ## INPUTS are copied deeply into a candidate; restored objects/indices are fresh.
-## PRESERVED retains live signal/command ownership; READ_ONLY is navigation data.
+## READ_ONLY fields are tile dimensions derived from the current navigation geometry.
 const INPUTS := [
 	"_officer_pool",
 	"player_owner",
@@ -67,26 +67,9 @@ const RESTORED := [
 	"_index_units_size",
 ]
 const OBJECTS := [
+	"geometry",
 	"session",
-	"economy",
-	"clock",
-	"nav",
-	"visibility",
-	"projectiles",
-	"fire_fields",
-	"transports",
-	"harvesting",
-	"construction",
-	"ai",
 	"simulation_rng",
-	"rules",
-	"command_rules",
-	"stratagems",
-	"automatic_gates",
-]
-const PRESERVED := [
-	"effects",
-	"player_commands",
 ]
 const READ_ONLY := [
 	"tile_w",
@@ -95,7 +78,7 @@ const READ_ONLY := [
 ]
 
 static func omissions(source: RefCounted) -> Array:
-	var expected: Array = INPUTS + RESET + RESTORED + OBJECTS + PRESERVED + READ_ONLY
+	var expected: Array = INPUTS + RESET + RESTORED + OBJECTS + READ_ONLY
 	var missing: Array = []
 	for property in source.get_property_list():
 		var key := str(property.name)

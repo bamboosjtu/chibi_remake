@@ -63,15 +63,15 @@ func resolve(host: Node2D, pointer: Vector2) -> Dictionary:
 	if direction != Vector2.ZERO and not bool(host.selecting):
 		var camera := view.cam as Camera2D
 		var wanted := camera.position+direction*4
-		var clamped := Metrics.clamp_world_pos(wanted,view.host.camera_bounds(),view.battle_rect(),get_viewport().get_visible_rect().size,camera.zoom)
+		var clamped := Metrics.clamp_world_pos(wanted,view.host.queries.camera_bounds(),view.battle_rect(),get_viewport().get_visible_rect().size,camera.zoom)
 		if not clamped.is_equal_approx(camera.position):
 			var directions := [Vector2(-1,-1),Vector2(0,-1),Vector2(1,-1),Vector2(1,0),Vector2(1,1),Vector2(0,1),Vector2(-1,1),Vector2(-1,0)]
 			return {"bank":"B","row":directions.find(direction)}
 	if not view.battle_rect().has_point(pointer): return {"bank":"A","row":0}
 	if host.selecting: return {"bank":"A","row":7}
 	var point: Vector2 = host.get_canvas_transform().affine_inverse()*pointer
-	var mode: String = host.commands.orders.cmd_pending_kind()
-	var targets: Dictionary = view.host.cursor_targets(point,mode)
+	var mode: String = host.queries.cmd_pending_kind()
+	var targets: Dictionary = view.host.queries.cursor_targets(point,mode)
 	var result := 0
 	match mode:
 		"attack":
@@ -98,9 +98,7 @@ func advance(delta: float, state: Dictionary) -> void:
 		elapsed -= 0.160;column=(column+1)%4
 
 func _battle() -> Node2D:
-	for child in get_tree().root.get_children():
-		if child is Node2D and child.get_script() != null and child.get_script().resource_path == "res://main.gd" and child.view != null: return child
-	return null
+	return get_tree().get_first_node_in_group("active_battle_queries") as Node2D
 
 func _video_playing() -> bool:
 	for player in get_tree().get_nodes_in_group("presentation_video_players"):

@@ -16,7 +16,7 @@ func run() -> void:
 	var tick: int=b.sim_tick;var rendered:=Engine.get_process_frames()
 	for i in range(10):await process_frame
 	assert(Engine.get_process_frames()>rendered and b.sim_tick==tick)
-	b.commands.world._sim_step(b.SIM_DT)
+	b.world.battle_simulation._sim_step(b.SIM_DT)
 	assert(b.sim_tick==tick+1 and not script.workload_valid(b),"Manual logic cannot legitimize paused FPS")
 	b.view.briefing.close();assert(not paused and script.workload_valid(b))
 	var running_tick: int=b.sim_tick
@@ -28,10 +28,10 @@ func run() -> void:
 	assert(await harness._start_live_measurement(b,report))
 	assert(b.sim_tick==fixed_tick and report.frameInitialTick==fixed_tick and report.renderWarmupPreservedSimulation,"Renderer warmup must preserve the exact simulation start")
 	assert(not str(report.frameInitialStateChecksum).is_empty())
-	assert(b._modules.battle_simulation.timing_enabled and b.nav.paths.profile_enabled,"Benchmark must opt in to wall-clock sampling")
-	var measured: int=b._modules.battle_simulation.tick_microseconds
-	b.commands.world._sim_step(b.SIM_DT)
-	assert(b._modules.battle_simulation.tick_microseconds>measured)
+	assert(b.world.battle_simulation.timing_enabled and b.nav.paths.profile_enabled,"Benchmark must opt in to wall-clock sampling")
+	var measured: int=b.world.battle_simulation.tick_microseconds
+	b.world.battle_simulation._sim_step(b.SIM_DT)
+	assert(b.world.battle_simulation.tick_microseconds>measured)
 	harness.free()
 	b.game_end=1;assert(not script.workload_valid(b))
 	b.scene.ready_to_save=false;b.free();done=true;print("BENCHMARK GUARD PASS real briefing pause / rendered frames without gameplay rejected / manual-tick bypass rejected / ended battle rejected");quit()

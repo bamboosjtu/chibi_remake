@@ -1,11 +1,16 @@
 extends RefCounted
-const Access = preload("res://simulation/ports/scenario_rules_access.gd")
-var host: Access
+const NavRuntime = preload("res://simulation/navigation/nav.gd")
+var _nav: NavRuntime
+var _state: RefCounted
+var _dep_command_groups: Object
+var _dep_officer_teams: Object
 var missions := {}
 var campaign_modes := {}
 var default_defeat_mode := "economy"
 func _init(h: Object) -> void:
-	host = h.simulation_access("scenario_rules") if h.has_method("simulation_access") else h
+	_state = h.state
+	_dep_command_groups = h.command_groups
+	_dep_officer_teams = h.officer_teams
 	var data := preload("res://simulation/definitions/rule_catalog.gd").get_catalog("scenario_rules.json")
 	missions = data.missions
 	campaign_modes = data.campaignModes
@@ -15,50 +20,50 @@ func defeat_policy(map_id: String) -> Dictionary:
 	return campaign_modes.get(map_id,{"mode":default_defeat_mode}).duplicate(true)
 
 func tick() -> int:
-	for stage in missions.get(str(host.scenario_mission), {}).get("stages", []):
-		if host.task_latches.get("%d/%s" % [int(host.scenario_mission),str(stage.id)],false):
+	for stage in missions.get(str(_state.scenario_mission), {}).get("stages", []):
+		if _state.task_latches.get("%d/%s" % [int(_state.scenario_mission),str(stage.id)],false):
 			if bool(stage.get("lose",false)): return 2
-	for stage in missions.get(str(host.scenario_mission), {}).get("stages", []):
-		var key := "%d/%s" % [int(host.scenario_mission), str(stage.id)]
-		if host.task_latches.get(key, false):
+	for stage in missions.get(str(_state.scenario_mission), {}).get("stages", []):
+		var key := "%d/%s" % [int(_state.scenario_mission), str(stage.id)]
+		if _state.task_latches.get(key, false):
 			continue
 		var ready := true
 		for prerequisite in stage.get("requires", []):
-			ready = ready and bool(host.task_latches.get("%d/%s" % [int(host.scenario_mission), str(prerequisite)], false))
+			ready = ready and bool(_state.task_latches.get("%d/%s" % [int(_state.scenario_mission), str(prerequisite)], false))
 		if not ready or not condition(stage.condition):
 			continue
-		host.task_latches[key] = true
+		_state.task_latches[key] = true
 		for effect in stage.get("effects", []):
 			apply_effect(effect)
 		if bool(stage.get("lose",false)): return 2
 		if bool(stage.get("win", false)):
-			host.objective_done = true
+			_state.objective_done = true
 			return 1
 		if bool(stage.get("yield", false)):
 			return 0
-	return 1 if host.objective_done else 0
+	return 1 if _state.objective_done else 0
 
 ## 参战方列表按序号取归属（0 基）。越界/未定义返回 -1。
 func side_owner(index: int) -> int:
-	if index < 0 or index >= host.scenario_sides.size(): return -1
-	return int((host.scenario_sides[index] as Dictionary).get("owner", -1))
+	if index < 0 or index >= _state.scenario_sides.size(): return -1
+	return int((_state.scenario_sides[index] as Dictionary).get("owner", -1))
 
 ## 该参战方是否已无任何存活实体（含建筑；淡出中的尸体不算存活）。
 func side_cleared(index: int) -> bool:
 	var owner := side_owner(index)
 	if owner < 0: return false
-	for u in host.units:
+	for u in _state.units:
 		if int(u.get("owner", -1)) != owner: continue
 		if bool(u.get("alive", false)) and float(u.get("die_t", -1)) < 0.0:
 			return false
 	return true
 
 func side_matches(u: Dictionary, side: String) -> bool:
-	return int(u.owner) == int(host.player_owner) if side == "player" else int(u.owner) != int(host.player_owner) and int(u.owner) != 0
+	return int(u.owner) == int(_state.player_owner) if side == "player" else int(u.owner) != int(_state.player_owner) and int(u.owner) != 0
 
 func candidates(side: String) -> Array:
 	var out := []
-	for u in host.units:
+	for u in _state.units:
 		if u.alive and u.die_t < 0.0 and side_matches(u, side):
 			out.append(u)
 	return out
@@ -98,33 +103,36 @@ func condition(c: Dictionary) -> bool:
 func apply_effect(effect: Dictionary) -> void:
 	match str(effect.kind):
 		"officer_experience":
-			var amount=effect.get("amount",host.map_data.get("scenario",{}).get(str(effect.get("experienceParameter","eventExperience"))))
+			var amount=effect.get("amount",_state.map_data.get("scenario",{}).get(str(effect.get("experienceParameter","eventExperience"))))
 			if amount==null:return # Unresolved research parameters are never replaced by invented XP.
 			for u in candidates(str(effect.get("side","player"))):
-				if int(u.get("officer",{}).get("index",-1))+1==int(effect.get("officer",-1)):host._grant_officer_exp(u,float(amount))
+				if int(u.get("officer",{}).get("index",-1))+1==int(effect.get("officer",-1)):_dep_officer_teams._grant_officer_exp(u,float(amount))
 		"status_delta":
 			for u in candidates(str(effect.side)):
 				u["status_173"] = (int(u.get("status_173", 70)) + int(effect.amount)) & 255
 		"event":
-			host.task_events.append({"id": int(effect.id), "tick": int(host.sim_tick)})
+			_state.task_events.append({"id": int(effect.id), "tick": int(_state.sim_tick)})
 		"clear_tiles":
 			for cell in effect.cells:
-				host.terrain_changes["%d/%d/%d" % [int(effect.layer), int(cell[0]), int(cell[1])]] = 65535
+				_state.terrain_changes["%d/%d/%d" % [int(effect.layer), int(cell[0]), int(cell[1])]] = 65535
 				var c := Vector2i(int(cell[0]), int(cell[1]))
-				if host.map_data.has("terrainWalkable"):
-					host.map_data.terrainWalkable[c.x * int(host.map_data.cols) + c.y] = 1
-				host.nav.unblock(c)
+				if _state.map_data.has("terrainWalkable"):
+					_state.map_data.terrainWalkable[c.x * int(_state.map_data.cols) + c.y] = 1
+				_nav.unblock(c)
 		"enemy_order":
 			for enemy in candidates("enemy"):
 				if enemy.is_building:
 					continue
-				var target: Vector2 = host.nav.anchor_of(int(effect.target[0]), int(effect.target[1]))
-				enemy.path = host.nav.find_path(Vector2(enemy.ax, enemy.ay), target, false, host._nav_layer(enemy), int(enemy.get("owner", -1)), int(enemy.get("unit", -1)))
+				var target: Vector2 = _nav.anchor_of(int(effect.target[0]), int(effect.target[1]))
+				enemy.path = _nav.find_path(Vector2(enemy.ax, enemy.ay), target, false, _dep_command_groups._nav_layer(enemy), int(enemy.get("owner", -1)), int(enemy.get("unit", -1)))
 				enemy.pi = 0
 				enemy.state = "move" if not enemy.path.is_empty() else "idle"
 				# DAT_0048534c initial value is 100 in the PE data section.
-				var amount: int = int(host.map_data.get("scenario", {}).get(str(effect.experienceParameter), 100))
+				var amount: int = int(_state.map_data.get("scenario", {}).get(str(effect.experienceParameter), 100))
 				var id: int = int(enemy.get("officer", {}).get("index", -1))
 				if id >= 0:
-					host.officer_progress[id] = (int(host.officer_progress.get(id, 0)) + amount) & 255
-					enemy["event_experience"] = host.officer_progress[id]
+					_state.officer_progress[id] = (int(_state.officer_progress.get(id, 0)) + amount) & 255
+					enemy["event_experience"] = _state.officer_progress[id]
+
+func bind_dependencies(world: Object) -> void:
+	_nav = world.nav

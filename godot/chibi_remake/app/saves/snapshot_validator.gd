@@ -57,7 +57,7 @@ func _reject(stage: String) -> Dictionary:
 
 func _index_units(arr: Array, simulation: Dictionary) -> Dictionary:
 	var ids := {}
-	if not battle.visibility.valid_snapshot(simulation.get("explored", "")):
+	if not host.world.visibility.valid_snapshot(simulation.get("explored", "")):
 		return {}
 	# 在修改世界前验证完整快照。
 	for rec in arr:
@@ -69,7 +69,7 @@ func _index_units(arr: Array, simulation: Dictionary) -> Dictionary:
 		var uid := int(rec.uid)
 		if ids.has(uid) or not battle.map_data.units.has(str(int(rec.get("unit", -1)))):
 			return {}
-		if host.commands.world._sheet_ref_for(int(rec.unit), int(rec.get("owner", -1))) == "":
+		if host.world.entity_factory._sheet_ref_for(int(rec.unit), int(rec.get("owner", -1))) == "":
 			return {}
 		if not rec.has("x") or not rec.has("y") or not is_finite(float(rec.x)) or not is_finite(float(rec.y)):
 			return {}
@@ -186,12 +186,12 @@ func _valid_technology(simulation: Dictionary, ids: Dictionary, arr: Array, prod
 		if owner <= 0 or not ids.has(uid) or production_buildings.has(uid) or int(job.t) >= Technology.ticks() or idx >= Technology.table().size(): return false
 		var building: Dictionary = ids[uid]
 		if not bool(building.get("building",false)) or int(building.owner) != owner or not bool(building.get("alive",false)) or float(building.get("dieT",-1)) >= 0 or bool(building.get("simulation",{}).get("site",false)): return false
-		var line: String = host.commands.technology._tech_line_of(idx)
+		var line: String = host.world.technology._tech_line_of(idx)
 		var lines: Array = Technology.building_lines(int(building.unit))
 		if owner != battle.player_owner and int(building.unit) in [4,5]: lines = ["bow"]
 		if not lines.has(line) or not _valid_cost.call(job.get("cost",{})): return false
 		var key := "%d/%d" % [owner,idx]
-		if not host.commands.technology.tech_is_sell(idx) and researching.has(key): return false
+		if not host.world.technology.tech_is_sell(idx) and researching.has(key): return false
 		researching[key] = true; production_buildings[uid] = true
 
 	return true
@@ -204,7 +204,7 @@ func _valid_unit_states(d: Dictionary, arr: Array, ids: Dictionary) -> bool:
 		if not preload("res://simulation/definitions/unit_schema.gd").valid_snapshot(st2): return false
 		if not TickTimers.valid_snapshot(st2) or not ActionClock.valid_snapshot(st2): return false
 		if not preload("res://simulation/systems/locomotion.gd").valid_snapshot(st2): return false
-		if not battle.stratagems.valid_snapshot(st2):return false
+		if not host.world.stratagems.valid_snapshot(st2):return false
 		# R01：统一“基础上限 + 科技当前兵力”的合法范围；升级部队 hp > maxhp 是契约内状态。
 		# 只约束仍在场的单位：淡出中的尸体允许保留负 HP（击杀结算不夹到 0）。
 		if bool(rec2.get("alive", false)) and float(rec2.get("dieT", -1.0)) < 0.0:
@@ -259,11 +259,11 @@ func _complete_plan(d: Dictionary, simulation: Dictionary, ids: Dictionary) -> D
 		if not (stock is int or stock is float) or not is_finite(float(stock)) or float(stock) < 0: return {}
 		var base: Dictionary = battle.decor_cells[str(key)]
 		if int(base.unit) in [100,102] and float(stock) > 200: return {}
-	if not battle.projectiles.valid_snapshot(simulation.get("projectiles",[])): return {}
-	if not battle.fire_fields.valid_snapshot(simulation.get("fireFields",[])):return {}
-	if not battle.transports.valid_snapshot(ids):return {}
-	if not battle.construction.valid_snapshot(ids): return {}
-	if battle.ai != null and not battle.ai.valid_snapshot(simulation.get("ai",{}),ids,d.get("trainings",[]),int(d.get("nextUid",0))): return {}
+	if not host.world.projectiles.valid_snapshot(simulation.get("projectiles",[])): return {}
+	if not host.world.fire_fields.valid_snapshot(simulation.get("fireFields",[])):return {}
+	if not host.world.transports.valid_snapshot(ids):return {}
+	if not host.world.construction.valid_snapshot(ids): return {}
+	if host.world.ai != null and not host.world.ai.valid_snapshot(simulation.get("ai",{}),ids,d.get("trainings",[]),int(d.get("nextUid",0))): return {}
 	var speed = simulation.get("speedIndex",2)
 	if not Semantics.valid_timing(simulation): return {}
 	return {"simulation": simulation, "ids": ids, "speed": speed, "decor": decor_snapshot}

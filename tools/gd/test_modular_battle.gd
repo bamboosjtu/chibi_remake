@@ -22,14 +22,14 @@ func run() -> void:
 		for key in ["spr", "skin", "diamond", "hbar", "hfill", "gate_module"]:
 			assert(not unit.has(key), "Simulation records must not own presentation nodes")
 		assert(battle.view.unit_nodes(unit).has("spr"))
-	assert(battle.commands.session._save_game())
+	assert(battle.session_actions.save_game())
 	var snapshot: Dictionary = root.get_node("Game").load_save()
-	var before: String = JSON.stringify(battle.commands.session._save_extra())
+	var before: String = JSON.stringify(battle.scene_controller._save_extra())
 	var selection: Array = battle.selected.duplicate()
 	var invalid: Dictionary = snapshot.duplicate(true)
 	invalid.units[0].simulation.build_targetUid = 2147483646
 	assert(not battle.saver.apply_snapshot(invalid))
-	assert(JSON.stringify(battle.commands.session._save_extra()) == before and battle.selected == selection)
+	assert(JSON.stringify(battle.scene_controller._save_extra()) == before and battle.selected == selection)
 	assert(battle.saver.apply_snapshot(snapshot))
 	assert(battle.state.get_instance_id() != state_id)
 	for unit in battle.units:

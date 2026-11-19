@@ -1,10 +1,13 @@
-extends RefCounted
+extends Object
 const ViewMath = preload("res://presentation/battle/view_math.gd")
 ## selection info: presentation component.
 const UIState = preload("res://presentation/battle/components/battle_view_state.gd")
 var _ui: UIState
 var surface: Node2D
-var ports = preload("res://presentation/battle/components/ports/selection_info_dependencies.gd").new()
+var _dep_camera_controller: Object
+var _dep_command_model: Object
+var _dep_hud_layout: Object
+var _dep_unit_visuals: Object
 func _init(data: UIState, node: Node2D) -> void:
 	_ui = data
 	surface = node
@@ -12,37 +15,37 @@ func _init(data: UIState, node: Node2D) -> void:
 func update_hud_text() -> void:
 	if _ui.info == null:
 		return
-	ports._refresh_metrics()
+	_dep_hud_layout._refresh_metrics()
 	_refresh_res_slots()
-	var sel: Array = _ui.host.selection_views()
+	var sel: Array = _ui.host.queries.selection_views()
 	var fb: String = str(_ui.host.feedback_text)
 	# 原版左下角只显示一句状态（「训练完成」）。有反馈就显示反馈，没有就显示悬停信息。
 	var l1: String = fb if fb != "" else str(_ui.host.hover_text)
 	if fb == "" and not _ui.host.show_debug: l1 = ""
 	_ui.info.text = l1
 	_ui.info.visible = l1 != "" and _ui._art_hover_name == ""
-	var map_name: String = _ui.host.map_caption()
+	var map_name: String = _ui.host.queries.map_caption()
 	var l2: String = "三国赤壁 — %s \"%s\"   第 %d 关   我军 归属%d   我军 %d · 敌军 %d · 已选 %d" % [
-		str(_ui.host.map_id).to_upper(), map_name, int(_ui.host.scenario_mission),
-		int(_ui.host.player_owner), int(_ui.host.cnt_player), int(_ui.host.cnt_enemy), sel.size()]
+		str(_ui.host.queries.map_id).to_upper(), map_name, int(_ui.host.queries.scenario_mission),
+		int(_ui.host.queries.player_owner), int(_ui.host.queries.cnt_player), int(_ui.host.queries.cnt_enemy), sel.size()]
 	# ARCH-011：工程信息（map id / 帧率 / 事件数 / 武将策略）默认不展示，Ctrl+F3 打开
 	if bool(_ui.host.show_debug):
 		l2 += "   [调试] mission=%d 敌军建筑=%d zoom=%.2f tick=%d events=%d officer=%s src=%s" % [
-			int(_ui.host.scenario_mission), int(_ui.host.cnt_enemy_buildings),
-			ports.zoom_x(), int(_ui.host.sim_tick), int(_ui.host.ev_count), str(_ui.host.officer_policy), str(_ui.host.scenario_source)]
+			int(_ui.host.queries.scenario_mission), int(_ui.host.queries.cnt_enemy_buildings),
+			_dep_camera_controller.zoom_x(), int(_ui.host.queries.sim_tick), int(_ui.host.ev_count), str(_ui.host.queries.officer_policy), str(_ui.host.queries.scenario_source)]
 	_ui.status_sub.text = l2
 	_ui.status_sub.visible = bool(_ui.host.show_debug)
-	ports._layout_status_labels(surface.get_viewport_rect().size, _ui.ui_scale)
+	_dep_hud_layout._layout_status_labels(surface.get_viewport_rect().size, _ui.ui_scale)
 
 func _refresh_res_slots() -> void:
-	var vals: Array = [float(_ui.host.gold), float(_ui.host.food), float(_ui.host.wood), float(_ui.host.stone)]
+	var vals: Array = [float(_ui.host.queries.gold), float(_ui.host.queries.food), float(_ui.host.queries.wood), float(_ui.host.queries.stone)]
 	for i in range(_ui.res_slots.size()):
 		var e: Dictionary = _ui.res_slots[i]
 		var l: Label = e.value
 		l.text = "%.0f" % float(vals[i])
 
 func _officer_selection() -> Dictionary:
-	for u in _ui.host.selection_views():
+	for u in _ui.host.queries.selection_views():
 		if bool(u.get("alive", false)) and not bool(u.is_building) and not (u.get("officer", {}) as Dictionary).is_empty():
 			return u
 	return {}
@@ -50,7 +53,7 @@ func _officer_selection() -> Dictionary:
 func _refresh_banner() -> void:
 	if _ui.banner == null:
 		return
-	var sel: Array = _ui.host.selection_views()
+	var sel: Array = _ui.host.queries.selection_views()
 	if sel.is_empty():
 		_ui.banner.visible = false
 		return
@@ -61,16 +64,16 @@ func _refresh_banner() -> void:
 		_ui.banner_label.text = "已选 %d 个单位" % sel.size()
 
 func _unit_icon(u: Dictionary) -> Texture2D:
-	var skin: Sprite2D = ports.unit_nodes(u).get("skin", null)
+	var skin: Sprite2D = _dep_unit_visuals.unit_nodes(u).get("skin", null)
 	if skin != null and skin.visible and skin.texture != null:
 		var hd := AtlasTexture.new()
 		hd.atlas = skin.texture
 		hd.region = skin.region_rect
 		return hd
-	var path: String = str(_ui.host.commands.world._sheet_ref_for(int(u.unit), int(u.owner)))
+	var path: String = str(_ui.host.queries.sheet_ref_for(int(u.unit), int(u.owner)))
 	if path == "" or not ResourceLoader.exists("res://" + path):
 		return null
-	var tex: Texture2D = ports._sheet(path)
+	var tex: Texture2D = _dep_unit_visuals._sheet(path)
 	if tex == null:
 		return null
 	var f: int = 0
@@ -87,7 +90,7 @@ func _refresh_sel_frame() -> void:
 		return
 	if _ui.sel_frame == null:
 		return
-	var sel: Array = _ui.host.selection_views()
+	var sel: Array = _ui.host.queries.selection_views()
 	if sel.is_empty():
 		_ui.sel_portrait.texture = null
 		_ui.sel_name.text = "—— 未选择 ——"
@@ -96,7 +99,7 @@ func _refresh_sel_frame() -> void:
 		return
 	var u: Dictionary = sel[0]
 	_ui.sel_portrait.texture = _unit_icon(u)
-	var selected_skin: Sprite2D = ports.unit_nodes(u).get("skin", null)
+	var selected_skin: Sprite2D = _dep_unit_visuals.unit_nodes(u).get("skin", null)
 	_ui.sel_portrait.material = selected_skin.material if selected_skin != null and selected_skin.visible else null
 	_ui.hp_bg.visible = true
 	var hp: float = 0.0
@@ -111,7 +114,7 @@ func _refresh_sel_frame() -> void:
 			var lv := int(off.get("level", 0))
 			var need := 0
 			if lv >= 0 and lv < int(preload("res://simulation/definitions/officer_grades.gd").data.thresholds.size()): need = int(preload("res://simulation/definitions/officer_grades.gd").data.thresholds[lv])
-			_ui.sel_rank.text = "归属 %s   %s   经验 %d/%d" % [str(off.get("name", "?")), str(_ui.host.commands.military.officer_rank_name(off)), int(off.get("exp", 0)), need]
+			_ui.sel_rank.text = "归属 %s   %s   经验 %d/%d" % [str(off.get("name", "?")), str(_ui.host.queries.officer_rank_name(off)), int(off.get("exp", 0)), need]
 		else:
 			_ui.sel_rank.text = "%s   #%d" % ["建筑" if bool(u.is_building) else "部队", int(u.unit)]
 	else:
@@ -129,7 +132,7 @@ func _refresh_troop() -> void:
 		return
 	if _ui.troop_frame == null:
 		return
-	var sel: Array = _ui.host.selection_views()
+	var sel: Array = _ui.host.queries.selection_views()
 	if sel.is_empty():
 		_ui.troop_frame.visible = false        # 未选择时不显示空框（空的金框看着像坏掉的占位）
 		_ui.troop_icon.texture = null
@@ -149,7 +152,7 @@ func _refresh_troop() -> void:
 				float(u.get("officer_might", 0)), float(u.get("officer_intellect", 0))]
 		else:
 			_ui.troop_icon.texture = _unit_icon(u)
-			var troop_skin: Sprite2D = ports.unit_nodes(u).get("skin", null)
+			var troop_skin: Sprite2D = _dep_unit_visuals.unit_nodes(u).get("skin", null)
 			_ui.troop_icon.material = troop_skin.material if troop_skin != null and troop_skin.visible else null
 			_ui.troop_icon.visible = true
 			_ui.troop_label.text = "%s\nHP %.0f / %.0f   兵力 %d" % [str(u.name), float(u.hp), float(u.maxhp), 1]
@@ -185,29 +188,29 @@ func _dominant(sel: Array) -> Dictionary:
 	return {"unit": best_id, "n": best, "sample": sample[best_id]}
 
 func _act_assign_officer(idx: int) -> void:
-	_ui.host.commands.session.submit_command("assign_officer", -1, idx)
+	_ui.host.actions.submit_command("assign_officer", -1, idx)
 	_ui.officer_pick = false
-	ports._refresh_cmd_panel()
+	_dep_command_model._refresh_cmd_panel()
 
 func _act_open_officer_pick() -> void:
 	_ui.officer_pick = true
-	ports._refresh_cmd_panel()
+	_dep_command_model._refresh_cmd_panel()
 
 func _act_close_officer_pick() -> void:
 	_ui.officer_pick = false
 	_ui.build_menu = false
-	ports._refresh_cmd_panel()
+	_dep_command_model._refresh_cmd_panel()
 
 func _selected_building() -> Dictionary:
-	for u in _ui.host.selection_views():
-		if bool(u.is_building) and int(u.owner) == int(_ui.host.player_owner) and bool(u.alive) \
+	for u in _ui.host.queries.selection_views():
+		if bool(u.is_building) and int(u.owner) == int(_ui.host.queries.player_owner) and bool(u.alive) \
 				and not bool(u.get("site", false)):
 			return u
 	return {}
 
 func _selected_site() -> Dictionary:
-	for u in _ui.host.selection_views():
-		if bool(u.is_building) and int(u.owner) == int(_ui.host.player_owner) and bool(u.alive) and bool(u.get("site", false)):
+	for u in _ui.host.queries.selection_views():
+		if bool(u.is_building) and int(u.owner) == int(_ui.host.queries.player_owner) and bool(u.alive) and bool(u.get("site", false)):
 			return u
 	return {}
 
@@ -226,8 +229,8 @@ func _mobile_count(sel: Array) -> int:
 	return n
 
 func _can_afford(tt: Dictionary) -> bool:
-	return float(_ui.host.gold) >= float(tt.get("gold", 0)) and float(_ui.host.wood) >= float(tt.get("wood", 0)) \
-		and float(_ui.host.food) >= float(tt.get("food", 0)) and float(_ui.host.stone) >= float(tt.get("stone", 0))
+	return float(_ui.host.queries.gold) >= float(tt.get("gold", 0)) and float(_ui.host.queries.wood) >= float(tt.get("wood", 0)) \
+		and float(_ui.host.queries.food) >= float(tt.get("food", 0)) and float(_ui.host.queries.stone) >= float(tt.get("stone", 0))
 
 func _cost_text(tt: Dictionary) -> String:
 	var keys: Array = ["gold", "food", "wood", "stone"]
@@ -247,7 +250,7 @@ func _rebuild_stats_text() -> void:
 		return
 	if _ui.panel_label == null:
 		return
-	var sel: Array = _ui.host.selection_views()
+	var sel: Array = _ui.host.queries.selection_views()
 	var lines: PackedStringArray = PackedStringArray()
 	if sel.is_empty():
 		lines.append("左键 选兵/框选 · Shift 加选 · 右键 移动/攻击")
@@ -258,11 +261,11 @@ func _rebuild_stats_text() -> void:
 		if sel.size() == 1:
 			var u: Dictionary = sel[0]
 			if bool(u.is_building):
-				var trs: Array = _ui.host.training_views()
+				var trs: Array = _ui.host.queries.training_views()
 				if trs.is_empty():
 					lines.append("生产队列：空")
 				for tr in trs:
-					lines.append("生产中 %s  余 %.1fs" % [str(_ui.host.commands.world._unit_name(int(tr.unit))), float(tr.t) * _ui.host.clock_view().period])
+					lines.append("生产中 %s  余 %.1fs" % [str(_ui.host.queries.unit_name(int(tr.unit))), float(tr.t) * _ui.host.queries.clock_view().period])
 			else:
 				# 与原版面板同序：攻击力 / 防御力 / 射程 / 视野（均取自 DATA.EXP）
 				lines.append("攻击力 %.0f    防御力 %.0f" % [float(u.attack), float(u.defence)])
@@ -277,7 +280,7 @@ func _rebuild_stats_text() -> void:
 				#   **士气本模拟没有建模** —— 明说，不编一个数字出来。
 				lines.append("经验 %d   谋略 %.0f" % [int(off.get("level", 0)), float(u.get("officer_intellect", 0))])
 				lines.append("粮数 %.0f   士气（未建模）" % float(u.get("carry", 0.0)))
-			var ca: Vector2i = _ui.host.commands.orders._cell_of_px(float(u.ax), float(u.ay))
+			var ca: Vector2i = _ui.host.queries.cell_of_px(float(u.ax), float(u.ay))
 			lines.append("位置 A=%d B=%d   状态 %s" % [ca.x, ca.y, str(u.state)])
 			lines.append("uid %d   归属 %d" % [int(u.uid), int(u.owner)])
 		else:
@@ -305,13 +308,19 @@ func _rebuild_stats_text() -> void:
 
 func _sel_state_text() -> String:
 	var parts: PackedStringArray = PackedStringArray()
-	for u in _ui.host.selection_views():
+	for u in _ui.host.queries.selection_views():
 		parts.append("%s:%s/%d" % [str(u.name), str(u.state), int(u.path_count)])
 	return ",".join(parts) if parts.size() > 0 else "-"
 
 func update_hover() -> void:
 	_ui.host.hover_text = ""
 	if not _ui.host.show_debug:return
-	var hu: Dictionary = _ui.host.hover_view(surface.get_global_mouse_position())
+	var hu: Dictionary = _ui.host.queries.hover_view(surface.get_global_mouse_position())
 	if not hu.is_empty():
 		_ui.host.hover_text = "%s  hp %.0f/%.0f  owner %d" % [str(hu.name), float(hu.hp), float(hu.maxhp), int(hu.owner)]
+
+func bind_dependencies(components: Object) -> void:
+	_dep_camera_controller = components.camera_controller
+	_dep_command_model = components.command_model
+	_dep_hud_layout = components.hud_layout
+	_dep_unit_visuals = components.unit_visuals

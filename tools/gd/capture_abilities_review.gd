@@ -16,7 +16,7 @@ func key(code: int, unicode := 0) -> void:
 
 func capture(name: String) -> void:
 	await process_frame
-	b.view._refresh_metrics()
+	b.view.hud_layout._refresh_metrics()
 	b.view.update_hud_text()
 	b.view.update_panel()
 	await process_frame
@@ -59,12 +59,12 @@ func run() -> void:
 	assert(FileAccess.file_exists("user://chibi_shot.png"),"F11 must invoke the screenshot path")
 	var leader: Dictionary=b.selected[0]
 	leader.officer.level=9; leader.mou=1000; leader.team_kind="combat"
-	b.view._act_hot_menu()
+	b.view.command_actions._act_hot_menu()
 	assert(b.view.art_sub=="hot")
 	await capture("magics-panel")
 	assert(b.view.art_sub=="hot")
-	b.view._close_art_sub()
-	b.view._act_form_menu()
+	b.view.command_art._close_art_sub()
+	b.view.command_actions._act_form_menu()
 	assert(b.view.art_sub=="form")
 	await capture("formation-panel")
 	assert(b.view.art_sub=="form")

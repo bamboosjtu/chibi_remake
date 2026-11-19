@@ -1,40 +1,48 @@
-extends RefCounted
+extends Object
+const NavRuntime = preload("res://simulation/navigation/nav.gd")
+var _nav: NavRuntime
+const EffectsRuntime = preload("res://simulation/battle_effects.gd")
+var _effects: EffectsRuntime
 const Balance = preload("res://simulation/definitions/balance_rules.gd")
 ## officer teams: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
-const REQUIRED_SERVICES := {"abilities": ["_reset_jimou"], "battle_simulation": ["_clear_control_group_for", "_clear_officer_control_groups", "_feedback", "_free_unit_at", "_place_unit"], "combat": ["officer_rank_name"], "command_groups": ["_cancel_unit_command", "_commander_for", "_group_units"], "entity_factory": ["_attach_officer", "_make_unit", "_sheet_ref_for"], "interaction_paths": ["_edge_interaction_path"], "officer_pool": ["_officer_by_index", "_officer_held_only_by_selection", "_sync_officer_to_pool", "officer_in_use"], "production": ["_army_count", "_commander_count"], "spatial_index": ["_free_unit_cell"], "technology": ["_apply_tech_bonuses", "_is_worker_unit"]}
 var battle: State
-var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
+var _dep_abilities: Object
+var _dep_battle_simulation: Object
+var _dep_combat: Object
+var _dep_command_groups: Object
+var _dep_entity_factory: Object
+var _dep_interaction_paths: Object
+var _dep_officer_pool: Object
+var _dep_production: Object
+var _dep_spatial_index: Object
+var _dep_technology: Object
 
 func _init(data: State) -> void:
 	battle = data
 
 func _grant_officer_exp(u: Dictionary, amount: float) -> void:
-	var services := ports.acquire(["command_groups", "officer_pool", "battle_simulation", "combat"])
-	if services.is_empty(): return
 	if amount < 0.0:
 		return
-	var commander: Dictionary = services.command_groups._commander_for(u)
+	var commander: Dictionary = _dep_command_groups._commander_for(u)
 	var off: Dictionary = commander.get("officer", {})
 	if off.is_empty():
 		return
 	var promoted: bool=preload("res://simulation/systems/officer_progression.gd").award(off,int(amount))
-	services.officer_pool._sync_officer_to_pool(off)
+	_dep_officer_pool._sync_officer_to_pool(off)
 	if promoted and int(commander.owner)==battle.player_owner:
-		services.battle_simulation._feedback("%s：%s（%d级 · %s）" % [str(off.get("name","")),str(preload("res://simulation/systems/officer_progression.gd").data.levelUp.message),int(off.level),services.combat.officer_rank_name(off)])
-		if battle.effects != null:battle.effects.sound("play_id", [106])
-	if battle.effects != null:battle.effects.visual("update_panel", [])
+		_effects.feedback("%s：%s（%d级 · %s）" % [str(off.get("name","")),str(preload("res://simulation/systems/officer_progression.gd").data.levelUp.message),int(off.level),_dep_combat.officer_rank_name(off)])
+		if _effects != null:_effects.sound("play_id", [106])
+	if _effects != null:_effects.visual("update_panel", [])
 
 func _form_hero_unit(u: Dictionary, idx: int, actors = null) -> bool:
-	var services := ports.acquire(["production", "officer_pool", "entity_factory", "spatial_index", "technology", "battle_simulation"])
-	if services.is_empty(): return false
-	if services.production._army_count(int(u.owner)) >= Balance.army_cap() or services.production._commander_count(int(u.owner)) >= Balance.commander_cap(): return false
-	if u.is_building or not u.alive or u.die_t >= 0.0 or services.officer_pool.officer_in_use(idx): return false
-	var o: Dictionary = services.officer_pool._officer_by_index(idx)
+	if _dep_production._army_count(int(u.owner)) >= Balance.army_cap() or _dep_production._commander_count(int(u.owner)) >= Balance.commander_cap(): return false
+	if u.is_building or not u.alive or u.die_t >= 0.0 or _dep_officer_pool.officer_in_use(idx): return false
+	var o: Dictionary = _dep_officer_pool._officer_by_index(idx)
 	if o.is_empty(): return false
 	var hero_type := int(o.get("heroType", -1))
 	var meta: Dictionary = battle.map_data.units.get(str(hero_type), {})
-	if meta.is_empty() or services.entity_factory._sheet_ref_for(hero_type, int(u.owner)) == "": return false
+	if meta.is_empty() or _dep_entity_factory._sheet_ref_for(hero_type, int(u.owner)) == "": return false
 	var members: Array = []
 	for member in battle.selected if actors == null else actors:
 		if member.alive and member.die_t < 0.0 and not member.is_building and member.owner == u.owner and member.get("officer", {}).is_empty() and int(member.get("group_officer", -1)) < 0:
@@ -43,28 +51,26 @@ func _form_hero_unit(u: Dictionary, idx: int, actors = null) -> bool:
 	if members.is_empty(): return false
 	var w := int(meta.get("w", 64))
 	var h := int(meta.get("h", 64))
-	var want_cell := battle.nav.near_walkable(battle.nav.cell_of_px(u.ax, u.ay - battle.tile_hh * 2))
-	var cell: Vector2i = services.spatial_index._free_unit_cell(want_cell, 0, -1, hero_type)
+	var want_cell := _nav.near_walkable(_nav.cell_of_px(u.ax, u.ay - battle.tile_hh * 2))
+	var cell: Vector2i = _dep_spatial_index._free_unit_cell(want_cell, 0, -1, hero_type)
 	if cell.x < 0: return false
-	var anchor := battle.nav.anchor_of(cell.x, cell.y)
-	var commander: Dictionary = services.entity_factory._make_unit({"unit": hero_type, "owner": int(u.owner), "A": cell.x, "B": cell.y,
+	var anchor := _nav.anchor_of(cell.x, cell.y)
+	var commander: Dictionary = _dep_entity_factory._make_unit({"unit": hero_type, "owner": int(u.owner), "A": cell.x, "B": cell.y,
 		"px": anchor.x - w * 0.5, "py": anchor.y - h, "w": w, "h": h,
-		"tail": [], "sheet": services.entity_factory._sheet_ref_for(hero_type, int(u.owner))}, false)
-	services.entity_factory._attach_officer(commander, o)
-	commander.team_kind="worker" if members.all(func(member):return services.technology._is_worker_unit(member)) else "combat"
+		"tail": [], "sheet": _dep_entity_factory._sheet_ref_for(hero_type, int(u.owner))}, false)
+	_dep_entity_factory._attach_officer(commander, o)
+	commander.team_kind="worker" if members.all(func(member):return _dep_technology._is_worker_unit(member)) else "combat"
 	commander.base_maxhp = float(o.get("hp", commander.base_maxhp))
 	commander.maxhp = commander.base_maxhp; commander.hp = commander.base_maxhp
-	services.technology._apply_tech_bonuses(commander)
+	_dep_technology._apply_tech_bonuses(commander)
 	battle.units.append(commander)
 	if actors == null or battle.selected == actors: battle.selected = [commander]
 	for member in members:
 		member.group_officer = idx
-	services.battle_simulation._place_unit(commander)
+	_dep_battle_simulation._place_unit(commander)
 	return true
 
 func _order_disband(actors = null) -> int:
-	var services := ports.acquire(["command_groups", "battle_simulation", "abilities"])
-	if services.is_empty(): return 0
 	var selection_unchanged: bool = actors == null or battle.selected == actors
 	var leaders: Array = []
 	var detached := 0
@@ -72,7 +78,7 @@ func _order_disband(actors = null) -> int:
 		if not battle.units.any(func(current): return is_same(current,unit)): continue
 		if unit.alive and unit.die_t<0 and int(unit.owner)==battle.player_owner and unit.get("officer",{}).is_empty() and int(unit.get("group_officer",-1))>=0:
 			unit.group_officer=-1
-			if unit.state=="build":services.command_groups._cancel_unit_command(unit)
+			if unit.state=="build":_dep_command_groups._cancel_unit_command(unit)
 			detached+=1
 		if unit.alive and unit.die_t<0 and not bool(unit.get("attached",false)) and unit.owner == battle.player_owner and not (unit.get("officer", {}) as Dictionary).is_empty():
 			leaders.append(unit)
@@ -83,24 +89,22 @@ func _order_disband(actors = null) -> int:
 		for member in battle.units:
 			if member.alive and member.owner == leader.owner and int(member.get("group_officer", -1)) == idx:
 				member["group_officer"] = -1        # 成员回到"未编组"，可再次组建
-		services.battle_simulation._clear_control_group_for(int(leader.uid))
+		_dep_battle_simulation._clear_control_group_for(int(leader.uid))
 		_unassign_officer(leader)
 		if battle.jimou_caster == leader:
-			services.abilities._reset_jimou()
+			_dep_abilities._reset_jimou()
 		leader.alive = false
-		services.battle_simulation._free_unit_at(position)
+		_dep_battle_simulation._free_unit_at(position)
 	if selection_unchanged: battle.selected = []
 	if not leaders.is_empty():
-		services.battle_simulation._feedback("部队已解散（%d 队），成员保留，可重新组建" % leaders.size())
-	if detached>0:services.battle_simulation._feedback("%d 名成员已解除编组" % detached)
+		_effects.feedback("部队已解散（%d 队），成员保留，可重新组建" % leaders.size())
+	if detached>0:_effects.feedback("%d 名成员已解除编组" % detached)
 	return leaders.size()+detached
 
 func _order_join(target: Dictionary, actors = null) -> int:
-	var services := ports.acquire(["command_groups", "battle_simulation", "interaction_paths"])
-	if services.is_empty(): return 0
-	var leader: Dictionary = target if not target.get("officer", {}).is_empty() else services.command_groups._commander_for(target)
+	var leader: Dictionary = target if not target.get("officer", {}).is_empty() else _dep_command_groups._commander_for(target)
 	if leader.is_empty() or not bool(leader.get("alive", false)) or int(leader.owner) != battle.player_owner or leader.is_building:
-		services.battle_simulation._feedback("加入需要点击我方带将队伍")
+		_effects.feedback("加入需要点击我方带将队伍")
 		return 0
 	var idx := int(leader.officer.index)
 	var members: Array = battle.units.filter(func(u): return bool(u.alive) and u.die_t < 0 and int(u.owner) == battle.player_owner and int(u.get("group_officer", -1)) == idx)
@@ -109,22 +113,20 @@ func _order_join(target: Dictionary, actors = null) -> int:
 	for member in (battle.selected if actors == null else actors).duplicate():
 		if room <= 0: break
 		if not bool(member.alive) or member.is_building or member.die_t >= 0 or int(member.owner) != battle.player_owner or bool(member.get("attached", false)) or not member.get("officer", {}).is_empty() or int(member.get("group_officer", -1)) >= 0: continue
-		var path: Array = services.interaction_paths._edge_interaction_path(member, leader)
+		var path: Array = _dep_interaction_paths._edge_interaction_path(member, leader)
 		if path.is_empty(): continue
-		services.command_groups._cancel_unit_command(member)
+		_dep_command_groups._cancel_unit_command(member)
 		member.state = "join"; member.join_target_uid = int(leader.uid)
 		member.path = path; member.pi = 0
 		count += 1; room -= 1
-	services.battle_simulation._feedback("已派出%d名成员加入队伍" % count if count > 0 else "队伍已满或无法靠近")
+	_effects.feedback("已派出%d名成员加入队伍" % count if count > 0 else "队伍已满或无法靠近")
 	return count
 
 func _assign_officer_to(u: Dictionary, idx: int) -> bool:
-	var services := ports.acquire(["officer_pool", "entity_factory", "technology"])
-	if services.is_empty(): return false
 	if u.is_building or not u.alive or u.die_t >= 0.0:
 		print("组建：目标不是可指派的部队")
 		return false
-	if services.officer_pool.officer_in_use(idx) and not services.officer_pool._officer_held_only_by_selection(idx):
+	if _dep_officer_pool.officer_in_use(idx) and not _dep_officer_pool._officer_held_only_by_selection(idx):
 		print("组建：武将 %d 已被占用（原版 CTRL_GROUP_Create_Error）" % idx)
 		return false
 	# 只被选中部队持有 → 先从原持有者移出（原版 CTRL_GROUP_Sub），再指派
@@ -134,13 +136,13 @@ func _assign_officer_to(u: Dictionary, idx: int) -> bool:
 		var o2 = u2.get("officer", null)
 		if (o2 is Dictionary) and int((o2 as Dictionary).get("index", -1)) == idx:
 			_unassign_officer(u2)
-	var o: Dictionary = services.officer_pool._officer_by_index(idx)
+	var o: Dictionary = _dep_officer_pool._officer_by_index(idx)
 	if o.is_empty():
 		print("组建：找不到武将 %d" % idx)
 		return false
 	if int(u.get("officer", {}).get("index", -1)) >= 0 and int(u.officer.index) != idx:
 		_unassign_officer(u)
-	services.entity_factory._attach_officer(u, o)
+	_dep_entity_factory._attach_officer(u, o)
 	# 原版：单位的 HP 取自**武将 HP**，而武将 HP = 该 tier 对应的"将"类兵种 HP
 	# （装载器里文本第 5 个整数读进 HP 后**立即被覆盖**，见 tools/lib/officer_hp.mjs 头部）。
 	var ohp := float(o.get("hp", 0))
@@ -148,7 +150,7 @@ func _assign_officer_to(u: Dictionary, idx: int) -> bool:
 		u["base_maxhp"] = ohp
 		u["maxhp"] = ohp
 		u["hp"] = ohp
-		services.technology._apply_tech_bonuses(u)
+		_dep_technology._apply_tech_bonuses(u)
 	print("组建：%s ← 「%s」%s 武力=%.0f 智力=%.0f HP=%.0f" % [
 
 		str(u.get("name", "?")), str(o.get("name", "?")).replace(" ", ""),
@@ -157,16 +159,14 @@ func _assign_officer_to(u: Dictionary, idx: int) -> bool:
 	return true
 
 func _unassign_officer(u: Dictionary) -> void:
-	var services := ports.acquire(["officer_pool", "battle_simulation"])
-	if services.is_empty(): return
 	var previous := int(u.get("officer", {}).get("index", -1))
 	var previous_off: Dictionary = u.get("officer", {})
 	if not previous_off.is_empty():
-		services.officer_pool._sync_officer_to_pool(previous_off)
+		_dep_officer_pool._sync_officer_to_pool(previous_off)
 	if previous >= 0:
 		# Capture the team's identities before unlinking the officer. Death starts
 		# here; _finish_death runs later, after the officer field is already empty.
-		services.battle_simulation._clear_officer_control_groups(previous,int(u.owner),int(u.uid))
+		_dep_battle_simulation._clear_officer_control_groups(previous,int(u.owner),int(u.uid))
 		for member in battle.units:
 			if member.owner == u.owner and int(member.get("group_officer", -1)) == previous:
 				member["group_officer"] = -1
@@ -183,14 +183,12 @@ func _order_form_up(officer_index: int, actors = null) -> void:
 			done += 1
 			break          # 一个武将只带一支部队（占用位唯一）
 	if done == 0:
-		battle.effects.visual("feedback", ["组建失败"])
+		_effects.visual("feedback", ["组建失败"])
 	else:
-		battle.effects.visual("feedback", ["组建完成"])
+		_effects.visual("feedback", ["组建完成"])
 		_auto_assign_new_team(officer_index)
 
 func _auto_assign_new_team(officer_index: int) -> void:
-	var services := ports.acquire(["command_groups"])
-	if services.is_empty(): return
 	var ids: Array = []
 	for u in battle.units:
 		if not bool(u.get("alive", false)) or u.die_t >= 0.0 or int(u.owner) != battle.player_owner: continue
@@ -205,7 +203,7 @@ func _auto_assign_new_team(officer_index: int) -> void:
 			battle.control_groups[n] = old
 			return
 	for n in range(1, 10):
-		if services.command_groups._group_units(n).is_empty():
+		if _dep_command_groups._group_units(n).is_empty():
 			battle.control_groups[n] = ids
 			return
 
@@ -223,3 +221,17 @@ func _process_officer_recovery() -> void:
 			u["mou"] = minf(cap, float(u.get("mou", 0.0)) + 5.0)
 		else:
 			u["hp"] = minf(float(u.get("maxhp", 0.0)), float(u.get("hp", 0.0)) + 10.0)
+
+func bind_dependencies(world: Object) -> void:
+	_dep_abilities = world.abilities
+	_dep_battle_simulation = world.battle_simulation
+	_dep_combat = world.combat
+	_dep_command_groups = world.command_groups
+	_dep_entity_factory = world.entity_factory
+	_dep_interaction_paths = world.interaction_paths
+	_dep_officer_pool = world.officer_pool
+	_dep_production = world.production
+	_dep_spatial_index = world.spatial_index
+	_dep_technology = world.technology
+	_effects = world.effects
+	_nav = world.nav

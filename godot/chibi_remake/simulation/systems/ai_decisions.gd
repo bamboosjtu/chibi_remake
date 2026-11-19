@@ -44,16 +44,16 @@ func _init(data: AIState) -> void:
 	_ai_state = data
 
 func army_for(owner: int) -> Array:
-	var lvl: int = clampi(int(_ai_state.host.ai_level(owner)), 0, ARMY_BY_TIER.size() - 1)
+	var lvl: int = clampi(int(_ai_state.ai_economy.ai_level(owner)), 0, ARMY_BY_TIER.size() - 1)
 	return ARMY_BY_TIER[lvl]
 
 func _think_once(owner: int) -> void:
 	# 1) AI 每轮把金钱补满（原版 DAT_004b8d08[owner] = 20000）
-	_ai_state.host.ai_set_gold(owner, AI_MONEY)
+	_ai_state.ai_economy.ai_set_gold(owner, AI_MONEY)
 
 	# FUN_00472230: training precedes the 22-thought building/research refresh.
 	_slot_train(owner)
-	_ai_state.naval.step(owner, naval_slots(_ai_state.host.ai_behavior(owner), _ai_state.host.ai_tech_gate(owner)))
+	_ai_state.naval.step(owner, naval_slots(_ai_state.ai_economy.ai_behavior(owner), _ai_state.technology.ai_tech_gate(owner)))
 	_train(owner)
 	_ai_state._plan[owner] = int(_ai_state._plan.get(owner, 0)) + 1
 	if int(_ai_state._plan[owner]) >= BUILD_PLAN_PERIOD:
@@ -69,33 +69,33 @@ func _think_once(owner: int) -> void:
 ## 训练：科技闸通过才造；买不起就送资源（原版在 FUN_00471c60 里直接加钱加粮）
 
 func _train(owner: int) -> void:
-	var gate: int = int(_ai_state.host.ai_tech_gate(owner))
-	var lvl: int = int(_ai_state.host.ai_level(owner))
-	if _ai_state.host.ai_behavior(owner) != 0 or (gate > lvl and gate > 0):
+	var gate: int = int(_ai_state.technology.ai_tech_gate(owner))
+	var lvl: int = int(_ai_state.ai_economy.ai_level(owner))
+	if _ai_state.ai_economy.ai_behavior(owner) != 0 or (gate > lvl and gate > 0):
 		return                              # 科技不够 —— 原版同样不造
 	# 四系各自派发，建筑工作锁统一由宿主执行；后续生产开放仍受现有范围限制。
 	var order: Array = army_for(owner).duplicate(); order.append(34)
 	for unit_id in order:
 		if _ai_state.slots.line_busy(owner,int(unit_id)): continue
-		var building: Dictionary = _ai_state.host.ai_production_building(owner,int(unit_id))
+		var building: Dictionary = _ai_state.ai_economy.ai_production_building(owner,int(unit_id))
 		if building.is_empty(): continue
-		var cost: Dictionary = _ai_state.host.ai_unit_cost(int(unit_id))
-		if not _ai_state.host.ai_can_afford(owner,cost):
-			_ai_state.host.ai_gift(owner,GIFT_WOOD,GIFT_FOOD,GIFT_STONE)
+		var cost: Dictionary = _ai_state.ai_economy.ai_unit_cost(int(unit_id))
+		if not _ai_state.ai_economy.ai_can_afford(owner,cost):
+			_ai_state.ai_economy.ai_gift(owner,GIFT_WOOD,GIFT_FOOD,GIFT_STONE)
 			continue
-		_ai_state.host.ai_enqueue_train(owner,building,int(unit_id),cost)
+		_ai_state.ai_economy.ai_enqueue_train(owner,building,int(unit_id),cost)
 
 func _slot_train(owner: int) -> void:
 	_ai_state.slots.refresh(owner)
-	var allowed := available_slots(_ai_state.host.ai_behavior(owner),_ai_state.host.ai_tech_gate(owner),_ai_state.host.ai_level(owner),_ai_state.host.ai_level(_ai_state.host.player_owner),_ai_state.host.ai_gold(_ai_state.host.player_owner),_ai_state.host.scenario_mission)
+	var allowed := available_slots(_ai_state.ai_economy.ai_behavior(owner),_ai_state.technology.ai_tech_gate(owner),_ai_state.ai_economy.ai_level(owner),_ai_state.ai_economy.ai_level(_ai_state.state.player_owner),_ai_state.ai_economy.ai_gold(_ai_state.state.player_owner),_ai_state.state.scenario_mission)
 	for slot in allowed:
 		_ai_state.slots.dispatch(owner,int(slot),army_for(owner))
 
 ## 已确认的槽位准入表，与四系训练器保持独立。
 
 func _research_plan(owner: int) -> bool:
-	var gate: int = _ai_state.host.ai_tech_gate(owner)
-	if gate < 2 or (gate >= 3 and _ai_state.host.ai_behavior(owner) > 1): return false
+	var gate: int = _ai_state.technology.ai_tech_gate(owner)
+	if gate < 2 or (gate >= 3 and _ai_state.ai_economy.ai_behavior(owner) > 1): return false
 	var bow := [3] if gate == 2 else ([3,4] if gate == 3 else [3,4,5])
 	var equipment := [6,9] if gate == 2 else ([6,9,7,10] if gate == 3 else [6,9,7,10,8,11])
 	var families := [bow,equipment]
@@ -108,11 +108,11 @@ func _research_plan(owner: int) -> bool:
 	for offset in range(families.size()):
 		var family := (cursor+offset) % families.size()
 		for idx in families[family]:
-			if int(idx) in [20,21,22] and not _ai_state.host._naval_research_gate(owner): break
-			var line: String = _ai_state.host._tech_line_of(int(idx))
-			if _ai_state.host._tech_line_pos(int(idx)) < _ai_state.host._tech_line_progress(line,owner): continue
-			var building: Dictionary = _ai_state.host.ai_research_building(owner,int(idx))
-			if not building.is_empty() and _ai_state.host._queue_research(owner,building,int(idx),true):
+			if int(idx) in [20,21,22] and not _ai_state.ai_economy._naval_research_gate(owner): break
+			var line: String = _ai_state.technology._tech_line_of(int(idx))
+			if _ai_state.technology._tech_line_pos(int(idx)) < _ai_state.technology._tech_line_progress(line,owner): continue
+			var building: Dictionary = _ai_state.ai_economy.ai_research_building(owner,int(idx))
+			if not building.is_empty() and _ai_state.player_commands._queue_research(owner,building,int(idx),true):
 				_ai_state._research_cursor[owner] = (family+1) % families.size()
 				return true
 			break # 本系前一档未完成，不能跳过它派后档。
@@ -121,7 +121,7 @@ func _research_plan(owner: int) -> bool:
 ## 进攻闸门（FUN_00471600 的条件逐条照搬；L1 另走槽位顺序目标/单群命令）
 
 func _assault_maybe(owner: int, skip_groups: Array = []) -> void:
-	var human_units: int = int(_ai_state.host.ai_force_units(_ai_state.host.player_owner))
+	var human_units: int = int(_ai_state.ai_economy.ai_force_units(_ai_state.state.player_owner))
 	var period := int(_ai_state._assault_period.get(owner, ASSAULT_PERIOD))
 	if int(_ai_state._assault[owner]) <= period:
 		return
@@ -130,19 +130,19 @@ func _assault_maybe(owner: int, skip_groups: Array = []) -> void:
 	if human_units < HUMAN_WEAK_UNITS:
 		_ai_state._assault_period[owner] = ASSAULT_PERIOD_URGENT
 	# 原版：自身等级 < 关卡科技闸，且（人类等级 < 闸-1 或 人类金钱 < 15000）→ 按兵不动
-	var gate: int = int(_ai_state.host.ai_tech_gate(owner))
+	var gate: int = int(_ai_state.technology.ai_tech_gate(owner))
 	var my_lvl := _hq_level(owner)
-	var human_lvl := _hq_level(int(_ai_state.host.player_owner))
-	var human_gate: int = int(_ai_state.host.ai_tech_gate(_ai_state.host.player_owner))
-	var human_gold: float = float(_ai_state.host.ai_gold(_ai_state.host.player_owner))
-	if int(_ai_state.host.scenario_mission) != 14 and my_lvl < gate and (human_lvl < human_gate - 1 or human_gold < HUMAN_GOLD_FOR_ASSAULT):
+	var human_lvl := _hq_level(int(_ai_state.state.player_owner))
+	var human_gate: int = int(_ai_state.technology.ai_tech_gate(_ai_state.state.player_owner))
+	var human_gold: float = float(_ai_state.ai_economy.ai_gold(_ai_state.state.player_owner))
+	if int(_ai_state.state.scenario_mission) != 14 and my_lvl < gate and (human_lvl < human_gate - 1 or human_gold < HUMAN_GOLD_FOR_ASSAULT):
 		return
-	_ai_state.host.ai_order_assault(owner, skip_groups)
+	_ai_state.ai_orders.ai_order_assault(owner, skip_groups)
 
 func _hq_level(owner: int) -> int:
 	# DAT_004b8d29 starts at 1 even for an expedition without an HQ (L1).
 	# Production/upgrade indices remain zero-based everywhere else.
-	return int(_ai_state.host.ai_level(owner)) + 1
+	return int(_ai_state.ai_economy.ai_level(owner)) + 1
 
 ## 局部拦截（FUN_00471fd0）：把焦点单位周围 ±90 内的部队叫去拦截
 
@@ -154,15 +154,15 @@ func _intercept_near(owner: int, skip_groups: Array = []) -> void:
 	if int(_ai_state._intercept[0]) < INTERCEPT_PERIOD:
 		_ai_state._intercept[0] += 1
 		return
-	var focus: Dictionary = _ai_state.host.ai_focus_unit(owner)
-	if focus.is_empty() or skip_groups.has(int(_ai_state.host.ai_group_of(focus))):
+	var focus: Dictionary = _ai_state.ai_orders.ai_focus_unit(owner)
+	if focus.is_empty() or skip_groups.has(int(_ai_state.ai_economy.ai_group_of(focus))):
 		return
-	_ai_state.host.ai_order_intercept(owner, focus, INTERCEPT_RADIUS, skip_groups)
+	_ai_state.ai_orders.ai_order_intercept(owner, focus, INTERCEPT_RADIUS, skip_groups)
 
 ## 归队 / 集结（FUN_0044b600）：把闲置或离得太远的部队拉回自家集结点
 
 func _rally(owner: int, skip_groups: Array = []) -> void:
-	_ai_state.host.ai_order_rally(owner, skip_groups)
+	_ai_state.ai_orders.ai_order_rally(owner, skip_groups)
 
 ## 建造计划项(1..0x14) → 建筑类型（**DATA.EXP 建筑 id**）。
 ## 直接取自 CB.EXE `FUN_004675b0` 里 0x467861 处的跳转表（REA 反编译原文）：
@@ -172,10 +172,10 @@ func _rally(owner: int, skip_groups: Array = []) -> void:
 ## 「同一建筑的两个阵营版本」——所以原型把成对的 id 归为同一个"种类"。
 
 func _refresh_plan(owner: int) -> void:
-	_ai_state.host.ai_queue_hq_upgrade(owner)
-	var have: Array = _ai_state.host.ai_building_kinds(owner)
-	have.append_array(_ai_state.host.ai_construction_kinds(owner)) # 预留工地不重复下单，但不算解锁前置。
-	var priority: Array = [0,10,12,4,14] if _ai_state.host.ai_tech_gate(owner) == 1 and _ai_state.host.ai_behavior(owner) == 0 else BUILD_PRIORITY_KINDS
+	_ai_state.ai_economy.ai_queue_hq_upgrade(owner)
+	var have: Array = _ai_state.ai_economy.ai_building_kinds(owner)
+	have.append_array(_ai_state.ai_economy.ai_construction_kinds(owner)) # 预留工地不重复下单，但不算解锁前置。
+	var priority: Array = [0,10,12,4,14] if _ai_state.technology.ai_tech_gate(owner) == 1 and _ai_state.ai_economy.ai_behavior(owner) == 0 else BUILD_PRIORITY_KINDS
 	for kind in priority:
 		if have.has(int(kind)):
 			continue                                # 这一类已经有了
@@ -186,7 +186,7 @@ func _refresh_plan(owner: int) -> void:
 		var bt: int = int(PLAN_TO_BUILDING.get(item, -1))
 		if bt < 0:
 			continue
-		if not _ai_state.host.ai_can_build(owner, bt):
+		if not _ai_state.ai_economy.ai_can_build(owner, bt):
 			continue                                # 科技闸/造价不够
 		_ai_state.plan[owner] = item
 		return
@@ -200,35 +200,35 @@ func _worker_step(owner: int) -> void:
 	var commander := _maintain_construction_team(owner)
 	var team_size := 0
 	if not commander.is_empty():
-		team_size = _ai_state.host._construction_workers(commander).size()
+		team_size = _ai_state.command_groups._construction_workers(commander).size()
 	# 训练闸看**施工群人数**，不是全势力工人数：5 名采集工人不能顶替施工队。
 	if team_size >= 5:
 		return
-	if commander.is_empty() and int(_ai_state.host.ai_worker_count(owner)) >= 5:
+	if commander.is_empty() and int(_ai_state.ai_economy.ai_worker_count(owner)) >= 5:
 		return                        # 没有空闲队长时不再堆工人（等编制释放）
-	var building: Dictionary = _ai_state.host.ai_production_building(owner, 30)
+	var building: Dictionary = _ai_state.ai_economy.ai_production_building(owner, 30)
 	if building.is_empty():
 		return
-	var cost: Dictionary = _ai_state.host.ai_unit_cost(30)
-	if not _ai_state.host.ai_can_afford(owner, cost):
+	var cost: Dictionary = _ai_state.ai_economy.ai_unit_cost(30)
+	if not _ai_state.ai_economy.ai_can_afford(owner, cost):
 		return
-	_ai_state.host.ai_enqueue_train(owner, building, 30, cost)
+	_ai_state.ai_economy.ai_enqueue_train(owner, building, 30, cost)
 
 ## R11：把一个空闲武将（本来没有成员）设为施工队长，并把空闲、未编组、
 ## 没有采集/运输/修理/施工任务的工人补到 5 名。不抢正在工作的工人。
 
 func _maintain_construction_team(owner: int) -> Dictionary:
-	var commander: Dictionary = _ai_state.host.ai_construction_commander(owner)
+	var commander: Dictionary = _ai_state.ai_economy.ai_construction_commander(owner)
 	if commander.is_empty():
 		commander = _spare_construction_officer(owner)
 	if commander.is_empty():
 		return {}
 	var index := int(commander.officer.index)
-	var members: Array = _ai_state.host._construction_workers(commander)
+	var members: Array = _ai_state.command_groups._construction_workers(commander)
 	if members.is_empty():
 		# ai_construction_commander 只接受“已有成员且全空闲”的队；这里允许新队长从 0 开始。
 		members = []
-		for u in _ai_state.host.units:
+		for u in _ai_state.state.units:
 			if u == commander or int(u.get("owner", -1)) != owner: continue
 			if int(u.get("group_officer", -1)) == index and bool(u.get("alive", false)) and float(u.get("die_t", -1)) < 0.0:
 				members.append(u)
@@ -236,7 +236,7 @@ func _maintain_construction_team(owner: int) -> Dictionary:
 	if need <= 0:
 		return commander
 	var pool: Array = []
-	for w in _ai_state.host.units:
+	for w in _ai_state.state.units:
 		if int(w.get("owner", -1)) != owner or int(w.get("unit", -1)) != 30: continue
 		if not bool(w.get("alive", false)) or float(w.get("die_t", -1)) >= 0.0: continue
 		if bool(w.get("is_building", false)) or bool(w.get("attached", false)): continue
@@ -254,11 +254,11 @@ func _maintain_construction_team(owner: int) -> Dictionary:
 ## 不会被再次选中，避免一队两个武将。
 
 func _spare_construction_officer(owner: int) -> Dictionary:
-	var roster := preload("res://simulation/queries/construction_roster.gd").new(_ai_state.host.units)
+	var roster := preload("res://simulation/queries/construction_roster.gd").new(_ai_state.state.units)
 	for u in roster.by_owner.get(owner, []):
 		if int(u.get("owner", -1)) != owner or bool(u.get("is_building", false)): continue
 		if not bool(u.get("alive", false)) or float(u.get("die_t", -1)) >= 0.0: continue
-		if bool(u.get("attached", false)) or not _ai_state.host._is_hero_unit(u): continue
+		if bool(u.get("attached", false)) or not _ai_state.command_groups._is_hero_unit(u): continue
 		if (u.get("officer", {}) as Dictionary).is_empty(): continue
 		if str(u.get("state", "idle")) != "idle": continue
 		var index := int(u.officer.index)
@@ -277,14 +277,14 @@ func _spare_construction_officer(owner: int) -> Dictionary:
 
 func _officer_groups(owner: int) -> Dictionary:
 	var groups := {}
-	for u in _ai_state.host.units:
+	for u in _ai_state.state.units:
 		if int(u.get("owner", -1)) != owner or bool(u.get("is_building", false)): continue
 		if not bool(u.get("alive", false)) or float(u.get("die_t", -1)) >= 0.0: continue
 		if bool(u.get("attached", false)): continue
 		var officer: Dictionary = u.get("officer", {})
 		if officer.is_empty(): continue
 		groups[int(officer.index)] = [u]
-	for u in _ai_state.host.units:
+	for u in _ai_state.state.units:
 		if int(u.get("owner", -1)) != owner or bool(u.get("is_building", false)): continue
 		if not bool(u.get("alive", false)) or float(u.get("die_t", -1)) >= 0.0: continue
 		if bool(u.get("attached", false)): continue
@@ -304,11 +304,11 @@ func _retreat_step(owner: int) -> Dictionary:
 	if count < C.RETREAT_PERIOD or not _ai_state._retreat_points.has(owner): return active
 	var point: Array = _ai_state._retreat_points[owner]
 	var destination := Vector2(float(point[0]),float(point[1]))
-	for unit in _ai_state.host.units:
+	for unit in _ai_state.state.units:
 		if int(unit.owner)!=owner or unit.is_building or not unit.alive or unit.die_t>=0 or bool(unit.get("attached",false)): continue
 		if int(unit.get("site_inside_uid",-1))>=0 or not unit.get("target") is Dictionary: continue
-		if not _ai_state.host.move_order(owner, int(unit.uid), destination): continue
-		var group: int = _ai_state.host.ai_group_of(unit)
+		if not _ai_state.player_commands.move_order(owner, int(unit.uid), destination): continue
+		var group: int = _ai_state.ai_economy.ai_group_of(unit)
 		if group>=0: active[group] = 1
 	if not active.is_empty(): _ai_state._retreat[owner] = active
 	return active
@@ -327,10 +327,10 @@ func _active_retreats(owner: int) -> Dictionary:
 func _living_attacker(anchor: Dictionary, owner: int) -> Dictionary:
 	var aid := int(anchor.get("last_attacker_uid", -1))
 	if aid < 0: return {}
-	for e in _ai_state.host.units:
+	for e in _ai_state.state.units:
 		if int(e.get("uid", -1)) != aid: continue
 		if not bool(e.get("alive", false)) or float(e.get("die_t", -1)) >= 0.0: continue
-		if not _ai_state.host._hostile_owners(owner, int(e.get("owner", -1))): continue
+		if not _ai_state.combat._hostile_owners(owner, int(e.get("owner", -1))): continue
 		return e
 	return {}
 
@@ -342,12 +342,12 @@ func _build_step(owner: int) -> void:
 	if bt < 0:
 		_ai_state.plan[owner] = 0
 		return
-	if not _ai_state.host.ai_can_build(owner, bt):
+	if not _ai_state.ai_economy.ai_can_build(owner, bt):
 		_ai_state.plan[owner] = 0
 		return
-	var commander: Dictionary = _ai_state.host.ai_construction_commander(owner)
+	var commander: Dictionary = _ai_state.ai_economy.ai_construction_commander(owner)
 	if commander.is_empty(): return # 没有现成空闲工人队伍；自动补工策略待确认。
-	if _ai_state.host.ai_place_building(owner, bt, commander):
+	if _ai_state.player_commands.ai_place_building(owner, bt, commander):
 		_ai_state.plan[owner] = 0
 
 

@@ -15,39 +15,39 @@ func run() -> void:
 	root.get_node("Game").current_map = "chibil1"
 	var b: Node2D = load("res://main.tscn").instantiate(); root.add_child(b)
 	b.set_process(false); b.cli_mode = true; b.ai = null
-	for unit in b.units: b.commands.military._cancel_unit_command(unit); unit.hold = true
+	for unit in b.units: b.world.command_groups._cancel_unit_command(unit); unit.hold = true
 	var hq: Dictionary = b.units.filter(func(u): return u.owner == b.player_owner and int(u.unit) == 0)[0]
 	var leader: Dictionary = b.selected[0]
 	b.view.update_panel() # Cache the grouped panel before selecting a new worker.
 	b.selected = [hq]; b.gold = 20000; b.wood = 20000; b.food = 20000
 	b.view.update_panel()
 	assert(b.view.cmd_buttons[0].icon != null and str(b.view.cmd_buttons[0].get_meta("build_hint")).contains("400"), "idle training option must include its cost")
-	assert(b.commands.economy._queue_train(b.player_owner, hq, 30))
+	assert(b.world.production._queue_train(b.player_owner, hq, 30))
 	b.view.update_panel()
 	var panel = b.view.classic_panel
 	assert(panel.work_icon.visible and panel.progress_bar.visible and panel.progress_bar.value == 0)
 	assert(b.view.cmd_capsules.size() == 1 and b.view.cmd_capsules[0].text == "取消生产")
-	for tick in range(50): b.commands.economy._process_trainings(b.SIM_DT)
+	for tick in range(50): b.world.production._process_trainings(b.SIM_DT)
 	b.view.update_panel()
 	assert(panel.progress_bar.value == 50 and panel.work_badge.text == "100人")
 	await capture(b, "worker-training")
 	var game := root.get_node("Game")
-	assert(game.save_game(b.units, b.commands.world._resources(), b.commands.session._save_extra()), "save during worker production")
+	assert(game.save_game(b.units, b.world.economy.player_resources(), b.scene_controller._save_extra()), "save during worker production")
 	var saved: Dictionary = game.load_save()
 	assert(saved.has("checksum") and game.verify_save_checksum(saved))
-	for tick in range(50): b.commands.economy._process_trainings(b.SIM_DT)
+	for tick in range(50): b.world.production._process_trainings(b.SIM_DT)
 	var worker: Dictionary = b.units.back()
 	assert(int(worker.unit) == 30 and int(worker.group_officer) < 0 and b.feedback_text.contains("训练完成"))
-	b.commands.session.select_at(Vector2(worker.ax, worker.ay - worker.h * 0.5), false)
+	b.actions.select_at(Vector2(worker.ax, worker.ay - worker.h * 0.5), false)
 	assert(b.selected.size() == 1 and is_same(b.selected[0], worker))
-	assert(b.view._panel_specs().map(func(sp): return str(sp.cmd)) == ["move", "form", "join", "board"])
+	assert(b.view.command_art._panel_specs().map(func(sp): return str(sp.cmd)) == ["move", "form", "join", "board"])
 	for i in range(4): assert(b.view.art_buttons[i].btn.visible)
 	assert(not b.view.art_buttons[4].btn.visible)
 	assert(b.view.art_buttons[1].btn.get_meta("cmd_name") == "组建" and b.view.art_buttons[2].btn.get_meta("cmd_name") == "加入", "panel cache must refresh grouped -> independent")
 	var leader_index: int = leader.officer.index
 	leader.officer.index = -1
 	b.view.update_panel()
-	assert(b.commands.military._commander_for(worker).is_empty())
+	assert(b.world.command_groups._commander_for(worker).is_empty())
 	assert(b.view.art_buttons[2].btn.get_meta("cmd_name") == "加入", "an ungrouped worker must not match an unassigned officer slot")
 	leader.officer.index = leader_index
 	assert(b.view.art_buttons[1].btn.get_meta("command_id") == 16144 and b.view.art_buttons[1].btn.get_meta("source_frame") == 167 and b.view.art_buttons[1].btn.texture != null, "form command must use its registered icon")
@@ -57,35 +57,35 @@ func run() -> void:
 		worker.carry = 200.0; worker.carry_kind = kind; worker.state = "deliver"; worker.moved = true
 		worker.move_facing = int(worker.dir)
 		b.cam.position = Vector2(worker.ax,worker.ay); b.cam.force_update_scroll()
-		b.commands.world._update_visual(worker)
+		b.world.battle_simulation._update_visual(worker)
 		var clip: String = {"wood":"act1", "stone":"act2", "food":"act3"}[kind]
 		assert(worker.clips[clip][(int(worker.move_facing)+2)%8].any(func(frame): return int(frame) == int(b.view.unit_nodes(worker).frame)), "visible cargo %s must display its wheelbarrow clip" % kind)
 		await capture(b, "worker-cart-" + kind)
 	worker.carry = 0.0; worker.carry_kind = ""
-	assert(b.commands.military._order_join(leader) == 1)
+	assert(b.world.officer_teams._order_join(leader) == 1)
 	for tick in range(2500):
-		b.commands.orders._step_unit(worker, b.SIM_DT)
+		b.world.unit_actions._step_unit(worker, b.SIM_DT)
 		if int(worker.group_officer) >= 0: break
-	assert(int(worker.group_officer) == int(leader.officer.index) and b.commands.military.control_group_size(1) == 6, "join must reach the commander and update the existing slot")
+	assert(int(worker.group_officer) == int(leader.officer.index) and b.world.command_groups.control_group_size(1) == 6, "join must reach the commander and update the existing slot")
 	b.view.update_panel()
-	assert(b.view._panel_specs().map(func(sp): return int(sp.id)) == [16130,16136,16142,16146])
+	assert(b.view.command_art._panel_specs().map(func(sp): return int(sp.id)) == [16130,16136,16142,16146])
 	assert(b.view.art_buttons[1].btn.get_meta("cmd_name") == "解散", "independent -> member refresh")
-	b.view._on_panel_slot(1)
+	b.view.command_art._on_panel_slot(1)
 	assert(b.player_commands.has_pending())
-	b.commands.world._sim_step(b.SIM_DT)
+	b.world.battle_simulation._sim_step(b.SIM_DT)
 	assert(int(worker.group_officer) < 0)
 	b.selected = [worker]; b.view.update_panel()
-	assert(b.view._panel_specs().map(func(sp): return str(sp.cmd)) == ["move", "form", "join", "board"], "disbanded workers expose join after the command tick")
+	assert(b.view.command_art._panel_specs().map(func(sp): return str(sp.cmd)) == ["move", "form", "join", "board"], "disbanded workers expose join after the command tick")
 	worker.group_officer = int(leader.officer.index)
-	var site: Dictionary = b.commands.economy._place_building(b.player_owner, 10, Vector2(hq.ax + 300, hq.ay), true)
+	var site: Dictionary = b.world.construction_orders._place_building(b.player_owner, 10, Vector2(hq.ax + 300, hq.ay), true)
 	assert(not site.is_empty())
 	worker.build_target = site; worker.state = "build"
-	b.commands.economy._complete_site(site)
+	b.world.construction_orders._complete_site(site)
 	assert(not site.site and worker.group_officer == int(leader.officer.index), "construction completion retains team membership")
 	# JSON number normalization must retain integrity checks for large integers.
-	var extra: Dictionary = b.commands.session._save_extra()
+	var extra: Dictionary = b.scene_controller._save_extra()
 	extra.simulation.officerProgress["precision_probe"] = 9007199254740993
-	assert(game.save_game(b.units, b.commands.world._resources(), extra), "save after joining and training")
+	assert(game.save_game(b.units, b.world.economy.player_resources(), extra), "save after joining and training")
 	saved = game.load_save()
 	assert(saved.has("checksum") and game.verify_save_checksum(saved))
 	assert(b.saver.apply_snapshot(saved), "saved worker production and team state must reload")

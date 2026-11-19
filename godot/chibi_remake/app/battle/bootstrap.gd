@@ -1,11 +1,11 @@
-extends RefCounted
+extends Object
 ## bootstrap: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
-const Dependencies = preload("res://app/battle/ports/bootstrap_dependencies.gd")
 var battle: State:
 	get: return node.state
-var ports := Dependencies.new()
+var _dep_campaign: Object
+var _dep_scene_controller: Object
 const SceneServices = preload("res://app/battle_scene_state.gd")
 var scene: SceneServices
 var node: Node2D
@@ -47,7 +47,7 @@ func _ready() -> void:
 	var opening := preload("res://app/battle/battle_opening.gd").new(node.world)
 	var map_error := opening.prepare_map(battle.map_id)
 	if not map_error.is_empty():
-		ports._fatal(map_error)
+		_dep_scene_controller._fatal(map_error)
 		return
 	Game.current_map = battle.map_id
 
@@ -62,7 +62,7 @@ func _ready() -> void:
 	# ⚠️ 必须在这里就先建好：地形、单位、HUD 的节点都挂在它下面。
 	# --simtest / --noview 下**一个渲染节点都不建** —— 那样跑出来的状态摘要才叫纯模拟。
 	if want_view:
-		scene.view = View.new(node)
+		scene.view = View.new(node.create_view_context())
 		node.add_child(scene.view)
 
 	scene.sfx = preload("res://presentation/audio/sfx.gd").new()
@@ -70,25 +70,25 @@ func _ready() -> void:
 	scene.bgm = preload("res://presentation/audio/bgm.gd").new()
 	node.add_child(scene.bgm)
 	scene.bgm.play("res://media/music/record01.ogg")
-	ports._build_terrain()
+	_dep_scene_controller._build_terrain()
 	if not opening.populate(not Game.pending_load):
-		ports._fatal("地图实体已经初始化")
+		_dep_scene_controller._fatal("地图实体已经初始化")
 		return
-	if scene.view!=null and DisplayServer.get_name()!="headless":battle.nav.warm_runtime_shapes()
+	if scene.view!=null and DisplayServer.get_name()!="headless":node.world.nav.warm_runtime_shapes()
 	scene.saver = SaveSvc.new(node)  # ARCH-006：存档编排在 save_service.gd（与 ai.gd 同样的鸭子类型宿主）
 	var had_pending_load := bool(Game.pending_load)
 	if Game.pending_load:
-		if not ports._apply_save():
+		if not _dep_scene_controller._apply_save():
 			Game.pending_load = false
 			Game.pending_load_slot = 0
 			Game.last_load_error = scene.saver.last_load_error + " 原档已保留，请重新选择。"
-			ports._schedule_failed_load_return()
+			_dep_scene_controller._schedule_failed_load_return()
 			return
 		Game.pending_load = false
 		Game.pending_load_slot = 0
 	# AI was initialized before snapshot restore. # ARCH-006：AI 逻辑在 ai.gd，main 只提供状态访问
-	ports._build_ui()
-	ports._setup_camera()
+	_dep_scene_controller._build_ui()
+	_dep_scene_controller._setup_camera()
 	# Resolve initial command icons and the selected portrait during loading.
 	# The first live HUD update then reuses the same textures and labels.
 	if scene.view != null:
@@ -99,10 +99,10 @@ func _ready() -> void:
 	if scene.view != null:
 		scene.view.completion = preload("res://presentation/hud/battle_completion.gd").new(scene.view.host)
 		scene.view.add_child(scene.view.completion)
-		if battle.game_end != 0: ports._show_end(battle.game_end)
+		if battle.game_end != 0: _dep_campaign._show_end(battle.game_end)
 	# 章节开场过场：读档进入、测试模式与 --no-intro 时跳过（battle_view 内再判一次参数）。
 	if scene.view != null and not had_pending_load:
-		scene.view.maybe_play_intro(battle.map_data)
+		scene.view.maybe_play_intro(str(battle.map_data.get("scenario", {}).get("avi", "")))
 
 	print("Chibi RTS: %s terrain %dx%d units=%d player=%d" % [battle.map_id, int(battle.map_data.terrainW), int(battle.map_data.terrainH), battle.units.size(), battle.player_owner])
 
@@ -124,7 +124,7 @@ func _ready() -> void:
 			return
 
 	if "--demo" in args:
-		ports._demo()
+		_dep_scene_controller._demo()
 		return
 	if "--diag-nav" in args:
 		await node.get_tree().create_timer(0.5).timeout
@@ -136,7 +136,7 @@ func _ready() -> void:
 		return
 	if "--screenshot" in args:
 		await node.get_tree().create_timer(1.2).timeout
-		await ports._screenshot()
+		await _dep_scene_controller._screenshot()
 		node.get_tree().quit()
 
 func _initialize_session() -> void:
@@ -145,7 +145,11 @@ func _initialize_session() -> void:
 
 func _run_smoke() -> void:
 	var before: int=battle.sim_tick
-	node.commands.world._sim_step(Config.SIM_DT)
+	node.world.battle_simulation._sim_step(Config.SIM_DT)
 	var valid: bool=battle.sim_tick==before+1 and battle.game_end==0
-	ports._write_smoke(valid,"initialized and advanced one live tick" if valid else "initial simulation ended or did not advance")
+	_dep_scene_controller._write_smoke(valid,"initialized and advanced one live tick" if valid else "initial simulation ended or did not advance")
 	node.get_tree().quit(0 if valid else 1)
+
+func bind_dependencies(scene_root: Object) -> void:
+	_dep_campaign = scene_root.world.campaign
+	_dep_scene_controller = scene_root.scene_controller

@@ -73,7 +73,7 @@ func _mobile_count(battle: Node2D) -> int:
 
 func _fill(battle: Node2D) -> int:
 	var owners: Array = [int(battle.player_owner)]
-	for owner in battle._modules["ai_economy"].ai_owners():
+	for owner in battle.world.ai_economy.ai_owners():
 		if int(owner) != int(battle.player_owner) and not owners.has(int(owner)): owners.append(int(owner))
 	if capacity_stress:
 		owners=[]
@@ -99,7 +99,7 @@ func _fill(battle: Node2D) -> int:
 		var unit_id: int = int(Roles.ids("officers")[attempts % Roles.ids("officers").size()])
 		var ax := rng.randf_range(120.0, terrain_w - 120.0)
 		var ay := rng.randf_range(120.0, terrain_h - 120.0)
-		if battle.commands.world._spawn_unit(unit_id, owner, ax, ay, false):
+		if battle.world.entity_factory._spawn_unit(unit_id, owner, ax, ay, false):
 			spawned += 1
 	# Give a bounded share of the troops an enemy so pathfinding, attacks and
 	# projectiles run, while the rest stay as AI reserve.
@@ -109,7 +109,7 @@ func _fill(battle: Node2D) -> int:
 		if engaging >= engage: break
 		if not bool(unit.get("alive", false)) or bool(unit.get("is_building", false)): continue
 		if int(unit.get("unit", 0)) in Roles.ids("officers") and str(unit.get("state", "")) in ["idle", ""]:
-			var enemy: Dictionary = battle.commands.military._nearest_enemy(unit, 100000.0)
+			var enemy: Dictionary = battle.world.combat._nearest_enemy(unit, 100000.0)
 			if not enemy.is_empty():
 				unit.target = enemy
 				unit.state = "attack"
@@ -132,7 +132,7 @@ func _invalid(reason: String) -> void:
 
 func _probe_command(battle: Node2D) -> bool:
 	var at:=Time.get_ticks_usec()
-	if battle.commands.session.submit_command("assign_group", -1, 10) <= 0: return false
+	if battle.actions.submit_command("assign_group", -1, 10) <= 0: return false
 	command_submissions[int(battle.player_commands.sequence)] = at
 	return true
 
@@ -173,14 +173,14 @@ func run() -> void:
 	# Keep the same fighting workload alive throughout both measurement phases.
 	for unit in battle.units:
 		unit.hp=maxf(float(unit.hp),10000000.0);unit.maxhp=unit.hp
-	for i in range(60):battle.commands.world._sim_step(Config.SIM_DT)
-	battle._modules.unit_actions.profile_enabled=profile_units
-	battle._modules.unit_actions.profile.clear()
-	battle._modules.battle_simulation.profile_enabled=profile_units
-	battle._modules.battle_simulation.timing_enabled=true
+	for i in range(60):battle.world.battle_simulation._sim_step(Config.SIM_DT)
+	battle.world.unit_actions.profile_enabled=profile_units
+	battle.world.unit_actions.profile.clear()
+	battle.world.battle_simulation.profile_enabled=profile_units
+	battle.world.battle_simulation.timing_enabled=true
 	battle.nav.set_profiling(true)
-	battle._modules.battle_simulation.profile.clear()
-	battle._modules.battle_simulation.native_unit_profile.clear()
+	battle.world.battle_simulation.profile.clear()
+	battle.world.battle_simulation.native_unit_profile.clear()
 	var path_begin: Dictionary=battle.nav.performance_counters()
 	var visual_begin: Dictionary=battle.view.performance_counters() if battle.view!=null else {}
 	var times: Array=[]
@@ -189,7 +189,7 @@ func run() -> void:
 		if paused or battle.game_end!=0:_invalid("Simulation stopped during logic measurement");return
 		if i%10==0:await _logic_frame(battle)
 		var before: int=battle.sim_tick;var begin:=Time.get_ticks_usec()
-		battle.commands.world._sim_step(Config.SIM_DT)
+		battle.world.battle_simulation._sim_step(Config.SIM_DT)
 		if battle.sim_tick!=before+1:_invalid("Logic measurement did not execute exactly one tick");return
 		times.append(float(Time.get_ticks_usec()-begin)/1000.0)
 	var path_end: Dictionary=battle.nav.performance_counters()
@@ -225,20 +225,20 @@ func population(battle: Node2D) -> Dictionary:
 func _record_profile(battle: Node2D, report: Dictionary) -> void:
 	report["renderingMethod"]=RenderingServer.get_current_rendering_method()
 	report["renderingDriver"]=RenderingServer.get_current_rendering_driver_name()
-	report["nativeUnitBatch"]=preload("res://simulation/native/math_kernel.gd").get_kernel()!=null and battle._modules.battle_simulation.native_unit_port!=null
+	report["nativeUnitBatch"]=preload("res://simulation/native/math_kernel.gd").get_kernel()!=null and battle.world.battle_simulation.native_unit_port!=null
 	report["minimapBackend"]="gpu-instanced" if battle.view!=null and battle.view._ui.minimap.gpu_markers else "cpu"
-	report["unitProfileUsec"]=battle._modules.unit_actions.profile.duplicate()
-	report["worldProfileUsec"]=battle._modules.battle_simulation.profile.duplicate()
-	for key in battle._modules.battle_simulation.native_unit_profile:report.unitProfileUsec[key]=int(report.unitProfileUsec.get(key,0))+int(battle._modules.battle_simulation.native_unit_profile[key])
+	report["unitProfileUsec"]=battle.world.unit_actions.profile.duplicate()
+	report["worldProfileUsec"]=battle.world.battle_simulation.profile.duplicate()
+	for key in battle.world.battle_simulation.native_unit_profile:report.unitProfileUsec[key]=int(report.unitProfileUsec.get(key,0))+int(battle.world.battle_simulation.native_unit_profile[key])
 
 func _logic_frame(battle: Node2D) -> void:
 	if battle.view!=null:battle.view.flush_visuals(false)
 	await process_frame
 
 func _start_live_measurement(battle: Node2D, report: Dictionary) -> bool:
-	battle._modules.unit_actions.profile_enabled=false
-	battle._modules.battle_simulation.profile_enabled=false
-	battle._modules.battle_simulation.timing_enabled=false
+	battle.world.unit_actions.profile_enabled=false
+	battle.world.battle_simulation.profile_enabled=false
+	battle.world.battle_simulation.timing_enabled=false
 	battle.nav.set_profiling(false)
 	var game: Node=root.get_node("Game")
 	var checksum: String=game.save_checksum(battle.saver.continuation_snapshot(game))
@@ -248,17 +248,17 @@ func _start_live_measurement(battle: Node2D, report: Dictionary) -> bool:
 	report["frameInitialTick"]=battle.sim_tick
 	report["frameInitialStateChecksum"]=checksum
 	report["renderWarmupPreservedSimulation"]=true
-	battle._modules.battle_simulation.timing_enabled=true
+	battle.world.battle_simulation.timing_enabled=true
 	battle.nav.set_profiling(true)
 	battle.player_commands.command_finished.connect(_command_finished)
 	battle.sim_acc=0;battle.set_process(true)
 	return true
 
 func _frame_counters(battle: Node2D) -> Dictionary:
-	var controller = battle._modules.scene_controller
+	var controller = battle.scene_controller
 	var visuals: Dictionary = battle.view.performance_counters()
 	return {
-		"tick":battle.sim_tick, "simulationUsec":battle._modules.battle_simulation.tick_microseconds,
+		"tick":battle.sim_tick, "simulationUsec":battle.world.battle_simulation.tick_microseconds,
 		"visualUsec":visuals.syncMicroseconds, "hudUsec":controller.hud_microseconds,
 		"interpolationUsec":controller.interpolation_microseconds, "minimapUsec":visuals.minimapMicroseconds,
 		"visualsChecked":visuals.candidatesChecked, "visibleChecks":visuals.visibleChecks,
@@ -272,8 +272,8 @@ func _measure_frames(battle: Node2D, report: Dictionary) -> bool:
 	if not workload_valid(battle):_invalid("Rendering phase has no running gameplay process");return false
 	var visual_begin: Dictionary = battle.view.performance_counters() if battle.view!=null else {}
 	var path_begin: Dictionary = battle.nav.performance_counters()
-	var simulation_begin: int=battle._modules.battle_simulation.tick_microseconds
-	var view_time: int=battle._modules.scene_controller.view_microseconds;var hud_time: int=battle._modules.scene_controller.hud_microseconds;var interpolate_time: int=battle._modules.scene_controller.interpolation_microseconds
+	var simulation_begin: int=battle.world.battle_simulation.tick_microseconds
+	var view_time: int=battle.scene_controller.view_microseconds;var hud_time: int=battle.scene_controller.hud_microseconds;var interpolate_time: int=battle.scene_controller.interpolation_microseconds
 	var tick_begin: int=battle.sim_tick;var backlog_begin: float=battle.sim_acc;var backlog_max:=backlog_begin
 	var at:=Time.get_ticks_usec();var previous:=at;var durations: Array=[]
 	var samples := []
@@ -302,7 +302,7 @@ func _measure_frames(battle: Node2D, report: Dictionary) -> bool:
 	if advanced<=0 or command_latencies.size()<ceili(float(frames)/10.0):_invalid("Frames were produced without all simulation/input work");return false
 	var visual_end: Dictionary = battle.view.performance_counters() if battle.view!=null else {}
 	var path_end: Dictionary = battle.nav.performance_counters()
-	report.merge({"frameSimulationMsPerTick":float(battle._modules.battle_simulation.tick_microseconds-simulation_begin)/advanced/1000.0,"frameSimulationMsPerFrame":float(battle._modules.battle_simulation.tick_microseconds-simulation_begin)/frames/1000.0,"cameraHoverMsPerFrame":float(battle._modules.scene_controller.view_microseconds-view_time)/frames/1000.0,"hudMsPerFrame":float(battle._modules.scene_controller.hud_microseconds-hud_time)/frames/1000.0,"interpolationMsPerFrame":float(battle._modules.scene_controller.interpolation_microseconds-interpolate_time)/frames/1000.0,"realtimeLogicBudgetMs":battle.clock.period()*1000.0,"framePathCallsPerTick":float(path_end.calls-path_begin.calls)/advanced,"framePathMsPerTick":float(path_end.microseconds-path_begin.microseconds)/advanced/1000.0,"updateVisualMsPerFrame":float(visual_end.get("syncMicroseconds",0)-visual_begin.get("syncMicroseconds",0))/frames/1000.0,"fogUpdateMsPerFrame":float(visual_end.get("fogMicroseconds",0)-visual_begin.get("fogMicroseconds",0))/frames/1000.0,"visualSyncsPerFrame":float(visual_end.get("syncCalls",0)-visual_begin.get("syncCalls",0))/frames})
+	report.merge({"frameSimulationMsPerTick":float(battle.world.battle_simulation.tick_microseconds-simulation_begin)/advanced/1000.0,"frameSimulationMsPerFrame":float(battle.world.battle_simulation.tick_microseconds-simulation_begin)/frames/1000.0,"cameraHoverMsPerFrame":float(battle.scene_controller.view_microseconds-view_time)/frames/1000.0,"hudMsPerFrame":float(battle.scene_controller.hud_microseconds-hud_time)/frames/1000.0,"interpolationMsPerFrame":float(battle.scene_controller.interpolation_microseconds-interpolate_time)/frames/1000.0,"realtimeLogicBudgetMs":battle.clock.period()*1000.0,"framePathCallsPerTick":float(path_end.calls-path_begin.calls)/advanced,"framePathMsPerTick":float(path_end.microseconds-path_begin.microseconds)/advanced/1000.0,"updateVisualMsPerFrame":float(visual_end.get("syncMicroseconds",0)-visual_begin.get("syncMicroseconds",0))/frames/1000.0,"fogUpdateMsPerFrame":float(visual_end.get("fogMicroseconds",0)-visual_begin.get("fogMicroseconds",0))/frames/1000.0,"visualSyncsPerFrame":float(visual_end.get("syncCalls",0)-visual_begin.get("syncCalls",0))/frames})
 	report.merge({"validWorkload":true,"frames":frames,"fps":frames/maxf(seconds,0.001),"frameP50Ms":_percentile(durations,0.5),"frameP95Ms":_percentile(durations,0.95),"frameP99Ms":_percentile(durations,0.99),"frameMaxMs":durations.back(),"simulationTicksAdvanced":advanced,"measurementSeconds":seconds,"ticksPerSecond":advanced/seconds,"targetTicksPerSecond":1.0/battle.clock.period(),"simAccumulatorBegin":backlog_begin,"simAccumulatorEnd":battle.sim_acc,"simAccumulatorMax":backlog_max,"wallClockBehindSeconds":maxf(0.0,seconds-advanced*battle.clock.period()),"unitsAtFrameEnd":_mobile_count(battle),"commandSamples":command_latencies.size(),"commandLatencyP95Ms":_percentile(command_latencies,0.95),"commandLatencyScope":"in-game command queue; OS input delivery excluded","pausedAtEnd":paused,"gameEnd":battle.game_end})
 	report.merge({"memoryStaticBytes":Performance.get_monitor(Performance.MEMORY_STATIC),"memoryStaticMaxBytes":Performance.get_monitor(Performance.MEMORY_STATIC_MAX),"videoMemoryBytes":Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED),"renderObjects":Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME),"drawCalls":Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)})
 	if frame_diagnostics:

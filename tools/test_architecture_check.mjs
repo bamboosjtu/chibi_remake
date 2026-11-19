@@ -19,6 +19,11 @@ try{
  write('simulation/test.gd','extends RefCounted\n');write('presentation/test.gd','extends RefCounted\n');
  write('app/private.gd','extends RefCounted\nfunc bad(view):\n\treturn view._ui\n');assert.notEqual(run().status,0);
  write('app/private.gd','extends RefCounted\n');
+ for (const value of ['Game.repository','host.world.combat._kill()', 'host.state.units', 'combat._damage()', 'host.actions._battle', 'load("res://app/automation/menu_driver.gd")']) {
+  write('presentation/test.gd','extends RefCounted\nfunc bad(host):\n\treturn '+value+'\n');assert.notEqual(run().status,0,value);
+ }
+ write('presentation/test.gd','extends RefCounted\n');
+
  for(const mutation of ['tree.paused = false', 'get_tree().paused=true', 'tree.set("paused", false)', "tree.set_deferred('paused', true)"]){
   write('app/private.gd','extends RefCounted\nfunc bad(tree):\n\t'+mutation+'\n');assert.notEqual(run().status,0,mutation);
  }
@@ -51,9 +56,9 @@ try{
  write('presentation/battle/battle_resources.gd','extends RefCounted\n');
 
  for(const field of ['units','selected','map_data','decor_cells']){
-  write('presentation/battle/battle_access.gd','extends RefCounted\nfunc bad(data):\n\treturn data.'+field+'.duplicate(true)\n');assert.notEqual(run().status,0);
+  write('app/read_models/battle_queries.gd','extends RefCounted\nfunc bad(data):\n\treturn data.'+field+'.duplicate(true)\n');assert.notEqual(run().status,0);
  }
- write('presentation/battle/battle_access.gd','extends RefCounted\n');
+ write('app/read_models/battle_queries.gd','extends RefCounted\n');
  write('presentation/test.gd','extends RefCounted\nfunc bad(host):\n\thost.saver.apply_snapshot({})\n');assert.notEqual(run().status,0);
  write('presentation/test.gd','extends RefCounted\n');
  const limits={files:{'simulation/test.gd':600},functions:{},violations:[],reviews:{}};

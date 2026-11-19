@@ -1,11 +1,18 @@
-extends RefCounted
+extends Object
+const NavRuntime = preload("res://simulation/navigation/nav.gd")
+var _nav: NavRuntime
+const EffectsRuntime = preload("res://simulation/battle_effects.gd")
+var _effects: EffectsRuntime
+var _construction: RefCounted
 const Balance = preload("res://simulation/definitions/balance_rules.gd")
 const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## command groups: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
-const REQUIRED_SERVICES := {"abilities": ["_reset_jimou"], "battle_simulation": ["_feedback"], "officer_teams": ["_order_disband"], "technology": ["_is_worker_unit"], "world_orders": ["_clear_pending"]}
 var battle: State
-var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)
+var _dep_abilities: Object
+var _dep_officer_teams: Object
+var _dep_technology: Object
+var _dep_world_orders: Object
 
 func _init(data: State) -> void:
 	battle = data
@@ -34,8 +41,8 @@ func control_group_work_site(n: int) -> Dictionary:
 		var site_id := int(member.get("site_inside_uid", -1))
 		if site_id < 0: site_id = int(member.get("site_follow_uid", -1))
 		if site_id >= 0:
-			var site: Dictionary = battle.construction.site_for(site_id)
-			if battle.construction.active(site): return site
+			var site: Dictionary = _construction.site_for(site_id)
+			if _construction.active(site): return site
 	return {}
 
 func _group_assign(n: int, actors = null) -> void:
@@ -58,13 +65,11 @@ func _group_recall(n: int) -> bool:
 	battle.selected.clear()
 	for u in g:
 		battle.selected.append(u)
-	if battle.effects != null: battle.effects.sound("play_select", [battle.selected])
+	if _effects != null: _effects.sound("play_select", [battle.selected])
 	print("呼出编队 %d：%d 个单位" % [n, g.size()])
 	return true
 
 func _cmd_watch(actors = null) -> void:
-	var services := ports.acquire(["battle_simulation"])
-	if services.is_empty(): return
 	var n := 0
 	for u in _command_units(actors):
 		if u.is_building or not u.alive or u.die_t>=0 or int(u.owner)!=battle.player_owner or bool(u.get("attached",false)):
@@ -73,14 +78,14 @@ func _cmd_watch(actors = null) -> void:
 		u["hold"] = true
 		n += 1
 	if n > 0:
-		services.battle_simulation._feedback("警戒：%d 支部队取消命令、原地待命" % n)
+		_effects.feedback("警戒：%d 支部队取消命令、原地待命" % n)
 	else:
-		services.battle_simulation._feedback("没有可警戒的部队")
+		_effects.feedback("没有可警戒的部队")
 
 func _cancel_unit_command(u: Dictionary) -> void:
 	u.erase("blocked_cursor")
 	u["route_failures"]=0
-	battle.construction.leave(u)
+	_construction.leave(u)
 	u["site_follow_uid"] = -1
 	preload("res://simulation/systems/action_clock.gd").reset(u)
 	u["state"] = "idle"
@@ -108,8 +113,6 @@ func _order_hold() -> void:
 	_cmd_watch()
 
 func _cmd_rest(actors = null) -> void:
-	var services := ports.acquire(["battle_simulation"])
-	if services.is_empty(): return
 	var n := 0
 	for u in battle.selected if actors == null else actors:
 		if u.is_building or not u.alive or u.die_t >= 0.0 or int(u.owner)!=battle.player_owner or bool(u.get("attached",false)):
@@ -121,9 +124,9 @@ func _cmd_rest(actors = null) -> void:
 		u["rest_t"] = 0
 		n += 1
 	if n > 0:
-		services.battle_simulation._feedback("休息：%d 支将部队原地休整（每 %d tick +%s 兵力）" % [n, int(Balance.work().restTicks), str(Balance.work().restHp)])
+		_effects.feedback("休息：%d 支将部队原地休整（每 %d tick +%s 兵力）" % [n, int(Balance.work().restTicks), str(Balance.work().restHp)])
 	else:
-		services.battle_simulation._feedback("只有武将部队可以休整")
+		_effects.feedback("只有武将部队可以休整")
 
 func _is_hero_unit(u: Dictionary) -> bool:
 	return Roles.is_hero(int(u.get("unit", -1)))
@@ -154,42 +157,34 @@ func _is_naval(u: Dictionary) -> bool:
 	return Roles.is_naval(int(u.get("unit", -1)))
 
 func _nav_layer(u: Dictionary) -> int:
-	return 1 if _is_naval(u) and battle.nav.has_water else 0
+	return 1 if _is_naval(u) and _nav.has_water else 0
 
 func _cmd_begin(kind: String, data: Dictionary = {}) -> void:
-	var services := ports.acquire(["battle_simulation", "world_orders", "abilities"])
-	if services.is_empty(): return
 	if battle.selected.is_empty():
-		services.battle_simulation._feedback("先选择部队")
-		return
-	if kind=="unload":
-		services.world_orders._clear_pending()
-		battle.player_commands.submit("unload", battle.selected)
+		_effects.feedback("先选择部队")
 		return
 	if battle.cmd_pending == kind:
-		services.world_orders._clear_pending()
-		services.battle_simulation._feedback("已取消")
+		_dep_world_orders._clear_pending()
+		_effects.feedback("已取消")
 		return
-	services.abilities._reset_jimou()
+	_dep_abilities._reset_jimou()
 	battle.duel_pending = false
 	battle.cmd_pending = kind
 	battle.cmd_pending_data = data
 	match kind:
-		"move": services.battle_simulation._feedback("移动：点击目的地")
-		"attack": services.battle_simulation._feedback("攻击：点击敌方单位")
-		"transport": services.battle_simulation._feedback("运输：点击资源点（铁矿／民居／树林／粮堆）")
-		"repair": services.battle_simulation._feedback("修理：点击我方单位或建筑")
-		"build": services.battle_simulation._feedback("建造：点击空地放下工地（%s）" % str(data.get("name", "?")))
-		"board": services.battle_simulation._feedback("上船：点击我方运输船（陆军靠近后自动装载）")
-		"join": services.battle_simulation._feedback("加入：点击我方带将队伍，工人靠近后编入（每队最多15名成员）")
-		_: services.battle_simulation._feedback("选择目标")
+		"move": _effects.feedback("移动：点击目的地")
+		"attack": _effects.feedback("攻击：点击敌方单位")
+		"transport": _effects.feedback("运输：点击资源点（铁矿／民居／树林／粮堆）")
+		"repair": _effects.feedback("修理：点击我方单位或建筑")
+		"build": _effects.feedback("建造：点击空地放下工地（%s）" % str(data.get("name", "?")))
+		"board": _effects.feedback("上船：点击我方运输船（陆军靠近后自动装载）")
+		"join": _effects.feedback("加入：点击我方带将队伍，工人靠近后编入（每队最多15名成员）")
+		_: _effects.feedback("选择目标")
 
 func _cmd_disband(actors = null) -> void:
-	var services := ports.acquire(["officer_teams", "battle_simulation"])
-	if services.is_empty(): return
-	var n: int = services.officer_teams._order_disband(actors)
+	var n: int = _dep_officer_teams._order_disband(actors)
 	if n <= 0:
-		services.battle_simulation._feedback("请选择武将部队")
+		_effects.feedback("请选择武将部队")
 
 func _commander_for(u: Dictionary) -> Dictionary:
 	if not u.get("officer", {}).is_empty(): return u
@@ -212,19 +207,15 @@ func _command_units(actors = null) -> Array:
 	return result
 
 func _return_selected_cargo(actors = null) -> void:
-	var services := ports.acquire(["technology", "battle_simulation"])
-	if services.is_empty(): return
 	var count:=0
 	for worker in battle.selected if actors == null else actors:
-		if not services.technology._is_worker_unit(worker) or float(worker.get("carry",0))<=0:continue
+		if not _dep_technology._is_worker_unit(worker) or float(worker.get("carry",0))<=0:continue
 		var resource=worker.get("gather_obj")
 		_cancel_unit_command(worker)
 		worker.gather_obj=resource;worker.state="deliver";count+=1
-	services.battle_simulation._feedback("%d 名工人返回入库" % count)
+	_effects.feedback("%d 名工人返回入库" % count)
 
 func stop_selected(actors = null) -> void:
-	var services := ports.acquire(["battle_simulation"])
-	if services.is_empty(): return
 	var count := 0
 	for u in battle.selected if actors == null else actors:
 		if not u.alive or u.is_building:
@@ -232,7 +223,7 @@ func stop_selected(actors = null) -> void:
 		_cancel_unit_command(u)
 		count += 1
 	if count > 0:
-		services.battle_simulation._feedback("停止")
+		_effects.feedback("停止")
 
 ## HUD query: one world pass for all ten slots, with value-only records. Empty
 ## slots and unrelated units do not trigger twenty repeated eligibility scans.
@@ -250,11 +241,20 @@ func control_group_summaries() -> Array:
 			if not memberships.has(uid) or not unit.alive or unit.die_t>=0 or int(unit.owner)!=battle.player_owner or bool(unit.get("attached",false)):continue
 			var site_id:=int(unit.get("site_inside_uid",-1))
 			if site_id<0:site_id=int(unit.get("site_follow_uid",-1))
-			var site: Dictionary=battle.construction.site_for(site_id) if site_id>=0 else {}
-			var site_name: String=str(site.name) if battle.construction.active(site) else ""
+			var site: Dictionary=_construction.site_for(site_id) if site_id>=0 else {}
+			var site_name: String=str(site.name) if _construction.active(site) else ""
 			for index in memberships[uid]:
 				result[index].count+=1
 				if result[index].workSiteName=="":result[index].workSiteName=site_name
 	for item in result:item.make_read_only()
 	result.make_read_only()
 	return result
+
+func bind_dependencies(world: Object) -> void:
+	_dep_abilities = world.abilities
+	_dep_officer_teams = world.officer_teams
+	_dep_technology = world.technology
+	_dep_world_orders = world.world_orders
+	_construction = world.construction
+	_effects = world.effects
+	_nav = world.nav

@@ -1,4 +1,5 @@
 extends CanvasLayer
+const SessionActions = preload("res://app/session_actions.gd")
 ## Presentation owns the short victory countdown; Game owns chapter selection.
 var host: Node2D
 var panel: PanelContainer
@@ -31,12 +32,12 @@ func _ready() -> void:
 	panel.hide(); get_viewport().size_changed.connect(_fit)
 
 func open(kind: int) -> void:
-	if is_open or not automatic or bool(host.cli_mode): return
+	if is_open or not automatic or bool(host.queries.cli_mode): return
 	is_open = true; advancing = false; seconds = 5.0
-	next_entry = Game.next_level(str(host.map_id))
+	next_entry = Game.next_level(str(host.queries.map_id))
 	countdown = kind == 1 and not next_entry.is_empty()
 	next_button.text = "下一关" if countdown else "返回主菜单"
-	_refresh(kind); panel.show(); _fit(); pause_token = Game.pauses.acquire(self,"battle completion")
+	_refresh(kind); panel.show(); _fit(); pause_token = SessionActions.pause(self,"battle completion")
 	next_button.grab_focus()
 
 func _refresh(kind: int) -> void:
@@ -50,24 +51,24 @@ func _fit() -> void:
 	panel.position = ((vp-panel.size)*Vector2(0.5, 0.73)).floor()
 
 func _process(delta: float) -> void:
-	if not is_open or advancing or not countdown or not Game.pauses.is_top(pause_token): return
+	if not is_open or advancing or not countdown or not SessionActions.owns_pause(pause_token): return
 	seconds = maxf(0, seconds-delta); _refresh(1)
 	if seconds <= 0: advance()
 
 func stay() -> void:
-	countdown = false; Game.pauses.release(pause_token); pause_token = 0
-	message.text = "自动跳转已取消，可随时进入下一关。" if not next_entry.is_empty() and int(host.game_end)==1 else "战役结束，可返回主菜单。"
+	countdown = false; SessionActions.resume(pause_token); pause_token = 0
+	message.text = "自动跳转已取消，可随时进入下一关。" if not next_entry.is_empty() and int(host.queries.game_end)==1 else "战役结束，可返回主菜单。"
 
 func reset() -> void:
 	is_open = false; countdown = false; advancing = false; panel.hide()
-	Game.pauses.release(pause_token); pause_token = 0
+	SessionActions.resume(pause_token); pause_token = 0
 
 func advance() -> void:
 	if advancing: return
 	advancing = true; countdown = false
-	if pause_token == 0: pause_token = Game.pauses.acquire(self,"battle completion")
-	if int(host.game_end) == 1 and not Game.next_level(str(host.map_id)).is_empty():
-		if not Game.advance_campaign(str(host.map_id)):
+	if pause_token == 0: pause_token = SessionActions.pause(self,"battle completion")
+	if int(host.queries.game_end) == 1 and not Game.next_level(str(host.queries.map_id)).is_empty():
+		if not Game.advance_campaign(str(host.queries.map_id)):
 			advancing = false; message.text = "下一关无法载入，请返回主菜单重试。"
 	else:
 		if Game.return_to_menu() != OK:

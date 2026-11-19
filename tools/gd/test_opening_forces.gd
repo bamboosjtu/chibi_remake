@@ -21,14 +21,14 @@ func run() -> void:
 		assert(battle.player_owner == chapter.sides[0].owner and battle.scenario_avi == chapter.avi)
 		for side in chapter.sides:
 			sides += 1
-			var balance: Dictionary = battle.commands.world._resources() if side.player else battle.commands.economy._ai_res_of(int(side.owner))
+			var balance: Dictionary = battle.world.economy.player_resources() if side.player else battle.world.ai_economy._ai_res_of(int(side.owner))
 			for kind in ["gold", "food", "wood", "stone"]: assert(balance[kind] == side.resources[kind], str(chapter.id)+" resource "+kind)
 			var leaders: Array = battle.units.filter(func(u): return int(u.owner) == int(side.owner) and not u.get("officer", {}).is_empty())
 			var expected_leaders := 0
 			for officer in side.officers:
 				var expected_count := 0
 				for count in officer.troops.values(): expected_count += int(count)
-				var model: Dictionary = battle.commands.military._officer_by_index(int(officer.id) - 1)
+				var model: Dictionary = battle.world.officer_pool._officer_by_index(int(officer.id) - 1)
 				assert(not model.is_empty() and int(model.might) == int(officer.might) and int(model.intellect) == int(officer.intellect))
 				var level := maxi(0, int(officer.rank) - 1) if officer.rank != null else 0
 				if int(officer.id) <= 33 and level == 0: level = 5
@@ -47,7 +47,7 @@ func run() -> void:
 					assert(members.filter(func(u): return int(u.unit) == int(type)).size() == int(officer.troops[type]))
 				var cell: Vector2i = battle.nav.cell_of_px(leader.ax,leader.ay)
 				assert(cell==Vector2i(int(leader.A),int(leader.B)), "Final commander cell must match its actual world position")
-				assert(battle.commands.world._unit_placement_free(cell,int(leader.unit),battle.commands.military._nav_layer(leader),int(leader.uid)), str(chapter.id)+" commander must occupy a legal, unshared footprint")
+				assert(battle.world.spatial_index._unit_placement_free(cell,int(leader.unit),battle.world.command_groups._nav_layer(leader),int(leader.uid)), str(chapter.id)+" commander must occupy a legal, unshared footprint")
 				if expected_count == 15: full_teams += 1
 			assert(leaders.size() == expected_leaders)
 		print("OPENING CHAPTER PASS ",chapter.id)

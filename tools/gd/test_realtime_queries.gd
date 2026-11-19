@@ -33,42 +33,42 @@ func retries() -> void:
 	for x in range(40):sim.nav.block(Vector2i(x,15))
 	a.state="attack";a.target=b;a.repath=0;a.route_failures=0;a.blocked_n=0
 	var initial: int=sim.nav.performance_counters().calls
-	for tick in range(120):sim.commands.orders._step_unit_inner(a,sim.SIM_DT)
+	for tick in range(120):sim.world.unit_actions._step_unit_inner(a,sim.SIM_DT)
 	var queries: int=sim.nav.performance_counters().calls-initial
 	assert(queries>0 and queries<=64,"Failed paths must honor cooldown/backoff instead of querying every tick: "+str(queries))
 	assert(a.route_failures==3 and b.hp==1000.)
 	var calls: int=sim.nav.performance_counters().calls
-	sim.commands.military._cancel_unit_command(a);assert(a.route_failures==0)
-	a.state="attack";a.target=b;a.repath=0;sim.commands.orders._step_unit_inner(a,sim.SIM_DT)
+	sim.world.command_groups._cancel_unit_command(a);assert(a.route_failures==0)
+	a.state="attack";a.target=b;a.repath=0;sim.world.unit_actions._step_unit_inner(a,sim.SIM_DT)
 	assert(sim.nav.performance_counters().calls>calls,"A new order can query immediately")
 	for x in range(40):sim.nav.unblock(Vector2i(x,15))
-	for tick in range(150):sim.commands.orders._step_unit_inner(a,sim.SIM_DT)
+	for tick in range(150):sim.world.unit_actions._step_unit_inner(a,sim.SIM_DT)
 	assert(a.route_failures==0 and (not a.path.is_empty() or b.hp<1000.),"Opening a route must recover without discarding the attack order")
 	print("REALTIME RETRIES PASS bounded failed queries / explicit order reset / topology recovery")
 func view_and_save() -> void:
 	var scene=load("res://main.tscn").instantiate();root.add_child(scene);scene.set_process(false);scene.cli_mode=true;scene.ai=null
 	var unit: Dictionary=scene.selected[0];unit.route_failures=2;unit.repath=1.25
-	assert(scene.commands.session._save_game())
+	assert(scene.session_actions.save_game())
 	var snapshot: Dictionary=root.get_node("Game").load_save();var uid:=int(unit.uid)
 	assert(snapshot.units.any(func(record):return int(record.uid)==uid and int(record.simulation.route_failures)==2))
-	var summaries: Array=scene.commands.military.control_group_summaries()
+	var summaries: Array=scene.world.command_groups.control_group_summaries()
 	assert(summaries.is_read_only() and summaries.size()==10)
 	for slot in range(1,11):
-		assert(summaries[slot-1].is_read_only() and int(summaries[slot-1].count)==scene.commands.military.control_group_size(slot))
-		var site: Dictionary=scene.commands.military.control_group_work_site(slot)
+		assert(summaries[slot-1].is_read_only() and int(summaries[slot-1].count)==scene.world.command_groups.control_group_size(slot))
+		var site: Dictionary=scene.world.command_groups.control_group_work_site(slot)
 		assert(str(summaries[slot-1].workSiteName)==("" if site.is_empty() else str(site.name)))
 	var before: Dictionary=scene.view.performance_counters()
 	var notifications: Array=[]
 	var observe:=func(action: String,_arguments: Array):notifications.append(action)
-	scene.state.effects.visual_requested.connect(observe)
-	for tick in range(5):scene.commands.world._sim_step(scene.SIM_DT)
-	scene.state.effects.visual_requested.disconnect(observe)
+	scene.world.effects.visual_requested.connect(observe)
+	for tick in range(5):scene.world.battle_simulation._sim_step(scene.SIM_DT)
+	scene.world.effects.visual_requested.disconnect(observe)
 	assert(notifications.count("world_dirty")==5 and not notifications.has("update_visual") and not notifications.has("place_unit"),"Each tick emits one world refresh rather than per-unit visual signals")
 	assert(scene.view.performance_counters().syncCalls==before.syncCalls,"Logic ticks must not perform sprite synchronization")
 	scene.view.flush_visuals()
 	var calls: int=scene.view.performance_counters().syncCalls-before.syncCalls
 	assert(calls>0 and calls<=scene.units.size(),"Five catch-up ticks synchronize each UID once")
-	unit.ax+=100;scene.view.queue_visual(unit)
+	unit.ax+=100;scene.view.queue_visual(int(unit.uid))
 	assert(scene.saver.apply_snapshot(snapshot))
 	var restored: Dictionary=scene.units.filter(func(u):return int(u.uid)==uid)[0]
 	assert(not is_same(restored,unit) and restored.route_failures==2 and is_equal_approx(restored.repath,1.25))

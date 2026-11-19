@@ -15,7 +15,7 @@ func run() -> void:
 	var repository = load("res://app/saves/save_repository.gd").new(valid,valid)
 	repository.path=game.SAVE_PATH.get_base_dir().path_join("services/save.json")
 	repository.storage.pinned=true
-	assert(repository.begin_save(2,0) and repository.commit(repository.slot_path(2),'{"probe":1,"saveName":"one"}'))
+	assert(repository.begin_save(2) and repository.commit(repository.slot_path(2),'{"probe":1,"saveName":"one"}'))
 	var reads := Reads.new(); reads.repository=repository
 	var catalog = load("res://app/saves/slot_catalog.gd").new(reads.read_slot,repository.slot_path,20)
 	repository.changed.connect(catalog.invalidate)
@@ -26,10 +26,9 @@ func run() -> void:
 	assert(catalog.info(2).name=="one")
 	assert(repository.commit(repository.slot_path(2),'{"probe":1,"saveName":"two"}'))
 	assert(catalog.info(2).name=="two", "Repository writes invalidate even same-size metadata")
-	assert(not repository.begin_save(21,0) and not repository.last_error.is_empty())
-	assert(not repository.begin_save(2,1) and repository.last_error.code==ERR_BUSY)
+	assert(not repository.begin_save(21) and not repository.last_error.is_empty())
 	repository.force_failure=true
-	assert(not repository.begin_save(2,0) and repository.load_slot(2).probe==1)
+	assert(not repository.begin_save(2) and repository.load_slot(2).probe==1)
 	catalog.invalidate(); catalog.entries(); assert(reads.count>count)
 	var campaign = load("res://app/campaign_session.gd").new()
 	campaign.pending_load=true; campaign.pending_load_slot=9

@@ -102,7 +102,7 @@ func _setup_gate_apertures(map_id: String) -> void:
 	if not is_inside_tree() or not is_instance_valid(host) or not host.is_inside_tree(): return
 	var apertures := PackedVector4Array()
 	var slopes := PackedFloat32Array()
-	for u in host.unit_views():
+	for u in host.queries.unit_views():
 		if int(u.unit) not in [16,17]: continue
 		var id := int(u.unit)
 		var module = preload("res://presentation/battle/gate_module.gd")
@@ -122,10 +122,10 @@ func _setup_gate_apertures(map_id: String) -> void:
 
 func _process(_delta: float) -> void:
 	_finish_requests(false)
-	if event_patch != null and not host.terrain_has_changes(patch.get("keys",[])):
+	if event_patch != null and not host.queries.terrain_has_changes(patch.get("keys",[])):
 		event_patch.free(); event_patch=null
 	if event_patch == null and not patch.is_empty():
-		var changed: bool = host.terrain_has_changes(patch["keys"])
+		var changed: bool = host.queries.terrain_has_changes(patch["keys"])
 		if changed:
 			event_patch = Sprite2D.new()
 			event_patch.texture = Textures.load_texture(patch.texture)

@@ -1,5 +1,4 @@
 extends RefCounted
-const Access = preload("res://simulation/ports/ai_access.gd")
 ## Deterministic AI constants shared by the facade and its state.
 const THINK_PERIOD := 41          # DAT_00485648[owner] -> 0x28
 const BUILD_PLAN_PERIOD := 22     # DAT_004856b0[owner] -> 0x15

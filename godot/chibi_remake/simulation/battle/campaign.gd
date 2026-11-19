@@ -1,4 +1,7 @@
-extends RefCounted
+extends Object
+var _rules: RefCounted
+const EffectsRuntime = preload("res://simulation/battle_effects.gd")
+var _effects: EffectsRuntime
 ## campaign: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
@@ -27,7 +30,7 @@ func _objective_kind() -> String:
 	return "none"
 
 func _objective_eval() -> int:
-	return battle.rules.tick() if battle.rules != null else 0
+	return _rules.tick() if _rules != null else 0
 
 func _water_cell_count() -> int:
 	var w: Array = battle.map_data.get("waterWalkable", [])
@@ -60,7 +63,7 @@ func _check_end() -> void:
 	battle.cnt_enemy_buildings = enemy_buildings
 	if battle.game_end != 0:
 		return
-	var policy: Dictionary = battle.rules.defeat_policy(str(battle.map_id)) if battle.rules != null else {"mode":"economy"}
+	var policy: Dictionary = _rules.defeat_policy(str(battle.map_id)) if _rules != null else {"mode":"economy"}
 	if int(policy.get("requiredOfficer",0))>0 and not _required_officer_alive(int(policy.requiredOfficer)):
 		battle.game_end=2;_show_end(2);return
 	var outcome := _objective_eval()
@@ -93,4 +96,8 @@ func _unit_name(unit_id: int) -> String:
 	return str(battle.map_data.units.get(str(unit_id), {}).get("name", "unit %d" % unit_id))
 
 func _show_end(kind: int) -> void:
-	battle.effects.visual("show_end", [kind])
+	_effects.visual("show_end", [kind])
+
+func bind_dependencies(world: Object) -> void:
+	_effects = world.effects
+	_rules = world.rules

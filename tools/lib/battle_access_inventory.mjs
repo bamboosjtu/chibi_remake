@@ -3,7 +3,7 @@ export function collectReadModelUses(sources) {
   const references = [];
   const strings = /"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g;
   for (const [file, source] of Object.entries(sources).sort(([a],[b]) => a.localeCompare(b,'en'))) {
-    if (file.endsWith('/battle_access.gd')) continue; // Provider owns the boundary reads.
+    if (!file.startsWith('presentation/')) continue; // Provider owns the boundary reads.
     const code = source.replace(/("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|#[^\r\n]*/g, (all,string) => string ?? '');
     const masked = code.replace(strings, value => value.replace(/[^\r\n]/g,' '));
     const add = (match, field, syntax) => references.push({file, line:code.slice(0,match.index).split('\n').length,

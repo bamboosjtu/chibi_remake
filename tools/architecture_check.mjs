@@ -47,7 +47,7 @@ for (const file of files(root)) {
   if(relative === 'app/campaign_session.gd' && /\b(?:FileAccess|DirAccess)\b/.test(executable)) fail(`${relative}: campaign queries must use the cached level catalog`);
   if (relative !== 'simulation/battle_world.gd' && /\bworld\.(?:_modules|_access)\b|\bworld\.(?:get|set)\(\s*['"]_(?:modules|access)['"]/.test(code)) fail(`${relative}: accesses private BattleWorld collections`);
   if (['presentation/battle/components/camera_controller.gd','presentation/battle/build_preview.gd','presentation/battle/battle_resources.gd'].includes(relative) && /\bhost\.(?:units|selected|map_data|nav|decor_cells)\b|\bhost(?:\.(?:get|get\.bind)\(\s*|\[\s*)['"](?:units|selected|map_data|nav|decor_cells)['"]/.test(code)) fail(`${relative}: bypasses value read model`);
-  if (relative === 'presentation/battle/battle_access.gd' && /\b(?:data|state)\.(?:units|selected|map_data|decor_cells)\.duplicate\(\s*true\s*\)/.test(code)) fail(`${relative}: deep-copies world data at the read boundary`);
+  if (relative === 'app/read_models/battle_queries.gd' && /\b(?:_?data|state)\.(?:units|selected|map_data|decor_cells)\.duplicate\(\s*true\s*\)/.test(code)) fail(`${relative}: deep-copies world data at the read boundary`);
   const budget = limits.files[relative] ?? 600;
   if (count > budget) fail(`${relative}: ${count} lines exceeds ${budget}`);
   if (relative.startsWith('simulation/')) {
@@ -73,14 +73,17 @@ for (const file of files(root)) {
   }
   if(relative.startsWith('app/') && /\bview\._ui\b/.test(code))fail(`${relative}: app reaches private presentation state`);
   if((relative==='app/save_service.gd'||relative.startsWith('app/saves/')) && /\bview\.(?:unit_nodes|event_view|completion|end_label|projectile_view)\b/.test(code))fail(`${relative}: save pipeline bypasses loaded-view API`);
-  if(relative.startsWith('presentation/')&&relative!=='presentation/battle/battle_access.gd'&& /\bhost\.(?:units|selected|map_data|nav|decor_cells|trainings|visibility|clock|projectiles|fire_fields|player_commands|build_types|cmd_pending_data|task_events|terrain_changes)\b|\bhost(?:\.(?:get|get\.bind)\(\s*|\[\s*)['"](?:units|selected|map_data|nav|decor_cells|trainings|visibility|clock|projectiles|fire_fields|player_commands|build_types|cmd_pending_data|task_events|terrain_changes)['"]/.test(code))fail(`${relative}: presentation bypasses value read model`);
-  if(relative==='presentation/battle/battle_access.gd'&&/^var (?:units|selected|map_data|nav|decor_cells|trainings|visibility|clock|projectiles|fire_fields|player_commands|build_types|cmd_pending_data|task_events|terrain_changes):/m.test(code))fail(`${relative}: retired mutable getter restored`);
+  if(relative.startsWith('presentation/')&& /\bhost\.(?:units|selected|map_data|nav|decor_cells|trainings|visibility|clock|projectiles|fire_fields|player_commands|build_types|cmd_pending_data|task_events|terrain_changes)\b|\bhost(?:\.(?:get|get\.bind)\(\s*|\[\s*)['"](?:units|selected|map_data|nav|decor_cells|trainings|visibility|clock|projectiles|fire_fields|player_commands|build_types|cmd_pending_data|task_events|terrain_changes)['"]/.test(code))fail(`${relative}: presentation bypasses value read model`);
+  if(relative==='app/read_models/battle_queries.gd'&&/^var (?:units|selected|map_data|nav|decor_cells|trainings|visibility|clock|projectiles|fire_fields|player_commands|build_types|cmd_pending_data|task_events|terrain_changes):/m.test(code))fail(`${relative}: retired mutable getter restored`);
   if(relative==='app/read_models/unit_projection.gd'&&/\b(?:unit|data\.(?:units|selected|map_data))\.duplicate\(\s*true\s*\)/.test(code))fail(`${relative}: copies whole domain records instead of selecting fields`);
   if(relative.startsWith('presentation/') && /\.saver\.apply_snapshot\(|\.selected\.(?:append|clear|erase)\(/.test(code))fail(`${relative}: presentation bypasses session commands`);
   if (relative.startsWith('presentation/') && /(?:preload|load)\(\s*['"]res:\/\/simulation\/systems\//.test(code)) {
     waive(`${relative}::direct-system`, `${relative}: presentation imports a simulation system instead of a port`);
   }
   if (relative.startsWith('presentation/')) {
+    if (/\b(?:Game\.repository|(?:host|battle)\.(?:world|state)\b)|res:\/\/(?:testing|app\/automation)\//.test(code)) fail(relative + ': presentation crosses the application boundary');
+
+    if (/\.(?:_kill|_damage|_spawn_unit|_sim_step)\b|\.(?:actions|session_actions)\._\w+|\bhost\._data\b/.test(code)) fail(relative + ': presentation calls a private application or simulation member');
     for (const dependency of dependencies(relative)) {
       if (/^simulation\/(systems|navigation|battle)\//.test(dependency) || /^simulation\/battle_(state|world)\.gd$/.test(dependency)) {
         fail(`${relative}: transitive mutable simulation dependency ${dependency}`);

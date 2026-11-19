@@ -98,25 +98,16 @@ func _load_wav(path: String) -> AudioStreamWAV:
 	return stream
 
 ## 选中：武将优先 XR（选人/武将语音）；弓兵 XG；其余步兵/骑兵 XB。
-func play_select(units: Array) -> void:
-	if units.is_empty(): return
-	var hero := false
-	var mobile := false
-	for u in units:
-		if bool(u.get("is_building", false)): continue
-		mobile = true
-		if not (u.get("officer", {}) as Dictionary).is_empty(): hero = true
-	if not mobile: return
+func play_select(hero: bool) -> void:
 	# WAVE 里的两条人声应答：pmove01=“主公有何吩咐”（武将），pmove02=“将军请下令”（部队）。
 	# XB/XG/XR 是战斗/提示音，不是选中语音。
 	play("pmove01.wav" if hero else "pmove02.wav", -5.0)
 
 ## 攻击：近战 fight、远程 arrow、投石 throw；只在实际击发时调用。
-func play_attack(unit: Dictionary) -> void:
-	var id := int(unit.get("unit", -1))
+func play_attack(id: int, attack_range: int) -> void:
 	var names: Array = []
 	if id == 34: names = _bank_files("throw")
-	elif int(unit.get("atk_range", 1)) > 1 or (id == 45 or Roles.is_naval(id)): names = _bank_files("arrow")
+	elif attack_range > 1 or (id == 45 or Roles.is_naval(id)): names = _bank_files("arrow")
 	else: names = _bank_files("fight")
 	if names.is_empty(): return
 	play(names[_rng.randi() % names.size()], -7.0)

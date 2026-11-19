@@ -40,7 +40,7 @@ func _modals(pauses: Node) -> void:
 	media.active = true; media._finish_media()
 	assert(paused and pauses.count() == 1)
 	briefing.open()
-	var snapshot: Dictionary = game.snapshot(battle.units,battle.commands.world._resources(),battle.saver.save_extra())
+	var snapshot: Dictionary = game.snapshot(battle.units,battle.world.economy.player_resources(),battle.saver.save_extra())
 	var world: WeakRef = weakref(battle.world)
 	var transaction = load("res://app/saves/world_transaction.gd")
 	transaction.force_view_failure_after_attach = true

@@ -1,9 +1,13 @@
-extends RefCounted
+extends Object
+const SessionActions = preload("res://app/session_actions.gd")
 ## controller: presentation component.
 const UIState = preload("res://presentation/menu/menu_state.gd")
 var _ui: UIState
 var surface: Control
-var ports = preload("res://presentation/menu/ports/controller_dependencies.gd").new()
+var _automation_driver: Object
+var _dep_campaign_dialog: Object
+var _dep_level_dialog: Object
+var _dep_menu_styles: Object
 const RemasterArt = preload("res://presentation/battle/art_catalog.gd")
 
 const CAMPAIGN_CAO := "chibic"             # 左格：曹操（关卡 id 前缀也是它）
@@ -15,7 +19,7 @@ func _init(data: UIState, node: Control) -> void:
 func _ready() -> void:
 	surface.get_window().title = "三国赤壁 · 高清重制"
 	surface.get_tree().set_auto_accept_quit(false)
-	ports._build_styles()
+	_dep_menu_styles._build_styles()
 	var bgm = load("res://presentation/audio/bgm.gd").new()
 	surface.add_child(bgm)
 	bgm.play("res://media/music/start.ogg")
@@ -111,8 +115,8 @@ func _ready() -> void:
 	_ui.toast.visible = false
 	surface.add_child(_ui.toast)
 
-	ports._build_level_dialog()
-	ports._build_campaign_dialog()
+	_dep_level_dialog._build_level_dialog()
+	_dep_campaign_dialog._build_campaign_dialog()
 
 	# 直入关卡：--map=CHIBIC1（配合 --screenshot 可做发布版验证）
 	var args := OS.get_cmdline_user_args()
@@ -131,10 +135,10 @@ func _ready() -> void:
 		if a == "--campaign":
 			want_campaign = true
 		elif a.begins_with("--campaign="):
-			var c := ports._campaign_alias(a.substr(11))
+			var c = _dep_campaign_dialog._campaign_alias(a.substr(11))
 			if c != "":
 				_ui.campaign = c
-				ports._set_campaign(c, false)
+				_dep_campaign_dialog._set_campaign(c, false)
 
 	# --levels：直接把关卡列表摊开（菜单截图 / 布局自检用）。必须和 --screenshot
 	# 一起用，否则会停在菜单上等人操作。
@@ -151,7 +155,7 @@ func _ready() -> void:
 	# --keytest：把合成按键塞进视口输入流，验证「选择势力」那一步真的吃键盘
 	#（← / → / A / D 换边、Enter 确定、Esc 取消）。放在截图之前，跑完直接退出。
 	if "--keytest" in args:
-		await ports._run_keytest()
+		await _automation_driver._run_keytest()
 		surface.get_tree().quit()
 		return
 
@@ -161,7 +165,7 @@ func _ready() -> void:
 	# outside = 面板外的固定点（80,80，点在遮罩上）；x,y = 显式视口坐标；
 	# confirm = 金凸「确定」，cancel = 金凸「取消」。--mousetest 是完整矩阵，跑完即退。
 	if "--mousetest" in args:
-		await ports._run_mouse_matrix()
+		await _automation_driver._run_mouse_matrix()
 		surface.get_tree().quit()
 		return
 	var mc_cmd := ""
@@ -173,7 +177,7 @@ func _ready() -> void:
 			mc_cmd = "unspecified"
 			break
 	if mc_cmd != "":
-		await ports._run_mouse_click(mc_cmd)
+		await _automation_driver._run_mouse_click(mc_cmd)
 		# 不带 --screenshot/--levels 时点完即退（否则挂在菜单上等人）；带了就落下去
 		# 走截图那一段（它自己负责截图和退出）。
 		if "--screenshot" not in args and "--levels" not in args:
@@ -187,23 +191,23 @@ func _ready() -> void:
 	if "--screenshot" in args or "--levels" in args:
 		await surface.get_tree().create_timer(0.8).timeout
 		if "--levels" in args:
-			ports._report_level_dialog()
+			_automation_driver._report_level_dialog()
 			for a in args:
 				if a.begins_with("--scroll="):
-					ports._scroll_to(int(a.substr(9)))
+					_dep_level_dialog._scroll_to(int(a.substr(9)))
 				elif a.begins_with("--focus="):
-					ports._focus_row(int(a.substr(8)))
+					_dep_level_dialog._focus_row(int(a.substr(8)))
 				elif a.begins_with("--scrollby="):
-					ports._scroll_by(int(a.substr(11)))
+					_dep_level_dialog._scroll_by(int(a.substr(11)))
 			await surface.get_tree().process_frame
 			await surface.get_tree().process_frame
 			if "--levels" in args:
-				ports._report_scroll_state()
+				_automation_driver._report_scroll_state()
 		elif want_campaign:
 			await surface.get_tree().process_frame
 			await surface.get_tree().process_frame
-			ports._refresh_campaign_cursor()
-			ports._report_campaign_dialog()
+			_dep_campaign_dialog._refresh_campaign_cursor()
+			_automation_driver._report_campaign_dialog()
 		if "--screenshot" in args: await _save_menu_screenshot(args)
 		surface.get_tree().quit()
 		return
@@ -211,7 +215,7 @@ func _ready() -> void:
 	if Game.last_load_error != "":
 		var load_msg := Game.last_load_error
 		Game.last_load_error = ""
-		surface.call_deferred("_show_toast", load_msg)
+		_show_toast.call_deferred(load_msg)
 
 	_ui.media_view=preload("res://presentation/media/event_view.gd").new(surface);surface.add_child(_ui.media_view)
 	var visible_args := Array(args).filter(func(arg): return not str(arg).begins_with("--portable-root=") and str(arg) != "--portable" and not str(arg).begins_with("--storage-mode="))
@@ -236,11 +240,11 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			surface.get_viewport().set_input_as_handled()
 			return
 		if event.is_action_pressed("ui_left"):
-			ports._move_campaign(-1)
+			_dep_campaign_dialog._move_campaign(-1)
 			surface.get_viewport().set_input_as_handled()
 			return
 		if event.is_action_pressed("ui_right"):
-			ports._move_campaign(1)
+			_dep_campaign_dialog._move_campaign(1)
 			surface.get_viewport().set_input_as_handled()
 			return
 		if event is InputEventKey:
@@ -248,10 +252,10 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			if k.pressed and not k.echo:
 				var kc: int = k.physical_keycode if k.physical_keycode != 0 else k.keycode
 				if kc == KEY_A or kc == KEY_LEFT:
-					ports._move_campaign(-1)
+					_dep_campaign_dialog._move_campaign(-1)
 					surface.get_viewport().set_input_as_handled()
 				elif kc == KEY_D or kc == KEY_RIGHT:
-					ports._move_campaign(1)
+					_dep_campaign_dialog._move_campaign(1)
 					surface.get_viewport().set_input_as_handled()
 		return
 	# ── 关卡列表开着时：Esc = 返回（和改版前完全一致）──
@@ -284,9 +288,9 @@ func _on_start() -> void:
 		_ui.campaign_panel.visible = true
 	if _ui.scrim != null:
 		_ui.scrim.visible = true
-	ports._set_title_visible(false)           # 居中后的对话框会压住标题 → 干脆把标题/副标题收掉
-	ports._release_focus()
-	ports._refresh_campaign_cursor.call_deferred()
+	_dep_campaign_dialog._set_title_visible(false)           # 居中后的对话框会压住标题 → 干脆把标题/副标题收掉
+	_dep_campaign_dialog._release_focus()
+	_dep_campaign_dialog._refresh_campaign_cursor.call_deferred()
 
 func _on_campaign_confirm() -> void:
 	_ui.campaign = _ui.campaign_choice
@@ -294,14 +298,14 @@ func _on_campaign_confirm() -> void:
 		_ui.campaign_panel.visible = false
 	if _ui.campaign_cursor != null:
 		_ui.campaign_cursor.visible = false
-	ports._fill_level_list()
+	_dep_level_dialog._fill_level_list()
 	_ui.level_panel.visible = true
 	if _ui.scrim != null:
 		_ui.scrim.visible = true
-	ports._set_title_visible(false)
-	ports._scroll_to(0)
+	_dep_campaign_dialog._set_title_visible(false)
+	_dep_level_dialog._scroll_to(0)
 	# 打开就把焦点放到第一行：方向键/回车立刻可用，Esc/滚轮也照常
-	var first := ports._first_row()
+	var first = _dep_level_dialog._first_row()
 	if first != null:
 		first.grab_focus()
 
@@ -313,10 +317,10 @@ func _on_back() -> void:
 		_ui.campaign_cursor.visible = false
 	if _ui.scrim != null:
 		_ui.scrim.visible = false
-	ports._set_title_visible(true)
+	_dep_campaign_dialog._set_title_visible(true)
 	for b in _ui.main_buttons:
 		b.visible = true
-	ports._release_focus()
+	_dep_campaign_dialog._release_focus()
 
 func _on_skirmish() -> void:
 	_show_toast("对战模式：复刻路线图内（未实现）")
@@ -325,7 +329,7 @@ func _on_history() -> void:
 	if _ui.media_view!=null:_ui.media_view.play_media("res://media/videos/LISHI.AVI")
 
 func _on_level(id: String) -> void:
-	if Game.change_battle(id) != OK: surface._show_toast("关卡无法载入，请重试。")
+	if Game.change_battle(id) != OK: _show_toast("关卡无法载入，请重试。")
 
 func _on_load() -> void:
 	if _ui.slots_dialog==null:
@@ -335,15 +339,11 @@ func _on_load() -> void:
 	_ui.slots_dialog.open(false)
 
 func _load_slot(slot: int, _title: String) -> void:
-	var d := Game.load_save(slot)
-	if d.is_empty():_ui.slots_dialog.show_error("所选进度无法读取");return
-	var id := str(d.get("map", "chibic1"))
-	# 存档指向的关卡数据如果已经不在，明确提示而不是切过去白屏
-	if not FileAccess.file_exists("res://data/%s.json" % id):
-		_ui.slots_dialog.show_error("存档对应的关卡已不存在")
-		return
-	if Game.change_battle(id,slot) != OK: surface._show_toast("进度无法载入，当前菜单已保留。")
-
+	match SessionActions.open_saved_battle(slot):
+		OK: return
+		ERR_FILE_CORRUPT: _ui.slots_dialog.show_error("所选进度无法读取")
+		ERR_DOES_NOT_EXIST: _ui.slots_dialog.show_error("存档对应的关卡已不存在")
+		_: _show_toast("进度无法载入，当前菜单已保留。")
 
 func _save_menu_screenshot(args: PackedStringArray) -> void:
 	var path := "user://chibi_shot.png"
@@ -356,3 +356,9 @@ func _save_menu_screenshot(args: PackedStringArray) -> void:
 	if texture != null:
 		var image := texture.get_image()
 		if image != null: image.save_png(path)
+
+func bind_dependencies(components: Object) -> void:
+	_automation_driver = components.automation_driver
+	_dep_campaign_dialog = components.campaign_dialog
+	_dep_level_dialog = components.level_dialog
+	_dep_menu_styles = components.menu_styles

@@ -1,10 +1,13 @@
-extends RefCounted
+extends Object
 ## command art: presentation component.
 const UIState = preload("res://presentation/battle/components/battle_view_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
 var _ui: UIState
 var surface: Node2D
-var ports = preload("res://presentation/battle/components/ports/command_art_dependencies.gd").new()
+var _dep_command_actions: Object
+var _dep_command_model: Object
+var _dep_hud_build: Object
+var _dep_selection_info: Object
 const Textures = preload("res://presentation/battle/runtime_textures.gd")
 
 const CMD_HOT_NAMES = preload("res://simulation/battle_config.gd").JIMOU_NAMES
@@ -52,7 +55,7 @@ func _build_cmd_art() -> void:
 	back_bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	back_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_ui.art_back.add_child(back_bg)
-	var back_label := ports._mk_label(_ui.art_back, 14, _ui.c_gold, HORIZONTAL_ALIGNMENT_CENTER)
+	var back_label = _dep_hud_build._mk_label(_ui.art_back, 14, _ui.c_gold, HORIZONTAL_ALIGNMENT_CENTER)
 	back_label.text = "返回"
 	back_label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for page in ["form_next", "form_prev"]:
@@ -61,16 +64,16 @@ func _build_cmd_art() -> void:
 		_ui.art_buttons.back().btn.set_meta("source_frame", 123 if page == "form_next" else 124)
 	# 组建入口：原版由"组建/生产"对话框（16140 → 0x11210）承担，
 	# 本工程把它作为图标面板旁的小按钮保留（否则工人无法组建部队）。
-	_ui.worker_button = ports._mk_button(_ui.ui_layer, 12)
+	_ui.worker_button = _dep_hud_build._mk_button(_ui.ui_layer, 12)
 	_ui.worker_button.text = ""
 	_ui.worker_button.tooltip_text = "组建"
 	_ui.worker_button.text = "组建"
 	_ui.worker_button.icon = null
 	_ui.worker_button.expand_icon = true
-	_ui.worker_button.pressed.connect(ports._act_open_officer_pick)
-	_ui.join_button = ports._mk_button(_ui.ui_layer,12)
+	_ui.worker_button.pressed.connect(_dep_selection_info._act_open_officer_pick)
+	_ui.join_button = _dep_hud_build._mk_button(_ui.ui_layer,12)
 	_ui.join_button.text="加入"
-	_ui.join_button.pressed.connect(func():_ui.host.commands.session.begin_target("join"))
+	_ui.join_button.pressed.connect(func():_ui.host.actions.begin_target("join"))
 	# 悬停提示
 	_ui.art_tip = Label.new()
 	_ui.art_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -130,10 +133,10 @@ func _panel_specs() -> Array:
 	return specs
 
 func _selection_description() -> Dictionary:
-	return _refresh_selection if _refreshing else _ui.host.selection_description()
+	return _refresh_selection if _refreshing else _ui.host.queries.selection_description()
 
 func _panel_kind() -> String:
-	return str(_refresh_selection.kind) if _refreshing else ports.panel_kind()
+	return str(_refresh_selection.kind) if _refreshing else _dep_command_model.panel_kind()
 
 func _unlocked_indices(formation: bool) -> Array:
 	if _refreshing:return _refresh_formations if formation else _refresh_jimou
@@ -141,10 +144,10 @@ func _unlocked_indices(formation: bool) -> Array:
 
 func _compute_unlocked_indices(formation: bool) -> Array:
 	var level := -1
-	for unit in _ui.host.selection_views():
+	for unit in _ui.host.queries.selection_views():
 		if not bool(unit.get("alive", false)) or float(unit.get("die_t", -1)) >= 0.0:
 			continue
-		if int(unit.get("owner", -1)) != int(_ui.host.player_owner) or bool(unit.get("attached", false)) or bool(unit.get("is_building", false)):
+		if int(unit.get("owner", -1)) != int(_ui.host.queries.player_owner) or bool(unit.get("attached", false)) or bool(unit.get("is_building", false)):
 			continue
 		var officer: Dictionary = unit.get("officer", {})
 		if not officer.is_empty():
@@ -202,7 +205,7 @@ func _apply_panel_type() -> void:
 func _close_art_sub() -> void:
 	_ui.art_sub = ""
 	_ui.build_menu = false
-	ports._refresh_cmd_panel()
+	_dep_command_model._refresh_cmd_panel()
 
 func _layout_cmd_art() -> void:
 	_build_cmd_art()
@@ -274,7 +277,7 @@ func _refresh_cmd_art() -> void:
 		return
 	# One synchronous refresh observes one selection. Never retain world objects
 	# or cache across input events, loads, command changes, or simulation ticks.
-	_refresh_selection=_ui.host.selection_description()
+	_refresh_selection=_ui.host.queries.selection_description()
 	_refresh_jimou=_compute_unlocked_indices(false);_refresh_formations=_compute_unlocked_indices(true)
 	_refreshing=true
 	_refresh_cmd_art_core()
@@ -338,22 +341,22 @@ func _on_panel_slot(i: int) -> void:
 	if i < _ui.art_buttons.size() and bool(_ui.art_buttons[i].btn.get_meta("cmd_disabled", false)):
 		return
 	match str(specs[i].cmd):
-		"attack": _ui.host.commands.session.begin_target("attack")
-		"move": _ui.host.commands.session.begin_target("move")
-		"transport": _ui.host.commands.session.begin_target("transport")
+		"attack": _ui.host.actions.begin_target("attack")
+		"move": _ui.host.actions.begin_target("move")
+		"transport": _ui.host.actions.begin_target("transport")
 		"build": _open_build_menu()
-		"repair": _ui.host.commands.session.begin_target("repair")
-		"rest": ports._act_rest()
+		"repair": _ui.host.actions.begin_target("repair")
+		"rest": _dep_command_actions._act_rest()
 		"disband":
-			ports._act_disband()
+			_dep_command_actions._act_disband()
 			_ui.art_sub = ""
-			ports.update_panel()
-		"board": _ui.host.commands.session.begin_target("board")
-		"unload": _ui.host.commands.session.begin_target("unload")
-		"form": ports._act_open_officer_pick()
-		"join": _ui.host.commands.session.begin_target("join")
-		"return": _ui.host.commands.session.submit_command("return_cargo")
-		"watch": ports._act_watch()
+			_dep_command_model.update_panel()
+		"board": _ui.host.actions.begin_target("board")
+		"unload": _ui.host.actions.begin_target("unload")
+		"form": _dep_selection_info._act_open_officer_pick()
+		"join": _ui.host.actions.begin_target("join")
+		"return": _ui.host.actions.submit_command("return_cargo")
+		"watch": _dep_command_actions._act_watch()
 		"formation":
 			_ui.art_sub = "" if _ui.art_sub == "form" else "form"
 			_refresh_cmd_art()
@@ -361,31 +364,31 @@ func _on_panel_slot(i: int) -> void:
 			_ui.art_sub = "" if _ui.art_sub == "hot" else "hot"
 			_refresh_cmd_art()
 		"duel":
-			_ui.host.commands.session.begin_target("duel")
+			_ui.host.actions.begin_target("duel")
 			_ui.art_sub = ""
 			_refresh_cmd_art()
 
 func _open_build_menu() -> void:
-	if not _ui.host.can_build_selected():
-		_ui.host.commands.world._feedback("建造由麾下带工人的武将发起；独立工人请先组建队伍")
+	if not _ui.host.queries.can_build_selected():
+		_ui.host.actions.feedback("建造由麾下带工人的武将发起；独立工人请先组建队伍")
 		return
-	if _ui.host.build_options().is_empty():
-		_ui.host.commands.world._feedback("本关没有可建造的建筑")
+	if _ui.host.queries.build_options().is_empty():
+		_ui.host.actions.feedback("本关没有可建造的建筑")
 		return
 	_ui.build_menu = true
 	_ui.art_sub = ""
-	ports._refresh_cmd_panel()
+	_dep_command_model._refresh_cmd_panel()
 
 func _on_art_hot(i: int) -> void:
 	if not _jimou_indices().has(i):
 		return
-	_ui.host.commands.session.begin_target("jimou", i)
+	_ui.host.actions.begin_target("jimou", i)
 	_ui.art_sub = ""
 	_refresh_cmd_art()
 
 func _on_art_form(i: int) -> void:
 	if not _unlocked_indices(true).has(i): return
-	_ui.host.commands.session.submit_command("formation", -1, i)
+	_ui.host.actions.submit_command("formation", -1, i)
 	_ui.art_sub = ""
 	_refresh_cmd_art()
 
@@ -397,19 +400,19 @@ func _handle_cmd_key(k: InputEvent) -> bool:
 		return false
 	if k.is_action_pressed("battle_page_previous"):
 		if _ui.art_sub == "form_more": _formation_page(false); return true
-		return ports._on_cmd_page(-1)
+		return _dep_command_model._on_cmd_page(-1)
 	if k.is_action_pressed("battle_page_next"):
 		if _ui.art_sub == "form" and _unlocked_indices(true).has(9): _formation_page(true); return true
-		return ports._on_cmd_page(1)
+		return _dep_command_model._on_cmd_page(1)
 	if _ui.officer_pick:
 		if k.is_action_pressed("battle_cancel"):
-			ports._act_close_officer_pick()
+			_dep_selection_info._act_close_officer_pick()
 			return true
 		if k is InputEventKey and k.keycode >= KEY_1 and k.keycode <= KEY_6:
 			var slot := int(k.keycode) - int(KEY_1)
 			var idx := _ui.cmd_page * CMD_PAGE + slot
 			if idx < _ui.cmd_capsules.size() and bool((_ui.cmd_capsules[idx] as Dictionary).get("enabled", false)):
-				ports._on_cmd(slot)          # 与按钮同一路径：槽位动作 + 页内偏移
+				_dep_command_actions._on_cmd(slot)          # 与按钮同一路径：槽位动作 + 页内偏移
 				return true
 	var hot_slot := -1
 	for slot in range(9):
@@ -434,3 +437,9 @@ func _handle_cmd_key(k: InputEvent) -> bool:
 		if _ui.host.sfx!=null:_ui.host.sfx.play("click.wav")
 		return true
 	return false
+
+func bind_dependencies(components: Object) -> void:
+	_dep_command_actions = components.command_actions
+	_dep_command_model = components.command_model
+	_dep_hud_build = components.hud_build
+	_dep_selection_info = components.selection_info

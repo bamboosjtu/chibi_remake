@@ -14,7 +14,7 @@ func _initialize() -> void:
 func run() -> void:
 	game=root.get_node("Game");game.current_map="chibic1"
 	battle=load("res://main.tscn").instantiate();root.add_child(battle);battle.set_process(false)
-	var base: Dictionary=game.snapshot(battle.units,battle.commands.world._resources(),battle.saver.save_extra())
+	var base: Dictionary=game.snapshot(battle.units,battle.world.economy.player_resources(),battle.saver.save_extra())
 	var digest: String=game.save_checksum(battle.saver.continuation_snapshot(game))
 	var identity: int=battle.state.get_instance_id()
 	var invalids:=[]
@@ -117,8 +117,8 @@ func _json_limits() -> void:
 	DirAccess.remove_absolute(path)
 
 func _backup_source() -> void:
-	assert(game.save_game(battle.units,battle.commands.world._resources(),battle.saver.save_extra(),19))
-	assert(game.save_game(battle.units,battle.commands.world._resources(),battle.saver.save_extra(),19))
+	assert(game.save_game(battle.units,battle.world.economy.player_resources(),battle.saver.save_extra(),19))
+	assert(game.save_game(battle.units,battle.world.economy.player_resources(),battle.saver.save_extra(),19))
 	var path: String=game.save_slot_path(19)
 	var text:=FileAccess.get_file_as_string(path)
 	var data: Dictionary=JSON.parse_string(text)

@@ -1,24 +1,24 @@
-extends RefCounted
+extends Object
 ## world layers: presentation component.
 const UIState = preload("res://presentation/battle/components/battle_view_state.gd")
 var _ui: UIState
 var surface: Node2D
 var terrain: Node2D
-var ports = preload("res://presentation/battle/components/ports/world_layers_dependencies.gd").new()
+
 func _init(data: UIState, node: Node2D) -> void:
 	_ui = data
 	surface = node
 
 func build_terrain() -> void:
 	# Visual streaming must finish while the opening briefing pauses the simulation.
-	var fog: Sprite2D=load("res://presentation/battle/battle_fog.gd").new(_ui.host.visibility_view, _ui.host.visibility_planes)
+	var fog: Sprite2D=load("res://presentation/battle/battle_fog.gd").new(_ui.host.queries.visibility_view, _ui.host.queries.visibility_planes)
 	_ui.fog_sprite=fog
 	fog.process_mode=Node.PROCESS_MODE_ALWAYS
 	surface.add_child(fog)
 	_ui.resource_layer = load("res://presentation/battle/battle_resources.gd").new(_ui.host)
 	_ui.resource_layer.process_mode=Node.PROCESS_MODE_ALWAYS
 	surface.add_child(_ui.resource_layer)
-	var map_id := str(_ui.host.map_id)
+	var map_id := str(_ui.host.queries.map_id)
 	var plan := terrain_plan(map_id)
 	if plan.is_empty():
 		push_error("Missing HD terrain: " + map_id)
@@ -32,11 +32,24 @@ func prepare_opening_layers() -> void:
 	if _ui.fog_sprite != null: _ui.fog_sprite._process(0.0)
 
 func install_terrain(map_id: String, plan: Dictionary, preflight := false) -> bool:
+	var staged := stage_terrain(map_id, plan, preflight)
+	if staged == null: return false
+	commit_terrain(staged)
+	return true
+
+func stage_terrain(map_id: String, plan: Dictionary, preflight: bool) -> Node2D:
+	var staged := preload("res://presentation/battle/terrain_stream.gd").new(_ui.host, map_id, plan)
+	staged.process_mode = Node.PROCESS_MODE_ALWAYS
+	surface.add_child(staged)
+	if preflight and not staged.load_opening_view():
+		staged.free()
+		return null
+	return staged
+
+func commit_terrain(staged: Node2D) -> void:
 	release_terrain()
-	terrain = preload("res://presentation/battle/terrain_stream.gd").new(_ui.host, map_id, plan)
-	terrain.process_mode=Node.PROCESS_MODE_ALWAYS
-	surface.add_child(terrain)
-	return not preflight or terrain.load_opening_view()
+	terrain = staged
+	terrain.host = _ui.host
 
 func release_terrain() -> void:
 	if is_instance_valid(terrain): terrain.free()

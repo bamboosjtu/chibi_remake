@@ -18,10 +18,8 @@ func slot_path(slot: int) -> String:
 	if slot < 0 or slot > SAVE_SLOTS: return ""
 	return path if slot == 0 else path.get_base_dir().path_join("slot-%02d.json" % slot)
 
-func begin_save(slot: int, pending_duels: int) -> bool:
+func begin_save(slot: int) -> bool:
 	last_error={}
-	if pending_duels > 0:
-		last_error={"stage":"unsettled duel; use session save command","code":ERR_BUSY}; return false
 	if slot_path(slot).is_empty():
 		last_error={"stage":"invalid slot","code":ERR_INVALID_PARAMETER}; return false
 	if force_failure:

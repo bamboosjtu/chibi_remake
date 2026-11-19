@@ -32,32 +32,32 @@ func restore(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 	battle.army_tech=_numeric_keys.call(simulation.get("armyTech",{})).duplicate(true)
 	# ---- 校验通过：开始交换世界 ----
 	# R07：待确认的施法/单挑引用属于旧世界，恢复后不能保留为可执行状态。
-	host.commands.military._reset_jimou()
+	host.world.abilities._reset_jimou()
 	battle.duel_pending = false
 	battle.cmd_pending = ""
 	battle.cmd_pending_data = {}
-	host.commands.economy._build_decor_targets()
+	host.world.harvest_orders._build_decor_targets()
 	for key in decor_snapshot:
 		var entry: Dictionary = decor_snapshot[key]
 		var target: Dictionary = battle.decor_cells[str(key)]
 		target.stock = float(entry.stock)
-		if target.stock <= 0: host.commands.economy._remove_decor(target)
+		if target.stock <= 0: host.world.harvest_orders._remove_decor(target)
 
-	host.commands.military._restore_officer_pool(simulation.get("officerPool", {}))
+	host.world.officer_pool._restore_officer_pool(simulation.get("officerPool", {}))
 	battle.selected.clear()
 	while not battle.units.is_empty():
-		host.commands.world._free_unit_at(battle.units.size() - 1)
+		host.world.battle_simulation._free_unit_at(battle.units.size() - 1)
 	if not _restore_units(d, arr, simulation): return false
 	battle.next_uid = int(d.nextUid)
-	host.commands.military._enforce_team_limits()
+	host.world.command_groups._enforce_team_limits()
 	for uid in ids:
 		battle.next_uid = maxi(battle.next_uid, int(uid) + 1)
 	battle.game_end = int(d.get("gameEnd", 0))
 	battle.auto_control = bool(simulation.get("autoControl", false))
 	_restore_resources.call(d)
 	_restore_trainings.call(d)
-	battle.projectiles.restore(simulation.get("projectiles",[]))
-	battle.fire_fields.restore(simulation.get("fireFields",[]))
+	host.world.projectiles.restore(simulation.get("projectiles",[]))
+	host.world.fire_fields.restore(simulation.get("fireFields",[]))
 	_restore_clock(simulation, speed)
 	battle.ai_res = _numeric_keys.call(simulation.get("aiResources", {})).duplicate(true)
 	battle.control_groups = _numeric_keys.call(simulation.get("groups", {}))
@@ -78,19 +78,19 @@ func restore(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 	battle.army_tech = _numeric_keys.call(simulation.get("armyTech", {})).duplicate(true)
 	# 攻防加成是科技等级的派生数据；旧档的单口径缓存不能覆盖新四计算器。
 	for unit in battle.units:
-		host.commands.technology._apply_tech_bonuses(unit)
+		host.world.technology._apply_tech_bonuses(unit)
 	battle.research_jobs = simulation.get("researchJobs",[]).duplicate(true)
-	if battle.ai != null:
-		battle.ai.restore(simulation.get("ai", {}))
+	if host.world.ai != null:
+		host.world.ai.restore(simulation.get("ai", {}))
 	# rebuild_buildings performs the terrain reset and preserves resource cells.
-	battle.nav.set_resources(battle.decor_targets)
-	battle.nav.rebuild_buildings(battle.units)
+	host.world.nav.set_resources(battle.decor_targets)
+	host.world.nav.rebuild_buildings(battle.units)
 	# R02：读档重建的占地必须与新建一致；旧档若把单位留在建筑占地里，这里按重建后的
 	# 真实阻挡把它们挪到最近可走格，避免“合法工人被包进帅帐”。
-	host.commands.orders._resolve_navigation_overlaps()
-	battle.transports.restore()
-	host.commands.world._update_gates()
-	battle.visibility.restore(str(simulation.get("explored", "")), battle.units, battle.player_owner)
+	host.world.movement._resolve_navigation_overlaps()
+	host.world.transports.restore()
+	host.world.battle_simulation._update_gates()
+	host.world.visibility.restore(str(simulation.get("explored", "")), battle.units, battle.player_owner)
 	return true
 
 func _restore_scalars(unit: Dictionary, record: Dictionary, state: Dictionary) -> void:
@@ -99,7 +99,7 @@ func _restore_scalars(unit: Dictionary, record: Dictionary, state: Dictionary) -
 	UnitSchema.restore_scalars(state,unit)
 
 func _restore_clock(simulation: Dictionary, speed: int) -> void:
-	battle.clock.set_speed(speed)
+	host.world.clock.set_speed(speed)
 	battle.sim_tick = int(simulation.tick)
 	battle.simulation_rng.state = int(simulation.rngState)
 	battle.sim_acc = float(simulation.accumulator)
@@ -108,7 +108,7 @@ func _restore_units(d: Dictionary, arr: Array, simulation: Dictionary) -> bool:
 	battle.next_uid = 0
 	var by_uid := {}
 	for rec in arr:
-		if not host.commands.world._spawn_unit(int(rec.unit), int(rec.owner), float(rec.x), float(rec.y), true):
+		if not host.world.entity_factory._spawn_unit(int(rec.unit), int(rec.owner), float(rec.x), float(rec.y), true):
 			push_error("Snapshot unit failed after validation")
 			return false
 		var u: Dictionary = battle.units.back()
@@ -118,7 +118,7 @@ func _restore_units(d: Dictionary, arr: Array, simulation: Dictionary) -> bool:
 		var state: Dictionary = rec.simulation
 		_restore_scalars(u,rec,state)
 		TickTimers.restore(state,u)
-		battle.stratagems.restore(state,u)
+		host.world.stratagems.restore(state,u)
 		ActionClock.restore(state,u)
 		preload("res://simulation/systems/locomotion.gd").restore(state,u)
 		by_uid[int(u.uid)] = u

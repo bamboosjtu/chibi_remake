@@ -28,7 +28,7 @@ func run() -> void:
 	assert(recovered and bool(game.Store.read(orphan).get("recovered", false)))
 	# 语法完整但校验和损坏的主档，不能取代有效备份。
 	var checked: String = game.SAVE_PATH.get_base_dir().path_join("checksum-backup.json")
-	var payload: Dictionary = game.snapshot(b.units,b.commands.world._resources(),b.commands.session._save_extra())
+	var payload: Dictionary = game.snapshot(b.units,b.world.economy.player_resources(),b.scene_controller._save_extra())
 	payload.erase("checksum"); payload["generation"] = 1
 	payload.checksum = game.save_checksum(payload)
 	assert(game._atomic_write(checked, JSON.stringify(payload)))
@@ -39,7 +39,7 @@ func run() -> void:
 	var backup: Dictionary = game.Store.read(checked + ".bak", game.verify_save_checksum)
 	assert(backup.get("generation") == 1 and backup.get("checksum") == payload.checksum)
 	b.view.event_view.restore_history()
-	assert(b.view._command_icon(34).region == Rect2(1294,825,190,229), "HD command atlas uses measured separators")
+	assert(b.view.command_art._command_icon(34).region == Rect2(1294,825,190,229), "HD command atlas uses measured separators")
 	root.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
 	for dimensions in [Vector2i(1920, 1080), Vector2i(1560, 1440), Vector2i(1280, 720), Vector2i(640, 480)]:
 		root.size = dimensions
@@ -53,7 +53,7 @@ func run() -> void:
 			if i % 3 > 0:
 				assert(is_equal_approx(button.position.y, b.view.art_buttons[i - 1].btn.position.y))
 	print("M0 LAYOUT PASS: 1920x1080, 1560x1440, 640x480")
-	var ok: bool = game.save_game(b.units, b.commands.world._resources(), b.commands.session._save_extra())
+	var ok: bool = game.save_game(b.units, b.world.economy.player_resources(), b.scene_controller._save_extra())
 	print("M0 SAVE view=",b.view != null," result=",ok," error=",game.Store.last_error)
 	if not ok: quit(1); return
 	assert(b.saver.apply_snapshot(game.load_save()))
@@ -107,9 +107,9 @@ func run() -> void:
 	game.current_map="chibic1"
 	var other: Node2D=load("res://main.tscn").instantiate();root.add_child(other)
 	other.set_process(false);other.cli_mode=true;other.gold=5678
-	assert(other.commands.session._save_game(20,"另一战役"));other.free()
+	assert(other.session_actions.save_game(20,"另一战役"));other.free()
 	game.current_map="chibil1"
-	main_menu._on_load();choose(main_menu.slots_dialog,20);main_menu.slots_dialog._confirm()
+	main_menu.controller._on_load();choose(main_menu.slots_dialog,20);main_menu.slots_dialog._confirm()
 	await process_frame;await process_frame
 	assert(current_scene is Node2D and current_scene.map_id=="chibic1" and current_scene.gold==5678)
 	var loaded_menu=current_scene.view.battle_menu

@@ -5,7 +5,7 @@ func _initialize() -> void:
 func run() -> void:
 	var game: Node = root.get_node("Game")
 	var battle = load("res://main.tscn").instantiate(); root.add_child(battle); battle.set_process(false)
-	var baseline: Dictionary = game.snapshot(battle.units,battle.commands.world._resources(),battle.saver.save_extra())
+	var baseline: Dictionary = game.snapshot(battle.units,battle.world.economy.player_resources(),battle.saver.save_extra())
 	var before: String = game.save_checksum(battle.saver.continuation_snapshot(game))
 	var state_id: int = battle.state.get_instance_id()
 	var cases := []

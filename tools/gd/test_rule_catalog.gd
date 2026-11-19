@@ -35,12 +35,12 @@ func run() -> void:
 	var actor: Dictionary = battle.selected[0]
 	Stratagem.set_status(actor, 2); Stratagem.set_status(actor, 4)
 	assert(actor.haste_t == tuning.statusTicks and actor.farsight_t == tuning.statusTicks)
-	for tick in range(4): battle.commands.world._sim_step(battle.SIM_DT)
+	for tick in range(4): battle.world.battle_simulation._sim_step(battle.SIM_DT)
 	assert(actor.haste_t == tuning.statusTicks - 4 and actor.farsight_t == tuning.statusTicks - 4)
-	var simulation: RefCounted = battle.world.module_view().battle_simulation
+	var simulation: Object = battle.world.battle_simulation
 	assert(simulation.tick_microseconds == 0 and battle.nav.performance_counters().microseconds == 0)
 	simulation.profile_enabled = true; battle.nav.set_profiling(true)
-	battle.commands.world._sim_step(battle.SIM_DT)
+	battle.world.battle_simulation._sim_step(battle.SIM_DT)
 	battle.nav.find_path(Vector2(actor.ax, actor.ay), Vector2(actor.ax, actor.ay), true)
 	assert(simulation.tick_microseconds > 0 and battle.nav.performance_counters().microseconds > 0)
 	simulation.profile_enabled = false; battle.nav.set_profiling(false); simulation = null
@@ -115,7 +115,7 @@ func _loader_failures() -> void:
 	assert(DirAccess.remove_absolute(directory) == OK)
 
 func _worlds(game: Node, battle: Node2D) -> void:
-	var snapshot: Dictionary = game.snapshot(battle.units, battle.commands.world._resources(), battle.saver.save_extra())
+	var snapshot: Dictionary = game.snapshot(battle.units, battle.world.economy.player_resources(), battle.saver.save_extra())
 	var before: String = game.save_checksum(battle.saver.continuation_snapshot(game))
 	var old: WeakRef = weakref(battle.world)
 	var transaction = load("res://app/saves/world_transaction.gd")
@@ -127,7 +127,7 @@ func _worlds(game: Node, battle: Node2D) -> void:
 	assert(battle.saver.apply_snapshot(snapshot) and old.get_ref() == null)
 	assert(is_same(battle.command_rules.model, Catalog.get_catalog("command_variants.json").three_layer_model))
 	assert(is_same(battle.rules.missions, Catalog.get_catalog("scenario_rules.json").missions))
-	battle.commands.world._sim_step(battle.SIM_DT)
+	battle.world.battle_simulation._sim_step(battle.SIM_DT)
 
 func _frozen(value) -> bool:
 	if value is Array or value is Dictionary:

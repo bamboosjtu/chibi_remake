@@ -146,7 +146,7 @@ func _install_cjk_font() -> void:
 ## @param extra      {"nextUid":int, "trainings":Array, "gameEnd":int}
 ## @return 是否真的落盘成功（调用方应当据此提示玩家，而不是假定成功）
 func save_game(units: Array, resources: Dictionary = {}, extra: Dictionary = {}, slot := 0) -> bool:
-	if not repository.begin_save(slot, int(extra.get("pendingDuels",0))): return false
+	if not repository.begin_save(slot): return false
 	var path := save_slot_path(slot)
 	var payload := snapshot(units, resources, extra, slot)
 	if payload.is_empty(): return false

@@ -1,9 +1,10 @@
-extends RefCounted
+extends Object
 ## campaign dialog: presentation component.
 const UIState = preload("res://presentation/menu/menu_state.gd")
 var _ui: UIState
 var surface: Control
-var ports = preload("res://presentation/menu/ports/campaign_dialog_dependencies.gd").new()
+var _dep_controller: Object
+var _dep_menu_styles: Object
 const Textures = preload("res://presentation/battle/runtime_textures.gd")
 
 # ── 「选择势力」这一步（2a 新增）：开始游戏 → 先问曹操/刘备，再列该线关卡 ──
@@ -74,7 +75,7 @@ func _make_faction_slot(camp: String) -> Control:
 	col.add_child(arrow_room)
 
 	var frame := PanelContainer.new()
-	frame.add_theme_stylebox_override("panel", ports._wood_frame(false, 10))
+	frame.add_theme_stylebox_override("panel", _dep_menu_styles._wood_frame(false, 10))
 	frame.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	col.add_child(frame)
@@ -88,7 +89,7 @@ func _make_faction_slot(camp: String) -> Control:
 	frame.add_child(pic)
 
 	var plate := PanelContainer.new()
-	plate.add_theme_stylebox_override("panel", ports._wood_plate())
+	plate.add_theme_stylebox_override("panel", _dep_menu_styles._wood_plate())
 	plate.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	col.add_child(plate)
@@ -132,7 +133,7 @@ func _refresh_campaign_cursor() -> void:
 		idx = 0
 	for i in _ui.campaign_frames.size():
 		var f: PanelContainer = _ui.campaign_frames[i]
-		f.add_theme_stylebox_override("panel", ports._wood_frame(i == idx, 10))
+		f.add_theme_stylebox_override("panel", _dep_menu_styles._wood_frame(i == idx, 10))
 	if _ui.campaign_cursor == null:
 		return
 	if _ui.campaign_panel == null or not _ui.campaign_panel.visible or idx >= _ui.campaign_slots.size():
@@ -228,8 +229,8 @@ func _build_campaign_dialog() -> void:
 	foot.alignment = BoxContainer.ALIGNMENT_CENTER
 	foot.add_theme_constant_override("separation", 24)
 	col.add_child(foot)
-	foot.add_child(ports._gold_button("确定", 200.0, 46.0, 22, ports._on_campaign_confirm))
-	foot.add_child(ports._gold_button("取消", 200.0, 46.0, 22, ports._on_back))
+	foot.add_child(_dep_menu_styles._gold_button("确定", 200.0, 46.0, 22, _dep_controller._on_campaign_confirm))
+	foot.add_child(_dep_menu_styles._gold_button("取消", 200.0, 46.0, 22, _dep_controller._on_back))
 
 	# 红箭头：Polygon2D 是 Node2D，容器不碰它 → 挂在根上按全局坐标自己摆。
 	# 放在 campaign_panel 之后（并给 z_index）保证画在面板之上。
@@ -260,3 +261,7 @@ func _portrait_status(camp: String) -> String:
 	if t == null:
 		return "%s=missing" % camp
 	return "%s=%dx%d" % [camp, t.get_width(), t.get_height()]
+
+func bind_dependencies(components: Object) -> void:
+	_dep_controller = components.controller
+	_dep_menu_styles = components.menu_styles

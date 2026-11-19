@@ -38,49 +38,49 @@ func run() -> void:
 	var form_counts := [3,3,3,6,6,8,10,10,10,10]
 	for level in range(10):
 		leader.officer.level = level
-		view.art_sub = ""; view._refresh_cmd_art()
+		view.art_sub = ""; view.command_art._refresh_cmd_art()
 		var grid: Array = []
 		for i in range(9): grid.append(view.art_buttons[i].btn.get_global_rect())
-		view.art_sub = "hot"; view._refresh_cmd_art()
+		view.art_sub = "hot"; view.command_art._refresh_cmd_art()
 		assert(view.command_panel.mask == skill_masks[level])
 		for i in range(9):
 			var button: TextureRect = view.art_buttons[9+i].btn
 			assert(button.visible == ((skill_masks[level] & (1 << i)) != 0))
 			assert(button.get_global_rect() == grid[i], "skills retain main-command size and fixed slots")
-			b.commands.military._reset_jimou(); b.commands.military._jimou_begin(i)
+			b.world.abilities._reset_jimou(); b.world.abilities._jimou_begin(i)
 			assert(b.jimou_pending == (i if button.visible else -1), "execution and UI share the same unlock rule")
-		b.commands.military._reset_jimou()
+		b.world.abilities._reset_jimou()
 		assert(not view.art_back.visible)
-		view.art_sub = "form"; view._refresh_cmd_art()
+		view.art_sub = "form"; view.command_art._refresh_cmd_art()
 		for i in range(10):
 			assert(view.art_buttons[18+i].btn.visible == (i < mini(8, form_counts[level])))
 		assert(view.art_buttons[29].btn.visible == (form_counts[level] == 10))
 		if form_counts[level] == 10:
-			assert(view._handle_cmd_key(key(KEY_C)))
+			assert(view.command_art._handle_cmd_key(key(KEY_C)))
 			assert(view.art_sub == "form_more" and view.command_panel.mask == 259)
 			for i in [8,9]: assert(view.art_buttons[18+i].btn.get_global_rect() == grid[i-8])
-			assert(view.art_buttons[30].btn.visible and view._handle_cmd_key(key(KEY_C)))
+			assert(view.art_buttons[30].btn.visible and view.command_art._handle_cmd_key(key(KEY_C)))
 			assert(view.art_sub == "form")
 		else:
-			var before: int = b.commands.world._state_digest()
-			b.commands.military._set_formation(9)
-			assert(b.commands.world._state_digest() == before, "locked formations cannot be forced through execution")
+			var before: int = b.world.battle_simulation._state_digest()
+			b.world.abilities._set_formation(9)
+			assert(b.world.battle_simulation._state_digest() == before, "locked formations cannot be forced through execution")
 	leader.officer.level = 2
-	view.art_sub = "hot"; view._refresh_cmd_art()
-	assert(not view._handle_cmd_key(key(KEY_W)))
-	assert(view._handle_cmd_key(key(KEY_X)) and b.jimou_pending == 7, "X remains recovery in bottom-centre slot")
-	b.commands.military._reset_jimou(); view.art_sub = "hot"; view._refresh_cmd_art()
+	view.art_sub = "hot"; view.command_art._refresh_cmd_art()
+	assert(not view.command_art._handle_cmd_key(key(KEY_W)))
+	assert(view.command_art._handle_cmd_key(key(KEY_X)) and b.jimou_pending == 7, "X remains recovery in bottom-centre slot")
+	b.world.abilities._reset_jimou(); view.art_sub = "hot"; view.command_art._refresh_cmd_art()
 	await capture("level2-skills")
 	for menu in ["hot", "form"]:
-		view.art_sub = menu; view._refresh_cmd_art()
+		view.art_sub = menu; view.command_art._refresh_cmd_art()
 		var event := InputEventMouseButton.new()
 		event.button_index = MOUSE_BUTTON_LEFT; event.position = view.battle_rect().get_center(); event.pressed = true
 		root.push_input(event, true); await process_frame
 		event.pressed = false; root.push_input(event, true); await process_frame
 		assert(view.art_sub == "" and b.selected == [leader] and b.player_commands.pending_commands().is_empty())
-	view.art_sub = "form"; view._refresh_cmd_art(); await capture("level2-formations")
+	view.art_sub = "form"; view.command_art._refresh_cmd_art(); await capture("level2-formations")
 	leader.officer.level = 6
-	view.art_sub = "form"; view._refresh_cmd_art(); await capture("level6-formations-first")
-	view._handle_cmd_key(key(KEY_C)); await capture("level6-formations-second")
+	view.art_sub = "form"; view.command_art._refresh_cmd_art(); await capture("level6-formations-first")
+	view.command_art._handle_cmd_key(key(KEY_C)); await capture("level6-formations-second")
 	print("ABILITY MENUS PASS ten levels / fixed skill slots / matching sizes / formation pages / locked execution / X recovery / world-click dismissal")
 	done = true; quit()

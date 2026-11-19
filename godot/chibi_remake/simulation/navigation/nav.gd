@@ -34,6 +34,7 @@ var _api_missing: Array = []
 
 func _init() -> void:
 	for field in state.PROXY_FIELDS: _fields[field] = true
+	paths.bind_dependencies(self)
 	var services := {"grid": grid, "paths": paths}
 	var report := preload("res://composition_contract.gd").wire(services, "nav")
 	_api_missing = report.missing

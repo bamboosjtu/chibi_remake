@@ -11,7 +11,7 @@ func _initialize() -> void:
 	run.call_deferred()
 func cancel() -> void:
 	for unit in b.units:
-		if int(unit.owner)==2: b.commands.military._cancel_unit_command(unit)
+		if int(unit.owner)==2: b.world.command_groups._cancel_unit_command(unit)
 func run() -> void:
 	root.size=Vector2i(1920,1080)
 	root.get_node("Game").current_map="chibic1"
@@ -19,11 +19,11 @@ func run() -> void:
 	infantry=b.units.filter(func(unit):return int(unit.owner)==2 and int(unit.unit)==32)[0].duplicate(true)
 	hq=b.units.filter(func(unit):return int(unit.owner)==2 and int(unit.unit)==1)[0].duplicate(true)
 	for tick in range(2910):
-		b.commands.world._sim_step(b.SIM_DT)
+		b.world.battle_simulation._sim_step(b.SIM_DT)
 		assert(b.units.all(func(unit):return int(unit.owner)!=2 or str(unit.state)!="attack"),"C1 must not send a cross-map interception before the first assault cycle")
 		if tick%300==0: await process_frame
 	assert(b.game_end==0 and b.sim_tick==2910)
-	b.commands.world._sim_step(b.SIM_DT)
+	b.world.battle_simulation._sim_step(b.SIM_DT)
 	var attacks: Array=b.units.filter(func(unit):return int(unit.owner)==2 and str(unit.state)=="attack")
 	assert(attacks.size()==23,"C1 dispatches its eligible original troops at tick 2911")
 	var first_player: Dictionary=b.units.filter(func(unit):return int(unit.owner)==3 and not unit.is_building)[0]
@@ -36,22 +36,22 @@ func run() -> void:
 	intercept_checks()
 	b.scene.ready_to_save=false;b.free();done=true;print("AI RESEARCH PASS");quit()
 func save_point_checks() -> void:
-	var cell: Vector2i=b.commands.world._free_unit_cell(Vector2i(60,100),0,-1,32)
+	var cell: Vector2i=b.world.spatial_index._free_unit_cell(Vector2i(60,100),0,-1,32)
 	assert(cell.x>=0)
 	assert(b.ai.set_retreat_point(2,b.nav.anchor_of(cell.x,cell.y)))
 	b.ai._retreat_clock[2]=41;b.ai._think[2]=40
 	var game: Node=root.get_node("Game")
-	var saved: Dictionary=game.snapshot(b.units,b.commands.world._resources(),b.commands.session._save_extra())
+	var saved: Dictionary=game.snapshot(b.units,b.world.economy.player_resources(),b.scene_controller._save_extra())
 	var phase: Dictionary=b.ai.snapshot()
-	b.commands.world._sim_step(b.SIM_DT)
+	b.world.battle_simulation._sim_step(b.SIM_DT)
 	var expected: String=game.save_checksum(b.saver.continuation_snapshot(game))
 	assert(b.saver.apply_snapshot(saved),"Explicit retreat destination must pass complete world restore")
 	assert(b.ai.snapshot().retreatPoints==phase.retreatPoints and b.ai.snapshot().retreatClock==phase.retreatClock)
-	b.commands.world._sim_step(b.SIM_DT)
+	b.world.battle_simulation._sim_step(b.SIM_DT)
 	assert(game.save_checksum(b.saver.continuation_snapshot(game))==expected,"Restored retreat timing must resume identically")
 	print("AI RESEARCH SAVE PASS full world / explicit retreat point /42-thought boundary / identical continuation")
 func gate_checks() -> void:
-	cancel();b.ai=AI.new(b)
+	cancel();b.ai=AI.new(b.world)
 	b.scenario_sides[0].init=[0,1,1];b.scenario_sides[1].init=[0,4,1]
 	b.economy.write(3,{"gold":15000,"food":1000,"wood":1000,"stone":1000})
 	b.ai._assault[2]=71;b.ai._assault_maybe(2)
@@ -81,8 +81,8 @@ func intercept_checks() -> void:
 	var near:=copy_unit(503,2,Vector2(1089,1089))
 	var far:=copy_unit(504,2,Vector2(1091,1000))
 	var worker:=copy_unit(505,2,Vector2(1050,1000),30)
-	b.units=[base,focus,near,far,worker,target];b.commands.world._rebuild_unit_index();b.ai=AI.new(b)
-	assert(b.commands.military.ai_focus_unit(2).is_empty(),"An idle unit is not evidence of enemy contact")
+	b.units=[base,focus,near,far,worker,target];b.world.spatial_index._rebuild_unit_index();b.ai=AI.new(b.world)
+	assert(b.world.ai_orders.ai_focus_unit(2).is_empty(),"An idle unit is not evidence of enemy contact")
 	focus.target=target;focus.state="attack"
 	for thought in range(15):
 		b.ai._intercept_near(2);b.ai._intercept_near(1)

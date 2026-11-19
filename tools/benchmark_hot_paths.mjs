@@ -10,8 +10,8 @@ const directory=path.resolve(option('--output','_work/bench/hot-paths')),engine=
 fs.mkdirSync(directory,{recursive:true});
 const budgets=JSON.parse(fs.readFileSync('tools/inputs/hot_path_budgets.json','utf8'));
 function command(binary,args){const r=spawnSync(binary,args,{encoding:'utf8',maxBuffer:16*1024*1024});if(r.status!==0)throw Error(r.stderr||r.stdout||String(r.error));return r.stdout.trim();}
-async function run(name,project){
- const r=await runGodot({engine,directory,name,timeout:300,markers:['HOT PATH BENCHMARK PASS'],args:['--headless','--path',project,'--script',path.resolve('tools/gd/bench_hot_paths.gd'),'--','--noview','--no-intro','--save-test-id=hot-'+crypto.randomUUID()]});
+async function run(name,project,script=path.resolve('tools/gd/bench_hot_paths.gd')){
+ const r=await runGodot({engine,directory,name,timeout:300,markers:['HOT PATH BENCHMARK PASS'],args:['--headless','--path',project,'--script',script,'--','--noview','--no-intro','--save-test-id=hot-'+crypto.randomUUID()]});
  assert(r.ok,r.output);return {log:r.log,metrics:JSON.parse(r.output.match(/^HOT PATH BENCHMARK JSON: (.+)$/m)[1])};
 }
 const report={schemaVersion:1,baseline:null,current:null,budgets};
@@ -37,7 +37,13 @@ if(args.includes('--baseline')){
    }
   }
  }
- report.baseline={revision,...await run('before',project)};
+ const driverDirectory=path.join(fixture,'drivers');
+ const driverArchive=path.join(fixture,'drivers.tar');
+ fs.mkdirSync(driverDirectory);
+ command('git',['archive','--format=tar','-o',driverArchive,revision+':tools/gd']);
+ command('tar',['-xf',driverArchive,'-C',driverDirectory]);
+ const baselineScript=path.join(driverDirectory,'bench_hot_paths.gd');
+ report.baseline={revision,driverSha256:crypto.createHash('sha256').update(fs.readFileSync(baselineScript)).digest('hex'),...await run('before',project,baselineScript)};
 }
 report.current=await run('current',path.resolve('godot/chibi_remake'));
 for(const [name,max] of Object.entries(budgets.p95Ms))assert(report.current.metrics[name].p95Ms<=max,`${name} P95 exceeds ${max}ms`);

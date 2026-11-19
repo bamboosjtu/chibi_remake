@@ -1,4 +1,5 @@
 extends CanvasLayer
+const SessionActions = preload("res://app/session_actions.gd")
 ## Shared save/load picker for the campaign menu and paused battle.
 signal confirmed(slot: int, title: String)
 signal cancelled
@@ -59,7 +60,7 @@ func open(for_save: bool, default_title := "") -> void:
 	name_field.visible=saving;name_field.text=default_title
 	records.clear();entries.clear();selected_slot=-1;status.text=""
 	var preferred := -1
-	for entry in Game.save_slots():
+	for entry in SessionActions.save_slots():
 		if int(entry.slot)==0 and (saving or not bool(entry.occupied)):continue
 		entries.append(entry)
 		var prefix: String="自动进度 / 旧版进度" if int(entry.slot)==0 else "记录 %02d" % int(entry.slot)
@@ -102,19 +103,19 @@ func dismiss() -> void:overlay.hide()
 func show_error(message: String) -> void:status.text=message
 
 func _refresh_damage_button() -> void:
-	var damage: Dictionary = Game.repository.damaged_files()
+	var damage: Dictionary = SessionActions.damaged_files()
 	cleanup_button.visible = not damage.names.is_empty()
 	cleanup_button.tooltip_text = "损坏进度占用 %.2f MiB" % (float(damage.bytes) / 1048576.0)
 
 func _confirm_damage_cleanup() -> void:
-	var damage: Dictionary = Game.repository.damaged_files()
+	var damage: Dictionary = SessionActions.damaged_files()
 	reviewed_damage = damage.names
 	if reviewed_damage.is_empty(): return
 	cleanup_prompt.dialog_text = "删除 %d 个已隔离的损坏文件，共 %.2f MiB？" % [reviewed_damage.size(), float(damage.bytes) / 1048576.0]
 	cleanup_prompt.popup_centered()
 
 func _clean_reviewed_damage() -> void:
-	var count: int = Game.repository.remove_damaged_files(reviewed_damage)
+	var count: int = SessionActions.remove_damaged_files(reviewed_damage)
 	reviewed_damage.clear()
 	_refresh_damage_button()
 	status.text = "已清理 %d 个损坏文件" % count

@@ -7,7 +7,7 @@ extends RefCounted
 ##
 ## 本模块持有这张唯一矩形：
 ##   · battle_rect —— HUD 之外的可操作战场区域（视口坐标）。**唯一写回方**
-##     是 battle_view._apply_metrics{,_original}（布局权威），矩形与布局同步更新。
+##     是 battle_view.hud_layout._apply_metrics{,_original}（布局权威），矩形与布局同步更新。
 ##   · clamp_world_pos() / visible_world_rect() —— 两个纯函数，供相机夹边与
 ##     小地图取景框使用；输入输出全部显式传参，布局不参与，可被合成分辨率直接断言。
 ##

@@ -1,4 +1,5 @@
 extends Control
+const Progression = preload("res://simulation/definitions/officer_grades.gd")
 const Roles = preload("res://simulation/definitions/unit_roles.gd")
 const Technology = preload("res://simulation/definitions/technology_rules.gd")
 ## 原版右侧信息区：人物像、竖排姓名、经验／谋略／士气／粮数。
@@ -84,8 +85,8 @@ func set_ui_scale(s: float) -> void:
 	backdrop.size = size
 	portrait_frame.position = Vector2(4, 4) * s
 	portrait_frame.size = Vector2(58, 65) * s
-	view._decorate_frame(backdrop, 3 * s)
-	view._decorate_frame(portrait_frame, 2 * s)
+	view.hud_layout._decorate_frame(backdrop, 3 * s)
+	view.hud_layout._decorate_frame(portrait_frame, 2 * s)
 	portrait.position = Vector2(6, 6) * s; portrait.size = Vector2(54, 61) * s
 	name_label.position = Vector2(72, 7) * s; name_label.size = Vector2(54, 48) * s
 	rank_label.position=Vector2(69,55)*s;rank_label.size=Vector2(61,15)*s
@@ -110,11 +111,11 @@ func set_ui_scale(s: float) -> void:
 		captions[i].add_theme_font_size_override("font_size", maxi(9, int(12 * s)))
 
 func sync_selection() -> void:
-	var selection: Array = host.selection_views()
+	var selection: Array = host.queries.selection_views()
 	visible = not selection.is_empty()
 	if not visible: return
 	var u: Dictionary = selection[0]
-	var leader: Dictionary = view._officer_selection()
+	var leader: Dictionary = view.selection_info._officer_selection()
 	if not leader.is_empty(): u = leader
 	var officer: Dictionary = u.get("officer", {})
 	work_icon.hide()
@@ -127,11 +128,11 @@ func sync_selection() -> void:
 	for label in values: label.show()
 	rank_label.visible=not officer.is_empty()
 	if not officer.is_empty():
-		rank_label.text=host.commands.military.officer_rank_name(officer)
+		rank_label.text=host.queries.officer_rank_name(officer)
 		rank_label.tooltip_text="%d级 · %s" % [int(officer.level),rank_label.text]
 	portrait.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED if bool(u.is_building) else TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	if officer.is_empty():
-		portrait.texture = view._unit_icon(u)
+		portrait.texture = view.selection_info._unit_icon(u)
 		portrait.material = view.unit_nodes(u).get("skin").material if view.unit_nodes(u).get("skin") != null else null
 		name_label.text = str(u.name)
 		detail.text = "已选 %d 个单位" % selection.size()
@@ -140,16 +141,16 @@ func sync_selection() -> void:
 		portrait.material = null
 		var letters := str(officer.get("name", "")).replace(" ", "")
 		name_label.text = "\n".join(letters.split(""))
-		detail.text = "官职 %s" % str(host.commands.military.officer_rank_name(officer))
-	var soldiers: int = host.team_soldiers(int(u.owner), int(officer.index)) if not officer.is_empty() else 0
+		detail.text = "官职 %s" % str(host.queries.officer_rank_name(officer))
+	var soldiers: int = host.queries.team_soldiers(int(u.owner), int(officer.index)) if not officer.is_empty() else 0
 	var titles := ["武力", "智力", "经验", "谋略", "士气", "兵数"]
 	var data := [str(int(u.get("officer_might", 0))), str(int(u.get("officer_intellect", 0))),
-		host.Progression.progress_text(officer), str(int(u.get("mou", 0))), str(int(u.get("status_173", 70))), str(soldiers)]
+		Progression.progress_text(officer), str(int(u.get("mou", 0))), str(int(u.get("status_173", 70))), str(soldiers)]
 	if officer.is_empty():
 		titles = ["归属", "攻击力", "防御力", "射程", "视野", "携带"]
 		var carry := 0
 		for member in selection: carry += int(member.get("carry", 0))
-		var commander: String = host.commander_name(int(u.owner), int(u.get("group_officer", -1)))
+		var commander: String = host.queries.commander_name(int(u.owner), int(u.get("group_officer", -1)))
 		data = [commander, str(int(u.attack)), str(int(u.defence)), str(int(u.atk_range)), str(int(u.vision)), str(carry)]
 	if bool(u.is_building):
 		_sync_building(u)
@@ -165,7 +166,7 @@ func sync_selection() -> void:
 func _sync_building(u: Dictionary) -> void:
 	if int(u.unit) in [22,24,25]:
 		var titles := ["生命", "归属", "资源", "存量", "工作", "视野"]
-		var data := ["%d/%d" % [int(u.hp),int(u.maxhp)], "中立" if int(u.owner)==0 else ("我方" if int(u.owner)==host.player_owner else "敌方"), "金币" if int(u.unit) in [24,25] else "铁矿", str(int(u.get("stock",0))), "可采集" if float(u.get("stock",0))>0 else "已采空", str(int(u.vision))]
+		var data := ["%d/%d" % [int(u.hp),int(u.maxhp)], "中立" if int(u.owner)==0 else ("我方" if int(u.owner)==host.queries.player_owner else "敌方"), "金币" if int(u.unit) in [24,25] else "铁矿", str(int(u.get("stock",0))), "可采集" if float(u.get("stock",0))>0 else "已采空", str(int(u.vision))]
 		for i in range(6):
 			captions[i].text = titles[i]
 			values[i].text = data[i]
@@ -178,14 +179,14 @@ func _sync_building_work(u: Dictionary) -> void:
 	for label in values: label.hide()
 	var site: bool = u.get("site", false)
 	rank_label.visible = not site
-	var level := clampi(int(host.commands.economy.ai_level(int(u.owner))), 0, 3) if int(u.unit) in [0,1] else 0
+	var level := clampi(int(host.queries.ai_level(int(u.owner))), 0, 3) if int(u.unit) in [0,1] else 0
 	rank_label.text = ["一级", "二级", "三级", "四级"][level]
 	progress_bar.visible = site
 	progress_bar.value = 100.0 * float(u.hp) / maxf(1.0, float(u.maxhp)) if site else 0.0
-	var work: Dictionary = host.building_work(int(u.uid))
+	var work: Dictionary = host.queries.building_work(int(u.uid))
 	var training: Dictionary = work.training
 	if not training.is_empty():
-		var capacity: float = host.unit_capacity(int(training.unit))
+		var capacity: float = host.queries.unit_capacity(int(training.unit))
 		work_icon.texture = host.remaster_art.unit_icon(int(training.unit))
 		work_icon.material = portrait.material
 		work_icon.show()
@@ -195,8 +196,8 @@ func _sync_building_work(u: Dictionary) -> void:
 		progress_bar.value = 100.0 * (1.0 - float(training.t) / maxf(1.0, float(capacity)))
 	var research: Dictionary = work.research
 	if not research.is_empty():
-		var selling: bool = host.commands.technology.tech_is_sell(int(research.tech))
-		work_icon.texture = view.command_catalog.work_icon(host.commands.technology.tech_row(int(research.tech))) if selling else view._unit_icon(u)
+		var selling: bool = host.queries.tech_is_sell(int(research.tech))
+		work_icon.texture = view.command_catalog.work_icon(host.queries.tech_row(int(research.tech))) if selling else view.selection_info._unit_icon(u)
 		view.command_catalog.decorate_sale(work_icon, selling)
 		work_icon.show()
 		progress_bar.show()

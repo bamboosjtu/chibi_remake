@@ -1,12 +1,12 @@
 extends RefCounted
-const PROXY_FIELDS := ["session", "effects", "units", "selected", "_officer_pool", "player_owner", "cheats_enabled", "auto_control", "cheat_build_any", "cheat_invulnerable", "cheat_reveal", "economy", "trainings", "player_tech", "research_jobs", "army_tech", "scenario_sides", "game_end", "clock", "_officer_initial_state", "nav", "visibility", "map_data", "map_id", "gold", "wood", "food", "stone", "projectiles", "fire_fields", "transports", "harvesting", "construction", "resource_revision", "sheet_by_unit", "train_types", "build_types", "next_uid", "_cell_index", "_cell_index_cell", "_cell_index_layer", "_cell_index_cells", "_index_unit_id", "_foot_cache", "_targets", "_target_owner", "_index_units_ref", "_index_units_size", "cnt_player", "cnt_enemy", "tile_w", "tile_hw", "tile_hh", "scenario_source", "scenario_mission", "scenario_avi", "ai", "ai_res", "sim_acc", "simulation_rng", "sim_tick", "simtest_seconds", "cnt_enemy_buildings", "task_latches", "terrain_changes", "terrain_base", "officer_progress", "rules", "task_events", "objective_done", "officer_policy", "cli_mode", "command_rules", "stratagems", "jimou_pending", "jimou_caster", "duel_pending", "cmd_pending", "cmd_pending_data", "decor_targets", "decor_cells", "control_groups", "automatic_gates", "player_commands"]
+const PROXY_FIELDS := ["geometry", "session", "units", "selected", "_officer_pool", "player_owner", "cheats_enabled", "auto_control", "cheat_build_any", "cheat_invulnerable", "cheat_reveal", "trainings", "player_tech", "research_jobs", "army_tech", "scenario_sides", "game_end", "_officer_initial_state", "map_data", "map_id", "gold", "wood", "food", "stone", "resource_revision", "sheet_by_unit", "train_types", "build_types", "next_uid", "_cell_index", "_cell_index_cell", "_cell_index_layer", "_cell_index_cells", "_index_unit_id", "_foot_cache", "_targets", "_target_owner", "_index_units_ref", "_index_units_size", "cnt_player", "cnt_enemy", "tile_w", "tile_hw", "tile_hh", "scenario_source", "scenario_mission", "scenario_avi", "ai_res", "sim_acc", "simulation_rng", "sim_tick", "simtest_seconds", "cnt_enemy_buildings", "task_latches", "terrain_changes", "terrain_base", "officer_progress", "task_events", "objective_done", "officer_policy", "cli_mode", "jimou_pending", "jimou_caster", "duel_pending", "cmd_pending", "cmd_pending_data", "decor_targets", "decor_cells", "control_groups"]
 ## Single owner of battle data. No scene nodes or rendering handles.
 const CombatRules = preload("res://simulation/systems/combat_rules.gd")
 const OFFICER_BLOCK_FOR_OWNER = preload("res://simulation/battle_config.gd").OFFICER_BLOCK_FOR_OWNER
 const GRID_FALLBACK = preload("res://simulation/battle_config.gd").GRID_FALLBACK
 const SPEED = preload("res://simulation/battle_config.gd").SPEED
 const HUD_HZ = preload("res://simulation/battle_config.gd").HUD_HZ
-const Nav = preload("res://simulation/navigation/nav.gd")
+var geometry = preload("res://simulation/navigation/navigation_state.gd").new()
 const SIM_HZ = preload("res://simulation/battle_config.gd").SIM_HZ
 const SIM_DT = preload("res://simulation/battle_config.gd").SIM_DT
 const SIM_MAX_CATCHUP = preload("res://simulation/battle_config.gd").SIM_MAX_CATCHUP
@@ -28,7 +28,6 @@ const SCRIPTED_OBJECTIVES = preload("res://simulation/battle_config.gd").SCRIPTE
 const SCRIPTED_EVENT_MISSIONS = preload("res://simulation/battle_config.gd").SCRIPTED_EVENT_MISSIONS
 const SPECIAL_OBJECTIVE_MISSIONS = preload("res://simulation/battle_config.gd").SPECIAL_OBJECTIVE_MISSIONS
 var session = preload("res://simulation/session_state.gd").new()
-var effects = preload("res://simulation/battle_effects.gd").new()
 var units: Array = []
 
 var selected: Array:
@@ -54,7 +53,6 @@ var cheat_reveal: bool:
 	get: return session.cheat_reveal
 	set(value): session.cheat_reveal = value
 
-var economy: RefCounted
 
 var trainings: Array = []
 
@@ -72,7 +70,6 @@ var scenario_sides: Array = []
 
 var game_end := 0
 
-var clock = preload("res://simulation/systems/battle_clock.gd").new()
 
 
 
@@ -80,9 +77,7 @@ var clock = preload("res://simulation/systems/battle_clock.gd").new()
 
 var _officer_initial_state: Dictionary = {}
 
-var nav := Nav.new()                                # 拥有 AStarGrid2D 与瓦片尺寸（tile_w/tile_hw/tile_hh）
 
-var visibility = preload("res://simulation/systems/battle_visibility.gd").new()
 
 var map_data: Dictionary = {}
 
@@ -105,15 +100,10 @@ var food := 2000.0
 
 var stone := 800.0
 
-var projectiles: RefCounted
 
-var fire_fields: RefCounted
 
-var transports: RefCounted
 
-var harvesting: RefCounted
 
-var construction: RefCounted
 
 var resource_revision := 0
 
@@ -159,15 +149,15 @@ var cnt_enemy := 0
 
 var tile_w: float:
 	get:
-		return nav.state.tile_w
+		return geometry.tile_w
 
 var tile_hw: float:
 	get:
-		return nav.state.tile_hw
+		return geometry.tile_hw
 
 var tile_hh: float:
 	get:
-		return nav.state.tile_hh
+		return geometry.tile_hh
 # ARCH-007 / #5：本关规则来源。prototype = 未在 BATTLE.EXP 中找到，必须显式标注，
 # 不能把原型规则冒充成原版规则。
 
@@ -179,7 +169,6 @@ var scenario_avi := ""
 # ARCH-010：固定模拟步长。表现层用真实 delta，**模拟**用固定 tick，
 # 这样帧率（30/60/144）不会改变同一命令序列的结束状态。
 
-var ai: RefCounted = null       # ARCH-006：电脑势力决策已抽到 ai.gd
 
 var ai_res := {}                # owner -> {gold,wood,food,stone}（电脑势力各有各的钱）
 
@@ -203,7 +192,6 @@ var terrain_base: Array = []
 
 var officer_progress := {}
 
-var rules: RefCounted = null
 
 var task_events: Array = []
 
@@ -218,9 +206,7 @@ var cli_mode: bool:
 
 # ------------------------------------------------------------------- setup ----
 
-var command_rules: RefCounted
 
-var stratagems: RefCounted
 
 var jimou_pending: int:
 	get: return session.jimou_pending
@@ -250,9 +236,3 @@ var decor_targets: Array = []          # 全部饰物伪对象（载入时一次
 var decor_cells: Dictionary = {}       # "行_列" → 伪对象（按格命中）
 
 var control_groups := {}
-
-
-var automatic_gates = preload("res://simulation/navigation/automatic_gates.gd").new()
-
-
-var player_commands: RefCounted

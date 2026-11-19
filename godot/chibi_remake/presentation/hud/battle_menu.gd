@@ -1,4 +1,5 @@
 extends CanvasLayer
+const SessionActions = preload("res://app/session_actions.gd")
 ## 战场菜单独立拥有暂停和模态输入；保存／恢复仍走宿主的存档服务。
 var host: Node2D
 var overlay: ColorRect
@@ -13,6 +14,7 @@ var surface_cache := {}
 var settings_panel: PanelContainer
 var speed_buttons: Array[Button] = []
 var slots_dialog: CanvasLayer
+var _slot_world := -1
 var previous_focus: WeakRef
 
 func _init(h: Node2D) -> void:
@@ -82,7 +84,7 @@ func _ready() -> void:
 
 func open() -> void:
 	if host.view.briefing!=null and host.view.briefing.is_open:host.view.briefing.close()
-	await host.commands.session.wait_command_boundary()
+	if not await host.session_actions.wait_command_boundary(): return
 	if not is_open:
 		previous_focus = weakref(get_viewport().gui_get_focus_owner())
 	slots_dialog.dismiss()
@@ -97,8 +99,8 @@ func open() -> void:
 	overlay.show()
 	status.text = ""
 	leave_button.hide()
-	buttons[0].disabled = not Game.has_save()
-	if pause_token == 0: pause_token = Game.pauses.acquire(self, "battle menu")
+	buttons[0].disabled = not SessionActions.has_save()
+	if pause_token == 0: pause_token = SessionActions.pause(self, "battle menu")
 	buttons[0].grab_focus()
 
 func close() -> void:
@@ -106,7 +108,7 @@ func close() -> void:
 	_close_settings()
 	is_open = false
 	overlay.hide()
-	Game.pauses.release(pause_token)
+	SessionActions.resume(pause_token)
 	pause_token = 0
 	var focus = previous_focus.get_ref() if previous_focus != null else null
 	if not get_tree().paused and is_instance_valid(focus) and focus.is_visible_in_tree():
@@ -116,7 +118,7 @@ func close() -> void:
 func _input(event: InputEvent) -> void:
 	if host.view.briefing!=null and host.view.briefing.is_open:return
 	if is_instance_valid(slots_dialog) and slots_dialog.overlay.visible:return
-	if is_open and Game.pauses.is_top(pause_token) and event.is_action_pressed("battle_cancel"):
+	if is_open and SessionActions.owns_pause(pause_token) and event.is_action_pressed("battle_cancel"):
 		if settings_panel.visible: _close_settings()
 		else: close()
 		get_viewport().set_input_as_handled()
@@ -148,7 +150,7 @@ func _build_settings() -> void:
 	grid.add_theme_constant_override("v_separation",14)
 	list.add_child(grid)
 	for i in range(4):
-		var button := _wood_button(str(host.clock_view().labels[i]),_select_speed.bind(i))
+		var button := _wood_button(str(host.queries.clock_view().labels[i]),_select_speed.bind(i))
 		grid.add_child(button)
 		speed_buttons.append(button)
 	var back := _wood_button("返回系统选单",_close_settings)
@@ -160,44 +162,50 @@ func show_settings() -> void:
 	panel.hide()
 	settings_panel.show()
 	_update_speed_buttons()
-	speed_buttons[host.clock_view().speed_index].grab_focus()
+	speed_buttons[host.queries.clock_view().speed_index].grab_focus()
 
 func _close_settings() -> void:
 	settings_panel.hide()
 	panel.show()
 
 func _select_speed(index: int) -> void:
-	host.commands.world.set_sim_speed(index)
+	host.actions.set_sim_speed(index)
 	_update_speed_buttons()
 
 func _update_speed_buttons() -> void:
 	for i in range(speed_buttons.size()):
-		speed_buttons[i].text = str(host.clock_view().labels[i]) + (" · 当前" if i==host.clock_view().speed_index else "")
+		speed_buttons[i].text = str(host.queries.clock_view().labels[i]) + (" · 当前" if i==host.queries.clock_view().speed_index else "")
 
 func save_game() -> void:
+	_slot_world = host.queries.world_identity()
 	panel.hide()
-	slots_dialog.open(true,Game.campaign_caption(str(host.map_id)))
+	slots_dialog.open(true,Game.campaign_caption(str(host.queries.map_id)))
 
 func load_game() -> void:
+	_slot_world = host.queries.world_identity()
 	panel.hide()
 	slots_dialog.open(false)
 
 func _slot_confirmed(slot: int, title: String) -> void:
+	if _slot_world != host.queries.world_identity():
+		slots_dialog.dismiss()
+		panel.show()
+		return
 	if slots_dialog.saving:
-		if not host.commands.session._save_game(slot,title):
+		if not host.session_actions.save_game(slot,title):
 			slots_dialog.show_error("保存失败（%s），原有记录已保留。" % str(Game.last_save_error.get("stage","unknown")));return
 		slots_dialog.dismiss();panel.show()
 		status.text="保存成功 · 记录 %02d" % slot
 		status.tooltip_text="存档位置："+ProjectSettings.globalize_path(Game.save_slot_path(slot))
-		buttons[0].disabled=not Game.has_save();return
-	var result: Dictionary = host.commands.session.load_slot(slot)
+		buttons[0].disabled=not SessionActions.has_save();return
+	var result: Dictionary = host.session_actions.load_slot(slot)
 	if not result.ok:
 		slots_dialog.show_error(str(result.error)); return
 	close()
 	host.view.update_panel()
 
 func return_to_menu() -> void:
-	if not host.commands.session._save_game():
+	if not host.session_actions.save_game():
 		status.text = "保存失败：%s（错误%d）\n位置：%s\n旧存档已保留，请检查该目录或返回游戏重试。" % [str(Game.last_save_error.get("stage", "unknown")), int(Game.last_save_error.get("code", FAILED)), str(Game.last_save_error.get("directory", Game.SAVE_PATH.get_base_dir()))]
 		leave_button.show()
 		return
@@ -205,7 +213,7 @@ func return_to_menu() -> void:
 
 func quit_game() -> void:
 	# 退出前先落盘；失败则留在菜单并提示，避免“点退出丢进度”。
-	if host.commands.session._save_game():
+	if host.session_actions.save_game():
 		get_tree().quit()
 	else:
 		status.text = "保存失败，未退出。请重试、返回游戏，或选择不保存返回主菜单。"

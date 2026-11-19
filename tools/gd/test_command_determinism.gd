@@ -43,28 +43,28 @@ func _play(game: Node, speed: int, ticks_per_frame: float) -> Array:
 	var commander_uid := int(battle.selected[0].uid)
 	var results := []
 	battle.player_commands.command_finished.connect(func(command, result): results.append([int(command.tick), result]))
-	assert(battle.commands.session.submit_point_order(point, true) > 0)
+	assert(battle.actions.submit_point_order(point, true) > 0)
 	var admitted: Dictionary = battle.player_commands.pending_commands()[0]
 	assert(admitted.kind == "gather" and admitted.cell == target.cell and admitted.tick == 1)
 	assert(JSON.parse_string(JSON.stringify(admitted)).kind == "gather")
 	battle.selected = []
 	var lease: int = game.pauses.acquire(battle, "fixture pause")
-	assert(not battle.commands.session._save_game(18) and game.last_save_error.code == ERR_BUSY)
+	assert(not battle.session_actions.save_game(18) and game.last_save_error.code == ERR_BUSY)
 	game.pauses.release(lease)
 	_advance(battle, 1, ticks_per_frame)
 	assert(worker.state == "gather" and battle.selected.is_empty() and results == [[1, "applied"]])
 	_advance(battle, 31, ticks_per_frame)
-	assert(battle.commands.session._save_game(18))
-	assert(battle.commands.session.load_slot(18).ok)
+	assert(battle.session_actions.save_game(18))
+	assert(battle.session_actions.load_slot(18).ok)
 	var restored: Dictionary = battle.units.filter(func(unit): return int(unit.uid) == int(worker.uid))[0]
 	assert(restored.gather_obj is Dictionary and restored.state in ["gather", "deliver"])
 	battle.selected = battle.units.filter(func(unit): return int(unit.uid) == commander_uid)
 	target = battle.decor_cells[targets[1].cell]
 	point = Vector2(target.ax, float(target.ay) - 30)
 	battle.player_commands.command_finished.connect(func(command, result): results.append([int(command.tick), result]))
-	assert(battle.commands.session.submit_point_order(point, true) == 1)
+	assert(battle.actions.submit_point_order(point, true) == 1)
 	assert(battle.player_commands.pending_commands()[0].cell == target.cell)
-	battle.commands.economy._remove_decor(target)
+	battle.world.harvest_orders._remove_decor(target)
 	_advance(battle, 32, ticks_per_frame)
 	assert(results.back() == [32, "stale_target"], str(results))
 	_advance(battle, 50, ticks_per_frame)
@@ -78,5 +78,5 @@ func _advance(battle: Node2D, tick: int, ticks_per_frame: float) -> void:
 	var period: float = battle.clock.period()
 	while int(battle.sim_tick) < tick:
 		var remaining := period * float(tick - int(battle.sim_tick)) - float(battle.sim_acc)
-		battle.commands.session.process_frame(minf(period * ticks_per_frame, remaining + 0.0000000001))
+		battle.scene_controller._process(minf(period * ticks_per_frame, remaining + 0.0000000001))
 	assert(int(battle.sim_tick) == tick)

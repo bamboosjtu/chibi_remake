@@ -220,3 +220,23 @@ func work(data: Object, uid: int) -> Dictionary:
 		result.busy = bool(building.get("site", false)) or not result.training.is_empty() or not result.research.is_empty()
 	Frozen.freeze(result)
 	return result
+
+## Immediate view notifications may precede insertion or follow removal.
+## Select display scalars from the supplied entity without looking it up by UID.
+static func event_record(unit: Dictionary) -> Dictionary:
+	var result := {}
+	for field in ["uid","unit","owner","ax","ay","A","B","w","h","k","count","grid","is_building","alive","die_t","attached","site_inside_uid"]:
+		if unit.has(field): result[field] = unit[field]
+	result.make_read_only()
+	return result
+
+static func staged_units(units: Array, sheets: Dictionary) -> Array:
+	var rows := []
+	for unit: Dictionary in units:
+		var visual := event_record(unit)
+		var sheet := str(sheets.get("%d_%d" % [unit.unit, unit.owner], ""))
+		var row := {"visual":visual, "sheet":sheet}
+		row.make_read_only()
+		rows.append(row)
+	rows.make_read_only()
+	return rows

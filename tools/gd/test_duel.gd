@@ -15,10 +15,14 @@ func point() -> Vector2:
 func refresh() -> void:
 	battle.visibility.update(battle.units,battle.player_owner)
 
+func confirm_duel() -> void:
+	battle.actions.submit_point_order(point(), false)
+	battle.player_commands.apply_tick(battle.sim_tick + 1)
+
 func rejected() -> void:
 	var hp := [caster.hp,enemy.hp]
 	battle.simulation_rng.seed=81; var next:int = battle.simulation_rng.randi(); battle.simulation_rng.seed=81
-	battle.commands.military._duel_at(point())
+	confirm_duel()
 	assert(not battle.duel_pending and [caster.hp,enemy.hp] == hp and battle.simulation_rng.randi() == next)
 
 func run() -> void:
@@ -29,10 +33,10 @@ func run() -> void:
 	enemy = battle.units.filter(func(u): return u.owner != battle.player_owner and not u.get("officer",{}).is_empty())[0]
 	caster.vision = 20
 	enemy.ax = caster.ax + battle.tile_w * 2; enemy.ay = caster.ay; refresh()
-	assert(is_same(battle.commands.orders._enemy_at(point()),enemy))
+	assert(is_same(battle.world.selection._enemy_at(point()),enemy))
 	# Caster is revalidated on confirmation, including a control-group change to flagship.
 	for property in ["flagship","dying","attached","foreign","stale"]:
-		battle.selected = [caster]; battle.commands.military._duel_begin(); assert(battle.duel_pending)
+		battle.selected = [caster]; battle.world.abilities._duel_begin(); assert(battle.duel_pending)
 		var type: int = caster.unit; var owner: int = caster.owner
 		match property:
 			"flagship": caster.unit = 52
@@ -45,48 +49,48 @@ func run() -> void:
 		battle.selected = [caster]
 	# A carried target is not present on the battlefield, and a flagship refuses.
 	for property in ["attached","flagship","range"]:
-		battle.commands.military._duel_begin(); assert(battle.duel_pending)
+		battle.world.abilities._duel_begin(); assert(battle.duel_pending)
 		var type: int = enemy.unit; var x: float = enemy.ax
 		match property:
 			"attached": enemy.attached = true
 			"flagship": enemy.unit = 52
 			"range": enemy.ax = caster.ax + battle.tile_w * 11
 		refresh()
-		if property == "range": assert(is_same(battle.commands.orders._enemy_at(point()),enemy))
+		if property == "range": assert(is_same(battle.world.selection._enemy_at(point()),enemy))
 		rejected()
 		enemy.unit = type; enemy.ax = x; enemy.attached = false; refresh()
 	for property in ["flagship","dying","attached"]:
-		battle.commands.orders._clear_pending()
+		battle.world.world_orders._clear_pending()
 		var type: int = caster.unit
 		if property == "flagship": caster.unit = 52
 		elif property == "dying": caster.die_t = 0
 		else: caster.attached = true
-		battle.commands.military._duel_begin(); assert(not battle.duel_pending)
+		battle.world.abilities._duel_begin(); assert(not battle.duel_pending)
 		caster.unit = type; caster.die_t = -1; caster.attached = false
 	print("DUEL VALIDITY PASS resolve-time caster identity-owner-life / flagship both sides / carried target / ten-cell range / no RNG on rejection")
 	# Confirmed acceptance uses force difference and force squared, not staminaA.
 	battle.simulation_rng.seed=81; var unchanged:int = battle.simulation_rng.randi(); battle.simulation_rng.seed=81
-	assert(battle.commands.military._duel_accept(100, 1, 100, 50) and battle.simulation_rng.randi() == unchanged)
+	assert(battle.world.abilities._duel_accept(100, 1, 100, 50) and battle.simulation_rng.randi() == unchanged)
 	# Equal stamina60, forceA50: the 20% branch accepts, then two damage rolls.
 	caster.officer.might = 60; caster.officer.level = 0; caster.officer.tier = 4
 	enemy.officer.might = 60; enemy.officer.level = 0; enemy.officer.tier = 4
 	caster.hp = caster.maxhp * 0.5; enemy.hp = enemy.maxhp
 	enemy.ax = caster.ax + battle.tile_w * 10; refresh()
-	assert(is_same(battle.commands.orders._enemy_at(point()),enemy))
+	assert(is_same(battle.world.selection._enemy_at(point()),enemy))
 	var chosen := -1; var roll_a := 0; var roll_b := 0
 	for value in range(100):
 		battle.simulation_rng.seed=value
 		if battle.simulation_rng.randi() % 5 != 2: continue
 		roll_a = battle.simulation_rng.randi() % 5 + 4; roll_b = battle.simulation_rng.randi() % 5 + 4
 		if roll_a != roll_b: chosen = value; break
-	assert(chosen >= 0 and battle.commands.military._stamina_of(caster) == 60 and battle.commands.military._stamina_of(enemy) == 60)
+	assert(chosen >= 0 and battle.world.abilities._stamina_of(caster) == 60 and battle.world.abilities._stamina_of(enemy) == 60)
 	battle.cmd_pending = "move"; battle.jimou_pending = 0
-	battle.commands.military._duel_begin()
+	battle.world.abilities._duel_begin()
 	assert(battle.cmd_pending == "" and battle.jimou_pending == -1 and battle.duel_pending)
-	battle.simulation_rng.seed=chosen; battle.commands.military._duel_at(point())
+	battle.simulation_rng.seed=chosen; confirm_duel()
 	assert(not battle.duel_pending)
 	assert(paused and battle.view.event_view.active)
-	assert(caster.hp == caster.maxhp * 0.5 and enemy.hp == enemy.maxhp)
+	assert(caster.hp == caster.maxhp * (50 - roll_b * 5) / 100.0 and enemy.hp == enemy.maxhp * (100 - int(roll_a * 2.5)) / 100.0)
 	assert(battle.view.event_view.player.stream.resource_path.ends_with("LDAN.AVI") and battle.view.event_view.segments==[[24.0,38.0],[78.0,87.0]])
 	battle.view.event_view.player.finished.emit()
 	assert(not paused and not battle.view.event_view.active)
@@ -101,9 +105,9 @@ func run() -> void:
 	# Restoring a world during playback cancels the old callback and unpauses.
 	var caster_id: int=caster.uid;var enemy_id: int=enemy.uid
 	caster.hp=caster.maxhp*0.5;enemy.hp=enemy.maxhp
-	assert(game.save_game(battle.units,battle.commands.world._resources(),battle.commands.session._save_extra()))
+	assert(game.save_game(battle.units,battle.world.economy.player_resources(),battle.scene_controller._save_extra()))
 	var snapshot: Dictionary=game.load_save()
-	battle.commands.military._duel_begin();battle.simulation_rng.seed=chosen;battle.commands.military._duel_at(point());assert(paused)
+	battle.world.abilities._duel_begin();battle.simulation_rng.seed=chosen;confirm_duel();assert(paused)
 	assert(battle.saver.apply_snapshot(snapshot))
 	assert(not paused and not battle.view.event_view.active)
 	caster=battle.units.filter(func(u):return int(u.uid)==caster_id)[0]
@@ -118,8 +122,8 @@ func run() -> void:
 	var members: Array = battle.units.filter(func(u): return u.owner == enemy.owner and int(u.get("group_officer",-1)) == int(enemy.officer.index))
 	assert(not members.is_empty())
 	var uid: int = enemy.uid
-	battle.commands.military._duel_begin(); battle.simulation_rng.seed=17; battle.commands.military._duel_at(point())
-	assert(paused and caster.hp == caster.maxhp and enemy.hp == enemy.maxhp)
+	battle.world.abilities._duel_begin(); battle.simulation_rng.seed=17; confirm_duel()
+	assert(paused and caster.hp == caster.maxhp * 0.9 and enemy.hp == 0)
 	assert(battle.view.event_view.player.stream.resource_path.ends_with("LDAN.AVI") and battle.view.event_view.segments.size()==3)
 	assert(not str(battle.view.event_view.caption.text).contains("胜出"))
 	assert(str(battle.view.event_view.ending_caption).contains(str(caster.officer.name).replace(" ","")+"胜出"))
@@ -128,9 +132,9 @@ func run() -> void:
 	assert(not paused)
 	assert(caster.hp == caster.maxhp * 0.9 and enemy.hp == 0 and enemy.die_t >= 0)
 	assert(members.all(func(u): return u.alive and u.group_officer == -1))
-	battle.commands.military._die_step(enemy,10.0); battle.commands.world._prune_dead()
+	battle.world.combat._die_step(enemy,10.0); battle.world.battle_simulation._prune_dead()
 	assert(battle.units.all(func(u): return int(u.uid) != uid))
-	assert(game.save_game(battle.units,battle.commands.world._resources(),battle.commands.session._save_extra()))
+	assert(game.save_game(battle.units,battle.world.economy.player_resources(),battle.scene_controller._save_extra()))
 	assert(battle.saver.apply_snapshot(game.load_save()))
 	assert(battle.units.all(func(u): return int(u.uid) != uid))
 	print("DUEL VICTORY PASS winner90percent / loser removed / surviving members released / no resurrection on load")
@@ -145,8 +149,8 @@ func run() -> void:
 	for value in range(100):
 		battle.simulation_rng.seed=value
 		if battle.simulation_rng.randi()%5==2:chosen=value;break
-	battle.commands.military._duel_begin();battle.simulation_rng.seed=chosen;battle.commands.military._duel_at(point())
-	assert(paused and caster.hp==caster.maxhp)
+	battle.world.abilities._duel_begin();battle.simulation_rng.seed=chosen;confirm_duel()
+	assert(paused and caster.hp==0)
 	assert(battle.view.event_view.ending_caption.contains(str(enemy.officer.name).replace(" ","")+"胜出"))
 	battle.view.event_view.player.finished.emit()
 	assert(not paused and caster.hp==0 and enemy.hp==enemy.maxhp*0.9)

@@ -1,12 +1,18 @@
 extends RefCounted
+const VisibilityRuntime = preload("res://simulation/systems/battle_visibility.gd")
+var _visibility: VisibilityRuntime
 ## research/units + research/magics: team targeting, flags and queued idle actions.
 const STATUS_FIELDS := {1:"inspired_t",2:"haste_t",3:"slow_t",4:"farsight_t",5:"confused_t",6:"ambush_t",7:"rolling_t"}
 const CONFUSION = preload("res://simulation/definitions/status_fields.gd").CONFUSION
 const ROLLING = preload("res://simulation/definitions/status_fields.gd").ROLLING
 const ACTIVE_TASKS := [CONFUSION,ROLLING]
-const Access = preload("res://simulation/ports/stratagem_rules_access.gd")
-var host: Access
-func _init(h:Object) -> void:host = h.simulation_access("stratagem_rules") if h.has_method("simulation_access") else h
+var _state: RefCounted
+var _dep_combat: Object
+var _dep_command_groups: Object
+func _init(h:Object) -> void:
+	_state = h.state
+	_dep_combat = h.combat
+	_dep_command_groups = h.command_groups
 static func config() -> Dictionary:
 	return preload("res://simulation/definitions/rule_catalog.gd").get_catalog("unit_tuning.json")
 
@@ -16,15 +22,15 @@ func eligible(unit:Dictionary, owner:int) -> bool:
 
 func target_team(target:Dictionary) -> Array:
 	var owner:=int(target.get("owner",-1))
-	if not eligible(target,owner) or not host.units.any(func(u):return is_same(u,target)):return []
-	var commander:Dictionary=host._commander_for(target)
+	if not eligible(target,owner) or not _state.units.any(func(u):return is_same(u,target)):return []
+	var commander:Dictionary=_dep_command_groups._commander_for(target)
 	if commander.is_empty():return [target]
 	if not eligible(commander,owner):return []
 	var index:=int(commander.officer.index)
 	# Canonical team order: commander first, then world-list members. Clicking a
 	# different member must not change which first 15 recipients receive an effect.
 	var result:Array=[commander]
-	for member in host.units:
+	for member in _state.units:
 		if result.size()>=15:break
 		if eligible(member,owner) and int(member.get("group_officer",-1))==index and not is_same(member,commander):result.append(member)
 	return result
@@ -67,13 +73,13 @@ func step_effects(unit:Dictionary) -> void:
 	unit.rolling_ticks=int(unit.get("rolling_ticks",0))+1
 	if int(unit.rolling_ticks)<30:return
 	unit.rolling_ticks=0
-	var radius:float=host.visibility.effective_vision(unit)*float(host.tile_w)
+	var radius:float=_visibility.effective_vision(unit)*float(_state.tile_w)
 	# Original task takes the first scan entry, rather than the nearest enemy.
-	for enemy in host.units:
+	for enemy in _state.units:
 		if not bool(enemy.alive) or float(enemy.die_t)>=0 or bool(enemy.get("attached",false)) or int(enemy.get("site_inside_uid",-1))>=0:continue
-		if not host._hostile_owners(int(unit.owner),int(enemy.owner)):continue
+		if not _dep_combat._hostile_owners(int(unit.owner),int(enemy.owner)):continue
 		if Vector2(enemy.ax-unit.ax,enemy.ay-unit.ay).length_squared()>radius*radius:continue
-		var commander:Dictionary=host._commander_for(enemy)
+		var commander:Dictionary=_dep_command_groups._commander_for(enemy)
 		if commander.is_empty():return
 		commander.status_173=maxi(0,int(commander.get("status_173",70))-50)
 		unit.rolling_t=0;unit.effect_task=0
@@ -92,3 +98,6 @@ static func valid_snapshot(state:Dictionary) -> bool:
 static func restore(state:Dictionary, unit:Dictionary) -> void:
 	unit.effect_tasks=state.get("effect_tasks",[]).map(func(task):return int(task))
 	unit.effect_task=int(state.get("effect_task",0))
+
+func bind_dependencies(world: Object) -> void:
+	_visibility = world.visibility

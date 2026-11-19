@@ -11,7 +11,7 @@ func run() -> void:
 	var battle = load("res://main.tscn").instantiate()
 	root.add_child(battle); battle.set_process(false); battle.cli_mode = true
 	battle.gold = 1234
-	assert(battle.commands.session._save_game())
+	assert(battle.session_actions.save_game())
 	var old_hash := FileAccess.get_sha256(game.SAVE_PATH)
 	battle.gold = 4321
 	battle.game_end = 2 if mode == "defeat" else 1

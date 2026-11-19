@@ -64,8 +64,8 @@ func _population() -> void:
 	var worker: Dictionary = battle.units.filter(func(u): return int(u.owner) == battle.player_owner and Roles.is_worker(int(u.unit)))[0]
 	var headquarters: Dictionary = battle.units.filter(func(u): return int(u.owner) == battle.player_owner and int(u.unit) in [0,1])[0]
 	battle.gold=100000.;battle.wood=100000.;battle.stone=100000.;battle.food=100000.
-	var production: RefCounted = battle.world.module_view().production
-	var construction: RefCounted = battle.world.module_view().construction_orders
+	var production: Object = battle.world.production
+	var construction: Object = battle.world.construction_orders
 	while production._army_count(battle.player_owner) < Balance.army_cap():
 		var filler: Dictionary = worker.duplicate(true)
 		filler.uid = 10000+battle.units.size(); filler.unit = 0; filler.is_building = true; filler.group_officer = -1
@@ -75,8 +75,8 @@ func _population() -> void:
 	assert(construction.build_placement_at(point,opt).reason == "已达%d单位上限" % Balance.army_cap())
 	var before: float = battle.gold
 	assert(not production._queue_train(battle.player_owner,headquarters,30) and battle.gold == before)
-	assert(not battle.commands.world._spawn_unit(32,battle.player_owner,point.x,point.y))
-	assert(not battle.world.module_view().officer_teams._form_hero_unit(worker,0))
+	assert(not battle.world.entity_factory._spawn_unit(32,battle.player_owner,point.x,point.y))
+	assert(not battle.world.officer_teams._form_hero_unit(worker,0))
 	# A corpse, an enemy, and a fading unit do not occupy a live entity slot.
 	var last: Dictionary = battle.units.back(); last.alive = false
 	assert(production._army_count(battle.player_owner) == Balance.army_cap()-1)
@@ -93,7 +93,7 @@ func _population() -> void:
 		commander.uid = 20000+battle.units.size(); commander.officer.index = 1000+battle.units.size()
 		battle.units.append(commander)
 	assert(production._army_count(battle.player_owner) < Balance.army_cap())
-	assert(not battle.world.module_view().officer_teams._form_hero_unit(worker,0), "Commander quota is independent of entity quota")
+	assert(not battle.world.officer_teams._form_hero_unit(worker,0), "Commander quota is independent of entity quota")
 	# Remove synthetic commanders before disposing the real scene.
 	while int(battle.units.back().uid) >= 20000: battle.units.pop_back()
 	production=null;construction=null;battle.scene.ready_to_save=false;battle.free()

@@ -4,31 +4,31 @@ func run() -> void:
 	var scene=load("res://main.tscn").instantiate();root.add_child(scene);scene.set_process(false)
 	template=scene.units.filter(func(u):return int(u.unit)==30)[0].duplicate(true);metadata=scene.map_data.units.duplicate(true)
 	var game: Node=root.get_node("Game")
-	var saved: Dictionary=game.snapshot(scene.units,scene.commands.world._resources(),scene.commands.session._save_extra())
-	for i in range(30):scene.commands.world._sim_step(scene.SIM_DT)
+	var saved: Dictionary=game.snapshot(scene.units,scene.world.economy.player_resources(),scene.scene_controller._save_extra())
+	for i in range(30):scene.world.battle_simulation._sim_step(scene.SIM_DT)
 	var expected: String=game.save_checksum(scene.saver.continuation_snapshot(game))
 	assert(scene.saver.apply_snapshot(saved))
-	scene._modules.unit_actions.profile_enabled=true
-	for i in range(30):scene.commands.world._sim_step(scene.SIM_DT)
+	scene.world.unit_actions.profile_enabled=true
+	for i in range(30):scene.world.battle_simulation._sim_step(scene.SIM_DT)
 	assert(game.save_checksum(scene.saver.continuation_snapshot(game))==expected,"Profiling changes domain state")
-	assert(scene._modules.unit_actions.profile.units>0 and scene._modules.unit_actions.profile.action>0)
+	assert(scene.world.unit_actions.profile.units>0 and scene.world.unit_actions.profile.action>0)
 	scene.scene.ready_to_save=false;scene.free()
 	blank();var actor:=make(1,3,32,Vector2i(10,10))
 	for px in [484.0,483.99999,484.00001,0.0,1847.0]:
 		for py in [16.5,16.49999,27.5,499.0]:
 			actor.ax=px;actor.ay=py
-			for i in range(2):assert(sim.commands.world._unit_cell(actor)==sim.nav.cell_of_px(px,py))
+			for i in range(2):assert(sim.world.spatial_index._unit_cell(actor)==sim.nav.cell_of_px(px,py))
 	var map: Dictionary=sim.map_data.duplicate(true);map.tileW=88;sim.nav.setup(map)
-	assert(sim.commands.world._unit_cell(actor)==sim.nav.cell_of_px(actor.ax,actor.ay))
+	assert(sim.world.spatial_index._unit_cell(actor)==sim.nav.cell_of_px(actor.ax,actor.ay))
 	sim.nav.tile_w=44;sim.nav.tile_hw=22;sim.nav.tile_hh=11
-	assert(sim.commands.world._unit_cell(actor)==sim.nav.cell_of_px(actor.ax,actor.ay))
+	assert(sim.world.spatial_index._unit_cell(actor)==sim.nav.cell_of_px(actor.ax,actor.ay))
 	blank();var a:=make(1,3,32,Vector2i(10,10));var b:=make(2,2,32,Vector2i(12,10));install([a,b])
 	a.ax=484.0;sim.nav.block(Vector2i(11,10))
-	var clear: bool=sim._modules.combat._melee_line_clear(a,b)
+	var clear: bool=sim.world.combat._melee_line_clear(a,b)
 	a.ax=483.99999
-	var cached: bool=sim._modules.combat._melee_line_clear(a,b)
-	sim._modules.combat._contact_cache.clear()
-	assert(cached==sim._modules.combat._melee_line_clear(a,b),"Sub-float32 endpoint movement reused a stale contact result")
+	var cached: bool=sim.world.combat._melee_line_clear(a,b)
+	sim.world.combat._contact_cache.clear()
+	assert(cached==sim.world.combat._melee_line_clear(a,b),"Sub-float32 endpoint movement reused a stale contact result")
 	sim.free();sim=null;population_contract();done=true;print("PRESSURE CONTRACTS PASS profile equivalence / exact coordinate cache / setup and setter invalidation / contact precision");quit()
 
 func population_contract() -> void:

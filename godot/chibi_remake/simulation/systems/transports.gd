@@ -1,27 +1,34 @@
 extends RefCounted
+const NavRuntime = preload("res://simulation/navigation/nav.gd")
+var _nav: NavRuntime
 const Roles = preload("res://simulation/definitions/unit_roles.gd")
 const Balance = preload("res://simulation/definitions/balance_rules.gd")
 ## 船员关联为权威状态；人数/兵力为派生汇总，不作为载员身份来源。
 const TechnologyState = preload("res://simulation/systems/technology_state.gd")
 const Footprint = preload("res://simulation/systems/unit_footprint.gd")
-const Access = preload("res://simulation/ports/transports_access.gd")
-var host: Access
+var _state: RefCounted
+var _dep_interaction_paths: Object
+var _dep_movement: Object
+var _dep_spatial_index: Object
 
 func _init(h: Object) -> void:
-	host = h.simulation_access("transports") if h.has_method("simulation_access") else h
+	_state = h.state
+	_dep_interaction_paths = h.interaction_paths
+	_dep_movement = h.movement
+	_dep_spatial_index = h.spatial_index
 
 func valid_unit(unit: Dictionary) -> bool:
-	return not unit.is_empty() and host.units.any(func(u):return is_same(u,unit)) and bool(unit.get("alive",false)) and float(unit.get("die_t",-1))<0
+	return not unit.is_empty() and _state.units.any(func(u):return is_same(u,unit)) and bool(unit.get("alive",false)) and float(unit.get("die_t",-1))<0
 
 func valid_ship(ship: Dictionary) -> bool:
 	return valid_unit(ship) and int(ship.unit)==Roles.transport_id() and not bool(ship.get("attached",false))
 
 func passengers(ship: Dictionary) -> Array:
-	return host.units.filter(func(u):return bool(u.get("alive",false)) and float(u.get("die_t",-1))<0 and bool(u.get("attached",false)) and int(u.get("aboard_uid",-1))==int(ship.uid))
+	return _state.units.filter(func(u):return bool(u.get("alive",false)) and float(u.get("die_t",-1))<0 and bool(u.get("attached",false)) and int(u.get("aboard_uid",-1))==int(ship.uid))
 
 func ship_for(unit: Dictionary) -> Dictionary:
 	var uid:=int(unit.get("aboard_uid",-1))
-	for ship in host.units:
+	for ship in _state.units:
 		if int(ship.uid)==uid and int(ship.unit)==Roles.transport_id():return ship
 	return {}
 
@@ -45,7 +52,7 @@ static func snapshot_fields(units: Array) -> Dictionary:
 	return fields
 
 func reconcile() -> void:
-	var units: Array = host.units
+	var units: Array = _state.units
 	var fields := snapshot_fields(units)
 	if fields.is_empty(): return
 	for unit in units:
@@ -58,24 +65,24 @@ func restore() -> void:
 
 func landing_cell(ship: Dictionary, unit: Dictionary = {}) -> Vector2i:
 	for cell in coastal_anchors(ship,int(unit.get("unit",-1))):
-		if host._unit_placement_free(cell,int(unit.get("unit",-1)),0,int(unit.get("uid",-1))):return cell
+		if _dep_spatial_index._unit_placement_free(cell,int(unit.get("unit",-1)),0,int(unit.get("uid",-1))):return cell
 	return Vector2i(-1,-1)
 
 func edge_distance_at(anchor: Vector2i, unit_id: int, ship: Dictionary) -> int:
 	var best:=2147483647
 	for own_cell in Footprint.shape(unit_id,anchor):
-		for ship_cell in host._footprint_cells(ship):
+		for ship_cell in _dep_interaction_paths._footprint_cells(ship):
 			best=mini(best,maxi(absi(own_cell.x-ship_cell.x),absi(own_cell.y-ship_cell.y)))
 	return best
 
 func adjacent(unit: Dictionary, ship: Dictionary) -> bool:
-	return edge_distance_at(host._unit_cell(unit),int(unit.unit),ship)==1
+	return edge_distance_at(_dep_spatial_index._unit_cell(unit),int(unit.unit),ship)==1
 
 ## Invert the unit's footprint offsets against the ship's eight-neighbor border.
 ## This covers large passengers without searching unrelated distant land rings.
 func coastal_anchors(ship: Dictionary, unit_id: int) -> Array:
 	var candidates:Dictionary={}
-	for ship_cell in host._footprint_cells(ship):
+	for ship_cell in _dep_interaction_paths._footprint_cells(ship):
 		for dx in range(-1,2):
 			for dy in range(-1,2):
 				if dx==0 and dy==0:continue
@@ -84,17 +91,17 @@ func coastal_anchors(ship: Dictionary, unit_id: int) -> Array:
 					for offset in Footprint.offsets(Footprint.class_of(unit_id),parity):
 						var anchor:Vector2i=border-offset
 						if (anchor.y&1)!=parity or candidates.has(anchor):continue
-						if anchor.x<0 or anchor.y<0 or anchor.x>=int(host.map_data.rows) or anchor.y>=int(host.map_data.cols):continue
+						if anchor.x<0 or anchor.y<0 or anchor.x>=int(_state.map_data.rows) or anchor.y>=int(_state.map_data.cols):continue
 						if edge_distance_at(anchor,unit_id,ship)!=1:continue
 						var clear:=true
 						for cell in Footprint.shape(unit_id,anchor):
-							if cell.x<0 or cell.y<0 or cell.x>=int(host.map_data.rows) or cell.y>=int(host.map_data.cols) or host.nav.is_water(cell) or host.nav.is_solid(cell,0):clear=false;break
+							if cell.x<0 or cell.y<0 or cell.x>=int(_state.map_data.rows) or cell.y>=int(_state.map_data.cols) or _nav.is_water(cell) or _nav.is_solid(cell,0):clear=false;break
 						if clear:candidates[anchor]=true
 	var ordered:Array=candidates.keys()
 	var center:=Vector2(float(ship.ax),float(ship.ay))
 	ordered.sort_custom(func(a,b):
-		var da:float=host.nav.anchor_of(a.x,a.y).distance_squared_to(center)
-		var db:float=host.nav.anchor_of(b.x,b.y).distance_squared_to(center)
+		var da:float=_nav.anchor_of(a.x,a.y).distance_squared_to(center)
+		var db:float=_nav.anchor_of(b.x,b.y).distance_squared_to(center)
 		return (a.y<b.y if a.y!=b.y else a.x<b.x) if is_equal_approx(da,db) else da<db)
 	return ordered
 
@@ -102,12 +109,12 @@ func boarding_path(unit: Dictionary, ship: Dictionary) -> Array:
 	var anchors:=coastal_anchors(ship,int(unit.unit))
 	var origin:=Vector2(float(unit.ax),float(unit.ay))
 	anchors.sort_custom(func(a,b):
-		var da:float=host.nav.anchor_of(a.x,a.y).distance_squared_to(origin)
-		var db:float=host.nav.anchor_of(b.x,b.y).distance_squared_to(origin)
+		var da:float=_nav.anchor_of(a.x,a.y).distance_squared_to(origin)
+		var db:float=_nav.anchor_of(b.x,b.y).distance_squared_to(origin)
 		return (a.y<b.y if a.y!=b.y else a.x<b.x) if is_equal_approx(da,db) else da<db)
 	for anchor in anchors:
-		if not host._unit_placement_free(anchor,int(unit.unit),0,int(unit.uid)):continue
-		var path:Array=host._path_to(unit,host.nav.anchor_of(anchor.x,anchor.y),false)
+		if not _dep_spatial_index._unit_placement_free(anchor,int(unit.unit),0,int(unit.uid)):continue
+		var path:Array=_dep_movement._path_to(unit,_nav.anchor_of(anchor.x,anchor.y),false)
 		if not path.is_empty():return path
 	return []
 
@@ -160,3 +167,6 @@ func valid_snapshot(ids: Dictionary) -> bool:
 		var state: Dictionary=unit.simulation;var total: Dictionary=totals.get(uid,{"n":0,"hp":0.0})
 		if (int(state.get("carry_n",0))!=int(total.n) or absf(float(state.get("carry_hp",0))-float(total.hp))>0.00001 or bool(state.get("loaded",false))!=(int(total.n)>0)):return false
 	return true
+
+func bind_dependencies(world: Object) -> void:
+	_nav = world.nav

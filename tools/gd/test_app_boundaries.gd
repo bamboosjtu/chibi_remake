@@ -58,7 +58,7 @@ func _snapshot() -> void:
 	var before: Array = battle.units.duplicate(true)
 	var extra: Dictionary = battle.saver.save_extra()
 	assert(battle.units == before,"Preparing save extras is a query")
-	var saved: Dictionary = game.snapshot(battle.units,battle.commands.world._resources(),extra)
+	var saved: Dictionary = game.snapshot(battle.units,battle.world.economy.player_resources(),extra)
 	assert(battle.units == before,"Canonical serialization cannot repair the live world")
 	var fields: Dictionary = saved.units[0].simulation
 	assert(fields.carry_n == 1 and fields.carry_hp == 200. and fields.loaded)

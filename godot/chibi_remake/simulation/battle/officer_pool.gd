@@ -1,4 +1,4 @@
-extends RefCounted
+extends Object
 ## officer pool: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
 const Config = preload("res://simulation/battle_config.gd")
