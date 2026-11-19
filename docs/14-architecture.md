@@ -40,7 +40,6 @@
 | `app/battle/scene_controller.gd` | 帧投递、输入、场景退出与表现协调 |
 | `simulation/battle/battle_simulation.gd` | 固定 tick 执行顺序、实体清理与摘要 |
 | `simulation/battle/` | 实体工厂、空间索引、交互路径、移动、战斗、建造、生产、武将、能力、命令、战役 |
-| `simulation/ports/` | 按职责声明的状态访问与函数依赖；场景退出时释放回调 |
 | `simulation/navigation/` | 导航状态、网格占格、路径查询与城门 |
 | `simulation/systems/ai.gd` | AI 调度、快照和稳定外部接口 |
 | `simulation/systems/ai_decisions.gd` | AI 建造、训练、研究与战术决策 |
@@ -238,7 +237,7 @@ while sim_acc >= 速度周期 且 本帧步数 < 5:
 
 ## 组合根封装与读模型试点
 
-正常场景和候选通过 `BattleWorld.connect_services(label, access_overrides, application_services, activate_native)` 装配，不读取或修改 World 的 `_modules/_access`。候选注入自己的命令适配器，安装前不激活 native port；地图实体播种也通过 World 的显式入口进行。诊断模块视图是只读集合副本，不能替换内部成员；模块对象仍用于诊断与剖析。门禁阻止运行代码直接访问 World 的私有集合；GDScript 本身不提供语言级私有隔离。
+正常场景和候选世界由 `BattleWorld._init` 统一构造全部领域服务并经 `bind_dependencies(world)` 绑定 `_dep_` 具名协作者，装配一致性由 `validate_services` 走 `composition_contract.wire` 校验，缺项即以非零退出终止；候选世界装配失败返回读档错误。地图实体播种通过 `World.seed_map_units` 显式入口进行。GDScript 不提供语言级私有隔离，跨层访问边界由 `architecture_check` 与 `registry_check` 门禁约束。
 
 领域服务的 `new(world)` 与行为模块的 `new(state)` 暂时保留：前者取得窄能力，后者操作领域状态。是否统一协议属于后续架构决策，不为统一签名改变所有服务。
 
