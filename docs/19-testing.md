@@ -12,9 +12,9 @@
 | 数据与工具 | `tools/test_*.mjs`、`test_publish.ps1` | 关卡数据、开局配置、内容管线、发布夹具 |
 | 候选冒烟 | `tools/verify_candidate.ps1` | 实际 EXE 全地图加载、同一 PCK 的完整 release 套件与已登记模拟基线；跳过时只能生成未发布候选 |
 | 本地 CI | `tools/ci_windows.ps1` | 默认文档、素材清单、架构与最小冒烟；`-FullRegression` 扩展到完整回归 |
-| 托管契约 | `.github/workflows/contracts.yml` | `tools/ci_lightweight.mjs`：注册表、分层、素材白名单与发布套件形状 |
+| 托管门禁 | `.github/workflows/ci.yml` | 单一工作流四个作业：`contracts` 聚合 `tools/ci_lightweight.mjs` 六组契约；`simulation`/`engine`/`continuation` 跑无素材依赖的引擎门禁 |
 
-GitHub Actions 的 `contracts` 把架构、注册表、数据、文档、仓库完整性和工具检查作为独立可观察步骤；即使前一项失败，后续检查仍执行，最终 job 保留失败状态。`ci` 在无 LFS 美术的条件下执行语法、引擎编译、完整已登记模拟基线、34 张地图启动、存档/Schema 回归与四图续跑。`release-regressions` 通过 `workflow_dispatch` 获取运行时美术并校验哈希后运行源码引擎的发布测试套件；它不代替 Windows EXE、GPU、性能和打包验收。
+GitHub Actions 只有一个 `ci` 工作流，四个作业都随推送与拉取请求执行：`contracts` 把架构、注册表、数据、文档、仓库完整性和工具检查交给 `tools/ci_lightweight.mjs` 聚合成一次运行（单项失败不跳过后续检查，最终 job 保留失败状态），并补克隆输入声明与 PowerShell 解析；`simulation` 在无 LFS 美术的条件下执行完整已登记模拟基线、34 张地图启动、存档/Schema 回归与三图引擎自检；`engine` 执行 Godot 脚本套件、组合注册表、三组"必须拒绝启动"的负例，并拉取两张地形源图运行地形管线；`continuation` 以四图矩阵各起一个独立进程跑 0/31/120/450/900/1800 tick 的续跑。完整源码发布套件、缺表现资源恢复、热路径预算、Windows 启动器与打包安全属于发布验收，由本地 `tools/ci_windows.ps1 -FullRegression`、`tools/release.ps1` 与 `verify_candidate.ps1` 执行；CI 不代替 Windows EXE、GPU、性能和打包验收。
 
 ## 2. 引擎自检
 

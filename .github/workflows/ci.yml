@@ -1,8 +1,23 @@
 name: ci
 
-# Push/PR gates run syntax, CPU-only saves, complete declared simulation
-# baselines, all-map startup and continuation without runtime art/templates.
-# The opt-in release-regressions workflow hydrates art for the full source suite.
+# Single hosted workflow. Everything here runs without art masters or export
+# templates and gates every push / pull request.
+#
+#   contracts     static contracts (architecture, registry, data, docs,
+#                 repository inventory, tooling), clone-input declarations and
+#                 PowerShell parsing. No engine.
+#   simulation    deterministic baselines, all 34 map startups, the save suite
+#                 and engine selftests.
+#   engine        Godot script suite, runtime composition registry, four
+#                 "must refuse to start" negatives and the terrain pipeline.
+#   continuation  four-map state/AI continuation matrix (one process per map).
+#
+# Release acceptance stays local: the full source release suite (31 tests),
+# missing-presentation recovery, hot-path budgets, packaging safety and the
+# Windows launcher are executed by tools/release.ps1 / verify_candidate.ps1 /
+# tools/ci_windows.ps1 -FullRegression on the reference machine. CI is not a
+# substitute for Windows EXE, GPU or performance acceptance.
+
 on:
   push:
   pull_request:
@@ -11,16 +26,67 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
-  simulation-baselines:
+  contracts:
+    name: contracts
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # One aggregating entry point: every group runs even when an earlier check
+      # fails, per-check results land in _work/lightweight, exit code is final.
+      - name: Architecture, registry, data, docs, repository and tooling gates
+        run: node tools/ci_lightweight.mjs
+      - name: Indexed clone inputs and terrain source declarations
+        run: |
+          node tools/audit_clone_inputs.mjs --index
+          node tools/terrain_sources.mjs --index
+      # Not covered by ci_lightweight: the PowerShell parser catches syntax that
+      # Windows PowerShell 5.1 and pwsh disagree on.
+      - name: PowerShell parse
+        shell: pwsh
+        run: |
+          $failed = @()
+          foreach ($file in (git ls-files '*.ps1')) {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path -LiteralPath $file).Path, [ref]$tokens, [ref]$errors) | Out-Null
+            if ($errors.Count -gt 0) {
+              $failed += ($file + ': ' + $errors[0].Message)
+            }
+          }
+          if ($failed.Count -gt 0) {
+            $failed | ForEach-Object { Write-Error $_ }
+            exit 1
+          }
+          Write-Output 'POWERSHELL SYNTAX PASS'
+      - name: Upload gate summaries
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract-results
+          path: _work/lightweight
+          retention-days: 7
+
+  simulation:
+    name: simulation
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      # A recorded digest may only move together with a reviewed note that
+      # carries the new checksum.
       - name: Require evidence for baseline changes
-        if: github.event_name != 'workflow_dispatch'
+        if: ${{ github.event_name != 'workflow_dispatch' }}
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
@@ -38,94 +104,35 @@ jobs:
         with:
           node-version: '22'
       - uses: ./.github/actions/setup-reviewed-godot
-      - name: Complete deterministic baselines and all map startups
-        run: node tools/run_regressions.mjs --engine "$GODOT_ENGINE" --baselines --maps --output _work/ci-baselines
-      - name: Save validity, schema and continuation regressions
-        if: ${{ !cancelled() }}
-        run: node tools/run_regressions.mjs --engine "$GODOT_ENGINE" --suite tools/inputs/save_tests.json --output _work/ci-saves
+      # One invocation, sequential engine runs: baselines (tick + digest +
+      # subsystems + full), 34 map startups, save suite and the engine selftest
+      # across three representative maps. A failing group does not skip later
+      # groups; the final exit code is the aggregate.
+      - name: Deterministic baselines, map startups, save suite and selftests
+        run: |
+          node tools/run_regressions.mjs --engine "$GODOT_ENGINE" \
+            --baselines --maps --selftests \
+            --suite tools/inputs/save_tests.json \
+            --output _work/ci-simulation
       - name: Upload simulation evidence
-        if: ${{ !cancelled() }}
+        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: simulation-baselines-and-saves
-          path: |
-            _work/ci-baselines
-            _work/ci-saves
-  continuation:
-    # Per-map CPU-only transactions; no LFS art or export templates required.
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        map: [chibic1, chibil1, chibic10, chibic17]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Install reviewed Godot bytes
-        run: |
-          curl -fsSL --retry 3 -o "$RUNNER_TEMP/godot.zip" \
-            https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip
-          mkdir -p "$RUNNER_TEMP/godot"
-          unzip -p "$RUNNER_TEMP/godot.zip" Godot_v4.7.2-stable_linux.x86_64 > "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
-          node tools/verify_engine.mjs --platform linux --engine "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
-          chmod +x "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
-      - name: Complete state and AI continuation
-        run: node tools/test_continuation_coverage.mjs --engine "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --map "${{ matrix.map }}" --output _work/ci-continuation
-      - uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: continuation-${{ matrix.map }}
-          path: _work/ci-continuation
-  syntax:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: JavaScript and JSON syntax
-        run: node tools/syntax_check.mjs
-      - name: PowerShell syntax
-        shell: pwsh
-        run: |
-          $failed = @()
-          foreach ($file in (git ls-files '*.ps1')) {
-            $tokens = $null
-            $errors = $null
-            [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path -LiteralPath $file).Path, [ref]$tokens, [ref]$errors) | Out-Null
-            if ($errors.Count -gt 0) {
-              $failed += ($file + ': ' + $errors[0].Message)
-            }
-          }
-          if ($failed.Count -gt 0) {
-            $failed | ForEach-Object { Write-Error $_ }
-            exit 1
-          }
-          Write-Output 'POWERSHELL SYNTAX PASS'
-      - name: Windows PowerShell 5.1 encoding compatibility
-        run: node tools/powershell_encoding.mjs && node tools/test_powershell_encoding.mjs
+          name: simulation-evidence
+          path: _work/ci-simulation
+          retention-days: 7
 
-  godot-smoke:
+  engine:
+    name: engine
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install Godot 4.7.2
-        run: |
-          curl -fsSL --retry 3 -o "$RUNNER_TEMP/godot.zip" \
-            https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip
-          mkdir -p "$RUNNER_TEMP/godot"
-          unzip -p "$RUNNER_TEMP/godot.zip" Godot_v4.7.2-stable_linux.x86_64 > "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
-          node tools/verify_engine.mjs --platform linux --engine "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
-          chmod +x "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
-          echo "GODOT_ENGINE=$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" >> "$GITHUB_ENV"
-      - name: Godot script compile and first-map smoke
+      - uses: ./.github/actions/setup-reviewed-godot
+      - name: Godot script suite and composition dump
         run: |
           node tools/run_regressions.mjs \
             --suite tools/inputs/ci_godot_tests.json \
@@ -141,16 +148,44 @@ jobs:
         run: node tools/test_rule_startup.mjs --engine "$GODOT_ENGINE" --cpu-only --output _work/ci-rule-startup
       - name: Invalid portable roots must refuse startup
         run: node tools/test_portable_startup.mjs --engine "$GODOT_ENGINE" --output _work/ci-portable-startup
+      # The terrain pipeline needs the two declared source images (LFS).
       - name: Fetch minimal terrain source fixture
-        run: git lfs pull --include="source/terrain/paint/00.png,source/terrain/masks/terrain-00-source.png" --exclude=""
+        run: git lfs pull --include="source/terrain/paint/00.png,source/terrain/masks/terrain-00-source.png"
       - name: Rebuildable terrain cache and failure recovery
         run: node tools/test_terrain_pipeline.mjs --engine "$GODOT_ENGINE"
-      - name: Upload Godot logs
-        if: failure()
+      - name: Upload engine logs
+        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: godot-ci-logs
+          name: engine-logs
           path: |
             _work/ci-godot
             _work/ci-rule-startup
             _work/ci-portable-startup
+          retention-days: 7
+
+  continuation:
+    name: continuation (${{ matrix.map }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        map: [chibic1, chibil1, chibic10, chibic17]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: ./.github/actions/setup-reviewed-godot
+      # One process per map: a hang in one map cannot mask the others, and the
+      # 600 s per-map watchdog stays inside this job's budget.
+      - name: State and AI continuation for ${{ matrix.map }}
+        run: node tools/test_continuation_coverage.mjs --engine "$GODOT_ENGINE" --map "${{ matrix.map }}" --output _work/ci-continuation
+      - name: Upload continuation logs
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: continuation-logs-${{ matrix.map }}
+          path: _work/ci-continuation
+          retention-days: 7

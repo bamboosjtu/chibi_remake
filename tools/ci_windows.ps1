@@ -1,4 +1,4 @@
-﻿param([switch]$SkipArtCheck,[switch]$FullRegression,[switch]$ReleaseSafetyOnly)
+param([switch]$SkipArtCheck,[switch]$FullRegression,[switch]$ReleaseSafetyOnly)
 # Windows CI: minimal smoke by default; full gameplay checks are opt-in.
 # Requires the local Godot engine and declared runtime assets, not art masters.
 # Godot may write a certificate warning to stderr; every native result is checked below.
@@ -51,6 +51,11 @@ if ($FullRegression) {
     node tools/run_regressions.mjs --engine $godot --suite tools/inputs/release_tests.json --output _work/ci/regressions
 }
 if ($LASTEXITCODE -ne 0) { throw 'Runtime regressions failed; inspect _work/ci/regressions/results.json' }
+if ($FullRegression) {
+    # Injected save faults must be reported as SELFTEST FAIL, not as a pass.
+    node tools/run_regressions.mjs --engine $godot --selftest-failures --output _work/ci/selftest-failures
+    if ($LASTEXITCODE -ne 0) { throw 'Injected selftest failures were not reported' }
+}
 node tools/test_exit_safety.mjs --engine $godot
 if ($LASTEXITCODE -ne 0) { throw 'Window exit safety failed' }
 if ($FullRegression) {

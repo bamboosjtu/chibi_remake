@@ -111,7 +111,7 @@ $env:APPDATA = (Resolve-Path "_work\godot_appdata").Path
 
 - 自检通过输出 `SELFTEST RESULT: PASS` 且退出码 0。
 - 摘要与 `tools/inputs/baselines.json` 比较；修改模拟或通行数据后必须显式更新基线。
-- GitHub Actions 包含 `contracts`、`ci` 和按需触发的 `release-regressions`。`contracts` 检查静态契约与素材声明。`ci` 运行语法、34 图启动、固定摘要、存档和四图续跑，地形烟测拉取两项 LFS 源图。`release-regressions` 拉取运行素材并运行发布源码回归。正式打包和发布在 Windows 本地执行。详见[测试与验收](docs/19-testing.md)与[构建发布](docs/18-build-release.md)。
+- GitHub Actions 只有单一 `ci` 工作流，四个作业覆盖每次推送与拉取请求：`contracts`（架构、注册表、数据、文档、仓库清单与工具门禁，外加克隆输入声明与 PowerShell 解析）、`simulation`（确定性基线、34 图启动、存档套件与三图引擎自检）、`engine`（Godot 脚本套件、组合注册表、三组"必须拒绝启动"的负例与地形管线）、`continuation`（四图续跑矩阵，每图独立进程）。需要运行素材或 Windows 的验收——完整源码发布套件、缺表现资源恢复、热路径预算、启动器编译与打包安全——由本地 `tools/release.ps1`、`verify_candidate.ps1` 与 `tools/ci_windows.ps1 -FullRegression` 在参考机执行；CI 不代替 Windows EXE、GPU 与性能验收。详见[测试与验收](docs/19-testing.md)与[构建发布](docs/18-build-release.md)。
 
 ## 目录
 

@@ -35,7 +35,7 @@
 
 `ci_lightweight.mjs` 按架构、注册表、数据、文档、仓库和工具六组执行。单个检查的非零退出、异常或信号退出都会记录为失败，后续检查继续，最终汇总非零退出。每组机器结果写到 `_work/lightweight`。
 
-`contracts.yml` 使用相同的分组入口，独立步骤使用 `!cancelled()`，不会被前一失败静默跳过。门禁自身覆盖“首项失败后仍执行后项”、孤儿脚本、重复条目、无理由手工排除、过期或无责任人的架构豁免。
+托管 `contracts` 作业使用相同的分组入口，独立步骤使用 `!cancelled()`，不会被前一失败静默跳过。门禁自身覆盖“首项失败后仍执行后项”、孤儿脚本、重复条目、无理由手工排除、过期或无责任人的架构豁免。该作业现在位于单一 `.github/workflows/ci.yml`，分组入口与聚合语义不变；完整发布套件与 Windows 打包验收改为本地执行。
 
 `architecture_limits.json` 的文件预算、长函数预算和边界豁免均有 owner、reason、reviewBy。责任角色 `project-maintainers` 指本仓库维护者，由当前变更维护者负责落实复审；期限为 2027-02-16。删除了已不需要的 `save_game` 长函数预算，并将七项历史宽预算收紧到实际长度；没有放宽预算。真正解决预算项时应删除对应复审条目，延期须说明原因。
 
@@ -85,6 +85,8 @@
 此外，`test_exit_safety` 明确由 `tools/test_exit_safety.mjs` 驱动多个原生窗口退出场景；capture/verify、离线美术工具和 economy fixture 也都登记在非套件清单中，不能悄悄失去归属。
 
 ### Hosted CI 可行性与接入
+
+> 本节记录当时的双工作流设计；后续已收敛为单一 `.github/workflows/ci.yml` 的四个作业，完整发布套件与 Windows 打包验收改为本地执行。
 
 push/PR 的 `ci.yml` 新增全部已登记模拟基线、34 图启动与 `save_tests`，不要求美术或导出模板；既有四图续跑保留。`release-regressions.yml` 提供显式 `workflow_dispatch`：获取 `godot/chibi_remake/**` 的 LFS 资源，按清单验证字节后运行完整 release 套件。运行资源清单为 627 个文件、约 1.087 GiB，远小于把参考图、研究源和所有制作中间件一起下载。
 
