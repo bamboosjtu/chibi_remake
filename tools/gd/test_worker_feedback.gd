@@ -38,11 +38,18 @@ func run() -> void:
 	for tick in range(50): b.commands.economy._process_trainings(b.SIM_DT)
 	var worker: Dictionary = b.units.back()
 	assert(int(worker.unit) == 30 and int(worker.group_officer) < 0 and b.feedback_text.contains("训练完成"))
-	b.selected = [worker]; b.view.update_panel()
+	b.commands.session.select_at(Vector2(worker.ax, worker.ay - worker.h * 0.5), false)
+	assert(b.selected.size() == 1 and is_same(b.selected[0], worker))
 	assert(b.view._panel_specs().map(func(sp): return str(sp.cmd)) == ["move", "form", "join", "board"])
 	for i in range(4): assert(b.view.art_buttons[i].btn.visible)
 	assert(not b.view.art_buttons[4].btn.visible)
 	assert(b.view.art_buttons[1].btn.get_meta("cmd_name") == "组建" and b.view.art_buttons[2].btn.get_meta("cmd_name") == "加入", "panel cache must refresh grouped -> independent")
+	var leader_index: int = leader.officer.index
+	leader.officer.index = -1
+	b.view.update_panel()
+	assert(b.commands.military._commander_for(worker).is_empty())
+	assert(b.view.art_buttons[2].btn.get_meta("cmd_name") == "加入", "an ungrouped worker must not match an unassigned officer slot")
+	leader.officer.index = leader_index
 	assert(b.view.art_buttons[1].btn.get_meta("command_id") == 16144 and b.view.art_buttons[1].btn.get_meta("source_frame") == 167 and b.view.art_buttons[1].btn.texture != null, "form command must use its registered icon")
 	await capture(b, "independent-worker")
 	# Cargo state, not combat action, selects the existing wheelbarrow frames.
@@ -63,6 +70,18 @@ func run() -> void:
 	b.view.update_panel()
 	assert(b.view._panel_specs().map(func(sp): return int(sp.id)) == [16130,16136,16142,16146])
 	assert(b.view.art_buttons[1].btn.get_meta("cmd_name") == "解散", "independent -> member refresh")
+	b.view._on_panel_slot(1)
+	assert(b.player_commands.has_pending())
+	b.commands.world._sim_step(b.SIM_DT)
+	assert(int(worker.group_officer) < 0)
+	b.selected = [worker]; b.view.update_panel()
+	assert(b.view._panel_specs().map(func(sp): return str(sp.cmd)) == ["move", "form", "join", "board"], "disbanded workers expose join after the command tick")
+	worker.group_officer = int(leader.officer.index)
+	var site: Dictionary = b.commands.economy._place_building(b.player_owner, 10, Vector2(hq.ax + 300, hq.ay), true)
+	assert(not site.is_empty())
+	worker.build_target = site; worker.state = "build"
+	b.commands.economy._complete_site(site)
+	assert(not site.site and worker.group_officer == int(leader.officer.index), "construction completion retains team membership")
 	# JSON number normalization must retain integrity checks for large integers.
 	var extra: Dictionary = b.commands.session._save_extra()
 	extra.simulation.officerProgress["precision_probe"] = 9007199254740993

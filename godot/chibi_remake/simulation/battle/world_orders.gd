@@ -1,7 +1,6 @@
 extends RefCounted
 ## world orders: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
-const Config = preload("res://simulation/battle_config.gd")
 const REQUIRED_SERVICES := {"abilities": ["jimou_target_at", "_duel_at", "_formation_target_cell", "_jimou_cast_at", "_reset_jimou"], "battle_simulation": ["_feedback"], "command_groups": ["_cancel_unit_command", "_command_units", "_nav_layer"], "construction_orders": ["_build_site_at", "_order_build", "_order_repair"], "harvest_orders": ["_order_gather", "_resource_at"], "movement": ["_anchor_of_cell", "_cell_of_px", "_march_destination", "_path_to"], "officer_teams": ["_order_join"], "selection": ["_attack_target_at", "_enemy_at", "_neutral_object_at", "_own_object_at"], "technology": ["_is_worker_unit"], "transport_orders": ["_cmd_board_at", "_cmd_unload_at", "_own_ship_at"]}
 var battle: State
 var ports := preload("res://simulation/service_dependencies.gd").new(REQUIRED_SERVICES)

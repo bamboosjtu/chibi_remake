@@ -2,20 +2,14 @@ extends RefCounted
 const PROXY_FIELDS := ["session", "effects", "units", "selected", "_officer_pool", "player_owner", "cheats_enabled", "auto_control", "cheat_build_any", "cheat_invulnerable", "cheat_reveal", "economy", "trainings", "player_tech", "research_jobs", "army_tech", "scenario_sides", "game_end", "clock", "_officer_initial_state", "nav", "visibility", "map_data", "map_id", "gold", "wood", "food", "stone", "projectiles", "fire_fields", "transports", "harvesting", "construction", "resource_revision", "sheet_by_unit", "train_types", "build_types", "next_uid", "_cell_index", "_cell_index_cell", "_cell_index_layer", "_cell_index_cells", "_index_unit_id", "_foot_cache", "_targets", "_target_owner", "_index_units_ref", "_index_units_size", "cnt_player", "cnt_enemy", "tile_w", "tile_hw", "tile_hh", "scenario_source", "scenario_mission", "scenario_avi", "ai", "ai_res", "sim_acc", "simulation_rng", "sim_tick", "simtest_seconds", "cnt_enemy_buildings", "task_latches", "terrain_changes", "terrain_base", "officer_progress", "rules", "task_events", "objective_done", "officer_policy", "cli_mode", "command_rules", "stratagems", "jimou_pending", "jimou_caster", "duel_pending", "cmd_pending", "cmd_pending_data", "decor_targets", "decor_cells", "control_groups", "automatic_gates", "player_commands"]
 ## Single owner of battle data. No scene nodes or rendering handles.
 const CombatRules = preload("res://simulation/systems/combat_rules.gd")
-const TechnologyState = preload("res://simulation/systems/technology_state.gd")
 const OFFICER_BLOCK_FOR_OWNER = preload("res://simulation/battle_config.gd").OFFICER_BLOCK_FOR_OWNER
 const GRID_FALLBACK = preload("res://simulation/battle_config.gd").GRID_FALLBACK
 const SPEED = preload("res://simulation/battle_config.gd").SPEED
 const HUD_HZ = preload("res://simulation/battle_config.gd").HUD_HZ
-const ActionClock = preload("res://simulation/systems/action_clock.gd")
-const TickTimers = preload("res://simulation/systems/tick_timers.gd")
 const Nav = preload("res://simulation/navigation/nav.gd")
-const BattleVision = preload("res://simulation/systems/battle_visibility.gd")
-const UnitFootprint = preload("res://simulation/systems/unit_footprint.gd")
 const SIM_HZ = preload("res://simulation/battle_config.gd").SIM_HZ
 const SIM_DT = preload("res://simulation/battle_config.gd").SIM_DT
 const SIM_MAX_CATCHUP = preload("res://simulation/battle_config.gd").SIM_MAX_CATCHUP
-const ScenarioRules = preload("res://simulation/systems/scenario_rules.gd")
 const Progression = preload("res://simulation/systems/officer_progression.gd")
 const PRODUCE_BY_BUILDING = preload("res://simulation/battle_config.gd").PRODUCE_BY_BUILDING
 const RESOURCE_YIELD = preload("res://simulation/battle_config.gd").RESOURCE_YIELD

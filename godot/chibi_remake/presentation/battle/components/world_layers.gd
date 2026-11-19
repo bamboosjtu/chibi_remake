@@ -27,6 +27,10 @@ func build_terrain() -> void:
 func terrain_plan(map_id: String) -> Dictionary:
 	return preload("res://presentation/battle/terrain_stream.gd").read_manifest(map_id)
 
+func prepare_opening_layers() -> void:
+	if _ui.resource_layer != null: _ui.resource_layer._process(0.0)
+	if _ui.fog_sprite != null: _ui.fog_sprite._process(0.0)
+
 func install_terrain(map_id: String, plan: Dictionary, preflight := false) -> bool:
 	release_terrain()
 	terrain = preload("res://presentation/battle/terrain_stream.gd").new(_ui.host, map_id, plan)

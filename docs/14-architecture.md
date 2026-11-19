@@ -240,9 +240,9 @@ while sim_acc >= 速度周期 且 本帧步数 < 5:
 
 领域服务的 `new(world)` 与行为模块的 `new(state)` 暂时保留：前者取得窄能力，后者操作领域状态。是否统一协议属于后续架构决策，不为统一签名改变所有服务。
 
-相机组件是首个完整读模型试点：地图边界、开局中心和瓦片几何分别以 Vector 值返回，组件不再借用 units、selected、map_data 或 nav。开局中心只在初始化时扫描单位，逐帧夹边只读取边界值。其他组件暂时保留借用引用，须逐个迁移，不能把所有 getter 换成逐帧深拷贝。
+相机、建造预览、资源层、单位名册/选择/生产以及 visibility/clock/projectiles/fire_fields/player_commands 等读模型已迁移；表现层不再借用 units、selected、map_data、nav、trainings、decor_cells 及服务配置容器。公开接口只返回值、UID 或递归冻结的投影，不能把“返回 Dictionary”当作可写授权。其余经别名、动态键或命令返回对象继续传递的引用仍需人工审查。
 
-端口清单 schemaVersion 3 将受检适配器与内部作用域分列。`resolvedCalls` 是由固定作用域接收者和组成清单核实的内部调用；其他端口的 `nameMatches` 仍只是未解析接收者的方法名命中。正命中可能属于别的对象，零命中也不证明无调用；清单不适用自动删除，仍需人工核查和运行时证据。
+端口清单当前为 schemaVersion 4，将受检适配器与内部作用域分列。`resolvedCalls` 是由固定作用域接收者和组成清单核实的内部调用；其他端口的 `nameMatches` 仍只是未解析接收者的方法名命中。正命中可能属于别的对象，零命中也不证明无调用；清单不适用自动删除，仍需人工核查和运行时证据。
 
 
 ### 建造预览的值投影
@@ -260,7 +260,7 @@ while sim_acc >= 速度周期 且 本帧步数 < 5:
 
 `battle_resources.gd` 不再保存 entries，也不读取 map_data、nav 或 decor_cells。BattleAccess 提供资源层的值键和可见描述数组，每个描述仅包含 index、anchor、phase；新建容器递归冻结，结果不含资源字典、地图、导航、Object、Callable 或可变 Packed 数组。decor_cells 的旧借用 getter 已从 BattleAccess 删除。
 
-资源层按世界身份、导航身份、resource_revision、导航几何版本和视口 Rect2 缓存。逐帧仅比较常量大小的值键；键变化后扫描 decor，只构造可见描述，不深拷贝整个地图或资源记录。普通阻挡版本变化不影响资源画法，不触发重扫；资源定义的直接修改必须提升资源版本或更换世界。该实现尚未引入资源空间索引。
+资源层按世界身份、导航身份、resource_revision、导航几何版本和视口 Rect2 缓存。逐帧仅比较常量大小的值键；键变化后扫描 decor，只构造可见描述，不深拷贝整个地图或资源记录。普通阻挡版本变化不影响资源画法，不触发重扫；资源定义的直接修改必须提升资源版本或更换世界。资源片连通区与点击命中分别由 `simulation/queries/resource_index.gd` 的缓存/空间桶服务，资源层投影不持有该索引或旧世界。
 
 精灵、纹理和图集 frame 元数据由表现层管理。即使 index 和 phase 相同，几何或世界变化后也更新精灵位置；phase 5 按既有图集声明跳过并移除旧精灵。实际交换回滚和读档、所有非身份键值相同的替换、保留旧投影时释放旧世界/导航均由回归覆盖。
 

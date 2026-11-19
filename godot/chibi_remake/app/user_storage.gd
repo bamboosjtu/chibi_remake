@@ -101,7 +101,11 @@ func resolve_path() -> String:
 static func _has_slots(directory: String) -> bool:
 	if not DirAccess.dir_exists_absolute(directory): return false
 	for name in DirAccess.get_files_at(directory):
-		if name == "save.json" or name == "save.json.bak" or name.begins_with("slot-"): return true
+		if name == "save.json" or name == "save.json.bak": return true
+		var primary := name.trim_suffix(".bak")
+		if primary.length() != 12 or not primary.begins_with("slot-") or not primary.ends_with(".json"): continue
+		var digits := primary.substr(5, 2)
+		if digits.is_valid_int() and int(digits) >= 1 and int(digits) <= 20 and primary == "slot-%02d.json" % int(digits): return true
 	return false
 
 func commit(path: String, text: String, validator: Callable, backup_validator: Callable = Callable()) -> bool:

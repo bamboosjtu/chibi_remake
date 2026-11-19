@@ -2591,7 +2591,6 @@
         "simulation/battle_world.gd",
         "simulation/systems/ai.gd",
         "simulation/systems/ai_config.gd",
-        "simulation/systems/ai_decisions.gd",
         "simulation/systems/ai_naval_slots.gd",
         "simulation/systems/ai_training_slots.gd"
       ],
@@ -2684,9 +2683,7 @@
           "forwarded": "_construction_workers",
           "mechanical": true,
           "privateContract": true,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "_hostile_owners",
@@ -2695,9 +2692,7 @@
           "forwarded": "_hostile_owners",
           "mechanical": true,
           "privateContract": true,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "_is_hero_unit",
@@ -2706,9 +2701,7 @@
           "forwarded": "_is_hero_unit",
           "mechanical": true,
           "privateContract": true,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "_naval_research_gate",
@@ -2717,23 +2710,17 @@
           "forwarded": "_naval_research_gate",
           "mechanical": true,
           "privateContract": true,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "move_order",
           "category": "module-capability",
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "_queue_research",
           "category": "module-capability",
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "_queue_train",
@@ -2750,9 +2737,7 @@
           "forwarded": "_tech_line_of",
           "mechanical": true,
           "privateContract": true,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "_tech_line_pos",
@@ -2761,9 +2746,7 @@
           "forwarded": "_tech_line_pos",
           "mechanical": true,
           "privateContract": true,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "_tech_line_progress",
@@ -2772,9 +2755,7 @@
           "forwarded": "_tech_line_progress",
           "mechanical": true,
           "privateContract": true,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "ai_behavior",
@@ -2784,7 +2765,6 @@
           "mechanical": true,
           "privateContract": false,
           "nameMatches": [
-            "simulation/systems/ai_decisions.gd",
             "simulation/systems/ai_naval_slots.gd",
             "simulation/systems/ai.gd"
           ]
@@ -2797,7 +2777,6 @@
           "mechanical": true,
           "privateContract": false,
           "nameMatches": [
-            "simulation/systems/ai_decisions.gd",
             "simulation/systems/ai_training_slots.gd"
           ]
         },
@@ -2809,7 +2788,6 @@
           "mechanical": true,
           "privateContract": false,
           "nameMatches": [
-            "simulation/systems/ai_decisions.gd",
             "simulation/systems/ai_training_slots.gd"
           ]
         },
@@ -2820,9 +2798,7 @@
           "forwarded": "ai_can_build",
           "mechanical": true,
           "privateContract": false,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "ai_construction_commander",
@@ -2831,9 +2807,7 @@
           "forwarded": "ai_construction_commander",
           "mechanical": true,
           "privateContract": false,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "ai_construction_kinds",
@@ -2842,9 +2816,7 @@
           "forwarded": "ai_construction_kinds",
           "mechanical": true,
           "privateContract": false,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "ai_enqueue_train",
@@ -2853,9 +2825,7 @@
           "forwarded": "ai_enqueue_train",
           "mechanical": true,
           "privateContract": false,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "ai_focus_unit",
@@ -2864,9 +2834,7 @@
           "forwarded": "ai_focus_unit",
           "mechanical": true,
           "privateContract": false,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "ai_force_units",
@@ -2875,9 +2843,7 @@
           "forwarded": "ai_force_units",
           "mechanical": true,
           "privateContract": false,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "ai_gift",
@@ -2887,7 +2853,6 @@
           "mechanical": true,
           "privateContract": false,
           "nameMatches": [
-            "simulation/systems/ai_decisions.gd",
             "simulation/systems/ai_training_slots.gd"
           ]
         },
@@ -2898,9 +2863,7 @@
           "forwarded": "ai_gold",
           "mechanical": true,
           "privateContract": false,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "ai_group_of",
@@ -2909,9 +2872,7 @@
           "forwarded": "ai_group_of",
           "mechanical": true,
           "privateContract": false,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "ai_level",
@@ -2920,9 +2881,7 @@
           "forwarded": "ai_level",
           "mechanical": true,
           "privateContract": false,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "ai_order_assault",
@@ -2931,9 +2890,7 @@
           "forwarded": "ai_order_assault",
           "mechanical": true,
           "privateContract": false,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "ai_order_assault_l1",
@@ -2951,9 +2908,7 @@
           "forwarded": "ai_order_intercept",
           "mechanical": true,
           "privateContract": false,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "ai_order_rally",
@@ -2962,9 +2917,7 @@
           "forwarded": "ai_order_rally",
           "mechanical": true,
           "privateContract": false,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "ai_owners",
@@ -2982,9 +2935,7 @@
         {
           "name": "ai_place_building",
           "category": "module-capability",
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "ai_production_building",
@@ -2994,7 +2945,6 @@
           "mechanical": true,
           "privateContract": false,
           "nameMatches": [
-            "simulation/systems/ai_decisions.gd",
             "simulation/systems/ai_naval_slots.gd",
             "simulation/systems/ai_training_slots.gd"
           ]
@@ -3006,9 +2956,7 @@
           "forwarded": "ai_queue_hq_upgrade",
           "mechanical": true,
           "privateContract": false,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "ai_research_building",
@@ -3017,9 +2965,7 @@
           "forwarded": "ai_research_building",
           "mechanical": true,
           "privateContract": false,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "ai_set_gold",
@@ -3028,9 +2974,7 @@
           "forwarded": "ai_set_gold",
           "mechanical": true,
           "privateContract": false,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "ai_tech_gate",
@@ -3039,9 +2983,7 @@
           "forwarded": "ai_tech_gate",
           "mechanical": true,
           "privateContract": false,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "ai_unit_cost",
@@ -3051,7 +2993,6 @@
           "mechanical": true,
           "privateContract": false,
           "nameMatches": [
-            "simulation/systems/ai_decisions.gd",
             "simulation/systems/ai_training_slots.gd"
           ]
         },
@@ -3062,9 +3003,7 @@
           "forwarded": "ai_worker_count",
           "mechanical": true,
           "privateContract": false,
-          "nameMatches": [
-            "simulation/systems/ai_decisions.gd"
-          ]
+          "nameMatches": []
         },
         {
           "name": "connect_services",
@@ -6913,7 +6852,7 @@
           "building_block_reason"
         ],
         "production": [
-          "train_types_for"
+          "find_training_building"
         ],
         "technology": [
           "_ai_side",
@@ -7016,17 +6955,9 @@
         {
           "file": "simulation/battle/ai_economy.gd",
           "caller": "ai_production_building",
-          "provider": "technology",
-          "method": "_building_work_busy",
-          "line": 173,
-          "argumentCount": 1
-        },
-        {
-          "file": "simulation/battle/ai_economy.gd",
-          "caller": "ai_production_building",
           "provider": "production",
-          "method": "train_types_for",
-          "line": 174,
+          "method": "find_training_building",
+          "line": 171,
           "argumentCount": 2
         }
       ]
@@ -7055,7 +6986,7 @@
           "caller": "ai_order_rally",
           "provider": "ai_economy",
           "method": "ai_production_building",
-          "line": 16,
+          "line": 15,
           "argumentCount": 1
         },
         {
@@ -7063,6 +6994,14 @@
           "caller": "ai_order_rally",
           "provider": "ai_economy",
           "method": "ai_group_of",
+          "line": 21,
+          "argumentCount": 1
+        },
+        {
+          "file": "simulation/battle/ai_orders.gd",
+          "caller": "ai_order_rally",
+          "provider": "ai_economy",
+          "method": "_working_construction_team",
           "line": 22,
           "argumentCount": 1
         },
@@ -7070,16 +7009,8 @@
           "file": "simulation/battle/ai_orders.gd",
           "caller": "ai_order_rally",
           "provider": "ai_economy",
-          "method": "_working_construction_team",
-          "line": 23,
-          "argumentCount": 1
-        },
-        {
-          "file": "simulation/battle/ai_orders.gd",
-          "caller": "ai_order_rally",
-          "provider": "ai_economy",
           "method": "_ai_forming",
-          "line": 23,
+          "line": 22,
           "argumentCount": 1
         },
         {
@@ -7087,7 +7018,7 @@
           "caller": "_l1_target",
           "provider": "harvest_orders",
           "method": "_yield_of",
-          "line": 41,
+          "line": 40,
           "argumentCount": 1
         },
         {
@@ -7095,6 +7026,14 @@
           "caller": "ai_order_assault",
           "provider": "ai_economy",
           "method": "ai_group_of",
+          "line": 55,
+          "argumentCount": 1
+        },
+        {
+          "file": "simulation/battle/ai_orders.gd",
+          "caller": "ai_order_assault",
+          "provider": "ai_economy",
+          "method": "_working_construction_team",
           "line": 56,
           "argumentCount": 1
         },
@@ -7102,16 +7041,8 @@
           "file": "simulation/battle/ai_orders.gd",
           "caller": "ai_order_assault",
           "provider": "ai_economy",
-          "method": "_working_construction_team",
-          "line": 57,
-          "argumentCount": 1
-        },
-        {
-          "file": "simulation/battle/ai_orders.gd",
-          "caller": "ai_order_assault",
-          "provider": "ai_economy",
           "method": "_ai_forming",
-          "line": 57,
+          "line": 56,
           "argumentCount": 1
         },
         {
@@ -7119,6 +7050,14 @@
           "caller": "ai_order_assault",
           "provider": "ai_economy",
           "method": "ai_group_of",
+          "line": 64,
+          "argumentCount": 1
+        },
+        {
+          "file": "simulation/battle/ai_orders.gd",
+          "caller": "ai_order_assault",
+          "provider": "ai_economy",
+          "method": "_working_construction_team",
           "line": 65,
           "argumentCount": 1
         },
@@ -7126,16 +7065,8 @@
           "file": "simulation/battle/ai_orders.gd",
           "caller": "ai_order_assault",
           "provider": "ai_economy",
-          "method": "_working_construction_team",
-          "line": 66,
-          "argumentCount": 1
-        },
-        {
-          "file": "simulation/battle/ai_orders.gd",
-          "caller": "ai_order_assault",
-          "provider": "ai_economy",
           "method": "_ai_forming",
-          "line": 66,
+          "line": 65,
           "argumentCount": 1
         },
         {
@@ -7143,7 +7074,7 @@
           "caller": "ai_order_intercept",
           "provider": "ai_economy",
           "method": "ai_group_of",
-          "line": 88,
+          "line": 87,
           "argumentCount": 1
         },
         {
@@ -7151,7 +7082,7 @@
           "caller": "ai_order_intercept",
           "provider": "ai_economy",
           "method": "_working_construction_team",
-          "line": 89,
+          "line": 88,
           "argumentCount": 1
         },
         {
@@ -7159,7 +7090,7 @@
           "caller": "ai_order_intercept",
           "provider": "ai_economy",
           "method": "_ai_forming",
-          "line": 89,
+          "line": 88,
           "argumentCount": 1
         },
         {
@@ -7167,7 +7098,7 @@
           "caller": "_nearest_enemy_threat",
           "provider": "combat",
           "method": "_hostile_owners",
-          "line": 115,
+          "line": 114,
           "argumentCount": 2
         }
       ]
@@ -7588,7 +7519,7 @@
           "caller": "_return_selected_cargo",
           "provider": "technology",
           "method": "_is_worker_unit",
-          "line": 218,
+          "line": 219,
           "argumentCount": 1
         },
         {
@@ -7596,7 +7527,7 @@
           "caller": "_return_selected_cargo",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 222,
+          "line": 223,
           "argumentCount": 1
         },
         {
@@ -7604,7 +7535,7 @@
           "caller": "stop_selected",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 234,
+          "line": 235,
           "argumentCount": 1
         }
       ]
@@ -9053,18 +8984,26 @@
       "resolvedCalls": [
         {
           "file": "simulation/battle/production.gd",
-          "caller": "train_types_for",
-          "provider": "ai_economy",
-          "method": "ai_level",
-          "line": 23,
+          "caller": "find_training_building",
+          "provider": "technology",
+          "method": "_building_work_busy",
+          "line": 53,
           "argumentCount": 1
         },
         {
           "file": "simulation/battle/production.gd",
-          "caller": "train_types_for",
+          "caller": "_training_tier",
+          "provider": "ai_economy",
+          "method": "ai_level",
+          "line": 63,
+          "argumentCount": 1
+        },
+        {
+          "file": "simulation/battle/production.gd",
+          "caller": "_trainable_meta",
           "provider": "entity_factory",
           "method": "_sheet_ref_for",
-          "line": 31,
+          "line": 72,
           "argumentCount": 2
         },
         {
@@ -9072,7 +9011,7 @@
           "caller": "_queue_train",
           "provider": "technology",
           "method": "_building_work_busy",
-          "line": 63,
+          "line": 100,
           "argumentCount": 1
         },
         {
@@ -9080,7 +9019,7 @@
           "caller": "_queue_train",
           "provider": "ai_economy",
           "method": "ai_unit_cost",
-          "line": 67,
+          "line": 104,
           "argumentCount": 1
         },
         {
@@ -9088,7 +9027,7 @@
           "caller": "_order_train",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 83,
+          "line": 120,
           "argumentCount": 1
         },
         {
@@ -9096,7 +9035,7 @@
           "caller": "_order_train",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 85,
+          "line": 122,
           "argumentCount": 1
         },
         {
@@ -9104,7 +9043,7 @@
           "caller": "_process_trainings",
           "provider": "entity_factory",
           "method": "_spawn_unit",
-          "line": 121,
+          "line": 158,
           "argumentCount": 4
         },
         {
@@ -9112,7 +9051,7 @@
           "caller": "_process_trainings",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 124,
+          "line": 161,
           "argumentCount": 1
         },
         {
@@ -9120,7 +9059,7 @@
           "caller": "_process_trainings",
           "provider": "campaign",
           "method": "_unit_name",
-          "line": 124,
+          "line": 161,
           "argumentCount": 1
         }
       ]
@@ -9185,7 +9124,7 @@
           "caller": "_index_remember",
           "provider": "command_groups",
           "method": "_nav_layer",
-          "line": 108,
+          "line": 115,
           "argumentCount": 1
         },
         {
@@ -9193,7 +9132,7 @@
           "caller": "_index_remember",
           "provider": "interaction_paths",
           "method": "_footprint_cells",
-          "line": 109,
+          "line": 116,
           "argumentCount": 1
         },
         {
@@ -9201,7 +9140,7 @@
           "caller": "_index_sync",
           "provider": "command_groups",
           "method": "_nav_layer",
-          "line": 132,
+          "line": 139,
           "argumentCount": 1
         },
         {
@@ -9209,7 +9148,7 @@
           "caller": "_separate_unit",
           "provider": "abilities",
           "method": "_spd_mult",
-          "line": 242,
+          "line": 249,
           "argumentCount": 1
         },
         {
@@ -9217,7 +9156,7 @@
           "caller": "_separate_unit",
           "provider": "battle_simulation",
           "method": "_place_unit",
-          "line": 248,
+          "line": 255,
           "argumentCount": 1
         },
         {
@@ -9225,7 +9164,7 @@
           "caller": "_connected_separation_cell",
           "provider": "command_groups",
           "method": "_nav_layer",
-          "line": 261,
+          "line": 268,
           "argumentCount": 1
         },
         {
@@ -9233,7 +9172,7 @@
           "caller": "_connected_separation_cell_script",
           "provider": "command_groups",
           "method": "_nav_layer",
-          "line": 267,
+          "line": 274,
           "argumentCount": 1
         }
       ]
@@ -9547,7 +9486,7 @@
           "caller": "_step_unit",
           "provider": "spatial_index",
           "method": "_separate_unit",
-          "line": 26,
+          "line": 28,
           "argumentCount": 1
         },
         {
@@ -9555,7 +9494,7 @@
           "caller": "_step_unit_profiled",
           "provider": "spatial_index",
           "method": "_separate_unit",
-          "line": 44,
+          "line": 49,
           "argumentCount": 1
         },
         {
@@ -9563,7 +9502,7 @@
           "caller": "_prepare_action",
           "provider": "transport_orders",
           "method": "_retry_unload",
-          "line": 91,
+          "line": 96,
           "argumentCount": 1
         },
         {
@@ -9571,7 +9510,7 @@
           "caller": "_prepare_action",
           "provider": "command_groups",
           "method": "_cancel_unit_command",
-          "line": 97,
+          "line": 102,
           "argumentCount": 1
         },
         {
@@ -9579,14 +9518,14 @@
           "caller": "_prepare_action",
           "provider": "combat",
           "method": "_nearest_enemy",
-          "line": 99
+          "line": 104
         },
         {
           "file": "simulation/battle/unit_actions.gd",
           "caller": "_prepare_action",
           "provider": "combat",
           "method": "_nearest_enemy",
-          "line": 103,
+          "line": 108,
           "argumentCount": 2
         },
         {
@@ -9594,7 +9533,7 @@
           "caller": "_follow_working_members",
           "provider": "movement",
           "method": "_path_to",
-          "line": 122,
+          "line": 127,
           "argumentCount": 3
         },
         {
@@ -9602,7 +9541,7 @@
           "caller": "_step_move",
           "provider": "movement",
           "method": "_path_to",
-          "line": 135,
+          "line": 140,
           "argumentCount": 3
         },
         {
@@ -9610,7 +9549,7 @@
           "caller": "_step_move",
           "provider": "movement",
           "method": "_follow",
-          "line": 139,
+          "line": 144,
           "argumentCount": 2
         },
         {
@@ -9618,7 +9557,7 @@
           "caller": "_step_join",
           "provider": "command_groups",
           "method": "_cancel_unit_command",
-          "line": 149,
+          "line": 154,
           "argumentCount": 1
         },
         {
@@ -9626,7 +9565,7 @@
           "caller": "_step_join",
           "provider": "interaction_paths",
           "method": "_edge_cell_distance",
-          "line": 150,
+          "line": 155,
           "argumentCount": 2
         },
         {
@@ -9634,7 +9573,7 @@
           "caller": "_step_join",
           "provider": "command_groups",
           "method": "_cancel_unit_command",
-          "line": 153,
+          "line": 158,
           "argumentCount": 1
         },
         {
@@ -9642,7 +9581,7 @@
           "caller": "_step_join",
           "provider": "officer_teams",
           "method": "_auto_assign_new_team",
-          "line": 156,
+          "line": 161,
           "argumentCount": 1
         },
         {
@@ -9650,7 +9589,7 @@
           "caller": "_step_join",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 157,
+          "line": 162,
           "argumentCount": 1
         },
         {
@@ -9658,7 +9597,7 @@
           "caller": "_step_join",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 158,
+          "line": 163,
           "argumentCount": 1
         },
         {
@@ -9666,7 +9605,7 @@
           "caller": "_step_join",
           "provider": "interaction_paths",
           "method": "_edge_interaction_path",
-          "line": 160,
+          "line": 165,
           "argumentCount": 2
         },
         {
@@ -9674,7 +9613,7 @@
           "caller": "_step_join",
           "provider": "command_groups",
           "method": "_cancel_unit_command",
-          "line": 161,
+          "line": 166,
           "argumentCount": 1
         },
         {
@@ -9682,7 +9621,7 @@
           "caller": "_step_join",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 161,
+          "line": 166,
           "argumentCount": 1
         },
         {
@@ -9690,16 +9629,8 @@
           "caller": "_step_join",
           "provider": "movement",
           "method": "_follow",
-          "line": 162,
+          "line": 167,
           "argumentCount": 2
-        },
-        {
-          "file": "simulation/battle/unit_actions.gd",
-          "caller": "_step_board",
-          "provider": "battle_simulation",
-          "method": "_feedback",
-          "line": 175,
-          "argumentCount": 1
         },
         {
           "file": "simulation/battle/unit_actions.gd",
@@ -9712,9 +9643,17 @@
         {
           "file": "simulation/battle/unit_actions.gd",
           "caller": "_step_board",
+          "provider": "battle_simulation",
+          "method": "_feedback",
+          "line": 185,
+          "argumentCount": 1
+        },
+        {
+          "file": "simulation/battle/unit_actions.gd",
+          "caller": "_step_board",
           "provider": "movement",
           "method": "_follow",
-          "line": 181,
+          "line": 186,
           "argumentCount": 2
         },
         {
@@ -9722,7 +9661,7 @@
           "caller": "_step_board",
           "provider": "transport_orders",
           "method": "_attach_to_ship",
-          "line": 184,
+          "line": 189,
           "argumentCount": 2
         },
         {
@@ -9730,7 +9669,7 @@
           "caller": "_step_gather",
           "provider": "interaction_paths",
           "method": "_edge_cell_distance",
-          "line": 194,
+          "line": 199,
           "argumentCount": 2
         },
         {
@@ -9738,7 +9677,7 @@
           "caller": "_step_gather",
           "provider": "interaction_paths",
           "method": "_edge_interaction_choice",
-          "line": 196,
+          "line": 201,
           "argumentCount": 2
         },
         {
@@ -9746,7 +9685,7 @@
           "caller": "_step_gather",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 202,
+          "line": 207,
           "argumentCount": 1
         },
         {
@@ -9754,7 +9693,7 @@
           "caller": "_step_gather",
           "provider": "movement",
           "method": "_follow",
-          "line": 203,
+          "line": 208,
           "argumentCount": 2
         },
         {
@@ -9762,7 +9701,7 @@
           "caller": "_step_deliver",
           "provider": "harvest_orders",
           "method": "_deposits_for",
-          "line": 211,
+          "line": 216,
           "argumentCount": 2
         },
         {
@@ -9770,7 +9709,7 @@
           "caller": "_step_deliver",
           "provider": "interaction_paths",
           "method": "_deposit_ready",
-          "line": 214,
+          "line": 219,
           "argumentCount": 2
         },
         {
@@ -9778,7 +9717,7 @@
           "caller": "_step_deliver",
           "provider": "harvest_orders",
           "method": "_deposit_carry",
-          "line": 219,
+          "line": 224,
           "argumentCount": 1
         },
         {
@@ -9786,7 +9725,7 @@
           "caller": "_step_deliver",
           "provider": "interaction_paths",
           "method": "_edge_interaction_path",
-          "line": 230,
+          "line": 235,
           "argumentCount": 4
         },
         {
@@ -9794,7 +9733,7 @@
           "caller": "_step_deliver",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 233,
+          "line": 238,
           "argumentCount": 1
         },
         {
@@ -9802,7 +9741,7 @@
           "caller": "_step_deliver",
           "provider": "movement",
           "method": "_follow",
-          "line": 234,
+          "line": 239,
           "argumentCount": 2
         },
         {
@@ -9810,31 +9749,31 @@
           "caller": "_step_repair",
           "provider": "spatial_index",
           "method": "_contains_unit",
-          "line": 253,
-          "argumentCount": 1
-        },
-        {
-          "file": "simulation/battle/unit_actions.gd",
-          "caller": "_step_repair",
-          "provider": "command_groups",
-          "method": "_cancel_unit_command",
-          "line": 254,
-          "argumentCount": 1
-        },
-        {
-          "file": "simulation/battle/unit_actions.gd",
-          "caller": "_step_repair",
-          "provider": "command_groups",
-          "method": "_cancel_unit_command",
-          "line": 256,
-          "argumentCount": 1
-        },
-        {
-          "file": "simulation/battle/unit_actions.gd",
-          "caller": "_step_repair",
-          "provider": "command_groups",
-          "method": "_cancel_unit_command",
           "line": 258,
+          "argumentCount": 1
+        },
+        {
+          "file": "simulation/battle/unit_actions.gd",
+          "caller": "_step_repair",
+          "provider": "command_groups",
+          "method": "_cancel_unit_command",
+          "line": 259,
+          "argumentCount": 1
+        },
+        {
+          "file": "simulation/battle/unit_actions.gd",
+          "caller": "_step_repair",
+          "provider": "command_groups",
+          "method": "_cancel_unit_command",
+          "line": 261,
+          "argumentCount": 1
+        },
+        {
+          "file": "simulation/battle/unit_actions.gd",
+          "caller": "_step_repair",
+          "provider": "command_groups",
+          "method": "_cancel_unit_command",
+          "line": 263,
           "argumentCount": 1
         },
         {
@@ -9842,7 +9781,7 @@
           "caller": "_step_repair",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 258,
+          "line": 263,
           "argumentCount": 1
         },
         {
@@ -9850,7 +9789,7 @@
           "caller": "_step_repair",
           "provider": "interaction_paths",
           "method": "_dist_to_obj",
-          "line": 259,
+          "line": 264,
           "argumentCount": 2
         },
         {
@@ -9858,7 +9797,7 @@
           "caller": "_step_repair",
           "provider": "interaction_paths",
           "method": "_interaction_path",
-          "line": 261,
+          "line": 266,
           "argumentCount": 3
         },
         {
@@ -9866,7 +9805,7 @@
           "caller": "_step_repair",
           "provider": "command_groups",
           "method": "_cancel_unit_command",
-          "line": 262,
+          "line": 267,
           "argumentCount": 1
         },
         {
@@ -9874,7 +9813,7 @@
           "caller": "_step_repair",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 262,
+          "line": 267,
           "argumentCount": 1
         },
         {
@@ -9882,7 +9821,7 @@
           "caller": "_step_repair",
           "provider": "movement",
           "method": "_follow",
-          "line": 263,
+          "line": 268,
           "argumentCount": 2
         },
         {
@@ -9890,7 +9829,7 @@
           "caller": "_step_repair",
           "provider": "construction_orders",
           "method": "_do_repair",
-          "line": 269,
+          "line": 274,
           "argumentCount": 2
         },
         {
@@ -9898,7 +9837,7 @@
           "caller": "_step_repair",
           "provider": "command_groups",
           "method": "_cancel_unit_command",
-          "line": 269,
+          "line": 274,
           "argumentCount": 1
         },
         {
@@ -9906,7 +9845,7 @@
           "caller": "_step_build",
           "provider": "construction_orders",
           "method": "_valid_build_worker",
-          "line": 276,
+          "line": 281,
           "argumentCount": 2
         },
         {
@@ -9914,7 +9853,7 @@
           "caller": "_step_build",
           "provider": "interaction_paths",
           "method": "_edge_cell_distance",
-          "line": 278,
+          "line": 283,
           "argumentCount": 2
         },
         {
@@ -9922,7 +9861,7 @@
           "caller": "_step_build",
           "provider": "construction_orders",
           "method": "_site_entry_path",
-          "line": 280,
+          "line": 285,
           "argumentCount": 2
         },
         {
@@ -9930,7 +9869,7 @@
           "caller": "_step_build",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 282,
+          "line": 287,
           "argumentCount": 1
         },
         {
@@ -9938,7 +9877,7 @@
           "caller": "_step_build",
           "provider": "movement",
           "method": "_follow",
-          "line": 283,
+          "line": 288,
           "argumentCount": 2
         },
         {
@@ -9946,7 +9885,7 @@
           "caller": "_step_attack",
           "provider": "spatial_index",
           "method": "_contains_unit",
-          "line": 292,
+          "line": 297,
           "argumentCount": 1
         },
         {
@@ -9954,7 +9893,7 @@
           "caller": "_step_attack",
           "provider": "command_groups",
           "method": "_cancel_unit_command",
-          "line": 293,
+          "line": 298,
           "argumentCount": 1
         },
         {
@@ -9962,7 +9901,7 @@
           "caller": "_step_attack",
           "provider": "spatial_index",
           "method": "_unit_cell",
-          "line": 311,
+          "line": 316,
           "argumentCount": 1
         },
         {
@@ -9970,7 +9909,7 @@
           "caller": "_step_attack",
           "provider": "spatial_index",
           "method": "_unit_cell",
-          "line": 311,
+          "line": 316,
           "argumentCount": 1
         },
         {
@@ -9978,7 +9917,7 @@
           "caller": "_step_attack",
           "provider": "combat",
           "method": "_melee_line_clear",
-          "line": 313,
+          "line": 318,
           "argumentCount": 2
         },
         {
@@ -9986,7 +9925,7 @@
           "caller": "_step_attack",
           "provider": "combat",
           "method": "_fire_attack",
-          "line": 319,
+          "line": 324,
           "argumentCount": 2
         },
         {
@@ -9994,7 +9933,7 @@
           "caller": "_step_attack",
           "provider": "command_groups",
           "method": "_cancel_unit_command",
-          "line": 321,
+          "line": 326,
           "argumentCount": 1
         },
         {
@@ -10002,7 +9941,7 @@
           "caller": "_step_attack",
           "provider": "movement",
           "method": "_follow",
-          "line": 327,
+          "line": 332,
           "argumentCount": 2
         },
         {
@@ -10010,7 +9949,7 @@
           "caller": "_repath_attack",
           "provider": "interaction_paths",
           "method": "_edge_interaction_path",
-          "line": 337,
+          "line": 342,
           "argumentCount": 2
         },
         {
@@ -10018,7 +9957,7 @@
           "caller": "_repath_attack",
           "provider": "movement",
           "method": "_path_to",
-          "line": 339,
+          "line": 344,
           "argumentCount": 3
         },
         {
@@ -10026,7 +9965,7 @@
           "caller": "_try_native_attack",
           "provider": "combat",
           "method": "_fire_attack",
-          "line": 354,
+          "line": 358,
           "argumentCount": 2
         },
         {
@@ -10034,7 +9973,7 @@
           "caller": "_try_native_attack",
           "provider": "movement",
           "method": "_follow",
-          "line": 356,
+          "line": 360,
           "argumentCount": 2
         },
         {
@@ -10042,7 +9981,7 @@
           "caller": "_try_native_attack",
           "provider": "spatial_index",
           "method": "_separate_unit",
-          "line": 360,
+          "line": 364,
           "argumentCount": 1
         }
       ]
@@ -10106,7 +10045,7 @@
           "caller": "_clear_pending",
           "provider": "abilities",
           "method": "_reset_jimou",
-          "line": 24,
+          "line": 23,
           "argumentCount": 0
         },
         {
@@ -10114,7 +10053,7 @@
           "caller": "_execute_order_context",
           "provider": "selection",
           "method": "_own_object_at",
-          "line": 34,
+          "line": 33,
           "argumentCount": 1
         },
         {
@@ -10122,7 +10061,7 @@
           "caller": "_execute_order_context",
           "provider": "construction_orders",
           "method": "_order_build",
-          "line": 36,
+          "line": 35,
           "argumentCount": 1
         },
         {
@@ -10130,7 +10069,7 @@
           "caller": "_execute_order_context",
           "provider": "harvest_orders",
           "method": "_resource_at",
-          "line": 38,
+          "line": 37,
           "argumentCount": 1
         },
         {
@@ -10138,7 +10077,7 @@
           "caller": "_execute_order_context",
           "provider": "harvest_orders",
           "method": "_order_gather",
-          "line": 40,
+          "line": 39,
           "argumentCount": 1
         },
         {
@@ -10146,7 +10085,7 @@
           "caller": "_execute_order_at",
           "provider": "selection",
           "method": "_enemy_at",
-          "line": 54,
+          "line": 53,
           "argumentCount": 1
         },
         {
@@ -10154,7 +10093,7 @@
           "caller": "_execute_order_at",
           "provider": "selection",
           "method": "_own_object_at",
-          "line": 58,
+          "line": 57,
           "argumentCount": 1
         },
         {
@@ -10162,7 +10101,7 @@
           "caller": "_execute_order_at",
           "provider": "construction_orders",
           "method": "_order_build",
-          "line": 60,
+          "line": 59,
           "argumentCount": 1
         },
         {
@@ -10170,7 +10109,7 @@
           "caller": "_execute_order_at",
           "provider": "selection",
           "method": "_neutral_object_at",
-          "line": 63,
+          "line": 62,
           "argumentCount": 1
         },
         {
@@ -10178,7 +10117,7 @@
           "caller": "_execute_order_at",
           "provider": "harvest_orders",
           "method": "_resource_at",
-          "line": 68,
+          "line": 67,
           "argumentCount": 1
         },
         {
@@ -10186,7 +10125,7 @@
           "caller": "_execute_order_at",
           "provider": "harvest_orders",
           "method": "_order_gather",
-          "line": 70,
+          "line": 69,
           "argumentCount": 1
         },
         {
@@ -10194,7 +10133,7 @@
           "caller": "_resolve_pending",
           "provider": "abilities",
           "method": "_jimou_cast_at",
-          "line": 79,
+          "line": 78,
           "argumentCount": 1
         },
         {
@@ -10202,7 +10141,7 @@
           "caller": "_resolve_pending",
           "provider": "abilities",
           "method": "_duel_at",
-          "line": 81,
+          "line": 80,
           "argumentCount": 1
         },
         {
@@ -10210,7 +10149,7 @@
           "caller": "_resolve_pending",
           "provider": "selection",
           "method": "_attack_target_at",
-          "line": 86,
+          "line": 85,
           "argumentCount": 1
         },
         {
@@ -10218,7 +10157,7 @@
           "caller": "_resolve_pending",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 88,
+          "line": 87,
           "argumentCount": 1
         },
         {
@@ -10226,7 +10165,7 @@
           "caller": "_resolve_pending",
           "provider": "selection",
           "method": "_own_object_at",
-          "line": 93,
+          "line": 92,
           "argumentCount": 1
         },
         {
@@ -10234,7 +10173,7 @@
           "caller": "_resolve_pending",
           "provider": "construction_orders",
           "method": "_order_build",
-          "line": 96,
+          "line": 95,
           "argumentCount": 1
         },
         {
@@ -10242,7 +10181,7 @@
           "caller": "_resolve_pending",
           "provider": "harvest_orders",
           "method": "_resource_at",
-          "line": 98,
+          "line": 97,
           "argumentCount": 1
         },
         {
@@ -10250,7 +10189,7 @@
           "caller": "_resolve_pending",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 100,
+          "line": 99,
           "argumentCount": 1
         },
         {
@@ -10258,7 +10197,7 @@
           "caller": "_resolve_pending",
           "provider": "harvest_orders",
           "method": "_order_gather",
-          "line": 103,
+          "line": 102,
           "argumentCount": 1
         },
         {
@@ -10266,7 +10205,7 @@
           "caller": "_resolve_pending",
           "provider": "selection",
           "method": "_own_object_at",
-          "line": 105,
+          "line": 104,
           "argumentCount": 1
         },
         {
@@ -10274,7 +10213,7 @@
           "caller": "_resolve_pending",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 107,
+          "line": 106,
           "argumentCount": 1
         },
         {
@@ -10282,7 +10221,7 @@
           "caller": "_resolve_pending",
           "provider": "construction_orders",
           "method": "_order_repair",
-          "line": 110,
+          "line": 109,
           "argumentCount": 1
         },
         {
@@ -10290,7 +10229,7 @@
           "caller": "_resolve_pending",
           "provider": "construction_orders",
           "method": "_build_site_at",
-          "line": 113,
+          "line": 112,
           "argumentCount": 2
         },
         {
@@ -10298,7 +10237,7 @@
           "caller": "_resolve_pending",
           "provider": "transport_orders",
           "method": "_cmd_board_at",
-          "line": 116,
+          "line": 115,
           "argumentCount": 1
         },
         {
@@ -10306,7 +10245,7 @@
           "caller": "_resolve_pending",
           "provider": "selection",
           "method": "_own_object_at",
-          "line": 118,
+          "line": 117,
           "argumentCount": 1
         },
         {
@@ -10314,7 +10253,7 @@
           "caller": "_resolve_pending",
           "provider": "officer_teams",
           "method": "_order_join",
-          "line": 119,
+          "line": 118,
           "argumentCount": 1
         },
         {
@@ -10322,7 +10261,7 @@
           "caller": "_resolve_pending",
           "provider": "transport_orders",
           "method": "_cmd_unload_at",
-          "line": 122,
+          "line": 121,
           "argumentCount": 1
         },
         {
@@ -10330,7 +10269,7 @@
           "caller": "_selected_has_worker",
           "provider": "technology",
           "method": "_is_worker_unit",
-          "line": 130,
+          "line": 129,
           "argumentCount": 1
         },
         {
@@ -10338,7 +10277,7 @@
           "caller": "_selected_has_nonworker_attacker",
           "provider": "technology",
           "method": "_is_worker_unit",
-          "line": 138,
+          "line": 137,
           "argumentCount": 1
         },
         {
@@ -10346,7 +10285,7 @@
           "caller": "_attack_selected",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 146,
+          "line": 145,
           "argumentCount": 1
         },
         {
@@ -10354,7 +10293,7 @@
           "caller": "_attack_selected",
           "provider": "command_groups",
           "method": "_command_units",
-          "line": 148,
+          "line": 147,
           "argumentCount": 1
         },
         {
@@ -10362,7 +10301,7 @@
           "caller": "_attack_selected",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 149,
+          "line": 148,
           "argumentCount": 1
         },
         {
@@ -10370,7 +10309,7 @@
           "caller": "_attack_units",
           "provider": "command_groups",
           "method": "_cancel_unit_command",
-          "line": 162,
+          "line": 161,
           "argumentCount": 1
         },
         {
@@ -10378,7 +10317,7 @@
           "caller": "_move_autonomous",
           "provider": "movement",
           "method": "_path_to",
-          "line": 172,
+          "line": 171,
           "argumentCount": 3
         },
         {
@@ -10386,7 +10325,7 @@
           "caller": "_move_autonomous",
           "provider": "command_groups",
           "method": "_cancel_unit_command",
-          "line": 174,
+          "line": 173,
           "argumentCount": 1
         },
         {
@@ -10394,7 +10333,7 @@
           "caller": "_move_selected_to",
           "provider": "command_groups",
           "method": "_command_units",
-          "line": 182,
+          "line": 181,
           "argumentCount": 1
         },
         {
@@ -10402,7 +10341,7 @@
           "caller": "_move_selected_to",
           "provider": "command_groups",
           "method": "_nav_layer",
-          "line": 190,
+          "line": 189,
           "argumentCount": 1
         },
         {
@@ -10410,7 +10349,7 @@
           "caller": "_move_selected_to",
           "provider": "movement",
           "method": "_cell_of_px",
-          "line": 192,
+          "line": 191,
           "argumentCount": 2
         },
         {
@@ -10418,7 +10357,7 @@
           "caller": "_move_selected_to",
           "provider": "movement",
           "method": "_path_to",
-          "line": 193,
+          "line": 192,
           "argumentCount": 3
         },
         {
@@ -10426,7 +10365,7 @@
           "caller": "_move_selected_to",
           "provider": "movement",
           "method": "_cell_of_px",
-          "line": 194,
+          "line": 193,
           "argumentCount": 2
         },
         {
@@ -10434,7 +10373,7 @@
           "caller": "_move_selected_to",
           "provider": "command_groups",
           "method": "_cancel_unit_command",
-          "line": 201,
+          "line": 200,
           "argumentCount": 1
         },
         {
@@ -10442,7 +10381,7 @@
           "caller": "_move_selected_to",
           "provider": "movement",
           "method": "_anchor_of_cell",
-          "line": 206,
+          "line": 205,
           "argumentCount": 1
         },
         {
@@ -10450,7 +10389,7 @@
           "caller": "_move_selected_to",
           "provider": "abilities",
           "method": "_formation_target_cell",
-          "line": 206,
+          "line": 205,
           "argumentCount": 2
         },
         {
@@ -10458,7 +10397,7 @@
           "caller": "_move_selected_to",
           "provider": "movement",
           "method": "_march_destination",
-          "line": 209,
+          "line": 208,
           "argumentCount": 3
         },
         {
@@ -10466,7 +10405,7 @@
           "caller": "_move_selected_to",
           "provider": "command_groups",
           "method": "_nav_layer",
-          "line": 211,
+          "line": 210,
           "argumentCount": 1
         },
         {
@@ -10474,7 +10413,7 @@
           "caller": "_move_selected_to",
           "provider": "movement",
           "method": "_cell_of_px",
-          "line": 213,
+          "line": 212,
           "argumentCount": 2
         },
         {
@@ -10482,7 +10421,7 @@
           "caller": "_move_selected_to",
           "provider": "movement",
           "method": "_path_to",
-          "line": 219,
+          "line": 218,
           "argumentCount": 3
         },
         {
@@ -10490,7 +10429,7 @@
           "caller": "_move_selected_to",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 233,
+          "line": 232,
           "argumentCount": 1
         },
         {
@@ -10498,7 +10437,7 @@
           "caller": "_move_selected_to",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 235,
+          "line": 234,
           "argumentCount": 1
         },
         {
@@ -10506,7 +10445,7 @@
           "caller": "_context_mode",
           "provider": "selection",
           "method": "_own_object_at",
-          "line": 244,
+          "line": 243,
           "argumentCount": 1
         },
         {
@@ -10514,7 +10453,7 @@
           "caller": "_context_mode",
           "provider": "harvest_orders",
           "method": "_resource_at",
-          "line": 246,
+          "line": 245,
           "argumentCount": 1
         },
         {
@@ -10522,7 +10461,7 @@
           "caller": "_context_mode",
           "provider": "selection",
           "method": "_attack_target_at",
-          "line": 247,
+          "line": 246,
           "argumentCount": 1
         },
         {
@@ -10530,6 +10469,14 @@
           "caller": "submit_point_order",
           "provider": "selection",
           "method": "_attack_target_at",
+          "line": 258,
+          "argumentCount": 1
+        },
+        {
+          "file": "simulation/battle/world_orders.gd",
+          "caller": "submit_point_order",
+          "provider": "selection",
+          "method": "_own_object_at",
           "line": 259,
           "argumentCount": 1
         },
@@ -10538,15 +10485,7 @@
           "caller": "submit_point_order",
           "provider": "selection",
           "method": "_own_object_at",
-          "line": 260,
-          "argumentCount": 1
-        },
-        {
-          "file": "simulation/battle/world_orders.gd",
-          "caller": "submit_point_order",
-          "provider": "selection",
-          "method": "_own_object_at",
-          "line": 262,
+          "line": 261,
           "argumentCount": 1
         },
         {
@@ -10554,7 +10493,7 @@
           "caller": "submit_point_order",
           "provider": "harvest_orders",
           "method": "_resource_at",
-          "line": 266,
+          "line": 265,
           "argumentCount": 1
         },
         {
@@ -10562,7 +10501,7 @@
           "caller": "submit_point_order",
           "provider": "transport_orders",
           "method": "_own_ship_at",
-          "line": 267,
+          "line": 266,
           "argumentCount": 1
         },
         {
@@ -10570,7 +10509,7 @@
           "caller": "submit_point_order",
           "provider": "abilities",
           "method": "jimou_target_at",
-          "line": 271,
+          "line": 270,
           "argumentCount": 2
         },
         {
@@ -10578,7 +10517,7 @@
           "caller": "submit_point_order",
           "provider": "selection",
           "method": "_enemy_at",
-          "line": 272,
+          "line": 271,
           "argumentCount": 1
         },
         {
@@ -10586,7 +10525,7 @@
           "caller": "submit_point_order",
           "provider": "selection",
           "method": "_own_object_at",
-          "line": 274,
+          "line": 273,
           "argumentCount": 1
         },
         {
@@ -10594,7 +10533,7 @@
           "caller": "submit_point_order",
           "provider": "harvest_orders",
           "method": "_resource_at",
-          "line": 275,
+          "line": 274,
           "argumentCount": 1
         },
         {
@@ -10602,7 +10541,7 @@
           "caller": "submit_point_order",
           "provider": "selection",
           "method": "_enemy_at",
-          "line": 276,
+          "line": 275,
           "argumentCount": 1
         },
         {
@@ -10610,7 +10549,7 @@
           "caller": "submit_point_order",
           "provider": "selection",
           "method": "_neutral_object_at",
-          "line": 286,
+          "line": 285,
           "argumentCount": 1
         },
         {
@@ -10618,7 +10557,7 @@
           "caller": "submit_point_order",
           "provider": "battle_simulation",
           "method": "_feedback",
-          "line": 293,
+          "line": 292,
           "argumentCount": 1
         }
       ]

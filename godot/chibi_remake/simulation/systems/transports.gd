@@ -28,23 +28,27 @@ func ship_for(unit: Dictionary) -> Dictionary:
 ## Derived carrier fields are projected without modifying authoritative unit records.
 static func snapshot_fields(units: Array) -> Dictionary:
 	var totals := {}; var fields := {}
+	var carriers: Array[int] = []
+	var transport_types := Roles.ids("transports")
 	for unit in units:
+		if transport_types.has(int(unit.get("unit", -1))): carriers.append(int(unit.uid))
 		if not bool(unit.get("attached",false)): continue
 		if not bool(unit.get("alive",false)) or float(unit.get("die_t",-1)) >= 0:
 			fields[int(unit.uid)] = {"aboard_uid":-1}; continue
 		var uid := int(unit.get("aboard_uid",-1))
 		if not totals.has(uid): totals[uid] = {"n":0,"hp":0.0}
 		totals[uid].n += 1; totals[uid].hp += float(unit.hp)
-	for unit in units:
-		if not Roles.is_transport(int(unit.get("unit",-1))): continue
-		var total: Dictionary = totals.get(int(unit.uid),{"n":0,"hp":0.0})
-		if not fields.has(int(unit.uid)): fields[int(unit.uid)] = {}
-		fields[int(unit.uid)].merge({"carry_n":int(total.n),"carry_hp":float(total.hp),"loaded":int(total.n)>0})
+	for uid in carriers:
+		var total: Dictionary = totals.get(uid, {"n": 0, "hp": 0.0})
+		if not fields.has(uid): fields[uid] = {}
+		fields[uid].merge({"carry_n": int(total.n), "carry_hp": float(total.hp), "loaded": int(total.n) > 0})
 	return fields
 
 func reconcile() -> void:
-	var fields := snapshot_fields(host.units)
-	for unit in host.units:
+	var units: Array = host.units
+	var fields := snapshot_fields(units)
+	if fields.is_empty(): return
+	for unit in units:
 		var uid := int(unit.uid)
 		if not fields.has(uid): continue
 		for key in fields[uid]: unit[key] = fields[uid][key]

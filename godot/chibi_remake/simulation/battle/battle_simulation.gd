@@ -111,7 +111,8 @@ func connect_native() -> void:
 	var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel(true)
 	if kernel==null:return
 	var abort:=preload("res://composition_contract.gd").abort_if_broken.bind("native unit commands",[{"provider":"native unit commands","method":"provider lifetime"}])
-	native_unit_port=kernel.make_unit_port(ports._fire_attack,ports._repath_attack,ports._follow,ports._separate_unit,ports._step_unit,ports._die_step,battle.nav.native_query_context,abort)
+	# The batch calls its fallback only when attack_fast has already rejected the unit.
+	native_unit_port=kernel.make_unit_port(ports._fire_attack,ports._repath_attack,ports._follow,ports._separate_unit,ports._step_unit.bind(true),ports._die_step,battle.nav.native_query_context,abort)
 
 func disconnect_native() -> void:
 	if native_unit_port!=null:native_unit_port.release_commands()

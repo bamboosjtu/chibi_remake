@@ -10,7 +10,7 @@ static func eligible(u: Dictionary) -> bool:
 		and Combat.can_attack(u)
 
 static func step(host: RefCounted, u: Dictionary, nearest_enemy: Callable) -> void:
-	if not eligible(u) or (int(host.sim_tick) + int(u.uid)) % 6 != 0: return
+	if (int(host.sim_tick) + int(u.uid)) % 6 != 0 or not eligible(u): return
 	var radius: float = minf(8.0, float(u.get("vision", 8))) * float(host.tile_w)
 	var enemy: Dictionary = nearest_enemy.call(u, radius)
 	if enemy.is_empty(): return

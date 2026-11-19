@@ -7,6 +7,9 @@ func _initialize() -> void:
 
 func run() -> void:
 	var game: Node = root.get_node("Game")
+	var canonical_fixture := {"z":[null,true,false,1,1.0], "a":{"2":"quoted \"text\"", "10":"中文"}}
+	assert(game.save_canonical_text(canonical_fixture) == '{"a":{"10":"中文","2":"quoted \\"text\\""},"z":[null,true,false,1,1]}', "Canonical v9 bytes must retain recursive lexical ordering, escaping and integer normalization")
+	assert(game.save_canonical_text({2:"two",10:"ten"}) == '{"10":"ten","2":"two"}', "Integer dictionary keys retain string ordering")
 	var battle = load("res://main.tscn").instantiate()
 	root.add_child(battle); battle.set_process(false)
 	var good: Dictionary = game.snapshot(battle.units, battle.commands.world._resources(), battle.saver.save_extra())

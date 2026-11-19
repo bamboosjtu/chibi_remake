@@ -1,7 +1,6 @@
 extends RefCounted
 const PROXY_FIELDS := ["tile_w", "tile_hw", "tile_hh", "map_data", "astar", "water_astar", "has_water", "occupancy", "version", "gates", "gate_cells", "blocked_cells", "resource_cells", "_route_owner", "_planning_gates", "_shape_graphs", "_shape_pending", "topology_edges", "geometry_revision"]
 ## Shared navigation grids and occupancy.
-const UnitFootprint = preload("res://simulation/systems/unit_footprint.gd")
 
 var tile_w := 44.0              # 来自 map_data.tileW
 

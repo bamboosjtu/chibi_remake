@@ -1,7 +1,6 @@
 extends RefCounted
 ## ai orders: composed battle behavior.
 const State = preload("res://simulation/battle_state.gd")
-const Config = preload("res://simulation/battle_config.gd")
 const REQUIRED_SERVICES := {"ai_economy": ["_ai_forming", "_working_construction_team", "ai_group_of", "ai_production_building"], "combat": ["_hostile_owners"], "harvest_orders": ["_yield_of"]}
 const Targets = preload("res://simulation/systems/ai_targets.gd")
 var battle: State

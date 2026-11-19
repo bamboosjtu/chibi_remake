@@ -76,7 +76,7 @@ release/
 - 文件复制、声明缺失或启动器替换失败时，旧指针保持不变。
 - 启动器优先读取主指针，损坏时读取备份；运行中的旧游戏不会因指针切换而更换文件。
 
-发布与分卷不要求签名、证书或 attestation。SHA-256 用于完整性检查；机器验收、不可变版本目录和原子指针切换继续执行。
+代码签名与 detached checksum 签名在当前发布策略中仍是可选项；SHA-256 用于完整性检查。`tools/sign_release_checksums.ps1` 提供分离签名的写入/验签夹具，正式发行若启用签名须配置证书并把签名纳入发布检查。机器验收、不可变版本目录和原子指针切换继续执行。
 
 ## 6. 回滚与清理
 
@@ -84,7 +84,7 @@ release/
 
 ## 7. 本地试玩与发布打包
 
-GitHub Actions 配置三个工作流。`contracts` 检查静态契约和输入声明。`ci` 检查语法、34 图启动、固定摘要、存档和四图续跑，并为地形冒烟检查拉取两项 LFS 源图。按需触发的 `release-regressions` 使用运行素材执行发布套件。统一入口 `tools/release.ps1` 提供两个模式。
+GitHub Actions 配置三个工作流。`contracts` 检查静态契约和输入声明。`ci` 检查语法、34 图启动、固定摘要、存档和四图续跑，并为地形冒烟检查拉取两项 LFS 源图。`release-regressions` 在 PR、定时任务和手动触发时运行：PR 先跑 Windows 发布安全套件，非 PR 运行完整源码 release 套件（需要运行素材/LFS）；统一入口 `tools/release.ps1` 提供两个模式。
 
 ```powershell
 # 试玩：构建并安装到 release/versions，允许未提交改动
@@ -107,7 +107,7 @@ gh release upload v0.1.1 dist/package/* --clobber
 
 - 下载包后先运行 `join-release.ps1` 合并分卷并校验 SHA256，再启动 `ChibiRTS.exe`。
 
-发布和分卷均不要求签名。验收、完整性哈希及原子版本切换继续作为发行门禁。
+发布和分卷当前不强制代码签名或 detached checksum 签名；若启用，`tools/sign_release_checksums.ps1` 负责写入/验签，验收、完整性哈希及原子版本切换继续作为发行门禁。
 
 地形缓存键包含实际引擎二进制 SHA-256、源输入、烘焙脚本和编码参数；同版本号的不同引擎构建也必须重新烘焙。`tools/inputs/terrain_equivalence.sha256` 固化整改前运行 JPEG 经既有 q78 传输编码后的历史哈希，配套 JSON 记录源输入身份、34 图几何摘要及 LOD 数量。该快照来自独立历史缓存，并逐项核对源素材重建结果；不可用生成结果自动覆盖预期。
 

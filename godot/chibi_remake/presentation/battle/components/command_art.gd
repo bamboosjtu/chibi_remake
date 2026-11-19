@@ -27,6 +27,10 @@ func _build_cmd_art() -> void:
 	_ui.art_atlas = Textures.load_texture("res://art/full/ui/cmd-icons-redraw-v3.png")
 	if _ui.art_atlas == null:
 		return
+	# Ungrouping a worker switches to these two larger textures immediately.
+	# Load them with the command panel so the first switch reuses GPU resources.
+	_ui.command_catalog.icon(167)
+	_ui.command_catalog.icon(168)
 	_ui.art_panel = Control.new()
 	_ui.art_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_ui.ui_layer.add_child(_ui.art_panel)

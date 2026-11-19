@@ -1,7 +1,6 @@
 extends RefCounted
 ## Spatial buckets contain values and are rebuilt only after geometry or decor changes.
 const BUCKET_PIXELS := 256.0
-const Frozen = preload("res://simulation/definitions/frozen_data.gd")
 var _key: Array = []
 var _buckets := {}
 
@@ -33,7 +32,9 @@ func _build(data: Object) -> void:
 		var source: Dictionary = data.decor_cells.get("%d_%d" % [a, b], {})
 		var bucket := _bucket(anchor)
 		if not _buckets.has(bucket): _buckets[bucket] = []
-		_buckets[bucket].append(Frozen.copy({"index":index, "anchor":anchor, "phase":int(source.get("phase", cell[2]))}))
+		var row := {"index":index, "anchor":anchor, "phase":int(source.get("phase", cell[2]))}
+		row.make_read_only()
+		_buckets[bucket].append(row)
 
 func _bucket(point: Vector2) -> Vector2i:
 	return Vector2i(floori(point.x / BUCKET_PIXELS), floori(point.y / BUCKET_PIXELS))

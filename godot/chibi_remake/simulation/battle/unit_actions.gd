@@ -14,13 +14,15 @@ var profile: Dictionary={}
 func _init(data: State) -> void:
 	battle = data
 
-func _step_unit(u: Dictionary, delta: float) -> void:
+func _step_unit(u: Dictionary, delta: float, native_attack_checked := false) -> void:
 	var services := ports.acquire(["spatial_index"])
 	if services.is_empty(): return
 	if profile_enabled:
-		_step_unit_profiled(u,delta);return
+		_step_unit_profiled(u, delta, native_attack_checked)
+		return
 	var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel()
-	if kernel!=null and _try_native_attack(u,delta,kernel):return
+	if not native_attack_checked and kernel != null and u.state == "attack" and not u.is_building:
+		if _try_native_attack(u, delta, kernel): return
 	preload("res://simulation/systems/stratagem_rules.gd").begin_update(u)
 	_step_unit_inner(u, delta)
 	services.spatial_index._separate_unit(u)
@@ -30,13 +32,16 @@ func _step_unit(u: Dictionary, delta: float) -> void:
 		preload("res://simulation/systems/locomotion.gd").step_script(u)
 		preload("res://simulation/systems/tick_timers.gd").step_statuses_script(u)
 
-func _step_unit_profiled(u: Dictionary, delta: float) -> void:
+func _step_unit_profiled(u: Dictionary, delta: float, native_attack_checked: bool) -> void:
 	var services := ports.acquire(["spatial_index"])
 	if services.is_empty(): return
 	var at:=ProfileClock.now(profile_enabled)
 	var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel()
-	if kernel!=null and _try_native_attack(u,delta,kernel):
-		_profile_time("nativeAttack",at);profile["units"]=int(profile.get("units",0))+1;return
+	if not native_attack_checked and kernel != null and u.state == "attack" and not u.is_building:
+		if _try_native_attack(u, delta, kernel):
+			_profile_time("nativeAttack", at)
+			profile["units"] = int(profile.get("units", 0)) + 1
+			return
 	preload("res://simulation/systems/stratagem_rules.gd").begin_update(u);at=_profile_time("beginStatus",at)
 	_step_unit_inner(u,delta);var end:=ProfileClock.now(profile_enabled)
 	var key: String="kind%d" % int(u.unit);profile[key]=int(profile.get(key,0))+end-at
@@ -85,7 +90,7 @@ func _prepare_action(u: Dictionary, delta: float) -> bool:
 		return false
 	if (int(u.get("site_inside_uid",-1))>=0 or int(u.get("site_follow_uid",-1))>=0) and battle.construction.step(u): return false
 	# 下船按每 4 拍一名推进；船接到新命令也不打断在舱载员的卸载。
-	if int(u.get("unit", -1)) == Roles.transport_id() and (bool(u.get("unload_active", false)) or str(u.get("state", "")) == "unload"):
+	if (bool(u.get("unload_active", false)) or str(u.get("state", "")) == "unload") and int(u.get("unit", -1)) == Roles.transport_id():
 		u.unload_t = int(u.get("unload_t", 0)) + 1
 		if int(u.unload_t) % 4 == 0:
 			services.transport_orders._retry_unload(u)
@@ -103,25 +108,25 @@ func _prepare_action(u: Dictionary, delta: float) -> bool:
 		var enemy: Dictionary = services.combat._nearest_enemy(u, float(u.atk_range) * battle.tile_w)
 		if not enemy.is_empty():
 			u.target = enemy; u.state = "attack"
-	_follow_working_members(u)
+	if u.state == "idle" and not bool(u.get("hold", false)) and not (u.get("officer", {}) as Dictionary).is_empty():
+		_follow_working_members(u)
 	return true
 
 func _follow_working_members(u: Dictionary) -> void:
 	var services := ports.acquire(["movement"])
 	if services.is_empty(): return
 	# 带将部队的将本体在空闲时跟随正在干活/行军的成员，不把将留在原地。
-	if u.state == "idle" and not bool(u.get("hold", false)) and not (u.get("officer", {}) as Dictionary).is_empty():
-		var leader_idx := int(u.officer.get("index", -1))
-		for member in battle.units:
-			if is_same(member, u) or not bool(member.get("alive", false)) or float(member.get("die_t", -1)) >= 0.0: continue
-			if int(member.get("group_officer", -1)) != leader_idx: continue
-			if str(member.get("state", "")) in ["move", "gather", "deliver", "build", "repair", "attack"]:
-				var follow_to := Vector2(float(member.ax), float(member.ay))
-				if Vector2(float(u.ax), float(u.ay)).distance_to(follow_to) > 2.0 * battle.tile_w:
-					u.state = "move"
-					u.path = services.movement._path_to(u, follow_to, true)
-					u.pi = 0
-					break
+	var leader_idx := int(u.officer.get("index", -1))
+	for member in battle.units:
+		if int(member.get("group_officer", -1)) != leader_idx: continue
+		if is_same(member, u) or not bool(member.get("alive", false)) or float(member.get("die_t", -1)) >= 0.0: continue
+		if str(member.get("state", "")) in ["move", "gather", "deliver", "build", "repair", "attack"]:
+			var follow_to := Vector2(float(member.ax), float(member.ay))
+			if Vector2(float(u.ax), float(u.ay)).distance_to(follow_to) > 2.0 * battle.tile_w:
+				u.state = "move"
+				u.path = services.movement._path_to(u, follow_to, true)
+				u.pi = 0
+				break
 
 func _step_move(u: Dictionary, delta: float) -> void:
 	var services := ports.acquire(["movement"])
@@ -346,7 +351,6 @@ func _repath_attack(u: Dictionary,t: Dictionary,attack_range: float) -> void:
 func _try_native_attack(u: Dictionary,delta: float,kernel: Object) -> bool:
 	var services := ports.acquire(["combat", "movement", "spatial_index"])
 	if services.is_empty(): return false
-	if u.state!="attack" or bool(u.is_building):return false
 	var at:=ProfileClock.now(profile_enabled)
 	var result: int=kernel.attack_fast(u,delta,battle.nav.native_query_context(),battle._target_owner,battle._targets,battle.units,battle._index_units_ref,battle._index_units_size)
 	if profile_enabled:at=_profile_time("nativePrepare",at)

@@ -46,6 +46,7 @@ func submit_point_order(position: Vector2, context: bool) -> int:
 
 func select_at(position: Vector2, add: bool) -> void:
 	ports._select_click(position, add)
+	_view_hud()
 
 func wait_command_boundary() -> void:
 	_waiting_for_commands = true
@@ -183,6 +184,7 @@ func focus_group(n: int) -> bool:
 		scene.cam.position = Vector2(float(leader.ax), float(leader.ay))
 		if scene.view != null:
 			scene.view.clamp_camera()
+	_view_hud()
 	return true
 
 func _battle_input(event: InputEvent) -> void:
@@ -217,12 +219,13 @@ func _battle_input(event: InputEvent) -> void:
 					submit_point_order(world_pos, false)
 				elif not clicked:
 					ports._select_box(_sel_rect(), add)
+					_view_hud()
 				else:
 					# 选中工人队后直接左键资源也下采集令：资源点本来就不能被“选中”，
 					# 不应当清空选择让玩家以为点击无效（右键仍然同样生效）。
 					var rclick := ports._resource_at(world_pos)
 					if rclick.is_empty() or bool(rclick.get("is_building",false)) or not battle.command_rules.allows_context(16138):
-						ports._select_click(world_pos, add)
+						select_at(world_pos, add)
 					else:
 						battle.player_commands.submit("gather", battle.selected, world_pos, int(rclick.uid), -1, str(rclick.get("cell", "")))
 		elif mbe.button_index == MOUSE_BUTTON_RIGHT and mbe.pressed:

@@ -55,6 +55,18 @@ func unit_views() -> Array:
 	var data = preload("res://named_port.gd").require_provider(_data,"unit values")
 	return _unit_projection.units(data) if data != null else []
 
+func minimap_markers() -> Array:
+	var data = preload("res://named_port.gd").require_provider(_data, "minimap markers")
+	return _unit_projection.minimap_markers(data) if data != null else []
+
+func team_soldiers(owner: int, officer_index: int) -> int:
+	var data = preload("res://named_port.gd").require_provider(_data, "team strength")
+	return _unit_projection.team_soldiers(data, owner, officer_index) if data != null else 0
+
+func commander_name(owner: int, officer_index: int) -> String:
+	var data = preload("res://named_port.gd").require_provider(_data, "commander name")
+	return _unit_projection.commander_name(data, owner, officer_index) if data != null else "—"
+
 func renderable_unit_count() -> int:
 	var data = preload("res://named_port.gd").require_provider(_data, "unit count")
 	return data.units.size() if data != null else 0

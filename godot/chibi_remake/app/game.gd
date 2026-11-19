@@ -255,14 +255,17 @@ static func _canonical_json(value) -> String:
 	if value is String:
 		return JSON.stringify(str(value))
 	if value is Array:
-		var parts: Array = []
+		var parts := PackedStringArray()
 		for v in value:
 			parts.append(_canonical_json(v))
 		return "[" + ",".join(parts) + "]"
 	if value is Dictionary:
 		var keys: Array = value.keys()
-		keys.sort_custom(func(a, b): return str(a) < str(b))
-		var parts: Array = []
+		if keys.all(func(key): return key is String):
+			keys.sort()
+		else:
+			keys.sort_custom(func(a, b): return str(a) < str(b))
+		var parts := PackedStringArray()
 		for k in keys:
 			parts.append(JSON.stringify(str(k)) + ":" + _canonical_json(value[k]))
 		return "{" + ",".join(parts) + "}"
@@ -283,10 +286,9 @@ static func verify_save_checksum(d: Dictionary) -> bool:
 		return false
 	var copy := d.duplicate(true)
 	copy.erase("checksum")
-	var canon := save_canonical_text(copy)
 	var ok := str(d.get("checksum", "")) == save_checksum(copy)
 	if not ok:
-		push_warning("save checksum mismatch (len=%d)" % canon.length())
+		push_warning("save checksum mismatch")
 	return ok
 
 static func is_valid_save(d: Dictionary) -> bool:

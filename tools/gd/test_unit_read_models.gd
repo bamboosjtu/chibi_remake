@@ -49,6 +49,19 @@ func run() -> void:
 	var selected: Array=reader.selection_views()
 	var all: Array=reader.unit_views()
 	assert(_values(selected) and _values(all) and selected[0].uid==actor.uid)
+	var expected_markers := []
+	for unit: Dictionary in all:
+		if unit.alive and unit.die_t < 0 and not unit.get("attached", false) and int(unit.get("site_inside_uid", -1)) < 0 and unit.visible:
+			expected_markers.append({"position":Vector2(unit.ax, unit.ay), "owner":int(unit.owner), "is_building":bool(unit.is_building)})
+	var markers: Array = reader.minimap_markers()
+	assert(_values(markers) and markers == expected_markers, "Small minimap projection preserves fog, position and marker order")
+	if not actor.officer.is_empty():
+		var soldiers := 0
+		for unit: Dictionary in all:
+			if unit.alive and unit.owner == actor.owner and int(unit.get("group_officer", -1)) == int(actor.officer.index):
+				soldiers += int(unit.hp)
+		assert(reader.team_soldiers(int(actor.owner), int(actor.officer.index)) == soldiers)
+		assert(reader.commander_name(int(actor.owner), int(actor.officer.index)) == str(actor.officer.name).replace(" ", ""))
 	assert(not selected[0].has("target") and not selected[0].has("path") and not selected[0].has("gather_obj"))
 	var detached: Dictionary=selected[0].duplicate(true);detached.hp=0;detached.officer.level=9
 	assert(actor.hp!=0 and actor.officer.level!=9)

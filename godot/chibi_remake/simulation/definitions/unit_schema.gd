@@ -1,7 +1,6 @@
 extends RefCounted
 const Balance = preload("res://simulation/definitions/balance_rules.gd")
 ## Authoritative unit field policy. Dictionary units remain the runtime model.
-const Config = preload("res://simulation/battle_config.gd")
 const FIELDS := {
 	"gate_open": {"type":"bool", "default":false, "persist":false, "derived":true, "group":"derived"},
 	"occupied_cells": {"type":"Array", "default":[], "persist":false, "derived":true, "group":"derived"},

@@ -21,7 +21,6 @@ const ARMY_BY_TIER = C.ARMY_BY_TIER
 ## 该方当前的兵种表（按自身等级 0..2 取；超出范围钳制）
 const HUMAN_WEAK_UNITS = C.HUMAN_WEAK_UNITS
 const INTERCEPT_RADIUS = C.INTERCEPT_RADIUS
-const Access = preload("res://simulation/ports/ai_access.gd")
 const PLAN_TO_BUILDING = C.PLAN_TO_BUILDING
 ## **归属奇偶层** —— 订正：此前记录里说"REA 反编译没有奇偶证据"是**错的**。
 ## 证据就在 `FUN_0046e4b0` 里（`_work/fun_46e4b0.c` 第 27/31/40/41/53/54 行）：

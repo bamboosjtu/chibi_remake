@@ -11,6 +11,9 @@ func performance_counters() -> Dictionary:
 	counters["fogMicroseconds"]=_ui.fog_sprite.upload_microseconds if _ui.fog_sprite!=null else 0
 	counters["minimapMicroseconds"] = _ui.minimap.draw_microseconds if _ui.minimap != null else 0
 	return counters
+
+func prepare_opening_layers() -> void:
+	_components["world_layers"].prepare_opening_layers()
 ## Composition root; presentation components own their specific behavior.
 const GRID_FALLBACK := 8
 

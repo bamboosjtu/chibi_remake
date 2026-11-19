@@ -42,10 +42,10 @@ func _process_trainings(_delta: float) -> void:
 	if provider == null: return
 	provider._process_trainings(_delta)
 
-func _step_unit(u: Dictionary, delta: float) -> void:
+func _step_unit(u: Dictionary, delta: float, native_attack_checked := false) -> void:
 	var provider = _require(_provider_unit_actions, "unit_actions")
 	if provider == null: return
-	provider._step_unit(u, delta)
+	provider._step_unit(u, delta, native_attack_checked)
 
 func _target_forget(u: Dictionary) -> void:
 	var provider = _require(_provider_spatial_index, "spatial_index")

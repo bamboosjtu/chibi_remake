@@ -36,6 +36,11 @@ static func read_with_source(path: String, validator: Callable = Callable()) -> 
 	value = _read(path + ".bak", validator)
 	return {"data":value,"source":"backup" if not value.is_empty() else "none"}
 
+static func _matches_bytes(path: String, expected: PackedByteArray) -> bool:
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null or file.get_length() != expected.size(): return false
+	return file.get_buffer(expected.size()) == expected
+
 static func commit(path: String, text: String, validator: Callable = Callable(), backup_validator: Callable = Callable()) -> bool:
 	last_error = {}
 	path = ProjectSettings.globalize_path(path).replace("\\", "/").simplify_path()
@@ -60,7 +65,10 @@ static func commit(path: String, text: String, validator: Callable = Callable(),
 	f.flush()
 	var error := f.get_error()
 	f.close()
-	if error != OK or _read(tmp_path, validator).is_empty():
+	# The payload was parsed and domain-validated above. Verify exact bytes at
+	# both readbacks so corruption fails without repeating the same validation.
+	var expected := text.to_utf8_buffer()
+	if error != OK or not _matches_bytes(tmp_path, expected):
 		return _fail("verify temporary", error)
 	var d := DirAccess.open(path.get_base_dir())
 	if d == null:
@@ -89,7 +97,7 @@ static func commit(path: String, text: String, validator: Callable = Callable(),
 			elif damaged != "": d.rename(damaged, name)
 		return _fail("commit temporary")
 	# rename 成功也可能因磁盘/文件系统问题读到截断内容；提交后必须读回。
-	if _read(path, validator).is_empty():
+	if not _matches_bytes(path, expected):
 		if not _read(path + ".bak", validator).is_empty(): d.rename(name + ".bak", name)
 		elif damaged != "": d.rename(damaged, name)
 		return _fail("verify committed")

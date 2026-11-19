@@ -194,6 +194,7 @@ func _cmd_disband(actors = null) -> void:
 func _commander_for(u: Dictionary) -> Dictionary:
 	if not u.get("officer", {}).is_empty(): return u
 	var index := int(u.get("group_officer", -1))
+	if index < 0: return {}
 	for other in battle.units:
 		if other.alive and other.die_t < 0 and int(other.owner) == int(u.owner) and int(other.get("officer", {}).get("index", -2)) == index: return other
 	return {}

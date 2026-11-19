@@ -1,8 +1,6 @@
 extends Control
 ## Composition root; presentation components own their specific behavior.
-const RemasterArt = preload("res://presentation/battle/art_catalog.gd")
 
-const Textures = preload("res://presentation/battle/runtime_textures.gd")
 
 # ── 「选择势力」这一步（2a 新增）：开始游戏 → 先问曹操/刘备，再列该线关卡 ──
 

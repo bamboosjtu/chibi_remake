@@ -141,11 +141,7 @@ func sync_selection() -> void:
 		var letters := str(officer.get("name", "")).replace(" ", "")
 		name_label.text = "\n".join(letters.split(""))
 		detail.text = "官职 %s" % str(host.commands.military.officer_rank_name(officer))
-	var soldiers := 0
-	if not officer.is_empty():
-		for member in host.unit_views():
-			if member.alive and member.owner == u.owner and int(member.get("group_officer", -1)) == int(officer.index):
-				soldiers += int(member.hp)
+	var soldiers: int = host.team_soldiers(int(u.owner), int(officer.index)) if not officer.is_empty() else 0
 	var titles := ["武力", "智力", "经验", "谋略", "士气", "兵数"]
 	var data := [str(int(u.get("officer_might", 0))), str(int(u.get("officer_intellect", 0))),
 		host.Progression.progress_text(officer), str(int(u.get("mou", 0))), str(int(u.get("status_173", 70))), str(soldiers)]
@@ -153,11 +149,7 @@ func sync_selection() -> void:
 		titles = ["归属", "攻击力", "防御力", "射程", "视野", "携带"]
 		var carry := 0
 		for member in selection: carry += int(member.get("carry", 0))
-		var commander := "—"
-		for member in host.unit_views():
-			if member.alive and int(member.owner) == int(u.owner) and int(member.get("officer", {}).get("index", -2)) == int(u.get("group_officer", -1)):
-				commander = str(member.officer.get("name", "")).replace(" ", "")
-				break
+		var commander: String = host.commander_name(int(u.owner), int(u.get("group_officer", -1)))
 		data = [commander, str(int(u.attack)), str(int(u.defence)), str(int(u.atk_range)), str(int(u.vision)), str(carry)]
 	if bool(u.is_building):
 		_sync_building(u)

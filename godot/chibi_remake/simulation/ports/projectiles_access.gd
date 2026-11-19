@@ -1,7 +1,6 @@
 extends "res://named_port.gd"
 ## projectiles: only the state and commands required by this system.
 const State = preload("res://simulation/battle_state.gd")
-const Config = preload("res://simulation/battle_config.gd")
 var _state: WeakRef
 var battle: State:
 	get: return _state.get_ref()

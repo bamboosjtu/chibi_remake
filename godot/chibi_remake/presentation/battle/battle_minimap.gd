@@ -108,18 +108,16 @@ func _draw_markers() -> void:
 	var scale: float=view.ui_scale
 	var count:=0
 	marker_mesh.visible=gpu_markers
-	if gpu_markers:_reserve_markers(host.unit_views().size())
+	var markers: Array = host.minimap_markers()
+	if gpu_markers: _reserve_markers(markers.size())
 	overlay.draw_rect(world_rect,Color(0.45,0.4,0.3),false,1.0)
-	for unit: Dictionary in host.unit_views():
-		if not bool(unit.alive) or float(unit.die_t)>=0:continue
-		if bool(unit.get("attached",false)) or int(unit.get("site_inside_uid",-1))>=0:continue
-		var owner:=int(unit.owner)
-		if owner!=player and not bool(unit.visible):continue
+	for marker: Dictionary in markers:
+		var owner := int(marker.owner)
 		var color:=Color(0.55,0.55,0.55)
 		if owner==player:color=Color(0.3,1.0,0.35)
 		elif owner!=0:color=Color(1.0,0.3,0.25)
-		var point:=off+Vector2(float(unit.ax),float(unit.ay))*k
-		var d:float=(4.0 if bool(unit.is_building) else 2.5)*scale
+		var point: Vector2 = off + marker.position * k
+		var d:float=(4.0 if bool(marker.is_building) else 2.5)*scale
 		if gpu_markers:
 			# One transform/color buffer upload; no GPU result is read by simulation.
 			var index:=count*12

@@ -3,9 +3,7 @@ const PROXY_FIELDS := ["saver", "cam", "bgm", "sfx", "remaster_art", "view", "ch
 ## Scene-owned services and nodes. No simulation rules.
 const RemasterArt = preload("res://presentation/battle/art_catalog.gd")
 
-const SaveSvc = preload("res://app/save_service.gd")    # ARCH-006：存档/读档编排
 
-const View = preload("res://presentation/battle/battle_view.gd")        # ARCH-013：表现层（HUD/相机/单位外观/框选）
 
 
 var saver: RefCounted = null                        # 需要宿主，所以在 _ready 里用 self 造

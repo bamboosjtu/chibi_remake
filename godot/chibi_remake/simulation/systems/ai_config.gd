@@ -1,4 +1,5 @@
 extends RefCounted
+const Access = preload("res://simulation/ports/ai_access.gd")
 ## Deterministic AI constants shared by the facade and its state.
 const THINK_PERIOD := 41          # DAT_00485648[owner] -> 0x28
 const BUILD_PLAN_PERIOD := 22     # DAT_004856b0[owner] -> 0x15
@@ -19,7 +20,6 @@ const ARMY_BY_TIER := [[45,32,36], [39,38,37]]
 ## 该方当前的兵种表（按自身等级 0..2 取；超出范围钳制）
 const HUMAN_WEAK_UNITS := 6
 const INTERCEPT_RADIUS := 90.0
-const Access = preload("res://simulation/ports/ai_access.gd")
 const PLAN_TO_BUILDING := {
 	1: 0, 2: 1, 3: 8, 4: 9, 5: 0xe, 6: 0xf, 7: 6, 8: 7, 9: 0xc, 10: 0xd,
 	11: 0x12, 12: 0x13, 13: 2, 14: 3, 15: 10, 16: 0xb, 17: 4, 18: 5, 19: 0x14, 20: 0x17,

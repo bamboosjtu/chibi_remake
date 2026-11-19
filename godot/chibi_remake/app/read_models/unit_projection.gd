@@ -81,6 +81,36 @@ func roster(data: Object, uid: int) -> Dictionary:
 	var index: int = _indices.get(uid, -1)
 	return rows[index] if index >= 0 else {}
 
+func minimap_markers(data: Object) -> Array:
+	var markers := []
+	var player := int(data.player_owner)
+	var visibility = data.visibility
+	for unit: Dictionary in data.units:
+		if not unit.alive or unit.die_t >= 0 or unit.get("attached", false) or int(unit.get("site_inside_uid", -1)) >= 0:
+			continue
+		var owner := int(unit.owner)
+		var point := Vector2(unit.ax, unit.ay)
+		if owner != player and not visibility.is_visible(point): continue
+		markers.append({"position":point, "owner":owner, "is_building":bool(unit.is_building)})
+		markers.back().make_read_only()
+	markers.make_read_only()
+	return markers
+
+func team_soldiers(data: Object, owner: int, officer_index: int) -> int:
+	var soldiers := 0
+	for unit: Dictionary in data.units:
+		if unit.alive and int(unit.owner) == owner and int(unit.get("group_officer", -1)) == officer_index:
+			soldiers += int(unit.hp)
+	return soldiers
+
+func commander_name(data: Object, owner: int, officer_index: int) -> String:
+	for unit: Dictionary in data.units:
+		if not unit.alive or int(unit.owner) != owner: continue
+		var officer: Dictionary = unit.get("officer", {})
+		if int(officer.get("index", -2)) == officer_index:
+			return str(officer.get("name", "")).replace(" ", "")
+	return "—"
+
 func visual(data: Object, uid: int) -> Dictionary:
 	units(data) # Rebuild scalar UID -> array-index lookup at the same boundary.
 	if _visuals.has(uid): return _visuals[uid]

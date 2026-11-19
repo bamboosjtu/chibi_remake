@@ -89,6 +89,12 @@ func _ready() -> void:
 	# AI was initialized before snapshot restore. # ARCH-006：AI 逻辑在 ai.gd，main 只提供状态访问
 	ports._build_ui()
 	ports._setup_camera()
+	# Resolve initial command icons and the selected portrait during loading.
+	# The first live HUD update then reuses the same textures and labels.
+	if scene.view != null:
+		scene.view.prepare_opening_layers()
+		scene.view.update_hud_text()
+		scene.view.update_panel()
 	scene.ready_to_save = true
 	if scene.view != null:
 		scene.view.completion = preload("res://presentation/hud/battle_completion.gd").new(scene.view.host)
