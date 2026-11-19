@@ -56,11 +56,19 @@ func install(live: Node2D, candidate: RefCounted, cross_map := false) -> bool:
 			Game.pauses.release(lease)
 			candidate.dispose(); return false
 	var previous: RefCounted = live.exchange_world(candidate.world)
+	candidate.world = null
+	candidate.saver = null
+	# Release the resources whose lifetime is no longer conditional before the purely
+	# presentational tail: a script error later in this function must not leak the whole
+	# previous world or keep the scene paused forever.
 	if view != null:
 		view.commit_world_nodes(presentation)
 		if cross_map:
 			view.commit_map_terrain(staged_terrain)
 			view.finish_map_change()
+	previous.dispose()
+	if cross_map: Game.pauses.release(lease)
+	if view != null:
 		view.finish_loaded_world(visual_rows,live.game_end)
 	live.scene.reset_transients()
 	live.cmd_pending = ""
@@ -70,8 +78,4 @@ func install(live: Node2D, candidate: RefCounted, cross_map := false) -> bool:
 	if cross_map:
 		live.scene.sec_visible.clear()
 		for unit in live.state.units: live.scene.sec_visible[int(unit.owner)] = true
-		Game.pauses.release(lease)
-	candidate.world = null
-	candidate.saver = null
-	previous.dispose()
 	return true

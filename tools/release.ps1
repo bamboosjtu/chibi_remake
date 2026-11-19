@@ -43,7 +43,8 @@ $manifest = Get-Content -Raw -Encoding UTF8 $manifestPath | ConvertFrom-Json
 $null=Assert-CandidateVerification $versionDir $manifest
 if ($manifest.dirty) { throw 'Release mode requires a clean build; commit the source and rerun without -SkipBuild' }
 $head = (& git -C $root rev-parse HEAD 2>$null)
-if ($head -and ([string]$manifest.commit).Trim() -ne ([string]$head).Trim()) {
+if ($LASTEXITCODE -ne 0 -or !$head) { throw 'Cannot prove the release was built from HEAD: git rev-parse failed' }
+if (([string]$manifest.commit).Trim() -ne ([string]$head).Trim()) {
     throw ('Release mode requires a version built from HEAD ' + $head + '; rebuild without -SkipBuild')
 }
 if (!$Tag) { $Tag = $version }

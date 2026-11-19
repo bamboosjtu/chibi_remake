@@ -13,13 +13,11 @@
     "testing/navigation_checks.gd::_selftest_naval": 133,
     "testing/technology_checks.gd::_selftest_tech": 125,
     "app/battle/bootstrap.gd::_ready": 153,
-    "app/battle/scene_controller.gd::_battle_input": 84,
     "presentation/menu/campaign_dialog.gd::_build_campaign_dialog": 98,
     "presentation/menu/controller.gd::_ready": 220,
     "presentation/menu/level_dialog.gd::_build_level_dialog": 151,
     "presentation/battle/components/command_model.gd::_refresh_cmd_panel": 109,
     "presentation/battle/components/hud_build.gd::_build_right_panel": 95,
-    "presentation/battle/components/hud_input.gd::_input": 117,
     "presentation/battle/components/hud_layout.gd::_apply_metrics": 140,
     "simulation/battle/entity_factory.gd::_make_unit": 101
   },
@@ -69,11 +67,6 @@
       "reviewBy": "2027-02-16",
       "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."
     },
-    "functions:app/battle/scene_controller.gd::_battle_input": {
-      "owner": "project-maintainers",
-      "reviewBy": "2027-02-16",
-      "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."
-    },
     "functions:presentation/menu/campaign_dialog.gd::_build_campaign_dialog": {
       "owner": "project-maintainers",
       "reviewBy": "2027-02-16",
@@ -95,11 +88,6 @@
       "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."
     },
     "functions:presentation/battle/components/hud_build.gd::_build_right_panel": {
-      "owner": "project-maintainers",
-      "reviewBy": "2027-02-16",
-      "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."
-    },
-    "functions:presentation/battle/components/hud_input.gd::_input": {
       "owner": "project-maintainers",
       "reviewBy": "2027-02-16",
       "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."

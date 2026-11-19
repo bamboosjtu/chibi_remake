@@ -317,12 +317,6 @@ func _dispose_components() -> void:
 		var value = _ui.get(property.name)
 		if value is Array or value is Dictionary: value.clear()
 
-func rekey_unit(unit: Dictionary, new_uid: int) -> void:
-	var old_uid := int(unit.uid)
-	if old_uid == new_uid or not _ui._nodes_by_uid.has(old_uid): return
-	_ui._nodes_by_uid[new_uid] = _ui._nodes_by_uid[old_uid]
-	_ui._nodes_by_uid.erase(old_uid)
-
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_PREDELETE and not _disposed: _dispose_components()
 

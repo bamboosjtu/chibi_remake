@@ -10,9 +10,13 @@ for (const match of factory.slice(factory.indexOf('var u := {'),factory.indexOf(
   if (declared.has(match[1]) && JSON.stringify(defaults[match[1]]) !== JSON.stringify(JSON.parse(match[2]))) throw Error('Unit default drift: '+match[1]);
 }
 const walk = dir => fs.readdirSync(dir,{withFileTypes:true}).flatMap(entry => entry.isDirectory() ? walk(dir+'/'+entry.name) : entry.name.endsWith('.gd') ? [dir+'/'+entry.name] : []);
+// Unit records are Dictionaries, so the receiver name is the only static hint that a
+// write targets a unit. Cover the names used across the simulation, including the
+// officer/worker aliases that used to slip past a four-name list.
+const receivers = 'u|unit|nu|gate|commander|worker|member|leader|ship|target|other|attacker|victim';
 for (const file of walk(root+'/simulation')) {
   const source = fs.readFileSync(file,'utf8');
-  for (const match of source.matchAll(/\b(?:u|unit|nu|gate)\.(\w+)\s*=(?!=)|\b(?:u|unit|nu|gate)\["(\w+)"\]\s*=(?!=)/g)) keys.add(match[1] ?? match[2]);
+  for (const match of source.matchAll(new RegExp('\\b(?:'+receivers+')\\.(\\w+)\\s*=(?!=)|\\b(?:'+receivers+')\\["(\\w+)"\\]\\s*=(?!=)','g'))) keys.add(match[1] ?? match[2]);
 }
 const missing = [...keys].filter(key => !declared.has(key));
 if (missing.length) throw Error('Unregistered unit field writes: '+missing.join(', '));

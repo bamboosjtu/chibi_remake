@@ -90,8 +90,9 @@ func _sim_step(dt: float) -> void:
 	var phase:=tick_begin
 	if _effects!=null:_effects.simulating=true
 	if _effects != null:_effects.visual("capture_motion", [])
-	_visibility.update(battle.units, battle.player_owner)
-	if profile_enabled:phase=_profile_time("visibilityBegin",phase)
+	# Visibility is published once at the end of the tick. Map start, load and reveal
+	# changes publish it themselves (battle_opening, snapshot_restorer, cheat_rules),
+	# so a start-of-tick pass would only rescan the unchanged previous state.
 	battle.sim_tick += 1
 	_player_commands.apply_tick(battle.sim_tick)
 	_dep_cheat_rules._step_auto_control()

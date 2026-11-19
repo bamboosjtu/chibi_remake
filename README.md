@@ -30,7 +30,7 @@
 | [界面](docs/12-interface.md) | HUD、命令面板、光标与键鼠操作 |
 | [技术架构](docs/14-architecture.md) | 分层、数据流、确定性与性能预算 |
 | [数据规格](docs/15-data-spec.md) | JSON 字段与数值约定 |
-| [存档](docs/16-save-compat.md) | 槽位、快照、校验与版本迁移 |
+| [存档](docs/16-save-compat.md) | 槽位、快照、校验与版本策略 |
 | [美术](docs/17-art.md) | 素材清单、命名、管线与验收 |
 | [发布操作手册](release.md) | 从源码准备到打包、版本安装与回滚 |
 | [构建发布](docs/18-build-release.md) | 依赖、产物契约、发布与回滚 |

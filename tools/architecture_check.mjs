@@ -21,6 +21,9 @@ const dependencies = (file, seen = new Set()) => {
   const source = fs.readFileSync(full,'utf8');
   const code=source.replace(/("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|#[^\r\n]*/g,(all,string)=>string??'');
   for (const match of code.matchAll(/(?:preload|load)\(\s*(['"])res:\/\/([^'"\n]+\.gd)\1\s*\)/g)) dependencies(match[2],seen);
+  // Inheritance is a dependency edge too: `extends "res://simulation/..."` used to be
+  // how adapter bases were pulled into the presentation layer.
+  for (const match of code.matchAll(/^\s*extends\s+(['"])res:\/\/([^'"\n]+\.gd)\1/gm)) dependencies(match[2],seen);
   return seen;
 };
 let failures = 0, reviews = 0, waivedHits = 0;
@@ -35,6 +38,22 @@ const waive = (key, message) => {
   if (waived.has(key)) waivedHits++;
   else fail(message + ' [' + key + ']');
 };
+// `extends Object` has no reference counting: every subclass must be created by a
+// composition point that also releases it. Requiring an owning file catches a new
+// Object that nothing frees, which is a silent permanent leak.
+const objectScripts = [];
+const objectOwners = new Map();
+for (const file of files(root)) {
+  const relative = path.posix.relative(root, file);
+  const source = fs.readFileSync(file, 'utf8');
+  if (/^extends Object\b/m.test(source)) objectScripts.push(relative);
+  if (/_owned_(?:services|components)\(|\.free\(\)/.test(source)) objectOwners.set(relative, source);
+}
+for (const script of objectScripts) {
+  const reference = '"res://' + script + '"';
+  const owned = [...objectOwners.entries()].some(([owner, source]) => owner !== script && source.includes(reference));
+  if (!owned) fail(`${script}: Object subclass is not released by any composition point`);
+}
 for (const file of files(root)) {
   const relative = path.posix.relative(root, file);
   const source = fs.readFileSync(file, 'utf8');

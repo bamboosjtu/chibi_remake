@@ -197,9 +197,15 @@ func snapshot(units: Array, resources: Dictionary, extra: Dictionary, slot := -1
 		"savedAt": Time.get_datetime_string_from_system(),
 		"saveName": str(extra.get("saveName", "")),
 	}
+	var invalid := _non_finite_path(payload)
+	if not invalid.is_empty():
+		var error := {"stage":"snapshot non-finite value", "code":ERR_INVALID_DATA, "slot":slot, "path":invalid}
+		if slot >= 0: last_save_error = error
+		push_warning("Save snapshot rejected: " + str(error))
+		return {}
 	# Hash the same JSON number representation that the reader will receive.
 	# JSON parses integers as floats, including values beyond the 53-bit exact range.
-	payload = JSON.parse_string(JSON.stringify(_json_safe(payload), "", true, true))
+	payload = JSON.parse_string(JSON.stringify(payload, "", true, true))
 	payload["checksum"] = save_checksum(payload)
 	return payload
 
@@ -220,21 +226,22 @@ static func snapshot_trainings(trainings: Array) -> Array:
 			if rec.has(field): trains.back()[field]=rec[field]
 	return trains
 
-## 存档前把非有限浮点归一，避免 JSON/校验和失败（长时间战斗的 NAN/INF 也能存）。
-static func _json_safe(value):
+## 存档拒绝非有限浮点，而不是把它改写成 0：NaN/INF 是上游缺陷，静默归零会让
+## "内存里坏、盘上好看"的存档逃过校验。返回第一个出问题的路径，空前缀表示合法。
+static func _non_finite_path(value, path := "") -> String:
 	if value is float:
-		return value if is_finite(value) else 0.0
+		return path if not is_finite(value) else ""
 	if value is Dictionary:
-		var out := {}
-		for k in value:
-			out[k] = _json_safe(value[k])
-		return out
+		for key in value:
+			var hit := _non_finite_path(value[key], str(path, "/", key))
+			if not hit.is_empty(): return hit
+		return ""
 	if value is Array:
-		var out: Array = []
-		for v in value:
-			out.append(_json_safe(v))
-		return out
-	return value
+		for index in range(value.size()):
+			var hit := _non_finite_path(value[index], "%s[%d]" % [path, index])
+			if not hit.is_empty(): return hit
+		return ""
+	return ""
 
 ## 档内校验和：只覆盖 payload（不含 checksum 本身）。
 ## 不能依赖 JSON.stringify(sort_keys) 的深层顺序——Godot 只保证显式序列化行为，

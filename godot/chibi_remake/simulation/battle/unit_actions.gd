@@ -344,7 +344,8 @@ func _try_native_attack(u: Dictionary,delta: float,kernel: Object) -> bool:
 	if profile_enabled:at=_profile_time("nativePrepare",at)
 	if result<0:return false
 	if result&1:_dep_combat._fire_attack(u,u.target)
-	if result&2:_repath_attack(u,u.target,float(u.atk_range))
+	# Same range source as the script path (ambush units use their vision radius).
+	if result&2:_repath_attack(u,u.target,preload("res://simulation/systems/combat_rules.gd").effective_range(u))
 	if result&4:_dep_movement._follow(u,delta)
 	u.anim+=delta
 	if profile_enabled:at=_profile_time("nativeApply",at)

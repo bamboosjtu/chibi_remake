@@ -147,18 +147,18 @@ func _cast_jimou(pos: Vector2, idx: int, caster: Dictionary, tgt: Dictionary) ->
 	_effects.feedback(msg)
 	return true
 
-func _set_formation(idx: int, actors = null) -> void:
+func _set_formation(idx: int, actors = null) -> bool:
 	if battle.game_end != 0 or idx < 0 or idx >= Config.FORM_OFFSETS.size():
-		return
+		return false
 	var caster := _jimou_caster_for_selection(actors)
 	var group: Array = _formation_group(caster)
 	if group.is_empty():
 		_effects.feedback("没有可变换阵型的部队")
-		return
+		return false
 	var level := clampi(int(caster.officer.get("level", 0)), 0, 9)
 	if (int(Config.FORM_LV_MASK[level]) & (1 << idx)) == 0:
 		_effects.feedback("级别不够没有可用阵法")
-		return
+		return false
 	var offs: Array = Config.FORM_OFFSETS[idx]
 	var origin_cell: Vector2i = _dep_movement._cell_of_px(float(caster.get("ax", group[0].ax)), float(caster.get("ay", group[0].ay)))
 	var n := 0
@@ -175,6 +175,7 @@ func _set_formation(idx: int, actors = null) -> void:
 		_effects.feedback("没有可变换阵型的部队")
 	else:
 		_effects.feedback("%d 支部队列阵：%s（纯队形，无攻防加成）" % [n, Config.FORM_NAMES[idx]])
+	return n > 0
 
 func _formation_group(caster: Dictionary) -> Array:
 	if caster.is_empty(): return []

@@ -202,7 +202,9 @@ func _apply_cmd_page() -> void:
 		var progress_badge := btn.get_node_or_null("ProductionProgress") as Label
 		if progress_badge != null: progress_badge.hide()
 		var icon_command := bool(sp.get("icon_command", false))
-		if _ui.build_menu or production or icon_command:
+		# The icon atlas is optional art: without it `art_buttons` stays empty and the
+		# text layout below is the documented fallback. Never index the slots blindly.
+		if (_ui.build_menu or production or icon_command) and i < _ui.art_buttons.size():
 			var slot: Control = _ui.art_buttons[i].btn
 			_dep_hud_layout._place_left(btn, slot.position.x, slot.position.y, slot.size.x, slot.size.y)
 			btn.text = ""

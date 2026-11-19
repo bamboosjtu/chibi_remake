@@ -33,8 +33,14 @@ for (const [name, files] of Object.entries(rootFiles)) {
  if (name === 'menu') owners.automation_driver = 'app/automation/menu_driver.gd';
  const wiring = files.map(read).join('\n');
  for (const [service, file] of Object.entries(owners)) {
+  // Require the named factory itself, not a substring of it: `rules` matched
+  // `command_rules` before, so a missing or renamed factory could pass.
+  const target = 'res://' + file.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const aliases = [...wiring.matchAll(new RegExp('const\\s+(\\w+)\\s*=\\s*(?:preload|load)\\(\\s*"' + target + '"', 'g'))].map(match => match[1]);
+  const sources = ['(?:preload|load)\\(\\s*"' + target + '"\\s*\\)', ...aliases].join('|');
+  assert(new RegExp('^\\s*(?:var\\s+)?' + service + '\\s*(?::=|=)\\s*(?:' + sources + ')\\s*\\.new\\(', 'm').test(wiring),
+   name + ': missing factory for ' + service + ' -> ' + file);
   const code = read(file);
-  assert(wiring.includes(service) && wiring.includes('res://' + file), name + ': missing factory for ' + service);
   for (const match of code.matchAll(/\b_dep_(\w+)\.(\w+)\b/g)) {
    const [, peer, method] = match;
    assert(owners[peer] && new RegExp('^func ' + method + '\\(', 'm').test(read(owners[peer])), file + ': missing ' + peer + '.' + method);
@@ -46,4 +52,22 @@ for(const file of ['simulation/battle_state.gd','app/battle_scene_state.gd','pre
  assert.deepEqual(declared,[...source.matchAll(/^var (\w+)/gm)].map(m=>m[1]),file+': explicit property surface is stale');
 }
 for(const retired of ['registry.gd','simulation/ports/capability_links.gd','app/battle_facade.gd','app/saves/legacy_snapshot.gd','app/saves/legacy_seed.gd','data/db/rules_contract.json','data/db/registry_compatibility.json'])if(fs.existsSync(path.join(root,retired)))throw Error('Retired implementation still exists: '+retired);
-console.log('REGISTRY PASS concrete factories / direct peer methods / registered state fields');
+// Resolve direct `world.<service>.<member>(...)` calls from the application and
+// presentation layers. These calls are untyped, so without this a renamed or removed
+// member only surfaces at run time in front of the player.
+const worldOwners = {...manifest.hosts.main};
+const worldKeys = Object.keys(worldOwners);
+const gdFiles = dir => fs.readdirSync(path.join(root, dir), {withFileTypes: true}).flatMap(entry =>
+ entry.isDirectory() ? gdFiles(path.join(dir, entry.name)) : entry.name.endsWith('.gd') ? [path.join(dir, entry.name).replaceAll('\\', '/')] : []);
+const unresolved = [];
+for (const file of [...gdFiles('app'), ...gdFiles('presentation')]) {
+ const code = fs.readFileSync(path.join(root, file), 'utf8').replace(/("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|#[^\r\n]*/g, (all, string) => string ?? '');
+ for (const match of code.matchAll(/\bworld\.(\w+)\.(\w+)\s*\(/g)) {
+  const [, service, member] = match;
+  if (!worldKeys.includes(service)) continue;
+  if (!new RegExp('^(?:static )?func ' + member + '\\(', 'm').test(read(worldOwners[service])))
+   unresolved.push(file + ': world.' + service + '.' + member + ' missing in ' + worldOwners[service]);
+ }
+}
+assert.deepEqual(unresolved, [], 'unresolved world member calls:\n' + unresolved.join('\n'));
+console.log('REGISTRY PASS concrete factories / direct peer methods / resolved world members / registered state fields');

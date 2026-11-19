@@ -14,7 +14,7 @@ try{
  write('simulation/definitions/profile_clock.gd','extends RefCounted\nstatic func now(enabled):\n\treturn Time.get_ticks_usec() if enabled else 0\n');assert.equal(run().status,0);
  write('simulation/test.gd','extends RefCounted\n');
  write('presentation/test.gd',"extends RefCounted\nconst Bad=preload('res://simulation/test.gd')\n");
- write('simulation/test.gd',"extends 'res://named_port.gd'\nconst Indirect=load('res://simulation/systems/mutable.gd')\n");
+ write('simulation/test.gd',"extends 'res://simulation/systems/mutable.gd'\nconst Indirect=load('res://simulation/systems/mutable.gd')\n");
  write('simulation/systems/mutable.gd','extends RefCounted\n');assert.notEqual(run().status,0);
  write('simulation/test.gd','extends RefCounted\n');write('presentation/test.gd','extends RefCounted\n');
  write('app/private.gd','extends RefCounted\nfunc bad(view):\n\treturn view._ui\n');assert.notEqual(run().status,0);
@@ -61,6 +61,14 @@ try{
  write('app/read_models/battle_queries.gd','extends RefCounted\n');
  write('presentation/test.gd','extends RefCounted\nfunc bad(host):\n\thost.saver.apply_snapshot({})\n');assert.notEqual(run().status,0);
  write('presentation/test.gd','extends RefCounted\n');
+ // An Object subclass must be created by a composition point that frees it.
+ write('simulation/unowned.gd','extends Object\n');
+ write('simulation/creator.gd','extends RefCounted\nconst Made=preload("res://simulation/unowned.gd")\nfunc make():\n\treturn Made.new()\n');
+ assert.notEqual(run().status,0,'Object subclass without an owning release point');
+ write('simulation/creator.gd','extends RefCounted\nconst Made=preload("res://simulation/unowned.gd")\nfunc make():\n\tvar value=Made.new()\n\tvalue.free()\n');
+ assert.equal(run().status,0);
+ write('simulation/unowned.gd','extends RefCounted\n');
+ write('simulation/creator.gd','extends RefCounted\n');
  const limits={files:{'simulation/test.gd':600},functions:{},violations:[],reviews:{}};
  const checkReview=()=>{write('limits.json',JSON.stringify(limits));return spawnSync(process.execPath,['tools/architecture_check.mjs','--root',root,'--limits',path.join(root,'limits.json')],{encoding:'utf8'});};
  assert.notEqual(checkReview().status,0,'Waivers require ownership and a deadline');

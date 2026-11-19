@@ -45,12 +45,13 @@ func control_group_work_site(n: int) -> Dictionary:
 			if _construction.active(site): return site
 	return {}
 
-func _group_assign(n: int, actors = null) -> void:
+func _group_assign(n: int, actors = null) -> bool:
 	var ids: Array = []
 	for u in battle.selected if actors == null else actors:
 		if u.alive and u.die_t<0 and int(u.owner)==battle.player_owner and not bool(u.get("attached",false)):ids.append(int(u.uid))
 	battle.control_groups[n] = ids
 	print("编队 %d：%d 个单位" % [n, ids.size()])
+	return true
 
 func _group_recall(n: int) -> bool:
 	var g := _group_units(n)
@@ -69,7 +70,7 @@ func _group_recall(n: int) -> bool:
 	print("呼出编队 %d：%d 个单位" % [n, g.size()])
 	return true
 
-func _cmd_watch(actors = null) -> void:
+func _cmd_watch(actors = null) -> bool:
 	var n := 0
 	for u in _command_units(actors):
 		if u.is_building or not u.alive or u.die_t>=0 or int(u.owner)!=battle.player_owner or bool(u.get("attached",false)):
@@ -81,6 +82,7 @@ func _cmd_watch(actors = null) -> void:
 		_effects.feedback("警戒：%d 支部队取消命令、原地待命" % n)
 	else:
 		_effects.feedback("没有可警戒的部队")
+	return n > 0
 
 func _cancel_unit_command(u: Dictionary) -> void:
 	u.erase("blocked_cursor")
@@ -109,10 +111,7 @@ func _cancel_unit_command(u: Dictionary) -> void:
 	u["rest_t"] = 0
 	u["build_t"] = 0
 
-func _order_hold() -> void:
-	_cmd_watch()
-
-func _cmd_rest(actors = null) -> void:
+func _cmd_rest(actors = null) -> bool:
 	var n := 0
 	for u in battle.selected if actors == null else actors:
 		if u.is_building or not u.alive or u.die_t >= 0.0 or int(u.owner)!=battle.player_owner or bool(u.get("attached",false)):
@@ -127,6 +126,7 @@ func _cmd_rest(actors = null) -> void:
 		_effects.feedback("休息：%d 支将部队原地休整（每 %d tick +%s 兵力）" % [n, int(Balance.work().restTicks), str(Balance.work().restHp)])
 	else:
 		_effects.feedback("只有武将部队可以休整")
+	return n > 0
 
 func _is_hero_unit(u: Dictionary) -> bool:
 	return Roles.is_hero(int(u.get("unit", -1)))
@@ -181,10 +181,11 @@ func _cmd_begin(kind: String, data: Dictionary = {}) -> void:
 		"join": _effects.feedback("加入：点击我方带将队伍，工人靠近后编入（每队最多15名成员）")
 		_: _effects.feedback("选择目标")
 
-func _cmd_disband(actors = null) -> void:
+func _cmd_disband(actors = null) -> bool:
 	var n: int = _dep_officer_teams._order_disband(actors)
 	if n <= 0:
 		_effects.feedback("请选择武将部队")
+	return n > 0
 
 func _commander_for(u: Dictionary) -> Dictionary:
 	if not u.get("officer", {}).is_empty(): return u
@@ -206,7 +207,7 @@ func _command_units(actors = null) -> Array:
 				result.append(member); seen[int(member.uid)] = true
 	return result
 
-func _return_selected_cargo(actors = null) -> void:
+func _return_selected_cargo(actors = null) -> bool:
 	var count:=0
 	for worker in battle.selected if actors == null else actors:
 		if not _dep_technology._is_worker_unit(worker) or float(worker.get("carry",0))<=0:continue
@@ -214,8 +215,9 @@ func _return_selected_cargo(actors = null) -> void:
 		_cancel_unit_command(worker)
 		worker.gather_obj=resource;worker.state="deliver";count+=1
 	_effects.feedback("%d 名工人返回入库" % count)
+	return count > 0
 
-func stop_selected(actors = null) -> void:
+func stop_selected(actors = null) -> bool:
 	var count := 0
 	for u in battle.selected if actors == null else actors:
 		if not u.alive or u.is_building:
@@ -224,6 +226,7 @@ func stop_selected(actors = null) -> void:
 		count += 1
 	if count > 0:
 		_effects.feedback("停止")
+	return count > 0
 
 ## HUD query: one world pass for all ten slots, with value-only records. Empty
 ## slots and unrelated units do not trigger twenty repeated eligibility scans.

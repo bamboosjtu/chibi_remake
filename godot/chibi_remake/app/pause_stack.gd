@@ -20,11 +20,6 @@ func release(token: int) -> void:
 	_leases.erase(token)
 	_sync()
 
-func release_scope(scope: Node) -> void:
-	for token in _leases.keys():
-		var owner = _leases[token].owner.get_ref()
-		if owner == null or owner == scope or scope.is_ancestor_of(owner): release(token)
-
 func is_top(token: int) -> bool:
 	return token > 0 and _leases.has(token) and token == _leases.keys().back()
 

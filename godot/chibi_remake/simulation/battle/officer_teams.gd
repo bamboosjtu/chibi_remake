@@ -174,7 +174,7 @@ func _unassign_officer(u: Dictionary) -> void:
 	u["officer_might"] = 0.0
 	u["officer_intellect"] = 0.0
 
-func _order_form_up(officer_index: int, actors = null) -> void:
+func _order_form_up(officer_index: int, actors = null) -> bool:
 	var done := 0
 	for u in (battle.selected if actors == null else actors).duplicate():
 		if u.is_building or not u.alive:
@@ -187,6 +187,7 @@ func _order_form_up(officer_index: int, actors = null) -> void:
 	else:
 		_effects.visual("feedback", ["组建完成"])
 		_auto_assign_new_team(officer_index)
+	return done > 0
 
 func _auto_assign_new_team(officer_index: int) -> void:
 	var ids: Array = []

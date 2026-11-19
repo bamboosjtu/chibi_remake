@@ -194,17 +194,19 @@ while sim_acc >= 速度周期 且 本帧步数 < 5:
 
 ## 13. 结构门禁
 
-`node tools/architecture_check.mjs` 检查直接及传递分层依赖、模拟节点所有权、入口和模块大小。三个入口预算分别为 250、500、400 行，其余运行脚本为 600 行。迁移保留的长函数在 `tools/inputs/architecture_limits.json` 中逐项记录；新增超过 80 行的函数或已有函数超出记录预算时必须重新评审。
+`node tools/architecture_check.mjs` 检查直接及传递分层依赖、模拟节点所有权、入口和模块大小。传递依赖同时跟随 `preload`/`load` 与 `extends "res://…"`。三个入口预算分别为 250、500、400 行，其余运行脚本为 600 行。迁移保留的长函数在 `tools/inputs/architecture_limits.json` 中逐项记录；新增超过 80 行的函数或已有函数超出记录预算时必须重新评审。
 
 同一文件还检查三条与"可无视图运行"直接相关的规则：
 
 - `simulation/` 不得出现 `get_node(`、`: Node` 类型标注或 `/root/` 路径——模拟必须能在没有场景树时运行；
 - `app/` 不得消费 `simulation_rng`（`randi`/`randf`）——玩法随机性只能落在 `simulation/`，否则 headless 摘要覆盖不到；读写 `rngState` 用于存档不在此列；
-- `presentation/` 不得直接 `preload("res://simulation/systems/...")`，只能经端口或 `battle_config` 的公共常量。
+- `presentation/` 不得直接 `preload("res://simulation/systems/...")`，只能经 `battle_queries`/`battle_actions` 或 `battle_config` 的公共常量。
+
+`extends Object` 的脚本必须由一个含 `_owned_services()`、`_owned_components()` 或 `free()` 的装配点持有——Object 没有引用计数兜底，漏登记即永久泄漏。
 
 引入规则时已存在的违规记在同文件的 `violations` 数组（`<文件>::<规则>`），逐条列明并保持让检查通过；新增违规直接失败，修好后应删除对应条目，因此该列表只能变短。
 
-`node tools/registry_check.mjs` 核对组合根工厂、直接协作者的方法和状态字段登记。引擎侧 `dump_composition.gd` 提供四个组合根的实际装配记录。
+`node tools/registry_check.mjs` 核对组合根工厂、直接协作者的方法和状态字段登记。工厂断言要求具名赋值与 `preload("res://<文件>")` 或同名常量精确对应，短名不得靠子串命中。另解析 `app/`、`presentation/` 中的 `world.<服务>.<成员>(...)` 调用，成员必须在组成清单登记的服务脚本里存在。引擎侧 `dump_composition.gd` 提供四个组合根的实际装配记录。
 
 清单与组合根的实际工厂声明交叉校验；`--runtime-log` 严格比较四个根的服务集合及脚本路径。状态代理仅暴露各状态类登记的 `PROXY_FIELDS`，未登记的写入返回失败。上述检查由 `tools/ci_lightweight.mjs` 和 `contracts` 工作流执行。
 
@@ -212,7 +214,7 @@ while sim_acc >= 速度周期 且 本帧步数 < 5:
 
 表现层通过 BattleQueries 查询投影，通过 BattleActions 操作战场，通过 SessionActions 管理暂停和存档。相机、音频和 HUD 节点归视图上下文持有。菜单自动化驱动按验收命令行参数加载。
 
-装配错误在创建阶段报告组件与缺失依赖，场景启动失败以非零码退出。交互中失效的单位、过期的世界身份和无效槽位由对应操作返回业务结果。
+装配错误在创建阶段报告组件与缺失依赖，场景启动失败以非零码退出。交互中失效的单位、过期的世界身份和无效槽位由对应操作返回业务结果。读模型以弱引用持有宿主：宿主释放后每条查询返回自身类型的空值并报告一次契约失败，关闭与换世界期间不得解引用已释放节点。
 
 战斗读模型和操作入口由场景持有。候选视图准备使用独立读模型，提交后稳定入口读取新世界。
 

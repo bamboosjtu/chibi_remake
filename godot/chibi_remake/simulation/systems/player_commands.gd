@@ -157,15 +157,15 @@ func _apply_order(command: Dictionary, battle: State, actors: Array, target: Dic
 			if not _dep_abilities._cast_jimou(pos, parameter, actors[0], target): return false
 			if battle.jimou_pending == parameter and is_same(battle.jimou_caster, actors[0]): _dep_world_orders._clear_pending()
 		"duel": return _dep_abilities._start_duel(actors[0], target)
-		"formation": _dep_abilities._set_formation(parameter, actors)
-		"unload": _dep_transport_orders._unload_selected(actors)
-		"watch": _dep_command_groups._cmd_watch(actors)
-		"rest": _dep_command_groups._cmd_rest(actors)
-		"stop": _dep_command_groups.stop_selected(actors)
-		"disband": _dep_command_groups._cmd_disband(actors)
-		"assign_officer": _dep_officer_teams._order_form_up(parameter, actors)
-		"assign_group": _dep_command_groups._group_assign(parameter, actors)
-		"return_cargo": _dep_command_groups._return_selected_cargo(actors)
+		"formation": return _dep_abilities._set_formation(parameter, actors)
+		"unload": return _dep_transport_orders._unload_selected(actors)
+		"watch": return _dep_command_groups._cmd_watch(actors)
+		"rest": return _dep_command_groups._cmd_rest(actors)
+		"stop": return _dep_command_groups.stop_selected(actors)
+		"disband": return _dep_command_groups._cmd_disband(actors)
+		"assign_officer": return _dep_officer_teams._order_form_up(parameter, actors)
+		"assign_group": return _dep_command_groups._group_assign(parameter, actors)
+		"return_cargo": return _dep_command_groups._return_selected_cargo(actors)
 		_: return false
 	return true
 

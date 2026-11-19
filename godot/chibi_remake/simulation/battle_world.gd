@@ -142,8 +142,9 @@ func validate_services(label: String, application_services: Dictionary = {}, fai
 func dispose() -> void:
 	if _disposed: return
 	_disposed = true
-	if battle_simulation == null: return
+	# Presentation listeners are closed even on a partially initialized world.
 	effects.close()
+	if battle_simulation == null: return
 	player_commands.retire()
 	battle_simulation.disconnect_native()
 	nav.release_runtime_queries()

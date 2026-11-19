@@ -282,12 +282,12 @@
 
 工人高清图页的行距不均匀，布局生成器按每列的透明间隔提取完整姿势，并校验姿势数量与页契约一致。空手、木材、矿物和粮食帧独立裁切，显示高度与脚底仍取源帧边界；不能先按等分网格裁切，否则会混入相邻搬运姿势或截断货物。
 
-### 可选移动表现状态（兼容 v8 旧档）
+### 可选移动表现状态（字段登记与恢复）
 
-每个机动单位可带 `walk_tick`、`move_facing`、`turn_tick`、`move_started`、`move_turning`。前三者是非负整数，朝向限制在 0–7；后两者是布尔值。恢复前验证类型与范围；旧档缺省为零时钟和当前路径朝向。它们不参与寻路、位移、攻防或胜负判定，只用于继续步态与转向，故不改变关卡内容哈希。
+每个机动单位可带 `walk_tick`、`move_facing`、`turn_tick`、`move_started`、`move_turning`。前三者是非负整数，朝向限制在 0–7；后两者是布尔值。恢复前验证类型与范围；缺省为零时钟和当前路径朝向。它们不参与寻路、位移、攻防或胜负判定，只用于继续步态与转向，故不改变关卡内容哈希。
 
 ### 单位研究与可选计谋快照
 
 `unit_definitions.json` 由 `tools/import_unit_research.py` 读取 research/units 的26种定义、动画与现有高清 manifest 生成；`unit_rules.gd` 只替换已确认属性，保留原地图的阵营美术配置。`unit_tuning.json` 记录800更新、2/0.5移动倍率和固定10格远视等已确认值及暂定表现说明。
 
-v8新增字段均可缺省：每单位 `ambush_t`、`rolling_t`、`rolling_ticks`、`effect_tasks`（27/28的去重任务列表）、`effect_task`（0/27/28）；模拟全局 `fireFields`（a/b地面格、age0–99）。验证全部结构后才交换世界；旧档hidden_t迁移为ambush_t，旧档缺火场与队列时默认空。不会改变关卡内容哈希或玩家存档路径。
+v9 只接受当前格式：单位字段除登记为 `optional` 的 `stock`/`stock_max` 外都是必需项，缺失即拒绝读取，不存在旧档迁移分支。每单位 `ambush_t`、`rolling_t`、`rolling_ticks`、`effect_tasks`（27/28 的去重任务列表）、`effect_task`（0/27/28）与模拟全局 `fireFields`（a/b 地面格、age0–99）都由 Schema 持久化；全部结构验证通过后才交换世界。不会改变关卡内容哈希或玩家存档路径。

@@ -134,9 +134,12 @@ func _detach_from_ship(u: Dictionary, ship: Dictionary) -> bool:
 		ship["loaded"] = false
 	return true
 
-func _unload_selected(actors = null) -> void:
+func _unload_selected(actors = null) -> bool:
+	var queued := 0
 	for ship in battle.selected if actors == null else actors:
-		if int(ship.unit)==Roles.transport_id():_order_unload(ship)
+		if int(ship.unit)==Roles.transport_id() and _order_unload(ship) > 0:
+			queued += 1
+	return queued > 0
 
 func _order_unload(ship: Dictionary, _pos:=Vector2.ZERO) -> int:
 	if not _transports.valid_ship(ship) or int(ship.owner)!=battle.player_owner:return 0
