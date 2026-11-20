@@ -261,7 +261,7 @@ while sim_acc >= 速度周期 且 本帧步数 < 5:
 
 `battle_resources.gd` 不再保存 entries，也不读取 map_data、nav 或 decor_cells。BattleQueries 提供资源层的值键和可见描述数组，每个描述仅包含 index、anchor、phase；新建容器递归冻结，结果不含资源字典、地图、导航、Object、Callable 或可变 Packed 数组。decor_cells 的旧借用 getter 已从 BattleQueries 删除。
 
-资源层按世界身份、导航身份、resource_revision、导航几何版本和视口 Rect2 缓存。逐帧仅比较常量大小的值键；键变化后扫描 decor，只构造可见描述，不深拷贝整个地图或资源记录。普通阻挡版本变化不影响资源画法，不触发重扫；资源定义的直接修改必须提升资源版本或更换世界。资源片连通区与点击命中分别由 `simulation/queries/resource_index.gd` 的缓存/空间桶服务，资源层投影不持有该索引或旧世界。
+资源层按世界身份、导航身份、resource_revision、导航几何版本和视口 Rect2 缓存。逐帧仅比较常量大小的值键；键变化后扫描 decor，只构造可见描述，不深拷贝整个地图或资源记录。普通阻挡版本变化不影响资源画法，不触发重扫；资源定义的直接修改必须提升资源版本或更换世界。资源片连通区与点击命中分别由 `simulation/economy/resource_index.gd` 的缓存/空间桶服务，资源层投影不持有该索引或旧世界。
 
 精灵、纹理和图集 frame 元数据由表现层管理。即使 index 和 phase 相同，几何或世界变化后也更新精灵位置；phase 5 按既有图集声明跳过并移除旧精灵。实际交换回滚和读档、所有非身份键值相同的替换、保留旧投影时释放旧世界/导航均由回归覆盖。
 

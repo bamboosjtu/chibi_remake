@@ -65,7 +65,7 @@ func ai_worker_count(owner: int) -> int:
 	return n
 
 func ai_construction_commander(owner: int) -> Dictionary:
-	var roster := preload("res://simulation/queries/construction_roster.gd").new(battle.units)
+	var roster := preload("res://simulation/construction/construction_roster.gd").new(battle.units)
 	for commander in roster.by_owner.get(owner, []):
 		if int(commander.owner) != owner or str(commander.state) != "idle": continue
 		var workers := roster.construction_workers(commander)

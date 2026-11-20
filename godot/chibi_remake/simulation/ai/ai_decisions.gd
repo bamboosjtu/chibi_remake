@@ -254,7 +254,7 @@ func _maintain_construction_team(owner: int) -> Dictionary:
 ## 不会被再次选中，避免一队两个武将。
 
 func _spare_construction_officer(owner: int) -> Dictionary:
-	var roster := preload("res://simulation/queries/construction_roster.gd").new(_ai_state.state.units)
+	var roster := preload("res://simulation/construction/construction_roster.gd").new(_ai_state.state.units)
 	for u in roster.by_owner.get(owner, []):
 		if int(u.get("owner", -1)) != owner or bool(u.get("is_building", false)): continue
 		if not bool(u.get("alive", false)) or float(u.get("die_t", -1)) >= 0.0: continue

@@ -1,5 +1,5 @@
 extends "test_contact_and_occupancy.gd"
-const Roster = preload("res://simulation/queries/construction_roster.gd")
+const Roster = preload("res://simulation/construction/construction_roster.gd")
 const Schema = preload("res://simulation/units/unit_schema.gd")
 func run() -> void:
 	root.get_node("Game").current_map="chibic1"

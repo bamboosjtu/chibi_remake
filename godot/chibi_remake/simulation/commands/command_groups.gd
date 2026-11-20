@@ -132,7 +132,7 @@ func _is_hero_unit(u: Dictionary) -> bool:
 	return Roles.is_hero(int(u.get("unit", -1)))
 
 func _construction_workers(commander: Dictionary) -> Array:
-	return preload("res://simulation/queries/construction_roster.gd").new(battle.units).construction_workers(commander)
+	return preload("res://simulation/construction/construction_roster.gd").new(battle.units).construction_workers(commander)
 
 func _selected_construction_workers(actors = null) -> Array:
 	var workers := []

@@ -9,7 +9,7 @@ var _dep_command_groups: Object
 var _dep_harvest_orders: Object
 var _dep_movement: Object
 var _dep_spatial_index: Object
-var resource_index := preload("res://simulation/queries/resource_index.gd").new()
+var resource_index := preload("res://simulation/economy/resource_index.gd").new()
 
 func _init(data: State) -> void:
 	battle = data
