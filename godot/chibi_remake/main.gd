@@ -110,10 +110,10 @@ func _init() -> void:
 	var report: Dictionary = world.validate_services("main", {"bootstrap":bootstrap, "cheat_controller":cheat_controller, "duel_controller":duel_controller, "scene_controller":scene_controller})
 	_api_missing = report.missing
 	if _api_missing.is_empty(): _activate_world()
-
-func create_view_context() -> Node2D:
-	var queries := preload("res://app/read_models/battle_queries.gd").new(self)
-	return create_view_context_for(queries)
+func run_acceptance(kind: String, argument: String = "") -> void:
+	if not Game.acceptance_enabled: push_error("Acceptance script requested without the companion"); get_tree().quit(1); return
+	await load("res://testing/automation/acceptance_hook.gd").new().run(self, kind, argument)
+func create_view_context() -> Node2D: return create_view_context_for(preload("res://app/read_models/battle_queries.gd").new(self))
 
 func create_view_context_for(queries: Object, parent: Node = null) -> Node2D:
 	var reader: Node2D = presentation.create_view_context(scene, queries, actions, session_actions)

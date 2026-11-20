@@ -28,7 +28,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\build_release.ps1 -S
 
 1. 准备隔离的临时目录、用户目录和导出模板。
 2. 按参数导出或复用关卡数据，核对运行资源白名单与全部输入的 SHA-256。
-3. `stage_release.mjs` 创建独立暂存工程与 `release_inputs.json`。
+3. `stage_release.mjs` 创建独立暂存工程与 `release_inputs.json`，干净构建从对应提交读取脚本、场景、配置和测试脚本，并校验该提交的 LFS 指针。
 4. `build_terrain.mjs` 验证 `source/terrain` 的版本化源输入，并按源内容、地图、烘焙器及编码参数重建或命中 `_work/terrain`；`dedupe_terrain.mjs` 合并同内容分块并重写引用。
 5. 导入资源，按 `Windows HD Art` 导出独立 EXE/PCK、配套原生库和显式绿色存储配置。
 6. 先用实际 EXE 加载全部地图，再用启用断言的临时引擎挂载同一 PCK，运行发布回归、确定性基线、连续三轮标准性能，以及真实 EXE 的绿色/系统模式保存与重启读取，写出绑定 EXE/PCK/DLL/存储配置哈希的 `verification.json`。
@@ -39,7 +39,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\build_release.ps1 -S
 
 ## 4. 构建清单与发布
 
-`build-manifest.json` 记录构建起点的提交、工作区改动标记、生成时间、引擎版本、候选冒烟结果（`candidate-smoke` / `skipped` / `unverified`），以及 EXE/PCK、DLL 和声明文件的哈希。schema 3 同时记录 `verification.json` 的哈希。`publish_release.ps1` 重新核对证据、全部必测项目和产物哈希；无证据、证据失败、覆盖不全、清单过期或产物变化均拒绝发布。
+`build-manifest.json` 记录构建起点的提交、工作区改动标记、生成时间、引擎版本、候选冒烟结果（`candidate-smoke` / `skipped` / `unverified`），以及 EXE/PCK、DLL 和声明文件的哈希；干净构建另记录源文件快照和 LFS 指针校验结果。schema 3 同时记录 `verification.json` 的哈希。`publish_release.ps1` 重新核对证据、全部必测项目和产物哈希；无证据、证据失败、覆盖不全、清单过期或产物变化均拒绝发布。
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\publish_release.ps1 -Executable '<候选目录>\ChibiRTS.exe'
@@ -95,7 +95,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/release.ps1 -Mode rele
 ```
 
 - `preview` 写入 `release/versions/<时间>_<提交>_<ID>` 并切换 `release/current.json`，双击 `release\ChibiRTS.exe` 即可试玩；`-SkipBuild` 只打印当前版本。
-- `release` 要求 `build-manifest.json` 的 `dirty=false`；`tools/package_release.ps1` 以 900 MiB 为上限拆分：超过上限的文件生成 `.partNNN` 分卷，其余文件直接复制，同时生成 `join-release.ps1`、`join-release.cmd`、`SHA256SUMS.txt` 和 `dist/release-body.md`。
+- `release` 要求工作区干净、构建清单提交与 `origin` 上 `-Tag` 指向的提交一致；`tools/package_release.ps1` 按 `release-files.json` 在独立目录生成分卷、重组脚本、校验和与发布说明，成功后替换 `dist/package`。
 - 发布资产采用扁平命名（例如 `licenses-ffmpeg-LICENSE-ffmpeg.txt`），避免 GitHub 资产名不能含路径的问题；所有资产都小于 1 GiB。
 - 手动上传：
 

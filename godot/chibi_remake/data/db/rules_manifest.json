@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "files": {
-    "res://app/battle/startup/bootstrap.gd": "a8a6ec05bf763570a3540c168eb50389594363d4655ba528eefd36a3466c5173",
+    "res://app/battle/startup/bootstrap.gd": "b8a14012a25dafed79dfa62183500cf5db31626fbc80b211f8151e4b5e4e5d0a",
     "res://simulation/ai/ai.gd": "473c35a85a798cb75f184e8096b2444b1ea155b8e7b63991418edbfb10d02c6c",
     "res://simulation/ai/ai_config.gd": "51c48b1c71c7330d568b823051653dfd77b81047c5048c494b1cb7cf6e7aa932",
     "res://simulation/ai/ai_decisions.gd": "72e6d1f21aaea21bdf8f81c4ea311375d3f942018924dd6e10ce0669d7391735",

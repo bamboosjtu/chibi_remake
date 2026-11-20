@@ -1,39 +1,5 @@
 {
   "schemaVersion": 1,
   "description": "Historical dependency edges the P0 gate must tolerate until the named stage removes them. Each entry records the current file edge and why it exists; stale entries fail the gate.",
-  "edges": [
-    {
-      "from": "app/battle/startup/bootstrap.gd",
-      "to": "testing/native/native_save_acceptance.gd",
-      "fromPackage": "app/battle",
-      "toPackage": "testing",
-      "kind": "import",
-      "line": 123,
-      "reason": "Acceptance-only probe load; gated by Game.acceptance_enabled and the requested parameter; testpack is not shipped in normal PCK.",
-      "removeByStage": "P6",
-      "reviewBy": "2026-12-31"
-    },
-    {
-      "from": "app/battle/startup/bootstrap.gd",
-      "to": "testing/checks/navigation_checks.gd",
-      "fromPackage": "app/battle",
-      "toPackage": "testing",
-      "kind": "import",
-      "line": 131,
-      "reason": "Acceptance-only probe load; gated by Game.acceptance_enabled and the requested parameter; testpack is not shipped in normal PCK.",
-      "removeByStage": "P6",
-      "reviewBy": "2026-12-31"
-    },
-    {
-      "from": "app/battle/startup/bootstrap.gd",
-      "to": "testing/driver/battle_selftest.gd",
-      "fromPackage": "app/battle",
-      "toPackage": "testing",
-      "kind": "import",
-      "line": 135,
-      "reason": "Acceptance-only probe load; gated by Game.acceptance_enabled and the requested parameter; testpack is not shipped in normal PCK.",
-      "removeByStage": "P6",
-      "reviewBy": "2026-12-31"
-    }
-  ]
+  "edges": []
 }
