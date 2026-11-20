@@ -1,0 +1,374 @@
+extends Object
+var _transports: RefCounted
+var _stratagems: RefCounted
+const NavRuntime = preload("res://simulation/navigation/nav.gd")
+var _nav: NavRuntime
+var _harvesting: RefCounted
+const EffectsRuntime = preload("res://simulation/ports/battle_events.gd")
+var _effects: EffectsRuntime
+var _economy: RefCounted
+var _construction: RefCounted
+const Balance = preload("res://simulation/definitions/balance_rules.gd")
+const Roles = preload("res://simulation/definitions/unit_roles.gd")
+## unit actions: composed battle behavior.
+const State = preload("res://simulation/state/battle_state.gd")
+const ProfileClock = preload("res://simulation/core/profile_clock.gd")
+const Config = preload("res://simulation/definitions/battle_config.gd")
+var battle: State
+var _dep_combat: Object
+var _dep_command_groups: Object
+var _dep_construction_orders: Object
+var _dep_harvest_orders: Object
+var _dep_interaction_paths: Object
+var _dep_movement: Object
+var _dep_officer_teams: Object
+var _dep_spatial_index: Object
+var _dep_transport_orders: Object
+var profile_enabled := false
+var profile: Dictionary={}
+
+func _init(data: State) -> void:
+	battle = data
+
+func _step_unit(u: Dictionary, delta: float, native_attack_checked := false) -> void:
+	if profile_enabled:
+		_step_unit_profiled(u, delta, native_attack_checked)
+		return
+	var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel()
+	if not native_attack_checked and kernel != null and u.state == "attack" and not u.is_building:
+		if _try_native_attack(u, delta, kernel): return
+	preload("res://simulation/combat/stratagem_rules.gd").begin_update(u)
+	_step_unit_inner(u, delta)
+	_dep_spatial_index._separate_unit(u)
+	_stratagems.step_effects(u)
+	if kernel!=null:kernel.finish_unit(u)
+	else:
+		preload("res://simulation/movement/locomotion.gd").step_script(u)
+		preload("res://simulation/movement/tick_timers.gd").step_statuses_script(u)
+
+func _step_unit_profiled(u: Dictionary, delta: float, native_attack_checked: bool) -> void:
+	var at:=ProfileClock.now(profile_enabled)
+	var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel()
+	if not native_attack_checked and kernel != null and u.state == "attack" and not u.is_building:
+		if _try_native_attack(u, delta, kernel):
+			_profile_time("nativeAttack", at)
+			profile["units"] = int(profile.get("units", 0)) + 1
+			return
+	preload("res://simulation/combat/stratagem_rules.gd").begin_update(u);at=_profile_time("beginStatus",at)
+	_step_unit_inner(u,delta);var end:=ProfileClock.now(profile_enabled)
+	var key: String="kind%d" % int(u.unit);profile[key]=int(profile.get(key,0))+end-at
+	at=_profile_time("action",at)
+	_dep_spatial_index._separate_unit(u);at=_profile_time("separation",at)
+	_stratagems.step_effects(u);at=_profile_time("effects",at)
+	preload("res://simulation/movement/locomotion.gd").step(u);at=_profile_time("locomotion",at)
+	preload("res://simulation/movement/tick_timers.gd").step_statuses(u);_profile_time("timers",at)
+	profile["units"]=int(profile.get("units",0))+1
+
+func _profile_time(key: String, at: int) -> int:
+	var now:=ProfileClock.now(profile_enabled);profile[key]=int(profile.get(key,0))+now-at;return now
+
+
+func _step_unit_inner(u: Dictionary, delta: float) -> void:
+	var phase := ProfileClock.now(profile_enabled)
+	if not _prepare_action(u, delta): return
+	if profile_enabled: _profile_time("prepare", phase)
+	match str(u.state):
+		"attack": _step_attack(u, delta, _is_tower(u))
+		"move": _step_move(u, delta)
+		"join": _step_join(u, delta)
+		"board": _step_board(u, delta)
+		"gather": _step_gather(u, delta)
+		"deliver":
+			# Delivery waits deliberately skip animation, as in the original tick.
+			if not _step_deliver(u, delta): return
+		"rest": _step_rest(u, delta)
+		"repair": _step_repair(u, delta)
+		"build": _step_build(u, delta)
+	# Idle, unload and passive states share the same final animation step.
+	u.anim += delta
+
+func _is_tower(u: Dictionary) -> bool:
+	return bool(u.is_building) and int(u.unit) in [18,19]
+
+func _prepare_action(u: Dictionary, delta: float) -> bool:
+	u.moved = false
+	if bool(u.get("attached", false)):
+		return false
+	# Confusion/rolling idle tasks wait behind the running order, without clearing it.
+	if preload("res://simulation/combat/stratagem_rules.gd").active(u):
+		u.anim += delta
+		return false
+	if (int(u.get("site_inside_uid",-1))>=0 or int(u.get("site_follow_uid",-1))>=0) and _construction.step(u): return false
+	# 下船按每 4 拍一名推进；船接到新命令也不打断在舱载员的卸载。
+	if (bool(u.get("unload_active", false)) or str(u.get("state", "")) == "unload") and int(u.get("unit", -1)) == Roles.transport_id():
+		u.unload_t = int(u.get("unload_t", 0)) + 1
+		if int(u.unload_t) % 4 == 0:
+			_dep_transport_orders._retry_unload(u)
+		if int(u.get("carry_n", 0)) <= 0:
+			u.unload_active = false
+			if str(u.get("state", "")) == "unload": u.state = "idle"
+	# 旧存档或旧AI可能留下无武装单位的攻击命令；执行层同样拒绝。
+	if u.state == "attack" and not preload("res://simulation/definitions/combat_rules.gd").can_attack(u):
+		_dep_command_groups._cancel_unit_command(u)
+	# 遭遇接战不受战略 AI 的出兵科技/金钱条件限制；忙碌与原地待命单位保留命令。
+	if u.state=="idle":preload("res://simulation/combat/engagement.gd").step(battle, u, _dep_combat._nearest_enemy)
+	# 箭楼独立守卫，AI之间不互相射击。
+	var tower := _is_tower(u)
+	if tower and u.state == "idle" and not bool(u.get("site", false)) and int(u.get("confused_t", 0)) <= 0:
+		var enemy: Dictionary = _dep_combat._nearest_enemy(u, float(u.atk_range) * battle.tile_w)
+		if not enemy.is_empty():
+			u.target = enemy; u.state = "attack"
+	if u.state == "idle" and not bool(u.get("hold", false)) and not (u.get("officer", {}) as Dictionary).is_empty():
+		_follow_working_members(u)
+	return true
+
+func _follow_working_members(u: Dictionary) -> void:
+	# 带将部队的将本体在空闲时跟随正在干活/行军的成员，不把将留在原地。
+	var leader_idx := int(u.officer.get("index", -1))
+	for member in battle.units:
+		if int(member.get("group_officer", -1)) != leader_idx: continue
+		if is_same(member, u) or not bool(member.get("alive", false)) or float(member.get("die_t", -1)) >= 0.0: continue
+		if str(member.get("state", "")) in ["move", "gather", "deliver", "build", "repair", "attack"]:
+			var follow_to := Vector2(float(member.ax), float(member.ay))
+			if Vector2(float(u.ax), float(u.ay)).distance_to(follow_to) > 2.0 * battle.tile_w:
+				u.state = "move"
+				u.path = _dep_movement._path_to(u, follow_to, true)
+				u.pi = 0
+				break
+
+func _step_move(u: Dictionary, delta: float) -> void:
+	# REQ-003：行军被新占地截断 → 按**新世界**重寻路（A* 已反映新占地）。
+	# 绕得开就继续走向原目的地；绕不开（目的地不可达）才弃单转 idle。
+	# 连续被堵却一步都没走出去（blocked_n>2，见 _follow）同样弃单 —— 不会原地无限重试。
+	if u.path.is_empty() and u.has("repath_to"):
+		var dest: Vector2 = u["repath_to"]
+		u.erase("repath_to")
+		u.path = _dep_movement._path_to(u, dest, true)
+		u.pi = 0
+		if u.path.is_empty():
+			u.state = "idle"
+	if _dep_movement._follow(u, delta):
+		u.state = "idle"
+
+func _step_join(u: Dictionary, delta: float) -> void:
+	var leader: Dictionary = {}
+	for candidate in battle.units:
+		if int(candidate.uid) == int(u.get("join_target_uid", -1)): leader = candidate; break
+	if leader.is_empty() or not bool(leader.alive) or leader.die_t >= 0 or leader.get("officer", {}).is_empty() or int(leader.owner) != int(u.owner):
+		_dep_command_groups._cancel_unit_command(u)
+	elif _dep_interaction_paths._edge_cell_distance(u, leader) <= Config.EDGE_DISTANCE:
+		var idx := int(leader.officer.index)
+		var members: Array = battle.units.filter(func(member): return bool(member.alive) and member.die_t < 0 and int(member.owner) == int(u.owner) and int(member.get("group_officer", -1)) == idx)
+		_dep_command_groups._cancel_unit_command(u)
+		if members.size() < Balance.team_max_members():
+			u.group_officer = idx
+			_dep_officer_teams._auto_assign_new_team(idx)
+			_effects.feedback("已加入%s的队伍" % str(leader.officer.name).replace(" ", ""))
+		else: _effects.feedback("该队伍已满15名成员")
+	else:
+		if u.path.is_empty(): u.path = _dep_interaction_paths._edge_interaction_path(u, leader); u.pi = 0
+		if u.path.is_empty(): _dep_command_groups._cancel_unit_command(u); _effects.feedback("无法靠近该队伍")
+		else: _dep_movement._follow(u, delta)
+
+func _step_board(u: Dictionary, delta: float) -> void:
+	# 装载（模式 0xC）：走到运输船旁 → 附着上船（船计数 +1、HP 累加）。
+	var bship = u.get("board_target", null)
+	if not (bship is Dictionary) or not _transports.valid_ship(bship) or str(bship.state)=="unload" \
+			or int(bship.get("unit", -1)) != Roles.transport_id() \
+			or int(bship.get("owner", -1)) != int(u.get("owner", -1)):
+		u.state = "idle"; u.board_target = null
+	elif int(bship.get("carry_n", 0)) >= Balance.transport_capacity():
+		u.state = "idle"; u.board_target = null
+		_effects.feedback("运输船已满（%d）" % Balance.transport_capacity())
+	elif not _transports.adjacent(u,bship):
+		if u.path.is_empty():
+			u.path = _transports.boarding_path(u,bship); u.pi = 0
+		if u.path.is_empty():
+			u.state = "idle"; u.board_target = null; _effects.feedback("无法靠近运输船")
+		else: _dep_movement._follow(u, delta)
+	else:
+		u.path = []
+		_dep_transport_orders._attach_to_ship(u, bship)
+
+func _step_gather(u: Dictionary, delta: float) -> void:
+	var obj = u.get("gather_obj", null)
+	if not (obj is Dictionary) or obj.is_empty():
+		u.state = "idle"; u.path = []
+	elif not bool(obj.get("alive", false)) or float(obj.get("die_t", -1)) >= 0:
+		_harvesting.next_target(u, obj)
+	elif _dep_interaction_paths._edge_cell_distance(u, obj) != Config.EDGE_DISTANCE:
+		if u.path.is_empty():
+			var choice: Dictionary = _dep_interaction_paths._edge_interaction_choice(u, obj)
+			if not choice.is_empty():
+				u.gather_obj = choice.object
+				u.path = choice.path
+			u.pi = 0
+		if u.path.is_empty():
+			u.state = "idle"; _effects.feedback("工人无法到达该资源点边缘")
+		else: _dep_movement._follow(u, delta)
+	else:
+		u.path = []
+		_harvesting.extract(u, obj)
+
+func _step_deliver(u: Dictionary, delta: float) -> bool:
+	var deposits: Array = _dep_harvest_orders._deposits_for(u, str(u.get("carry_kind", "")))
+	var arrived: Dictionary = {}
+	for building in deposits:
+		if _dep_interaction_paths._deposit_ready(u, building):
+			arrived = building; break
+	if not arrived.is_empty():
+		u.delivery_ticks = int(u.get("delivery_ticks", 0)) + 1
+		if int(u.delivery_ticks) % 4 != 0: return false
+		if _dep_harvest_orders._deposit_carry(u):
+			u.path = []; u.pi = 0
+			# 卸货后继续玩家指定的资源，不暗中改采其他种类。
+			if u.gather_obj is Dictionary: _harvesting.resume_after_deposit(u, u.gather_obj)
+			else: u.state = "idle"
+		else:
+			u.path = []; u.pi = 0
+			u.state = "idle"
+	else:
+		if u.path.is_empty():
+			for building in deposits:
+				u.path = _dep_interaction_paths._edge_interaction_path(u, building, {}, Config.DEPOSIT_EDGE_PX); u.pi = 0
+				if not u.path.is_empty(): break
+		if u.path.is_empty():
+			u.state = "idle"; _effects.feedback("没有可到达的卸货建筑，工人保留携带资源")
+		else: _dep_movement._follow(u, delta)
+	return true
+
+func _step_rest(u: Dictionary, delta: float) -> void:
+	# 休息（模式 4，FUN_004602e0）：每 REST_TICKS 个逻辑 tick HP +1，满编即结束。
+	if float(u.hp) >= float(u.maxhp) - 0.001:
+		u.state = "idle"; u.rest_t = 0
+	else:
+		u.rest_t = int(u.get("rest_t", 0)) + 1
+		if int(u.rest_t) >= int(Balance.work().restTicks):
+			u.rest_t = 0
+			u.hp = minf(float(u.maxhp), float(u.hp) + float(Balance.work().restHp))
+		if float(u.hp) >= float(u.maxhp):
+			u.state = "idle"; u.rest_t = 0
+
+func _step_repair(u: Dictionary, delta: float) -> void:
+	var rt = u.get("repair_target",null)
+	if not (rt is Dictionary) or not rt.get("alive",false) or float(rt.get("die_t",-1)) >= 0 or rt.get("attached",false) or int(rt.owner) != int(u.owner) or not _dep_spatial_index._contains_unit(rt):
+		_dep_command_groups._cancel_unit_command(u)
+	elif float(rt.hp) >= float(rt.maxhp):
+		_dep_command_groups._cancel_unit_command(u)
+	elif not _economy.can_pay(int(u.owner),Balance.work().repairCost):
+		_dep_command_groups._cancel_unit_command(u); _effects.feedback("修理：四种资源都须多于15")
+	elif _dep_interaction_paths._dist_to_obj(u,rt) > Config.GATHER_REACH:
+		preload("res://simulation/movement/action_clock.gd").reset(u)
+		if u.path.is_empty(): u.path = _dep_interaction_paths._interaction_path(u,rt,Config.GATHER_REACH); u.pi = 0
+		if u.path.is_empty(): _dep_command_groups._cancel_unit_command(u); _effects.feedback("工人无法到达该修理目标")
+		else: _dep_movement._follow(u,delta)
+	else:
+		u.path = []
+		var offset := Vector2(rt.ax-u.ax,rt.ay-u.ay)
+		u.dir = int(round(offset.angle()/(PI/4.0))) & 7
+		if preload("res://simulation/movement/action_clock.gd").step(u,"repair",int(rt.uid)):
+			if not _dep_construction_orders._do_repair(u,rt) or float(rt.hp) >= float(rt.maxhp): _dep_command_groups._cancel_unit_command(u)
+
+func _step_build(u: Dictionary, delta: float) -> void:
+	# 建造（模式 8，FUN_0045c320）：走到工地旁，**每 4 tick 给工地 +2 HP**（多工人叠加）。
+	var bt = u.get("build_target", null)
+	if not (bt is Dictionary) or not _dep_construction_orders._valid_build_worker(u, bt):
+		u.state = "idle"; u.build_target = null; u.build_t = 0
+	elif _dep_interaction_paths._edge_cell_distance(u, bt) != Config.EDGE_DISTANCE:
+		if u.path.is_empty():
+			u.path = _dep_construction_orders._site_entry_path(u, bt); u.pi = 0
+		if u.path.is_empty():
+			u.state = "idle"; u.build_target = null; u.build_t = 0; _effects.feedback("工人无法到达工地")
+		else: _dep_movement._follow(u, delta)
+	else:
+		_construction.enter(u, bt)
+
+func _step_attack(u: Dictionary,delta: float,tower: bool) -> void:
+	var phase:=ProfileClock.now(profile_enabled)
+	var raw_target = u.target
+	if not (raw_target is Dictionary) or not raw_target.alive or raw_target.die_t >= 0 or raw_target.get("attached",false) or not _dep_spatial_index._contains_unit(raw_target):
+		_dep_command_groups._cancel_unit_command(u)
+	else:
+		if profile_enabled:phase=_profile_time("validTarget",phase)
+		var t: Dictionary=raw_target
+		var attack_range: float=preload("res://simulation/definitions/combat_rules.gd").effective_range(u)
+		var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel()
+		var prepared: int
+		if kernel!=null:prepared=kernel.prepare_combat(u,t,attack_range,battle.tile_w,tower,_nav.native_query_context())
+		else:prepared=preload("res://simulation/movement/action_clock.gd").prepare_attack_script(u,t,attack_range,battle.tile_w,tower)
+		var strike: bool=(prepared&1)!=0
+		if profile_enabled:phase=_profile_time("clock",phase)
+		var in_reach: bool=(prepared&2)!=0
+		# 近战按**近距离格**判定：不叠格后，等距邻格/斜邻格的脚点距离可到 66px，
+		# 仍应视为贴脸可攻击（否则会被前面的单位卡在 66px 外）。
+		# R06：放宽到两格时必须同时确认中间没有墙/不可通行地形/封闭建筑，
+		# 否则会“隔墙扣血”。远程越墙仍走独立规则（不在此补偿内）。
+		if attack_range <= 1 and kernel==null:
+			if not in_reach:
+				var uc: Vector2i = _dep_spatial_index._unit_cell(u);var tc: Vector2i = _dep_spatial_index._unit_cell(t)
+				in_reach=maxi(absi(uc.x-tc.x),absi(uc.y-tc.y))<=2
+			in_reach=in_reach and _dep_combat._melee_line_clear(u,t)
+		if profile_enabled:phase=_profile_time("contact",phase)
+		if in_reach:
+			u.route_failures=0
+			u.path = []; u.pi = 0
+			if strike:
+				_dep_combat._fire_attack(u,t)
+		elif tower:
+			_dep_command_groups._cancel_unit_command(u)
+		else:
+			if strike: preload("res://simulation/movement/action_clock.gd").reset(u) # 击发时射程失效，重发同一攻击重新等待。
+			u.repath -= delta
+			if u.repath <= 0:
+				_repath_attack(u,t,attack_range)
+			_dep_movement._follow(u,delta)
+
+	if profile_enabled:phase=_profile_time("hitOrFollow",phase)
+
+func _repath_attack(u: Dictionary,t: Dictionary,attack_range: float) -> void:
+	# 近战不能把“敌方占格”当终点（不叠格会停在两格外），
+	# 改寻到目标占格旁的落脚格；远程仍寻到目标本身。
+	if attack_range <= 1:
+		u.path = _dep_interaction_paths._edge_interaction_path(u, t)
+	else:
+		u.path = _dep_movement._path_to(u,Vector2(t.ax,t.ay),false)
+	u.pi = 0
+	u.route_failures=mini(3,int(u.get("route_failures",0))+1) if u.path.is_empty() else 0
+	# Stable UID phases spread synchronized retry bursts without using
+	# wall time or RNG; the remaining delay is saved with the order.
+	u.repath=0.8*pow(2.0,maxi(0,int(u.route_failures)-1))+(int(u.uid)%11)*Config.SIM_DT
+
+func _try_native_attack(u: Dictionary,delta: float,kernel: Object) -> bool:
+	var at:=ProfileClock.now(profile_enabled)
+	var result: int=kernel.attack_fast(u,delta,_nav.native_query_context(),battle._target_owner,battle._targets,battle.units,battle._index_units_ref,battle._index_units_size)
+	if profile_enabled:at=_profile_time("nativePrepare",at)
+	if result<0:return false
+	if result&1:_dep_combat._fire_attack(u,u.target)
+	# Same range source as the script path (ambush units use their vision radius).
+	if result&2:_repath_attack(u,u.target,preload("res://simulation/definitions/combat_rules.gd").effective_range(u))
+	if result&4:_dep_movement._follow(u,delta)
+	u.anim+=delta
+	if profile_enabled:at=_profile_time("nativeApply",at)
+	if kernel.finish_or_separate(u,battle._cell_index,_nav.native_query_context()):
+		_dep_spatial_index._separate_unit(u)
+		kernel.finish_plain_attack(u)
+	if profile_enabled:_profile_time("nativeFinalize",at)
+	return true
+
+func bind_dependencies(world: Object) -> void:
+	_dep_combat = world.combat
+	_dep_command_groups = world.command_groups
+	_dep_construction_orders = world.construction_orders
+	_dep_harvest_orders = world.harvest_orders
+	_dep_interaction_paths = world.interaction_paths
+	_dep_movement = world.movement
+	_dep_officer_teams = world.officer_teams
+	_dep_spatial_index = world.spatial_index
+	_dep_transport_orders = world.transport_orders
+	_construction = world.construction
+	_economy = world.economy
+	_effects = world.effects
+	_harvesting = world.harvesting
+	_nav = world.nav
+	_stratagems = world.stratagems
+	_transports = world.transports

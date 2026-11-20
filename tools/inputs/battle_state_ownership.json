@@ -47,8 +47,8 @@
       "policy": "RESTORED",
       "owner": "commands",
       "current_writers": [
-        "simulation/battle/selection.gd",
-        "simulation/battle/command_groups.gd"
+        "simulation/commands/selection.gd",
+        "simulation/commands/command_groups.gd"
       ],
       "readers": [
         "*"
@@ -102,7 +102,7 @@
       "policy": "INPUTS",
       "owner": "ai",
       "current_writers": [
-        "simulation/battle/cheat_rules.gd"
+        "simulation/cheats/cheat_rules.gd"
       ],
       "readers": [
         "*"
@@ -156,7 +156,7 @@
       "policy": "INPUTS",
       "owner": "production",
       "current_writers": [
-        "simulation/battle/production.gd"
+        "simulation/production/production.gd"
       ],
       "readers": [
         "*"
@@ -184,7 +184,7 @@
       "policy": "INPUTS",
       "owner": "technology",
       "current_writers": [
-        "simulation/battle/technology.gd"
+        "simulation/technology/technology.gd"
       ],
       "readers": [
         "*"
@@ -277,7 +277,7 @@
       "policy": "INPUTS",
       "owner": "economy",
       "current_writers": [
-        "simulation/systems/economy.gd"
+        "simulation/economy/economy.gd"
       ],
       "readers": [
         "*"
@@ -292,7 +292,7 @@
       "policy": "INPUTS",
       "owner": "economy",
       "current_writers": [
-        "simulation/systems/economy.gd"
+        "simulation/economy/economy.gd"
       ],
       "readers": [
         "*"
@@ -307,7 +307,7 @@
       "policy": "INPUTS",
       "owner": "economy",
       "current_writers": [
-        "simulation/systems/economy.gd"
+        "simulation/economy/economy.gd"
       ],
       "readers": [
         "*"
@@ -322,7 +322,7 @@
       "policy": "INPUTS",
       "owner": "economy",
       "current_writers": [
-        "simulation/systems/economy.gd"
+        "simulation/economy/economy.gd"
       ],
       "readers": [
         "*"
@@ -714,7 +714,7 @@
       "policy": "INPUTS",
       "owner": "scenario",
       "current_writers": [
-        "simulation/systems/scenario_rules.gd"
+        "simulation/scenario/scenario_rules.gd"
       ],
       "readers": [
         "*"

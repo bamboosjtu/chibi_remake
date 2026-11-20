@@ -4,7 +4,7 @@ const Contract = preload("res://simulation/definitions/contracts/rule_contract.g
 const Roles = preload("res://simulation/definitions/unit_roles.gd")
 const Balance = preload("res://simulation/definitions/balance_rules.gd")
 const Technology = preload("res://simulation/definitions/technology_rules.gd")
-const State = preload("res://simulation/systems/technology_state.gd")
+const State = preload("res://simulation/technology/technology_state.gd")
 func _initialize() -> void: run.call_deferred()
 func run() -> void:
 	_contracts()

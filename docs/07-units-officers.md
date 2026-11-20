@@ -244,10 +244,10 @@
 | 职责 | 模块 |
 |---|---|
 | 单位属性、生成、状态机 | `main.gd::_make_unit`、`_step_unit_inner` |
-| 武将库、占用、编组 | `simulation/battle/officer_pool.gd`、`simulation/battle/officer_teams.gd`、`main.gd::_assign_officers` |
-| 品级与武将攻防 | `simulation/systems/combat_rules.gd` |
+| 武将库、占用、编组 | `simulation/officers/officer_pool.gd`、`simulation/officers/officer_teams.gd`、`main.gd::_assign_officers` |
+| 品级与武将攻防 | `simulation/definitions/combat_rules.gd` |
 | 命令面板与分型 | `presentation/battle/battle_view.gd`、`presentation/hud/command_catalog.gd` |
-| 运输与载员 | `simulation/systems/transports.gd`、`main.gd::_order_board`、`_order_unload` |
+| 运输与载员 | `simulation/transport/transports.gd`、`main.gd::_order_board`、`_order_unload` |
 | 控制组 | `main.gd::_group_*`、HUD 左缘条 |
 
 ## 8. 验收要点

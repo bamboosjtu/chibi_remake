@@ -24,7 +24,7 @@ func run() -> void:
 	assert(worker.delivery_ticks==1 and worker.anim==2.0 and worker.state=="deliver")
 	# Confusion precedes order execution and animates exactly once.
 	worker.state="move";worker.path=[Vector2(worker.ax+100,worker.ay)];worker.confused_t=4
-	worker.effect_task=preload("res://simulation/systems/stratagem_rules.gd").CONFUSION
+	worker.effect_task=preload("res://simulation/combat/stratagem_rules.gd").CONFUSION
 	var before:=Vector2(worker.ax,worker.ay)
 	sim.world.unit_actions._step_unit_inner(worker,sim.SIM_DT)
 	assert(worker.state=="move" and Vector2(worker.ax,worker.ay)==before and is_equal_approx(worker.anim,2.0+sim.SIM_DT))

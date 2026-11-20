@@ -1,6 +1,6 @@
 extends SceneTree
-const Visibility = preload("res://simulation/systems/battle_visibility.gd")
-const Timers = preload("res://simulation/systems/tick_timers.gd")
+const Visibility = preload("res://simulation/visibility/battle_visibility.gd")
+const Timers = preload("res://simulation/movement/tick_timers.gd")
 var done := false
 
 func _initialize() -> void:

@@ -167,7 +167,7 @@ func snapshot(units: Array, resources: Dictionary, extra: Dictionary, slot := -1
 			if slot >= 0: last_save_error = error
 			push_warning("Save snapshot rejected: " + str(error))
 			return {}
-	var derived := preload("res://simulation/systems/transports.gd").snapshot_fields(units)
+	var derived := preload("res://simulation/transport/transports.gd").snapshot_fields(units)
 	var recs := []
 	var by_uid := {}
 	for unit in units: by_uid[int(unit.uid)] = unit

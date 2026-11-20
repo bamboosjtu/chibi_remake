@@ -40,7 +40,7 @@ static func valid(data: Dictionary) -> bool:
 		if seen.has(int(record.uid)) or not record.get("simulation") is Dictionary: return false
 		seen[int(record.uid)] = true
 		if not Schema.valid_snapshot(record.simulation): return false
-		if not preload("res://simulation/systems/tick_timers.gd").valid_snapshot(record.simulation): return false
+		if not preload("res://simulation/movement/tick_timers.gd").valid_snapshot(record.simulation): return false
 	return true
 
 static func known_world_fields(simulation: Dictionary) -> bool:

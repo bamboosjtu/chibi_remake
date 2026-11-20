@@ -1,5 +1,5 @@
 extends SceneTree
-const Locomotion=preload("res://simulation/systems/locomotion.gd")
+const Locomotion=preload("res://simulation/movement/locomotion.gd")
 ## Continuous travel, safe shortcuts, render interpolation and distinct group goals.
 var done := false
 func _initialize() -> void:

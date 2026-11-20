@@ -20,9 +20,9 @@ func prepare_map(map_id: String) -> String:
 	var data = JSON.parse_string(file.get_as_text())
 	if not Campaign.is_level_doc(data):
 		return path + " 解析失败或关卡字段缺失"
-	if not preload("res://simulation/systems/unit_rules.gd").apply_definitions(data):
+	if not preload("res://simulation/definitions/unit_rules.gd").apply_definitions(data):
 		return "单位定义或生产数据损坏"
-	preload("res://simulation/systems/building_rules.gd").apply_definitions(data)
+	preload("res://simulation/definitions/building_rules.gd").apply_definitions(data)
 	battle.map_id = map_id
 	battle.map_data = data
 	world.set_definition(data)

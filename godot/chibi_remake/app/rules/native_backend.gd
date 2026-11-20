@@ -2,9 +2,9 @@ extends RefCounted
 ## Optional backend discovery belongs to startup, never to a math/tick query.
 const Kernel = preload("res://simulation/native/math_kernel.gd")
 const Catalog = preload("res://simulation/definitions/rule_catalog.gd")
-const Footprint = preload("res://simulation/systems/unit_footprint.gd")
+const Footprint = preload("res://simulation/navigation/unit_footprint.gd")
 const Status = preload("res://simulation/definitions/status_fields.gd")
-const Action = preload("res://simulation/definitions/action_visual.gd")
+const Action = preload("res://simulation/definitions/timing/action_visual.gd")
 static var _attempted := false
 static var _errors: Array = []
 

@@ -239,10 +239,10 @@
 |---|---|
 | 生产清单与费用 | `data/db/production_units.json`、`main.gd::train_types_for` |
 | 生产队列、出生、取消 | `main.gd::_queue_train`、`_process_trainings` |
-| 科技表、费用、前置、订单 | `simulation/battle/technology.gd` |
-| 科技等级与生命上限 | `simulation/systems/technology_state.gd` |
-| 攻防计算 | `simulation/systems/combat_rules.gd` |
-| AI 研究与生产调度 | `simulation/systems/ai.gd`、`ai_training_slots.gd`、`ai_naval_slots.gd` |
+| 科技表、费用、前置、订单 | `simulation/technology/technology.gd` |
+| 科技等级与生命上限 | `simulation/technology/technology_state.gd` |
+| 攻防计算 | `simulation/definitions/combat_rules.gd` |
+| AI 研究与生产调度 | `simulation/ai/ai.gd`、`ai_training_slots.gd`、`ai_naval_slots.gd` |
 
 ## 6. 验收要点
 

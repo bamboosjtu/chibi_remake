@@ -1,5 +1,5 @@
 extends Object
-const VisibilityRuntime = preload("res://simulation/systems/battle_visibility.gd")
+const VisibilityRuntime = preload("res://simulation/visibility/battle_visibility.gd")
 var _visibility: VisibilityRuntime
 var _transports: RefCounted
 var _projectiles: RefCounted
@@ -9,7 +9,7 @@ var _nav: NavRuntime
 var _fire_fields: RefCounted
 const EffectsRuntime = preload("res://simulation/ports/battle_events.gd")
 var _effects: EffectsRuntime
-const ClockRuntime = preload("res://simulation/systems/battle_clock.gd")
+const ClockRuntime = preload("res://simulation/core/battle_clock.gd")
 var _clock: ClockRuntime
 const AutomaticGatesRuntime = preload("res://simulation/navigation/automatic_gates.gd")
 var _automatic_gates: AutomaticGatesRuntime

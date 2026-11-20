@@ -22,7 +22,7 @@ func blank() -> void:
 	sim.player_owner = 3
 	sim.scenario_sides = [{"owner": 3}, {"owner": 1}, {"owner": 2}]
 	sim.scenario_mission = 29
-	sim.rules = load("res://simulation/systems/scenario_rules.gd").new(sim.world)
+	sim.rules = load("res://simulation/scenario/scenario_rules.gd").new(sim.world)
 
 func make(uid: int, owner: int, kind: int, cell: Vector2i, building := false) -> Dictionary:
 	var u: Dictionary = template.duplicate(true)

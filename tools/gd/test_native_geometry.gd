@@ -1,6 +1,6 @@
 extends "test_contact_and_occupancy.gd"
 const K=preload("res://simulation/native/math_kernel.gd")
-const A=preload("res://simulation/systems/action_clock.gd")
+const A=preload("res://simulation/movement/action_clock.gd")
 func run():
 	var kernel:=K.get_kernel()
 	if kernel==null:print("NATIVE GEOMETRY FALLBACK PASS");done=true;quit();return

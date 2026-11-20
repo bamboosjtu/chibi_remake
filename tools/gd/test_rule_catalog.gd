@@ -2,7 +2,7 @@ extends SceneTree
 const Catalog = preload("res://simulation/definitions/rule_catalog.gd")
 const Contract = preload("res://simulation/definitions/contracts/rule_contract.gd")
 const Loader = preload("res://app/rules/rule_loader.gd")
-const Stratagem = preload("res://simulation/systems/stratagem_rules.gd")
+const Stratagem = preload("res://simulation/combat/stratagem_rules.gd")
 const Identity = preload("res://app/saves/rules_identity.gd")
 
 func _initialize() -> void:
@@ -76,8 +76,8 @@ func _contracts() -> void:
 	var first: Array = opening.pool([]); var second: Array = opening.pool([])
 	first[0][0].level = 9
 	assert(second[0][0].level == 5 and Catalog.get_catalog("officers.json").blocks[0].officers[0].level == 0)
-	var rules = preload("res://simulation/systems/unit_rules.gd")
-	var buildings = preload("res://simulation/systems/building_rules.gd")
+	var rules = preload("res://simulation/definitions/unit_rules.gd")
+	var buildings = preload("res://simulation/definitions/building_rules.gd")
 	var map_a := {"units":{}}; var map_b := {"units":{}}
 	assert(rules.apply_definitions(map_a) and rules.apply_definitions(map_b))
 	buildings.apply_definitions(map_a); buildings.apply_definitions(map_b)

@@ -27,7 +27,7 @@ func blank() -> void:
 	sim.selected = []
 	sim.player_owner = 3
 	sim.scenario_sides = []
-	brain = load("res://simulation/systems/ai.gd").new(sim.world)
+	brain = load("res://simulation/ai/ai.gd").new(sim.world)
 	sim.ai = brain
 
 func install(list: Array) -> void:

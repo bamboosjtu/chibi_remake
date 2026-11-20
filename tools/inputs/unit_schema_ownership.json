@@ -20,7 +20,7 @@
       "group": "derived",
       "owner": "navigation",
       "current_writers": [
-        "simulation/battle/spatial_index.gd"
+        "simulation/navigation/spatial_index.gd"
       ],
       "readers": [
         "*"
@@ -321,7 +321,7 @@
       "group": "scalar",
       "owner": "officers",
       "current_writers": [
-        "simulation/battle/officer_teams.gd"
+        "simulation/officers/officer_teams.gd"
       ],
       "readers": [
         "*"
@@ -1220,11 +1220,11 @@
       "group": "relation",
       "owner": "movement",
       "current_writers": [
-        "simulation/battle/command_groups.gd",
-        "simulation/battle/construction_orders.gd",
-        "simulation/systems/harvesting.gd",
-        "simulation/systems/scenario_rules.gd",
-        "simulation/systems/engagement.gd"
+        "simulation/commands/command_groups.gd",
+        "simulation/construction/construction_orders.gd",
+        "simulation/economy/harvesting.gd",
+        "simulation/scenario/scenario_rules.gd",
+        "simulation/combat/engagement.gd"
       ],
       "readers": [
         "*"

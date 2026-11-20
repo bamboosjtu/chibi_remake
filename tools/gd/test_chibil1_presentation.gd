@@ -77,7 +77,7 @@ func _run() -> void:
 			if member.owner == battle.player_owner: assert(int(member.get("group_officer", -1)) != 42, "released commander must not retain followers")
 		print("PRESENTATION PASS ", dimensions, " zoom=", expected, " HQ fraction=", composition, " skills / palette / group / fog / rejected-load unchanged")
 		viewport.free()
-	var state = load("res://simulation/systems/battle_visibility.gd").new()
+	var state = load("res://simulation/visibility/battle_visibility.gd").new()
 	state.setup(Vector2(4048, 3130))
 	var scout := {"ax": 500.0, "ay": 500.0, "unit": 30, "owner": 2, "alive": true, "is_building": false, "vision": 4}
 	state.update([scout], 2)

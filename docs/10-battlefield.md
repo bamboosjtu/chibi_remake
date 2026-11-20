@@ -225,9 +225,9 @@
 | 职责 | 模块 |
 |---|---|
 | 网格、A*、双层、占格索引、城门登记 | `simulation/navigation/nav.gd` |
-| 占格形状 | `simulation/systems/unit_footprint.gd` |
+| 占格形状 | `simulation/navigation/unit_footprint.gd` |
 | 城门开闭 | `simulation/navigation/automatic_gates.gd` |
-| 视野与迷雾 | `simulation/systems/battle_visibility.gd` |
+| 视野与迷雾 | `simulation/visibility/battle_visibility.gd` |
 | 移动状态机、防叠 | `main.gd::_follow`、`_separate_unit`、`_resolve_navigation_overlaps` |
 | 地图数据 | `data/*.json`、`tools/godot_export.mjs` |
 
@@ -247,6 +247,6 @@
 
 ### 基于 research/movements 的行走与转向
 
-逻辑档位已有 20/30/50/100ms 周期，本次保留战场节拍与移动距离，修正固定 10fps 步态和瞬切朝向。`simulation/systems/locomotion.gd` 维护独立 `walk_tick`，仅在实际移动时推进，每两次更新选下一帧；跨路点、转向和重复命令不清零。各方向按步态行 `turn` 的完整序列循环并保留重复帧；`walk` 标签对应的动作行只用于站定攻击/修理，不因其名称而用于位移。v8 继续只用于攻击/修理周期。
+逻辑档位已有 20/30/50/100ms 周期，本次保留战场节拍与移动距离，修正固定 10fps 步态和瞬切朝向。`simulation/movement/locomotion.gd` 维护独立 `walk_tick`，仅在实际移动时推进，每两次更新选下一帧；跨路点、转向和重复命令不清零。各方向按步态行 `turn` 的完整序列循环并保留重复帧；`walk` 标签对应的动作行只用于站定攻击/修理，不因其名称而用于位移。v8 继续只用于攻击/修理周期。
 
 显示 `move_facing` 与路径 `dir` 分开，每两次更新向目标方向转一个相邻扇区并使用 turn 姿势，移动起步保留短过渡；不等待转身结束才位移。显示层采用独立转向模型。位置和行走相位一起插值；镜头外继续计数而不加载高清帧。移动中携带资源仍用搬运序列，停下攻击/修理仍由 ActionClock 控制。

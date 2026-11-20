@@ -1,5 +1,5 @@
 extends SceneTree
-const Rules = preload("res://simulation/systems/combat_rules.gd")
+const Rules = preload("res://simulation/definitions/combat_rules.gd")
 var done := false
 func _initialize() -> void:
 	create_timer(60).timeout.connect(func():

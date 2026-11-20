@@ -9,9 +9,9 @@ var content_revision: Callable
 var _valid_cost: Callable
 var _valid_integer: Callable
 var compatibility_error := ""
-const ActionClock = preload("res://simulation/systems/action_clock.gd")
-const TickTimers = preload("res://simulation/systems/tick_timers.gd")
-const TechnologyState = preload("res://simulation/systems/technology_state.gd")
+const ActionClock = preload("res://simulation/movement/action_clock.gd")
+const TickTimers = preload("res://simulation/movement/tick_timers.gd")
+const TechnologyState = preload("res://simulation/technology/technology_state.gd")
 const Semantics = preload("res://app/saves/snapshot_semantics.gd")
 
 func _init(battle: Object, revision: Callable, cost: Callable, integer: Callable) -> void:
@@ -203,7 +203,7 @@ func _valid_unit_states(d: Dictionary, arr: Array, ids: Dictionary) -> bool:
 		var st2: Dictionary = rec2.get("simulation", {})
 		if not preload("res://simulation/units/unit_schema.gd").valid_snapshot(st2): return false
 		if not TickTimers.valid_snapshot(st2) or not ActionClock.valid_snapshot(st2): return false
-		if not preload("res://simulation/systems/locomotion.gd").valid_snapshot(st2): return false
+		if not preload("res://simulation/movement/locomotion.gd").valid_snapshot(st2): return false
 		if not host.world.stratagems.valid_snapshot(st2):return false
 		# R01：统一“基础上限 + 科技当前兵力”的合法范围；升级部队 hp > maxhp 是契约内状态。
 		# 只约束仍在场的单位：淡出中的尸体允许保留负 HP（击杀结算不夹到 0）。

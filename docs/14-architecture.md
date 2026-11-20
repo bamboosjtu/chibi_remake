@@ -41,15 +41,15 @@
 | `simulation/world/battle_simulation.gd` | 固定 tick 执行顺序、实体清理与摘要 |
 | `simulation/battle/` | 实体工厂、空间索引、交互路径、移动、战斗、建造、生产、武将、能力、命令、战役 |
 | `simulation/navigation/` | 导航状态、网格占格、路径查询与城门 |
-| `simulation/systems/ai.gd` | AI 调度、快照和稳定外部接口 |
-| `simulation/systems/ai_decisions.gd` | AI 建造、训练、研究与战术决策 |
+| `simulation/ai/ai.gd` | AI 调度、快照和稳定外部接口 |
+| `simulation/ai/ai_decisions.gd` | AI 建造、训练、研究与战术决策 |
 | `presentation/battle/components/` | HUD 创建与布局、命令模型与动作、输入、选择信息、相机、单位外观、世界图层 |
 | `presentation/menu/` | 菜单控制器、样式、关卡选择、势力选择与自动化驱动 |
 | `presentation/audio/sfx.gd` | 音效播放；随机数与模拟分离 |
 | `app/saves/` | 快照字段、完整校验、候选世界恢复与提交 |
 | `testing/` | 随候选包提供的自检套件；由原 `--selftest` 参数分派 |
 
-科技和武将使用组合服务；模拟状态由 `simulation/state/battle_state.gd` 持有，科技服务在 `simulation/battle/technology.gd`，不保留按旧资源路径命名的兼容脚本。场景同名方法仅保留仍有外部调用的转发。
+科技和武将使用组合服务；模拟状态由 `simulation/state/battle_state.gd` 持有，科技服务在 `simulation/technology/technology.gd`，不保留按旧资源路径命名的兼容脚本。场景同名方法仅保留仍有外部调用的转发。
 
 战场组合根持有具名服务，并在初始化时连接协作者。启动装配失败以退出码 1 终止，候选装配失败返回读档错误。
 

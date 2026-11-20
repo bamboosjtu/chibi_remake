@@ -21,57 +21,57 @@ var ai: RefCounted:
 		if production != null: production._ai = value
 var effects = preload("res://simulation/ports/battle_events.gd").new()
 var nav := Nav.new()                                # 拥有 AStarGrid2D 与瓦片尺寸（tile_w/tile_hw/tile_hh）
-var visibility = preload("res://simulation/systems/battle_visibility.gd").new()
+var visibility = preload("res://simulation/visibility/battle_visibility.gd").new()
 var automatic_gates = preload("res://simulation/navigation/automatic_gates.gd").new()
-var clock = preload("res://simulation/systems/battle_clock.gd").new()
+var clock = preload("res://simulation/core/battle_clock.gd").new()
 
 var definition: Dictionary = {}
 var state := preload("res://simulation/state/battle_state.gd").new()
-const AbilitiesService = preload("res://simulation/battle/abilities.gd")
+const AbilitiesService = preload("res://simulation/combat/abilities.gd")
 var abilities: AbilitiesService
-const AiEconomyService = preload("res://simulation/battle/ai_economy.gd")
+const AiEconomyService = preload("res://simulation/ai/ai_economy.gd")
 var ai_economy: AiEconomyService
-const AiOrdersService = preload("res://simulation/battle/ai_orders.gd")
+const AiOrdersService = preload("res://simulation/ai/ai_orders.gd")
 var ai_orders: AiOrdersService
 const BattleSimulationService = preload("res://simulation/world/battle_simulation.gd")
 var battle_simulation: BattleSimulationService
-const CampaignService = preload("res://simulation/battle/campaign.gd")
+const CampaignService = preload("res://simulation/scenario/campaign.gd")
 var campaign: CampaignService
-const CheatRulesService = preload("res://simulation/battle/cheat_rules.gd")
+const CheatRulesService = preload("res://simulation/cheats/cheat_rules.gd")
 var cheat_rules: CheatRulesService
-const CombatService = preload("res://simulation/battle/combat.gd")
+const CombatService = preload("res://simulation/combat/combat.gd")
 var combat: CombatService
-const CommandGroupsService = preload("res://simulation/battle/command_groups.gd")
+const CommandGroupsService = preload("res://simulation/commands/command_groups.gd")
 var command_groups: CommandGroupsService
-const ConstructionOrdersService = preload("res://simulation/battle/construction_orders.gd")
+const ConstructionOrdersService = preload("res://simulation/construction/construction_orders.gd")
 var construction_orders: ConstructionOrdersService
-const EntityFactoryService = preload("res://simulation/battle/entity_factory.gd")
+const EntityFactoryService = preload("res://simulation/units/entity_factory.gd")
 var entity_factory: EntityFactoryService
-const HarvestOrdersService = preload("res://simulation/battle/harvest_orders.gd")
+const HarvestOrdersService = preload("res://simulation/economy/harvest_orders.gd")
 var harvest_orders: HarvestOrdersService
-const InteractionPathsService = preload("res://simulation/battle/interaction_paths.gd")
+const InteractionPathsService = preload("res://simulation/navigation/interaction_paths.gd")
 var interaction_paths: InteractionPathsService
-const MovementService = preload("res://simulation/battle/movement.gd")
+const MovementService = preload("res://simulation/movement/movement.gd")
 var movement: MovementService
-const OfficerPoolService = preload("res://simulation/battle/officer_pool.gd")
+const OfficerPoolService = preload("res://simulation/officers/officer_pool.gd")
 var officer_pool: OfficerPoolService
-const OfficerTeamsService = preload("res://simulation/battle/officer_teams.gd")
+const OfficerTeamsService = preload("res://simulation/officers/officer_teams.gd")
 var officer_teams: OfficerTeamsService
-const ProductionService = preload("res://simulation/battle/production.gd")
+const ProductionService = preload("res://simulation/production/production.gd")
 var production: ProductionService
-const SelectionService = preload("res://simulation/battle/selection.gd")
+const SelectionService = preload("res://simulation/commands/selection.gd")
 var selection: SelectionService
-const SpatialIndexService = preload("res://simulation/battle/spatial_index.gd")
+const SpatialIndexService = preload("res://simulation/navigation/spatial_index.gd")
 var spatial_index: SpatialIndexService
-const TechnologyService = preload("res://simulation/battle/technology.gd")
+const TechnologyService = preload("res://simulation/technology/technology.gd")
 var technology: TechnologyService
-const TransportOrdersService = preload("res://simulation/battle/transport_orders.gd")
+const TransportOrdersService = preload("res://simulation/transport/transport_orders.gd")
 var transport_orders: TransportOrdersService
-const UnitActionsService = preload("res://simulation/battle/unit_actions.gd")
+const UnitActionsService = preload("res://simulation/units/unit_actions.gd")
 var unit_actions: UnitActionsService
-const WorldOrdersService = preload("res://simulation/battle/world_orders.gd")
+const WorldOrdersService = preload("res://simulation/commands/world_orders.gd")
 var world_orders: WorldOrdersService
-const PlayerCommandsService = preload("res://simulation/systems/player_commands.gd")
+const PlayerCommandsService = preload("res://simulation/commands/player_commands.gd")
 var player_commands: PlayerCommandsService
 var _disposed := false
 
@@ -104,22 +104,22 @@ func _init() -> void:
 	unit_actions = UnitActionsService.new(state)
 	world_orders = WorldOrdersService.new(state)
 	player_commands = PlayerCommandsService.new(state, get_instance_id())
-	economy = preload("res://simulation/systems/economy.gd").new(self)
-	projectiles = preload("res://simulation/systems/projectiles.gd").new(self)
-	fire_fields = preload("res://simulation/systems/fire_fields.gd").new(self)
-	transports = preload("res://simulation/systems/transports.gd").new(self)
-	harvesting = preload("res://simulation/systems/harvesting.gd").new(self)
-	construction = preload("res://simulation/systems/construction_interior.gd").new(self)
-	stratagems = preload("res://simulation/systems/stratagem_rules.gd").new(self)
-	command_rules = preload("res://simulation/systems/command_rules.gd").new(self)
-	rules = preload("res://simulation/systems/scenario_rules.gd").new(self)
+	economy = preload("res://simulation/economy/economy.gd").new(self)
+	projectiles = preload("res://simulation/combat/projectiles.gd").new(self)
+	fire_fields = preload("res://simulation/combat/fire_fields.gd").new(self)
+	transports = preload("res://simulation/transport/transports.gd").new(self)
+	harvesting = preload("res://simulation/economy/harvesting.gd").new(self)
+	construction = preload("res://simulation/construction/construction_interior.gd").new(self)
+	stratagems = preload("res://simulation/combat/stratagem_rules.gd").new(self)
+	command_rules = preload("res://simulation/commands/command_policy.gd").new(self)
+	rules = preload("res://simulation/scenario/scenario_rules.gd").new(self)
 	for service in _owned_services().values():
 		if service != null and service.has_method("bind_dependencies"): service.bind_dependencies(self)
 	set_ai_enabled(true)
 
 func set_ai_enabled(enabled: bool) -> void:
 	if not enabled: ai = null
-	elif ai == null: ai = preload("res://simulation/systems/ai.gd").new(self)
+	elif ai == null: ai = preload("res://simulation/ai/ai.gd").new(self)
 
 func prepare_map() -> void:
 	nav.setup(state.map_data)

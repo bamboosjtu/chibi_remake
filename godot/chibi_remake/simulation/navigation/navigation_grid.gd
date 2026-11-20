@@ -5,7 +5,7 @@ var _grid_state: GridState
 var _route_cache_version := -1
 var _route_gate_cache: Dictionary={}
 
-const UnitFootprint = preload("res://simulation/systems/unit_footprint.gd")
+const UnitFootprint = preload("res://simulation/navigation/unit_footprint.gd")
 
 func _init(data: GridState) -> void:
 	_grid_state = data

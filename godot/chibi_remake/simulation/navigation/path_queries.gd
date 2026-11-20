@@ -9,7 +9,7 @@ const GridRay = preload("res://simulation/navigation/grid_ray.gd")
 var _gate_shape_version := -1
 var _gate_shape_cache: Dictionary={}
 var metrics := {"calls":0,"microseconds":0,"smoothMicroseconds":0,"searchMicroseconds":0,"rayCells":0,"avoidWrites":0,"avoidScopes":0}
-const UnitFootprint = preload("res://simulation/systems/unit_footprint.gd")
+const UnitFootprint = preload("res://simulation/navigation/unit_footprint.gd")
 
 func _init(data: GridState) -> void:
 	_grid_state = data

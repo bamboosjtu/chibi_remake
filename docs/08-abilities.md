@@ -138,12 +138,12 @@ power = 截断( ((兵力A% − 体力B%) × 4 / 60 + 1) × 兵力A%² × 0.006 )
 
 | 职责 | 模块 |
 |---|---|
-| 计谋校验、施放、队伍与任务 | `simulation/battle/abilities.gd`、`simulation/systems/stratagem_rules.gd` |
-| 单格火场 | `simulation/systems/fire_fields.gd` |
-| 状态计时与恢复 | `simulation/systems/tick_timers.gd`、`simulation/battle/officer_teams.gd` |
-| 阵法偏移与应用 | `simulation/battle/abilities.gd` |
+| 计谋校验、施放、队伍与任务 | `simulation/combat/abilities.gd`、`simulation/combat/stratagem_rules.gd` |
+| 单格火场 | `simulation/combat/fire_fields.gd` |
+| 状态计时与恢复 | `simulation/movement/tick_timers.gd`、`simulation/officers/officer_teams.gd` |
+| 阵法偏移与应用 | `simulation/combat/abilities.gd` |
 | 单挑 | `main.gd::_duel_begin`、`_duel_at` |
-| 视野与远视 | `simulation/systems/battle_visibility.gd`；施放当帧刷新，到期恢复基础半径 |
+| 视野与远视 | `simulation/visibility/battle_visibility.gd`；施放当帧刷新，到期恢复基础半径 |
 | 计谋与阵法子菜单 | `presentation/battle/battle_view.gd` |
 
 ## 7. 验收要点

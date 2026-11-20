@@ -1,5 +1,5 @@
 extends SceneTree
-const Timers = preload("res://simulation/systems/tick_timers.gd")
+const Timers = preload("res://simulation/movement/tick_timers.gd")
 var done := false
 var b: Node2D
 var game: Node

@@ -127,7 +127,7 @@ func run() -> void:
 	assert(b.world.construction_orders._assign_build_worker(worker, new_site) and b.economy.balance(3) == paid, "resume is not a second purchase")
 	print("CONSTRUCTION PAYMENT PASS worker-team commander required / reachable site / normal cost once / resuming no charge")
 	# 真实AI计划执行：没有空闲队伍就等待；完工后同一武将队伍可承接下一处工地。
-	b.ai = load("res://simulation/systems/ai.gd").new(b.world)
+	b.ai = load("res://simulation/ai/ai.gd").new(b.world)
 	b.ai._refresh_plan(3)
 	var count: int = b.units.size()
 	var waiting_cost: Dictionary = b.economy.balance(3).duplicate()

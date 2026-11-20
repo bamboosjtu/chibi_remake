@@ -3,7 +3,7 @@ const args=process.argv.slice(2),engine=path.resolve(args.includes('--engine')?a
 const directory=path.resolve(args.includes('--output')?args[args.indexOf('--output')+1]:'_work/registry-negative-runtime');fs.mkdirSync(directory,{recursive:true});
 for(const [name,body] of Object.entries({
  missing:'preload("res://composition_contract.gd").wire({"combat":null},"negative")',
- missing_peer:'var module=preload("res://simulation/battle/unit_actions.gd").new(preload("res://simulation/state/battle_state.gd").new())\n\tpreload("res://composition_contract.gd").wire({"unit_actions":module},"negative")',
+ missing_peer:'var module=preload("res://simulation/units/unit_actions.gd").new(preload("res://simulation/state/battle_state.gd").new())\n\tpreload("res://composition_contract.gd").wire({"unit_actions":module},"negative")',
  wrong_peer:'var nav=preload("res://simulation/navigation/nav.gd").new()\n\tvar other=preload("res://simulation/navigation/nav.gd").new()\n\tpreload("res://composition_contract.gd").wire({"paths":nav.paths,"grid":other.grid},"wrong navigation grid")',
  unknown_visual:'var battle=load("res://main.gd").new()\n\tvar view=Node2D.new()\n\tbattle.scene.view=view\n\tbattle._on_visual("unknown_visual",[])\n\tbattle.dispose_services()\n\tview.free()\n\tbattle.free()',
  unknown_sound:'var battle=load("res://main.gd").new()\n\tvar sound=Node.new()\n\tbattle.scene.sfx=sound\n\tbattle._on_sound("unknown_sound",[])\n\tbattle.dispose_services()\n\tsound.free()\n\tbattle.free()',

@@ -89,7 +89,7 @@ func performance_counters() -> Dictionary:
 	return {"syncCalls":sync_calls,"syncMicroseconds":sync_microseconds,
 		"candidatesChecked":candidates_checked,"visibleChecks":visible_checks,"movingVisuals":_moving.size()}
 
-const FRAME_TICKS = preload("res://simulation/definitions/action_visual.gd").FRAME_TICKS # Presentation sampling; simulation owns gait state.
+const FRAME_TICKS = preload("res://simulation/definitions/timing/action_visual.gd").FRAME_TICKS # Presentation sampling; simulation owns gait state.
 
 func _init(data: UIState, node: Node2D) -> void:
 	_ui = data
@@ -312,7 +312,7 @@ func _apply_visual(u: Dictionary, nodes: Dictionary, context: Dictionary) -> voi
 				var outline := PackedVector2Array(u.footprint_outline)
 				dia.points=outline;dia.set_meta("footprint",cells.duplicate())
 	if float(u.get("die_t",-1)) >= 0:
-		var rule = preload("res://simulation/definitions/death_visual.gd")
+		var rule = preload("res://simulation/definitions/timing/death_visual.gd")
 		var frame: int = rule.frame(u,float(u.die_t))
 		if frame >= 0: set_frame(u,frame)
 		else: hide_unit(u)

@@ -67,7 +67,7 @@
       ],
       "remakeRefs": [
         "godot/chibi_remake/main.gd:_order_unload",
-        "godot/chibi_remake/simulation/systems/transports.gd:landing_cell"
+        "godot/chibi_remake/simulation/transport/transports.gd:landing_cell"
       ],
       "tests": [
         "贴岸自动下人",

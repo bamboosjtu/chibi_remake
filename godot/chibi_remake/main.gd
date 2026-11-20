@@ -2,8 +2,8 @@ extends Node2D
 ## Battle composition root. Rules and state live in composed services.
 const UnitProjection = preload("res://app/read_models/unit_projection.gd")
 const Config = preload("res://simulation/definitions/battle_config.gd")
-const CombatRules = preload("res://simulation/systems/combat_rules.gd")
-const UnitFootprint = preload("res://simulation/systems/unit_footprint.gd")
+const CombatRules = preload("res://simulation/definitions/combat_rules.gd")
+const UnitFootprint = preload("res://simulation/navigation/unit_footprint.gd")
 const SPEED = Config.SPEED
 const SIM_DT = Config.SIM_DT
 const SIM_MAX_CATCHUP = Config.SIM_MAX_CATCHUP

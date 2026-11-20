@@ -3,7 +3,7 @@ const Balance = preload("res://simulation/definitions/balance_rules.gd")
 const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## A single synchronous decision's roster. Rebuild at the next decision rather
 ## than caching mutable ownership/group/attachment fields across ticks.
-const Rules = preload("res://simulation/systems/unit_rules.gd")
+const Rules = preload("res://simulation/definitions/unit_rules.gd")
 var by_owner: Dictionary = {}
 var groups: Dictionary = {}
 var identities: Dictionary = {}

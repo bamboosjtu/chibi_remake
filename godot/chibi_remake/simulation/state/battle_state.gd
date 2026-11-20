@@ -1,7 +1,7 @@
 extends RefCounted
 const PROXY_FIELDS := ["geometry", "session", "units", "selected", "_officer_pool", "player_owner", "cheats_enabled", "auto_control", "cheat_build_any", "cheat_invulnerable", "cheat_reveal", "trainings", "player_tech", "research_jobs", "army_tech", "scenario_sides", "game_end", "_officer_initial_state", "map_data", "map_id", "gold", "wood", "food", "stone", "resource_revision", "sheet_by_unit", "train_types", "build_types", "next_uid", "_cell_index", "_cell_index_cell", "_cell_index_layer", "_cell_index_cells", "_index_unit_id", "_foot_cache", "_targets", "_target_owner", "_index_units_ref", "_index_units_size", "cnt_player", "cnt_enemy", "tile_w", "tile_hw", "tile_hh", "scenario_source", "scenario_mission", "scenario_avi", "ai_res", "sim_acc", "simulation_rng", "sim_tick", "simtest_seconds", "cnt_enemy_buildings", "task_latches", "terrain_changes", "terrain_base", "officer_progress", "task_events", "objective_done", "officer_policy", "cli_mode", "jimou_pending", "jimou_caster", "duel_pending", "cmd_pending", "cmd_pending_data", "decor_targets", "decor_cells", "control_groups"]
 ## Single owner of battle data. No scene nodes or rendering handles.
-const CombatRules = preload("res://simulation/systems/combat_rules.gd")
+const CombatRules = preload("res://simulation/definitions/combat_rules.gd")
 const OFFICER_BLOCK_FOR_OWNER = preload("res://simulation/definitions/battle_config.gd").OFFICER_BLOCK_FOR_OWNER
 const GRID_FALLBACK = preload("res://simulation/definitions/battle_config.gd").GRID_FALLBACK
 const SPEED = preload("res://simulation/definitions/battle_config.gd").SPEED
@@ -10,7 +10,7 @@ var geometry = preload("res://simulation/navigation/navigation_state.gd").new()
 const SIM_HZ = preload("res://simulation/definitions/battle_config.gd").SIM_HZ
 const SIM_DT = preload("res://simulation/definitions/battle_config.gd").SIM_DT
 const SIM_MAX_CATCHUP = preload("res://simulation/definitions/battle_config.gd").SIM_MAX_CATCHUP
-const Progression = preload("res://simulation/systems/officer_progression.gd")
+const Progression = preload("res://simulation/officers/officer_progression.gd")
 const PRODUCE_BY_BUILDING = preload("res://simulation/definitions/battle_config.gd").PRODUCE_BY_BUILDING
 const RESOURCE_YIELD = preload("res://simulation/definitions/battle_config.gd").RESOURCE_YIELD
 const FOOD_BUILDINGS = preload("res://simulation/definitions/battle_config.gd").FOOD_BUILDINGS

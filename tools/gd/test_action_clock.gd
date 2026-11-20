@@ -1,5 +1,5 @@
 extends SceneTree
-const Clock = preload("res://simulation/systems/action_clock.gd")
+const Clock = preload("res://simulation/movement/action_clock.gd")
 var done := false
 var b: Node2D
 var game: Node

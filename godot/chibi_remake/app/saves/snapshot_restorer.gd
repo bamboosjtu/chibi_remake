@@ -8,8 +8,8 @@ var _apply_unit_record: Callable
 var _restore_resources: Callable
 var _restore_trainings: Callable
 var _numeric_keys: Callable
-const ActionClock = preload("res://simulation/systems/action_clock.gd")
-const TickTimers = preload("res://simulation/systems/tick_timers.gd")
+const ActionClock = preload("res://simulation/movement/action_clock.gd")
+const TickTimers = preload("res://simulation/movement/tick_timers.gd")
 const UnitSchema = preload("res://simulation/units/unit_schema.gd")
 const Relations = preload("res://app/saves/unit_relations.gd")
 const Envelope = preload("res://app/saves/save_envelope.gd")
@@ -120,7 +120,7 @@ func _restore_units(d: Dictionary, arr: Array, simulation: Dictionary) -> bool:
 		TickTimers.restore(state,u)
 		host.world.stratagems.restore(state,u)
 		ActionClock.restore(state,u)
-		preload("res://simulation/systems/locomotion.gd").restore(state,u)
+		preload("res://simulation/movement/locomotion.gd").restore(state,u)
 		by_uid[int(u.uid)] = u
 	# 所有实体建好后再解析引用，采矿／卸货目标可以排在工人后面。
 	for rec in arr:

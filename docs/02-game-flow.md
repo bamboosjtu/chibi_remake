@@ -148,4 +148,4 @@
 | 战场入口、初始化顺序、固定步长主循环 | `main.gd` |
 | 暂停菜单与设置 | `presentation/hud/battle_menu.gd` |
 | 开场与事件视频 | `presentation/media/event_view.gd` |
-| 胜负判定 | `main.gd::_check_end`、`simulation/systems/scenario_rules.gd` |
+| 胜负判定 | `main.gd::_check_end`、`simulation/scenario/scenario_rules.gd` |

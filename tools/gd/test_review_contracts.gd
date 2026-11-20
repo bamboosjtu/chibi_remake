@@ -2,7 +2,7 @@ extends SceneTree
 func _initialize() -> void:run.call_deferred()
 func run() -> void:
 	var game:Node=root.get_node("Game")
-	var unit_rules = preload("res://simulation/systems/unit_rules.gd")
+	var unit_rules = preload("res://simulation/definitions/unit_rules.gd")
 	var catalog = JSON.parse_string(FileAccess.get_file_as_string("res://data/db/unit_definitions.json"))
 	assert(unit_rules.valid_catalog(catalog, true))
 	var malformed: Dictionary = catalog.duplicate(true)

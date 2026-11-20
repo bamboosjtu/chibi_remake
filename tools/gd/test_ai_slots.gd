@@ -1,6 +1,6 @@
 extends SceneTree
-const AI=preload("res://simulation/systems/ai.gd")
-const Technology=preload("res://simulation/systems/technology_state.gd")
+const AI=preload("res://simulation/ai/ai.gd")
+const Technology=preload("res://simulation/technology/technology_state.gd")
 var b: Node2D
 var game: Node
 var owner: int

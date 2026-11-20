@@ -1,5 +1,5 @@
 extends SceneTree
-const Engagement = preload("res://simulation/systems/engagement.gd")
+const Engagement = preload("res://simulation/combat/engagement.gd")
 var b: Node2D
 var done := false
 

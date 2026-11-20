@@ -10,7 +10,7 @@ func _run() -> void:
 	var game = root.get_node("Game"); game.current_map = "chibic1"
 	var b: Node2D = load("res://main.tscn").instantiate(); root.add_child(b)
 	b.set_process(false); b.cli_mode = true
-	var UF = load("res://simulation/systems/unit_footprint.gd")
+	var UF = load("res://simulation/navigation/unit_footprint.gd")
 	assert(UF.class_of(30) == 0 and UF.class_of(34) == 1 and UF.class_of(49) == 3)
 	var even4: Array = UF.shape(34, Vector2i(10, 20))
 	var odd4: Array = UF.shape(34, Vector2i(10, 21))

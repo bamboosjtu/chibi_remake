@@ -152,8 +152,8 @@
 
 | 职责 | 模块 |
 |---|---|
-| 记账、支付、退款、入库 | `simulation/systems/economy.gd` |
-| 采集节拍、耗尽、转采、返程 | `simulation/systems/harvesting.gd` |
+| 记账、支付、退款、入库 | `simulation/economy/economy.gd` |
+| 采集节拍、耗尽、转采、返程 | `simulation/economy/harvesting.gd` |
 | 资源点/饰物、贴边路径、交付点选择、粮食容量 | `main.gd`（`_build_decor_targets`、`_edge_interaction_*`、`_deposits_for`、`_food_capacity`） |
 | 资源栏与费用文本 | `presentation/battle/battle_view.gd` |
 

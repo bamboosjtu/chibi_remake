@@ -1,6 +1,6 @@
 extends SceneTree
-const Rules = preload("res://simulation/systems/combat_rules.gd")
-const State = preload("res://simulation/systems/technology_state.gd")
+const Rules = preload("res://simulation/definitions/combat_rules.gd")
+const State = preload("res://simulation/technology/technology_state.gd")
 var done := false
 var battle: Node2D
 var game: Node

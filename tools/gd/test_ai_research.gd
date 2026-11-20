@@ -1,6 +1,6 @@
 extends SceneTree
-const AI = preload("res://simulation/systems/ai.gd")
-const Targets = preload("res://simulation/systems/ai_targets.gd")
+const AI = preload("res://simulation/ai/ai.gd")
+const Targets = preload("res://simulation/ai/ai_targets.gd")
 var done := false
 var b
 var infantry: Dictionary

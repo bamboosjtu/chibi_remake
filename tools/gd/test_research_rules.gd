@@ -1,7 +1,7 @@
 extends SceneTree
 ## One integration check for the three newly supplied research datasets.
-const Growth = preload("res://simulation/systems/officer_progression.gd")
-const Combat = preload("res://simulation/systems/combat_rules.gd")
+const Growth = preload("res://simulation/officers/officer_progression.gd")
+const Combat = preload("res://simulation/definitions/combat_rules.gd")
 var b: Node2D
 var done := false
 func _initialize() -> void:

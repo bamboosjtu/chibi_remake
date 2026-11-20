@@ -2,7 +2,7 @@ import fs from 'node:fs';
 const root = 'godot/chibi_remake';
 const schema = fs.readFileSync(root+'/simulation/units/unit_schema.gd','utf8');
 const declared = new Set([...schema.matchAll(/^\s*"(\w+)": \{/gm)].map(match => match[1]));
-const factory = fs.readFileSync(root+'/simulation/battle/entity_factory.gd','utf8');
+const factory = fs.readFileSync(root+'/simulation/units/entity_factory.gd','utf8');
 const keys = new Set([...factory.slice(factory.indexOf('var u := {'),factory.indexOf('battle.sheet_by_unit')).matchAll(/"(\w+)"\s*:/g)].map(match => match[1]));
 const literal = '(?:true|false|null|-?\\d+(?:\\.\\d+)?|""|\\[\\]|\\{\\})';
 const defaults = Object.fromEntries([...schema.matchAll(new RegExp('^\\s*"(\\w+)": \\{[^\\n]*?"default": ('+literal+')(?=,)', 'gm'))].map(match => [match[1],JSON.parse(match[2])]));

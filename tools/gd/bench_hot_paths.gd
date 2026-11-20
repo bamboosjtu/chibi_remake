@@ -48,7 +48,7 @@ func ai_workload() -> void:
 		var member:=make(index*2+2,3,32,Vector2i(4,3));member.group_officer=index
 		units.append(leader);units.append(member)
 	install(units)
-	var ai=load("res://simulation/systems/ai.gd").new(sim.world)
+	var ai=load("res://simulation/ai/ai.gd").new(sim.world)
 	measure("aiConstruction600",func():
 		assert(sim.world.ai_economy.ai_construction_commander(3).is_empty())
 		assert(ai._spare_construction_officer(3).is_empty()))

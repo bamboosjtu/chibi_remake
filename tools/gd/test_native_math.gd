@@ -1,9 +1,9 @@
 extends SceneTree
 const K=preload("res://simulation/native/math_kernel.gd")
-const S=preload("res://simulation/systems/stratagem_rules.gd")
-const L=preload("res://simulation/systems/locomotion.gd")
-const T=preload("res://simulation/systems/tick_timers.gd")
-const A=preload("res://simulation/systems/action_clock.gd")
+const S=preload("res://simulation/combat/stratagem_rules.gd")
+const L=preload("res://simulation/movement/locomotion.gd")
+const T=preload("res://simulation/movement/tick_timers.gd")
+const A=preload("res://simulation/movement/action_clock.gd")
 func _initialize():run.call_deferred()
 func run():
 	var kernel:=K.get_kernel()
@@ -29,7 +29,7 @@ func run():
 	quit()
 
 func visibility_equivalence() -> void:
-	var View=preload("res://simulation/systems/battle_visibility.gd")
+	var View=preload("res://simulation/visibility/battle_visibility.gd")
 	var actual:=View.new();var expected:=View.new()
 	actual.setup(Vector2(1600,1000));expected.setup(Vector2(1600,1000))
 	var rng:=RandomNumberGenerator.new();rng.seed=100723

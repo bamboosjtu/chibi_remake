@@ -94,7 +94,7 @@ func run() -> void:
 	assert(battle.world.technology.tech_rows_for_building(4).has(3) and battle.world.technology.tech_rows_for_building(14).is_empty())
 	for row in [13,16]:assert(battle.world.technology.tech_cost(row).stone in [1000.0,5000.0] and battle.world.technology.tech_cost(row).food==0)
 	for row in [14,17]:assert(battle.world.technology.tech_cost(row).food in [1000.0,5000.0] and battle.world.technology.tech_cost(row).stone==0)
-	var rules=load("res://simulation/systems/building_rules.gd")
+	var rules=load("res://simulation/definitions/building_rules.gd")
 	var frames:=[]
 	for hp_fraction in [0.0,0.34,0.67,1.0]:frames.append(rules.construction_frame(hp_fraction*2400,2400,battle.map_data.units["0"],10))
 	assert(frames==[9,8,1,0],"HQ uses construction stages, not a linear damage-frame sweep")

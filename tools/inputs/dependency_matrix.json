@@ -340,7 +340,7 @@
   },
   "fileExceptions": [
     {
-      "file": "simulation/battle/unit_actions.gd",
+      "file": "simulation/units/unit_actions.gd",
       "allow": [
         "simulation/combat",
         "simulation/commands",
@@ -353,7 +353,9 @@
         "simulation/visibility",
         "simulation/state",
         "simulation/definitions",
-        "simulation/ports"
+        "simulation/ports",
+        "simulation/core",
+        "simulation/native"
       ],
       "reason": "Legacy behavior coordinator; P6 splits into tick coordinator + lifecycle + domain steps",
       "reviewBy": "2026-12-31"

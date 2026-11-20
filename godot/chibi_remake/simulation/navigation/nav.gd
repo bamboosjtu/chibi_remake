@@ -151,7 +151,7 @@ func warm_runtime_shapes() -> void:
 	for key in state.map_data.get("units",{}):
 		var uid:=int(key)
 		if uid<27:continue
-		var cls:=preload("res://simulation/systems/unit_footprint.gd").class_of(uid)
+		var cls:=preload("res://simulation/navigation/unit_footprint.gd").class_of(uid)
 		if cls==0:continue
 		var water: bool=Roles.is_naval(uid)
 		if water and not state.has_water:continue

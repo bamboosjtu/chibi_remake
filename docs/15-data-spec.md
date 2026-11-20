@@ -265,10 +265,10 @@
 | 规则加载与校验 | `app/rules/rule_loader.gd`、`simulation/definitions/contracts/rule_contract.gd` |
 | 冻结目录 | `simulation/definitions/rule_catalog.gd` |
 | 类型与费用合并 | `app/battle/bootstrap.gd`（生产单位覆盖） |
-| 武将库 | `simulation/battle/officer_pool.gd` |
+| 武将库 | `simulation/officers/officer_pool.gd` |
 | 命令与光标 | `presentation/hud/command_catalog.gd`、`software_cursor.gd` |
 | 音频索引 | `presentation/audio/sfx.gd` |
-| 任务数据 | `simulation/systems/scenario_rules.gd` |
+| 任务数据 | `simulation/scenario/scenario_rules.gd` |
 
 ## 9. 验收要点
 

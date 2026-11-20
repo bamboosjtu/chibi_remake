@@ -1,8 +1,8 @@
 extends SceneTree
 const Schema = preload("res://simulation/units/unit_schema.gd")
-const Timers = preload("res://simulation/systems/tick_timers.gd")
-const Locomotion = preload("res://simulation/systems/locomotion.gd")
-const Clock = preload("res://simulation/systems/action_clock.gd")
+const Timers = preload("res://simulation/movement/tick_timers.gd")
+const Locomotion = preload("res://simulation/movement/locomotion.gd")
+const Clock = preload("res://simulation/movement/action_clock.gd")
 var done := false
 
 func _initialize() -> void:
@@ -28,7 +28,7 @@ func run() -> void:
 	Timers.restore(saved,restored)
 	Locomotion.restore(saved, restored)
 	Clock.restore(saved, restored)
-	preload("res://simulation/systems/stratagem_rules.gd").restore(saved, restored)
+	preload("res://simulation/combat/stratagem_rules.gd").restore(saved, restored)
 	assert(Schema.valid_snapshot(saved) and Timers.valid_snapshot(saved))
 	for key in Schema.persisted_scalars():
 		assert(saved.has(key), "Snapshot omitted " + key)
