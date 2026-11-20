@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "description": "Historical dependency edges the P0 gate must tolerate until the named stage removes them. Each entry records the current file edge and why it exists; stale entries fail the gate.",
+  "edges": [
+    {
+      "from": "testing/automation/menu_driver.gd",
+      "to": "presentation/menu/menu_state.gd",
+      "fromPackage": "app",
+      "toPackage": "presentation",
+      "kind": "import",
+      "line": 3,
+      "reason": "Menu automation driver still lives in app until the P4c harness move; the edge disappears with the move.",
+      "removeByStage": "P4c",
+      "reviewBy": "2026-12-31"
+    },
+    {
+      "from": "app/battle/startup/bootstrap.gd",
+      "to": "presentation/battle/view/battle_view.gd",
+      "fromPackage": "app/battle",
+      "toPackage": "presentation",
+      "kind": "import",
+      "line": 13,
+      "reason": "Bootstrap creates the battle view; P5 injects ViewOps and lets main.gd construct presentation.",
+      "removeByStage": "P5",
+      "reviewBy": "2026-12-31"
+    },
+    {
+      "from": "app/battle/startup/bootstrap.gd",
+      "to": "presentation/audio/sfx.gd",
+      "fromPackage": "app/battle",
+      "toPackage": "presentation",
+      "kind": "import",
+      "line": 68,
+      "reason": "Bootstrap creates audio nodes; P5 moves audio construction to main.gd.",
+      "removeByStage": "P5",
+      "reviewBy": "2026-12-31"
+    },
+    {
+      "from": "app/battle/startup/bootstrap.gd",
+      "to": "presentation/audio/bgm.gd",
+      "fromPackage": "app/battle",
+      "toPackage": "presentation",
+      "kind": "import",
+      "line": 70,
+      "reason": "Bootstrap creates audio nodes; P5 moves audio construction to main.gd.",
+      "removeByStage": "P5",
+      "reviewBy": "2026-12-31"
+    },
+    {
+      "from": "app/battle/startup/bootstrap.gd",
+      "to": "presentation/battle/hud/battle_completion.gd",
+      "fromPackage": "app/battle",
+      "toPackage": "presentation",
+      "kind": "import",
+      "line": 100,
+      "reason": "Bootstrap creates the completion UI; P5 lets presentation subscribe to the game_end event.",
+      "removeByStage": "P5",
+      "reviewBy": "2026-12-31"
+    },
+    {
+      "from": "app/battle/startup/bootstrap.gd",
+      "to": "testing/native/native_save_acceptance.gd",
+      "fromPackage": "app/battle",
+      "toPackage": "testing",
+      "kind": "import",
+      "line": 123,
+      "reason": "Acceptance-only probe load; gated by Game.acceptance_enabled and the requested parameter; testpack is not shipped in normal PCK.",
+      "removeByStage": "P6",
+      "reviewBy": "2026-12-31"
+    },
+    {
+      "from": "app/battle/startup/bootstrap.gd",
+      "to": "testing/checks/navigation_checks.gd",
+      "fromPackage": "app/battle",
+      "toPackage": "testing",
+      "kind": "import",
+      "line": 131,
+      "reason": "Acceptance-only probe load; gated by Game.acceptance_enabled and the requested parameter; testpack is not shipped in normal PCK.",
+      "removeByStage": "P6",
+      "reviewBy": "2026-12-31"
+    },
+    {
+      "from": "app/battle/startup/bootstrap.gd",
+      "to": "testing/driver/battle_selftest.gd",
+      "fromPackage": "app/battle",
+      "toPackage": "testing",
+      "kind": "import",
+      "line": 135,
+      "reason": "Acceptance-only probe load; gated by Game.acceptance_enabled and the requested parameter; testpack is not shipped in normal PCK.",
+      "removeByStage": "P6",
+      "reviewBy": "2026-12-31"
+    },
+    {
+      "from": "app/battle/runtime/cheat_controller.gd",
+      "to": "presentation/battle/hud/cheat_console.gd",
+      "fromPackage": "app/battle",
+      "toPackage": "presentation",
+      "kind": "import",
+      "line": 5,
+      "reason": "Cheat console is created by the app-side controller; P5 moves input to presentation/battle/input/cheat_input.gd and keeps only a command.",
+      "removeByStage": "P5",
+      "reviewBy": "2026-12-31"
+    },
+    {
+      "from": "app/battle/runtime/battle_runtime.gd",
+      "to": "presentation/battle/view/battle_view.gd",
+      "fromPackage": "app/battle",
+      "toPackage": "presentation",
+      "kind": "import",
+      "line": 20,
+      "reason": "Scene controller owns frame/input/view coordination; P5 splits it into battle_runtime plus presentation input/frame controllers.",
+      "removeByStage": "P5",
+      "reviewBy": "2026-12-31"
+    },
+    {
+      "from": "app/battle/runtime/battle_runtime_state.gd",
+      "to": "presentation/battle/resources/art_catalog.gd",
+      "fromPackage": "app/battle",
+      "toPackage": "presentation",
+      "kind": "import",
+      "line": 4,
+      "reason": "Scene state carries camera/audio/view/art fields; P5 splits it into app runtime state and presentation state.",
+      "removeByStage": "P5",
+      "reviewBy": "2026-12-31"
+    },
+    {
+      "from": "app/game.gd",
+      "to": "presentation/shell/software_cursor.gd",
+      "fromPackage": "app",
+      "toPackage": "presentation",
+      "kind": "import",
+      "line": 100,
+      "reason": "Game autoload creates the global cursor; P5 moves lifetime to presentation/shell and the presentation host.",
+      "removeByStage": "P5",
+      "reviewBy": "2026-12-31"
+    },
+    {
+      "from": "app/saves/world_transaction.gd",
+      "to": "presentation/battle/view/battle_view_context.gd",
+      "fromPackage": "app/saves",
+      "toPackage": "presentation",
+      "kind": "import",
+      "line": 39,
+      "reason": "World transaction creates a view preview and drives view/camera/terrain calls; P5 replaces this with the ViewOps transaction interface.",
+      "removeByStage": "P5",
+      "reviewBy": "2026-12-31"
+    },
+    {
+      "from": "simulation/state/battle_state.gd",
+      "to": "simulation/navigation/navigation_state.gd",
+      "fromPackage": "simulation/state",
+      "toPackage": "simulation/navigation",
+      "kind": "import",
+      "line": 9,
+      "reason": "State creates a navigation geometry; P1 hands geometry ownership to Navigation and removes the static load.",
+      "removeByStage": "P1",
+      "reviewBy": "2026-12-31"
+    },
+    {
+      "from": "simulation/state/battle_state.gd",
+      "to": "simulation/officers/officer_progression.gd",
+      "fromPackage": "simulation/state",
+      "toPackage": "simulation/officers",
+      "kind": "import",
+      "line": 13,
+      "reason": "State preloads officer progression only for a static helper; P1 removes the static dependency or routes it through definitions.",
+      "removeByStage": "P1",
+      "reviewBy": "2026-12-31"
+    }
+  ]
+}

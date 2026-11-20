@@ -303,6 +303,15 @@ pwsh -NoProfile -File tools/bench_full_battle.ps1 -ReleasePack <候选目录>/Ch
 
 `node tools/suite_check.mjs` 检查 `tools/gd` 下全部 GDScript：自动套件必须有成功标记，非自动入口必须在 `manual_tests.json` 中声明类别、前提与运行方式。CI 和存档套件各自声明运行范围，发布与开发主套件之间保持唯一归属。新增脚本未登记、条目失效或手工排除缺少理由均阻止门禁。开局兵力测试声明 `opening-forces` fixture，runner 先从规格文档生成并校验输入；准备失败单独记为失败并继续其他测试。
 
+### 架构依赖与字段所有权基线
+
+`tools/inputs/module_map.json` 保存 181 个源文件的逐文件目标路径（moved/renamed/retained/deleted 与阶段），`tools/inputs/dependency_matrix.json` 是目标包允许集与文件级例外，`tools/inputs/dependency_baseline.json` 记录尚未消除的历史边（含 `removeByStage` 与 `reviewBy`）。三者由以下门禁消费：
+
+- `node tools/dependency_check.mjs`：用 `tools/dependency_report.mjs` 扫描 `preload/load/extends`、`_dep_` 绑定、`world.<svc>` 调用、构造函数注入和动态加载，输出 `_work/refactor/dependency-graph.json`（含 SCC）；新增未登记违规或已失效的基线边都失败。
+- `node tools/unit_schema_ownership_check.mjs`：`unit_schema_ownership.json` 的键集与 `UnitSchema.FIELDS` 精确相等，owner 唯一，`persist`/`derived` 与 Schema 一致。
+- `node tools/battle_state_ownership_check.mjs`：`battle_state_ownership.json` 覆盖 69 个属性，12 个代理指向 `session.<field>`，策略与 `BattleStateFields` 一致；`auto_control` 归 AI，`selected` 归 Commands，`tile_*` 归 Navigation 只读。
+- `node tools/test_dependency_report.mjs` 与 `node tools/test_ownership_checks.mjs`：正负夹具，验证合法边通过、非法边失败、基线可消解、字段缺失/重复/错误 owner 失败。
+
 `node tools/ci_lightweight.mjs` 执行全部检查并汇总；`--group architecture|registry|data|docs|repository|tooling` 执行对应组，均把机器可读结果写入 `_work/lightweight`。退出非零表示至少一项失败，不允许用后续成功覆盖失败。`repository` 组包含 `node tools/workflow_check.mjs`：工作流必须唯一、每个作业都有超时、引用的脚本/输入/本地 action/LFS 夹具必须存在，续跑矩阵必须与 `test_continuation_coverage.mjs` 支持的地图一致——避免托管流水线在推送后才发现引用了已删除的脚本。架构体积预算与边界豁免必须有 owner、reason、reviewBy；到期阻止门禁。`node tools/port_inventory.mjs` 检查已退役的依赖适配器、提供者字段和作用域调用。
 
 单位字段检查同时使用 `unit_schema_check.mjs` 的工厂/常见字面量写入检查、`test_unit_schema.gd` 的逐字段保存/校验/恢复，以及真实快照和续跑样本。静态扫描无法证明任意动态键表达式的完整性，新增动态字段必须补充真实场景样本。Schema 不替代载员、科技、生产、AI 和引用的语义验证。

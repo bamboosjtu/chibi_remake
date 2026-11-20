@@ -1,0 +1,1538 @@
+{
+  "schemaVersion": 1,
+  "source": "godot/chibi_remake/simulation/definitions/unit_schema.gd",
+  "fieldCount": 117,
+  "fields": {
+    "gate_open": {
+      "group": "derived",
+      "owner": "navigation",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "navigation",
+      "lifecycle": "unit_occupancy",
+      "backing_store": "unit.gate_open"
+    },
+    "occupied_cells": {
+      "group": "derived",
+      "owner": "navigation",
+      "current_writers": [
+        "simulation/battle/spatial_index.gd"
+      ],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "navigation",
+      "lifecycle": "unit_occupancy",
+      "backing_store": "unit.occupied_cells"
+    },
+    "route_failures": {
+      "group": "scalar",
+      "owner": "commands",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_orders",
+      "backing_store": "unit.route_failures"
+    },
+    "blocked_n": {
+      "group": "scalar",
+      "owner": "commands",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_orders",
+      "backing_store": "unit.blocked_n"
+    },
+    "blocked_cursor": {
+      "group": "scalar",
+      "owner": "commands",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_orders",
+      "backing_store": "unit.blocked_cursor"
+    },
+    "last_attacker_uid": {
+      "group": "scalar",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.last_attacker_uid"
+    },
+    "A": {
+      "group": "cell_cache",
+      "owner": "navigation",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "navigation",
+      "lifecycle": "unit_occupancy",
+      "backing_store": "unit.A"
+    },
+    "B": {
+      "group": "cell_cache",
+      "owner": "navigation",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "navigation",
+      "lifecycle": "unit_occupancy",
+      "backing_store": "unit.B"
+    },
+    "maxhp": {
+      "group": "scalar",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.maxhp"
+    },
+    "base_maxhp": {
+      "group": "scalar",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.base_maxhp"
+    },
+    "hold": {
+      "group": "scalar",
+      "owner": "commands",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_orders",
+      "backing_store": "unit.hold"
+    },
+    "cool": {
+      "group": "scalar",
+      "owner": "movement",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_movement",
+      "backing_store": "unit.cool"
+    },
+    "repath": {
+      "group": "scalar",
+      "owner": "movement",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_movement",
+      "backing_store": "unit.repath"
+    },
+    "pi": {
+      "group": "scalar",
+      "owner": "movement",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_movement",
+      "backing_store": "unit.pi"
+    },
+    "anim": {
+      "group": "scalar",
+      "owner": "movement",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_movement",
+      "backing_store": "unit.anim"
+    },
+    "dir": {
+      "group": "scalar",
+      "owner": "movement",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_movement",
+      "backing_store": "unit.dir"
+    },
+    "moved": {
+      "group": "scalar",
+      "owner": "movement",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_movement",
+      "backing_store": "unit.moved"
+    },
+    "build_frame": {
+      "group": "scalar",
+      "owner": "construction",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_construction",
+      "backing_store": "unit.build_frame"
+    },
+    "status_173": {
+      "group": "scalar",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.status_173"
+    },
+    "event_experience": {
+      "group": "scalar",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.event_experience"
+    },
+    "attack_bonus": {
+      "group": "scalar",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.attack_bonus"
+    },
+    "defence_bonus": {
+      "group": "scalar",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.defence_bonus"
+    },
+    "officer_might": {
+      "group": "scalar",
+      "owner": "officers",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_officers",
+      "backing_store": "unit.officer_might"
+    },
+    "officer_intellect": {
+      "group": "scalar",
+      "owner": "officers",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_officers",
+      "backing_store": "unit.officer_intellect"
+    },
+    "group_officer": {
+      "group": "scalar",
+      "owner": "officers",
+      "current_writers": [
+        "simulation/battle/officer_teams.gd"
+      ],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_officers",
+      "backing_store": "unit.group_officer"
+    },
+    "team_kind": {
+      "group": "scalar",
+      "owner": "officers",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_officers",
+      "backing_store": "unit.team_kind"
+    },
+    "carry": {
+      "group": "scalar",
+      "owner": "economy",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_economy",
+      "backing_store": "unit.carry"
+    },
+    "carry_kind": {
+      "group": "scalar",
+      "owner": "economy",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_economy",
+      "backing_store": "unit.carry_kind"
+    },
+    "gather_t": {
+      "group": "scalar",
+      "owner": "economy",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_economy",
+      "backing_store": "unit.gather_t"
+    },
+    "gather_ticks": {
+      "group": "scalar",
+      "owner": "economy",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_economy",
+      "backing_store": "unit.gather_ticks"
+    },
+    "delivery_ticks": {
+      "group": "scalar",
+      "owner": "economy",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_economy",
+      "backing_store": "unit.delivery_ticks"
+    },
+    "tech_hp_bonus": {
+      "group": "scalar",
+      "owner": "technology",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_tech",
+      "backing_store": "unit.tech_hp_bonus"
+    },
+    "mou": {
+      "group": "scalar",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.mou"
+    },
+    "formation": {
+      "group": "scalar",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.formation"
+    },
+    "haste_t": {
+      "group": "status",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.haste_t"
+    },
+    "slow_t": {
+      "group": "status",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.slow_t"
+    },
+    "farsight_t": {
+      "group": "status",
+      "owner": "visibility",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_vision",
+      "backing_store": "unit.farsight_t"
+    },
+    "confused_t": {
+      "group": "status",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.confused_t"
+    },
+    "fo_x": {
+      "group": "scalar",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.fo_x"
+    },
+    "fo_y": {
+      "group": "scalar",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.fo_y"
+    },
+    "site": {
+      "group": "scalar",
+      "owner": "construction",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_construction",
+      "backing_store": "unit.site"
+    },
+    "rest_t": {
+      "group": "elapsed",
+      "owner": "commands",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_orders",
+      "backing_store": "unit.rest_t"
+    },
+    "build_t": {
+      "group": "elapsed",
+      "owner": "commands",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_orders",
+      "backing_store": "unit.build_t"
+    },
+    "action_wait": {
+      "group": "action",
+      "owner": "commands",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_orders",
+      "backing_store": "unit.action_wait"
+    },
+    "action_phase": {
+      "group": "action",
+      "owner": "commands",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_orders",
+      "backing_store": "unit.action_phase"
+    },
+    "action_started": {
+      "group": "action",
+      "owner": "commands",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_orders",
+      "backing_store": "unit.action_started"
+    },
+    "action_kind": {
+      "group": "action",
+      "owner": "commands",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_orders",
+      "backing_store": "unit.action_kind"
+    },
+    "action_target_uid": {
+      "group": "action",
+      "owner": "commands",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_orders",
+      "backing_store": "unit.action_target_uid"
+    },
+    "inspired_t": {
+      "group": "status",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.inspired_t"
+    },
+    "stock": {
+      "group": "scalar",
+      "owner": "economy",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_economy",
+      "backing_store": "unit.stock"
+    },
+    "stock_max": {
+      "group": "scalar",
+      "owner": "economy",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_economy",
+      "backing_store": "unit.stock_max"
+    },
+    "attached": {
+      "group": "scalar",
+      "owner": "construction",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_construction",
+      "backing_store": "unit.attached"
+    },
+    "join_target_uid": {
+      "group": "scalar",
+      "owner": "construction",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_construction",
+      "backing_store": "unit.join_target_uid"
+    },
+    "aboard_uid": {
+      "group": "scalar",
+      "owner": "transport",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_transport",
+      "backing_store": "unit.aboard_uid"
+    },
+    "carry_n": {
+      "group": "scalar",
+      "owner": "economy",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_economy",
+      "backing_store": "unit.carry_n"
+    },
+    "carry_hp": {
+      "group": "scalar",
+      "owner": "economy",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_economy",
+      "backing_store": "unit.carry_hp"
+    },
+    "loaded": {
+      "group": "scalar",
+      "owner": "transport",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_transport",
+      "backing_store": "unit.loaded"
+    },
+    "unload_active": {
+      "group": "scalar",
+      "owner": "transport",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_transport",
+      "backing_store": "unit.unload_active"
+    },
+    "unload_t": {
+      "group": "scalar",
+      "owner": "transport",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_transport",
+      "backing_store": "unit.unload_t"
+    },
+    "site_inside_uid": {
+      "group": "scalar",
+      "owner": "construction",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_construction",
+      "backing_store": "unit.site_inside_uid"
+    },
+    "site_follow_uid": {
+      "group": "scalar",
+      "owner": "construction",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_construction",
+      "backing_store": "unit.site_follow_uid"
+    },
+    "site_entry_x": {
+      "group": "scalar",
+      "owner": "construction",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_construction",
+      "backing_store": "unit.site_entry_x"
+    },
+    "site_entry_y": {
+      "group": "scalar",
+      "owner": "construction",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_construction",
+      "backing_store": "unit.site_entry_y"
+    },
+    "site_exit_pending": {
+      "group": "scalar",
+      "owner": "construction",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_construction",
+      "backing_store": "unit.site_exit_pending"
+    },
+    "build_cost": {
+      "group": "",
+      "owner": "economy",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_economy",
+      "backing_store": "unit.build_cost"
+    },
+    "rolling_t": {
+      "group": "status",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.rolling_t"
+    },
+    "rolling_ticks": {
+      "group": "elapsed",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.rolling_ticks"
+    },
+    "ambush_t": {
+      "group": "status",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.ambush_t"
+    },
+    "effect_task": {
+      "group": "effect",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.effect_task"
+    },
+    "effect_tasks": {
+      "group": "effect",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.effect_tasks"
+    },
+    "walk_tick": {
+      "group": "locomotion",
+      "owner": "movement",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_movement",
+      "backing_store": "unit.walk_tick"
+    },
+    "move_facing": {
+      "group": "locomotion",
+      "owner": "movement",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_movement",
+      "backing_store": "unit.move_facing"
+    },
+    "turn_tick": {
+      "group": "locomotion",
+      "owner": "movement",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_movement",
+      "backing_store": "unit.turn_tick"
+    },
+    "move_started": {
+      "group": "locomotion",
+      "owner": "movement",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_movement",
+      "backing_store": "unit.move_started"
+    },
+    "move_turning": {
+      "group": "locomotion",
+      "owner": "movement",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_movement",
+      "backing_store": "unit.move_turning"
+    },
+    "uid": {
+      "group": "record",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.uid"
+    },
+    "alive": {
+      "group": "record",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.alive"
+    },
+    "ax": {
+      "group": "record",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.ax"
+    },
+    "ay": {
+      "group": "record",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.ay"
+    },
+    "hp": {
+      "group": "record",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.hp"
+    },
+    "owner": {
+      "group": "record",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.owner"
+    },
+    "unit": {
+      "group": "record",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.unit"
+    },
+    "is_building": {
+      "group": "record",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.is_building"
+    },
+    "map_object": {
+      "group": "record",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.map_object"
+    },
+    "map_index": {
+      "group": "record",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.map_index"
+    },
+    "die_t": {
+      "group": "record",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.die_t"
+    },
+    "state": {
+      "group": "record",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.state"
+    },
+    "officer": {
+      "group": "",
+      "owner": "officers",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_officers",
+      "backing_store": "unit.officer"
+    },
+    "target": {
+      "group": "relation",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.target"
+    },
+    "build_target": {
+      "group": "relation",
+      "owner": "commands",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_orders",
+      "backing_store": "unit.build_target"
+    },
+    "repair_target": {
+      "group": "relation",
+      "owner": "commands",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_orders",
+      "backing_store": "unit.repair_target"
+    },
+    "board_target": {
+      "group": "relation",
+      "owner": "transport",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_transport",
+      "backing_store": "unit.board_target"
+    },
+    "gather_obj": {
+      "group": "relation",
+      "owner": "economy",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_economy",
+      "backing_store": "unit.gather_obj"
+    },
+    "path": {
+      "group": "relation",
+      "owner": "movement",
+      "current_writers": [
+        "simulation/battle/command_groups.gd",
+        "simulation/battle/construction_orders.gd",
+        "simulation/systems/harvesting.gd",
+        "simulation/systems/scenario_rules.gd",
+        "simulation/systems/engagement.gd"
+      ],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_movement",
+      "backing_store": "unit.path"
+    },
+    "repath_to": {
+      "group": "relation",
+      "owner": "commands",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_orders",
+      "backing_store": "unit.repath_to"
+    },
+    "atk_range": {
+      "group": "derived",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "combat",
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.atk_range"
+    },
+    "attack": {
+      "group": "derived",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "combat",
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.attack"
+    },
+    "attack_b": {
+      "group": "derived",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "combat",
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.attack_b"
+    },
+    "attack_b_bonus": {
+      "group": "derived",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "combat",
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.attack_b_bonus"
+    },
+    "base_vision": {
+      "group": "derived",
+      "owner": "visibility",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "visibility",
+      "lifecycle": "unit_vision",
+      "backing_store": "unit.base_vision"
+    },
+    "clips": {
+      "group": "",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": false,
+      "derived_by": null,
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.clips"
+    },
+    "count": {
+      "group": "derived",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "units",
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.count"
+    },
+    "defence": {
+      "group": "derived",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "combat",
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.defence"
+    },
+    "defence_b": {
+      "group": "derived",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "combat",
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.defence_b"
+    },
+    "defence_b_bonus": {
+      "group": "derived",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "combat",
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.defence_b_bonus"
+    },
+    "exp_gain": {
+      "group": "derived",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "combat",
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.exp_gain"
+    },
+    "frame_sec": {
+      "group": "derived",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "units",
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.frame_sec"
+    },
+    "grid": {
+      "group": "derived",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "units",
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.grid"
+    },
+    "h": {
+      "group": "derived",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "units",
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.h"
+    },
+    "k": {
+      "group": "derived",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "units",
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.k"
+    },
+    "mitig": {
+      "group": "derived",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "combat",
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.mitig"
+    },
+    "morale_gain": {
+      "group": "derived",
+      "owner": "combat",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "combat",
+      "lifecycle": "unit_combat",
+      "backing_store": "unit.morale_gain"
+    },
+    "name": {
+      "group": "derived",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "units",
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.name"
+    },
+    "rate": {
+      "group": "derived",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "units",
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.rate"
+    },
+    "tail_value": {
+      "group": "derived",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "units",
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.tail_value"
+    },
+    "vision": {
+      "group": "derived",
+      "owner": "visibility",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "visibility",
+      "lifecycle": "unit_vision",
+      "backing_store": "unit.vision"
+    },
+    "w": {
+      "group": "derived",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "derived": true,
+      "derived_by": "units",
+      "lifecycle": "unit_lifecycle",
+      "backing_store": "unit.w"
+    }
+  }
+}

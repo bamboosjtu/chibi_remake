@@ -1,0 +1,367 @@
+{
+  "schemaVersion": 1,
+  "description": "Formal package allow-list for chibi_remake after the directory migration. Historical violations are listed in dependency_baseline.json.",
+  "packages": {
+    "root": {
+      "allow": [
+        "*",
+        "root"
+      ]
+    },
+    "testing": {
+      "allow": [
+        "*",
+        "root"
+      ]
+    },
+    "app": {
+      "allow": [
+        "app",
+        "simulation",
+        "root"
+      ]
+    },
+    "app/battle": {
+      "allow": [
+        "app",
+        "simulation",
+        "root"
+      ]
+    },
+    "app/saves": {
+      "allow": [
+        "app",
+        "simulation",
+        "root"
+      ]
+    },
+    "app/read_models": {
+      "allow": [
+        "app",
+        "simulation",
+        "root"
+      ]
+    },
+    "app/rules": {
+      "allow": [
+        "app",
+        "simulation",
+        "root"
+      ]
+    },
+    "app/campaign": {
+      "allow": [
+        "app",
+        "simulation",
+        "root"
+      ]
+    },
+    "presentation": {
+      "allow": [
+        "presentation",
+        "app/read_models",
+        "app/campaign",
+        "simulation/definitions",
+        "simulation/state",
+        "root"
+      ],
+      "allowFiles": [
+        "app/battle/session/session_actions.gd",
+        "app/battle/commands/battle_actions.gd"
+      ]
+    },
+    "simulation/state": {
+      "allow": [
+        "simulation/session",
+        "simulation/definitions",
+        "root"
+      ]
+    },
+    "simulation/session": {
+      "allow": [
+        "root"
+      ]
+    },
+    "simulation/ports": {
+      "allow": [
+        "root"
+      ]
+    },
+    "simulation/world": {
+      "allow": [
+        "simulation",
+        "root"
+      ]
+    },
+    "simulation/core": {
+      "allow": [
+        "root"
+      ]
+    },
+    "simulation/units": {
+      "allow": [
+        "simulation/state",
+        "simulation/definitions",
+        "simulation/ports",
+        "simulation/navigation",
+        "simulation/movement",
+        "simulation/commands",
+        "simulation/production",
+        "simulation/technology",
+        "root"
+      ]
+    },
+    "simulation/movement": {
+      "allow": [
+        "simulation/state",
+        "simulation/units",
+        "simulation/navigation",
+        "simulation/definitions",
+        "simulation/ports",
+        "simulation/native",
+        "simulation/commands",
+        "simulation/combat",
+        "simulation/core",
+        "root"
+      ]
+    },
+    "simulation/navigation": {
+      "allow": [
+        "simulation/state",
+        "simulation/units",
+        "simulation/definitions",
+        "simulation/ports",
+        "simulation/native",
+        "simulation/economy",
+        "simulation/commands",
+        "simulation/combat",
+        "simulation/movement",
+        "simulation/core",
+        "root"
+      ]
+    },
+    "simulation/combat": {
+      "allow": [
+        "simulation/state",
+        "simulation/units",
+        "simulation/movement",
+        "simulation/navigation",
+        "simulation/officers",
+        "simulation/visibility",
+        "simulation/commands",
+        "simulation/definitions",
+        "simulation/ports",
+        "simulation/production",
+        "simulation/technology",
+        "simulation/native",
+        "root"
+      ]
+    },
+    "simulation/economy": {
+      "allow": [
+        "simulation/state",
+        "simulation/units",
+        "simulation/navigation",
+        "simulation/visibility",
+        "simulation/definitions",
+        "simulation/ports",
+        "simulation/ai",
+        "simulation/officers",
+        "simulation/combat",
+        "simulation/commands",
+        "simulation/technology",
+        "root"
+      ]
+    },
+    "simulation/construction": {
+      "allow": [
+        "simulation/state",
+        "simulation/units",
+        "simulation/navigation",
+        "simulation/economy",
+        "simulation/definitions",
+        "simulation/ports",
+        "simulation/commands",
+        "simulation/movement",
+        "simulation/technology",
+        "simulation/officers",
+        "simulation/ai",
+        "simulation/combat",
+        "simulation/production",
+        "root"
+      ]
+    },
+    "simulation/production": {
+      "allow": [
+        "simulation/state",
+        "simulation/units",
+        "simulation/economy",
+        "simulation/technology",
+        "simulation/definitions",
+        "simulation/ports",
+        "simulation/ai",
+        "simulation/scenario",
+        "root"
+      ]
+    },
+    "simulation/transport": {
+      "allow": [
+        "simulation/state",
+        "simulation/units",
+        "simulation/movement",
+        "simulation/navigation",
+        "simulation/definitions",
+        "simulation/ports",
+        "simulation/commands",
+        "simulation/technology",
+        "root"
+      ]
+    },
+    "simulation/technology": {
+      "allow": [
+        "simulation/state",
+        "simulation/economy",
+        "simulation/definitions",
+        "simulation/ports",
+        "simulation/core",
+        "root"
+      ]
+    },
+    "simulation/officers": {
+      "allow": [
+        "simulation/state",
+        "simulation/units",
+        "simulation/definitions",
+        "simulation/ports",
+        "simulation/navigation",
+        "simulation/combat",
+        "simulation/commands",
+        "simulation/production",
+        "simulation/technology",
+        "root"
+      ]
+    },
+    "simulation/commands": {
+      "allow": [
+        "simulation/state",
+        "simulation/units",
+        "simulation/combat",
+        "simulation/economy",
+        "simulation/construction",
+        "simulation/transport",
+        "simulation/technology",
+        "simulation/officers",
+        "simulation/movement",
+        "simulation/navigation",
+        "simulation/definitions",
+        "simulation/ports",
+        "simulation/visibility",
+        "simulation/production",
+        "root"
+      ]
+    },
+    "simulation/ai": {
+      "allow": [
+        "simulation/state",
+        "simulation/definitions",
+        "simulation/commands",
+        "simulation/units",
+        "simulation/combat",
+        "simulation/production",
+        "simulation/construction",
+        "simulation/economy",
+        "simulation/navigation",
+        "simulation/ports",
+        "simulation/technology",
+        "root"
+      ]
+    },
+    "simulation/cheats": {
+      "allow": [
+        "simulation/state",
+        "simulation/definitions",
+        "simulation/ai",
+        "simulation/officers",
+        "simulation/construction",
+        "simulation/combat",
+        "simulation/visibility",
+        "simulation/economy",
+        "simulation/ports",
+        "root"
+      ]
+    },
+    "simulation/scenario": {
+      "allow": [
+        "simulation/state",
+        "simulation/definitions",
+        "simulation/commands",
+        "simulation/officers",
+        "simulation/navigation",
+        "simulation/combat",
+        "simulation/ports",
+        "root"
+      ]
+    },
+    "simulation/visibility": {
+      "allow": [
+        "simulation/state",
+        "simulation/units",
+        "simulation/navigation",
+        "simulation/definitions",
+        "simulation/ports",
+        "simulation/combat",
+        "simulation/native",
+        "root"
+      ]
+    },
+    "simulation/definitions": {
+      "allow": [
+        "simulation/definitions",
+        "simulation/state",
+        "simulation/scenario",
+        "simulation/units",
+        "simulation/officers",
+        "simulation/native",
+        "root"
+      ]
+    },
+    "simulation/diagnostics": {
+      "allow": [
+        "simulation/state",
+        "simulation/definitions",
+        "root"
+      ]
+    },
+    "simulation/native": {
+      "allow": [
+        "root"
+      ]
+    }
+  },
+  "fileExceptions": [
+    {
+      "file": "simulation/battle/unit_actions.gd",
+      "allow": [
+        "simulation/combat",
+        "simulation/commands",
+        "simulation/construction",
+        "simulation/economy",
+        "simulation/movement",
+        "simulation/navigation",
+        "simulation/officers",
+        "simulation/transport",
+        "simulation/visibility",
+        "simulation/state",
+        "simulation/definitions",
+        "simulation/ports"
+      ],
+      "reason": "Legacy behavior coordinator; P6 splits into tick coordinator + lifecycle + domain steps",
+      "reviewBy": "2026-12-31"
+    }
+  ],
+  "notes": [
+    "Presentation must not depend on simulation/ports; main.gd forwards events.",
+    "Domains must not depend on simulation/world.",
+    "state writes are field-level (see ownership JSON); package allow-list only covers imports."
+  ]
+}
