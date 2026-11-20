@@ -46,53 +46,53 @@ func run() -> void:
 	battle.view.event_view.restore_history();battle.view.flush_visuals()
 	var reader: Node2D=battle.view.host
 	var actor: Dictionary=battle.selected[0]
-	var selected: Array=reader.queries.selection_views()
-	var all: Array=reader.queries.unit_views()
+	var selected: Array=reader.queries.unit.selection_views()
+	var all: Array=reader.queries.unit.unit_views()
 	assert(_values(selected) and _values(all) and selected[0].uid==actor.uid)
 	var expected_markers := []
 	for unit: Dictionary in all:
 		if unit.alive and unit.die_t < 0 and not unit.get("attached", false) and int(unit.get("site_inside_uid", -1)) < 0 and unit.visible:
 			expected_markers.append({"position":Vector2(unit.ax, unit.ay), "owner":int(unit.owner), "is_building":bool(unit.is_building)})
-	var markers: Array = reader.queries.minimap_markers()
+	var markers: Array = reader.queries.unit.minimap_markers()
 	assert(_values(markers) and markers == expected_markers, "Small minimap projection preserves fog, position and marker order")
 	if not actor.officer.is_empty():
 		var soldiers := 0
 		for unit: Dictionary in all:
 			if unit.alive and unit.owner == actor.owner and int(unit.get("group_officer", -1)) == int(actor.officer.index):
 				soldiers += int(unit.hp)
-		assert(reader.queries.team_soldiers(int(actor.owner), int(actor.officer.index)) == soldiers)
-		assert(reader.queries.commander_name(int(actor.owner), int(actor.officer.index)) == str(actor.officer.name).replace(" ", ""))
+		assert(reader.queries.unit.team_soldiers(int(actor.owner), int(actor.officer.index)) == soldiers)
+		assert(reader.queries.unit.commander_name(int(actor.owner), int(actor.officer.index)) == str(actor.officer.name).replace(" ", ""))
 	assert(not selected[0].has("target") and not selected[0].has("path") and not selected[0].has("gather_obj"))
 	var detached: Dictionary=selected[0].duplicate(true);detached.hp=0;detached.officer.level=9
 	assert(actor.hp!=0 and actor.officer.level!=9)
 	var tier: int=actor.officer.get("tier",4)
 	for category in range(1,5):
 		actor.officer.tier=category
-		assert(battle.world.combat.officer_rank_name(reader.queries.selection_views()[0].officer)==battle.world.combat.officer_rank_name(actor.officer))
+		assert(battle.world.combat.officer_rank_name(reader.queries.unit.selection_views()[0].officer)==battle.world.combat.officer_rank_name(actor.officer))
 	actor.officer.tier=tier
 	var builds: int=reader.queries.projection_counters().unitBuilds
 	for frame in range(3):
 		await process_frame
-		for repeat in range(20): assert(is_same(all,reader.queries.unit_views()))
+		for repeat in range(20): assert(is_same(all,reader.queries.unit.unit_views()))
 	assert(reader.queries.projection_counters().unitBuilds==builds,"Unchanged render frames must reuse unit values")
 	var hp: float=actor.hp;actor.hp-=1
-	var changed: Array=reader.queries.selection_views()
+	var changed: Array=reader.queries.unit.selection_views()
 	assert(changed[0].hp==hp-1 and selected[0].hp==hp and not is_same(changed,selected))
 	actor.hp=hp
 	actor.hp-=2; battle.world.battle_simulation._place_unit(actor)
-	var event_values: Array=reader.queries.unit_views()
+	var event_values: Array=reader.queries.unit.unit_views()
 	assert(event_values.filter(func(unit):return unit.uid==actor.uid)[0].hp==hp-2)
 	actor.hp=hp; battle.world.battle_simulation._place_unit(actor)
-	var geometry: Array=reader.queries.unit_views()
+	var geometry: Array=reader.queries.unit.unit_views()
 	battle.nav.tile_w=battle.nav.tile_w+1
-	assert(not is_same(geometry,reader.queries.unit_views()),"Navigation geometry is part of the projection identity")
+	assert(not is_same(geometry,reader.queries.unit.unit_views()),"Navigation geometry is part of the projection identity")
 	battle.nav.tile_w=battle.nav.tile_w-1
 	battle.selected=[]
-	assert(reader.queries.selection_views().is_empty())
+	assert(reader.queries.unit.selection_views().is_empty())
 	battle.selected=[actor]
-	assert(reader.queries.selection_views()[0].uid==actor.uid)
+	assert(reader.queries.unit.selection_views()[0].uid==actor.uid)
 	var tick: int=battle.sim_tick;battle.sim_tick+=1
-	assert(not is_same(all,reader.queries.unit_views()));battle.sim_tick=tick
+	assert(not is_same(all,reader.queries.unit.unit_views()));battle.sim_tick=tick
 	_projection_cost(battle)
 	_work_and_worlds(game,battle,reader)
 	battle.scene.ready_to_save=false
@@ -129,22 +129,22 @@ func _work_and_worlds(game: Node, battle: Node2D, reader: Node2D) -> void:
 	battle.selected=[building]
 	assert(battle.world.production._queue_train(battle.player_owner,building,30))
 	battle.view.update_panel()
-	assert(_values(reader.queries.training_views()) and _values(reader.queries.building_work(uid)))
-	assert(reader.queries.training_views()[0].buildingUid==uid and reader.queries.building_work(uid).busy)
+	assert(_values(reader.queries.unit.training_views()) and _values(reader.queries.unit.building_work(uid)))
+	assert(reader.queries.unit.training_views()[0].buildingUid==uid and reader.queries.unit.building_work(uid).busy)
 	var action: Callable=battle.view.cmd_capsules[0].act
 	var snapshot: Dictionary=game.snapshot(battle.units,battle.world.economy.player_resources(),battle.saver.save_extra())
 	var transaction=load("res://app/saves/world_transaction.gd")
 	var old_epoch: int=battle.world.get_instance_id()
 	var old_world: WeakRef=weakref(battle.world)
 	var old_state: WeakRef=weakref(battle.state)
-	var retained: Array=reader.queries.unit_views()
+	var retained: Array=reader.queries.unit.unit_views()
 	transaction.force_view_failure_after_attach=true
 	assert(not battle.saver.apply_snapshot(snapshot))
 	transaction.force_view_failure_after_attach=false
-	assert(battle.world.get_instance_id()==old_epoch and reader.queries.unit_views()[0].world_id==old_epoch)
+	assert(battle.world.get_instance_id()==old_epoch and reader.queries.unit.unit_views()[0].world_id==old_epoch)
 	assert(battle.saver.apply_snapshot(snapshot))
 	assert(old_world.get_ref()==null and old_state.get_ref()==null)
-	assert(is_same(reader,battle.view.host) and reader.queries.unit_views()[0].world_id!=old_epoch and _values(retained))
+	assert(is_same(reader,battle.view.host) and reader.queries.unit.unit_views()[0].world_id!=old_epoch and _values(retained))
 	# A retained UI callback has the same UID but an obsolete world identity.
 	action.call()
 	assert(battle.player_commands.apply_tick(battle.sim_tick + 1)==0 and battle.trainings.size()==1)

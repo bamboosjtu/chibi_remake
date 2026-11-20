@@ -94,21 +94,21 @@ func _world_exchange(preview: Node2D, reader: Node2D, point: Vector2, uid: int, 
 	transaction.force_view_failure_after_attach=false
 	preview.update_at(point)
 	assert(battle.state.get_instance_id()==state_id and is_same(preview.placement,model), "Rollback must keep the live read model")
-	var original_bounds: Vector2 = reader.queries.camera_bounds()
+	var original_bounds: Vector2 = reader.queries.map.camera_bounds()
 	battle.map_data.terrainW+=100
-	assert(reader.queries.camera_bounds().x==original_bounds.x+100)
+	assert(reader.queries.map.camera_bounds().x==original_bounds.x+100)
 	var old_world: WeakRef = weakref(battle.world)
 	var old_nav: WeakRef = weakref(battle.nav)
 	var old_key: Array = preview.signature
 	var builds: int = preview.projection_builds
 	assert(battle.saver.apply_snapshot(snapshot))
 	assert(old_world.get_ref()==null and old_nav.get_ref()==null)
-	assert(is_same(reader,battle.view.host) and reader.queries.camera_bounds()==original_bounds)
+	assert(is_same(reader,battle.view.host) and reader.queries.map.camera_bounds()==original_bounds)
 	# Re-arm before any inactive preview frame, and force every non-identity key equal.
 	battle.selected=[battle.units.filter(func(unit): return int(unit.uid)==uid)[0]]
 	battle.world.command_groups._cmd_begin("build",option)
 	battle.nav.version=int(old_key[5])
-	var key: Array = reader.queries.construction_preview_key(point)
+	var key: Array = reader.queries.map.construction_preview_key(point)
 	assert(key.slice(2)==old_key.slice(2) and key[0]!=old_key[0] and key[1]!=old_key[1])
 	preview.update_at(point)
 	assert(preview.projection_builds==builds+1 and not is_same(preview.placement,model))

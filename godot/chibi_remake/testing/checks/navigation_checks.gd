@@ -1,14 +1,5 @@
-extends RefCounted
+extends "res://testing/checks/checks_base.gd"
 const Roles = preload("res://simulation/definitions/unit_roles.gd")
-## Development assertions; shipped for --selftest candidate validation.
-var host: Node2D
-var _suite: WeakRef
-var suite: RefCounted:
-	get: return _suite.get_ref()
-
-func _init(battle: Node2D, runner: RefCounted) -> void:
-	host = battle
-	_suite = weakref(runner) if runner != null else null
 
 func _selftest_naval() -> void:
 	print("SELFTEST naval: water_layer=%s 水面格=%d" % [str(host.nav.has_water), host.world.campaign._water_cell_count()])

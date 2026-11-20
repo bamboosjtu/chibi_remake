@@ -1,4 +1,5 @@
 extends Object
+const UnitPath = preload("res://simulation/movement/unit_path.gd")
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
 ## spatial index: composed battle behavior.
@@ -247,7 +248,7 @@ func _separate_unit(u: Dictionary) -> void:
 	var actual:=_unit_cell(u);u.A=actual.x;u.B=actual.y
 	u.moved=not next.is_equal_approx(previous)
 	if u.moved:u.dir=int(round((next-previous).angle()/(PI/4.0)))&7
-	u.path = []; u.pi = 0
+	UnitPath.set_points(u, []); u.pi = 0
 	_dep_battle_simulation._place_unit(u)
 
 func _connected_separation_cell(u: Dictionary, cell: Vector2i, near_only: bool) -> Vector2i:

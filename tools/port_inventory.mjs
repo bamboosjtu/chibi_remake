@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 const root = 'godot/chibi_remake';
-const retiredPaths = /^(?:simulation\/ports\/|app\/commands\/|app\/battle_commands\.gd$|simulation\/service_dependencies\.gd$)/;
+const retiredPaths = /^(?:simulation\/ports\/(?!battle_events\.gd$)|app\/commands\/|app\/battle_commands\.gd$|simulation\/service_dependencies\.gd$)/;
 const retired = /\b(?:REQUIRED_SERVICES|_provider_\w+|simulation_access)\b|\bports\.acquire\(/;
 function visit(directory) {
  for (const entry of fs.readdirSync(directory, {withFileTypes:true})) {

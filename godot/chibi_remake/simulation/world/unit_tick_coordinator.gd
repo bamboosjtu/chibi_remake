@@ -1,4 +1,5 @@
 extends Object
+const UnitPath = preload("res://simulation/movement/unit_path.gd")
 var _transports: RefCounted
 var _stratagems: RefCounted
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
@@ -134,7 +135,7 @@ func _follow_working_members(u: Dictionary) -> void:
 			var follow_to := Vector2(float(member.ax), float(member.ay))
 			if Vector2(float(u.ax), float(u.ay)).distance_to(follow_to) > 2.0 * battle.tile_w:
 				u.state = "move"
-				u.path = _dep_movement._path_to(u, follow_to, true)
+				UnitPath.set_points(u, _dep_movement._path_to(u, follow_to, true))
 				u.pi = 0
 				break
 

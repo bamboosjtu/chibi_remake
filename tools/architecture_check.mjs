@@ -5,6 +5,8 @@ const args=process.argv.slice(2);
 const root = (args.includes('--root')?args[args.indexOf('--root')+1]:'godot/chibi_remake').replaceAll('\\','/');
 const limitsFile = args.includes('--limits') ? args[args.indexOf('--limits') + 1] : 'tools/inputs/architecture_limits.json';
 const limits = JSON.parse(fs.readFileSync(limitsFile, 'utf8'));
+const queryFiles = new Set(['battle_queries', 'unit_queries', 'map_queries', 'command_queries', 'battle_status_queries']
+  .map(name => 'app/read_models/' + name + '.gd'));
 const files = directory => fs.readdirSync(directory, {withFileTypes: true}).flatMap(entry => {
   if (entry.name.startsWith('.') || ['art', 'media', 'assets', 'addons', 'data'].includes(entry.name)) return [];
   const file = directory + '/' + entry.name;
@@ -61,7 +63,7 @@ for (const file of files(root)) {
   const executable = code.replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g, '""');
   const count = source.trimEnd().split('\n').length;
   if(relative !== 'app/battle/session/pause_stack.gd' && /\.\s*paused\s*=(?!=)|\.(?:set|set_deferred)\(\s*['"]paused['"]/.test(code)) fail(`${relative}: SceneTree pause writes belong to PauseStack`);
-  if(/^app\/battle\/(?:bootstrap|scene_controller|cheat_controller|duel_controller)\.gd$/.test(relative) && /func _init\(\s*data\s*:/.test(code)) fail(`${relative}: application controllers must bind the live scene, not ignore an injected state`);
+  if(/^app\/battle\/(?:startup\/bootstrap|runtime\/(?:scene|cheat|duel)_controller)\.gd$/.test(relative) && /func _init\(\s*data\s*:/.test(code)) fail(`${relative}: application controllers must bind the live scene, not ignore an injected state`);
   if((relative === 'app/saves/save_service.gd' || relative === 'app/game.gd') && /\.transports\.reconcile\(/.test(code)) fail(`${relative}: save serialization must project transport values without mutating the world`);
   if(relative === 'app/campaign/campaign_session.gd' && /\b(?:FileAccess|DirAccess)\b/.test(executable)) fail(`${relative}: campaign queries must use the cached level catalog`);
   if (relative !== 'simulation/world/battle_world.gd' && /\bworld\.(?:_modules|_access)\b|\bworld\.(?:get|set)\(\s*['"]_(?:modules|access)['"]/.test(code)) fail(`${relative}: accesses private BattleWorld collections`);
@@ -110,10 +112,13 @@ for (const file of files(root)) {
     }
   }
   if (relative.startsWith('simulation/') && /res:\/\/(app|presentation)\//.test([...dependencies(relative)].join('\n'))) fail(`${relative}: transitive upper layer dependency`);
-  if (relative.startsWith('presentation/battle/components/')) {
+  if (relative.startsWith('presentation/')) {
     if (/\b(?:host|u|unit)\.(?:hp|alive|target|path|gold|wood|food|stone|attached)\s*=(?!=)/.test(code)) fail(`${relative}: presentation writes gameplay state`);
   }
   const functions = [...source.matchAll(/^(?:static )?func\s+(\w+)\(/gm)];
+  if (queryFiles.has(relative) && (count > 150 || functions.length > 20)) {
+    fail(relative + ': query file exceeds 150 lines or 20 functions');
+  }
   for (let i = 0; i < functions.length; i++) {
     const fn = functions[i];
     const remainder = source.slice(fn.index);
@@ -121,12 +126,13 @@ for (const file of files(root)) {
     const nextDeclaration = /^(?:var|const|signal|class|extends|(?:static )?func)\b/m.exec(remainder.slice(firstLine + 1));
     const body = remainder.slice(0, nextDeclaration ? firstLine + 1 + nextDeclaration.index : remainder.length).trimEnd();
     const length = body.split('\n').length;
-    if (length <= 80) continue;
+    if (length < 80) continue;
     const key = relative + '::' + fn[1];
     const existing = limits.functions[key];
     if (!existing || length > existing) fail(`${key}: ${length} lines; review required (budget ${existing ?? 80})`);
     reviews++;
   }
 }
+if (reviews > 5) fail('Project exceeds the budget of five functions of 80 lines or more');
 if (failures) process.exitCode = 1;
 else console.log(`ARCHITECTURE PASS layers / state ownership / file budgets; ${reviews} preserved long functions tracked for review; ${waivedHits} recorded debt item(s)`);

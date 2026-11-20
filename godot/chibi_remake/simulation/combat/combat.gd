@@ -1,4 +1,5 @@
 extends Object
+const UnitPath = preload("res://simulation/movement/unit_path.gd")
 const VisibilityRuntime = preload("res://simulation/visibility/battle_visibility.gd")
 var _visibility: VisibilityRuntime
 var _transports: RefCounted
@@ -233,7 +234,7 @@ func step_attack(u: Dictionary,delta: float,tower: bool) -> void:
 		if profile_enabled:phase=_profile_time("contact",phase)
 		if in_reach:
 			u.route_failures=0
-			u.path = []; u.pi = 0
+			UnitPath.set_points(u, []); u.pi = 0
 			if strike:
 				_fire_attack(u,t)
 		elif tower:
@@ -251,9 +252,9 @@ func repath_attack(u: Dictionary,t: Dictionary,attack_range: float) -> void:
 	# 近战不能把“敌方占格”当终点（不叠格会停在两格外），
 	# 改寻到目标占格旁的落脚格；远程仍寻到目标本身。
 	if attack_range <= 1:
-		u.path = _dep_interaction_paths._edge_interaction_path(u, t)
+		UnitPath.set_points(u, _dep_interaction_paths._edge_interaction_path(u, t))
 	else:
-		u.path = _dep_movement._path_to(u,Vector2(t.ax,t.ay),false)
+		UnitPath.set_points(u, _dep_movement._path_to(u,Vector2(t.ax,t.ay),false))
 	u.pi = 0
 	u.route_failures=mini(3,int(u.get("route_failures",0))+1) if u.path.is_empty() else 0
 	# Stable UID phases spread synchronized retry bursts without using

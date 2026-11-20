@@ -1,4 +1,5 @@
 extends Object
+const UnitPath = preload("res://simulation/movement/unit_path.gd")
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
 const EffectsRuntime = preload("res://simulation/ports/battle_events.gd")
@@ -58,7 +59,7 @@ func _order_repair(target: Dictionary, actors = null) -> int:
 		_dep_command_groups._cancel_unit_command(w)
 		w["repair_target"] = target
 		w["state"] = "repair"
-		w["path"] = _dep_interaction_paths._interaction_path(w, target, Config.GATHER_REACH)
+		UnitPath.set_points(w, _dep_interaction_paths._interaction_path(w, target, Config.GATHER_REACH))
 		w["pi"] = 0
 		n += 1
 	if n > 0:
@@ -130,7 +131,7 @@ func _assign_build_worker(worker: Dictionary, site: Dictionary) -> bool:
 	_dep_command_groups._cancel_unit_command(worker)
 	worker.build_target = site
 	worker.state = "build"
-	worker.path = path
+	UnitPath.set_points(worker, path)
 	return true
 
 func _valid_build_worker(worker: Dictionary, site: Dictionary) -> bool:
@@ -344,11 +345,11 @@ func step_repair(u: Dictionary, delta: float) -> void:
 		_dep_command_groups._cancel_unit_command(u); _effects.feedback("修理：四种资源都须多于15")
 	elif _dep_interaction_paths._dist_to_obj(u,rt) > Config.GATHER_REACH:
 		preload("res://simulation/movement/action_clock.gd").reset(u)
-		if u.path.is_empty(): u.path = _dep_interaction_paths._interaction_path(u,rt,Config.GATHER_REACH); u.pi = 0
+		if u.path.is_empty(): UnitPath.set_points(u, _dep_interaction_paths._interaction_path(u,rt,Config.GATHER_REACH)); u.pi = 0
 		if u.path.is_empty(): _dep_command_groups._cancel_unit_command(u); _effects.feedback("工人无法到达该修理目标")
 		else: _dep_movement._follow(u,delta)
 	else:
-		u.path = []
+		UnitPath.set_points(u, [])
 		var offset := Vector2(rt.ax-u.ax,rt.ay-u.ay)
 		u.dir = int(round(offset.angle()/(PI/4.0))) & 7
 		if preload("res://simulation/movement/action_clock.gd").step(u,"repair",int(rt.uid)):
@@ -361,7 +362,7 @@ func step_build(u: Dictionary, delta: float) -> void:
 		u.state = "idle"; u.build_target = null; u.build_t = 0
 	elif _dep_interaction_paths._edge_cell_distance(u, bt) != Config.EDGE_DISTANCE:
 		if u.path.is_empty():
-			u.path = _site_entry_path(u, bt); u.pi = 0
+			UnitPath.set_points(u, _site_entry_path(u, bt)); u.pi = 0
 		if u.path.is_empty():
 			u.state = "idle"; u.build_target = null; u.build_t = 0; _effects.feedback("工人无法到达工地")
 		else: _dep_movement._follow(u, delta)

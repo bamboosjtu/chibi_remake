@@ -25,7 +25,16 @@ func run() -> void:
 	b.set_process(false)
 	var fixed_tick: int=b.sim_tick;var report: Dictionary={}
 	var harness:=WarmupHarness.new();root.add_child(harness)
+	b.world.unit_actions.profile["action"] = 7
+	b.world.combat.profile["validTarget"] = 11
+	b.world.combat.profile["contact"] = 9
+	b.world.battle_simulation.native_unit_profile["contact"] = 3
+	b.world.combat.profile_enabled = true
+	harness._record_profile(b, report)
+	assert(report.unitProfileUsec.action == 7 and report.unitProfileUsec.validTarget == 11)
+	assert(report.unitProfileUsec.contact == 12, "Script and native combat profiling must contribute to the same report")
 	assert(await harness._start_live_measurement(b,report))
+	assert(not b.world.combat.profile_enabled, "Live FPS measurement must disable combat profiling")
 	assert(b.sim_tick==fixed_tick and report.frameInitialTick==fixed_tick and report.renderWarmupPreservedSimulation,"Renderer warmup must preserve the exact simulation start")
 	assert(not str(report.frameInitialStateChecksum).is_empty())
 	assert(b.world.battle_simulation.timing_enabled and b.nav.paths.profile_enabled,"Benchmark must opt in to wall-clock sampling")

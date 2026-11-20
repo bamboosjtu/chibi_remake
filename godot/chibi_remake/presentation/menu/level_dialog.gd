@@ -1,11 +1,13 @@
 extends Object
+const DialogBuilder = preload("res://presentation/shared/dialogs/dialog_builder.gd")
+const MenuCatalog = preload("res://presentation/menu/menu_catalog.gd")
 ## level dialog: presentation component.
 const UIState = preload("res://presentation/menu/menu_state.gd")
 var _ui: UIState
 var surface: Control
 var _dep_controller: Object
 var _dep_menu_styles: Object
-const CAMPAIGN_TITLE := {"chibic": "曹操线", "chibil": "刘备线"}
+const CAMPAIGN_TITLE := MenuCatalog.CAMPAIGN_TITLE
 
 const ROW_H := 42                       # 木条行高
 
@@ -31,52 +33,9 @@ func _build_level_dialog() -> void:
 	_ui.scrim.visible = false
 	surface.add_child(_ui.scrim)
 
-	# 外框：深石面 + 3px 浅色倒角 + 投影
-	var frame := StyleBoxFlat.new()
-	frame.bg_color = _ui.C_FACE
-	frame.border_color = _ui.C_BEVEL
-	frame.set_border_width_all(3)
-	frame.set_corner_radius_all(4)
-	frame.shadow_color = Color(0, 0, 0, 0.55)
-	frame.shadow_size = 12
-	frame.shadow_offset = Vector2(0, 6)
-	frame.set_content_margin_all(6)
-
-	# 摆位（2b 改）：几何居中 —— 四边锚点全 0.5，偏移给 860x580，中心恒等于视口中心。
-	# 逻辑坐标恒为 1600x900（canvas_items + expand，1280x720 与 1920x1080 都是 16:9），
-	# 所以矩形恒为 (370,160)-(1230,740)。原来 anchor_top=0.39 是「停在标题下面」，
-	# 现在居中必然压到标题（标题底 ~251）—— 靠 scrim + 开框时藏标题解决，
-	# 自检里 centred=true / title_shown=false / overlap_title=false 三条一起看。
 	_ui.level_panel = PanelContainer.new()
-	_ui.level_panel.add_theme_stylebox_override("panel", frame)
-	_ui.level_panel.anchor_left = 0.5
-	_ui.level_panel.anchor_right = 0.5
-	_ui.level_panel.anchor_top = 0.5
-	_ui.level_panel.anchor_bottom = 0.5
-	_ui.level_panel.offset_left = -430.0
-	_ui.level_panel.offset_right = 430.0
-	_ui.level_panel.offset_top = -290.0
-	_ui.level_panel.offset_bottom = 290.0
-	_ui.level_panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	_ui.level_panel.grow_vertical = Control.GROW_DIRECTION_BOTH
-	_ui.level_panel.mouse_filter = Control.MOUSE_FILTER_STOP  # 模态：不让点击漏到后面的菜单按钮
-	_ui.level_panel.visible = false
-	surface.add_child(_ui.level_panel)
-
-	# 内层凹面：2px 暗槽 + 略亮的石面
-	var face := StyleBoxFlat.new()
-	face.bg_color = _ui.C_FACE_IN
-	face.border_color = _ui.C_GROOVE
-	face.set_border_width_all(2)
-	face.set_corner_radius_all(2)
-	face.set_content_margin_all(16)
 	_ui.level_face = PanelContainer.new()
-	_ui.level_face.add_theme_stylebox_override("panel", face)
-	_ui.level_panel.add_child(_ui.level_face)
-
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 10)
-	_ui.level_face.add_child(col)
+	var col := DialogBuilder.add_frame(surface, _ui.level_panel, _ui.level_face, _ui, Vector2(430, 290))
 
 	# ── 标题行：红方点 + 选择关卡 + 右侧操作提示 ──
 	var head := HBoxContainer.new()
@@ -108,6 +67,29 @@ func _build_level_dialog() -> void:
 	_ui.level_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	head.add_child(_ui.level_hint)
 
+	_build_level_list(col)
+	# ── 底栏：金色凸起「返回」 ──
+	var foot := HBoxContainer.new()
+	foot.alignment = BoxContainer.ALIGNMENT_CENTER
+	foot.add_theme_constant_override("separation", 18)
+	col.add_child(foot)
+
+	_ui.level_back = Button.new()
+	_ui.level_back.text = "返回"
+	_ui.level_back.custom_minimum_size = Vector2(220, 46)
+	_ui.level_back.add_theme_font_size_override("font_size", 22)
+	_ui.level_back.add_theme_color_override("font_color", _ui.C_GOLD_TXT)
+	_ui.level_back.add_theme_color_override("font_hover_color", _ui.C_GOLD_TXT)
+	_ui.level_back.add_theme_color_override("font_pressed_color", _ui.C_GOLD_TXT)
+	_ui.level_back.add_theme_color_override("font_disabled_color", _ui.C_GOLD_TXT)
+	_ui.level_back.add_theme_stylebox_override("normal", _ui.sb_gold)
+	_ui.level_back.add_theme_stylebox_override("hover", _ui.sb_gold_hover)
+	_ui.level_back.add_theme_stylebox_override("pressed", _ui.sb_gold_press)
+	_ui.level_back.add_theme_stylebox_override("focus", _ui.sb_gold_focus)
+	_ui.level_back.pressed.connect(_dep_controller._on_back)
+	foot.add_child(_ui.level_back)
+
+func _build_level_list(col: VBoxContainer) -> void:
 	# ── 列表 + 右侧 ▲▼ ──
 	var body := HBoxContainer.new()
 	body.add_theme_constant_override("separation", 8)
@@ -150,27 +132,6 @@ func _build_level_dialog() -> void:
 		bar.add_theme_stylebox_override("grabber", _dep_menu_styles._flat(Color("8d7a4e"), Color("c9b273"), 1, 2))
 		bar.add_theme_stylebox_override("grabber_highlight", _dep_menu_styles._flat(Color("b39a5f"), Color("e0c98a"), 1, 2))
 		bar.add_theme_stylebox_override("grabber_pressed", _dep_menu_styles._flat(Color("6f6039"), Color("a08a4e"), 1, 2))
-
-	# ── 底栏：金色凸起「返回」 ──
-	var foot := HBoxContainer.new()
-	foot.alignment = BoxContainer.ALIGNMENT_CENTER
-	foot.add_theme_constant_override("separation", 18)
-	col.add_child(foot)
-
-	_ui.level_back = Button.new()
-	_ui.level_back.text = "返回"
-	_ui.level_back.custom_minimum_size = Vector2(220, 46)
-	_ui.level_back.add_theme_font_size_override("font_size", 22)
-	_ui.level_back.add_theme_color_override("font_color", _ui.C_GOLD_TXT)
-	_ui.level_back.add_theme_color_override("font_hover_color", _ui.C_GOLD_TXT)
-	_ui.level_back.add_theme_color_override("font_pressed_color", _ui.C_GOLD_TXT)
-	_ui.level_back.add_theme_color_override("font_disabled_color", _ui.C_GOLD_TXT)
-	_ui.level_back.add_theme_stylebox_override("normal", _ui.sb_gold)
-	_ui.level_back.add_theme_stylebox_override("hover", _ui.sb_gold_hover)
-	_ui.level_back.add_theme_stylebox_override("pressed", _ui.sb_gold_press)
-	_ui.level_back.add_theme_stylebox_override("focus", _ui.sb_gold_focus)
-	_ui.level_back.pressed.connect(_dep_controller._on_back)
-	foot.add_child(_ui.level_back)
 
 func _make_arrow_button(glyph: String, delta: int) -> Button:
 	var b := Button.new()

@@ -1,4 +1,5 @@
 extends Object
+const UnitPath = preload("res://simulation/movement/unit_path.gd")
 var _player_commands: RefCounted
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
@@ -167,7 +168,7 @@ func _move_autonomous(unit: Dictionary, position: Vector2) -> bool:
 	if path.is_empty(): return false
 	_dep_command_groups._cancel_unit_command(unit)
 	unit.state = "move"
-	unit.path = path
+	UnitPath.set_points(unit, path)
 	return true
 
 func _move_selected_to(pos: Vector2, selected = null) -> int:
@@ -212,12 +213,12 @@ func _move_selected_to(pos: Vector2, selected = null) -> int:
 		if p.is_empty():
 			u["state"] = "idle"
 			u["target"] = null
-			u["path"] = []
+			UnitPath.set_points(u, [])
 			u["pi"] = 0
 			fail_count += 1
 			continue
 		u["state"] = "move"
-		u["path"] = p
+		UnitPath.set_points(u, p)
 		u["pi"] = 0
 		u["target"] = null
 		ok_count += 1

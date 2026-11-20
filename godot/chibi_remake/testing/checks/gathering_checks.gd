@@ -1,14 +1,5 @@
-extends RefCounted
+extends "res://testing/checks/checks_base.gd"
 const Balance = preload("res://simulation/definitions/balance_rules.gd")
-## Development assertions; shipped for --selftest candidate validation.
-var host: Node2D
-var _suite: WeakRef
-var suite: RefCounted:
-	get: return _suite.get_ref()
-
-func _init(battle: Node2D, runner: RefCounted) -> void:
-	host = battle
-	_suite = weakref(runner) if runner != null else null
 
 func _selftest_gather() -> void:
 	# ---- 先走**真实的右键点击路径**（_order_at），因为之前的测试直接调 _order_gather，

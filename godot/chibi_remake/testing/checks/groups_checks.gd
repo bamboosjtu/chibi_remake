@@ -1,13 +1,4 @@
-extends RefCounted
-## Development assertions; shipped for --selftest candidate validation.
-var host: Node2D
-var _suite: WeakRef
-var suite: RefCounted:
-	get: return _suite.get_ref()
-
-func _init(battle: Node2D, runner: RefCounted) -> void:
-	host = battle
-	_suite = weakref(runner) if runner != null else null
+extends "res://testing/checks/checks_base.gd"
 
 func _selftest_ctrlgroup() -> void:
 	var tgt: Dictionary = {}

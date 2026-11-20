@@ -1,4 +1,6 @@
 extends Object
+const DialogBuilder = preload("res://presentation/shared/dialogs/dialog_builder.gd")
+const MenuCatalog = preload("res://presentation/menu/menu_catalog.gd")
 ## campaign dialog: presentation component.
 const UIState = preload("res://presentation/menu/menu_state.gd")
 var _ui: UIState
@@ -9,20 +11,17 @@ const Textures = preload("res://presentation/battle/resources/runtime_textures.g
 
 # ── 「选择势力」这一步（2a 新增）：开始游戏 → 先问曹操/刘备，再列该线关卡 ──
 
-const CAMPAIGN_CAO := "chibic"             # 左格：曹操（关卡 id 前缀也是它）
+const CAMPAIGN_CAO := MenuCatalog.CAMPAIGN_CAO
 
-const CAMPAIGN_LIU := "chibil"             # 右格：刘备
+const CAMPAIGN_LIU := MenuCatalog.CAMPAIGN_LIU
 
-const CAMPAIGN_IDS := ["chibic", "chibil"]
+const CAMPAIGN_IDS := MenuCatalog.CAMPAIGN_IDS
 
-const CAMPAIGN_FACTION := {"chibic": "曹操", "chibil": "刘备"}
+const CAMPAIGN_FACTION := MenuCatalog.CAMPAIGN_FACTION
 # 立绘取自 res:// 里已有的官员像（059=曹操 / 039=刘备）。
 # res:// 没有任何 UI 贴图，所以木框/名牌/箭头全部是形状，不许引用不存在的贴图。
 
-const PORTRAIT_PATH := {
-	"chibic": "res://art/full/officers/059-portrait-v2.png",
-	"chibil": "res://art/full/officers/039-portrait-v2.png",
-}
+const PORTRAIT_PATH := MenuCatalog.PORTRAIT_PATH
 
 const PORTRAIT_SIZE := 300                 # 立绘显示边长（原图 1254x1254 正方形，等比不裁）
 
@@ -149,45 +148,8 @@ func _build_campaign_dialog() -> void:
 	_ui.campaign_frames.clear()
 	_ui.campaign_tex.clear()
 
-	var frame := StyleBoxFlat.new()
-	frame.bg_color = _ui.C_FACE
-	frame.border_color = _ui.C_BEVEL
-	frame.set_border_width_all(3)
-	frame.set_corner_radius_all(4)
-	frame.shadow_color = Color(0, 0, 0, 0.55)
-	frame.shadow_size = 12
-	frame.shadow_offset = Vector2(0, 6)
-	frame.set_content_margin_all(6)
-
 	_ui.campaign_panel = PanelContainer.new()
-	_ui.campaign_panel.add_theme_stylebox_override("panel", frame)
-	_ui.campaign_panel.anchor_left = 0.5
-	_ui.campaign_panel.anchor_right = 0.5
-	_ui.campaign_panel.anchor_top = 0.5
-	_ui.campaign_panel.anchor_bottom = 0.5
-	_ui.campaign_panel.offset_left = -420.0
-	_ui.campaign_panel.offset_right = 420.0
-	_ui.campaign_panel.offset_top = -318.0
-	_ui.campaign_panel.offset_bottom = 318.0
-	_ui.campaign_panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	_ui.campaign_panel.grow_vertical = Control.GROW_DIRECTION_BOTH
-	_ui.campaign_panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	_ui.campaign_panel.visible = false
-	surface.add_child(_ui.campaign_panel)
-
-	var face := StyleBoxFlat.new()
-	face.bg_color = _ui.C_FACE_IN
-	face.border_color = _ui.C_GROOVE
-	face.set_border_width_all(2)
-	face.set_corner_radius_all(2)
-	face.set_content_margin_all(16)
-	var inner := PanelContainer.new()
-	inner.add_theme_stylebox_override("panel", face)
-	_ui.campaign_panel.add_child(inner)
-
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 10)
-	inner.add_child(col)
+	var col := DialogBuilder.add_frame(surface, _ui.campaign_panel, PanelContainer.new(), _ui, Vector2(420, 318))
 
 	var head := HBoxContainer.new()
 	head.add_theme_constant_override("separation", 10)

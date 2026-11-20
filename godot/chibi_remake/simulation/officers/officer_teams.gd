@@ -1,4 +1,5 @@
 extends Object
+const UnitPath = preload("res://simulation/movement/unit_path.gd")
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
 const EffectsRuntime = preload("res://simulation/ports/battle_events.gd")
@@ -119,7 +120,7 @@ func _order_join(target: Dictionary, actors = null) -> int:
 		if path.is_empty(): continue
 		_dep_command_groups._cancel_unit_command(member)
 		member.state = "join"; member.join_target_uid = int(leader.uid)
-		member.path = path; member.pi = 0
+		UnitPath.set_points(member, path); member.pi = 0
 		count += 1; room -= 1
 	_effects.feedback("已派出%d名成员加入队伍" % count if count > 0 else "队伍已满或无法靠近")
 	return count
@@ -257,6 +258,6 @@ func step_join(u: Dictionary, delta: float) -> void:
 			_effects.feedback("已加入%s的队伍" % str(leader.officer.name).replace(" ", ""))
 		else: _effects.feedback("该队伍已满15名成员")
 	else:
-		if u.path.is_empty(): u.path = _dep_interaction_paths._edge_interaction_path(u, leader); u.pi = 0
+		if u.path.is_empty(): UnitPath.set_points(u, _dep_interaction_paths._edge_interaction_path(u, leader)); u.pi = 0
 		if u.path.is_empty(): _dep_command_groups._cancel_unit_command(u); _effects.feedback("无法靠近该队伍")
 		else: _dep_movement._follow(u, delta)

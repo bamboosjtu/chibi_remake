@@ -150,7 +150,7 @@ func _build_settings() -> void:
 	grid.add_theme_constant_override("v_separation",14)
 	list.add_child(grid)
 	for i in range(4):
-		var button := _wood_button(str(host.queries.clock_view().labels[i]),_select_speed.bind(i))
+		var button := _wood_button(str(host.queries.status.clock_view().labels[i]),_select_speed.bind(i))
 		grid.add_child(button)
 		speed_buttons.append(button)
 	var back := _wood_button("返回系统选单",_close_settings)
@@ -162,7 +162,7 @@ func show_settings() -> void:
 	panel.hide()
 	settings_panel.show()
 	_update_speed_buttons()
-	speed_buttons[host.queries.clock_view().speed_index].grab_focus()
+	speed_buttons[host.queries.status.clock_view().speed_index].grab_focus()
 
 func _close_settings() -> void:
 	settings_panel.hide()
@@ -174,20 +174,20 @@ func _select_speed(index: int) -> void:
 
 func _update_speed_buttons() -> void:
 	for i in range(speed_buttons.size()):
-		speed_buttons[i].text = str(host.queries.clock_view().labels[i]) + (" · 当前" if i==host.queries.clock_view().speed_index else "")
+		speed_buttons[i].text = str(host.queries.status.clock_view().labels[i]) + (" · 当前" if i==host.queries.status.clock_view().speed_index else "")
 
 func save_game() -> void:
-	_slot_world = host.queries.world_identity()
+	_slot_world = host.queries.status.world_identity()
 	panel.hide()
 	slots_dialog.open(true,Game.campaign_caption(str(host.queries.map_id)))
 
 func load_game() -> void:
-	_slot_world = host.queries.world_identity()
+	_slot_world = host.queries.status.world_identity()
 	panel.hide()
 	slots_dialog.open(false)
 
 func _slot_confirmed(slot: int, title: String) -> void:
-	if _slot_world != host.queries.world_identity():
+	if _slot_world != host.queries.status.world_identity():
 		slots_dialog.dismiss()
 		panel.show()
 		return

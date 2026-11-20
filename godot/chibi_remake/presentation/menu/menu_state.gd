@@ -1,24 +1,22 @@
 extends RefCounted
+const MenuCatalog = preload("res://presentation/menu/menu_catalog.gd")
 const PROXY_FIELDS := ["media_view", "slots_dialog", "level_panel", "level_face", "level_scroll", "level_list", "level_back", "title_label", "main_buttons", "toast", "toast_serial", "row_parity", "campaign_panel", "campaign_cursor", "campaign_slots", "campaign_frames", "campaign_tex", "campaign_choice", "campaign", "scrim", "subtitle_label", "level_title", "level_hint", "C_FACE", "C_FACE_IN", "C_GROOVE", "C_BEVEL", "C_HEAD", "C_HINT", "C_ACCENT", "C_WOOD_A", "C_WOOD_B", "C_WOOD_RIM", "C_WOOD_DARK", "C_WOOD_HOVER", "C_WOOD_HOVER_RIM", "C_WOOD_PRESS", "C_WOOD_TXT", "C_GOLD", "C_GOLD_HOVER", "C_GOLD_PRESS", "C_GOLD_RIM", "C_GOLD_DARK", "C_GOLD_TXT", "sb_row_a", "sb_row_b", "sb_row_hover", "sb_row_press", "sb_row_focus", "sb_gold", "sb_gold_hover", "sb_gold_press", "sb_gold_focus"]
 ## Presentation-owned node references and interaction state.
 # ── 「选择势力」这一步（2a 新增）：开始游戏 → 先问曹操/刘备，再列该线关卡 ──
 
-const CAMPAIGN_CAO := "chibic"             # 左格：曹操（关卡 id 前缀也是它）
+const CAMPAIGN_CAO := MenuCatalog.CAMPAIGN_CAO
 
-const CAMPAIGN_LIU := "chibil"             # 右格：刘备
+const CAMPAIGN_LIU := MenuCatalog.CAMPAIGN_LIU
 
-const CAMPAIGN_IDS := ["chibic", "chibil"]
+const CAMPAIGN_IDS := MenuCatalog.CAMPAIGN_IDS
 
-const CAMPAIGN_TITLE := {"chibic": "曹操线", "chibil": "刘备线"}
+const CAMPAIGN_TITLE := MenuCatalog.CAMPAIGN_TITLE
 
-const CAMPAIGN_FACTION := {"chibic": "曹操", "chibil": "刘备"}
+const CAMPAIGN_FACTION := MenuCatalog.CAMPAIGN_FACTION
 # 立绘取自 res:// 里已有的官员像（059=曹操 / 039=刘备）。
 # res:// 没有任何 UI 贴图，所以木框/名牌/箭头全部是形状，不许引用不存在的贴图。
 
-const PORTRAIT_PATH := {
-	"chibic": "res://art/full/officers/059-portrait-v2.png",
-	"chibil": "res://art/full/officers/039-portrait-v2.png",
-}
+const PORTRAIT_PATH := MenuCatalog.PORTRAIT_PATH
 
 const PORTRAIT_SIZE := 300                 # 立绘显示边长（原图 1254x1254 正方形，等比不裁）
 

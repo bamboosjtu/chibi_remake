@@ -104,7 +104,7 @@ func _manual_exchange_and_rollback() -> void:
 	var old_key: Array = layer.signature
 	candidate.state.resource_revision=int(old_key[2]); candidate.world.nav.geometry_revision=int(old_key[3])
 	var previous: RefCounted = battle.exchange_world(candidate.world)
-	var key: Array = reader.queries.resource_layer_key(viewport)
+	var key: Array = reader.queries.map.resource_layer_key(viewport)
 	assert(key.slice(2)==old_key.slice(2) and key[0]!=old_key[0] and key[1]!=old_key[1])
 	layer.update_visible(viewport)
 	var rejected_projection: Array = layer.projection
@@ -145,7 +145,7 @@ func _restore_new_world(snapshot: Dictionary) -> void:
 	var builds: int = layer.projection_builds
 	assert(battle.saver.apply_snapshot(snapshot))
 	battle.resource_revision=int(old_key[2]); battle.nav.geometry_revision=int(old_key[3])
-	var key: Array = reader.queries.resource_layer_key(viewport)
+	var key: Array = reader.queries.map.resource_layer_key(viewport)
 	assert(key.slice(2)==old_key.slice(2) and key[0]!=old_key[0] and key[1]!=old_key[1])
 	layer.update_visible(viewport)
 	assert(layer.projection_builds==builds+1 and not is_same(layer.projection,retained))

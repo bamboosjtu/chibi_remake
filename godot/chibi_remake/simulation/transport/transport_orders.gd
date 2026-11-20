@@ -1,4 +1,5 @@
 extends Object
+const UnitPath = preload("res://simulation/movement/unit_path.gd")
 var _transports: RefCounted
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
@@ -72,7 +73,7 @@ func _order_board(ship: Dictionary, actors = null) -> int:
 		_dep_command_groups._cancel_unit_command(u)
 		u["board_target"] = ship
 		u["state"] = "board"
-		u["path"] = _transports.boarding_path(u,ship) if not _transports.adjacent(u,ship) else []
+		UnitPath.set_points(u, _transports.boarding_path(u,ship) if not _transports.adjacent(u,ship) else [])
 		u["pi"] = 0
 		n += 1
 	if n > 0:
@@ -92,7 +93,7 @@ func _attach_to_ship(u: Dictionary, ship: Dictionary) -> bool:
 	u["attached"] = true
 	u["aboard_uid"] = int(ship.uid)
 	u["state"] = "boarded"
-	u["path"] = []
+	UnitPath.set_points(u, [])
 	u["pi"] = 0
 	u["target"] = null
 	u["board_target"] = null
@@ -123,7 +124,7 @@ func _detach_from_ship(u: Dictionary, ship: Dictionary) -> bool:
 	u["A"] = target_cell.x
 	u["B"] = target_cell.y
 	u["state"] = "idle"
-	u["path"] = []
+	UnitPath.set_points(u, [])
 	u["pi"] = 0
 	if _effects != null:
 		_effects.visual("set_unit_attached", [u, false])

@@ -14,12 +14,12 @@ func _order_stop(_hold: bool) -> void:
 	_ui.host.actions.submit_command("stop")
 
 func _act_build(idx: int) -> void:
-	var bts: Array = _ui.host.queries.build_options()
+	var bts: Array = _ui.host.queries.commands.build_options()
 	if idx < 0 or idx >= bts.size():
 		return
 	_ui.host.actions.begin_target("build", int(bts[idx].unit))
 	# 已进入"点空地"状态 → 关掉建造清单，回到图标面板（下一步是地图点击）
-	if _ui.host.queries.cmd_pending_kind() == "build":
+	if _ui.host.queries.commands.cmd_pending_kind() == "build":
 		_ui.build_menu = false
 		_dep_command_model._refresh_cmd_panel()
 
@@ -33,7 +33,7 @@ func _act_cancel_train(building: Dictionary) -> void:
 
 func _act_train(i: int) -> void:
 	var b: Dictionary = _dep_selection_info._selected_building()
-	var tts: Array = _ui.host.queries.train_types_for(int(b.unit)) if not b.is_empty() else []
+	var tts: Array = _ui.host.queries.commands.train_types_for(int(b.unit)) if not b.is_empty() else []
 	if i < 0 or i >= tts.size():
 		return
 	_ui.host.actions.submit_command("train", -1, int(tts[i].unit))

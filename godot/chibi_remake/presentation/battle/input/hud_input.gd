@@ -114,12 +114,12 @@ func _navigate_focus(event: InputEvent) -> bool:
 		var focused := surface.get_viewport().gui_get_focus_owner()
 		if focused is Button and not focused.disabled and _ui.ui_layer.is_ancestor_of(focused):
 			_armed_button = weakref(focused)
-			_armed_world = _ui.host.queries.world_identity()
+			_armed_world = _ui.host.queries.status.world_identity()
 			return true
 	elif event.is_action_released("battle_confirm") and _armed_button != null:
 		var button = _armed_button.get_ref()
 		_armed_button = null
-		if is_instance_valid(button) and button.has_focus() and button.is_visible_in_tree() and not button.disabled and _armed_world == _ui.host.queries.world_identity():
+		if is_instance_valid(button) and button.has_focus() and button.is_visible_in_tree() and not button.disabled and _armed_world == _ui.host.queries.status.world_identity():
 			button.pressed.emit()
 		return true
 	for direction in [["left", SIDE_LEFT], ["up", SIDE_TOP], ["right", SIDE_RIGHT], ["down", SIDE_BOTTOM]]:
@@ -191,7 +191,7 @@ func _hud_panel_at(win_pos: Vector2) -> bool:
 func _hud_select_hook(want_building: bool) -> void:
 	await surface.get_tree().create_timer(0.9).timeout
 	var target: Dictionary = {}
-	for u in _ui.host.queries.unit_views():
+	for u in _ui.host.queries.unit.unit_views():
 		if not bool(u.alive) or int(u.owner) != int(_ui.host.queries.player_owner):
 			continue
 		if bool(u.is_building) == want_building:
@@ -212,12 +212,12 @@ func _hud_select_hook(want_building: bool) -> void:
 	await surface.get_tree().process_frame
 	var read_back: Vector2 = surface.get_global_mouse_position()
 	var path: String = "合成鼠标事件"
-	if _ui.host.queries.selection_views().is_empty():
+	if _ui.host.queries.unit.selection_views().is_empty():
 		_ui.host.actions.select_at(world, false)          # 宿主的真实选择入口（main._input 点击时调的就是它）
 		path = "退化：直接调 main._select_click"
 	print("HUD: --hud-select 点选「%s」 世界=%s 注入画布=%s 回读世界=%s 偏差=%.1f 路径=%s 已选=%d" % [
 		str(target.name), str(world), str(canvas_pos), str(read_back),
-		read_back.distance_to(world), path, _ui.host.queries.selection_views().size()])
+		read_back.distance_to(world), path, _ui.host.queries.unit.selection_views().size()])
 
 func _send_click(canvas_pos: Vector2) -> void:
 	var down := InputEventMouseButton.new()
@@ -267,7 +267,7 @@ func _hud_click_hook(idx: int, hot: bool) -> void:
 	var hov_name: String = "null"
 	if hov != null:
 		hov_name = "%s(%s)" % [str(hov.name), hov.get_class()]
-	var before_train: int = _ui.host.queries.training_views().size()
+	var before_train: int = _ui.host.queries.unit.training_views().size()
 	var before_fb: String = str(_ui.host.feedback_text)
 	var st_before: String = _dep_selection_info._sel_state_text()
 	_ui._click_probe = 0
@@ -280,7 +280,7 @@ func _hud_click_hook(idx: int, hot: bool) -> void:
 	await surface.get_tree().process_frame
 	var st_after: String = _dep_selection_info._sel_state_text()
 	var probe_n: int = _ui._click_probe
-	var fired: bool = (_ui.host.queries.training_views().size() > before_train) or (str(_ui.host.feedback_text) != before_fb) or (st_after != st_before)
+	var fired: bool = (_ui.host.queries.unit.training_views().size() > before_train) or (str(_ui.host.feedback_text) != before_fb) or (st_after != st_before)
 	var path: String = "真实点击（本模块 _input 接管）"
 	if not fired:
 		b.emit_signal("pressed")                     # 兜底：直接触发按钮信号
@@ -290,7 +290,7 @@ func _hud_click_hook(idx: int, hot: bool) -> void:
 		b.pressed.disconnect(_on_click_probe)
 	print("HUD: --hud-click%s=%d 「%s」 按钮矩形=%s 光标画布=%s 命中=%s gui悬停=%s 路径=%s 按钮信号次数=%d | trainings %d->%d 反馈=\"%s\"->\"%s\" 选中状态 %s -> %s" % [
 		"/hot" if hot else "", idx, b.text, str(rect), str(mouse_canvas), str(inside), hov_name, path, probe_n,
-		before_train, _ui.host.queries.training_views().size(), before_fb, str(_ui.host.feedback_text), st_before, st_after])
+		before_train, _ui.host.queries.unit.training_views().size(), before_fb, str(_ui.host.feedback_text), st_before, st_after])
 
 func _on_click_probe() -> void:
 	_ui._click_probe += 1

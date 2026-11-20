@@ -1,4 +1,5 @@
 extends Object
+const UnitLifecycle = preload("res://simulation/units/unit_lifecycle.gd")
 const VisibilityRuntime = preload("res://simulation/visibility/battle_visibility.gd")
 var _visibility: VisibilityRuntime
 var _transports: RefCounted
@@ -172,18 +173,7 @@ func _prune_dead() -> void:
 		i -= 1
 
 func _free_unit_at(i: int) -> void:
-	if i < 0 or i >= battle.units.size(): return
-	var u: Dictionary = battle.units[i]
-	if u.has("occupied_cells"):
-		_nav.occupy(u.occupied_cells, -1)
-	_dep_spatial_index._index_forget(u)
-	_dep_spatial_index._target_forget(u)
-	battle._foot_cache.erase(int(u.get("uid", -1)))
-	if _effects != null:
-		_effects.visual("free_unit", [u])
-	battle.selected.erase(u)
-	battle.units.remove_at(i)
-	battle._index_units_size = battle.units.size()
+	UnitLifecycle.remove_at(battle, i, _nav, _dep_spatial_index, _effects)
 
 func _update_visual(u: Dictionary) -> void:
 	_effects.visual("update_visual", [u])

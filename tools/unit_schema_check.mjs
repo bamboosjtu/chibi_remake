@@ -3,10 +3,12 @@ const root = 'godot/chibi_remake';
 const schema = fs.readFileSync(root+'/simulation/units/unit_schema.gd','utf8');
 const declared = new Set([...schema.matchAll(/^\s*"(\w+)": \{/gm)].map(match => match[1]));
 const factory = fs.readFileSync(root+'/simulation/units/entity_factory.gd','utf8');
-const keys = new Set([...factory.slice(factory.indexOf('var u := {'),factory.indexOf('battle.sheet_by_unit')).matchAll(/"(\w+)"\s*:/g)].map(match => match[1]));
+const record = factory.match(/var u := \{[\s\S]*?^\t\}/m)?.[0] ?? '';
+if (!record) throw Error('Missing unit factory record');
+const keys = new Set([...record.matchAll(/"(\w+)"\s*:/g)].map(match => match[1]));
 const literal = '(?:true|false|null|-?\\d+(?:\\.\\d+)?|""|\\[\\]|\\{\\})';
 const defaults = Object.fromEntries([...schema.matchAll(new RegExp('^\\s*"(\\w+)": \\{[^\\n]*?"default": ('+literal+')(?=,)', 'gm'))].map(match => [match[1],JSON.parse(match[2])]));
-for (const match of factory.slice(factory.indexOf('var u := {'),factory.indexOf('battle.sheet_by_unit')).matchAll(new RegExp('"(\\w+)":\\s*('+literal+')(?=[,\\s])','g'))) {
+for (const match of record.matchAll(new RegExp('"(\\w+)":\\s*('+literal+')(?=[,\\s])','g'))) {
   if (declared.has(match[1]) && JSON.stringify(defaults[match[1]]) !== JSON.stringify(JSON.parse(match[2]))) throw Error('Unit default drift: '+match[1]);
 }
 const walk = dir => fs.readdirSync(dir,{withFileTypes:true}).flatMap(entry => entry.isDirectory() ? walk(dir+'/'+entry.name) : entry.name.endsWith('.gd') ? [dir+'/'+entry.name] : []);

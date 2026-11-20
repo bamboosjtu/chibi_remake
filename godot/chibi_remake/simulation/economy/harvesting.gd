@@ -1,4 +1,5 @@
 extends RefCounted
+const UnitPath = preload("res://simulation/movement/unit_path.gd")
 var _economy: RefCounted
 const Balance = preload("res://simulation/definitions/balance_rules.gd")
 const Config = preload("res://simulation/definitions/battle_config.gd")
@@ -22,16 +23,16 @@ func _init(h: Object) -> void:
 func next_target(worker: Dictionary, previous: Dictionary) -> bool:
 	# 身上有货：任何“找下一个采集点”的路径都必须先回运，不能把货卡在 idle。
 	if float(worker.get("carry", 0.0)) > 0.0:
-		worker.state = "deliver"; worker.path = []; worker.pi = 0; worker.gather_obj = previous
+		worker.state = "deliver"; UnitPath.set_points(worker, []); worker.pi = 0; worker.gather_obj = previous
 		return true
 	# 敌方粮仓抽空后不自动改抢另一个粮仓；用户的自动转采只覆盖有限资源点。
 	if int(previous.get("unit",-1)) in [10,11]:
-		worker.state = "idle"; worker.path = []; worker.gather_obj = null
+		worker.state = "idle"; UnitPath.set_points(worker, []); worker.gather_obj = null
 		return false
 	var kind: String = _dep_harvest_orders._yield_of(int(previous.get("unit", -1)))
 	var found: Dictionary = _dep_harvest_orders._nearest_harvest_by_path(worker, kind)
 	if found.is_empty():
-		worker.state = "idle"; worker.path = []; worker.gather_obj = null
+		worker.state = "idle"; UnitPath.set_points(worker, []); worker.gather_obj = null
 		if int(worker.owner) == _state.player_owner: _effects.feedback("附近没有可达的同类资源")
 		return false
 	_dep_harvest_orders._begin_gather(worker, found.object, found.path)
@@ -73,7 +74,7 @@ func extract(worker: Dictionary, target: Dictionary) -> void:
 			_economy.write(int(target.owner), pool)
 		else: target.stock = stock - amount
 		worker.carry = amount; worker.carry_kind = kind
-		worker.state = "deliver"; worker.path = []; worker.pi = 0
+		worker.state = "deliver"; UnitPath.set_points(worker, []); worker.pi = 0
 		worker.gather_ticks = 0; worker.gather_t = 0.0
 	if stock - amount <= 0:
 		if bool(target.get("decor", false)): _dep_harvest_orders._remove_decor(target)
@@ -83,7 +84,7 @@ func extract(worker: Dictionary, target: Dictionary) -> void:
 	if amount <= 0:
 		# 目标已空但工人身上还有货：必须先回运，不能原地转 idle 把货扣在手里。
 		if float(worker.get("carry", 0.0)) > 0.0:
-			worker.state = "deliver"; worker.path = []; worker.pi = 0
+			worker.state = "deliver"; UnitPath.set_points(worker, []); worker.pi = 0
 		else:
 			next_target(worker, target)
 
@@ -94,7 +95,7 @@ func bind_dependencies(world: Object) -> void:
 func step_gather(u: Dictionary, delta: float) -> void:
 	var obj = u.get("gather_obj", null)
 	if not (obj is Dictionary) or obj.is_empty():
-		u.state = "idle"; u.path = []
+		u.state = "idle"; UnitPath.set_points(u, [])
 	elif not bool(obj.get("alive", false)) or float(obj.get("die_t", -1)) >= 0:
 		next_target(u, obj)
 	elif _dep_interaction_paths._edge_cell_distance(u, obj) != Config.EDGE_DISTANCE:
@@ -102,13 +103,13 @@ func step_gather(u: Dictionary, delta: float) -> void:
 			var choice: Dictionary = _dep_interaction_paths._edge_interaction_choice(u, obj)
 			if not choice.is_empty():
 				u.gather_obj = choice.object
-				u.path = choice.path
+				UnitPath.set_points(u, choice.path)
 			u.pi = 0
 		if u.path.is_empty():
 			u.state = "idle"; _effects.feedback("工人无法到达该资源点边缘")
 		else: _dep_movement._follow(u, delta)
 	else:
-		u.path = []
+		UnitPath.set_points(u, [])
 		extract(u, obj)
 
 func step_deliver(u: Dictionary, delta: float) -> bool:
@@ -121,17 +122,17 @@ func step_deliver(u: Dictionary, delta: float) -> bool:
 		u.delivery_ticks = int(u.get("delivery_ticks", 0)) + 1
 		if int(u.delivery_ticks) % 4 != 0: return false
 		if _dep_harvest_orders._deposit_carry(u):
-			u.path = []; u.pi = 0
+			UnitPath.set_points(u, []); u.pi = 0
 			# 卸货后继续玩家指定的资源，不暗中改采其他种类。
 			if u.gather_obj is Dictionary: resume_after_deposit(u, u.gather_obj)
 			else: u.state = "idle"
 		else:
-			u.path = []; u.pi = 0
+			UnitPath.set_points(u, []); u.pi = 0
 			u.state = "idle"
 	else:
 		if u.path.is_empty():
 			for building in deposits:
-				u.path = _dep_interaction_paths._edge_interaction_path(u, building, {}, Config.DEPOSIT_EDGE_PX); u.pi = 0
+				UnitPath.set_points(u, _dep_interaction_paths._edge_interaction_path(u, building, {}, Config.DEPOSIT_EDGE_PX)); u.pi = 0
 				if not u.path.is_empty(): break
 		if u.path.is_empty():
 			u.state = "idle"; _effects.feedback("没有可到达的卸货建筑，工人保留携带资源")

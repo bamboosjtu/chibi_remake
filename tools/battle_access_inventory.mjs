@@ -13,5 +13,5 @@ const report={schemaVersion:4,method:'Literal host/_ui.host properties and liter
   references,consumers};
 const target='tools/inputs/battle_access_inventory.json',text=JSON.stringify(report,null,2)+'\n';
 if(process.argv.includes('--write'))fs.writeFileSync(target,text);
-else if(!fs.existsSync(target)||fs.readFileSync(target,'utf8')!==text)throw Error('BattleAccess inventory stale; review and run node tools/battle_access_inventory.mjs --write');
+else if(!fs.existsSync(target)||fs.readFileSync(target,'utf8').replaceAll('\r\n','\n')!==text)throw Error('BattleAccess inventory stale; review and run node tools/battle_access_inventory.mjs --write');
 console.log(`BATTLE ACCESS INVENTORY PASS ${references.length} literal access sites / ${consumers.length} consumers / explicit scope limitations`);

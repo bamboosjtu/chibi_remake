@@ -249,10 +249,10 @@ func attach_unit(u: Dictionary, sheet: String, w: int, h: int, k: float) -> void
 func free_unit(u: Dictionary) -> void:
 	unit_visuals.free_unit(u)
 func place_unit(u: Dictionary) -> void:
-	host.queries.invalidate_unit_views()
+	host.queries.unit.invalidate_unit_views()
 	unit_visuals.place_unit(u)
 func capture_motion() -> void:
-	host.queries.invalidate_unit_views()
+	host.queries.unit.invalidate_unit_views()
 	unit_visuals.capture_motion()
 func interpolate_motion(alpha: float) -> void:
 	unit_visuals.interpolate_motion(alpha)
@@ -263,11 +263,11 @@ func fade_unit(u: Dictionary, alpha: float) -> void:
 func set_unit_attached(u: Dictionary, attached: bool) -> void:
 	unit_visuals.set_unit_attached(u, attached)
 func update_visual(u: Dictionary) -> void:
-	host.queries.invalidate_unit_views()
+	host.queries.unit.invalidate_unit_views()
 	unit_visuals.update_visual(u)
 
 func domain_changed() -> void:
-	host.queries.invalidate_unit_views()
+	host.queries.unit.invalidate_unit_views()
 func mobile_pose(u: Dictionary, gait_tick := -1.0) -> Dictionary:
 	return unit_visuals.mobile_pose(u, gait_tick)
 func set_frame(u: Dictionary, f: int) -> void:

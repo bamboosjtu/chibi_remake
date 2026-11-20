@@ -1474,6 +1474,16 @@
   ],
   "added": [
     {
+      "to": "testing/automation/acceptance_hook.gd",
+      "phase": "P6",
+      "reason": "acceptance-only dispatcher"
+    },
+    {
+      "to": "simulation/movement/unit_path.gd",
+      "phase": "P6",
+      "reason": "Movement-owned path replacement"
+    },
+    {
       "to": "testing/automation/menu_harness.gd",
       "phase": "P4c",
       "reason": "menu acceptance harness"

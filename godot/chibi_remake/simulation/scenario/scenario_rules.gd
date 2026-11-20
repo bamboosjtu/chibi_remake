@@ -1,4 +1,5 @@
 extends RefCounted
+const UnitPath = preload("res://simulation/movement/unit_path.gd")
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
 var _state: RefCounted
@@ -124,7 +125,7 @@ func apply_effect(effect: Dictionary) -> void:
 				if enemy.is_building:
 					continue
 				var target: Vector2 = _nav.anchor_of(int(effect.target[0]), int(effect.target[1]))
-				enemy.path = _nav.find_path(Vector2(enemy.ax, enemy.ay), target, false, _dep_command_groups._nav_layer(enemy), int(enemy.get("owner", -1)), int(enemy.get("unit", -1)))
+				UnitPath.set_points(enemy, _nav.find_path(Vector2(enemy.ax, enemy.ay), target, false, _dep_command_groups._nav_layer(enemy), int(enemy.get("owner", -1)), int(enemy.get("unit", -1))))
 				enemy.pi = 0
 				enemy.state = "move" if not enemy.path.is_empty() else "idle"
 				# DAT_0048534c initial value is 100 in the PE data section.

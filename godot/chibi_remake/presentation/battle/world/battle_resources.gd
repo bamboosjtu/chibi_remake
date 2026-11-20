@@ -21,10 +21,10 @@ func _process(_delta: float) -> void:
 	update_visible(rect)
 
 func update_visible(rect: Rect2) -> void:
-	var key: Array = host.queries.resource_layer_key(rect)
+	var key: Array = host.queries.map.resource_layer_key(rect)
 	if key == signature: return
 	signature = key
-	projection = host.queries.resource_layer_projection(rect) if not key.is_empty() else []
+	projection = host.queries.map.resource_layer_projection(rect) if not key.is_empty() else []
 	projection_builds += 1
 	var wanted := {}
 	for descriptor in projection: wanted[int(descriptor.index)] = true

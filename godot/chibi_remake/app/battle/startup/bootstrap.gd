@@ -21,8 +21,13 @@ func _ready() -> void:
 	if not Game.startup_valid:
 		node.set_process(false); return
 	_initialize_session()
-	battle.map_id = Game.current_map
 	var args := OS.get_cmdline_user_args()
+	var want_view := _read_startup_arguments(args)
+	if _prepare_battle(want_view):
+		await _run_startup_probe(args)
+
+func _read_startup_arguments(args: PackedStringArray) -> bool:
+	battle.map_id = Game.current_map
 	var want_view := true
 	for a in args:
 		if a.begins_with("--map=") and not Game.startup_map_consumed:
@@ -45,11 +50,14 @@ func _ready() -> void:
 	if "--load" in args and not Game.startup_load_consumed:
 		Game.pending_load = true    # 供自动化验证读档路径（等价于点菜单的「读取进度」）
 		Game.startup_load_consumed = true
+	return want_view
+
+func _prepare_battle(want_view: bool) -> bool:
 	var opening := preload("res://app/battle/startup/battle_opening.gd").new(node.world)
 	var map_error := opening.prepare_map(battle.map_id)
 	if not map_error.is_empty():
 		_dep_scene_controller._fatal(map_error)
-		return
+		return false
 	Game.current_map = battle.map_id
 
 	# R7：归属过滤键从数据里实际出现的归属建立，不再假设只有 0..4
@@ -74,7 +82,7 @@ func _ready() -> void:
 	_dep_scene_controller._build_terrain()
 	if not opening.populate(not Game.pending_load):
 		_dep_scene_controller._fatal("地图实体已经初始化")
-		return
+		return false
 	if scene.view!=null and DisplayServer.get_name()!="headless":node.world.nav.warm_runtime_shapes()
 	scene.saver = SaveSvc.new(node)  # ARCH-006：存档编排在 save_service.gd（与 ai.gd 同样的鸭子类型宿主）
 	var had_pending_load := bool(Game.pending_load)
@@ -84,7 +92,7 @@ func _ready() -> void:
 			Game.pending_load_slot = 0
 			Game.last_load_error = scene.saver.last_load_error + " 原档已保留，请重新选择。"
 			_dep_scene_controller._schedule_failed_load_return()
-			return
+			return false
 		Game.pending_load = false
 		Game.pending_load_slot = 0
 	# AI was initialized before snapshot restore. # ARCH-006：AI 逻辑在 ai.gd，main 只提供状态访问
@@ -113,7 +121,9 @@ func _ready() -> void:
 		if n is CanvasItem:
 			render_nodes += 1
 	print("ARCH-013: view=%s  CanvasItem节点=%d  units=%d" % [str(scene.view != null), render_nodes, battle.units.size()])
+	return true
 
+func _run_startup_probe(args: PackedStringArray) -> void:
 	# ARCH-012：导出的 exe 是 GUI 子系统，父进程拿不到 stdout，
 	# 所以冒烟测试把结论写进文件，构建脚本检查文件而不是控制台输出。
 	if "--smoketest" in args:

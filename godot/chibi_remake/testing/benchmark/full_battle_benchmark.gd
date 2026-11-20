@@ -176,6 +176,8 @@ func run() -> void:
 	for i in range(60):battle.world.battle_simulation._sim_step(Config.SIM_DT)
 	battle.world.unit_actions.profile_enabled=profile_units
 	battle.world.unit_actions.profile.clear()
+	battle.world.combat.profile_enabled=profile_units
+	battle.world.combat.profile.clear()
 	battle.world.battle_simulation.profile_enabled=profile_units
 	battle.world.battle_simulation.timing_enabled=true
 	battle.nav.set_profiling(true)
@@ -229,7 +231,9 @@ func _record_profile(battle: Node2D, report: Dictionary) -> void:
 	report["minimapBackend"]="gpu-instanced" if battle.view!=null and battle.view._ui.minimap.gpu_markers else "cpu"
 	report["unitProfileUsec"]=battle.world.unit_actions.profile.duplicate()
 	report["worldProfileUsec"]=battle.world.battle_simulation.profile.duplicate()
-	for key in battle.world.battle_simulation.native_unit_profile:report.unitProfileUsec[key]=int(report.unitProfileUsec.get(key,0))+int(battle.world.battle_simulation.native_unit_profile[key])
+	for counters in [battle.world.combat.profile, battle.world.battle_simulation.native_unit_profile]:
+		for key in counters:
+			report.unitProfileUsec[key]=int(report.unitProfileUsec.get(key,0))+int(counters[key])
 
 func _logic_frame(battle: Node2D) -> void:
 	if battle.view!=null:battle.view.flush_visuals(false)
@@ -237,6 +241,7 @@ func _logic_frame(battle: Node2D) -> void:
 
 func _start_live_measurement(battle: Node2D, report: Dictionary) -> bool:
 	battle.world.unit_actions.profile_enabled=false
+	battle.world.combat.profile_enabled=false
 	battle.world.battle_simulation.profile_enabled=false
 	battle.world.battle_simulation.timing_enabled=false
 	battle.nav.set_profiling(false)

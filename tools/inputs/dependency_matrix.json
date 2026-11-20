@@ -303,7 +303,7 @@
         "simulation/combat",
         "simulation/ports",
         "root"
-      ]
+      ], "allowFiles": ["simulation/movement/unit_path.gd"]
     },
     "simulation/visibility": {
       "allow": [
@@ -341,29 +341,7 @@
       ]
     }
   },
-  "fileExceptions": [
-    {
-      "file": "simulation/world/unit_tick_coordinator.gd",
-      "allow": [
-        "simulation/combat",
-        "simulation/commands",
-        "simulation/construction",
-        "simulation/economy",
-        "simulation/movement",
-        "simulation/navigation",
-        "simulation/officers",
-        "simulation/transport",
-        "simulation/visibility",
-        "simulation/state",
-        "simulation/definitions",
-        "simulation/ports",
-        "simulation/core",
-        "simulation/native"
-      ],
-      "reason": "Legacy behavior coordinator; P6 splits into tick coordinator + lifecycle + domain steps",
-      "reviewBy": "2026-12-31"
-    }
-  ],
+  "fileExceptions": [],
   "notes": [
     "Presentation must not depend on simulation/ports; main.gd forwards events.",
     "Domains must not depend on simulation/world.",

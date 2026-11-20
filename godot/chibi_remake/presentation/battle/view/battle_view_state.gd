@@ -222,7 +222,7 @@ var _art_hover_name: String = ""
 
 var _panel_sig: String = ""          # 当前面板分型（"worker"/"combat"/""）
 
-var build_menu := false              # 建造子菜单（高清图标分页，条目来自 host.queries.build_options()）
+var build_menu := false              # 建造子菜单（高清图标分页，条目来自 host.queries.commands.build_options()）
 
 ## 按研究中的将本体、成员、未编组三层规则分型。
 ## 建筑选择走文字面板（生产/建造菜单），不占用图标格位。

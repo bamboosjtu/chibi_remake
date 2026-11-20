@@ -1,14 +1,5 @@
-extends RefCounted
+extends "res://testing/checks/checks_base.gd"
 const Technology = preload("res://simulation/definitions/technology_rules.gd")
-## Development assertions; shipped for --selftest candidate validation.
-var host: Node2D
-var _suite: WeakRef
-var suite: RefCounted:
-	get: return _suite.get_ref()
-
-func _init(battle: Node2D, runner: RefCounted) -> void:
-	host = battle
-	_suite = weakref(runner) if runner != null else null
 
 func _selftest_tech() -> void:
 	print("SELFTEST tech: 表=%d 条 建筑菜单 武器库2=%s 弓兵所14=%s 钱庄23=%s" % [

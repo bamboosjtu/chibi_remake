@@ -1,4 +1,5 @@
 extends Object
+const MenuCatalog = preload("res://presentation/menu/menu_catalog.gd")
 const SessionActions = preload("res://app/battle/session/session_actions.gd")
 ## controller: presentation component.
 const UIState = preload("res://presentation/menu/menu_state.gd")
@@ -16,7 +17,7 @@ func _probe_missing() -> bool:
 	return true
 const RemasterArt = preload("res://presentation/battle/resources/art_catalog.gd")
 
-const CAMPAIGN_CAO := "chibic"             # 左格：曹操（关卡 id 前缀也是它）
+const CAMPAIGN_CAO := MenuCatalog.CAMPAIGN_CAO
 
 func _init(data: UIState, node: Control) -> void:
 	_ui = data
@@ -26,6 +27,14 @@ func _ready() -> void:
 	surface.get_window().title = "三国赤壁 · 高清重制"
 	surface.get_tree().set_auto_accept_quit(false)
 	_dep_menu_styles._build_styles()
+	_build_menu_backdrop()
+	_build_main_buttons()
+	_build_toast()
+	_dep_level_dialog._build_level_dialog()
+	_dep_campaign_dialog._build_campaign_dialog()
+	await _finish_menu_startup()
+
+func _build_menu_backdrop() -> void:
 	var bgm = load("res://presentation/audio/bgm.gd").new()
 	surface.add_child(bgm)
 	bgm.play("res://media/music/start.ogg")
@@ -70,6 +79,7 @@ func _ready() -> void:
 		_ui.subtitle_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		surface.add_child(_ui.subtitle_label)
 
+func _build_main_buttons() -> void:
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0.545, 0.333, 0.145, 0.92)
 	sb.border_color = Color(0.30, 0.16, 0.05)
@@ -105,6 +115,7 @@ func _ready() -> void:
 		surface.add_child(b)
 		_ui.main_buttons.append(b)
 
+func _build_toast() -> void:
 	_ui.toast = Label.new()
 	_ui.toast.anchor_left = 0.5
 	_ui.toast.anchor_right = 0.5
@@ -121,9 +132,7 @@ func _ready() -> void:
 	_ui.toast.visible = false
 	surface.add_child(_ui.toast)
 
-	_dep_level_dialog._build_level_dialog()
-	_dep_campaign_dialog._build_campaign_dialog()
-
+func _finish_menu_startup() -> void:
 	# 直入关卡：--map=CHIBIC1（配合 --screenshot 可做发布版验证）
 	var args := OS.get_cmdline_user_args()
 	for a in args:
@@ -192,36 +201,8 @@ func _ready() -> void:
 		if "--screenshot" not in args and "--levels" not in args:
 			surface.get_tree().quit()
 			return
-
-	# 发布版自测截图：--screenshot（菜单本身）。
-	# --levels 时可再跟 --scroll=N（把列表按像素滚到 N）、--focus=N（把焦点放到第 N 行，
-	# 走的是键盘导航那条 follow_focus 路径）或 --scrollby=N（按 N 像素步进，
-	# 走的是 ▲▼ 按钮的 _scroll_by 同一条路径）。
 	if "--screenshot" in args or "--levels" in args:
-		await surface.get_tree().create_timer(0.8).timeout
-		if "--levels" in args:
-			if _probe_missing(): return
-			_automation_driver._report_level_dialog()
-			for a in args:
-				if a.begins_with("--scroll="):
-					_dep_level_dialog._scroll_to(int(a.substr(9)))
-				elif a.begins_with("--focus="):
-					_dep_level_dialog._focus_row(int(a.substr(8)))
-				elif a.begins_with("--scrollby="):
-					_dep_level_dialog._scroll_by(int(a.substr(11)))
-			await surface.get_tree().process_frame
-			await surface.get_tree().process_frame
-			if "--levels" in args:
-				if _probe_missing(): return
-				_automation_driver._report_scroll_state()
-		elif want_campaign:
-			await surface.get_tree().process_frame
-			await surface.get_tree().process_frame
-			_dep_campaign_dialog._refresh_campaign_cursor()
-			if _probe_missing(): return
-			_automation_driver._report_campaign_dialog()
-		if "--screenshot" in args: await _save_menu_screenshot(args)
-		surface.get_tree().quit()
+		await _capture_menu_probe(args, want_campaign)
 		return
 
 	if Game.last_load_error != "":
@@ -229,11 +210,44 @@ func _ready() -> void:
 		Game.last_load_error = ""
 		_show_toast.call_deferred(load_msg)
 
+	_show_menu_intro(args)
+
+func _show_menu_intro(args: PackedStringArray) -> void:
 	_ui.media_view=preload("res://presentation/media/event_view.gd").new(surface);surface.add_child(_ui.media_view)
 	var visible_args := Array(args).filter(func(arg): return not str(arg).begins_with("--portable-root=") and str(arg) != "--portable" and not str(arg).begins_with("--storage-mode="))
 	if not Game.startup_video_seen and DisplayServer.get_name()!="headless" and visible_args.is_empty():
 		Game.startup_video_seen=true
 		_ui.media_view.play_media("res://media/videos/START.AVI")
+
+func _capture_menu_probe(args: PackedStringArray, want_campaign: bool) -> void:
+	# 发布版自测截图：--screenshot（菜单本身）。
+	# --levels 时可再跟 --scroll=N（把列表按像素滚到 N）、--focus=N（把焦点放到第 N 行，
+	# 走的是键盘导航那条 follow_focus 路径）或 --scrollby=N（按 N 像素步进，
+	# 走的是 ▲▼ 按钮的 _scroll_by 同一条路径）。
+	await surface.get_tree().create_timer(0.8).timeout
+	if "--levels" in args:
+		if _probe_missing(): return
+		_automation_driver._report_level_dialog()
+		for a in args:
+			if a.begins_with("--scroll="):
+				_dep_level_dialog._scroll_to(int(a.substr(9)))
+			elif a.begins_with("--focus="):
+				_dep_level_dialog._focus_row(int(a.substr(8)))
+			elif a.begins_with("--scrollby="):
+				_dep_level_dialog._scroll_by(int(a.substr(11)))
+		await surface.get_tree().process_frame
+		await surface.get_tree().process_frame
+		if "--levels" in args:
+			if _probe_missing(): return
+			_automation_driver._report_scroll_state()
+	elif want_campaign:
+		await surface.get_tree().process_frame
+		await surface.get_tree().process_frame
+		_dep_campaign_dialog._refresh_campaign_cursor()
+		if _probe_missing(): return
+		_automation_driver._report_campaign_dialog()
+	if "--screenshot" in args: await _save_menu_screenshot(args)
+	surface.get_tree().quit()
 
 func _notification(what: int) -> void:
 	if what == Node.NOTIFICATION_WM_CLOSE_REQUEST:

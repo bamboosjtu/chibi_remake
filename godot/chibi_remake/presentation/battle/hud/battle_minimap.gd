@@ -80,14 +80,14 @@ func _missing_terrain(reason: String) -> Image:
 
 func _draw() -> void:
 	if terrain==null:return
-	var world_size: Vector2=host.queries.camera_bounds()
+	var world_size: Vector2=host.queries.map.camera_bounds()
 	var k:=minf(size.x/world_size.x,size.y/world_size.y)
 	world_rect=Rect2((size-world_size*k)*0.5,world_size*k)
 	terrain.position=world_rect.position;terrain.size=world_rect.size
 	overlay.size=size
 	if view.fog_sprite!=null and view.fog_sprite.texture!=null:
 		fog_material.set_shader_parameter("fog_mask",view.fog_sprite.texture)
-		fog_material.set_shader_parameter("fog_uv_scale",world_size/(host.queries.visibility_geometry()))
+		fog_material.set_shader_parameter("fog_uv_scale",world_size/(host.queries.map.visibility_geometry()))
 		terrain.show()
 	else:terrain.hide()
 	overlay.queue_redraw()
@@ -101,14 +101,14 @@ func _draw_overlay() -> void:
 
 func _draw_markers() -> void:
 	if world_rect.size.x<=0:return
-	var k: float=world_rect.size.x/host.queries.camera_bounds().x
+	var k: float=world_rect.size.x/host.queries.map.camera_bounds().x
 	var off:=world_rect.position
 	# Resolve the guarded read model once for this synchronous draw, not per dot.
 	var player:=int(host.queries.player_owner)
 	var scale: float=view.ui_scale
 	var count:=0
 	marker_mesh.visible=gpu_markers
-	var markers: Array = host.queries.minimap_markers()
+	var markers: Array = host.queries.unit.minimap_markers()
 	if gpu_markers: _reserve_markers(markers.size())
 	overlay.draw_rect(world_rect,Color(0.45,0.4,0.3),false,1.0)
 	for marker: Dictionary in markers:
@@ -140,7 +140,7 @@ func _reserve_markers(count: int) -> void:
 
 func _draw_camera() -> void:
 	if world_rect.size.x<=0:return
-	var k: float=world_rect.size.x/host.queries.camera_bounds().x
+	var k: float=world_rect.size.x/host.queries.map.camera_bounds().x
 	var off:=world_rect.position
 	if view.cam!=null:
 		var rect:Rect2=Metrics.visible_world_rect(view.cam.position,view.battle_rect(),get_viewport_rect().size,view.cam.zoom)

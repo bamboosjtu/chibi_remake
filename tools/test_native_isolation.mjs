@@ -12,11 +12,27 @@ for(const [name,extra,code,marker] of [
  ['selftest',['--selftest'],0,'SELFTEST RESULT: PASS'],
  ['reject-dir',['--native-save=write','--save-test-dir='+canary],1,null],
  ['reject-id',['--native-save=write','--save-test-id=../player'],1,null],
+ ['menu-keyboard',['--keytest','--save-test-id=menu-keyboard'],0,'KEYTEST esc-campaign: campaign_visible=false scrim=false main_button0=true'],
+ ['menu-mouse',['--mousetest','--save-test-id=menu-mouse'],0,'MOUSETEST done:'],
+ ['player-menu-reject',['--mouseclick=slotR'],1,null],
  ['player-export',['--check-player-export'],0,'PLAYER EXPORT PASS acceptance scripts absent'],
  ['player-reject',['--screenshot','--shot='+path.join(canary,'shot.png')],1,null]
 ]){
- const result=await runGodot({engine:path.join(fixture,path.basename(sourceExe)),directory,name:'native-isolation-'+name,timeout:120,env:{CHIBI_ACCEPTANCE:name.startsWith('player-')?'0':'1'},args:['--headless','--resolution','1920x1080','--','--map=chibil1','--no-intro','--view',...extra],markers:marker?[marker]:[]});
+ const menuProbe=name.startsWith('menu-')||name==='player-menu-reject';
+ const result=await runGodot({engine:path.join(fixture,path.basename(sourceExe)),directory,name:'native-isolation-'+name,timeout:120,env:{CHIBI_ACCEPTANCE:name.startsWith('player-')?'0':'1'},args:['--headless','--resolution','1920x1080','--',...(menuProbe?[]:['--map=chibil1','--no-intro','--view']),...extra],markers:marker?[marker]:[]});
  assert.equal(result.code,code,result.output);assert(!result.timedOut,result.output);assert(!result.missing.length,result.output);assert.doesNotMatch(result.output,/SCRIPT ERROR:|SELFTEST RESULT: FAIL/);
+ if(name==='menu-keyboard'){
+  assert.match(result.output,/KEYTEST left: choice=chibil visible=true/);
+  assert.match(result.output,/KEYTEST right: choice=chibic/);
+  assert.match(result.output,/KEYTEST d: choice=chibil/);
+  assert.match(result.output,/KEYTEST a: choice=chibic/);
+  assert.match(result.output,/KEYTEST enter: campaign=chibic campaign_visible=false level_visible=true rows=[1-9]/);
+ }
+ if(name==='menu-mouse'){
+  const clicks=result.output.split(/\r?\n/).filter(line=>line.startsWith('MOUSECLICK:'));
+  assert.equal(clicks.length,7,result.output);
+  assert(clicks.every(line=>line.endsWith('ok=true')),result.output);
+ }
  assert.deepEqual(sentinels.map(hash),before,'Native test entry changed player or arbitrary directory files');
  const {output,...summary}=result;results.push({...summary,ok:true,observedExitCode:result.code,expectedExitCode:code,code:0});fs.writeFileSync(path.join(directory,'results.json'),JSON.stringify(results,null,2)+'\n');console.log('PASS native-isolation-'+name);
 }

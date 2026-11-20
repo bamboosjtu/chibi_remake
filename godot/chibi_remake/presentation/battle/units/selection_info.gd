@@ -17,14 +17,14 @@ func update_hud_text() -> void:
 		return
 	_dep_hud_layout._refresh_metrics()
 	_refresh_res_slots()
-	var sel: Array = _ui.host.queries.selection_views()
+	var sel: Array = _ui.host.queries.unit.selection_views()
 	var fb: String = str(_ui.host.feedback_text)
 	# 原版左下角只显示一句状态（「训练完成」）。有反馈就显示反馈，没有就显示悬停信息。
 	var l1: String = fb if fb != "" else str(_ui.host.hover_text)
 	if fb == "" and not _ui.host.show_debug: l1 = ""
 	_ui.info.text = l1
 	_ui.info.visible = l1 != "" and _ui._art_hover_name == ""
-	var map_name: String = _ui.host.queries.map_caption()
+	var map_name: String = _ui.host.queries.map.map_caption()
 	var l2: String = "三国赤壁 — %s \"%s\"   第 %d 关   我军 归属%d   我军 %d · 敌军 %d · 已选 %d" % [
 		str(_ui.host.queries.map_id).to_upper(), map_name, int(_ui.host.queries.scenario_mission),
 		int(_ui.host.queries.player_owner), int(_ui.host.queries.cnt_player), int(_ui.host.queries.cnt_enemy), sel.size()]
@@ -45,7 +45,7 @@ func _refresh_res_slots() -> void:
 		l.text = "%.0f" % float(vals[i])
 
 func _officer_selection() -> Dictionary:
-	for u in _ui.host.queries.selection_views():
+	for u in _ui.host.queries.unit.selection_views():
 		if bool(u.get("alive", false)) and not bool(u.is_building) and not (u.get("officer", {}) as Dictionary).is_empty():
 			return u
 	return {}
@@ -53,7 +53,7 @@ func _officer_selection() -> Dictionary:
 func _refresh_banner() -> void:
 	if _ui.banner == null:
 		return
-	var sel: Array = _ui.host.queries.selection_views()
+	var sel: Array = _ui.host.queries.unit.selection_views()
 	if sel.is_empty():
 		_ui.banner.visible = false
 		return
@@ -70,7 +70,7 @@ func _unit_icon(u: Dictionary) -> Texture2D:
 		hd.atlas = skin.texture
 		hd.region = skin.region_rect
 		return hd
-	var path: String = str(_ui.host.queries.sheet_ref_for(int(u.unit), int(u.owner)))
+	var path: String = str(_ui.host.queries.unit.sheet_ref_for(int(u.unit), int(u.owner)))
 	if path == "" or not ResourceLoader.exists("res://" + path):
 		return null
 	var tex: Texture2D = _dep_unit_visuals._sheet(path)
@@ -90,7 +90,7 @@ func _refresh_sel_frame() -> void:
 		return
 	if _ui.sel_frame == null:
 		return
-	var sel: Array = _ui.host.queries.selection_views()
+	var sel: Array = _ui.host.queries.unit.selection_views()
 	if sel.is_empty():
 		_ui.sel_portrait.texture = null
 		_ui.sel_name.text = "—— 未选择 ——"
@@ -114,7 +114,7 @@ func _refresh_sel_frame() -> void:
 			var lv := int(off.get("level", 0))
 			var need := 0
 			if lv >= 0 and lv < int(preload("res://simulation/definitions/officer_grades.gd").data.thresholds.size()): need = int(preload("res://simulation/definitions/officer_grades.gd").data.thresholds[lv])
-			_ui.sel_rank.text = "归属 %s   %s   经验 %d/%d" % [str(off.get("name", "?")), str(_ui.host.queries.officer_rank_name(off)), int(off.get("exp", 0)), need]
+			_ui.sel_rank.text = "归属 %s   %s   经验 %d/%d" % [str(off.get("name", "?")), str(_ui.host.queries.unit.officer_rank_name(off)), int(off.get("exp", 0)), need]
 		else:
 			_ui.sel_rank.text = "%s   #%d" % ["建筑" if bool(u.is_building) else "部队", int(u.unit)]
 	else:
@@ -132,7 +132,7 @@ func _refresh_troop() -> void:
 		return
 	if _ui.troop_frame == null:
 		return
-	var sel: Array = _ui.host.queries.selection_views()
+	var sel: Array = _ui.host.queries.unit.selection_views()
 	if sel.is_empty():
 		_ui.troop_frame.visible = false        # 未选择时不显示空框（空的金框看着像坏掉的占位）
 		_ui.troop_icon.texture = null
@@ -202,14 +202,14 @@ func _act_close_officer_pick() -> void:
 	_dep_command_model._refresh_cmd_panel()
 
 func _selected_building() -> Dictionary:
-	for u in _ui.host.queries.selection_views():
+	for u in _ui.host.queries.unit.selection_views():
 		if bool(u.is_building) and int(u.owner) == int(_ui.host.queries.player_owner) and bool(u.alive) \
 				and not bool(u.get("site", false)):
 			return u
 	return {}
 
 func _selected_site() -> Dictionary:
-	for u in _ui.host.queries.selection_views():
+	for u in _ui.host.queries.unit.selection_views():
 		if bool(u.is_building) and int(u.owner) == int(_ui.host.queries.player_owner) and bool(u.alive) and bool(u.get("site", false)):
 			return u
 	return {}
@@ -250,7 +250,7 @@ func _rebuild_stats_text() -> void:
 		return
 	if _ui.panel_label == null:
 		return
-	var sel: Array = _ui.host.queries.selection_views()
+	var sel: Array = _ui.host.queries.unit.selection_views()
 	var lines: PackedStringArray = PackedStringArray()
 	if sel.is_empty():
 		lines.append("左键 选兵/框选 · Shift 加选 · 右键 移动/攻击")
@@ -261,11 +261,11 @@ func _rebuild_stats_text() -> void:
 		if sel.size() == 1:
 			var u: Dictionary = sel[0]
 			if bool(u.is_building):
-				var trs: Array = _ui.host.queries.training_views()
+				var trs: Array = _ui.host.queries.unit.training_views()
 				if trs.is_empty():
 					lines.append("生产队列：空")
 				for tr in trs:
-					lines.append("生产中 %s  余 %.1fs" % [str(_ui.host.queries.unit_name(int(tr.unit))), float(tr.t) * _ui.host.queries.clock_view().period])
+					lines.append("生产中 %s  余 %.1fs" % [str(_ui.host.queries.unit.unit_name(int(tr.unit))), float(tr.t) * _ui.host.queries.status.clock_view().period])
 			else:
 				# 与原版面板同序：攻击力 / 防御力 / 射程 / 视野（均取自 DATA.EXP）
 				lines.append("攻击力 %.0f    防御力 %.0f" % [float(u.attack), float(u.defence)])
@@ -280,7 +280,7 @@ func _rebuild_stats_text() -> void:
 				#   **士气本模拟没有建模** —— 明说，不编一个数字出来。
 				lines.append("经验 %d   谋略 %.0f" % [int(off.get("level", 0)), float(u.get("officer_intellect", 0))])
 				lines.append("粮数 %.0f   士气（未建模）" % float(u.get("carry", 0.0)))
-			var ca: Vector2i = _ui.host.queries.cell_of_px(float(u.ax), float(u.ay))
+			var ca: Vector2i = _ui.host.queries.map.cell_of_px(float(u.ax), float(u.ay))
 			lines.append("位置 A=%d B=%d   状态 %s" % [ca.x, ca.y, str(u.state)])
 			lines.append("uid %d   归属 %d" % [int(u.uid), int(u.owner)])
 		else:
@@ -308,14 +308,14 @@ func _rebuild_stats_text() -> void:
 
 func _sel_state_text() -> String:
 	var parts: PackedStringArray = PackedStringArray()
-	for u in _ui.host.queries.selection_views():
+	for u in _ui.host.queries.unit.selection_views():
 		parts.append("%s:%s/%d" % [str(u.name), str(u.state), int(u.path_count)])
 	return ",".join(parts) if parts.size() > 0 else "-"
 
 func update_hover() -> void:
 	_ui.host.hover_text = ""
 	if not _ui.host.show_debug:return
-	var hu: Dictionary = _ui.host.queries.hover_view(surface.get_global_mouse_position())
+	var hu: Dictionary = _ui.host.queries.unit.hover_view(surface.get_global_mouse_position())
 	if not hu.is_empty():
 		_ui.host.hover_text = "%s  hp %.0f/%.0f  owner %d" % [str(hu.name), float(hu.hp), float(hu.maxhp), int(hu.owner)]
 

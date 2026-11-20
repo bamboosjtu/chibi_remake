@@ -1,5 +1,6 @@
 extends RefCounted
 ## 可存档的弹体模型；绘制频率、相机和贴图不参与命中结算。
+const CombatRules = preload("res://simulation/definitions/combat_rules.gd")
 const LIMIT := 100
 const SPEED := {"arrow":16.0,"stone":8.0,"ambush":16.0}
 var _state: RefCounted
@@ -19,7 +20,7 @@ func launch(attacker: Dictionary, target: Dictionary, kind: String) -> bool:
 		"owner":int(attacker.owner),"x":float(attacker.ax),"y":float(attacker.ay),
 		"tx":float(target.ax),"ty":float(target.ay),"travel":0.0,
 		"a":cell.x,"b":cell.y,"damage":int(_dep_combat._damage(attacker,target)),
-		"attackCents":roundi(_state.CombatRules.attack(attacker,true)*100.0)})
+		"attackCents":roundi(CombatRules.attack(attacker,true)*100.0)})
 	return true
 
 static func distance(effect: Dictionary) -> float:

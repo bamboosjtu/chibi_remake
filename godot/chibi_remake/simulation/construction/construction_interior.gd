@@ -1,4 +1,5 @@
 extends RefCounted
+const UnitPath = preload("res://simulation/movement/unit_path.gd")
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
 const Balance = preload("res://simulation/definitions/balance_rules.gd")
@@ -36,7 +37,7 @@ func enter(unit: Dictionary, site: Dictionary) -> void:
 	unit.site_entry_x = float(unit.ax); unit.site_entry_y = float(unit.ay)
 	unit.site_inside_uid = int(site.uid); unit.site_follow_uid = -1; unit.site_exit_pending = false
 	unit.ax = float(site.ax); unit.ay = float(site.ay); unit.A = int(site.A); unit.B = int(site.B)
-	unit.path = []; unit.pi = 0; unit.hold = true
+	UnitPath.set_points(unit, []); unit.pi = 0; unit.hold = true
 	if not _dep_technology._is_worker_unit(unit): unit.state = "idle"
 	_dep_battle_simulation._place_unit(unit); _dep_battle_simulation._update_visual(unit)
 
@@ -69,7 +70,7 @@ func order_commander(site: Dictionary, workers: Array) -> void:
 		if path.is_empty(): continue
 		_dep_command_groups._cancel_unit_command(commander)
 		commander.site_follow_uid = int(site.uid); commander.state = "move"
-		commander.path = path; commander.pi = 0; commander.hold = true
+		UnitPath.set_points(commander, path); commander.pi = 0; commander.hold = true
 
 ## Returns true when construction owns this unit's current tick.
 func step(unit: Dictionary) -> bool:
@@ -93,7 +94,7 @@ func step(unit: Dictionary) -> bool:
 		_dep_command_groups._cancel_unit_command(unit); return true
 	if _dep_interaction_paths._edge_cell_distance(unit, site) == _state.EDGE_DISTANCE:
 		enter(unit, site); return true
-	if unit.path.is_empty(): unit.path = _dep_construction_orders._site_entry_path(unit, site); unit.pi = 0
+	if unit.path.is_empty(): UnitPath.set_points(unit, _dep_construction_orders._site_entry_path(unit, site)); unit.pi = 0
 	if not unit.path.is_empty(): _dep_movement._follow(unit, _state.SIM_DT)
 	return true
 

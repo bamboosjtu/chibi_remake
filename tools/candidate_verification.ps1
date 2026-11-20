@@ -120,6 +120,6 @@ function Get-RequiredCandidateChecks([string]$Directory) {
     $expected+=@((Get-Content -Raw -Encoding UTF8 $baselinePath | ConvertFrom-Json).simtest | ForEach-Object { 'sim-'+$_.map+'-'+$_.seconds })
     if (Get-ChildItem -LiteralPath $Directory -Recurse -File -Filter 'ChibiSimulationMath.dll') { $expected+= 'test_native_world' }
     $expected+=@('native-save-green-write','native-save-green-read','native-save-system-write','native-save-system-read')
-    $expected+=@('native-isolation-write','native-isolation-selftest','native-isolation-reject-dir','native-isolation-reject-id','native-isolation-player-export','native-isolation-player-reject')
+    $expected+=@('native-isolation-write','native-isolation-selftest','native-isolation-reject-dir','native-isolation-reject-id','native-isolation-player-export','native-isolation-player-reject','native-isolation-menu-keyboard','native-isolation-menu-mouse','native-isolation-player-menu-reject')
     return $expected
 }

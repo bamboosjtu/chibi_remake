@@ -15,7 +15,7 @@ func _init(data: UIState, node: Node2D) -> void:
 	surface = node
 
 func update_panel() -> void:
-	var sel: Array = _ui.host.queries.selection_views()
+	var sel: Array = _ui.host.queries.unit.selection_views()
 	var kind:=panel_kind()
 	if kind!="combat":_ui.art_sub=""
 	if kind!="worker":_ui.build_menu=false
@@ -34,44 +34,24 @@ func update_panel() -> void:
 		_ui.classic_panel.sync_selection()
 
 func panel_kind() -> String:
-	return str(_ui.host.queries.selection_description().kind)
+	return str(_ui.host.queries.commands.selection_description().kind)
 
 func _refresh_cmd_panel() -> void:
 	if not cmd_box_ready():
 		return
-	var sel: Array = _ui.host.queries.selection_views()
+	var sel: Array = _ui.host.queries.unit.selection_views()
 	var specs: Array = []
 	var hint: String = ""
 	# 「选择将领」子面板：列出**尚未被占用**的武将（原版列表就是这个集合）
 	if _ui.officer_pick and not sel.is_empty():
-		# 候选 = 未被占用的 + **选中部队自己持有的**（可移出再指派，原版 CTRL_GROUP_Sub）。
-		# 只用 available_officers 的话，名单分完之后这里永远是"没有可用的将领"。
-		var avail: Array = _ui.host.queries.officer_candidates()
-		if avail.is_empty():
-			specs.append({
-				"text": "没有可用的将领", "enabled": false,
-				"tip": "名单上的武将都已被占用 —— 原版一个武将只能带一支部队。",
-				"act": Callable(),
-			})
-		else:
-			# REQ-005：不再 8 人封顶——完整名单进分页，全部可达
-			for o in avail:
-				specs.append({
-					"text": str(o.get("name", "?")).replace(" ", ""),
-					"enabled": true,
-					"tip": "武力 %d · 智力 %d。带领选中的成员组建部队。" % [int(o.get("might", 0)), int(o.get("intellect", 0))],
-					"act": _dep_selection_info._act_assign_officer.bind(int(o.get("index", -1))),
-				})
-		# 返回不再进清单——它是分页脚行的**固定按钮**（officer_pick 期间恒可见）
-		hint = "选择将领 · 指派后该武将即被占用"
-		_apply_cmd_specs(specs, hint)
+		_apply_cmd_specs(_officer_pick_specs(), "选择将领 · 指派后该武将即被占用")
 		return
 	# 建造清单与主命令共用格位；建筑缩略图来自已接入的高清帧。
 	if _ui.build_menu and not sel.is_empty():
-		var bts0: Array = _ui.host.queries.build_options()
+		var bts0: Array = _ui.host.queries.commands.build_options()
 		for bi in range(bts0.size()):
 			var bopt0: Dictionary = bts0[bi]
-			var reason: String = _ui.host.queries.building_block_reason(int(bopt0.unit))
+			var reason: String = _ui.host.queries.commands.building_block_reason(int(bopt0.unit))
 			var bok0: bool = _dep_selection_info._can_afford(bopt0) and reason == ""
 			specs.append({
 				"text": "建造 %s   %s" % [str(bopt0.get("name", "?")), _dep_selection_info._cost_text(bopt0)],
@@ -95,36 +75,18 @@ func _refresh_cmd_panel() -> void:
 				str(site.get("name", "?")), int(hp), int(mx), int(100.0 * hp / mx)]
 			specs.append(_cancel_spec("取消建造", _dep_command_actions._act_cancel_site.bind(site)))
 		elif not b.is_empty():
-			var busy: bool = bool(_ui.host.queries.building_work(int(b.uid)).busy)
+			var busy: bool = bool(_ui.host.queries.unit.building_work(int(b.uid)).busy)
 			if busy:
 				_apply_cmd_specs([_cancel_work_spec(b)], "")
 				return
 
-			# 生产清单按**建筑类型**取（帅帐→工兵、兵营→对应兵种、船坞→运输船/水军）；
-			# 原版没有生产项的建筑（粮仓/木材场/钱庄/箭楼…）返回空表。
-			var tts: Array = _ui.host.queries.train_types_for(int(b.unit))
-			for i in range(tts.size()):
-				var tt: Dictionary = tts[i]
-				var ok: bool = _dep_selection_info._can_afford(tt) and not busy
-				var name := "训练%s" % str(tt.name)
-				specs.append({
-					"text":name, "icon":_ui.host.remaster_art.unit_icon(int(tt.unit)), "production":true,
-					"progress_label":"%d人" % int(_ui.host.queries.unit_capacity(int(tt.unit))),
-					"hover":"%s：%s" % [name, _dep_selection_info._cost_text(tt)], "enabled":ok,
-					"tip":"%s：%s\n快捷键 %d%s" % [name, _dep_selection_info._cost_text(tt), i + 1, "" if ok else "；资源不足"],
-					"act":_dep_command_actions._act_train.bind(i),
-				})
-			# 科技树（§11.3–§11.4）：建筑类型决定可研线（帅帐 0-2 / 弓兵所 3-5 /
-			# 武器库 6-11 / 钱庄卖资源 12-17 / 车兵所 18-19 / 船坞 20-22）。
-			_add_tech_specs(specs, int(b.unit))
-			# 建造是**工兵的命令**（原版建造菜单 16139 在工人面板上）：这里不再放建造条目，
-			# 选中工兵后用面板第 4 格「建造」下单（main._build_site_at → 工地 HP=0）。
+			_append_production_specs(specs, b)
 		elif _dep_selection_info._mobile_count(sel) > 0:
 			# 图标面板（原版 3×3）接管时这段文字会被 _refresh_cmd_art 隐藏；
 			# 没有图集时它就是等价的可点击清单（同一批 main 命令入口）。
 			if _dep_selection_info._worker_count(sel) > 0:
 				specs.append({"text": "运输", "enabled": true, "tip": "点资源点：工人往返搬运（载重 200）。", "act": _dep_command_actions._act_transport})
-				specs.append({"text": "建造", "enabled": _ui.host.queries.can_build_selected(), "tip": "带工人的武将发起建造；工人到位后每4tick施工。", "act": _dep_command_art._open_build_menu})
+				specs.append({"text": "建造", "enabled": _ui.host.queries.commands.can_build_selected(), "tip": "带工人的武将发起建造；工人到位后每4tick施工。", "act": _dep_command_art._open_build_menu})
 				specs.append({"text": "修理", "enabled": true, "tip": "点我方单位/建筑：+16 兵力，四资源各 −16。", "act": _dep_command_actions._act_repair})
 			else:
 				specs.append({"text": "警戒", "enabled": true, "tip": "取消当前命令、原地待命（不再自动索敌）。", "act": _dep_command_actions._act_watch})
@@ -139,6 +101,50 @@ func _refresh_cmd_panel() -> void:
 		else:
 			hint = "选中的对象没有可用命令"
 	_apply_cmd_specs(specs, hint)
+
+func _officer_pick_specs() -> Array:
+	var specs: Array = []
+	# 候选 = 未被占用的 + **选中部队自己持有的**（可移出再指派，原版 CTRL_GROUP_Sub）。
+	# 只用 available_officers 的话，名单分完之后这里永远是"没有可用的将领"。
+	var avail: Array = _ui.host.queries.unit.officer_candidates()
+	if avail.is_empty():
+		specs.append({
+			"text": "没有可用的将领", "enabled": false,
+			"tip": "名单上的武将都已被占用 —— 原版一个武将只能带一支部队。",
+			"act": Callable(),
+		})
+	else:
+		# REQ-005：不再 8 人封顶——完整名单进分页，全部可达
+		for o in avail:
+			specs.append({
+				"text": str(o.get("name", "?")).replace(" ", ""),
+				"enabled": true,
+				"tip": "武力 %d · 智力 %d。带领选中的成员组建部队。" % [int(o.get("might", 0)), int(o.get("intellect", 0))],
+				"act": _dep_selection_info._act_assign_officer.bind(int(o.get("index", -1))),
+			})
+	# 返回不再进清单——它是分页脚行的**固定按钮**（officer_pick 期间恒可见）
+	return specs
+
+func _append_production_specs(specs: Array, b: Dictionary) -> void:
+	# 生产清单按**建筑类型**取（帅帐→工兵、兵营→对应兵种、船坞→运输船/水军）；
+	# 原版没有生产项的建筑（粮仓/木材场/钱庄/箭楼…）返回空表。
+	var tts: Array = _ui.host.queries.commands.train_types_for(int(b.unit))
+	for i in range(tts.size()):
+		var tt: Dictionary = tts[i]
+		var ok: bool = _dep_selection_info._can_afford(tt)
+		var name := "训练%s" % str(tt.name)
+		specs.append({
+			"text":name, "icon":_ui.host.remaster_art.unit_icon(int(tt.unit)), "production":true,
+			"progress_label":"%d人" % int(_ui.host.queries.unit.unit_capacity(int(tt.unit))),
+			"hover":"%s：%s" % [name, _dep_selection_info._cost_text(tt)], "enabled":ok,
+			"tip":"%s：%s\n快捷键 %d%s" % [name, _dep_selection_info._cost_text(tt), i + 1, "" if ok else "；资源不足"],
+			"act":_dep_command_actions._act_train.bind(i),
+		})
+	# 科技树（§11.3–§11.4）：建筑类型决定可研线（帅帐 0-2 / 弓兵所 3-5 /
+	# 武器库 6-11 / 钱庄卖资源 12-17 / 车兵所 18-19 / 船坞 20-22）。
+	_add_tech_specs(specs, int(b.unit))
+	# 建造是**工兵的命令**（原版建造菜单 16139 在工人面板上）：这里不再放建造条目，
+	# 选中工兵后用面板第 4 格「建造」下单（main._build_site_at → 工地 HP=0）。
 
 func _apply_cmd_specs(specs: Array, hint: String) -> void:
 	_ui.cmd_capsules = specs
@@ -175,7 +181,7 @@ func _cancel_spec(title: String, action: Callable) -> Dictionary:
 		"enabled":true, "tip":title + "，返还已付费用的75%", "act":action}
 
 func _cancel_work_spec(building: Dictionary) -> Dictionary:
-	if not _ui.host.queries.building_work(int(building.uid)).training.is_empty():
+	if not _ui.host.queries.unit.building_work(int(building.uid)).training.is_empty():
 		return _cancel_spec("取消生产", _dep_command_actions._act_cancel_train.bind(building))
 	return _cancel_spec("取消出售" if int(building.unit) == 23 else "取消研究", _dep_command_actions._act_cancel_research)
 
@@ -268,9 +274,9 @@ func cmd_box_ready() -> bool:
 	return _ui.cmd_hint != null and _ui.cmd_buttons.size() > 0
 
 func _refresh_hotkeys() -> void:
-	var groups: Array=_ui.host.queries.control_group_summaries()
+	var groups: Array=_ui.host.queries.commands.control_group_summaries()
 	var b: Dictionary = _dep_selection_info._selected_building()
-	var tts: Array = _ui.host.queries.train_types_for(int(b.unit)) if not b.is_empty() else []
+	var tts: Array = _ui.host.queries.commands.train_types_for(int(b.unit)) if not b.is_empty() else []
 	for i in range(_ui.hot_buttons.size()):
 		var e: Dictionary = _ui.hot_buttons[i]
 		var btn: Button = e.btn
@@ -300,7 +306,7 @@ func _refresh_hotkeys() -> void:
 				tip = "先选中我方建筑才能生产（同按键 %d）" % (i + 1)
 			else:
 				act = _dep_command_actions._act_train.bind(i)
-				var busy: bool = bool(_ui.host.queries.building_work(int(b.uid)).busy)
+				var busy: bool = bool(_ui.host.queries.unit.building_work(int(b.uid)).busy)
 				usable = _dep_selection_info._can_afford(tt) and not busy
 				tip = "生产 %s（%s）%s" % [str(tt.name), _dep_selection_info._cost_text(tt), " —— 建筑工作中" if busy else ("" if usable else " —— 资源不足")]
 		else:
@@ -325,21 +331,21 @@ func _refresh_hotkeys() -> void:
 			pip.visible = false
 
 func _add_tech_specs(specs: Array, bid: int) -> void:
-	var active: bool = bool(_ui.host.queries.tech_research_active())
-	var ids: Array = _ui.host.queries.tech_rows_for_building(bid)
+	var active: bool = bool(_ui.host.queries.commands.tech_research_active())
+	var ids: Array = _ui.host.queries.commands.tech_rows_for_building(bid)
 	for id_v in ids:
 		var idx := int(id_v)
-		var row: Dictionary = _ui.host.queries.tech_row(idx)
-		var sell: bool = bool(_ui.host.queries.tech_is_sell(idx))
-		var next: bool = bool(_ui.host.queries.tech_is_next(idx))
-		var unlocked: bool = bool(_ui.host.queries.tech_unlocked(idx))
-		var cost: Dictionary = _ui.host.queries.tech_cost(idx)
+		var row: Dictionary = _ui.host.queries.commands.tech_row(idx)
+		var sell: bool = bool(_ui.host.queries.commands.tech_is_sell(idx))
+		var next: bool = bool(_ui.host.queries.commands.tech_is_next(idx))
+		var unlocked: bool = bool(_ui.host.queries.commands.tech_unlocked(idx))
+		var cost: Dictionary = _ui.host.queries.commands.tech_cost(idx)
 		var affordable: bool = _dep_selection_info._can_afford(cost)
-		var busy: bool = not _dep_selection_info._selected_building().is_empty() and bool(_ui.host.queries.building_work(int(_dep_selection_info._selected_building().uid)).busy)
+		var busy: bool = not _dep_selection_info._selected_building().is_empty() and bool(_ui.host.queries.unit.building_work(int(_dep_selection_info._selected_building().uid)).busy)
 		var ok: bool = next and unlocked and affordable and not busy
-		var tip: String = "%s。%s" % [str(_ui.host.queries.tech_effect_desc(idx)), str(_ui.host.queries.tech_tip(idx))]
+		var tip: String = "%s。%s" % [str(_ui.host.queries.commands.tech_effect_desc(idx)), str(_ui.host.queries.commands.tech_tip(idx))]
 		if not unlocked or not next:
-			tip += " —— " + str(_ui.host.queries.tech_block_reason(idx))
+			tip += " —— " + str(_ui.host.queries.commands.tech_block_reason(idx))
 		elif busy:
 			tip += " —— 该建筑正在工作（完成或取消后才能再开始）"
 		elif not affordable:
@@ -353,7 +359,7 @@ func _add_tech_specs(specs: Array, bid: int) -> void:
 			"sale": sell,
 			"badge": ("5000" if idx >= 15 else "1000") if sell else "",
 			"enabled": ok,
-			"tip": "%s %s\n费用：%s%s" % [verb, tip, str(_ui.host.queries.tech_cost_text(idx)), "" if ok else "\n（当前不可用）"],
+			"tip": "%s %s\n费用：%s%s" % [verb, tip, str(_ui.host.queries.commands.tech_cost_text(idx)), "" if ok else "\n（当前不可用）"],
 			"act": _dep_command_actions._act_research.bind(idx),
 		})
 	# 原版取消入口 16025 → 模式 0x18，按 75% 返还（§11.3 第 4 条）。
@@ -362,7 +368,7 @@ func _add_tech_specs(specs: Array, bid: int) -> void:
 			"text": "取消研究",
 			"enabled": true,
 			"tip": "取消「%s」，返还已扣费用的 75%%（整除）。剩余 %d tick。" % [
-				str(_ui.host.queries.tech_research_name()), int(_ui.host.queries.tech_research_remaining())],
+				str(_ui.host.queries.status.tech_research_name()), int(_ui.host.queries.status.tech_research_remaining())],
 			"act": _dep_command_actions._act_cancel_research,
 		})
 

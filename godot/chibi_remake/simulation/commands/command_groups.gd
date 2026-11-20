@@ -1,4 +1,5 @@
 extends Object
+const UnitPath = preload("res://simulation/movement/unit_path.gd")
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
 const EffectsRuntime = preload("res://simulation/ports/battle_events.gd")
@@ -92,7 +93,7 @@ func _cancel_unit_command(u: Dictionary) -> void:
 	preload("res://simulation/movement/action_clock.gd").reset(u)
 	u["state"] = "idle"
 	u["target"] = null
-	u["path"] = []
+	UnitPath.set_points(u, [])
 	u["pi"] = 0
 	u["gather_obj"] = null
 	u["repair_target"] = null

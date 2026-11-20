@@ -335,7 +335,9 @@ func _build_right_panel(ui: CanvasLayer) -> void:
 	# 武将头像沿用现成的 officer_portrait.gd（117 张真实头像，没有头像的身份自动隐藏）
 	_ui.officer_portrait = load("res://presentation/battle/hud/officer_portrait.gd").new()
 	_ui.troop_frame.add_child(_ui.officer_portrait)
+	_build_command_controls(ui)
 
+func _build_command_controls(ui: CanvasLayer) -> void:
 	_ui.cmd_title = _mk_label(ui, 15.0, _ui.c_dim, HORIZONTAL_ALIGNMENT_LEFT)
 	_ui.cmd_title.text = "命令"
 	_ui.cmd_hint = _mk_label(ui, 13.0, _ui.c_dim, HORIZONTAL_ALIGNMENT_LEFT)

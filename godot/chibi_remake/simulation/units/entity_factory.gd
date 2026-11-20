@@ -1,4 +1,5 @@
 extends Object
+const UnitLifecycle = preload("res://simulation/units/unit_lifecycle.gd")
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
 const EffectsRuntime = preload("res://simulation/ports/battle_events.gd")
@@ -23,6 +24,17 @@ func _rate_of(meta: Dictionary) -> int:
 	return r if r > 0 else 100
 
 func _make_unit(ob: Dictionary, is_map_object: bool) -> Dictionary:
+	var template := _unit_template(ob)
+	var u := _unit_record(ob, is_map_object, template)
+	battle.sheet_by_unit["%d_%d" % [int(ob.unit), int(ob.owner)]] = str(ob.sheet)
+	# 用户确认首版统一铁矿50000、民居500；保留tail_value供后续规则校准。
+	if is_map_object and Config.STOCK_UNITS.has(int(ob.unit)):
+		u["stock"] = 50000.0 if int(ob.unit) == 22 else 500.0
+		u["stock_max"] = u.stock # 用户确认首版统一存量；逐点差异列入GAP。
+	_initialize_unit(u, ob, int(template.w), int(template.h), float(template.k))
+	return u
+
+func _unit_template(ob: Dictionary) -> Dictionary:
 	var w := int(ob.w)
 	var h := int(ob.h)
 	var ax := float(ob.px) + w * 0.5
@@ -51,7 +63,22 @@ func _make_unit(ob: Dictionary, is_map_object: bool) -> Dictionary:
 	# ARCH-013：sprite/skin/选中菱形/血条由 battle_view.gd 建；view 缺席时 u 里没有这些键。
 	# 倍率 k 是**数据**（图集自己的倍率优先，全图 spriteK 只作旧数据回退），所以留在 main。
 	var k: float = float(meta.get("sheetK", battle.map_data.get("spriteK", 1)))
+	return {"w": w, "h": h, "ax": ax, "ay": ay, "tail_v": tail_v, "building": building, "meta": meta, "frames": frames, "hp": hp, "attack": attack, "defence": defence, "vision": vision, "atk_range": atk_range, "mitig": mitig, "k": k}
 
+func _unit_record(ob: Dictionary, is_map_object: bool, template: Dictionary) -> Dictionary:
+	var w: int = template.w
+	var h: int = template.h
+	var tail_v: int = template.tail_v
+	var building: bool = template.building
+	var meta: Dictionary = template.meta
+	var frames: Dictionary = template.frames
+	var hp: float = template.hp
+	var attack: float = template.attack
+	var defence: float = template.defence
+	var vision: float = template.vision
+	var atk_range: float = template.atk_range
+	var mitig: float = template.mitig
+	var k: float = template.k
 	var uid := battle.next_uid
 	battle.next_uid += 1
 	var u := {
@@ -109,24 +136,16 @@ func _make_unit(ob: Dictionary, is_map_object: bool) -> Dictionary:
 		"unload_active": false, "unload_t": 0,
 		"site_inside_uid": -1, "site_follow_uid": -1, "site_entry_x": 0.0, "site_entry_y": 0.0, "site_exit_pending": false,
 		"tail_value": tail_v,   # 移动部队为统辖武将编号；建筑/资源尾字段另行解释。
-		"ax": ax, "ay": ay, "hp": hp, "maxhp": hp, "base_maxhp": hp, "alive": true,
+		"ax": float(template.ax), "ay": float(template.ay), "hp": hp, "maxhp": hp, "base_maxhp": hp, "alive": true,
 		"last_attacker_uid":-1,"action_wait":0,"action_phase":0,"action_started":false,"action_kind":"","action_target_uid":-1,
 		"state": "idle", "target": null, "cool": 0.0, "repath": 0.0, "route_failures":0,
 		"path": [], "pi": 0,
 		"anim": 0.0, "dir": 0, "moved": false, "die_t": -1.0,
 	}
-
-	battle.sheet_by_unit["%d_%d" % [int(ob.unit), int(ob.owner)]] = str(ob.sheet)
-	# 用户确认首版统一铁矿50000、民居500；保留tail_value供后续规则校准。
-	if is_map_object and Config.STOCK_UNITS.has(int(ob.unit)):
-		u["stock"] = 50000.0 if int(ob.unit) == 22 else 500.0
-		u["stock_max"] = u.stock # 用户确认首版统一存量；逐点差异列入GAP。
-	_initialize_unit(u, ob, w, h, k)
 	return u
 
 func _initialize_unit(u: Dictionary, ob: Dictionary, w: int, h: int, k: float) -> void:
-	preload("res://simulation/movement/locomotion.gd").ensure(u)
-	_dep_technology._apply_tech_bonuses(u)
+	UnitLifecycle.initialize_record(u, _dep_technology._apply_tech_bonuses)
 	# Render nodes belong to the view's UID registry, including during restoration.
 	if _effects != null:
 		_effects.visual("attach_unit", [u, ob, w, h, k])

@@ -27,7 +27,7 @@ func setup_camera() -> void:
 		_ui.cam = Camera2D.new()
 		surface.add_child(_ui.cam)
 		_ui.cam.make_current()
-	_ui.cam.position = _ui.host.queries.opening_camera_position()
+	_ui.cam.position = _ui.host.queries.map.opening_camera_position()
 	_ui.cam.zoom = Vector2.ONE * _ui.ui_scale
 	var opening_target := battle_rect().position + battle_rect().size * Vector2(0.625, 0.5)
 	_ui.cam.position -= (opening_target - surface.get_viewport_rect().size * 0.5) / _ui.cam.zoom
@@ -57,7 +57,7 @@ func battle_rect() -> Rect2:
 func clamp_camera() -> void:
 	if _ui.cam == null:
 		return
-	var bounds: Vector2 = _ui.host.queries.camera_bounds()
+	var bounds: Vector2 = _ui.host.queries.map.camera_bounds()
 	var mw: float = bounds.x
 	var mh: float = bounds.y
 	if mw <= 0.0 or mh <= 0.0:
@@ -87,7 +87,7 @@ func apply_cli_view() -> void:
 			if parts.size() == 2:
 				var aa: float = float(parts[0])
 				var bb: float = float(parts[1])
-				var tiles: Vector3 = _ui.host.queries.camera_tile_geometry()
+				var tiles: Vector3 = _ui.host.queries.map.camera_tile_geometry()
 				_ui.cam.position = Vector2(tiles.x * aa + tiles.y * (int(bb) & 1) + tiles.y, tiles.z * bb + tiles.z)
 				clamp_camera()          # 焦点跳转也要夹，否则 --focus-point 能跳到地图外
 
@@ -95,7 +95,7 @@ func fit_view() -> void:
 	if _ui.cam == null:
 		return
 	var vp: Vector2 = surface.get_viewport_rect().size
-	var bounds: Vector2 = _ui.host.queries.camera_bounds()
+	var bounds: Vector2 = _ui.host.queries.map.camera_bounds()
 	var mw: float = bounds.x
 	var mh: float = bounds.y
 	if mw <= 0.0 or mh <= 0.0:
@@ -112,7 +112,7 @@ func edge_direction(mouse: Vector2) -> Vector2:
 
 func _minimap_navigate(screen_position: Vector2) -> void:
 	if _ui.cam == null: return
-	var world_size: Vector2 = _ui.host.queries.camera_bounds()
+	var world_size: Vector2 = _ui.host.queries.map.camera_bounds()
 	var k := minf(_ui.minimap.size.x / world_size.x, _ui.minimap.size.y / world_size.y)
 	var origin := _ui.minimap.global_position + (_ui.minimap.size - world_size * k) * 0.5
 	var target := (screen_position - origin) / k

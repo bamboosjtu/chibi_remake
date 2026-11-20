@@ -1,4 +1,5 @@
 extends Object
+const UnitPath = preload("res://simulation/movement/unit_path.gd")
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
 const EffectsRuntime = preload("res://simulation/ports/battle_events.gd")
@@ -114,7 +115,7 @@ func _begin_gather(worker: Dictionary, obj: Dictionary, path: Array) -> void:
 	worker.hold = false
 	worker.gather_t = 0.0
 	worker.gather_ticks = 0
-	worker.path = path if worker.state == "gather" else []
+	UnitPath.set_points(worker, path if worker.state == "gather" else [])
 	worker.pi = 0
 	worker.target = null
 

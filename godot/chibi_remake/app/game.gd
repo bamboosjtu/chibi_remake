@@ -104,9 +104,9 @@ func _ready() -> void:
 
 func _has_acceptance_args(args: PackedStringArray) -> bool:
 	for arg in args:
-		if arg in ["--full-battle-bench","--selftest","--screenshot","--demo","--smoketest","--diag-nav","--levels","--keytest","--mousetest"]:
+		if arg in ["--full-battle-bench","--selftest","--screenshot","--demo","--smoketest","--diag-nav","--levels","--keytest","--mousetest","--mouseclick"]:
 			return true
-		for prefix in ["--bench-","--shot=","--simtest=","--selftest-fault=","--save-test-","--native-save=","--hud-click","--hud-select","--hud-hot"]:
+		for prefix in ["--bench-","--shot=","--simtest=","--selftest-fault=","--save-test-","--native-save=","--hud-click","--hud-select","--hud-hot","--mouseclick="]:
 			if arg.begins_with(prefix): return true
 	return false
 

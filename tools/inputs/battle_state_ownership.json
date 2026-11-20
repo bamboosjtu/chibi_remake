@@ -55,7 +55,7 @@
       ],
       "persist": false,
       "initializer": "session",
-      "restorer": "none",
+      "restorer": "snapshot_restorer",
       "backing_store": "session.selected"
     },
     "_officer_pool": {

@@ -27,7 +27,7 @@ func queue_world_visuals() -> void:
 
 func flush_visuals(interpolating := false) -> void:
 	var context := _visual_context()
-	var world: int = _ui.host.queries.world_identity()
+	var world: int = _ui.host.queries.status.world_identity()
 	var full := _world_dirty or world != _last_world or context != _last_context
 	if not full and pending_visuals.is_empty(): return
 	_last_world = world
@@ -37,10 +37,10 @@ func flush_visuals(interpolating := false) -> void:
 	if full:
 		_moving.clear()
 		_visible_mobiles.clear()
-		candidates_checked += _ui.host.queries.renderable_unit_count()
+		candidates_checked += _ui.host.queries.unit.renderable_unit_count()
 		var previous := _drawn
 		_drawn = {}
-		for unit in _ui.host.queries.renderable_units(context):
+		for unit in _ui.host.queries.unit.renderable_units(context):
 			_sync_visual(unit, context, true)
 		for uid in previous:
 			if _drawn.has(uid): continue
@@ -48,7 +48,7 @@ func flush_visuals(interpolating := false) -> void:
 			if not nodes.is_empty(): _hide_culled(nodes)
 	else:
 		for uid in pending_visuals:
-			var unit: Dictionary = _ui.host.queries.roster_unit(uid)
+			var unit: Dictionary = _ui.host.queries.unit.roster_unit(uid)
 			if not unit.is_empty(): _sync_visual(unit, context)
 	pending_visuals.clear()
 	_world_dirty = false
@@ -67,7 +67,7 @@ func _sync_visual(unit: Dictionary, context: Dictionary, projected := false) -> 
 		return
 	visible_checks += 1
 	if not unit.is_building: _visible_mobiles[uid] = true
-	var value: Dictionary = unit if projected else _ui.host.queries.visual_unit(uid)
+	var value: Dictionary = unit if projected else _ui.host.queries.unit.visual_unit(uid)
 	if value.is_empty(): return
 	_drawn[uid] = true
 	var selected: bool = context.selected.has(uid)
@@ -178,10 +178,10 @@ func place_unit(u: Dictionary) -> void:
 		if s.position!=point:s.position=point
 
 func capture_motion() -> void:
-	var filter = _visible_mobiles if _last_world == _ui.host.queries.world_identity() else null
+	var filter = _visible_mobiles if _last_world == _ui.host.queries.status.world_identity() else null
 	_ui._motion_previous.clear()
 	_ui._gait_previous.clear()
-	for unit: Dictionary in _ui.host.queries.motion_views(filter):
+	for unit: Dictionary in _ui.host.queries.unit.motion_views(filter):
 		var uid:=int(unit.uid)
 		var nodes: Dictionary=_ui._nodes_by_uid.get(int(unit.uid),{})
 		# Hidden units have no interpolated pixels; first reveal starts at the
@@ -253,7 +253,7 @@ func set_unit_attached(u: Dictionary, attached: bool) -> void:
 
 func _visual_context() -> Dictionary:
 	var selected: Dictionary={}
-	for unit in _ui.host.queries.selection_views():selected[int(unit.uid)]=true
+	for unit in _ui.host.queries.unit.selection_views():selected[int(unit.uid)]=true
 	var camera=_ui.host.cam;var area:=Rect2();var has_camera: bool=camera!=null
 	if has_camera:
 		var size: Vector2=surface.get_viewport_rect().size/camera.zoom
@@ -267,7 +267,7 @@ func _visible(u: Dictionary, context: Dictionary) -> bool:
 	elif not context.units or bool(u.get("attached", false)) or int(u.get("site_inside_uid", -1)) >= 0:
 		return false
 	if int(u.owner) != context.player:
-		if not (bool(u.visible) if u.has("visible") else _ui.host.queries.point_visible(Vector2(u.ax,u.ay))): return false
+		if not (bool(u.visible) if u.has("visible") else _ui.host.queries.map.point_visible(Vector2(u.ax,u.ay))): return false
 	if not context.camera: return true
 	var position := Vector2(float(u.ax) - float(u.w) * 0.5, float(u.ay) - float(u.h))
 	return (context.area as Rect2).intersects(Rect2(position, Vector2(u.w, u.h)))
@@ -286,7 +286,7 @@ func update_visual(u: Dictionary, context: Dictionary = {}) -> void:
 		_drawn.erase(int(u.uid))
 		_hide_culled(nodes)
 		return
-	var value: Dictionary = _ui.host.queries.visual_unit(int(u.uid))
+	var value: Dictionary = _ui.host.queries.unit.visual_unit(int(u.uid))
 	if not value.is_empty():
 		_drawn[int(u.uid)] = true
 		_apply_visual(value, nodes, context)

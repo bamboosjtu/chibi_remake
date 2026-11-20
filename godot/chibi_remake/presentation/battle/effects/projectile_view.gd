@@ -15,7 +15,7 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	var values: Dictionary=host.queries.effect_views()
+	var values: Dictionary=host.queries.status.effect_views()
 	for effect in values.projectiles:
 		var point: Vector2=effect.point
 		if not effect.visible: continue
@@ -48,6 +48,6 @@ func _draw() -> void:
 			draw_colored_polygon(PackedVector2Array([foot+Vector2(-3,0),foot+Vector2(sway*0.5,-height*0.6),foot+Vector2(3,0)]),Color(1,0.85,0.18,fade))
 	for effect in impacts:
 		var point: Vector2=effect.point
-		if not host.queries.point_visible(point):continue
+		if not host.queries.map.point_visible(point):continue
 		var progress: float=effect.life/0.22
 		draw_arc(point,3+progress*13,0,TAU,16,Color(0.83,0.65,0.36,1-progress),1.5,true)

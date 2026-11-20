@@ -133,7 +133,7 @@ func _panel_specs() -> Array:
 	return specs
 
 func _selection_description() -> Dictionary:
-	return _refresh_selection if _refreshing else _ui.host.queries.selection_description()
+	return _refresh_selection if _refreshing else _ui.host.queries.commands.selection_description()
 
 func _panel_kind() -> String:
 	return str(_refresh_selection.kind) if _refreshing else _dep_command_model.panel_kind()
@@ -144,7 +144,7 @@ func _unlocked_indices(formation: bool) -> Array:
 
 func _compute_unlocked_indices(formation: bool) -> Array:
 	var level := -1
-	for unit in _ui.host.queries.selection_views():
+	for unit in _ui.host.queries.unit.selection_views():
 		if not bool(unit.get("alive", false)) or float(unit.get("die_t", -1)) >= 0.0:
 			continue
 		if int(unit.get("owner", -1)) != int(_ui.host.queries.player_owner) or bool(unit.get("attached", false)) or bool(unit.get("is_building", false)):
@@ -277,7 +277,7 @@ func _refresh_cmd_art() -> void:
 		return
 	# One synchronous refresh observes one selection. Never retain world objects
 	# or cache across input events, loads, command changes, or simulation ticks.
-	_refresh_selection=_ui.host.queries.selection_description()
+	_refresh_selection=_ui.host.queries.commands.selection_description()
 	_refresh_jimou=_compute_unlocked_indices(false);_refresh_formations=_compute_unlocked_indices(true)
 	_refreshing=true
 	_refresh_cmd_art_core()
@@ -369,10 +369,10 @@ func _on_panel_slot(i: int) -> void:
 			_refresh_cmd_art()
 
 func _open_build_menu() -> void:
-	if not _ui.host.queries.can_build_selected():
+	if not _ui.host.queries.commands.can_build_selected():
 		_ui.host.actions.feedback("建造由麾下带工人的武将发起；独立工人请先组建队伍")
 		return
-	if _ui.host.queries.build_options().is_empty():
+	if _ui.host.queries.commands.build_options().is_empty():
 		_ui.host.actions.feedback("本关没有可建造的建筑")
 		return
 	_ui.build_menu = true

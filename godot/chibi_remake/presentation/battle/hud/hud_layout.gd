@@ -51,8 +51,33 @@ func _apply_metrics() -> void:
 	if _ui._topbar_original:
 		_dep_legacy_layout._apply_metrics_original(vp, s)
 		return
+	var bar_h := 40.0 * s
+	_layout_fallback_header(vp, s, bar_h)
+	var panel_right := _layout_fallback_panel(vp, s, bar_h)
+	var hx: float = 4.0 * s
+	var hw: float = 24.0 * s
+	var hh: float = 22.0 * s
+	var hgap: float = 3.0 * s
+	var hy: float = bar_h + 10.0 * s
+	for i in range(_ui.hot_buttons.size()):
+		var e2: Dictionary = _ui.hot_buttons[i]
+		var hb: Button = e2.btn
+		_place_left(hb, hx, hy + float(i) * (hh + hgap), hw, hh)
+		var pip: ColorRect = e2.pip
+		pip.position = Vector2(2.0 * s, hh * 0.5 - 2.5 * s)
+		pip.size = Vector2(5.0 * s, 5.0 * s)
 
-	var bar_h: float = 40.0 * s
+	_pin_bottom_right(_ui.ornament, 12.0, 120.0 * s, 90.0 * s)
+
+	# REQ-006：布局权威在这里把战场矩形一并写回（顶栏 / 左热键条含边距 / 右面板 / 底栏）
+	_ui.hud_metrics.update(vp, bar_h, 28.0 * s, panel_right, 33.0 * s)
+	_layout_status_labels(vp, s)
+	if _ui.minimap != null:
+		_ui.minimap.queue_redraw()
+	if _ui.ornament != null:
+		_ui.ornament.queue_redraw()
+
+func _layout_fallback_header(vp: Vector2, s: float, bar_h: float) -> void:
 	var margin: float = 12.0 * s
 	var slot_w: float = clampf(vp.x * 0.156, 110.0 * s, 200.0 * s)
 	var slot_h: float = 28.0 * s
@@ -98,6 +123,7 @@ func _apply_metrics() -> void:
 	if bsb != null:
 		bsb.set_corner_radius_all(int(bh * 0.5))
 
+func _layout_fallback_panel(vp: Vector2, s: float, bar_h: float) -> float:
 	var pr: float = 12.0                     # ARCH-011：右边缘内缩 12
 	var pad: float = 8.0 * s
 	var panel_w: float = clampf(vp.x * 0.235, 210.0 * s, 300.0 * s)
@@ -157,29 +183,7 @@ func _apply_metrics() -> void:
 	_pin_right(_ui.back_button, pr + pad + fw * 3.0 + 8.0 * s, inner - fw * 3.0 - 8.0 * s, foot_y, 20.0 * s)
 	var stats_top: float = foot_y + 20.0 * s + 6.0 * s
 	_pin_right(_ui.panel_label, pr + pad, inner, stats_top, maxf(40.0, panel_bot - pad - stats_top))
-
-	var hx: float = 4.0 * s
-	var hw: float = 24.0 * s
-	var hh: float = 22.0 * s
-	var hgap: float = 3.0 * s
-	var hy: float = bar_h + 10.0 * s
-	for i in range(_ui.hot_buttons.size()):
-		var e2: Dictionary = _ui.hot_buttons[i]
-		var hb: Button = e2.btn
-		_place_left(hb, hx, hy + float(i) * (hh + hgap), hw, hh)
-		var pip: ColorRect = e2.pip
-		pip.position = Vector2(2.0 * s, hh * 0.5 - 2.5 * s)
-		pip.size = Vector2(5.0 * s, 5.0 * s)
-
-	_pin_bottom_right(_ui.ornament, pr, 120.0 * s, 90.0 * s)
-
-	# REQ-006：布局权威在这里把战场矩形一并写回（顶栏 / 左热键条含边距 / 右面板 / 底栏）
-	_ui.hud_metrics.update(vp, bar_h, 28.0 * s, pr + panel_w, 33.0 * s)
-	_layout_status_labels(vp, s)
-	if _ui.minimap != null:
-		_ui.minimap.queue_redraw()
-	if _ui.ornament != null:
-		_ui.ornament.queue_redraw()
+	return pr + panel_w
 
 func _decorate_frame(panel: Panel, border: float) -> void:
 	var ornament: Control = panel.get_node_or_null("OrnateFrame")

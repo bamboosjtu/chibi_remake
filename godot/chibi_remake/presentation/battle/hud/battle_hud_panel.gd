@@ -111,7 +111,7 @@ func set_ui_scale(s: float) -> void:
 		captions[i].add_theme_font_size_override("font_size", maxi(9, int(12 * s)))
 
 func sync_selection() -> void:
-	var selection: Array = host.queries.selection_views()
+	var selection: Array = host.queries.unit.selection_views()
 	visible = not selection.is_empty()
 	if not visible: return
 	var u: Dictionary = selection[0]
@@ -128,7 +128,7 @@ func sync_selection() -> void:
 	for label in values: label.show()
 	rank_label.visible=not officer.is_empty()
 	if not officer.is_empty():
-		rank_label.text=host.queries.officer_rank_name(officer)
+		rank_label.text=host.queries.unit.officer_rank_name(officer)
 		rank_label.tooltip_text="%d级 · %s" % [int(officer.level),rank_label.text]
 	portrait.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED if bool(u.is_building) else TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	if officer.is_empty():
@@ -141,8 +141,8 @@ func sync_selection() -> void:
 		portrait.material = null
 		var letters := str(officer.get("name", "")).replace(" ", "")
 		name_label.text = "\n".join(letters.split(""))
-		detail.text = "官职 %s" % str(host.queries.officer_rank_name(officer))
-	var soldiers: int = host.queries.team_soldiers(int(u.owner), int(officer.index)) if not officer.is_empty() else 0
+		detail.text = "官职 %s" % str(host.queries.unit.officer_rank_name(officer))
+	var soldiers: int = host.queries.unit.team_soldiers(int(u.owner), int(officer.index)) if not officer.is_empty() else 0
 	var titles := ["武力", "智力", "经验", "谋略", "士气", "兵数"]
 	var data := [str(int(u.get("officer_might", 0))), str(int(u.get("officer_intellect", 0))),
 		Progression.progress_text(officer), str(int(u.get("mou", 0))), str(int(u.get("status_173", 70))), str(soldiers)]
@@ -150,7 +150,7 @@ func sync_selection() -> void:
 		titles = ["归属", "攻击力", "防御力", "射程", "视野", "携带"]
 		var carry := 0
 		for member in selection: carry += int(member.get("carry", 0))
-		var commander: String = host.queries.commander_name(int(u.owner), int(u.get("group_officer", -1)))
+		var commander: String = host.queries.unit.commander_name(int(u.owner), int(u.get("group_officer", -1)))
 		data = [commander, str(int(u.attack)), str(int(u.defence)), str(int(u.atk_range)), str(int(u.vision)), str(carry)]
 	if bool(u.is_building):
 		_sync_building(u)
@@ -179,14 +179,14 @@ func _sync_building_work(u: Dictionary) -> void:
 	for label in values: label.hide()
 	var site: bool = u.get("site", false)
 	rank_label.visible = not site
-	var level := clampi(int(host.queries.ai_level(int(u.owner))), 0, 3) if int(u.unit) in [0,1] else 0
+	var level := clampi(int(host.queries.status.ai_level(int(u.owner))), 0, 3) if int(u.unit) in [0,1] else 0
 	rank_label.text = ["一级", "二级", "三级", "四级"][level]
 	progress_bar.visible = site
 	progress_bar.value = 100.0 * float(u.hp) / maxf(1.0, float(u.maxhp)) if site else 0.0
-	var work: Dictionary = host.queries.building_work(int(u.uid))
+	var work: Dictionary = host.queries.unit.building_work(int(u.uid))
 	var training: Dictionary = work.training
 	if not training.is_empty():
-		var capacity: float = host.queries.unit_capacity(int(training.unit))
+		var capacity: float = host.queries.unit.unit_capacity(int(training.unit))
 		work_icon.texture = host.remaster_art.unit_icon(int(training.unit))
 		work_icon.material = portrait.material
 		work_icon.show()
@@ -196,8 +196,8 @@ func _sync_building_work(u: Dictionary) -> void:
 		progress_bar.value = 100.0 * (1.0 - float(training.t) / maxf(1.0, float(capacity)))
 	var research: Dictionary = work.research
 	if not research.is_empty():
-		var selling: bool = host.queries.tech_is_sell(int(research.tech))
-		work_icon.texture = view.command_catalog.work_icon(host.queries.tech_row(int(research.tech))) if selling else view.selection_info._unit_icon(u)
+		var selling: bool = host.queries.commands.tech_is_sell(int(research.tech))
+		work_icon.texture = view.command_catalog.work_icon(host.queries.commands.tech_row(int(research.tech))) if selling else view.selection_info._unit_icon(u)
 		view.command_catalog.decorate_sale(work_icon, selling)
 		work_icon.show()
 		progress_bar.show()

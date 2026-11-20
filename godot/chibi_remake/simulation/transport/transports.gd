@@ -1,4 +1,5 @@
 extends RefCounted
+const UnitPath = preload("res://simulation/movement/unit_path.gd")
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
 const Roles = preload("res://simulation/definitions/unit_roles.gd")
@@ -188,10 +189,10 @@ func step_board(u: Dictionary, delta: float) -> void:
 		_effects.feedback("运输船已满（%d）" % Balance.transport_capacity())
 	elif not adjacent(u,bship):
 		if u.path.is_empty():
-			u.path = boarding_path(u,bship); u.pi = 0
+			UnitPath.set_points(u, boarding_path(u,bship)); u.pi = 0
 		if u.path.is_empty():
 			u.state = "idle"; u.board_target = null; _effects.feedback("无法靠近运输船")
 		else: _dep_movement._follow(u, delta)
 	else:
-		u.path = []
+		UnitPath.set_points(u, [])
 		_dep_transport_orders._attach_to_ship(u, bship)

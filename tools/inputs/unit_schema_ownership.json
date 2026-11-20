@@ -1217,6 +1217,7 @@
       "backing_store": "unit.gather_obj"
     },
     "path": {
+      "restorer": "app/saves/save_service.gd::_apply_unit_record",
       "group": "relation",
       "owner": "movement",
       "current_writers": [
