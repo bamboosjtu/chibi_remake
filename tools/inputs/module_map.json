@@ -4,11 +4,10 @@
   "sourceFiles": 181,
   "generated": "2026-11-20T08:08:10.200Z",
   "statusCounts": {
-    "moved": 125,
+    "moved": 126,
     "split": 4,
     "renamed": 4,
-    "retained": 47,
-    "deleted": 1
+    "retained": 47
   },
   "phaseCounts": {
     "P4b": 13,
@@ -480,10 +479,10 @@
     },
     {
       "from": "presentation/battle/components/legacy_layout.gd",
-      "to": null,
+      "to": "presentation/battle/view/legacy_layout.gd",
       "phase": "P4a",
-      "note": "deleted",
-      "status": "deleted",
+      "note": "retained until P7; battle_view and hud_layout still reference it",
+      "status": "moved",
       "package": null
     },
     {
@@ -1562,5 +1561,12 @@
       "phase": "P6",
       "reason": "battle query split"
     }
+  ],
+  "appliedStages": [
+    "P1",
+    "P2",
+    "P3",
+    "P4a",
+    "P4b"
   ]
 }
