@@ -130,8 +130,8 @@
       "toPackage": "simulation/navigation",
       "kind": "import",
       "line": 9,
-      "reason": "State creates a navigation geometry; P1 hands geometry ownership to Navigation and removes the static load.",
-      "removeByStage": "P1",
+      "reason": "State creates a navigation geometry; P1 hands geometry ownership to Navigation and removes the static load. P1 kept the move pure; ownership cleanup is deferred to P6.",
+      "removeByStage": "P6",
       "reviewBy": "2026-12-31"
     },
     {
@@ -141,8 +141,8 @@
       "toPackage": "simulation/officers",
       "kind": "import",
       "line": 13,
-      "reason": "State preloads officer progression only for a static helper; P1 removes the static dependency or routes it through definitions.",
-      "removeByStage": "P1",
+      "reason": "State preloads officer progression only for a static helper; P1 removes the static dependency or routes it through definitions. P1 kept the move pure; ownership cleanup is deferred to P6.",
+      "removeByStage": "P6",
       "reviewBy": "2026-12-31"
     },
     {
