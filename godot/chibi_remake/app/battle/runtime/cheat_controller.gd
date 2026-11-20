@@ -1,4 +1,5 @@
 extends Object
+const CheatSession = preload("res://simulation/cheats/cheat_session.gd")
 ## research/meta: exact lowercase character matcher and battle-only hotkeys.
 const State = preload("res://simulation/state/battle_state.gd")
 const Services = preload("res://app/battle/runtime/battle_scene_state.gd")
@@ -75,7 +76,7 @@ func _cheat_type(event: InputEventKey) -> void:
 		# On mismatch the original resets, without retrying the same character.
 		matched = matched + 1 if matched < 7 and character == "eternal"[matched] else 0
 		if matched == 5:
-			battle.cheats_enabled = not battle.cheats_enabled
+			CheatSession.set_cheats_enabled(battle, not battle.cheats_enabled)
 			node.world.effects.feedback("秘籍已开启" if battle.cheats_enabled else "秘籍已关闭")
 	if is_instance_valid(console): console.update_input(text)
 

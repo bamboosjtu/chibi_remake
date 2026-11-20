@@ -1,4 +1,9 @@
 extends Object
+const UnitMotion = preload("res://simulation/movement/unit_motion.gd")
+const ManifestState = preload("res://simulation/transport/manifest_state.gd")
+const UnitLifecycle = preload("res://simulation/units/unit_lifecycle.gd")
+const CommandState = preload("res://simulation/commands/command_state.gd")
+const UnitPosition = preload("res://simulation/navigation/unit_position.gd")
 const UnitPath = preload("res://simulation/movement/unit_path.gd")
 const VisibilityRuntime = preload("res://simulation/visibility/battle_visibility.gd")
 var _visibility: VisibilityRuntime
@@ -47,7 +52,7 @@ func _apply_hit(target: Dictionary, damage: float, source_uid: int) -> void:
 	if int(target.get("site_inside_uid", -1)) >= 0: return
 	if not target.get("alive",false) or float(target.get("die_t",-1)) >= 0 or target.get("attached",false): return
 	if battle.cheat_invulnerable and int(target.owner) == battle.player_owner: return
-	target.hp -= damage; target["last_attacker_uid"] = source_uid
+	UnitLifecycle.subtract_from_hp(target, damage); target["last_attacker_uid"] = source_uid
 	if target.hp < 1:
 		_kill(target,_dep_spatial_index.unit_by_uid(source_uid))
 
@@ -135,16 +140,16 @@ func _kill(u: Dictionary, by: Dictionary = {}) -> void:
 	# 运输船被击沉：船上的被载单位一并死亡/移除（原版：船失效 → 被载单位收模式 0x12）。
 	if int(u.get("unit", -1)) == Roles.transport_id():
 		for p in _transports.passengers(u): _kill(p, by)
-		u["carry_n"] = 0
-		u["carry_hp"] = 0.0
-		u["loaded"] = false
+		ManifestState.set_carry_n(u, 0)
+		ManifestState.set_carry_hp(u, 0.0)
+		ManifestState.set_loaded(u, false)
 	if bool(u.get("attached",false)):
 		var carrier: Dictionary=_transports.ship_for(u)
 		if not carrier.is_empty():
-			u.ax=float(carrier.ax);u.ay=float(carrier.ay);u.A=int(carrier.A);u.B=int(carrier.B)
-			carrier.carry_n=maxi(0,int(carrier.carry_n)-1)
-			carrier.carry_hp=maxf(0,float(carrier.carry_hp)-float(u.hp));carrier.loaded=int(carrier.carry_n)>0
-		u.aboard_uid=-1 # 仍隐藏至死亡清理；不留指向已移除船的悬空引用。
+			UnitPosition.place_pixels(u, float(carrier.ax), float(carrier.ay));UnitPosition.place_cell(u, int(carrier.A), int(carrier.B))
+			ManifestState.set_carry_n(carrier, maxi(0,int(carrier.carry_n)-1))
+			ManifestState.set_carry_hp(carrier, maxf(0,float(carrier.carry_hp)-float(u.hp)));ManifestState.set_loaded(carrier, int(carrier.carry_n)>0)
+		ManifestState.set_aboard_uid(u, -1) # 仍隐藏至死亡清理；不留指向已移除船的悬空引用。
 	# 原版 FUN_00422a20 击杀结算（2026-10-16 REA）：
 	#   击杀方士气 += 兵种[+0x35]、经验 += 兵种[+0x34]（计入所辖将），被杀方 -士气；
 	#   大旗（26）被毁 → 该方全体士气 -50。
@@ -162,16 +167,16 @@ func _kill(u: Dictionary, by: Dictionary = {}) -> void:
 	# 于是这个武将可以再被"组建"到别的部队上。
 	if not (u.get("officer", {}) as Dictionary).is_empty():
 		_dep_officer_teams._unassign_officer(u)
-	u.die_t = 0.0
+	UnitLifecycle.set_die_t(u, 0.0)
 	if u.is_building: _construction.release_site(u)
 	u.state = "dead"
 	u.target = null
 	_dep_spatial_index._index_forget(u)               # R13：尸体不再阻挡落点/不再被索敌
 	_dep_spatial_index._target_forget(u)
-	battle.selected.erase(u)
+	CommandState.forget_selection(battle, u)
 
 func _die_step(u: Dictionary, delta: float) -> void:
-	u.die_t += delta
+	UnitLifecycle.add_to_die_t(u, delta)
 	var rule = preload("res://simulation/definitions/timing/death_visual.gd")
 	var frame: int = rule.frame(u,float(u.die_t))
 	if frame < 0:
@@ -233,15 +238,15 @@ func step_attack(u: Dictionary,delta: float,tower: bool) -> void:
 			in_reach=in_reach and _melee_line_clear(u,t)
 		if profile_enabled:phase=_profile_time("contact",phase)
 		if in_reach:
-			u.route_failures=0
-			UnitPath.set_points(u, []); u.pi = 0
+			UnitMotion.set_route_failures(u, 0)
+			UnitPath.set_points(u, []); UnitPath.reset_cursor(u)
 			if strike:
 				_fire_attack(u,t)
 		elif tower:
 			_dep_command_groups._cancel_unit_command(u)
 		else:
 			if strike: preload("res://simulation/movement/action_clock.gd").reset(u) # 击发时射程失效，重发同一攻击重新等待。
-			u.repath -= delta
+			UnitMotion.subtract_from_repath(u, delta)
 			if u.repath <= 0:
 				repath_attack(u,t,attack_range)
 			_dep_movement._follow(u,delta)
@@ -255,11 +260,11 @@ func repath_attack(u: Dictionary,t: Dictionary,attack_range: float) -> void:
 		UnitPath.set_points(u, _dep_interaction_paths._edge_interaction_path(u, t))
 	else:
 		UnitPath.set_points(u, _dep_movement._path_to(u,Vector2(t.ax,t.ay),false))
-	u.pi = 0
-	u.route_failures=mini(3,int(u.get("route_failures",0))+1) if u.path.is_empty() else 0
+	UnitPath.reset_cursor(u)
+	UnitMotion.set_route_failures(u, mini(3,int(u.get("route_failures",0))+1) if u.path.is_empty() else 0)
 	# Stable UID phases spread synchronized retry bursts without using
 	# wall time or RNG; the remaining delay is saved with the order.
-	u.repath=0.8*pow(2.0,maxi(0,int(u.route_failures)-1))+(int(u.uid)%11)*Config.SIM_DT
+	UnitMotion.set_repath(u, 0.8*pow(2.0,maxi(0,int(u.route_failures)-1))+(int(u.uid)%11)*Config.SIM_DT)
 
 func try_native_attack(u: Dictionary,delta: float,kernel: Object) -> bool:
 	var at:=ProfileClock.now(profile_enabled)
@@ -270,7 +275,7 @@ func try_native_attack(u: Dictionary,delta: float,kernel: Object) -> bool:
 	# Same range source as the script path (ambush units use their vision radius).
 	if result&2:repath_attack(u,u.target,preload("res://simulation/definitions/combat_rules.gd").effective_range(u))
 	if result&4:_dep_movement._follow(u,delta)
-	u.anim+=delta
+	UnitMotion.add_to_anim(u, delta)
 	if profile_enabled:at=_profile_time("nativeApply",at)
 	if kernel.finish_or_separate(u,battle._cell_index,_nav.native_query_context()):
 		_dep_spatial_index._separate_unit(u)

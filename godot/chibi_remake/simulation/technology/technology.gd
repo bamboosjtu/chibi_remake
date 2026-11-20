@@ -1,4 +1,6 @@
 extends Object
+const CombatState = preload("res://simulation/combat/combat_state.gd")
+const UnitLifecycle = preload("res://simulation/units/unit_lifecycle.gd")
 const EffectsRuntime = preload("res://simulation/ports/battle_events.gd")
 var _effects: EffectsRuntime
 var _economy: RefCounted
@@ -357,57 +359,57 @@ func _apply_tech_bonuses(u: Dictionary) -> void:
 	if owner <= 0: return
 	var state := _tech_for(owner)
 	if not u.has("base_maxhp"):
-		u["base_maxhp"] = float(u.get("maxhp", 0.0))
+		UnitLifecycle.set_base_maxhp(u, float(u.get("maxhp", 0.0)))
 	var base_max := float(u.get("base_maxhp", 0.0))
 	var level := int(state.get("level", 0))
 	if bool(u.get("is_building", false)):
 		if int(u.unit) < 27 and int(u.unit) not in [18, 19]:
 			var want_max := base_max + Technology.hp_per_level() * level
-			u["maxhp"] = want_max
-			u["hp"] = clampf(float(u.get("hp", 0.0)), 0.0, want_max)
+			UnitLifecycle.set_maxhp(u, want_max)
+			UnitLifecycle.set_hp(u, clampf(float(u.get("hp", 0.0)), 0.0, want_max))
 	elif Roles.has_mobile_hp_technology(int(u.unit)):
 		var applied := int(u.get("tech_hp_bonus", 0))
 		var want_hp := int(Technology.hp_per_level()) * level
 		var delta := want_hp - applied
 		# 原版只把“当前 HP”+400；最大 HP 仍取类型基础值（可超过上限，界面按当前值显示）。
-		u["maxhp"] = base_max
+		UnitLifecycle.set_maxhp(u, base_max)
 		if delta != 0:
-			u["hp"] = maxf(0.0, float(u.get("hp", 0.0)) + float(delta))
+			UnitLifecycle.set_hp(u, maxf(0.0, float(u.get("hp", 0.0)) + float(delta)))
 			u["tech_hp_bonus"] = want_hp
 	# 四列效果按兵种档位取值；武将计算器只使用武力与品级，不套普通兵种加成。
-	u["attack_bonus"] = 0.0
-	u["attack_b_bonus"] = 0.0
-	u["defence_bonus"] = 0.0
-	u["defence_b_bonus"] = 0.0
+	CombatState.set_attack_bonus(u, 0.0)
+	CombatState.set_attack_b_bonus(u, 0.0)
+	CombatState.set_defence_bonus(u, 0.0)
+	CombatState.set_defence_b_bonus(u, 0.0)
 	if preload("res://simulation/definitions/combat_rules.gd").hero(u): return
 	var category := _combat_tech_category(int(u.unit))
 	if category >= 0:
-		u.attack_bonus = _combat_tech_value("weapon", 6, category, owner)
-		u.attack_b_bonus = _combat_tech_value("bow", 3, category, owner)
-		u.defence_bonus = _combat_tech_value("armor", 9, category, owner)
-		u.defence_b_bonus = u.defence_bonus
+		CombatState.set_attack_bonus(u, _combat_tech_value("weapon", 6, category, owner))
+		CombatState.set_attack_b_bonus(u, _combat_tech_value("bow", 3, category, owner))
+		CombatState.set_defence_bonus(u, _combat_tech_value("armor", 9, category, owner))
+		CombatState.set_defence_b_bonus(u, u.defence_bonus)
 	if int(u.unit) == 34 or Roles.is_transport(int(u.unit)):
 		# 两类均没有普通家族档位，按用户补充与现有规格的槽−1规则读取各研究列。
-		u.attack_bonus = 0.0
-		u.attack_b_bonus = _catapult_tech_value(owner) if int(u.unit) == 34 else _combat_tech_value("weapon", 6, 3, owner)
-		u.defence_bonus = _combat_tech_value("bow", 3, 3, owner)
-		u.defence_b_bonus = _combat_tech_value("armor", 9, 3, owner)
+		CombatState.set_attack_bonus(u, 0.0)
+		CombatState.set_attack_b_bonus(u, _catapult_tech_value(owner) if int(u.unit) == 34 else _combat_tech_value("weapon", 6, 3, owner))
+		CombatState.set_defence_bonus(u, _combat_tech_value("bow", 3, 3, owner))
+		CombatState.set_defence_b_bonus(u, _combat_tech_value("armor", 9, 3, owner))
 	if _is_water_unit(u):
 		# 水军专用研究位只替换B攻击与两种防御；A攻击仍走普通兵种档位。
 		var ship_level := int(state.get("ship_atk", 0))
 		var armored := int(state.get("ship_def", 0)) > 0
 		match int(u.unit):
 			46:
-				u.attack_b_bonus = float(Technology.table()[20].v[4]) if ship_level >= 1 else 0.0
-				u.defence_bonus = float(Technology.table()[22].v[4]) if armored else 0.0
+				CombatState.set_attack_b_bonus(u, float(Technology.table()[20].v[4]) if ship_level >= 1 else 0.0)
+				CombatState.set_defence_bonus(u, float(Technology.table()[22].v[4]) if armored else 0.0)
 			48:
-				u.attack_b_bonus = float(Technology.table()[21].v[4]) if ship_level >= 2 else 0.0
-				u.defence_bonus = float(Technology.table()[22].v[5]) if armored else 0.0
+				CombatState.set_attack_b_bonus(u, float(Technology.table()[21].v[4]) if ship_level >= 2 else 0.0)
+				CombatState.set_defence_bonus(u, float(Technology.table()[22].v[5]) if armored else 0.0)
 			49:
 				# 用户确认的相邻字段规则：连船B攻取投石车研究，防取战船研究。
-				u.attack_b_bonus = _catapult_tech_value(owner)
-				u.defence_bonus = float(Technology.table()[21].v[4]) if ship_level >= 2 else 0.0
-		u.defence_b_bonus = u.defence_bonus
+				CombatState.set_attack_b_bonus(u, _catapult_tech_value(owner))
+				CombatState.set_defence_bonus(u, float(Technology.table()[21].v[4]) if ship_level >= 2 else 0.0)
+		CombatState.set_defence_b_bonus(u, u.defence_bonus)
 
 func _catapult_tech_value(owner := -1) -> float:
 	if owner < 0: owner = battle.player_owner

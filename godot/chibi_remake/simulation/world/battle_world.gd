@@ -1,4 +1,5 @@
 extends RefCounted
+const UnitLifecycle = preload("res://simulation/units/unit_lifecycle.gd")
 ## Scene-free domain graph shared by gameplay and snapshot candidates.
 const Nav = preload("res://simulation/navigation/nav.gd")
 var economy: RefCounted
@@ -132,8 +133,8 @@ func seed_map_units() -> bool:
 	if not state.units.is_empty(): return false
 	for index in range(state.map_data.objects.size()):
 		var unit: Dictionary = entity_factory._make_unit(state.map_data.objects[index], true)
-		unit.map_index = index
-		state.units.append(unit)
+		UnitLifecycle.set_map_index(unit, index)
+		UnitLifecycle.append_to_units(state, unit)
 	return true
 
 func validate_services(label: String, application_services: Dictionary = {}, fail_fast := true) -> Dictionary:

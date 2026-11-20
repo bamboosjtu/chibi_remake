@@ -1,4 +1,6 @@
 extends Object
+const SessionOptions = preload("res://simulation/session/session_options.gd")
+const WorldInputs = preload("res://simulation/world/world_inputs.gd")
 ## bootstrap: composed battle behavior.
 const State = preload("res://simulation/state/battle_state.gd")
 const Config = preload("res://simulation/definitions/battle_config.gd")
@@ -27,14 +29,14 @@ func _ready() -> void:
 		await _run_startup_probe(args)
 
 func _read_startup_arguments(args: PackedStringArray) -> bool:
-	battle.map_id = Game.current_map
+	WorldInputs.set_map_id(battle, Game.current_map)
 	var want_view := true
 	for a in args:
 		if a.begins_with("--map=") and not Game.startup_map_consumed:
-			battle.map_id = a.substr(6).to_lower()
+			WorldInputs.set_map_id(battle, a.substr(6).to_lower())
 			Game.startup_map_consumed = true
 		elif a.begins_with("--simtest="):
-			battle.simtest_seconds = maxf(0.1, float(a.substr(10)))
+			SessionOptions.set_simtest_seconds(battle, maxf(0.1, float(a.substr(10))))
 			# ARCH-013 验收：模拟必须能**没有任何渲染节点**地跑完 → 默认不建表现层
 			want_view = false
 		elif a == "--noview":
@@ -46,7 +48,7 @@ func _read_startup_arguments(args: PackedStringArray) -> bool:
 	if "--demo" in args or "--selftest" in args or "--screenshot" in args:
 		# 自动化模式：_edge_scroll 会因鼠标停在窗口边缘而持续平移相机，
 		# 导致同一条命令每次截到不同位置。测试模式下直接关掉。
-		battle.cli_mode = true
+		SessionOptions.set_cli_mode(battle, true)
 	if "--load" in args and not Game.startup_load_consumed:
 		Game.pending_load = true    # 供自动化验证读档路径（等价于点菜单的「读取进度」）
 		Game.startup_load_consumed = true

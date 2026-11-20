@@ -32,7 +32,7 @@
     "units": {
       "kind": "storage",
       "policy": "RESTORED",
-      "owner": "world",
+      "owner": "units",
       "current_writers": [],
       "readers": [
         "*"
@@ -247,6 +247,7 @@
       "backing_store": "state._officer_initial_state"
     },
     "map_data": {
+      "nested_mutation": "simulation/scenario/scenario_rules.gd::_make_terrain_walkable",
       "kind": "storage",
       "policy": "INPUTS",
       "owner": "world",
@@ -387,7 +388,7 @@
     "next_uid": {
       "kind": "storage",
       "policy": "INPUTS",
-      "owner": "world",
+      "owner": "units",
       "current_writers": [],
       "readers": [
         "*"
@@ -452,7 +453,7 @@
     "_index_unit_id": {
       "kind": "derived",
       "policy": "RESTORED",
-      "owner": "units",
+      "owner": "navigation",
       "current_writers": [],
       "readers": [
         "*"
@@ -478,7 +479,7 @@
     "_targets": {
       "kind": "derived",
       "policy": "RESTORED",
-      "owner": "ai",
+      "owner": "navigation",
       "current_writers": [],
       "readers": [
         "*"
@@ -491,7 +492,7 @@
     "_target_owner": {
       "kind": "derived",
       "policy": "RESTORED",
-      "owner": "ai",
+      "owner": "navigation",
       "current_writers": [],
       "readers": [
         "*"
@@ -504,7 +505,7 @@
     "_index_units_ref": {
       "kind": "derived",
       "policy": "RESTORED",
-      "owner": "units",
+      "owner": "navigation",
       "current_writers": [],
       "readers": [
         "*"
@@ -517,7 +518,7 @@
     "_index_units_size": {
       "kind": "derived",
       "policy": "RESTORED",
-      "owner": "units",
+      "owner": "navigation",
       "current_writers": [],
       "readers": [
         "*"
@@ -530,7 +531,7 @@
     "cnt_player": {
       "kind": "storage",
       "policy": "INPUTS",
-      "owner": "world",
+      "owner": "scenario",
       "current_writers": [],
       "readers": [
         "*"
@@ -543,7 +544,7 @@
     "cnt_enemy": {
       "kind": "storage",
       "policy": "INPUTS",
-      "owner": "world",
+      "owner": "scenario",
       "current_writers": [],
       "readers": [
         "*"
@@ -699,7 +700,7 @@
     "cnt_enemy_buildings": {
       "kind": "storage",
       "policy": "INPUTS",
-      "owner": "world",
+      "owner": "scenario",
       "current_writers": [],
       "readers": [
         "*"
@@ -883,7 +884,7 @@
     "decor_targets": {
       "kind": "storage",
       "policy": "INPUTS",
-      "owner": "world",
+      "owner": "economy",
       "current_writers": [],
       "readers": [
         "*"
@@ -896,7 +897,7 @@
     "decor_cells": {
       "kind": "storage",
       "policy": "INPUTS",
-      "owner": "world",
+      "owner": "economy",
       "current_writers": [],
       "readers": [
         "*"

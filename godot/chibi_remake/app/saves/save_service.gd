@@ -1,4 +1,6 @@
 extends RefCounted
+const TrainingQueue = preload("res://simulation/production/training_queue.gd")
+const SessionOptions = preload("res://simulation/session/session_options.gd")
 ## Validate a current-format archive, then atomically install its candidate world.
 var host: Object
 const BattleState = preload("res://simulation/state/battle_state.gd")
@@ -30,7 +32,7 @@ func _apply_other_map(d: Dictionary) -> bool:
 	if not last_load_error.is_empty():
 		candidate.dispose()
 		return false
-	candidate.state.cli_mode = battle.cli_mode
+	SessionOptions.set_cli_mode(candidate.state, battle.cli_mode)
 	var plan: Dictionary = candidate.saver._validation_plan(d, d.units)
 	if plan.is_empty() or not candidate.saver.restore_candidate(d, d.units, plan):
 		last_load_error = candidate.saver.last_load_error
@@ -150,17 +152,17 @@ func _apply_unit_record(u: Dictionary, rec: Dictionary) -> void:
 	host.world.battle_simulation._place_unit(u)            # 表现层 + R13 占格索引（视图缺席时也同步索引）
 
 func _restore_resources(d: Dictionary) -> void:
-	for key in preload("res://app/saves/save_envelope.gd").RESOURCE_KEYS: battle.set(key,float(d.resources[key]))
+	host.world.economy.write_player_resources(d.resources)
 
 func _restore_trainings(d: Dictionary) -> void:
 	var by_uid := {}
 	for unit in battle.units: by_uid[int(unit.uid)] = unit
-	battle.trainings.clear()
+	TrainingQueue.clear_trainings(battle)
 	for record in d.trainings:
 		var order := {"owner":int(record.owner),"b":by_uid[int(record.buildingUid)],"unit":int(record.unit),"t":float(record.t),"cost":record.cost.duplicate(true),"ticks":true}
 		for field in ["aiSlot","aiToken","navalSlot","navalToken"]:
 			if record.has(field): order[field] = int(record[field])
-		battle.trainings.append(order)
+		TrainingQueue.append_to_trainings(battle, order)
 
 func _valid_cost(value: Variant) -> bool:
 	return preload("res://simulation/definitions/resource_cost.gd").valid(value)

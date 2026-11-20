@@ -1,4 +1,7 @@
 extends Object
+const UnitMotion = preload("res://simulation/movement/unit_motion.gd")
+const CombatState = preload("res://simulation/combat/combat_state.gd")
+const WorldInputs = preload("res://simulation/world/world_inputs.gd")
 var view_microseconds := 0
 var hud_microseconds := 0
 var interpolation_microseconds := 0
@@ -236,12 +239,12 @@ func _process(delta: float) -> void:
 	_view_frame(delta)
 	view_microseconds+=Time.get_ticks_usec()-view_begin
 	# 模拟层：固定步长推进（ARCH-010）
-	battle.sim_acc = battle.sim_acc + delta if battle.game_end == 0 else 0.0
+	WorldInputs.set_sim_acc(battle, battle.sim_acc + delta if battle.game_end == 0 else 0.0)
 	var steps := 0
 	var period: float = node.world.clock.period()
 	var target_tick := ceili(battle.simtest_seconds * Config.SIM_HZ) if battle.simtest_seconds > 0.0 else -1
 	while battle.game_end == 0 and not node.get_tree().paused and battle.sim_acc + 0.000000001 >= period and steps < Config.SIM_MAX_CATCHUP and (target_tick < 0 or battle.sim_tick < target_tick):
-		battle.sim_acc = maxf(0.0,battle.sim_acc-period)
+		WorldInputs.set_sim_acc(battle, maxf(0.0,battle.sim_acc-period))
 		steps += 1
 		_dep_battle_simulation._sim_step(Config.SIM_DT)
 	# 达到每帧预算后保留欠下的tick，下一帧继续；不能丢弃计时导致低帧率少结算。
@@ -318,8 +321,8 @@ func _demo() -> void:
 			var e = _dep_combat._nearest_enemy(u, 99999.0)
 			if not e.is_empty():
 				u.state = "attack"
-				u.target = e
-				u.repath = 0.0
+				CombatState.set_target(u, e)
+				UnitMotion.set_repath(u, 0.0)
 				n += 1
 	print("DEMO: ordered %d units to attack" % n)
 	var t := 0.0

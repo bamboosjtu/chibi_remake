@@ -1,4 +1,7 @@
 extends Object
+const OfficerState = preload("res://simulation/officers/officer_state.gd")
+const IndexState = preload("res://simulation/navigation/index_state.gd")
+const UnitPosition = preload("res://simulation/navigation/unit_position.gd")
 const UnitLifecycle = preload("res://simulation/units/unit_lifecycle.gd")
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
@@ -176,7 +179,7 @@ func _spawn_unit(unit_id: int, owner: int, ax: float, ay: float, restoring := fa
 	# 也必须先与坐标一致，否则读档前后的 A/B 会一边是 0 一边是真实格。
 	if not nu.is_building:
 		var anchor_cell := _nav.near_walkable(_nav.cell_of_px(ax, ay), _dep_command_groups._nav_layer(nu))
-		nu.A = anchor_cell.x; nu.B = anchor_cell.y
+		UnitPosition.place_cell(nu, anchor_cell.x, anchor_cell.y)
 	if not nu.is_building and not restoring:
 		# 水军按**水面层**落位（船坞产出的船、读档恢复的船都在水上）；陆军仍按陆地层。
 		var layer: int = _dep_command_groups._nav_layer(nu)
@@ -187,23 +190,23 @@ func _spawn_unit(unit_id: int, owner: int, ax: float, ay: float, restoring := fa
 				_effects.visual("free_unit", [nu])
 			return false
 		var anchor := _nav.anchor_of(cell.x, cell.y)
-		nu.ax = anchor.x; nu.ay = anchor.y
-		nu.A = cell.x; nu.B = cell.y
+		UnitPosition.place_pixels(nu, anchor.x, anchor.y)
+		UnitPosition.place_cell(nu, cell.x, cell.y)
 		_dep_battle_simulation._place_unit(nu)
 	# 新生产成员保持未编组；只有明确的组建命令才能占用武将。
 	# 生产/组建出来的新单位同样套用当前科技（幂等；_make_unit 里已调过一次）。
 	if owner == battle.player_owner:
 		_dep_technology._apply_tech_bonuses(nu)
 	battle.units.append(nu)
-	battle._index_units_size = battle.units.size()
+	IndexState.set_index_units_size(battle, battle.units.size())
 	_dep_spatial_index._index_remember(nu)           # R13：新单位立即进入占格索引
 	_dep_spatial_index._target_sync(nu)
 	return true
 
 func _attach_officer(u: Dictionary, o: Dictionary) -> void:
-	u["officer"] = o
-	u["officer_might"] = float(o.get("might", 0))
-	u["officer_intellect"] = float(o.get("intellect", 0))
+	OfficerState.set_officer(u, o)
+	OfficerState.set_officer_might(u, float(o.get("might", 0)))
+	OfficerState.set_officer_intellect(u, float(o.get("intellect", 0)))
 	# 谋略池（计谋资源）：上限 = 智力 × 2 + 15（research/magics）。
 	u["mou"] = 10.0 # 开局可用谋略；不再凭智力赠送上千点
 

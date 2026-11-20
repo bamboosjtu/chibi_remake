@@ -1,4 +1,5 @@
 extends Object
+const CombatState = preload("res://simulation/combat/combat_state.gd")
 const UnitPath = preload("res://simulation/movement/unit_path.gd")
 var _player_commands: RefCounted
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
@@ -158,7 +159,7 @@ func _attack_units(actors: Array, target: Dictionary, owner: int) -> int:
 		if not preload("res://simulation/definitions/combat_rules.gd").can_attack(unit): continue
 		_dep_command_groups._cancel_unit_command(unit)
 		unit["state"] = "attack"
-		unit["target"] = target
+		CombatState.set_target(unit, target)
 		count += 1
 	return count
 
@@ -212,15 +213,15 @@ func _move_selected_to(pos: Vector2, selected = null) -> int:
 			p = _dep_movement._path_to(u, target_pos, true)   # 起点不同 → 必须自己算
 		if p.is_empty():
 			u["state"] = "idle"
-			u["target"] = null
+			CombatState.set_target(u, null)
 			UnitPath.set_points(u, [])
-			u["pi"] = 0
+			UnitPath.reset_cursor(u)
 			fail_count += 1
 			continue
 		u["state"] = "move"
 		UnitPath.set_points(u, p)
-		u["pi"] = 0
-		u["target"] = null
+		UnitPath.reset_cursor(u)
+		CombatState.set_target(u, null)
 		ok_count += 1
 	if fail_count > 0 and ok_count == 0:
 		_effects.feedback("无法到达那里")

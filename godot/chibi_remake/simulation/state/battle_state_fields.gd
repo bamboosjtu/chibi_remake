@@ -89,7 +89,7 @@ static func omissions(source: RefCounted) -> Array:
 	missing.append_array(expected)
 	return missing
 
-static func copy_inputs(source: RefCounted, target: RefCounted) -> void:
+static func copy_inputs(source: RefCounted, target_state: RefCounted) -> void:
 	for key in INPUTS:
 		var value = source.get(key)
-		target.set(key, value.duplicate(true) if value is Array or value is Dictionary else value)
+		target_state.set(key, value.duplicate(true) if value is Array or value is Dictionary else value)

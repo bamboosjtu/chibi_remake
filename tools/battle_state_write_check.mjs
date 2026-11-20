@@ -4,7 +4,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 
-const STATE_RECEIVERS = new Set(['battle', 'state', '_state']);
+const STATE_RECEIVERS = new Set(['battle', 'state', '_state', 'target_state']);
 const UNIT_RECEIVERS = new Set('u unit nu gate commander worker member leader ship bship target other attacker victim enemy passenger carrier rt bt'.split(' '));
 const MUTATORS = new Set('append append_array assign clear erase fill insert merge pop_at pop_back pop_front push_back push_front remove_at resize reverse shuffle sort sort_custom'.split(' '));
 const RESTORER = 'app/saves/snapshot_restorer.gd';
@@ -158,9 +158,66 @@ export function scan(root, stateOwnership, unitOwnership = {}) {
   return writes.sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line);
 }
 
-function allowed(write, ownership) {
+// These boundaries decode a fixed wire/schema group, forward a registered
+// proxy, or release known record references. Each operation is limited to its
+// own call site; repeated or changed dynamic writes still fail the gate.
+const BOUNDED_WRITES = {
+  'main.gd::_set': {
+    kind: 'state', sites: ['state.set(key, value)'], guards: ['if _state_fields.has(key): state.set(key, value)'],
+  },
+  'simulation/state/battle_state_fields.gd::copy_inputs': {
+    kind: 'state', sites: ['target_state.set(key, value.duplicate(true) if value is Array or value is Dictionary else value)'],
+    guards: ['for key in INPUTS:'],
+  },
+  'app/saves/unit_relations.gd::restore': {
+    kind: 'unit', sites: [
+      'unit[name] = by_uid.get(int(value) if value != null else -1)',
+      'unit[name] = _restore_gather_ref(value, by_uid, decor)',
+      'unit[name] = Vector2(float(value[0]), float(value[1]))',
+      'unit[name] = (value as Array).map(func(point): return Vector2(float(point[0]), float(point[1])))',
+    ], guards: ['static var _fields := Schema.fields("relation")', 'for name in _fields:', 'match field.codec:'],
+  },
+  'simulation/units/unit_schema.gd::restore_scalars': {
+    kind: 'unit', sites: ['unit[key] = decode(key,state[key])'], guards: ['for key in fields(group):'],
+  },
+  'simulation/movement/action_clock.gd::reset': {
+    kind: 'unit', sites: ['unit[key] = Schema.default_value(key)'], guards: ['Schema.fields("action")', 'for key in FIELDS:'],
+  },
+  'simulation/movement/action_clock.gd::restore': {
+    kind: 'unit', sites: ['unit[key] = Schema.decode(key, state[key])'], guards: ['Schema.fields("action")', 'for key in FIELDS:'],
+  },
+  'simulation/movement/locomotion.gd::ensure': {
+    kind: 'unit', sites: ['u[key] = (int(u.get("dir",0)) & 7) if key == "move_facing" else Schema.default_value(key)'],
+    guards: ['Schema.fields("locomotion")', 'for key in FIELDS:', 'if not u.has(key):'],
+  },
+  'simulation/movement/locomotion.gd::restore': {
+    kind: 'unit', sites: ['u[field] = Schema.decode(field,state[field])'],
+    guards: ['Schema.fields("locomotion")', 'for field in FIELDS:'],
+  },
+  'simulation/movement/tick_timers.gd::restore': {
+    kind: 'unit', sites: ['unit[key] = int(state[key])'],
+    guards: ['Schema.fields("status")', 'Schema.fields("elapsed")', 'for key in STATUS_KEYS + ELAPSED_KEYS:'],
+  },
+  'simulation/movement/tick_timers.gd::step_statuses_script': {
+    kind: 'unit', sites: ['unit[key]=remaining-1'], guards: ['Schema.fields("status")', 'for key in STATUS_KEYS:'],
+  },
+  'simulation/world/battle_world.gd::dispose': {
+    kind: 'unit', sites: ['unit[field]=null'],
+    guards: ['for field in ["target","gather_obj","build_target","repair_target","board_target"]:', 'if unit.get(field) is Dictionary:'],
+  },
+};
+
+function allowed(write, ownership, dynamic) {
   const field = ownership.fields?.[write.field];
   if (field?.policy === 'READ_ONLY') return false;
+  if (write.field === '<dynamic>') {
+    const routine = write.file + '::' + write.scope;
+    const contract = BOUNDED_WRITES[routine];
+    return contract?.kind === write.kind && dynamic.delete(routine + ':' + write.site);
+  }
+  if (field?.initializer === write.file + '::' + write.scope) return true;
+  if (field?.nested_mutation === write.file + '::' + write.scope && write.site.startsWith('_state.map_data.terrainWalkable[')) return true;
+  if (field?.restore_sites?.includes(write.file + '::' + write.scope)) return true;
   if (write.owner && write.file.startsWith('simulation/' + write.owner + '/')) return true;
   if (write.kind === 'unit' && field?.restorer === write.file + '::' + write.scope) return true;
   if (write.kind === 'state') {
@@ -176,7 +233,16 @@ const signature = ({ file, scope, kind, field, operation, site }) => JSON.string
 
 export function evaluate(root, stateOwnership, baseline, unitOwnership = {}) {
   const writes = scan(root, stateOwnership, unitOwnership);
-  const violations = writes.filter(write => !allowed(write, write.kind === 'unit' ? unitOwnership : stateOwnership));
+  const dynamic = new Set();
+  for (const [routine, contract] of Object.entries(BOUNDED_WRITES)) {
+    const file = path.join(root, routine.split('::')[0]);
+    if (!fs.existsSync(file)) continue;
+    const code = fs.readFileSync(file, 'utf8');
+    if (contract.guards.every(guard => code.includes(guard))) {
+      for (const site of contract.sites) dynamic.add(routine + ':' + site);
+    }
+  }
+  const violations = writes.filter(write => !allowed(write, write.kind === 'unit' ? unitOwnership : stateOwnership, dynamic));
   const unused = new Map();
   for (const entry of baseline.entries || []) {
     const key = signature(entry);
@@ -199,17 +265,11 @@ function main() {
   const state = read(arg('--ownership', 'tools/inputs/battle_state_ownership.json'));
   const units = read(arg('--unit-ownership', 'tools/inputs/unit_schema_ownership.json'));
   const baselinePath = arg('--baseline', 'tools/inputs/battle_state_write_baseline.json');
-  if (args.includes('--write')) {
-    const result = evaluate(root, state, {}, units);
-    const entries = result.violations.map(write => ({
-      ...write, reason: 'Pre-existing write to reconcile with the field owner', removeByStage: 'P7',
-    }));
-    const formatted = entries.map(entry => '    ' + JSON.stringify(entry)).join(',\n');
-    fs.writeFileSync(baselinePath, '{\n  "schemaVersion": 2,\n  "entries": [\n' + formatted + '\n  ]\n}\n');
-    console.log('FIELD WRITE BASELINE WRITE ' + entries.length + ' entries');
-    return;
+  const baseline = read(baselinePath);
+  if (baseline.schemaVersion !== 2 || !Array.isArray(baseline.entries) || baseline.entries.length !== 0) {
+    throw Error('P7 requires an empty historical write baseline');
   }
-  const result = evaluate(root, state, read(baselinePath), units);
+  const result = evaluate(root, state, baseline, units);
   console.log('FIELD WRITES: ' + result.writes.length + ' writes, ' + result.violations.length + ' outside owner, ' +
     result.unbaselined.length + ' new, ' + result.stale.length + ' stale');
   for (const write of result.unbaselined.slice(0, 40)) {

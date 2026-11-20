@@ -1,4 +1,6 @@
 extends Object
+const CombatState = preload("res://simulation/combat/combat_state.gd")
+const CommandState = preload("res://simulation/commands/command_state.gd")
 const UnitPath = preload("res://simulation/movement/unit_path.gd")
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
@@ -112,12 +114,12 @@ func _begin_gather(worker: Dictionary, obj: Dictionary, path: Array) -> void:
 	_dep_command_groups._cancel_unit_command(worker)
 	worker.state = "deliver" if float(worker.carry) > 0.0 else "gather"
 	worker.gather_obj = obj
-	worker.hold = false
+	CommandState.set_hold(worker, false)
 	worker.gather_t = 0.0
 	worker.gather_ticks = 0
 	UnitPath.set_points(worker, path if worker.state == "gather" else [])
-	worker.pi = 0
-	worker.target = null
+	UnitPath.reset_cursor(worker)
+	CombatState.set_target(worker, null)
 
 func _order_gather(target_obj: Dictionary, actors = null, owner := -1) -> int:
 	if owner < 0: owner = battle.player_owner

@@ -1,4 +1,6 @@
 extends RefCounted
+const CommandState = preload("res://simulation/commands/command_state.gd")
+const UnitPosition = preload("res://simulation/navigation/unit_position.gd")
 const UnitPath = preload("res://simulation/movement/unit_path.gd")
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
@@ -36,8 +38,8 @@ func enter(unit: Dictionary, site: Dictionary) -> void:
 	if _dep_technology._is_worker_unit(unit) and int(unit.unit)!=30:return
 	unit.site_entry_x = float(unit.ax); unit.site_entry_y = float(unit.ay)
 	unit.site_inside_uid = int(site.uid); unit.site_follow_uid = -1; unit.site_exit_pending = false
-	unit.ax = float(site.ax); unit.ay = float(site.ay); unit.A = int(site.A); unit.B = int(site.B)
-	UnitPath.set_points(unit, []); unit.pi = 0; unit.hold = true
+	UnitPosition.place_pixels(unit, float(site.ax), float(site.ay)); UnitPosition.place_cell(unit, int(site.A), int(site.B))
+	UnitPath.set_points(unit, []); UnitPath.reset_cursor(unit); CommandState.set_hold(unit, true)
 	if not _dep_technology._is_worker_unit(unit): unit.state = "idle"
 	_dep_battle_simulation._place_unit(unit); _dep_battle_simulation._update_visual(unit)
 
@@ -55,7 +57,7 @@ func leave(unit: Dictionary) -> bool:
 				var point: Vector2 = _nav.anchor_of(cell.x, cell.y)
 				if cell != start and _nav.find_path(origin, point, true, _dep_command_groups._nav_layer(unit), int(unit.owner), int(unit.unit)).is_empty(): continue
 				unit.site_inside_uid = -1; unit.site_follow_uid = -1; unit.site_exit_pending = false
-				unit.ax = point.x; unit.ay = point.y; unit.A = cell.x; unit.B = cell.y
+				UnitPosition.place_pixels(unit, point.x, point.y); UnitPosition.place_cell(unit, cell.x, cell.y)
 				_dep_battle_simulation._place_unit(unit); _dep_battle_simulation._update_visual(unit)
 				return true
 	return false
@@ -70,7 +72,7 @@ func order_commander(site: Dictionary, workers: Array) -> void:
 		if path.is_empty(): continue
 		_dep_command_groups._cancel_unit_command(commander)
 		commander.site_follow_uid = int(site.uid); commander.state = "move"
-		UnitPath.set_points(commander, path); commander.pi = 0; commander.hold = true
+		UnitPath.set_points(commander, path); UnitPath.reset_cursor(commander); CommandState.set_hold(commander, true)
 
 ## Returns true when construction owns this unit's current tick.
 func step(unit: Dictionary) -> bool:
@@ -94,7 +96,7 @@ func step(unit: Dictionary) -> bool:
 		_dep_command_groups._cancel_unit_command(unit); return true
 	if _dep_interaction_paths._edge_cell_distance(unit, site) == _state.EDGE_DISTANCE:
 		enter(unit, site); return true
-	if unit.path.is_empty(): UnitPath.set_points(unit, _dep_construction_orders._site_entry_path(unit, site)); unit.pi = 0
+	if unit.path.is_empty(): UnitPath.set_points(unit, _dep_construction_orders._site_entry_path(unit, site)); UnitPath.reset_cursor(unit)
 	if not unit.path.is_empty(): _dep_movement._follow(unit, _state.SIM_DT)
 	return true
 

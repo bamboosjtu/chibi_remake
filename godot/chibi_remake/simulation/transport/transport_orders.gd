@@ -1,4 +1,8 @@
 extends Object
+const ResourceState = preload("res://simulation/economy/resource_state.gd")
+const CombatState = preload("res://simulation/combat/combat_state.gd")
+const CommandState = preload("res://simulation/commands/command_state.gd")
+const UnitPosition = preload("res://simulation/navigation/unit_position.gd")
 const UnitPath = preload("res://simulation/movement/unit_path.gd")
 var _transports: RefCounted
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
@@ -74,7 +78,7 @@ func _order_board(ship: Dictionary, actors = null) -> int:
 		u["board_target"] = ship
 		u["state"] = "board"
 		UnitPath.set_points(u, _transports.boarding_path(u,ship) if not _transports.adjacent(u,ship) else [])
-		u["pi"] = 0
+		UnitPath.reset_cursor(u)
 		n += 1
 	if n > 0:
 		_effects.feedback("%d 支部队前往上船（载员 %d/%d）" % [n, int(ship.get("carry_n", 0)), Balance.transport_capacity()])
@@ -94,14 +98,14 @@ func _attach_to_ship(u: Dictionary, ship: Dictionary) -> bool:
 	u["aboard_uid"] = int(ship.uid)
 	u["state"] = "boarded"
 	UnitPath.set_points(u, [])
-	u["pi"] = 0
-	u["target"] = null
+	UnitPath.reset_cursor(u)
+	CombatState.set_target(u, null)
 	u["board_target"] = null
-	u["gather_obj"] = null
+	ResourceState.set_gather_obj(u, null)
 	ship["carry_n"] = int(ship.get("carry_n", 0)) + 1
 	ship["carry_hp"] = float(ship.get("carry_hp", 0.0)) + float(u.get("hp", 0.0))
 	ship["loaded"] = true
-	battle.selected.erase(u)
+	CommandState.forget_selection(battle, u)
 	_dep_spatial_index._index_forget(u)               # R13：装载后不再占陆地格
 	_dep_spatial_index._target_forget(u)              # 装载中的单位不可被索敌
 	if is_same(battle.jimou_caster, u):
@@ -119,13 +123,11 @@ func _detach_from_ship(u: Dictionary, ship: Dictionary) -> bool:
 	var point := _nav.anchor_of(target_cell.x, target_cell.y)
 	u["attached"] = false
 	u["aboard_uid"] = -1
-	u["ax"] = point.x
-	u["ay"] = point.y
-	u["A"] = target_cell.x
-	u["B"] = target_cell.y
+	UnitPosition.place_pixels(u, point.x, point.y)
+	UnitPosition.place_cell(u, target_cell.x, target_cell.y)
 	u["state"] = "idle"
 	UnitPath.set_points(u, [])
-	u["pi"] = 0
+	UnitPath.reset_cursor(u)
 	if _effects != null:
 		_effects.visual("set_unit_attached", [u, false])
 	_dep_battle_simulation._place_unit(u)

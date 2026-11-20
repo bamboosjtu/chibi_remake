@@ -1,4 +1,5 @@
 extends Object
+const UnitMotion = preload("res://simulation/movement/unit_motion.gd")
 const UnitPath = preload("res://simulation/movement/unit_path.gd")
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
@@ -246,9 +247,9 @@ func _separate_unit(u: Dictionary) -> void:
 	var next:=previous.move_toward(p,Config.SPEED*_dep_abilities._spd_mult(u)*Config.SIM_DT)
 	u.ax=next.x;u.ay=next.y
 	var actual:=_unit_cell(u);u.A=actual.x;u.B=actual.y
-	u.moved=not next.is_equal_approx(previous)
-	if u.moved:u.dir=int(round((next-previous).angle()/(PI/4.0)))&7
-	UnitPath.set_points(u, []); u.pi = 0
+	UnitMotion.set_moved(u, not next.is_equal_approx(previous))
+	if u.moved:UnitMotion.set_dir(u, int(round((next-previous).angle()/(PI/4.0)))&7)
+	UnitPath.set_points(u, []); UnitPath.reset_cursor(u)
 	_dep_battle_simulation._place_unit(u)
 
 func _connected_separation_cell(u: Dictionary, cell: Vector2i, near_only: bool) -> Vector2i:

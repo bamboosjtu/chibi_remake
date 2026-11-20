@@ -63,7 +63,12 @@ func reconcile() -> void:
 	for unit in units:
 		var uid := int(unit.uid)
 		if not fields.has(uid): continue
-		for key in fields[uid]: unit[key] = fields[uid][key]
+		var values: Dictionary = fields[uid]
+		if values.has("aboard_uid"): unit.aboard_uid = values.aboard_uid
+		if values.has("carry_n"):
+			unit.carry_n = values.carry_n
+			unit.carry_hp = values.carry_hp
+			unit.loaded = values.loaded
 
 func restore() -> void:
 	reconcile()
@@ -189,7 +194,7 @@ func step_board(u: Dictionary, delta: float) -> void:
 		_effects.feedback("运输船已满（%d）" % Balance.transport_capacity())
 	elif not adjacent(u,bship):
 		if u.path.is_empty():
-			UnitPath.set_points(u, boarding_path(u,bship)); u.pi = 0
+			UnitPath.set_points(u, boarding_path(u,bship)); UnitPath.reset_cursor(u)
 		if u.path.is_empty():
 			u.state = "idle"; u.board_target = null; _effects.feedback("无法靠近运输船")
 		else: _dep_movement._follow(u, delta)

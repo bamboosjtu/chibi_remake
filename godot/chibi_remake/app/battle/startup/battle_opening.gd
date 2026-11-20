@@ -1,4 +1,8 @@
 extends RefCounted
+const ScenarioState = preload("res://simulation/scenario/scenario_state.gd")
+const OfficerState = preload("res://simulation/officers/officer_state.gd")
+const WorldInputs = preload("res://simulation/world/world_inputs.gd")
+const CommandState = preload("res://simulation/commands/command_state.gd")
 ## Map preparation is shared by the live bootstrap and scene-free save candidates.
 const World = preload("res://simulation/world/battle_world.gd")
 const State = preload("res://simulation/state/battle_state.gd")
@@ -23,8 +27,8 @@ func prepare_map(map_id: String) -> String:
 	if not preload("res://simulation/definitions/unit_rules.gd").apply_definitions(data):
 		return "单位定义或生产数据损坏"
 	preload("res://simulation/definitions/building_rules.gd").apply_definitions(data)
-	battle.map_id = map_id
-	battle.map_data = data
+	WorldInputs.set_map_id(battle, map_id)
+	WorldInputs.set_map_data(battle, data)
 	world.set_definition(data)
 	_apply_scenario()
 	world.prepare_map()
@@ -43,21 +47,21 @@ func populate(opening_selection: bool) -> bool:
 	_assign_officers()
 	for unit in battle.units:
 		if not unit.get("officer", {}).is_empty():
-			unit.team_kind = world.command_rules.team_kind(unit)
+			OfficerState.set_team_kind(unit, world.command_rules.team_kind(unit))
 	world.visibility.update(battle.units, battle.player_owner)
 	if opening_selection: _select_opening_team()
-	battle.terrain_base = battle.map_data.get("terrainWalkable", battle.map_data.walkable).duplicate()
+	ScenarioState.set_terrain_base(battle, battle.map_data.get("terrainWalkable", battle.map_data.walkable).duplicate())
 	return true
 
 func _select_opening_team() -> void:
 	for unit in battle.units:
 		if int(unit.owner) != battle.player_owner or unit.get("officer", {}).is_empty(): continue
-		battle.selected = [unit]
+		CommandState.replace_selection(battle, [unit])
 		for member in battle.units:
 			if member.group_officer == int(unit.officer.index) and member.owner == battle.player_owner:
-				battle.selected.append(member)
+				CommandState.add_selection(battle, member)
 		world.command_groups._group_assign(1)
-		battle.selected = [unit]
+		CommandState.replace_selection(battle, [unit])
 		return
 
 func _apply_scenario() -> void:
@@ -68,14 +72,14 @@ func _apply_scenario() -> void:
 	var sides: Array = sc.get("sides", [])
 	if sides.is_empty():
 		return
-	battle.scenario_source = "battle.exp"
-	battle.scenario_mission = int(sc.get("missionId", -1))
-	battle.scenario_avi = str(sc.get("avi", ""))
-	battle.scenario_sides = sides
-	battle.player_owner = int((sides[0] as Dictionary).get("owner", battle.player_owner))
+	ScenarioState.set_scenario_source(battle, "battle.exp")
+	ScenarioState.set_scenario_mission(battle, int(sc.get("missionId", -1)))
+	ScenarioState.set_scenario_avi(battle, str(sc.get("avi", "")))
+	ScenarioState.set_scenario_sides(battle, sides)
+	WorldInputs.set_player_owner(battle, int((sides[0] as Dictionary).get("owner", battle.player_owner)))
 	var res: Array = (sides[0] as Dictionary).get("resources", [])
 	if res.size() >= 4:
-		battle.gold = float(res[0]); battle.food = float(res[1]); battle.wood = float(res[2]); battle.stone = float(res[3])
+		world.economy.write_player_resources({"gold": res[0], "food": res[1], "wood": res[2], "stone": res[3]})
 	print("scenario: mission %d  player=owner %d  sides=%s  res=%.0f/%.0f/%.0f/%.0f  avi=%s" % [
 		battle.scenario_mission, battle.player_owner, str(sides.map(func(x): return int(x.owner))),
 		battle.gold, battle.wood, battle.food, battle.stone, battle.scenario_avi])
@@ -90,7 +94,7 @@ func _build_train_types() -> void:
 	for i in range(mini(2, ids.size())):
 		var meta: Dictionary = battle.map_data.units.get(str(ids[i]), {})
 		var c: Array = meta.get("costs", [])
-		battle.train_types.append({
+		WorldInputs.append_to_train_types(battle, {
 			"unit": int(ids[i]),
 			"name": str(meta.get("name", "?")),
 			# costs = DATA.EXP 的 3 个造价字段（+0x24/+0x28/+0x2c）。
@@ -103,7 +107,7 @@ func _build_train_types() -> void:
 	print("train types: ", battle.train_types)
 
 func _build_build_types() -> void:
-	battle.build_types.clear()
+	WorldInputs.clear_build_types(battle)
 	var variant := 0 if str(battle.map_data.get("scenario", {}).get("avi", "")).to_lower().begins_with("liu") else 1
 	for u in battle.units:
 		if u.owner == battle.player_owner and int(u.unit) in [0, 1]:
@@ -115,12 +119,12 @@ func _build_build_types() -> void:
 		var meta: Dictionary = battle.map_data.units.get(str(bid), {})
 		if meta.is_empty() or world.entity_factory._sheet_ref_for(bid, battle.player_owner) == "": continue
 		var costs: Array = meta.get("costs", [0, 0, 0])
-		battle.build_types.append({"unit": bid, "name": str(meta.get("name", "?")), "gold": float(costs[0]), "wood": float(costs[1]), "food": float(costs[2]), "stone": float(meta.get("costStone", 0))})
+		WorldInputs.append_to_build_types(battle, {"unit": bid, "name": str(meta.get("name", "?")), "gold": float(costs[0]), "wood": float(costs[1]), "food": float(costs[2]), "stone": float(meta.get("costStone", 0))})
 	print("build types: ", battle.build_types)
 
 func _load_officers() -> void:
-	battle._officer_pool=preload("res://app/battle/startup/opening_officers.gd").pool(battle.scenario_sides)
-	battle._officer_initial_state=world.officer_pool._officer_pool_state()
+	OfficerState.set_officer_pool(battle, preload("res://app/battle/startup/opening_officers.gd").pool(battle.scenario_sides))
+	OfficerState.set_officer_initial_state(battle, world.officer_pool._officer_pool_state())
 	print("officers loaded: 117 in %d blocks" % battle._officer_pool.size())
 
 func _assign_officers() -> void:
@@ -182,7 +186,7 @@ func _assign_officers() -> void:
 				soldier["group_officer"] = index
 				member_counts[index] = int(member_counts.get(index, 0)) + 1
 		print("officers: MED 开局编制 %d 队；战役可用名单 %d 人" % [formed.size(), officers.size()])
-		battle.officer_policy = "battle.exp"
+		OfficerState.set_officer_policy(battle, "battle.exp")
 		by_owner.erase(owner)
 
 	# --- 2) 未被战役表覆盖的归属：原型启发式（显式标注） ---
@@ -200,5 +204,5 @@ func _assign_officers() -> void:
 			o2["from"] = "prototype"
 			world.entity_factory._attach_officer(us2[i], o2)
 		if battle.officer_policy == "none":
-			battle.officer_policy = "prototype"
+			OfficerState.set_officer_policy(battle, "prototype")
 	print("officers assigned (policy=%s): %s" % [battle.officer_policy, str(by_owner.keys())])

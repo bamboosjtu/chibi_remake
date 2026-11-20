@@ -1,4 +1,11 @@
 extends Object
+const UnitLifecycle = preload("res://simulation/units/unit_lifecycle.gd")
+const OfficerState = preload("res://simulation/officers/officer_state.gd")
+const ManifestState = preload("res://simulation/transport/manifest_state.gd")
+const ResourceState = preload("res://simulation/economy/resource_state.gd")
+const CombatState = preload("res://simulation/combat/combat_state.gd")
+const WorkState = preload("res://simulation/construction/work_state.gd")
+const UnitMotion = preload("res://simulation/movement/unit_motion.gd")
 const UnitPath = preload("res://simulation/movement/unit_path.gd")
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
@@ -87,30 +94,30 @@ func _cmd_watch(actors = null) -> bool:
 
 func _cancel_unit_command(u: Dictionary) -> void:
 	u.erase("blocked_cursor")
-	u["route_failures"]=0
+	UnitMotion.set_route_failures(u, 0)
 	_construction.leave(u)
-	u["site_follow_uid"] = -1
+	WorkState.set_site_follow_uid(u, -1)
 	preload("res://simulation/movement/action_clock.gd").reset(u)
 	u["state"] = "idle"
-	u["target"] = null
+	CombatState.set_target(u, null)
 	UnitPath.set_points(u, [])
-	u["pi"] = 0
-	u["gather_obj"] = null
+	UnitPath.reset_cursor(u)
+	ResourceState.set_gather_obj(u, null)
 	u["repair_target"] = null
-	u["build_target"] = null
-	u["board_target"] = null
-	u["join_target_uid"] = -1
-	u["cool"] = 0.0
-	u["repath"] = 0.0
-	u["blocked_n"] = 0
-	u["anim"] = 0.0
+	WorkState.set_build_target(u, null)
+	ManifestState.set_board_target(u, null)
+	OfficerState.set_join_target_uid(u, -1)
+	UnitMotion.set_cool(u, 0.0)
+	UnitMotion.set_repath(u, 0.0)
+	UnitMotion.set_blocked_n(u, 0)
+	UnitMotion.set_anim(u, 0.0)
 	u["hold"] = false
 	u.erase("repath_to")
-	u["gather_t"] = 0.0
-	u["gather_ticks"] = 0
-	u["delivery_ticks"] = 0
-	u["rest_t"] = 0
-	u["build_t"] = 0
+	ResourceState.set_gather_t(u, 0.0)
+	ResourceState.set_gather_ticks(u, 0)
+	ResourceState.set_delivery_ticks(u, 0)
+	UnitLifecycle.set_rest_t(u, 0)
+	WorkState.set_build_t(u, 0)
 
 func _cmd_rest(actors = null) -> bool:
 	var n := 0
@@ -121,7 +128,7 @@ func _cmd_rest(actors = null) -> bool:
 			continue
 		_cancel_unit_command(u)
 		u["state"] = "rest"
-		u["rest_t"] = 0
+		UnitLifecycle.set_rest_t(u, 0)
 		n += 1
 	if n > 0:
 		_effects.feedback("休息：%d 支将部队原地休整（每 %d tick +%s 兵力）" % [n, int(Balance.work().restTicks), str(Balance.work().restHp)])
@@ -151,7 +158,7 @@ func _enforce_team_limits() -> void:
 		members.sort_custom(func(a,b): return int(a.uid) < int(b.uid))
 		for i in range(Balance.team_max_members(), members.size()):
 			var member: Dictionary = members[i]
-			member.group_officer = -1
+			OfficerState.set_group_officer(member, -1)
 			if member.state == "build": _cancel_unit_command(member)
 
 func _is_naval(u: Dictionary) -> bool:
@@ -214,7 +221,7 @@ func _return_selected_cargo(actors = null) -> bool:
 		if not _dep_technology._is_worker_unit(worker) or float(worker.get("carry",0))<=0:continue
 		var resource=worker.get("gather_obj")
 		_cancel_unit_command(worker)
-		worker.gather_obj=resource;worker.state="deliver";count+=1
+		ResourceState.set_gather_obj(worker, resource);worker.state="deliver";count+=1
 	_effects.feedback("%d 名工人返回入库" % count)
 	return count > 0
 

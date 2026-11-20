@@ -1,4 +1,5 @@
 extends RefCounted
+const UnitLifecycle = preload("res://simulation/units/unit_lifecycle.gd")
 const UnitPath = preload("res://simulation/movement/unit_path.gd")
 var _economy: RefCounted
 const Balance = preload("res://simulation/definitions/balance_rules.gd")
@@ -23,7 +24,7 @@ func _init(h: Object) -> void:
 func next_target(worker: Dictionary, previous: Dictionary) -> bool:
 	# 身上有货：任何“找下一个采集点”的路径都必须先回运，不能把货卡在 idle。
 	if float(worker.get("carry", 0.0)) > 0.0:
-		worker.state = "deliver"; UnitPath.set_points(worker, []); worker.pi = 0; worker.gather_obj = previous
+		worker.state = "deliver"; UnitPath.set_points(worker, []); UnitPath.reset_cursor(worker); worker.gather_obj = previous
 		return true
 	# 敌方粮仓抽空后不自动改抢另一个粮仓；用户的自动转采只覆盖有限资源点。
 	if int(previous.get("unit",-1)) in [10,11]:
@@ -74,17 +75,17 @@ func extract(worker: Dictionary, target: Dictionary) -> void:
 			_economy.write(int(target.owner), pool)
 		else: target.stock = stock - amount
 		worker.carry = amount; worker.carry_kind = kind
-		worker.state = "deliver"; UnitPath.set_points(worker, []); worker.pi = 0
+		worker.state = "deliver"; UnitPath.set_points(worker, []); UnitPath.reset_cursor(worker)
 		worker.gather_ticks = 0; worker.gather_t = 0.0
 	if stock - amount <= 0:
 		if bool(target.get("decor", false)): _dep_harvest_orders._remove_decor(target)
 		elif target.die_t < 0:
-			target.hp = 0.0
+			UnitLifecycle.set_hp(target, 0.0)
 			_dep_combat._kill(target, {})
 	if amount <= 0:
 		# 目标已空但工人身上还有货：必须先回运，不能原地转 idle 把货扣在手里。
 		if float(worker.get("carry", 0.0)) > 0.0:
-			worker.state = "deliver"; UnitPath.set_points(worker, []); worker.pi = 0
+			worker.state = "deliver"; UnitPath.set_points(worker, []); UnitPath.reset_cursor(worker)
 		else:
 			next_target(worker, target)
 
@@ -104,7 +105,7 @@ func step_gather(u: Dictionary, delta: float) -> void:
 			if not choice.is_empty():
 				u.gather_obj = choice.object
 				UnitPath.set_points(u, choice.path)
-			u.pi = 0
+			UnitPath.reset_cursor(u)
 		if u.path.is_empty():
 			u.state = "idle"; _effects.feedback("工人无法到达该资源点边缘")
 		else: _dep_movement._follow(u, delta)
@@ -122,17 +123,17 @@ func step_deliver(u: Dictionary, delta: float) -> bool:
 		u.delivery_ticks = int(u.get("delivery_ticks", 0)) + 1
 		if int(u.delivery_ticks) % 4 != 0: return false
 		if _dep_harvest_orders._deposit_carry(u):
-			UnitPath.set_points(u, []); u.pi = 0
+			UnitPath.set_points(u, []); UnitPath.reset_cursor(u)
 			# 卸货后继续玩家指定的资源，不暗中改采其他种类。
 			if u.gather_obj is Dictionary: resume_after_deposit(u, u.gather_obj)
 			else: u.state = "idle"
 		else:
-			UnitPath.set_points(u, []); u.pi = 0
+			UnitPath.set_points(u, []); UnitPath.reset_cursor(u)
 			u.state = "idle"
 	else:
 		if u.path.is_empty():
 			for building in deposits:
-				UnitPath.set_points(u, _dep_interaction_paths._edge_interaction_path(u, building, {}, Config.DEPOSIT_EDGE_PX)); u.pi = 0
+				UnitPath.set_points(u, _dep_interaction_paths._edge_interaction_path(u, building, {}, Config.DEPOSIT_EDGE_PX)); UnitPath.reset_cursor(u)
 				if not u.path.is_empty(): break
 		if u.path.is_empty():
 			u.state = "idle"; _effects.feedback("没有可到达的卸货建筑，工人保留携带资源")

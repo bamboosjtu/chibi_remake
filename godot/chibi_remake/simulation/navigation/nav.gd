@@ -1,31 +1,33 @@
 extends RefCounted
 const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## Stable navigation API backed by grid and path-query components.
-var state := preload("res://simulation/navigation/navigation_state.gd").new()
-var grid := preload("res://simulation/navigation/navigation_grid.gd").new(state)
-var paths := preload("res://simulation/navigation/path_queries.gd").new(state)
+var _geometry := preload("res://simulation/navigation/navigation_state.gd").new()
+var state: RefCounted:
+	get: return _geometry
+var grid := preload("res://simulation/navigation/navigation_grid.gd").new(_geometry)
+var paths := preload("res://simulation/navigation/path_queries.gd").new(_geometry)
 var tile_w: float:
-	get: return state.tile_w
+	get: return _geometry.tile_w
 	set(value):
-		state.tile_w=value;state.geometry_revision+=1;state.version+=1
+		_geometry.tile_w=value;_geometry.geometry_revision+=1;_geometry.version+=1
 var tile_hw: float:
-	get: return state.tile_hw
+	get: return _geometry.tile_hw
 	set(value):
-		state.tile_hw=value;state.geometry_revision+=1;state.version+=1
+		_geometry.tile_hw=value;_geometry.geometry_revision+=1;_geometry.version+=1
 var tile_hh: float:
-	get: return state.tile_hh
+	get: return _geometry.tile_hh
 	set(value):
-		state.tile_hh=value;state.geometry_revision+=1;state.version+=1
+		_geometry.tile_hh=value;_geometry.geometry_revision+=1;_geometry.version+=1
 var has_water: bool:
-	get: return state.has_water
-	set(value): state.has_water=value
+	get: return _geometry.has_water
+	set(value): _geometry.has_water=value
 var version: int:
-	get: return state.version
-	set(value): state.version=value
+	get: return _geometry.version
+	set(value): _geometry.version=value
 var map_data: Dictionary:
-	get: return state.map_data
+	get: return _geometry.map_data
 	set(value):
-		state.map_data=value;state.geometry_revision+=1;state.version+=1
+		_geometry.map_data=value;_geometry.geometry_revision+=1;_geometry.version+=1
 
 var _native_context: Dictionary={}
 var _native_context_version := -1
@@ -33,19 +35,19 @@ var _fields: Dictionary = {}
 var _api_missing: Array = []
 
 func _init() -> void:
-	for field in state.PROXY_FIELDS: _fields[field] = true
+	for field in _geometry.PROXY_FIELDS: _fields[field] = true
 	paths.bind_dependencies(self)
 	var services := {"grid": grid, "paths": paths}
 	var report := preload("res://composition_contract.gd").wire(services, "nav")
 	_api_missing = report.missing
 
 func _get(key: StringName):
-	if _fields.has(key): return state.get(key)
+	if _fields.has(key): return _geometry.get(key)
 	preload("res://property_contract.gd").reject(self,key)
 	return null
 
 func _set(key: StringName, value) -> bool:
-	if _fields.has(key): state.set(key, value); return true
+	if _fields.has(key): _geometry.set(key, value); return true
 	preload("res://property_contract.gd").reject(self,key)
 	return false
 
@@ -148,23 +150,23 @@ func set_profiling(enabled: bool) -> void:
 ## stopping a live battle when the first cavalry/ship order needs a new graph.
 func warm_runtime_shapes() -> void:
 	var prepared: Dictionary={}
-	for key in state.map_data.get("units",{}):
+	for key in _geometry.map_data.get("units",{}):
 		var uid:=int(key)
 		if uid<27:continue
 		var cls:=preload("res://simulation/navigation/unit_footprint.gd").class_of(uid)
 		if cls==0:continue
 		var water: bool=Roles.is_naval(uid)
-		if water and not state.has_water:continue
+		if water and not _geometry.has_water:continue
 		var layer:=1 if water else 0;var shape:=Vector2i(layer,cls)
 		if prepared.has(shape):continue
 		paths._grid_for(layer,cls);paths._shape_apply_dirty(layer,cls);prepared[shape]=true
 
 func native_query_context() -> Dictionary:
-	if _native_context_version!=state.version:
-		_native_context={"w":state.tile_w,"rows":int(state.map_data.rows),"cols":int(state.map_data.cols),"terrainW":float(state.map_data.terrainW),"terrainH":float(state.map_data.terrainH),"version":state.version,"land":state.astar,"water":state.water_astar,"hasWater":state.has_water,"occupancy":state.occupancy}
+	if _native_context_version!=_geometry.version:
+		_native_context={"w":_geometry.tile_w,"rows":int(_geometry.map_data.rows),"cols":int(_geometry.map_data.cols),"terrainW":float(_geometry.map_data.terrainW),"terrainH":float(_geometry.map_data.terrainH),"version":_geometry.version,"land":_geometry.astar,"water":_geometry.water_astar,"hasWater":_geometry.has_water,"occupancy":_geometry.occupancy}
 		var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel()
 		if kernel!=null:_native_context["nativeQuery"]=kernel.make_query(_native_context)
-		_native_context.make_read_only();_native_context_version=state.version
+		_native_context.make_read_only();_native_context_version=_geometry.version
 	return _native_context
 
 func release_runtime_queries() -> void:

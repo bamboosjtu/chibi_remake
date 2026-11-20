@@ -1,4 +1,6 @@
 extends Object
+const CommandState = preload("res://simulation/commands/command_state.gd")
+const UnitPosition = preload("res://simulation/navigation/unit_position.gd")
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
 const EffectsRuntime = preload("res://simulation/ports/battle_events.gd")
@@ -105,8 +107,8 @@ func _follow(u: Dictionary, delta: float) -> bool:
 		if distance>0.00001:
 			var step:=minf(remaining,distance)
 			var point:=Vector2(float(u.ax),float(u.ay))+offset*(step/distance)
-			u.ax=point.x;u.ay=point.y
-			var cell:=_nav.cell_of_px(u.ax,u.ay);u.A=cell.x;u.B=cell.y
+			UnitPosition.place_pixels(u, point.x, point.y)
+			var cell:=_nav.cell_of_px(u.ax,u.ay);UnitPosition.place_cell(u, cell.x, cell.y)
 			u.dir=int(round(offset.angle()/(PI/4.0)))&7
 			u.moved=true;u.blocked_n=0;u.erase("blocked_cursor")
 			remaining-=step;_dep_battle_simulation._place_unit(u)
@@ -195,7 +197,7 @@ func _resolve_navigation_overlaps() -> void:
 		if _nav.is_solid(safe, layer):
 			continue
 		var point := _nav.anchor_of(safe.x, safe.y)
-		u.ax = point.x; u.ay = point.y; u.A = safe.x; u.B = safe.y
+		UnitPosition.place_pixels(u, point.x, point.y); UnitPosition.place_cell(u, safe.x, safe.y)
 		_dep_battle_simulation._place_unit(u)
 
 func _march_destination(unit: Dictionary, target: Vector2, reserved: Dictionary) -> Vector2:
@@ -225,7 +227,7 @@ func _move_unit_to_cell(u: Dictionary, cell: Vector2i) -> bool:
 	if path.is_empty():
 		return false
 	_dep_command_groups._cancel_unit_command(u)
-	u["hold"] = false
+	CommandState.set_hold(u, false)
 	u["state"] = "move"
 	u["path"] = path
 	u["pi"] = 0

@@ -109,6 +109,9 @@
         "simulation/production",
         "simulation/technology",
         "root"
+      ],
+      "allowFiles": [
+        "simulation/officers/officer_state.gd"
       ]
     },
     "simulation/movement": {
@@ -156,6 +159,9 @@
         "simulation/native",
         "root",
         "simulation/core"
+      ],
+      "allowFiles": [
+        "simulation/transport/manifest_state.gd"
       ]
     },
     "simulation/economy": {
@@ -217,6 +223,10 @@
         "simulation/commands",
         "simulation/technology",
         "root"
+      ],
+      "allowFiles": [
+        "simulation/combat/combat_state.gd",
+        "simulation/economy/resource_state.gd"
       ]
     },
     "simulation/technology": {
@@ -227,6 +237,10 @@
         "simulation/ports",
         "simulation/core",
         "root"
+      ],
+      "allowFiles": [
+        "simulation/combat/combat_state.gd",
+        "simulation/units/unit_lifecycle.gd"
       ]
     },
     "simulation/officers": {
@@ -303,7 +317,11 @@
         "simulation/combat",
         "simulation/ports",
         "root"
-      ], "allowFiles": ["simulation/movement/unit_path.gd"]
+      ],
+      "allowFiles": [
+        "simulation/movement/unit_path.gd",
+        "simulation/units/unit_lifecycle.gd"
+      ]
     },
     "simulation/visibility": {
       "allow": [

@@ -1,4 +1,5 @@
 extends RefCounted
+const CommandState = preload("res://simulation/commands/command_state.gd")
 ## Populate an isolated candidate. The live scene remains untouched on failure.
 var host: Object
 const BattleState = preload("res://simulation/state/battle_state.gd")
@@ -33,9 +34,9 @@ func restore(d: Dictionary, arr: Array, plan: Dictionary) -> bool:
 	# ---- 校验通过：开始交换世界 ----
 	# R07：待确认的施法/单挑引用属于旧世界，恢复后不能保留为可执行状态。
 	host.world.abilities._reset_jimou()
-	battle.duel_pending = false
-	battle.cmd_pending = ""
-	battle.cmd_pending_data = {}
+	CommandState.set_duel_pending(battle, false)
+	CommandState.set_cmd_pending(battle, "")
+	CommandState.set_cmd_pending_data(battle, {})
 	host.world.harvest_orders._build_decor_targets()
 	for key in decor_snapshot:
 		var entry: Dictionary = decor_snapshot[key]

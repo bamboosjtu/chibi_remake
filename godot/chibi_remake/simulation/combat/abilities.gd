@@ -1,4 +1,6 @@
 extends Object
+const UnitLifecycle = preload("res://simulation/units/unit_lifecycle.gd")
+const CommandState = preload("res://simulation/commands/command_state.gd")
 const VisibilityRuntime = preload("res://simulation/visibility/battle_visibility.gd")
 var _visibility: VisibilityRuntime
 var _stratagems: RefCounted
@@ -27,8 +29,8 @@ func _jimou_caster_for_selection(actors = null) -> Dictionary:
 	return {}
 
 func _reset_jimou() -> void:
-	battle.jimou_pending = -1
-	battle.jimou_caster = {}
+	CommandState.set_jimou_pending(battle, -1)
+	CommandState.set_jimou_caster(battle, {})
 
 func _jimou_begin(idx: int) -> void:
 	if idx < 0 or idx >= Config.JIMOU_NAMES.size():
@@ -49,8 +51,8 @@ func _jimou_begin(idx: int) -> void:
 		_reset_jimou()
 		_effects.feedback("已取消")
 		return
-	battle.jimou_pending = idx
-	battle.jimou_caster = caster
+	CommandState.set_jimou_pending(battle, idx)
+	CommandState.set_jimou_caster(battle, caster)
 	_effects.feedback("%s（耗谋略 %d）：选%s目标（%s 格内）" % [
 		Config.JIMOU_NAMES[idx], int(Balance.abilities().cost[idx]),
 		"地面" if str(Config.JIMOU_SIDE[idx]) == "ground" else ("我方" if str(Config.JIMOU_SIDE[idx]) == "own" else "敌方"), str(Balance.abilities().rangeCells)])
@@ -138,7 +140,7 @@ func _cast_jimou(pos: Vector2, idx: int, caster: Dictionary, tgt: Dictionary) ->
 		7:  # 恢复：+50 封顶（原版 +0x32 实证）
 			var commander:Dictionary=_dep_command_groups._commander_for(tgt)
 			if commander.is_empty():_effects.feedback("恢复需要有主将的部队");return false
-			commander.hp=minf(float(commander.maxhp),float(commander.hp)+50.0)
+			UnitLifecycle.set_hp(commander, minf(float(commander.maxhp),float(commander.hp)+50.0))
 			msg = "恢复：主将兵力 +50"
 		8:  # 地面单格火场，5/9/.../97 更新各扣10，100更新结束。
 			if not _fire_fields.ignite(pos):_effects.feedback("此处无法施放火攻");return false
@@ -165,9 +167,9 @@ func _set_formation(idx: int, actors = null) -> bool:
 	for i in range(mini(group.size(), offs.size())):
 		var u: Dictionary = group[i]
 		var off: Array = offs[i]
-		u["formation"] = idx
-		u["fo_x"] = int(off[0])
-		u["fo_y"] = int(off[1])
+		UnitLifecycle.set_formation(u, idx)
+		UnitLifecycle.set_fo_x(u, int(off[0]))
+		UnitLifecycle.set_fo_y(u, int(off[1]))
 		# 逐支下发"移动到主将坐标 + 偏移"（原版 FUN_0045f710 尾部）。
 		_dep_movement._move_unit_to_cell(u, _formation_target_cell(u, origin_cell))
 		n += 1
@@ -207,7 +209,7 @@ func _duel_begin() -> void:
 		_effects.feedback("旗舰不参与单挑")
 		return
 	_dep_world_orders._clear_pending()
-	battle.duel_pending = true
+	CommandState.set_duel_pending(battle, true)
 	_effects.feedback("单挑：选择敌方武将部队（10 格内）")
 
 func _stamina_of(u: Dictionary) -> float:
@@ -255,9 +257,9 @@ func _force_pct(u: Dictionary) -> float:
 
 func _write_force_pct(u: Dictionary, pct: float) -> void:
 	var p := clampf(pct, 0.0, 100.0)
-	u["hp"] = maxf(0.0, float(u.get("maxhp", 0.0)) * p / 100.0)
+	UnitLifecycle.set_hp(u, maxf(0.0, float(u.get("maxhp", 0.0)) * p / 100.0))
 	if float(u["hp"]) <= 0.0 and bool(u.get("alive", false)):
-		u["hp"] = 0.0
+		UnitLifecycle.set_hp(u, 0.0)
 
 func _start_duel(caster: Dictionary, target: Dictionary) -> bool:
 	if battle.game_end != 0: return false

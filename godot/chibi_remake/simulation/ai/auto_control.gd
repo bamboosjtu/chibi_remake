@@ -13,6 +13,10 @@ var _dep_stratagems: Object
 func _init(data: State) -> void:
 	battle = data
 
+func toggle() -> bool:
+	battle.auto_control = not battle.auto_control
+	return battle.auto_control
+
 func _step_auto_control() -> void:
 	if not battle.auto_control or battle.sim_tick % AUTO_PERIOD != 0: return
 	# The original F2 strategic policy is not fully recovered. Limit delegation to

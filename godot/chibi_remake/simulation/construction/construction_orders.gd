@@ -1,4 +1,8 @@
 extends Object
+const UnitMotion = preload("res://simulation/movement/unit_motion.gd")
+const IndexState = preload("res://simulation/navigation/index_state.gd")
+const UnitLifecycle = preload("res://simulation/units/unit_lifecycle.gd")
+const CommandState = preload("res://simulation/commands/command_state.gd")
 const UnitPath = preload("res://simulation/movement/unit_path.gd")
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
@@ -175,7 +179,7 @@ func _build_site_at(pos: Vector2, opt: Dictionary, actors = null) -> bool:
 		if _assign_build_worker(w, site): n += 1
 	if n > 0:
 		_construction.order_commander(site, workers)
-		if actors == null or battle.selected == actors: battle.selected = [site]
+		if actors == null or battle.selected == actors: CommandState.replace_selection(battle, [site])
 	_effects.feedback("开工：「%s」工地已放下，%d 名工人前往建造" % [str(opt.get("name", "?")), n])
 	return true
 
@@ -272,17 +276,17 @@ func _place_building(owner: int, building_type: int, near_px: Vector2, as_site :
 				if str(ob.sheet) == "":
 					return {}
 				var nu: Dictionary = _dep_entity_factory._make_unit(ob, false)
-				battle.units.append(nu)
-				battle._index_units_size = battle.units.size()
+				UnitLifecycle.append_to_units(battle, nu)
+				IndexState.set_index_units_size(battle, battle.units.size())
 				_dep_spatial_index._target_sync(nu)            # R13：新建筑立即可被索敌
 				if int(building_type) in [16, 17]:
 					_nav.register_gate(nu)
 				else:
-					nu["occupied_cells"] = cells
+					IndexState.set_occupied_cells(nu, cells)
 					_nav.occupy(cells, 1)
 				if as_site:
 					nu["site"] = true
-					nu["hp"] = 0.0
+					UnitLifecycle.set_hp(nu, 0.0)
 					nu["build_frame"] = maxi(0, int(nu.get("count", 1)) - 1)  # 工地＝最残破的一帧
 				return nu
 	return {}
@@ -345,13 +349,13 @@ func step_repair(u: Dictionary, delta: float) -> void:
 		_dep_command_groups._cancel_unit_command(u); _effects.feedback("修理：四种资源都须多于15")
 	elif _dep_interaction_paths._dist_to_obj(u,rt) > Config.GATHER_REACH:
 		preload("res://simulation/movement/action_clock.gd").reset(u)
-		if u.path.is_empty(): UnitPath.set_points(u, _dep_interaction_paths._interaction_path(u,rt,Config.GATHER_REACH)); u.pi = 0
+		if u.path.is_empty(): UnitPath.set_points(u, _dep_interaction_paths._interaction_path(u,rt,Config.GATHER_REACH)); UnitPath.reset_cursor(u)
 		if u.path.is_empty(): _dep_command_groups._cancel_unit_command(u); _effects.feedback("工人无法到达该修理目标")
 		else: _dep_movement._follow(u,delta)
 	else:
 		UnitPath.set_points(u, [])
 		var offset := Vector2(rt.ax-u.ax,rt.ay-u.ay)
-		u.dir = int(round(offset.angle()/(PI/4.0))) & 7
+		UnitMotion.set_dir(u, int(round(offset.angle()/(PI/4.0))) & 7)
 		if preload("res://simulation/movement/action_clock.gd").step(u,"repair",int(rt.uid)):
 			if not _do_repair(u,rt) or float(rt.hp) >= float(rt.maxhp): _dep_command_groups._cancel_unit_command(u)
 
@@ -362,7 +366,7 @@ func step_build(u: Dictionary, delta: float) -> void:
 		u.state = "idle"; u.build_target = null; u.build_t = 0
 	elif _dep_interaction_paths._edge_cell_distance(u, bt) != Config.EDGE_DISTANCE:
 		if u.path.is_empty():
-			UnitPath.set_points(u, _site_entry_path(u, bt)); u.pi = 0
+			UnitPath.set_points(u, _site_entry_path(u, bt)); UnitPath.reset_cursor(u)
 		if u.path.is_empty():
 			u.state = "idle"; u.build_target = null; u.build_t = 0; _effects.feedback("工人无法到达工地")
 		else: _dep_movement._follow(u, delta)

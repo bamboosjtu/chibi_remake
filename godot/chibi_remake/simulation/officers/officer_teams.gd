@@ -1,4 +1,6 @@
 extends Object
+const UnitLifecycle = preload("res://simulation/units/unit_lifecycle.gd")
+const CommandState = preload("res://simulation/commands/command_state.gd")
 const UnitPath = preload("res://simulation/movement/unit_path.gd")
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
@@ -63,11 +65,11 @@ func _form_hero_unit(u: Dictionary, idx: int, actors = null) -> bool:
 		"tail": [], "sheet": _dep_entity_factory._sheet_ref_for(hero_type, int(u.owner))}, false)
 	_dep_entity_factory._attach_officer(commander, o)
 	commander.team_kind="worker" if members.all(func(member):return _dep_technology._is_worker_unit(member)) else "combat"
-	commander.base_maxhp = float(o.get("hp", commander.base_maxhp))
-	commander.maxhp = commander.base_maxhp; commander.hp = commander.base_maxhp
+	UnitLifecycle.set_base_maxhp(commander, float(o.get("hp", commander.base_maxhp)))
+	UnitLifecycle.set_maxhp(commander, commander.base_maxhp); UnitLifecycle.set_hp(commander, commander.base_maxhp)
 	_dep_technology._apply_tech_bonuses(commander)
-	battle.units.append(commander)
-	if actors == null or battle.selected == actors: battle.selected = [commander]
+	UnitLifecycle.append_to_units(battle, commander)
+	if actors == null or battle.selected == actors: CommandState.replace_selection(battle, [commander])
 	for member in members:
 		member.group_officer = idx
 	_dep_battle_simulation._place_unit(commander)
@@ -96,9 +98,9 @@ func _order_disband(actors = null) -> int:
 		_unassign_officer(leader)
 		if battle.jimou_caster == leader:
 			_dep_abilities._reset_jimou()
-		leader.alive = false
+		UnitLifecycle.set_alive(leader, false)
 		_dep_battle_simulation._free_unit_at(position)
-	if selection_unchanged: battle.selected = []
+	if selection_unchanged: CommandState.replace_selection(battle, [])
 	if not leaders.is_empty():
 		_effects.feedback("部队已解散（%d 队），成员保留，可重新组建" % leaders.size())
 	if detached>0:_effects.feedback("%d 名成员已解除编组" % detached)
@@ -120,7 +122,7 @@ func _order_join(target: Dictionary, actors = null) -> int:
 		if path.is_empty(): continue
 		_dep_command_groups._cancel_unit_command(member)
 		member.state = "join"; member.join_target_uid = int(leader.uid)
-		UnitPath.set_points(member, path); member.pi = 0
+		UnitPath.set_points(member, path); UnitPath.reset_cursor(member)
 		count += 1; room -= 1
 	_effects.feedback("已派出%d名成员加入队伍" % count if count > 0 else "队伍已满或无法靠近")
 	return count
@@ -150,9 +152,9 @@ func _assign_officer_to(u: Dictionary, idx: int) -> bool:
 	# （装载器里文本第 5 个整数读进 HP 后**立即被覆盖**，见 tools/lib/officer_hp.mjs 头部）。
 	var ohp := float(o.get("hp", 0))
 	if ohp > 0.0:
-		u["base_maxhp"] = ohp
-		u["maxhp"] = ohp
-		u["hp"] = ohp
+		UnitLifecycle.set_base_maxhp(u, ohp)
+		UnitLifecycle.set_maxhp(u, ohp)
+		UnitLifecycle.set_hp(u, ohp)
 		_dep_technology._apply_tech_bonuses(u)
 	print("组建：%s ← 「%s」%s 武力=%.0f 智力=%.0f HP=%.0f" % [
 
@@ -204,11 +206,11 @@ func _auto_assign_new_team(officer_index: int) -> void:
 		if old.any(func(uid): return int(uid) in ids):
 			for uid in ids:
 				if not old.has(uid): old.append(uid)
-			battle.control_groups[n] = old
+			CommandState.set_control_groups_entry(battle, n, old)
 			return
 	for n in range(1, 10):
 		if _dep_command_groups._group_units(n).is_empty():
-			battle.control_groups[n] = ids
+			CommandState.set_control_groups_entry(battle, n, ids)
 			return
 
 func _process_officer_recovery() -> void:
@@ -222,9 +224,9 @@ func _process_officer_recovery() -> void:
 			continue
 		if float(u.get("inspired_t", 0.0)) > 0.0:
 			var cap := 2.0 * float(off.get("intellect", 0.0)) + 15.0
-			u["mou"] = minf(cap, float(u.get("mou", 0.0)) + 5.0)
+			UnitLifecycle.set_mou(u, minf(cap, float(u.get("mou", 0.0)) + 5.0))
 		else:
-			u["hp"] = minf(float(u.get("maxhp", 0.0)), float(u.get("hp", 0.0)) + 10.0)
+			UnitLifecycle.set_hp(u, minf(float(u.get("maxhp", 0.0)), float(u.get("hp", 0.0)) + 10.0))
 
 func bind_dependencies(world: Object) -> void:
 	_dep_abilities = world.abilities
@@ -258,6 +260,6 @@ func step_join(u: Dictionary, delta: float) -> void:
 			_effects.feedback("已加入%s的队伍" % str(leader.officer.name).replace(" ", ""))
 		else: _effects.feedback("该队伍已满15名成员")
 	else:
-		if u.path.is_empty(): UnitPath.set_points(u, _dep_interaction_paths._edge_interaction_path(u, leader)); u.pi = 0
+		if u.path.is_empty(): UnitPath.set_points(u, _dep_interaction_paths._edge_interaction_path(u, leader)); UnitPath.reset_cursor(u)
 		if u.path.is_empty(): _dep_command_groups._cancel_unit_command(u); _effects.feedback("无法靠近该队伍")
 		else: _dep_movement._follow(u, delta)

@@ -1,4 +1,5 @@
 extends Node2D
+const WorldInputs = preload("res://simulation/world/world_inputs.gd")
 ## Battle composition root. Rules and state live in composed services.
 const UnitProjection = preload("res://app/read_models/unit_projection.gd")
 const Config = preload("res://simulation/definitions/battle_config.gd")
@@ -139,7 +140,7 @@ func _get(key: StringName):
 func _set(key: StringName, value) -> bool:
 	if key == "map_data":
 		world.set_definition(value)
-		state.map_data = value
+		WorldInputs.set_map_data(state, value)
 		return true
 	if _state_fields.has(key): state.set(key, value); return true
 	if _scene_fields.has(key): scene.set(key, value); return true

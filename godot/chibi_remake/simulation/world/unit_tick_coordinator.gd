@@ -1,4 +1,7 @@
 extends Object
+const CombatState = preload("res://simulation/combat/combat_state.gd")
+const ManifestState = preload("res://simulation/transport/manifest_state.gd")
+const UnitMotion = preload("res://simulation/movement/unit_motion.gd")
 const UnitPath = preload("res://simulation/movement/unit_path.gd")
 var _transports: RefCounted
 var _stratagems: RefCounted
@@ -88,27 +91,27 @@ func _step_unit_inner(u: Dictionary, delta: float) -> void:
 		"repair": _dep_construction_orders.step_repair(u, delta)
 		"build": _dep_construction_orders.step_build(u, delta)
 	# Idle, unload and passive states share the same final animation step.
-	u.anim += delta
+	UnitMotion.add_to_anim(u, delta)
 
 func _is_tower(u: Dictionary) -> bool:
 	return bool(u.is_building) and int(u.unit) in [18,19]
 
 func _prepare_action(u: Dictionary, delta: float) -> bool:
-	u.moved = false
+	UnitMotion.set_moved(u, false)
 	if bool(u.get("attached", false)):
 		return false
 	# Confusion/rolling idle tasks wait behind the running order, without clearing it.
 	if preload("res://simulation/combat/stratagem_rules.gd").active(u):
-		u.anim += delta
+		UnitMotion.add_to_anim(u, delta)
 		return false
 	if (int(u.get("site_inside_uid",-1))>=0 or int(u.get("site_follow_uid",-1))>=0) and _construction.step(u): return false
 	# 下船按每 4 拍一名推进；船接到新命令也不打断在舱载员的卸载。
 	if (bool(u.get("unload_active", false)) or str(u.get("state", "")) == "unload") and int(u.get("unit", -1)) == Roles.transport_id():
-		u.unload_t = int(u.get("unload_t", 0)) + 1
+		ManifestState.set_unload_t(u, int(u.get("unload_t", 0)) + 1)
 		if int(u.unload_t) % 4 == 0:
 			_dep_transport_orders._retry_unload(u)
 		if int(u.get("carry_n", 0)) <= 0:
-			u.unload_active = false
+			ManifestState.set_unload_active(u, false)
 			if str(u.get("state", "")) == "unload": u.state = "idle"
 	# 旧存档或旧AI可能留下无武装单位的攻击命令；执行层同样拒绝。
 	if u.state == "attack" and not preload("res://simulation/definitions/combat_rules.gd").can_attack(u):
@@ -120,7 +123,7 @@ func _prepare_action(u: Dictionary, delta: float) -> bool:
 	if tower and u.state == "idle" and not bool(u.get("site", false)) and int(u.get("confused_t", 0)) <= 0:
 		var enemy: Dictionary = _dep_combat._nearest_enemy(u, float(u.atk_range) * battle.tile_w)
 		if not enemy.is_empty():
-			u.target = enemy; u.state = "attack"
+			CombatState.set_target(u, enemy); u.state = "attack"
 	if u.state == "idle" and not bool(u.get("hold", false)) and not (u.get("officer", {}) as Dictionary).is_empty():
 		_follow_working_members(u)
 	return true
@@ -136,7 +139,7 @@ func _follow_working_members(u: Dictionary) -> void:
 			if Vector2(float(u.ax), float(u.ay)).distance_to(follow_to) > 2.0 * battle.tile_w:
 				u.state = "move"
 				UnitPath.set_points(u, _dep_movement._path_to(u, follow_to, true))
-				u.pi = 0
+				UnitPath.reset_cursor(u)
 				break
 
 func bind_dependencies(world: Object) -> void:

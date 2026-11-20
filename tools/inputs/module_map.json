@@ -4,18 +4,17 @@
   "sourceFiles": 181,
   "generated": "2026-11-20T08:08:10.200Z",
   "statusCounts": {
-    "moved": 125,
-    "renamed": 5,
-    "split": 3,
+    "moved": 129,
+    "renamed": 4,
     "retained": 47,
     "deleted": 1
   },
   "phaseCounts": {
-    "P4b": 13,
+    "P4b": 16,
     "P4c": 1,
-    "P5": 4,
     "P0": 32,
     "P4a": 41,
+    "P5": 1,
     "P2": 59,
     "P1": 13,
     "P4d": 1,
@@ -59,24 +58,24 @@
       "from": "app/battle/cheat_controller.gd",
       "to": "app/battle/runtime/cheat_controller.gd",
       "phase": "P4b",
-      "note": "P5 splits into presentation cheat_input + command",
-      "status": "split",
+      "note": "moved during P4b; presentation dependency injected in P5",
+      "status": "moved",
       "package": "app/battle"
     },
     {
       "from": "app/battle/duel_controller.gd",
-      "to": "app/battle/runtime/duel_session.gd",
-      "phase": "P5",
-      "note": "renamed to duel_session",
-      "status": "renamed",
+      "to": "app/battle/runtime/duel_controller.gd",
+      "phase": "P4b",
+      "note": "moved during P4b; presentation dependency injected in P5",
+      "status": "moved",
       "package": "app/battle"
     },
     {
       "from": "app/battle/scene_controller.gd",
-      "to": "app/battle/runtime/battle_runtime.gd",
-      "phase": "P5",
-      "note": "split into battle_runtime + presentation input/frame controllers",
-      "status": "split",
+      "to": "app/battle/runtime/scene_controller.gd",
+      "phase": "P4b",
+      "note": "moved during P4b; presentation dependency injected in P5",
+      "status": "moved",
       "package": "app/battle"
     },
     {
@@ -89,10 +88,10 @@
     },
     {
       "from": "app/battle_scene_state.gd",
-      "to": "app/battle/runtime/battle_runtime_state.gd",
-      "phase": "P5",
-      "note": "split into app runtime state + presentation state",
-      "status": "split",
+      "to": "app/battle/runtime/battle_scene_state.gd",
+      "phase": "P4b",
+      "note": "moved during P4b; presentation dependency injected in P5",
+      "status": "moved",
       "package": "app/battle"
     },
     {
@@ -483,7 +482,7 @@
       "from": "presentation/battle/components/legacy_layout.gd",
       "to": "presentation/battle/view/legacy_layout.gd",
       "phase": "P4a",
-      "note": "retained until P7; battle_view and hud_layout still reference it",
+      "note": "retained as an active painted HUD layout",
       "status": "moved",
       "package": null
     },
@@ -1484,11 +1483,6 @@
       "reason": "Movement-owned path replacement"
     },
     {
-      "to": "testing/automation/menu_harness.gd",
-      "phase": "P4c",
-      "reason": "menu acceptance harness"
-    },
-    {
       "to": "testing/checks/checks_base.gd",
       "phase": "P6",
       "reason": "shared check base"
@@ -1512,36 +1506,6 @@
       "to": "simulation/cheats/cheat_actions.gd",
       "phase": "P4d",
       "reason": "cheat actions"
-    },
-    {
-      "to": "app/battle/runtime/battle_runtime.gd",
-      "phase": "P5",
-      "reason": "app battle runtime"
-    },
-    {
-      "to": "presentation/battle/controller/battle_input_controller.gd",
-      "phase": "P5",
-      "reason": "input controller"
-    },
-    {
-      "to": "presentation/battle/controller/battle_frame_controller.gd",
-      "phase": "P5",
-      "reason": "frame controller"
-    },
-    {
-      "to": "presentation/battle/input/cheat_input.gd",
-      "phase": "P5",
-      "reason": "cheat input"
-    },
-    {
-      "to": "app/battle/runtime/battle_runtime_state.gd",
-      "phase": "P5",
-      "reason": "app runtime state"
-    },
-    {
-      "to": "presentation/battle/view/battle_presentation_state.gd",
-      "phase": "P5",
-      "reason": "presentation state"
     },
     {
       "to": "presentation/shell/presentation_host.gd",
@@ -1572,6 +1536,81 @@
       "to": "app/read_models/battle_status_queries.gd",
       "phase": "P6",
       "reason": "battle query split"
+    },
+    {
+      "to": "presentation/battle/view/battle_presentation_factory.gd",
+      "phase": "P5",
+      "reason": "Presentation factory injected from the scene root"
+    },
+    {
+      "to": "simulation/cheats/cheat_session.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/combat/combat_state.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/commands/command_state.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/construction/work_state.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/economy/resource_state.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/movement/unit_motion.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/navigation/index_state.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/navigation/unit_position.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/officers/officer_state.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/production/training_queue.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/scenario/scenario_state.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/session/session_options.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/transport/manifest_state.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/world/world_inputs.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
     }
   ],
   "appliedStages": [

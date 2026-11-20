@@ -1,4 +1,5 @@
 extends Object
+const CommandState = preload("res://simulation/commands/command_state.gd")
 const UnitLifecycle = preload("res://simulation/units/unit_lifecycle.gd")
 const VisibilityRuntime = preload("res://simulation/visibility/battle_visibility.gd")
 var _visibility: VisibilityRuntime
@@ -57,14 +58,14 @@ func _fade_unit(u: Dictionary, alpha: float) -> void:
 		_effects.visual("fade_unit", [u, alpha])
 
 func _finish_death(u: Dictionary) -> void:
-	u.alive = false
+	UnitLifecycle.set_alive(u, false)
 	# 主将阵亡：部队自动解散，并把已失效的编队槽一起清掉，避免呼出只剩工人。
 	if not (u.get("officer", {}) as Dictionary).is_empty():
 		_clear_control_group_for(int(u.uid))
 		_dep_officer_teams._unassign_officer(u)
 	if _effects != null:
 		_effects.visual("hide_unit", [u])
-	battle.selected.erase(u)
+	CommandState.forget_selection(battle, u)
 
 func _clear_officer_control_groups(officer_index:int, owner:int, leader_uid:int) -> void:
 	var released:Dictionary={leader_uid:true}
@@ -74,13 +75,13 @@ func _clear_officer_control_groups(officer_index:int, owner:int, leader_uid:int)
 		var kept:Array=[]
 		for uid in battle.control_groups[slot]:
 			if not released.has(int(uid)):kept.append(int(uid))
-		if kept.is_empty():battle.control_groups.erase(slot)
-		else:battle.control_groups[slot]=kept
+		if kept.is_empty():CommandState.erase_from_control_groups(battle, slot)
+		else:CommandState.set_control_groups_entry(battle, slot, kept)
 
 func _clear_control_group_for(uid: int) -> void:
 	for n in battle.control_groups.keys():
 		if (battle.control_groups[n] as Array).has(uid):
-			battle.control_groups.erase(n)
+			CommandState.erase_from_control_groups(battle, n)
 
 func _update_gates() -> void:
 	_automatic_gates.update(_nav, battle.units)

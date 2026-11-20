@@ -19,8 +19,14 @@ func balance(owner: int) -> Dictionary:
 	return player_resources() if owner == _state.player_owner else _dep_ai_economy._ai_res_of(owner).duplicate()
 func write(owner: int, value: Dictionary) -> void:
 	if owner == _state.player_owner:
-		for kind in KINDS: _state.set(kind, float(value.get(kind, 0)))
-	elif not balance(owner).is_empty(): _state.ai_res[owner] = value
+		write_player_resources(value)
+	elif not balance(owner).is_empty(): _dep_ai_economy.replace_balance(owner, value)
+func write_player_resources(value: Dictionary) -> void:
+	_state.gold = float(value.get("gold", 0))
+	_state.wood = float(value.get("wood", 0))
+	_state.food = float(value.get("food", 0))
+	_state.stone = float(value.get("stone", 0))
+
 func can_pay(owner: int, cost: Dictionary) -> bool:
 	var res := balance(owner)
 	if res.is_empty(): return false

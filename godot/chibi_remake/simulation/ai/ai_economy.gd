@@ -1,4 +1,5 @@
 extends Object
+const ResourceState = preload("res://simulation/economy/resource_state.gd")
 var _player_commands: RefCounted
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
@@ -39,6 +40,9 @@ func _ai_res_of(owner: int) -> Dictionary:
 			"stone": float(r[3]) if r.size() > 3 else 200.0,
 		}
 	return battle.ai_res[owner]
+
+func replace_balance(owner: int, value: Dictionary) -> void:
+	battle.ai_res[owner] = value
 
 func ai_building_kinds(owner: int) -> Array:
 	var out: Array = []
@@ -101,7 +105,7 @@ func ai_gold(owner: int) -> float:
 
 func ai_set_gold(owner: int, v: float) -> void:
 	if owner == battle.player_owner:
-		battle.gold = v
+		ResourceState.set_gold(battle, v)
 	else:
 		_ai_res_of(owner)["gold"] = v
 

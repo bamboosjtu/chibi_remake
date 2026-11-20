@@ -1,4 +1,7 @@
 extends RefCounted
+const UnitLifecycle = preload("res://simulation/units/unit_lifecycle.gd")
+const OfficerState = preload("res://simulation/officers/officer_state.gd")
+const CombatState = preload("res://simulation/combat/combat_state.gd")
 const UnitPath = preload("res://simulation/movement/unit_path.gd")
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
@@ -110,7 +113,7 @@ func apply_effect(effect: Dictionary) -> void:
 				if int(u.get("officer",{}).get("index",-1))+1==int(effect.get("officer",-1)):_dep_officer_teams._grant_officer_exp(u,float(amount))
 		"status_delta":
 			for u in candidates(str(effect.side)):
-				u["status_173"] = (int(u.get("status_173", 70)) + int(effect.amount)) & 255
+				CombatState.set_status_173(u, (int(u.get("status_173", 70)) + int(effect.amount)) & 255)
 		"event":
 			_state.task_events.append({"id": int(effect.id), "tick": int(_state.sim_tick)})
 		"clear_tiles":
@@ -118,7 +121,7 @@ func apply_effect(effect: Dictionary) -> void:
 				_state.terrain_changes["%d/%d/%d" % [int(effect.layer), int(cell[0]), int(cell[1])]] = 65535
 				var c := Vector2i(int(cell[0]), int(cell[1]))
 				if _state.map_data.has("terrainWalkable"):
-					_state.map_data.terrainWalkable[c.x * int(_state.map_data.cols) + c.y] = 1
+					_make_terrain_walkable(c)
 				_nav.unblock(c)
 		"enemy_order":
 			for enemy in candidates("enemy"):
@@ -126,14 +129,17 @@ func apply_effect(effect: Dictionary) -> void:
 					continue
 				var target: Vector2 = _nav.anchor_of(int(effect.target[0]), int(effect.target[1]))
 				UnitPath.set_points(enemy, _nav.find_path(Vector2(enemy.ax, enemy.ay), target, false, _dep_command_groups._nav_layer(enemy), int(enemy.get("owner", -1)), int(enemy.get("unit", -1))))
-				enemy.pi = 0
+				UnitPath.reset_cursor(enemy)
 				enemy.state = "move" if not enemy.path.is_empty() else "idle"
 				# DAT_0048534c initial value is 100 in the PE data section.
 				var amount: int = int(_state.map_data.get("scenario", {}).get(str(effect.experienceParameter), 100))
 				var id: int = int(enemy.get("officer", {}).get("index", -1))
 				if id >= 0:
-					_state.officer_progress[id] = (int(_state.officer_progress.get(id, 0)) + amount) & 255
-					enemy["event_experience"] = _state.officer_progress[id]
+					OfficerState.set_officer_progress_entry(_state, id, (int(_state.officer_progress.get(id, 0)) + amount) & 255)
+					UnitLifecycle.set_event_experience(enemy, _state.officer_progress[id])
 
 func bind_dependencies(world: Object) -> void:
 	_nav = world.nav
+
+func _make_terrain_walkable(cell: Vector2i) -> void:
+	_state.map_data.terrainWalkable[cell.x * int(_state.map_data.cols) + cell.y] = 1

@@ -1,4 +1,5 @@
 extends RefCounted
+const CommandState = preload("res://simulation/commands/command_state.gd")
 
 var _waiters := 0
 var waiting_for_commands: bool:
@@ -54,7 +55,7 @@ func load_slot(slot: int) -> Dictionary:
 		return {"ok":false,"error":_battle.scene.saver.last_load_error}
 	if not cross_map:
 		for unit in _battle.state.units:
-			if int(unit.uid) in selection: _battle.state.selected.append(unit)
+			if int(unit.uid) in selection: CommandState.add_selection(_battle.state, unit)
 	return {"ok":true,"cross_map":cross_map,"source":_battle.scene.saver.last_load_source}
 
 static func pause(owner: Node, reason: String) -> int:

@@ -33,7 +33,7 @@
     },
     "route_failures": {
       "group": "scalar",
-      "owner": "commands",
+      "owner": "movement",
       "current_writers": [],
       "readers": [
         "*"
@@ -46,7 +46,7 @@
     },
     "blocked_n": {
       "group": "scalar",
-      "owner": "commands",
+      "owner": "movement",
       "current_writers": [],
       "readers": [
         "*"
@@ -59,7 +59,7 @@
     },
     "blocked_cursor": {
       "group": "scalar",
-      "owner": "commands",
+      "owner": "movement",
       "current_writers": [],
       "readers": [
         "*"
@@ -94,7 +94,10 @@
       "derived": true,
       "derived_by": "navigation",
       "lifecycle": "unit_occupancy",
-      "backing_store": "unit.A"
+      "backing_store": "unit.A",
+      "restore_sites": [
+        "app/saves/save_service.gd::_apply_unit_record"
+      ]
     },
     "B": {
       "group": "cell_cache",
@@ -107,7 +110,10 @@
       "derived": true,
       "derived_by": "navigation",
       "lifecycle": "unit_occupancy",
-      "backing_store": "unit.B"
+      "backing_store": "unit.B",
+      "restore_sites": [
+        "app/saves/save_service.gd::_apply_unit_record"
+      ]
     },
     "maxhp": {
       "group": "scalar",
@@ -120,7 +126,10 @@
       "derived": false,
       "derived_by": null,
       "lifecycle": "unit_lifecycle",
-      "backing_store": "unit.maxhp"
+      "backing_store": "unit.maxhp",
+      "restore_sites": [
+        "app/saves/snapshot_restorer.gd::_restore_scalars"
+      ]
     },
     "base_maxhp": {
       "group": "scalar",
@@ -185,7 +194,11 @@
       "derived": false,
       "derived_by": null,
       "lifecycle": "unit_movement",
-      "backing_store": "unit.pi"
+      "backing_store": "unit.pi",
+      "restore_sites": [
+        "app/saves/save_service.gd::_apply_unit_record",
+        "app/saves/unit_relations.gd::restore"
+      ]
     },
     "anim": {
       "group": "scalar",
@@ -302,7 +315,10 @@
       "derived": false,
       "derived_by": null,
       "lifecycle": "unit_officers",
-      "backing_store": "unit.officer_might"
+      "backing_store": "unit.officer_might",
+      "restore_sites": [
+        "app/saves/save_service.gd::_apply_unit_record"
+      ]
     },
     "officer_intellect": {
       "group": "scalar",
@@ -315,7 +331,10 @@
       "derived": false,
       "derived_by": null,
       "lifecycle": "unit_officers",
-      "backing_store": "unit.officer_intellect"
+      "backing_store": "unit.officer_intellect",
+      "restore_sites": [
+        "app/saves/save_service.gd::_apply_unit_record"
+      ]
     },
     "group_officer": {
       "group": "scalar",
@@ -542,7 +561,7 @@
     },
     "rest_t": {
       "group": "elapsed",
-      "owner": "commands",
+      "owner": "units",
       "current_writers": [],
       "readers": [
         "*"
@@ -555,7 +574,7 @@
     },
     "build_t": {
       "group": "elapsed",
-      "owner": "commands",
+      "owner": "construction",
       "current_writers": [],
       "readers": [
         "*"
@@ -568,7 +587,7 @@
     },
     "action_wait": {
       "group": "action",
-      "owner": "commands",
+      "owner": "movement",
       "current_writers": [],
       "readers": [
         "*"
@@ -581,7 +600,7 @@
     },
     "action_phase": {
       "group": "action",
-      "owner": "commands",
+      "owner": "movement",
       "current_writers": [],
       "readers": [
         "*"
@@ -594,7 +613,7 @@
     },
     "action_started": {
       "group": "action",
-      "owner": "commands",
+      "owner": "movement",
       "current_writers": [],
       "readers": [
         "*"
@@ -607,7 +626,7 @@
     },
     "action_kind": {
       "group": "action",
-      "owner": "commands",
+      "owner": "movement",
       "current_writers": [],
       "readers": [
         "*"
@@ -620,7 +639,7 @@
     },
     "action_target_uid": {
       "group": "action",
-      "owner": "commands",
+      "owner": "movement",
       "current_writers": [],
       "readers": [
         "*"
@@ -655,7 +674,11 @@
       "derived": false,
       "derived_by": null,
       "lifecycle": "unit_economy",
-      "backing_store": "unit.stock"
+      "backing_store": "unit.stock",
+      "restore_sites": [
+        "app/saves/snapshot_restorer.gd::restore"
+      ],
+      "initializer": "simulation/units/entity_factory.gd::_make_unit"
     },
     "stock_max": {
       "group": "scalar",
@@ -668,11 +691,12 @@
       "derived": false,
       "derived_by": null,
       "lifecycle": "unit_economy",
-      "backing_store": "unit.stock_max"
+      "backing_store": "unit.stock_max",
+      "initializer": "simulation/units/entity_factory.gd::_make_unit"
     },
     "attached": {
       "group": "scalar",
-      "owner": "construction",
+      "owner": "transport",
       "current_writers": [],
       "readers": [
         "*"
@@ -685,7 +709,7 @@
     },
     "join_target_uid": {
       "group": "scalar",
-      "owner": "construction",
+      "owner": "officers",
       "current_writers": [],
       "readers": [
         "*"
@@ -694,7 +718,10 @@
       "derived": false,
       "derived_by": null,
       "lifecycle": "unit_construction",
-      "backing_store": "unit.join_target_uid"
+      "backing_store": "unit.join_target_uid",
+      "restore_sites": [
+        "app/saves/snapshot_restorer.gd::_restore_units"
+      ]
     },
     "aboard_uid": {
       "group": "scalar",
@@ -711,7 +738,7 @@
     },
     "carry_n": {
       "group": "scalar",
-      "owner": "economy",
+      "owner": "transport",
       "current_writers": [],
       "readers": [
         "*"
@@ -724,7 +751,7 @@
     },
     "carry_hp": {
       "group": "scalar",
-      "owner": "economy",
+      "owner": "transport",
       "current_writers": [],
       "readers": [
         "*"
@@ -993,7 +1020,10 @@
       "derived": false,
       "derived_by": null,
       "lifecycle": "unit_lifecycle",
-      "backing_store": "unit.uid"
+      "backing_store": "unit.uid",
+      "restore_sites": [
+        "app/saves/snapshot_restorer.gd::_restore_units"
+      ]
     },
     "alive": {
       "group": "record",
@@ -1006,11 +1036,14 @@
       "derived": false,
       "derived_by": null,
       "lifecycle": "unit_lifecycle",
-      "backing_store": "unit.alive"
+      "backing_store": "unit.alive",
+      "restore_sites": [
+        "app/saves/save_service.gd::_apply_unit_record"
+      ]
     },
     "ax": {
       "group": "record",
-      "owner": "units",
+      "owner": "navigation",
       "current_writers": [],
       "readers": [
         "*"
@@ -1019,11 +1052,14 @@
       "derived": false,
       "derived_by": null,
       "lifecycle": "unit_lifecycle",
-      "backing_store": "unit.ax"
+      "backing_store": "unit.ax",
+      "restore_sites": [
+        "app/saves/save_service.gd::_apply_unit_record"
+      ]
     },
     "ay": {
       "group": "record",
-      "owner": "units",
+      "owner": "navigation",
       "current_writers": [],
       "readers": [
         "*"
@@ -1032,7 +1068,10 @@
       "derived": false,
       "derived_by": null,
       "lifecycle": "unit_lifecycle",
-      "backing_store": "unit.ay"
+      "backing_store": "unit.ay",
+      "restore_sites": [
+        "app/saves/save_service.gd::_apply_unit_record"
+      ]
     },
     "hp": {
       "group": "record",
@@ -1045,7 +1084,10 @@
       "derived": false,
       "derived_by": null,
       "lifecycle": "unit_lifecycle",
-      "backing_store": "unit.hp"
+      "backing_store": "unit.hp",
+      "restore_sites": [
+        "app/saves/save_service.gd::_apply_unit_record"
+      ]
     },
     "owner": {
       "group": "record",
@@ -1097,7 +1139,10 @@
       "derived": false,
       "derived_by": null,
       "lifecycle": "unit_lifecycle",
-      "backing_store": "unit.map_object"
+      "backing_store": "unit.map_object",
+      "restore_sites": [
+        "app/saves/snapshot_restorer.gd::_restore_units"
+      ]
     },
     "map_index": {
       "group": "record",
@@ -1110,7 +1155,10 @@
       "derived": false,
       "derived_by": null,
       "lifecycle": "unit_lifecycle",
-      "backing_store": "unit.map_index"
+      "backing_store": "unit.map_index",
+      "restore_sites": [
+        "app/saves/snapshot_restorer.gd::_restore_units"
+      ]
     },
     "die_t": {
       "group": "record",
@@ -1123,7 +1171,10 @@
       "derived": false,
       "derived_by": null,
       "lifecycle": "unit_lifecycle",
-      "backing_store": "unit.die_t"
+      "backing_store": "unit.die_t",
+      "restore_sites": [
+        "app/saves/save_service.gd::_apply_unit_record"
+      ]
     },
     "state": {
       "group": "record",
@@ -1149,7 +1200,10 @@
       "derived": false,
       "derived_by": null,
       "lifecycle": "unit_officers",
-      "backing_store": "unit.officer"
+      "backing_store": "unit.officer",
+      "restore_sites": [
+        "app/saves/save_service.gd::_apply_unit_record"
+      ]
     },
     "target": {
       "group": "relation",
@@ -1162,11 +1216,14 @@
       "derived": false,
       "derived_by": null,
       "lifecycle": "unit_combat",
-      "backing_store": "unit.target"
+      "backing_store": "unit.target",
+      "restore_sites": [
+        "app/saves/save_service.gd::_apply_unit_record"
+      ]
     },
     "build_target": {
       "group": "relation",
-      "owner": "commands",
+      "owner": "construction",
       "current_writers": [],
       "readers": [
         "*"
@@ -1238,7 +1295,7 @@
     },
     "repath_to": {
       "group": "relation",
-      "owner": "commands",
+      "owner": "movement",
       "current_writers": [],
       "readers": [
         "*"

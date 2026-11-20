@@ -1,4 +1,6 @@
 extends RefCounted
+const IndexState = preload("res://simulation/navigation/index_state.gd")
+const CommandState = preload("res://simulation/commands/command_state.gd")
 ## Per-unit lifecycle and idle-state actions. Tick coordination lives in world/unit_tick_coordinator.gd.
 const Balance = preload("res://simulation/definitions/balance_rules.gd")
 
@@ -25,9 +27,54 @@ static func remove_at(battle: Object, i: int, nav: Object, spatial_index: Object
 		nav.occupy(u.occupied_cells, -1)
 	spatial_index._index_forget(u)
 	spatial_index._target_forget(u)
-	battle._foot_cache.erase(int(u.get("uid", -1)))
+	IndexState.erase_from_foot_cache(battle, int(u.get("uid", -1)))
 	if effects != null:
 		effects.visual("free_unit", [u])
-	battle.selected.erase(u)
+	CommandState.forget_selection(battle, u)
 	battle.units.remove_at(i)
-	battle._index_units_size = battle.units.size()
+	IndexState.set_index_units_size(battle, battle.units.size())
+
+static func set_hp(unit: Dictionary, value: Variant) -> void:
+	unit.hp = value
+
+static func set_formation(unit: Dictionary, value: Variant) -> void:
+	unit.formation = value
+
+static func set_fo_x(unit: Dictionary, value: Variant) -> void:
+	unit.fo_x = value
+
+static func set_fo_y(unit: Dictionary, value: Variant) -> void:
+	unit.fo_y = value
+
+static func subtract_from_hp(unit: Dictionary, value: Variant) -> void:
+	unit.hp -= value
+
+static func set_die_t(unit: Dictionary, value: Variant) -> void:
+	unit.die_t = value
+
+static func add_to_die_t(unit: Dictionary, value: Variant) -> void:
+	unit.die_t += value
+
+static func set_rest_t(unit: Dictionary, value: Variant) -> void:
+	unit.rest_t = value
+
+static func append_to_units(battle: Object, value: Variant) -> void:
+	battle.units.append(value)
+
+static func set_base_maxhp(unit: Dictionary, value: Variant) -> void:
+	unit.base_maxhp = value
+
+static func set_maxhp(unit: Dictionary, value: Variant) -> void:
+	unit.maxhp = value
+
+static func set_alive(unit: Dictionary, value: Variant) -> void:
+	unit.alive = value
+
+static func set_mou(unit: Dictionary, value: Variant) -> void:
+	unit.mou = value
+
+static func set_event_experience(unit: Dictionary, value: Variant) -> void:
+	unit.event_experience = value
+
+static func set_map_index(unit: Dictionary, value: Variant) -> void:
+	unit.map_index = value

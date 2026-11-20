@@ -1,4 +1,5 @@
 extends RefCounted
+const UnitMotion = preload("res://simulation/movement/unit_motion.gd")
 const UnitPath = preload("res://simulation/movement/unit_path.gd")
 const Combat = preload("res://simulation/definitions/combat_rules.gd")
 ## Local encounters are independent of the strategic AI's campaign assault gate.
@@ -30,5 +31,5 @@ static func engage(u: Dictionary, enemy: Dictionary) -> void:
 	u.target = enemy
 	u.state = "attack"
 	UnitPath.set_points(u, [])
-	u.pi = 0
-	u.repath = 0.0
+	UnitPath.reset_cursor(u)
+	UnitMotion.set_repath(u, 0.0)
