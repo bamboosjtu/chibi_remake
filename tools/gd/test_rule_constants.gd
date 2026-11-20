@@ -1,6 +1,6 @@
 extends SceneTree
 const Catalog = preload("res://simulation/definitions/rule_catalog.gd")
-const Contract = preload("res://simulation/definitions/rule_contract.gd")
+const Contract = preload("res://simulation/definitions/contracts/rule_contract.gd")
 const Roles = preload("res://simulation/definitions/unit_roles.gd")
 const Balance = preload("res://simulation/definitions/balance_rules.gd")
 const Technology = preload("res://simulation/definitions/technology_rules.gd")

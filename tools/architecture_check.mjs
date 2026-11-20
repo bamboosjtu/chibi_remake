@@ -64,7 +64,7 @@ for (const file of files(root)) {
   if(/^app\/battle\/(?:bootstrap|scene_controller|cheat_controller|duel_controller)\.gd$/.test(relative) && /func _init\(\s*data\s*:/.test(code)) fail(`${relative}: application controllers must bind the live scene, not ignore an injected state`);
   if((relative === 'app/save_service.gd' || relative === 'app/game.gd') && /\.transports\.reconcile\(/.test(code)) fail(`${relative}: save serialization must project transport values without mutating the world`);
   if(relative === 'app/campaign_session.gd' && /\b(?:FileAccess|DirAccess)\b/.test(executable)) fail(`${relative}: campaign queries must use the cached level catalog`);
-  if (relative !== 'simulation/battle_world.gd' && /\bworld\.(?:_modules|_access)\b|\bworld\.(?:get|set)\(\s*['"]_(?:modules|access)['"]/.test(code)) fail(`${relative}: accesses private BattleWorld collections`);
+  if (relative !== 'simulation/world/battle_world.gd' && /\bworld\.(?:_modules|_access)\b|\bworld\.(?:get|set)\(\s*['"]_(?:modules|access)['"]/.test(code)) fail(`${relative}: accesses private BattleWorld collections`);
   if (['presentation/battle/components/camera_controller.gd','presentation/battle/build_preview.gd','presentation/battle/battle_resources.gd'].includes(relative) && /\bhost\.(?:units|selected|map_data|nav|decor_cells)\b|\bhost(?:\.(?:get|get\.bind)\(\s*|\[\s*)['"](?:units|selected|map_data|nav|decor_cells)['"]/.test(code)) fail(`${relative}: bypasses value read model`);
   if (relative === 'app/read_models/battle_queries.gd' && /\b(?:_?data|state)\.(?:units|selected|map_data|decor_cells)\.duplicate\(\s*true\s*\)/.test(code)) fail(`${relative}: deep-copies world data at the read boundary`);
   const budget = limits.files[relative] ?? 600;
@@ -72,7 +72,7 @@ for (const file of files(root)) {
   if (relative.startsWith('simulation/')) {
     if (/\b(?:FileAccess|DirAccess|ResourceLoader|GDExtensionManager|load)\b|\bJSON\s*\.\s*(?:new|parse\w*)\b|\bOS\s*\.\s*(?:execute|execute_with_pipe|create_process)\b/.test(executable)) fail(`${relative}: simulation performs runtime I/O or JSON parsing; load validated rules at startup`);
     const clocks=[...executable.matchAll(/\bTime\b/g)];
-    if(clocks.length && !(relative === 'simulation/definitions/profile_clock.gd' && clocks.length === 1 && /^\s*return Time\.get_ticks_usec\(\) if enabled else 0\s*$/m.test(executable))) fail(`${relative}: wall-clock sampling must use opt-in ProfileClock`);
+    if(clocks.length && !(relative === 'simulation/core/profile_clock.gd' && clocks.length === 1 && /^\s*return Time\.get_ticks_usec\(\) if enabled else 0\s*$/m.test(executable))) fail(`${relative}: wall-clock sampling must use opt-in ProfileClock`);
     for(const call of executable.matchAll(/\bProfileClock\s*\.\s*now\s*\(([^)]*)\)/g)){
       if(!['profile_enabled','profile_enabled or timing_enabled'].includes(call[1].trim().replace(/\s+/g,' '))) fail(`${relative}: profiling clock requires an explicit opt-in flag`);
     }

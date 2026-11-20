@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "source": "godot/chibi_remake/simulation/definitions/unit_schema.gd",
+  "source": "godot/chibi_remake/simulation/units/unit_schema.gd",
   "fieldCount": 117,
   "fields": {
     "gate_open": {

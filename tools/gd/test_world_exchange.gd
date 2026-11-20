@@ -1,5 +1,5 @@
 extends SceneTree
-const Digest = preload("res://simulation/systems/state_digest.gd")
+const Digest = preload("res://simulation/diagnostics/state_digest.gd")
 var Transaction: Script
 var done := false
 func _initialize() -> void:

@@ -1,6 +1,6 @@
 extends Object
 ## research/meta: exact lowercase character matcher and battle-only hotkeys.
-const State = preload("res://simulation/battle_state.gd")
+const State = preload("res://simulation/state/battle_state.gd")
 const Services = preload("res://app/battle_scene_state.gd")
 const Console = preload("res://presentation/hud/cheat_console.gd")
 const CHEAT_ACTIONS := {KEY_F2:"auto", KEY_F3:"demote", KEY_F4:"promote", KEY_F5:"ui",

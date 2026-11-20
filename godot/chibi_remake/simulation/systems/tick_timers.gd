@@ -2,7 +2,7 @@ extends RefCounted
 ## Persisted durations are integer logic ticks.
 ## Fire fields own their separate global effect clock.
 static var STATUS_DURATION: int = int(Schema.FIELDS.inspired_t.max)
-const Schema = preload("res://simulation/definitions/unit_schema.gd")
+const Schema = preload("res://simulation/units/unit_schema.gd")
 static var STATUS_KEYS: Array = Schema.fields("status")
 static var ELAPSED_KEYS: Array = Schema.fields("elapsed")
 

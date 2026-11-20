@@ -1,6 +1,6 @@
 extends Object
 ## duel controller: composed battle behavior.
-const State = preload("res://simulation/battle_state.gd")
+const State = preload("res://simulation/state/battle_state.gd")
 var battle: State:
 	get: return node.state
 

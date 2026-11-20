@@ -29,7 +29,7 @@ func run() -> void:
 	var next:int=b.simulation_rng.randi()
 	assert(b.saver.apply_snapshot(game.load_save()))
 	assert(b.simulation_rng.randi()==next)
-	var digest=preload("res://simulation/systems/state_digest.gd")
+	var digest=preload("res://simulation/diagnostics/state_digest.gd")
 	var before:Dictionary=digest.sections(b, game);b.gold+=1
 	var after:Dictionary=digest.sections(b, game)
 	assert(before.world==after.world and before.economy!=after.economy and before.total!=after.total)

@@ -2,8 +2,8 @@ extends Object
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
 ## spatial index: composed battle behavior.
-const State = preload("res://simulation/battle_state.gd")
-const Config = preload("res://simulation/battle_config.gd")
+const State = preload("res://simulation/state/battle_state.gd")
+const Config = preload("res://simulation/definitions/battle_config.gd")
 var battle: State
 var _dep_abilities: Object
 var _dep_battle_simulation: Object

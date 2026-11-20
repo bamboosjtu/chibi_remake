@@ -1,13 +1,13 @@
 extends Object
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
-const EffectsRuntime = preload("res://simulation/battle_effects.gd")
+const EffectsRuntime = preload("res://simulation/ports/battle_events.gd")
 var _effects: EffectsRuntime
 const Balance = preload("res://simulation/definitions/balance_rules.gd")
 const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## entity factory: composed battle behavior.
-const State = preload("res://simulation/battle_state.gd")
-const Config = preload("res://simulation/battle_config.gd")
+const State = preload("res://simulation/state/battle_state.gd")
+const Config = preload("res://simulation/definitions/battle_config.gd")
 var battle: State
 var _dep_battle_simulation: Object
 var _dep_command_groups: Object
@@ -30,7 +30,7 @@ func _make_unit(ob: Dictionary, is_map_object: bool) -> Dictionary:
 	var tail_v := 0
 	for i in range(ob.tail.size()):
 		tail_v += int(ob.tail[i]) << (8 * i)
-	var building: bool = preload("res://simulation/definitions/unit_schema.gd").is_building_type(int(ob.unit))
+	var building: bool = preload("res://simulation/units/unit_schema.gd").is_building_type(int(ob.unit))
 	# 注意：JSON 里的数字是 float，str(32.0) 与 JSON 的键 "32" 不一定相等；
 	# 必须 str(int(...)) 才能命中（此前 v6 的属性没生效就是这个原因）。
 	var meta: Dictionary = battle.map_data.units.get(str(int(ob.unit)), {})

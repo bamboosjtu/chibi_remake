@@ -1,10 +1,10 @@
 extends Object
 var _rules: RefCounted
-const EffectsRuntime = preload("res://simulation/battle_effects.gd")
+const EffectsRuntime = preload("res://simulation/ports/battle_events.gd")
 var _effects: EffectsRuntime
 ## campaign: composed battle behavior.
-const State = preload("res://simulation/battle_state.gd")
-const Config = preload("res://simulation/battle_config.gd")
+const State = preload("res://simulation/state/battle_state.gd")
+const Config = preload("res://simulation/definitions/battle_config.gd")
 var battle: State
 
 func _init(data: State) -> void:

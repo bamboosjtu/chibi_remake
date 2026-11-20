@@ -1,7 +1,7 @@
 extends RefCounted
 ## 攻击/修理共用整数节拍。动作相位只在等待结束后逐tick推进。
 const Kernel=preload("res://simulation/native/math_kernel.gd")
-const Schema = preload("res://simulation/definitions/unit_schema.gd")
+const Schema = preload("res://simulation/units/unit_schema.gd")
 static var FIELDS: Array = Schema.fields("action")
 
 static func reset(unit: Dictionary) -> void:

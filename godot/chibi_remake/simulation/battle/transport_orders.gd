@@ -2,12 +2,12 @@ extends Object
 var _transports: RefCounted
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
-const EffectsRuntime = preload("res://simulation/battle_effects.gd")
+const EffectsRuntime = preload("res://simulation/ports/battle_events.gd")
 var _effects: EffectsRuntime
 const Balance = preload("res://simulation/definitions/balance_rules.gd")
 const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## transport orders: composed battle behavior.
-const State = preload("res://simulation/battle_state.gd")
+const State = preload("res://simulation/state/battle_state.gd")
 var battle: State
 var _dep_abilities: Object
 var _dep_battle_simulation: Object

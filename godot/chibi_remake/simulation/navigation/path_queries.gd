@@ -2,7 +2,7 @@ extends RefCounted
 ## path queries.
 const GridState = preload("res://simulation/navigation/navigation_state.gd")
 var _grid_state: GridState
-const ProfileClock = preload("res://simulation/definitions/profile_clock.gd")
+const ProfileClock = preload("res://simulation/core/profile_clock.gd")
 var profile_enabled := false
 var _dep_grid: RefCounted
 const GridRay = preload("res://simulation/navigation/grid_ray.gd")

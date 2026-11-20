@@ -1,6 +1,6 @@
 extends SceneTree
 const Balance = preload("res://simulation/definitions/balance_rules.gd")
-const Contract = preload("res://simulation/definitions/constant_contract.gd")
+const Contract = preload("res://simulation/definitions/contracts/constant_contract.gd")
 const Identity = preload("res://app/saves/rules_identity.gd")
 var done := false
 

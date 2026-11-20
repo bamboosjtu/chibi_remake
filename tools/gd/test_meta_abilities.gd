@@ -1,5 +1,5 @@
 extends SceneTree
-const Config = preload("res://simulation/battle_config.gd")
+const Config = preload("res://simulation/definitions/battle_config.gd")
 var b: Node2D
 var game: Node
 var officer: Dictionary

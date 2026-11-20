@@ -23,7 +23,7 @@ if(args.includes('--runtime-log')){
 // calls these fields directly, so member resolution is possible without a
 // second manually maintained list of methods.
 const rootFiles = {
- main: ['simulation/battle_world.gd', 'main.gd'],
+ main: ['simulation/world/battle_world.gd', 'main.gd'],
  menu: ['menu.gd'],
  view: ['presentation/battle/battle_view.gd'],
  nav: ['simulation/navigation/nav.gd'],
@@ -47,7 +47,7 @@ for (const [name, files] of Object.entries(rootFiles)) {
   }
  }
 }
-for(const file of ['simulation/battle_state.gd','app/battle_scene_state.gd','presentation/menu/menu_state.gd','presentation/battle/components/battle_view_state.gd','simulation/navigation/navigation_state.gd','simulation/systems/ai_state.gd']){
+for(const file of ['simulation/state/battle_state.gd','app/battle_scene_state.gd','presentation/menu/menu_state.gd','presentation/battle/components/battle_view_state.gd','simulation/navigation/navigation_state.gd','simulation/systems/ai_state.gd']){
  const source=read(file),declared=JSON.parse(source.match(/^const PROXY_FIELDS := (.+)$/m)?.[1]??'null');
  assert.deepEqual(declared,[...source.matchAll(/^var (\w+)/gm)].map(m=>m[1]),file+': explicit property surface is stale');
 }

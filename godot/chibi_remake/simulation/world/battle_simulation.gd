@@ -7,7 +7,7 @@ var _player_commands: RefCounted
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
 var _fire_fields: RefCounted
-const EffectsRuntime = preload("res://simulation/battle_effects.gd")
+const EffectsRuntime = preload("res://simulation/ports/battle_events.gd")
 var _effects: EffectsRuntime
 const ClockRuntime = preload("res://simulation/systems/battle_clock.gd")
 var _clock: ClockRuntime
@@ -15,8 +15,8 @@ const AutomaticGatesRuntime = preload("res://simulation/navigation/automatic_gat
 var _automatic_gates: AutomaticGatesRuntime
 var _ai: RefCounted
 ## battle simulation: composed battle behavior.
-const State = preload("res://simulation/battle_state.gd")
-const ProfileClock = preload("res://simulation/definitions/profile_clock.gd")
+const State = preload("res://simulation/state/battle_state.gd")
+const ProfileClock = preload("res://simulation/core/profile_clock.gd")
 var battle: State
 var _dep_campaign: Object
 var _dep_cheat_rules: Object

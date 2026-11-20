@@ -23,7 +23,7 @@ static func apply_definitions(map_data: Dictionary) -> bool:
 	return true
 
 static func valid_catalog(data, canonical := false) -> bool:
-	return preload("res://simulation/definitions/rule_contract.gd").valid_units(data, canonical)
+	return preload("res://simulation/definitions/contracts/rule_contract.gd").valid_units(data, canonical)
 
 static func can_build(unit: Dictionary) -> bool:
 	return int(unit.get("unit",-1))==30

@@ -3,8 +3,8 @@ var view_microseconds := 0
 var hud_microseconds := 0
 var interpolation_microseconds := 0
 ## scene controller: composed battle behavior.
-const State = preload("res://simulation/battle_state.gd")
-const Config = preload("res://simulation/battle_config.gd")
+const State = preload("res://simulation/state/battle_state.gd")
+const Config = preload("res://simulation/definitions/battle_config.gd")
 var battle: State:
 	get: return node.state
 var _dep_battle_simulation: Object
@@ -249,7 +249,7 @@ func _process(delta: float) -> void:
 		print("SIMTEST: %.1fs tick=%d digest=%d" % [battle.simtest_seconds, battle.sim_tick, _dep_battle_simulation._state_digest()])
 		# The digest module stays free of the scene tree; the app layer supplies
 		# the hasher it needs.
-		print("SIMULATION DIGESTS: ", JSON.stringify(preload("res://simulation/systems/state_digest.gd").sections(node, node.get_node("/root/Game"))))
+		print("SIMULATION DIGESTS: ", JSON.stringify(preload("res://simulation/diagnostics/state_digest.gd").sections(node, node.get_node("/root/Game"))))
 		print("SIMULATION FULL DIGEST: ", Game.save_checksum(scene.saver.continuation_snapshot(Game)))
 		node.get_tree().quit()
 		return

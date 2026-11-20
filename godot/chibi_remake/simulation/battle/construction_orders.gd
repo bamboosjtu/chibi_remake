@@ -1,14 +1,14 @@
 extends Object
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
-const EffectsRuntime = preload("res://simulation/battle_effects.gd")
+const EffectsRuntime = preload("res://simulation/ports/battle_events.gd")
 var _effects: EffectsRuntime
 var _economy: RefCounted
 var _construction: RefCounted
 const Balance = preload("res://simulation/definitions/balance_rules.gd")
 ## construction orders: composed battle behavior.
-const State = preload("res://simulation/battle_state.gd")
-const Config = preload("res://simulation/battle_config.gd")
+const State = preload("res://simulation/state/battle_state.gd")
+const Config = preload("res://simulation/definitions/battle_config.gd")
 var battle: State
 var _dep_ai_economy: Object
 var _dep_battle_simulation: Object

@@ -10,8 +10,8 @@ try{
   write('simulation/test.gd','extends RefCounted\nfunc bad():\n\treturn '+expression+'\n');assert.notEqual(run().status,0,expression);
  }
  write('simulation/test.gd','extends RefCounted\n# FileAccess.open("ignored", 1)\nconst NOTE="JSON.parse_string and Time.get_ticks_usec() are forbidden"\nconst Valid=preload("res://simulation/helper.gd")\nfunc sample():\n\treturn ProfileClock.now(profile_enabled)\n');assert.equal(run().status,0);
- write('simulation/definitions/profile_clock.gd','extends RefCounted\nstatic func now(enabled):\n\treturn Time.get_ticks_usec()\n');assert.notEqual(run().status,0);
- write('simulation/definitions/profile_clock.gd','extends RefCounted\nstatic func now(enabled):\n\treturn Time.get_ticks_usec() if enabled else 0\n');assert.equal(run().status,0);
+ write('simulation/core/profile_clock.gd','extends RefCounted\nstatic func now(enabled):\n\treturn Time.get_ticks_usec()\n');assert.notEqual(run().status,0);
+ write('simulation/core/profile_clock.gd','extends RefCounted\nstatic func now(enabled):\n\treturn Time.get_ticks_usec() if enabled else 0\n');assert.equal(run().status,0);
  write('simulation/test.gd','extends RefCounted\n');
  write('presentation/test.gd',"extends RefCounted\nconst Bad=preload('res://simulation/test.gd')\n");
  write('simulation/test.gd',"extends 'res://simulation/systems/mutable.gd'\nconst Indirect=load('res://simulation/systems/mutable.gd')\n");

@@ -262,7 +262,7 @@
 |---|---|
 | 关卡导出 | `tools/godot_export.mjs` |
 | 关卡注册与校验 | `app/game.gd::is_level_doc`、`list_levels` |
-| 规则加载与校验 | `app/rules/rule_loader.gd`、`simulation/definitions/rule_contract.gd` |
+| 规则加载与校验 | `app/rules/rule_loader.gd`、`simulation/definitions/contracts/rule_contract.gd` |
 | 冻结目录 | `simulation/definitions/rule_catalog.gd` |
 | 类型与费用合并 | `app/battle/bootstrap.gd`（生产单位覆盖） |
 | 武将库 | `simulation/battle/officer_pool.gd` |

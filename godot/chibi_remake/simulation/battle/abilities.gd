@@ -3,13 +3,13 @@ const VisibilityRuntime = preload("res://simulation/systems/battle_visibility.gd
 var _visibility: VisibilityRuntime
 var _stratagems: RefCounted
 var _fire_fields: RefCounted
-const EffectsRuntime = preload("res://simulation/battle_effects.gd")
+const EffectsRuntime = preload("res://simulation/ports/battle_events.gd")
 var _effects: EffectsRuntime
 const Balance = preload("res://simulation/definitions/balance_rules.gd")
 const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## abilities: composed battle behavior.
-const State = preload("res://simulation/battle_state.gd")
-const Config = preload("res://simulation/battle_config.gd")
+const State = preload("res://simulation/state/battle_state.gd")
+const Config = preload("res://simulation/definitions/battle_config.gd")
 var battle: State
 var _dep_combat: Object
 var _dep_command_groups: Object

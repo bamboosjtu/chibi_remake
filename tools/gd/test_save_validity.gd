@@ -30,12 +30,12 @@ func run() -> void:
 	assert(not game.is_valid_save(invalid_path) and not game.can_rotate_save(invalid_path))
 	assert(not battle.saver.apply_snapshot(invalid_path), "Reject path coordinate types before restoration")
 	for invalid_reference in [{"repathTo":null},{"targetUid":"bad"},{"gatherRef":null}]:
-		assert(not preload("res://simulation/definitions/unit_schema.gd").valid_snapshot(invalid_reference))
+		assert(not preload("res://simulation/units/unit_schema.gd").valid_snapshot(invalid_reference))
 	var spent: Dictionary=good.units[0].simulation.duplicate(true)
 	spent.gatherRef={"kind":"spent","unit":24.0,"x":1,"y":2}
-	assert(preload("res://simulation/definitions/unit_schema.gd").valid_snapshot(spent), "JSON integer-valued floats must preserve spent sources")
+	assert(preload("res://simulation/units/unit_schema.gd").valid_snapshot(spent), "JSON integer-valued floats must preserve spent sources")
 	spent.gatherRef.unit=24.5
-	assert(not preload("res://simulation/definitions/unit_schema.gd").valid_snapshot(spent))
+	assert(not preload("res://simulation/units/unit_schema.gd").valid_snapshot(spent))
 	var path: String = game.SAVE_PATH.get_base_dir().path_join("validity.json")
 	var store = preload("res://app/json_store.gd")
 	assert(store.commit(path,JSON.stringify(good),game.is_valid_save,game.can_rotate_save))

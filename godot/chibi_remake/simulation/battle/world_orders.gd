@@ -2,11 +2,11 @@ extends Object
 var _player_commands: RefCounted
 const NavRuntime = preload("res://simulation/navigation/nav.gd")
 var _nav: NavRuntime
-const EffectsRuntime = preload("res://simulation/battle_effects.gd")
+const EffectsRuntime = preload("res://simulation/ports/battle_events.gd")
 var _effects: EffectsRuntime
 var _command_rules: RefCounted
 ## world orders: composed battle behavior.
-const State = preload("res://simulation/battle_state.gd")
+const State = preload("res://simulation/state/battle_state.gd")
 var battle: State
 var _dep_abilities: Object
 var _dep_command_groups: Object

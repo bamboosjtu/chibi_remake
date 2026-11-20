@@ -73,8 +73,8 @@ export function validateState(stateText, policyText, ownership) {
 function main() {
   const args = process.argv.slice(2);
   const arg = (name, fallback) => { const i = args.indexOf(name); return i >= 0 && i + 1 < args.length ? args[i + 1] : fallback; };
-  const statePath = arg('--state', 'godot/chibi_remake/simulation/battle_state.gd');
-  const policyPath = arg('--policy', 'godot/chibi_remake/simulation/battle_state_fields.gd');
+  const statePath = arg('--state', 'godot/chibi_remake/simulation/state/battle_state.gd');
+  const policyPath = arg('--policy', 'godot/chibi_remake/simulation/state/battle_state_fields.gd');
   const ownershipPath = arg('--ownership', 'tools/inputs/battle_state_ownership.json');
   for (const p of [statePath, policyPath, ownershipPath]) if (!fs.existsSync(p)) { console.error(`BATTLE STATE OWNERSHIP FAIL: missing ${p}`); process.exit(2); }
   const { errors, count } = validateState(

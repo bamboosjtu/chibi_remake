@@ -1,6 +1,6 @@
 extends RefCounted
 ## World-local derived values. Never retain source objects in the cache.
-const YIELDS = preload("res://simulation/battle_config.gd").RESOURCE_YIELD
+const YIELDS = preload("res://simulation/definitions/battle_config.gd").RESOURCE_YIELD
 const PATCH_LIMIT := 16
 const HIT_BUCKET := 64.0
 var _key: Array = []

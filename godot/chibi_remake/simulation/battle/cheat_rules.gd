@@ -5,7 +5,7 @@ var _stratagems: RefCounted
 var _player_commands: RefCounted
 const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## research/meta: confirmed state changes; no rendering or scene dependency.
-const State = preload("res://simulation/battle_state.gd")
+const State = preload("res://simulation/state/battle_state.gd")
 const AUTO_PERIOD := preload("res://simulation/systems/ai_config.gd").THINK_PERIOD
 var battle: State
 var _dep_abilities: Object

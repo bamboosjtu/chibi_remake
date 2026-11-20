@@ -1,12 +1,12 @@
 extends RefCounted
 ## Save-codec adapter over a scene-free domain graph.
-const SIM_DT = preload("res://simulation/battle_config.gd").SIM_DT
-var world := preload("res://simulation/battle_world.gd").new()
+const SIM_DT = preload("res://simulation/definitions/battle_config.gd").SIM_DT
+var world := preload("res://simulation/world/battle_world.gd").new()
 var state = world.state
 var saver: RefCounted
 
 func prepare(source: RefCounted, definition: Dictionary = {}) -> bool:
-	preload("res://simulation/battle_state_fields.gd").copy_inputs(source.state, state)
+	preload("res://simulation/state/battle_state_fields.gd").copy_inputs(source.state, state)
 	world.set_definition(definition if not definition.is_empty() else source.state.map_data)
 	state.map_data = world.definition.duplicate(true)
 	if not _connect(): return false

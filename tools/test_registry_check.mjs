@@ -5,7 +5,7 @@ const run=()=>spawnSync(process.execPath,['tools/registry_check.mjs','--root',fi
 try{copy('godot/chibi_remake');assert.equal(run().status,0);
  for(const [file,from,to] of [
   ['simulation/battle/unit_actions.gd','_dep_combat._fire_attack','_dep_combat.nonexistent'],
-  ['simulation/battle_state.gd','var units:', 'var unregistered_units:'],
+  ['simulation/state/battle_state.gd','var units:', 'var unregistered_units:'],
   ['menu.gd','preload("res://presentation/menu/controller.gd")','preload("res://missing.gd")'],
  ]) {
   const target=path.join(fixture,file), original=fs.readFileSync(target,'utf8');

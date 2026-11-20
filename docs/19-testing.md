@@ -140,7 +140,7 @@ powershell -NoProfile -File tools/ci_windows.ps1 -FullRegression
 | 职责 | 文件 |
 |---|---|
 | 自检 | `testing/battle_selftest.gd` |
-| 摘要 | `simulation/battle/battle_simulation.gd::_state_digest`、`simulation/systems/state_digest.gd` |
+| 摘要 | `simulation/world/battle_simulation.gd::_state_digest`、`simulation/diagnostics/state_digest.gd` |
 | 回归脚本 | `tools/gd/test_*.gd` |
 | 数据测试 | `tools/test_*.mjs` |
 | 发布测试清单 | `tools/inputs/release_tests.json` |

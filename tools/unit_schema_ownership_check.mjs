@@ -43,7 +43,7 @@ export function validateUnit(schemaText, ownership) {
 function main() {
   const args = process.argv.slice(2);
   const arg = (name, fallback) => { const i = args.indexOf(name); return i >= 0 && i + 1 < args.length ? args[i + 1] : fallback; };
-  const schemaPath = arg('--schema', 'godot/chibi_remake/simulation/definitions/unit_schema.gd');
+  const schemaPath = arg('--schema', 'godot/chibi_remake/simulation/units/unit_schema.gd');
   const ownershipPath = arg('--ownership', 'tools/inputs/unit_schema_ownership.json');
   for (const p of [schemaPath, ownershipPath]) if (!fs.existsSync(p)) { console.error(`UNIT OWNERSHIP FAIL: missing ${p}`); process.exit(2); }
   const { errors, count } = validateUnit(fs.readFileSync(schemaPath, 'utf8'), JSON.parse(fs.readFileSync(ownershipPath, 'utf8')));

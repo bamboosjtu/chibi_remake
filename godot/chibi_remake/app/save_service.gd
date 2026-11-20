@@ -1,14 +1,14 @@
 extends RefCounted
 ## Validate a current-format archive, then atomically install its candidate world.
 var host: Object
-const BattleState = preload("res://simulation/battle_state.gd")
+const BattleState = preload("res://simulation/state/battle_state.gd")
 var battle: BattleState:
 	get: return host.state
 var last_load_error := ""
 var last_load_source := "none"
 var _content_revision_cache := ""
 var _content_revision_world := 0
-const UnitSchema = preload("res://simulation/definitions/unit_schema.gd")
+const UnitSchema = preload("res://simulation/units/unit_schema.gd")
 func _init(h: Object) -> void:
 	host = h
 

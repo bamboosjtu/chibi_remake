@@ -1,6 +1,6 @@
 extends RefCounted
 ## Whole-world exchange. Old data/nodes remain owned until staging succeeds.
-const Fields = preload("res://simulation/battle_state_fields.gd")
+const Fields = preload("res://simulation/state/battle_state_fields.gd")
 static var force_view_failure := false
 static var force_view_failure_after_attach := false
 

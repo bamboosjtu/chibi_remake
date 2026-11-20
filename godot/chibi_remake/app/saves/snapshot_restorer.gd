@@ -1,7 +1,7 @@
 extends RefCounted
 ## Populate an isolated candidate. The live scene remains untouched on failure.
 var host: Object
-const BattleState = preload("res://simulation/battle_state.gd")
+const BattleState = preload("res://simulation/state/battle_state.gd")
 var battle: BattleState:
 	get: return host.state
 var _apply_unit_record: Callable
@@ -10,7 +10,7 @@ var _restore_trainings: Callable
 var _numeric_keys: Callable
 const ActionClock = preload("res://simulation/systems/action_clock.gd")
 const TickTimers = preload("res://simulation/systems/tick_timers.gd")
-const UnitSchema = preload("res://simulation/definitions/unit_schema.gd")
+const UnitSchema = preload("res://simulation/units/unit_schema.gd")
 const Relations = preload("res://app/saves/unit_relations.gd")
 const Envelope = preload("res://app/saves/save_envelope.gd")
 

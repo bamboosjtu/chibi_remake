@@ -11,7 +11,7 @@ func run() -> void:
 	var caster_uid: int = caster.uid
 	var enemy_uid: int = enemy.uid
 	execute_duel(battle, enemy)
-	var digest: Dictionary = preload("res://simulation/systems/state_digest.gd").sections(battle, game)
+	var digest: Dictionary = preload("res://simulation/diagnostics/state_digest.gd").sections(battle, game)
 	assert(paused and battle.view.event_view.active)
 	assert(game.save_game(battle.units,battle.world.economy.player_resources(),battle.scene_controller._save_extra(),3),"Raw save must contain settled damage")
 	var rng: int = battle.simulation_rng.state
@@ -29,7 +29,7 @@ func run() -> void:
 	silent.world.effects.duel_requested.disconnect(silent._on_duel)
 	execute_duel(silent, enemy_officer(silent))
 	assert(not paused and silent.simulation_rng.state == rng)
-	assert(preload("res://simulation/systems/state_digest.gd").sections(silent, game) == digest)
+	assert(preload("res://simulation/diagnostics/state_digest.gd").sections(silent, game) == digest)
 	silent.free()
 	print("DUEL SAVE PASS raw and session saves contain settled result / film completes once / restored HP and RNG")
 	quit()

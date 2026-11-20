@@ -1,5 +1,5 @@
 extends Object
-const EffectsRuntime = preload("res://simulation/battle_effects.gd")
+const EffectsRuntime = preload("res://simulation/ports/battle_events.gd")
 var _effects: EffectsRuntime
 var _economy: RefCounted
 const ClockRuntime = preload("res://simulation/systems/battle_clock.gd")
@@ -7,7 +7,7 @@ var _clock: ClockRuntime
 const Technology = preload("res://simulation/definitions/technology_rules.gd")
 const Roles = preload("res://simulation/definitions/unit_roles.gd")
 ## technology: composed battle behavior.
-const State = preload("res://simulation/battle_state.gd")
+const State = preload("res://simulation/state/battle_state.gd")
 var battle: State
 
 

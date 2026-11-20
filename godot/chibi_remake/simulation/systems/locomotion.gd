@@ -2,7 +2,7 @@ extends RefCounted
 ## research/movements: shared two-update gait clock, independent screen facing.
 ## These fields only choose poses. Path direction, travel and combat stay authoritative.
 const Kernel=preload("res://simulation/native/math_kernel.gd")
-const Schema = preload("res://simulation/definitions/unit_schema.gd")
+const Schema = preload("res://simulation/units/unit_schema.gd")
 static var FIELDS: Array = Schema.fields("locomotion")
 const STATIONARY_ACTIONS := ["attack","repair"]
 const FRAME_TICKS = preload("res://simulation/definitions/action_visual.gd").FRAME_TICKS

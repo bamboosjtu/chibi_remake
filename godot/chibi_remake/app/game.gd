@@ -55,7 +55,7 @@ var SAVE_PATH: String:
 const SAVE_VERSION = preload("res://app/saves/save_format.gd").VERSION
 const SAVE_SLOTS = Repository.SAVE_SLOTS
 const Store = preload("res://app/json_store.gd")
-const UnitSchema = preload("res://simulation/definitions/unit_schema.gd")
+const UnitSchema = preload("res://simulation/units/unit_schema.gd")
 const Relations = preload("res://app/saves/unit_relations.gd")
 const Envelope = preload("res://app/saves/save_envelope.gd")
 

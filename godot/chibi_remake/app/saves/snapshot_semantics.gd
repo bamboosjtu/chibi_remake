@@ -1,6 +1,6 @@
 extends RefCounted
 ## Current-format map and bounded-collection admission.
-const Schema = preload("res://simulation/definitions/unit_schema.gd")
+const Schema = preload("res://simulation/units/unit_schema.gd")
 const MAX_TASK_ENTRIES := 4096
 const MAX_TASK_NODES := 32768
 const MAX_TASK_DEPTH := 8

@@ -4,7 +4,7 @@
       "abilities": "simulation/battle/abilities.gd",
       "ai_economy": "simulation/battle/ai_economy.gd",
       "ai_orders": "simulation/battle/ai_orders.gd",
-      "battle_simulation": "simulation/battle/battle_simulation.gd",
+      "battle_simulation": "simulation/world/battle_simulation.gd",
       "campaign": "simulation/battle/campaign.gd",
       "cheat_rules": "simulation/battle/cheat_rules.gd",
       "combat": "simulation/battle/combat.gd",
@@ -41,7 +41,7 @@
       "visibility": "simulation/systems/battle_visibility.gd",
       "automatic_gates": "simulation/navigation/automatic_gates.gd",
       "clock": "simulation/systems/battle_clock.gd",
-      "effects": "simulation/battle_effects.gd"
+      "effects": "simulation/ports/battle_events.gd"
     },
     "view": {
       "controller": "presentation/battle/components/controller.gd",

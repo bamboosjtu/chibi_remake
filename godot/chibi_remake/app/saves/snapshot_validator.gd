@@ -2,7 +2,7 @@ extends RefCounted
 const Technology = preload("res://simulation/definitions/technology_rules.gd")
 ## Validate the complete snapshot before constructing or modifying any world.
 var host: Object
-const BattleState = preload("res://simulation/battle_state.gd")
+const BattleState = preload("res://simulation/state/battle_state.gd")
 var battle: BattleState:
 	get: return host.state
 var content_revision: Callable
@@ -63,7 +63,7 @@ func _index_units(arr: Array, simulation: Dictionary) -> Dictionary:
 	for rec in arr:
 		if not rec is Dictionary or not rec.get("simulation") is Dictionary:
 			return {}
-		if not preload("res://simulation/definitions/unit_schema.gd").valid_record(rec): return {}
+		if not preload("res://simulation/units/unit_schema.gd").valid_record(rec): return {}
 		if not Semantics.valid_unit(rec,battle.map_data): return {}
 		if not preload("res://app/saves/save_envelope.gd").integer(rec.get("uid")): return {}
 		var uid := int(rec.uid)
@@ -201,7 +201,7 @@ func _valid_unit_states(d: Dictionary, arr: Array, ids: Dictionary) -> bool:
 		if not rec2 is Dictionary:
 			return false
 		var st2: Dictionary = rec2.get("simulation", {})
-		if not preload("res://simulation/definitions/unit_schema.gd").valid_snapshot(st2): return false
+		if not preload("res://simulation/units/unit_schema.gd").valid_snapshot(st2): return false
 		if not TickTimers.valid_snapshot(st2) or not ActionClock.valid_snapshot(st2): return false
 		if not preload("res://simulation/systems/locomotion.gd").valid_snapshot(st2): return false
 		if not host.world.stratagems.valid_snapshot(st2):return false

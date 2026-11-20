@@ -13,7 +13,7 @@ func _ready() -> void:_initialize()
 ## rendering and terrain streaming. Run through tools/bench_full_battle.ps1 so
 ## the host can also record the process peak working set.
 
-const Config = preload("res://simulation/battle_config.gd")
+const Config = preload("res://simulation/definitions/battle_config.gd")
 const Roles = preload("res://simulation/definitions/unit_roles.gd")
 var script_kernel := false
 var capacity_stress := false

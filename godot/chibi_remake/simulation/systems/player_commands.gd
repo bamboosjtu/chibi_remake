@@ -1,12 +1,12 @@
 extends RefCounted
-const EffectsRuntime = preload("res://simulation/battle_effects.gd")
+const EffectsRuntime = preload("res://simulation/ports/battle_events.gd")
 var _effects: EffectsRuntime
 var _command_rules: RefCounted
 ## Command admission and application at the world's fixed tick boundary.
 signal commands_applied
 signal command_finished(command: Dictionary, result: String)
 const CAPACITY := 64
-const State = preload("res://simulation/battle_state.gd")
+const State = preload("res://simulation/state/battle_state.gd")
 const KINDS := ["move","attack","gather","continue_build","build","repair","train","research","cancel_research",
 	"watch","rest","stop","disband","assign_officer","assign_group","join","return_cargo","board","unload",
 	"formation","jimou","duel","cancel_site","cancel_train"]

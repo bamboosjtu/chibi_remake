@@ -37,7 +37,7 @@ func run() -> void:
 		var valid := original.duplicate(true); valid.gameEnd=ended; valid.erase("checksum")
 		valid.checksum=game.save_checksum(valid)
 		assert(game.is_valid_save(valid) and battle.saver.apply_snapshot(valid))
-	var schema = load("res://simulation/definitions/unit_schema.gd")
+	var schema = load("res://simulation/units/unit_schema.gd")
 	for state in schema.FIELDS.state.values:
 		assert(schema.valid_value("state",state))
 	var boarded: Dictionary=original.units[0].duplicate(true);boarded.unit=47.0;boarded.building=false;boarded.state="boarded"

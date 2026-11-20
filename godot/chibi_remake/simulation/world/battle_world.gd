@@ -19,21 +19,21 @@ var ai: RefCounted:
 		if ai_economy != null: ai_economy._ai = value
 		if battle_simulation != null: battle_simulation._ai = value
 		if production != null: production._ai = value
-var effects = preload("res://simulation/battle_effects.gd").new()
+var effects = preload("res://simulation/ports/battle_events.gd").new()
 var nav := Nav.new()                                # 拥有 AStarGrid2D 与瓦片尺寸（tile_w/tile_hw/tile_hh）
 var visibility = preload("res://simulation/systems/battle_visibility.gd").new()
 var automatic_gates = preload("res://simulation/navigation/automatic_gates.gd").new()
 var clock = preload("res://simulation/systems/battle_clock.gd").new()
 
 var definition: Dictionary = {}
-var state := preload("res://simulation/battle_state.gd").new()
+var state := preload("res://simulation/state/battle_state.gd").new()
 const AbilitiesService = preload("res://simulation/battle/abilities.gd")
 var abilities: AbilitiesService
 const AiEconomyService = preload("res://simulation/battle/ai_economy.gd")
 var ai_economy: AiEconomyService
 const AiOrdersService = preload("res://simulation/battle/ai_orders.gd")
 var ai_orders: AiOrdersService
-const BattleSimulationService = preload("res://simulation/battle/battle_simulation.gd")
+const BattleSimulationService = preload("res://simulation/world/battle_simulation.gd")
 var battle_simulation: BattleSimulationService
 const CampaignService = preload("res://simulation/battle/campaign.gd")
 var campaign: CampaignService

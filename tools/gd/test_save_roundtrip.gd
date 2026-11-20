@@ -1,7 +1,7 @@
 extends SceneTree
 ## Seeded sample points exercise actual save -> restore -> continuation with AI.
-const Fields = preload("res://simulation/battle_state_fields.gd")
-const Digest = preload("res://simulation/systems/state_digest.gd")
+const Fields = preload("res://simulation/state/battle_state_fields.gd")
+const Digest = preload("res://simulation/diagnostics/state_digest.gd")
 var done := false
 
 class UnregisteredState extends RefCounted:
@@ -26,7 +26,7 @@ func run() -> void:
 	for sample in range(6):
 		for tick in range(samples.randi_range(7, 57)): battle.world.battle_simulation._sim_step(battle.SIM_DT)
 		for unit in battle.units:
-			assert(preload("res://simulation/definitions/unit_schema.gd").omissions(unit).is_empty())
+			assert(preload("res://simulation/units/unit_schema.gd").omissions(unit).is_empty())
 		var before: Dictionary = Digest.sections(battle, game)
 		var combat: String = game.save_canonical_text(Digest.snapshot(battle).combat)
 		assert(battle.session_actions.save_game())

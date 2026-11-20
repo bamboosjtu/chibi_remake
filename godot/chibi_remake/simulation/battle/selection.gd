@@ -1,10 +1,10 @@
 extends Object
 const VisibilityRuntime = preload("res://simulation/systems/battle_visibility.gd")
 var _visibility: VisibilityRuntime
-const EffectsRuntime = preload("res://simulation/battle_effects.gd")
+const EffectsRuntime = preload("res://simulation/ports/battle_events.gd")
 var _effects: EffectsRuntime
 ## selection: composed battle behavior.
-const State = preload("res://simulation/battle_state.gd")
+const State = preload("res://simulation/state/battle_state.gd")
 var battle: State
 var _dep_harvest_orders: Object
 

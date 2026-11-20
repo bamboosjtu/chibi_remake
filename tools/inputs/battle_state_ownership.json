@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "source": "godot/chibi_remake/simulation/battle_state.gd",
+  "source": "godot/chibi_remake/simulation/state/battle_state.gd",
   "fieldCount": 69,
   "fields": {
     "geometry": {

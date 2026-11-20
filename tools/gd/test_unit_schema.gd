@@ -1,5 +1,5 @@
 extends SceneTree
-const Schema = preload("res://simulation/definitions/unit_schema.gd")
+const Schema = preload("res://simulation/units/unit_schema.gd")
 const Timers = preload("res://simulation/systems/tick_timers.gd")
 const Locomotion = preload("res://simulation/systems/locomotion.gd")
 const Clock = preload("res://simulation/systems/action_clock.gd")

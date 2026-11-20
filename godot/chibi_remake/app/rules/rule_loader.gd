@@ -1,6 +1,6 @@
 extends RefCounted
 ## The only JSON rule reader. Called before constructing any battle services.
-const Contract = preload("res://simulation/definitions/rule_contract.gd")
+const Contract = preload("res://simulation/definitions/contracts/rule_contract.gd")
 const Catalog = preload("res://simulation/definitions/rule_catalog.gd")
 static var _attempted := false
 static var _errors: Array = []

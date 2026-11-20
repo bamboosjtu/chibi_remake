@@ -1,7 +1,7 @@
 extends Object
 var _player_commands: RefCounted
 ## ai orders: composed battle behavior.
-const State = preload("res://simulation/battle_state.gd")
+const State = preload("res://simulation/state/battle_state.gd")
 const Targets = preload("res://simulation/systems/ai_targets.gd")
 var battle: State
 var _dep_ai_economy: Object

@@ -5,7 +5,7 @@ var _nav: NavRuntime
 var _economy: RefCounted
 var _ai: RefCounted
 ## ai economy: composed battle behavior.
-const State = preload("res://simulation/battle_state.gd")
+const State = preload("res://simulation/state/battle_state.gd")
 var battle: State
 var _dep_command_groups: Object
 var _dep_construction_orders: Object

@@ -1,7 +1,7 @@
 extends RefCounted
 ## File admission is independent of an installed map and any live world.
 const Format = preload("res://app/saves/save_format.gd")
-const Schema = preload("res://simulation/definitions/unit_schema.gd")
+const Schema = preload("res://simulation/units/unit_schema.gd")
 const Cost = preload("res://simulation/definitions/resource_cost.gd")
 const Semantics = preload("res://app/saves/snapshot_semantics.gd")
 const Relations = preload("res://app/saves/unit_relations.gd")

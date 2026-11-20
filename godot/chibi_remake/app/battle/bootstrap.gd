@@ -1,7 +1,7 @@
 extends Object
 ## bootstrap: composed battle behavior.
-const State = preload("res://simulation/battle_state.gd")
-const Config = preload("res://simulation/battle_config.gd")
+const State = preload("res://simulation/state/battle_state.gd")
+const Config = preload("res://simulation/definitions/battle_config.gd")
 var battle: State:
 	get: return node.state
 var _dep_campaign: Object

@@ -1,9 +1,9 @@
 extends RefCounted
 ## Validate consumed gameplay fields before any catalog becomes visible.
 const FILES := ["unit_definitions.json", "production_units.json", "buildings.json", "unit_tuning.json", "officers.json", "officer_progression.json", "command_variants.json", "scenario_rules.json", "native_math.json", "tech.json", "unit_roles.json", "balance.json"]
-const Constants = preload("res://simulation/definitions/constant_contract.gd")
-const Scenario = preload("res://simulation/definitions/scenario_contract.gd")
-const UnitSchema = preload("res://simulation/definitions/unit_schema.gd")
+const Constants = preload("res://simulation/definitions/contracts/constant_contract.gd")
+const Scenario = preload("res://simulation/scenario/scenario_contract.gd")
+const UnitSchema = preload("res://simulation/units/unit_schema.gd")
 const Status = preload("res://simulation/definitions/status_fields.gd")
 
 static func errors(documents: Dictionary) -> Array:

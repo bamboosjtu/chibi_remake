@@ -1,9 +1,9 @@
 extends RefCounted
 ## Map preparation is shared by the live bootstrap and scene-free save candidates.
-const World = preload("res://simulation/battle_world.gd")
-const State = preload("res://simulation/battle_state.gd")
+const World = preload("res://simulation/world/battle_world.gd")
+const State = preload("res://simulation/state/battle_state.gd")
 const Balance = preload("res://simulation/definitions/balance_rules.gd")
-const Config = preload("res://simulation/battle_config.gd")
+const Config = preload("res://simulation/definitions/battle_config.gd")
 const Campaign = preload("res://app/campaign_session.gd")
 var world: World
 var battle: State

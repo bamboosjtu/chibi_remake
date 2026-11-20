@@ -1,6 +1,6 @@
 extends RefCounted
 ## v9 relationship wire values come from the UnitSchema registry.
-const Schema = preload("res://simulation/definitions/unit_schema.gd")
+const Schema = preload("res://simulation/units/unit_schema.gd")
 static var _fields := Schema.fields("relation")
 
 static func encode(unit: Dictionary, by_uid: Dictionary) -> Dictionary:

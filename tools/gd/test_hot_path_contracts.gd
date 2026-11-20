@@ -1,6 +1,6 @@
 extends "test_contact_and_occupancy.gd"
 const Roster = preload("res://simulation/queries/construction_roster.gd")
-const Schema = preload("res://simulation/definitions/unit_schema.gd")
+const Schema = preload("res://simulation/units/unit_schema.gd")
 func run() -> void:
 	root.get_node("Game").current_map="chibic1"
 	var scene=load("res://main.tscn").instantiate();root.add_child(scene);scene.set_process(false)

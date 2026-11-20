@@ -1,6 +1,6 @@
 extends RefCounted
 ## One immutable, process-wide ruleset. Startup owns publication; worlds only read.
-const Contract = preload("res://simulation/definitions/rule_contract.gd")
+const Contract = preload("res://simulation/definitions/contracts/rule_contract.gd")
 const Frozen = preload("res://simulation/definitions/frozen_data.gd")
 static var _documents: Dictionary = {}
 

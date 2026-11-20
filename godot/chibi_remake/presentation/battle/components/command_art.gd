@@ -1,7 +1,7 @@
 extends Object
 ## command art: presentation component.
 const UIState = preload("res://presentation/battle/components/battle_view_state.gd")
-const Config = preload("res://simulation/battle_config.gd")
+const Config = preload("res://simulation/definitions/battle_config.gd")
 var _ui: UIState
 var surface: Node2D
 var _dep_command_actions: Object
@@ -10,9 +10,9 @@ var _dep_hud_build: Object
 var _dep_selection_info: Object
 const Textures = preload("res://presentation/battle/runtime_textures.gd")
 
-const CMD_HOT_NAMES = preload("res://simulation/battle_config.gd").JIMOU_NAMES
+const CMD_HOT_NAMES = preload("res://simulation/definitions/battle_config.gd").JIMOU_NAMES
 
-const CMD_FORM_NAMES = preload("res://simulation/battle_config.gd").FORM_NAMES
+const CMD_FORM_NAMES = preload("res://simulation/definitions/battle_config.gd").FORM_NAMES
 
 const CMD_PAGE := 6
 var _refresh_selection: Dictionary={}

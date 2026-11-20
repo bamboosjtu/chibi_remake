@@ -32,13 +32,13 @@
 
 | 模块 | 职责 |
 |---|---|
-| `simulation/battle_world.gd` | 无场景依赖的模拟组合根；统一创建规则、命令、AI 与领域服务，正常启动和候选共用地图初始化 |
+| `simulation/world/battle_world.gd` | 无场景依赖的模拟组合根；统一创建规则、命令、AI 与领域服务，正常启动和候选共用地图初始化 |
 | `app/battle_actions.gd`、`app/session_actions.gd`、`app/read_models/battle_queries.gd` | 提交玩家意图、办理会话操作、读取显示投影 |
-| `simulation/battle_state.gd` | 唯一可写战斗状态；普通 RefCounted，不继承场景 |
+| `simulation/state/battle_state.gd` | 唯一可写战斗状态；普通 RefCounted，不继承场景 |
 | `app/battle_scene_state.gd` | 场景拥有的表现节点和存档服务 |
 | `app/battle/bootstrap.gd` | 关卡装配、应用已冻结规则、开局与开发参数 |
 | `app/battle/scene_controller.gd` | 帧投递、输入、场景退出与表现协调 |
-| `simulation/battle/battle_simulation.gd` | 固定 tick 执行顺序、实体清理与摘要 |
+| `simulation/world/battle_simulation.gd` | 固定 tick 执行顺序、实体清理与摘要 |
 | `simulation/battle/` | 实体工厂、空间索引、交互路径、移动、战斗、建造、生产、武将、能力、命令、战役 |
 | `simulation/navigation/` | 导航状态、网格占格、路径查询与城门 |
 | `simulation/systems/ai.gd` | AI 调度、快照和稳定外部接口 |
@@ -49,7 +49,7 @@
 | `app/saves/` | 快照字段、完整校验、候选世界恢复与提交 |
 | `testing/` | 随候选包提供的自检套件；由原 `--selftest` 参数分派 |
 
-科技和武将使用组合服务；模拟状态由 `simulation/battle_state.gd` 持有，科技服务在 `simulation/battle/technology.gd`，不保留按旧资源路径命名的兼容脚本。场景同名方法仅保留仍有外部调用的转发。
+科技和武将使用组合服务；模拟状态由 `simulation/state/battle_state.gd` 持有，科技服务在 `simulation/battle/technology.gd`，不保留按旧资源路径命名的兼容脚本。场景同名方法仅保留仍有外部调用的转发。
 
 战场组合根持有具名服务，并在初始化时连接协作者。启动装配失败以退出码 1 终止，候选装配失败返回读档错误。
 
@@ -118,7 +118,7 @@ while sim_acc >= 速度周期 且 本帧步数 < 5:
 3. 在现有战场场景内暂存单位节点。跨图先释放旧地形分块，再准备目标地形、更新相机与小地图。
 4. 成功时提交世界和会话地图。失败时恢复原世界、单位节点、相机与地形。
 
-验证或候选恢复失败时保留原世界与选择。地图定义为深层只读数据；会话开关由独立 `session_state` 持有，界面字段由场景持有，空间索引按世界重建。`simulation/battle_state_fields.gd` 显式登记字段策略，新增字段未登记会拒绝保存与读档；提交不再逐字段搬运或重绑模拟服务 host。`simulation/definitions/unit_schema.gd` 是单位字段的唯一登记处，包含类型、默认值、持久化、派生策略和恢复分组；snapshot、validator、restorer、timers、action clock、locomotion 由它取得字段定义，关系引用按 Schema 的 codec 和键名编解码。工厂和常见单位写入的静态检查，加上真实单位与逐字段反射回归，防止字段静默遗漏。存档只接受当前格式，详见[存档与兼容](16-save-compat.md)。
+验证或候选恢复失败时保留原世界与选择。地图定义为深层只读数据；会话开关由独立 `session_state` 持有，界面字段由场景持有，空间索引按世界重建。`simulation/state/battle_state_fields.gd` 显式登记字段策略，新增字段未登记会拒绝保存与读档；提交不再逐字段搬运或重绑模拟服务 host。`simulation/units/unit_schema.gd` 是单位字段的唯一登记处，包含类型、默认值、持久化、派生策略和恢复分组；snapshot、validator、restorer、timers、action clock、locomotion 由它取得字段定义，关系引用按 Schema 的 codec 和键名编解码。工厂和常见单位写入的静态检查，加上真实单位与逐字段反射回归，防止字段静默遗漏。存档只接受当前格式，详见[存档与兼容](16-save-compat.md)。
 
 反馈文本、输入事件计数、阵营显示开关、拖拽与框选坐标属于 `battle_scene_state`，不进入候选世界；成功读档清空待选命令与拖拽/反馈瞬态，失败保留原会话。正在等待目标的模式和选择由 `session_state` 管理。
 

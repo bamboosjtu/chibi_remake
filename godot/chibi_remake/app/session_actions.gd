@@ -31,7 +31,7 @@ func save_game(slot := 0, title := "") -> bool:
 	if not _battle.scene.ready_to_save:
 		Game.last_save_error = {"stage":"battle not initialized", "code":ERR_UNCONFIGURED}
 		return false
-	var unregistered := preload("res://simulation/battle_state_fields.gd").omissions(_battle.state)
+	var unregistered := preload("res://simulation/state/battle_state_fields.gd").omissions(_battle.state)
 	if not unregistered.is_empty():
 		Game.last_save_error = {"stage":"snapshot world fields", "code":ERR_INVALID_DATA, "slot":slot, "fields":unregistered}
 		return false
