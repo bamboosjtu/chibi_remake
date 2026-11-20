@@ -1,0 +1,306 @@
+{
+  "schemaVersion": 1,
+  "entries": [
+    {
+      "file": "app/battle/runtime/cheat_controller.gd",
+      "field": "cheats_enabled",
+      "line": 78,
+      "reason": "Current cross-package writer (app/battle writes cheats field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/runtime/scene_controller.gd",
+      "field": "game_end",
+      "line": 239,
+      "reason": "Current cross-package writer (app/battle writes scenario field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/runtime/scene_controller.gd",
+      "field": "sim_acc",
+      "line": 239,
+      "reason": "Current cross-package writer (app/battle writes world field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/session/session_actions.gd",
+      "field": "game_end",
+      "line": 25,
+      "reason": "Current cross-package writer (app/battle writes scenario field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/startup/battle_opening.gd",
+      "field": "_officer_initial_state",
+      "line": 123,
+      "reason": "Current cross-package writer (app/battle writes officers field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/startup/battle_opening.gd",
+      "field": "_officer_pool",
+      "line": 122,
+      "reason": "Current cross-package writer (app/battle writes officers field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/startup/battle_opening.gd",
+      "field": "food",
+      "line": 78,
+      "reason": "Current cross-package writer (app/battle writes economy field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/startup/battle_opening.gd",
+      "field": "gold",
+      "line": 78,
+      "reason": "Current cross-package writer (app/battle writes economy field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/startup/battle_opening.gd",
+      "field": "map_data",
+      "line": 27,
+      "reason": "Current cross-package writer (app/battle writes world field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/startup/battle_opening.gd",
+      "field": "map_id",
+      "line": 26,
+      "reason": "Current cross-package writer (app/battle writes world field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/startup/battle_opening.gd",
+      "field": "officer_policy",
+      "line": 185,
+      "reason": "Current cross-package writer (app/battle writes officers field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/startup/battle_opening.gd",
+      "field": "player_owner",
+      "line": 75,
+      "reason": "Current cross-package writer (app/battle writes world field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/startup/battle_opening.gd",
+      "field": "scenario_avi",
+      "line": 73,
+      "reason": "Current cross-package writer (app/battle writes scenario field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/startup/battle_opening.gd",
+      "field": "scenario_mission",
+      "line": 72,
+      "reason": "Current cross-package writer (app/battle writes scenario field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/startup/battle_opening.gd",
+      "field": "scenario_sides",
+      "line": 74,
+      "reason": "Current cross-package writer (app/battle writes scenario field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/startup/battle_opening.gd",
+      "field": "scenario_source",
+      "line": 71,
+      "reason": "Current cross-package writer (app/battle writes scenario field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/startup/battle_opening.gd",
+      "field": "selected",
+      "line": 55,
+      "reason": "Current cross-package writer (app/battle writes commands field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/startup/battle_opening.gd",
+      "field": "stone",
+      "line": 78,
+      "reason": "Current cross-package writer (app/battle writes economy field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/startup/battle_opening.gd",
+      "field": "terrain_base",
+      "line": 49,
+      "reason": "Current cross-package writer (app/battle writes scenario field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/startup/battle_opening.gd",
+      "field": "wood",
+      "line": 78,
+      "reason": "Current cross-package writer (app/battle writes economy field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/startup/bootstrap.gd",
+      "field": "cli_mode",
+      "line": 44,
+      "reason": "Current cross-package writer (app/battle writes session field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/startup/bootstrap.gd",
+      "field": "game_end",
+      "line": 150,
+      "reason": "Current cross-package writer (app/battle writes scenario field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/startup/bootstrap.gd",
+      "field": "map_id",
+      "line": 24,
+      "reason": "Current cross-package writer (app/battle writes world field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/startup/bootstrap.gd",
+      "field": "sim_tick",
+      "line": 150,
+      "reason": "Current cross-package writer (app/battle writes world field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/battle/startup/bootstrap.gd",
+      "field": "simtest_seconds",
+      "line": 32,
+      "reason": "Current cross-package writer (app/battle writes session field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/saves/candidate_world.gd",
+      "field": "map_data",
+      "line": 11,
+      "reason": "Current cross-package writer (app/saves writes world field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "app/saves/save_service.gd",
+      "field": "cli_mode",
+      "line": 33,
+      "reason": "Current cross-package writer (app/saves writes session field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "simulation/ai/ai_economy.gd",
+      "field": "gold",
+      "line": 104,
+      "reason": "Current cross-package writer (simulation/ai writes economy field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "simulation/cheats/cheat_actions.gd",
+      "field": "auto_control",
+      "line": 19,
+      "reason": "Current cross-package writer (simulation/cheats writes ai field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "simulation/combat/abilities.gd",
+      "field": "duel_pending",
+      "line": 210,
+      "reason": "Current cross-package writer (simulation/combat writes commands field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "simulation/combat/abilities.gd",
+      "field": "jimou_caster",
+      "line": 31,
+      "reason": "Current cross-package writer (simulation/combat writes commands field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "simulation/combat/abilities.gd",
+      "field": "jimou_pending",
+      "line": 30,
+      "reason": "Current cross-package writer (simulation/combat writes commands field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "simulation/construction/construction_orders.gd",
+      "field": "_index_units_size",
+      "line": 275,
+      "reason": "Current cross-package writer (simulation/construction writes units field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "simulation/construction/construction_orders.gd",
+      "field": "selected",
+      "line": 177,
+      "reason": "Current cross-package writer (simulation/construction writes commands field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "simulation/navigation/nav.gd",
+      "field": "map_data",
+      "line": 28,
+      "reason": "Current cross-package writer (simulation/navigation writes world field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "simulation/navigation/spatial_index.gd",
+      "field": "_index_units_ref",
+      "line": 188,
+      "reason": "Current cross-package writer (simulation/navigation writes units field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "simulation/navigation/spatial_index.gd",
+      "field": "_index_units_size",
+      "line": 189,
+      "reason": "Current cross-package writer (simulation/navigation writes units field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "simulation/officers/officer_teams.gd",
+      "field": "jimou_caster",
+      "line": 94,
+      "reason": "Current cross-package writer (simulation/officers writes commands field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "simulation/officers/officer_teams.gd",
+      "field": "selected",
+      "line": 67,
+      "reason": "Current cross-package writer (simulation/officers writes commands field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "simulation/scenario/campaign.gd",
+      "field": "cnt_enemy",
+      "line": 62,
+      "reason": "Current cross-package writer (simulation/scenario writes world field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "simulation/scenario/campaign.gd",
+      "field": "cnt_enemy_buildings",
+      "line": 63,
+      "reason": "Current cross-package writer (simulation/scenario writes world field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "simulation/scenario/campaign.gd",
+      "field": "cnt_player",
+      "line": 45,
+      "reason": "Current cross-package writer (simulation/scenario writes world field)",
+      "removeByStage": "P7"
+    },
+    {
+      "file": "simulation/units/entity_factory.gd",
+      "field": "next_uid",
+      "line": 56,
+      "reason": "Current cross-package writer (simulation/units writes world field)",
+      "removeByStage": "P7"
+    }
+  ]
+}

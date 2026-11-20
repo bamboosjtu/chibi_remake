@@ -309,6 +309,7 @@ pwsh -NoProfile -File tools/bench_full_battle.ps1 -ReleasePack <候选目录>/Ch
 
 - `node tools/dependency_check.mjs`：用 `tools/dependency_report.mjs` 扫描 `preload/load/extends`、`_dep_` 绑定、`world.<svc>` 调用、构造函数注入和动态加载，输出 `_work/refactor/dependency-graph.json`（含 SCC）；新增未登记违规或已失效的基线边都失败。
 - `node tools/unit_schema_ownership_check.mjs`：`unit_schema_ownership.json` 的键集与 `UnitSchema.FIELDS` 精确相等，owner 唯一，`persist`/`derived` 与 Schema 一致。
+- `node tools/battle_state_write_check.mjs`：按 `battle_state_ownership.json` 的唯一业务 owner 判定 `battle.<field>`/`state.<field>`/`.set()` 写入；跨包写入冻结在 `battle_state_write_baseline.json`（43 条，P7 收敛），新增跨包写入或失效基线即失败。
 - `node tools/battle_state_ownership_check.mjs`：`battle_state_ownership.json` 覆盖 69 个属性，12 个代理指向 `session.<field>`，策略与 `BattleStateFields` 一致；`auto_control` 归 AI，`selected` 归 Commands，`tile_*` 归 Navigation 只读。
 - `node tools/test_dependency_report.mjs` 与 `node tools/test_ownership_checks.mjs`：正负夹具，验证合法边通过、非法边失败、基线可消解、字段缺失/重复/错误 owner 失败。
 
