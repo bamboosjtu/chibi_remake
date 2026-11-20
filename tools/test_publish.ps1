@@ -82,6 +82,42 @@ $evidence.performanceContract = $performance.performanceContract
 $evidence.standardPerformance = $performance.standardPerformance
 Write-FixtureEvidence
 & (Join-Path $PSScriptRoot 'write_build_manifest.ps1') -Executable $exe -SourceCommit $head -SourceDirty:$false -Verification candidate-smoke
+$fixtureManifest=Join-Path $candidate 'build-manifest.json'
+$originalBuild=Get-Content -Raw -LiteralPath $fixtureManifest | ConvertFrom-Json
+$previousHash=(Get-FileHash -LiteralPath $evidencePath).Hash
+$evidence.verifiedAt='2026-11-20T00:00:00.0000000Z'
+Save-CandidateVerification $candidate $evidence
+$refreshed=Get-Content -Raw -LiteralPath $fixtureManifest | ConvertFrom-Json
+if ($refreshed.verificationSha256 -eq $previousHash -or $refreshed.commit -ne $originalBuild.commit -or
+    $refreshed.dirty -ne $originalBuild.dirty -or $refreshed.builtAt -ne $originalBuild.builtAt -or
+    $refreshed.exeSha256 -ne $originalBuild.exeSha256 -or $refreshed.packSha256 -ne $originalBuild.packSha256) {
+    throw 'Reverification did not preserve build identity'
+}
+$null=Assert-CandidateVerification $candidate $refreshed
+$refreshedHash=(Get-FileHash -LiteralPath $fixtureManifest).Hash
+$evidence.results[0].ok=$false
+try { Save-CandidateVerification $candidate $evidence; throw 'Failed reverification accepted' }
+catch { if ($_.Exception.Message -notmatch 'verification failed') { throw } }
+$evidence.results[0].ok=$true
+if ((Get-FileHash -LiteralPath $fixtureManifest).Hash -ne $refreshedHash -or
+    (Get-FileHash -LiteralPath $evidencePath).Hash -ne $refreshed.verificationSha256) { throw 'Failure damaged candidate metadata' }
+
+# Simulate a manifest sharing violation after the new evidence has been staged.
+$evidence.verifiedAt='2026-11-20T00:01:00.0000000Z'
+$heldManifest=[IO.File]::Open($fixtureManifest,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::Read)
+try {
+    try {
+        Save-CandidateVerification $candidate $evidence
+        throw 'Locked candidate manifest was replaced'
+    } catch {
+        $exception=$_.Exception
+        while ($exception.InnerException) { $exception=$exception.InnerException }
+        if (($exception.HResult -band 0xffff) -notin @(32,33)) { throw }
+    }
+} finally { $heldManifest.Dispose() }
+if ((Get-FileHash -LiteralPath $fixtureManifest).Hash -ne $refreshedHash -or
+    (Get-FileHash -LiteralPath $evidencePath).Hash -ne $refreshed.verificationSha256) { throw 'Failed manifest update did not roll back evidence' }
+Write-Output 'REVERIFY PASS new matching evidence and manifest / preserved provenance / failure rollback'
 Move-Item -LiteralPath $evidencePath -Destination ($evidencePath+'.missing')
 try {
     try { & (Join-Path $PSScriptRoot 'publish_release.ps1') -Executable $exe -ReleaseRoot $release; throw 'Missing evidence accepted' }
@@ -92,7 +128,19 @@ Write-Output 'VERIFICATION GATE PASS unverified / missing / failed / incomplete 
 try { & (Join-Path $PSScriptRoot 'publish_release.ps1') -Executable $exe -ReleaseRoot $release -FailBeforeCommit; throw 'Failure was not injected' }
 catch { if ($_.Exception.Message -notmatch 'Injected failure') { throw } }
 if ((Get-FileHash -LiteralPath (Join-Path $release 'current.json')).Hash -ne $before) { throw 'Failed publish changed current pointer' }
-& (Join-Path $PSScriptRoot 'publish_release.ps1') -Executable $exe -ReleaseRoot $release
+$packageOutput=Join-Path $root ('_work/package-outputs/publish-'+[Guid]::NewGuid().ToString('N'))
+. (Join-Path $PSScriptRoot 'package_test_fixture.ps1')
+try {
+    try {
+        & (Join-Path $PSScriptRoot 'publish_release.ps1') -Executable $exe -ReleaseRoot $release -PackageDirectory $packageOutput -PartMiB 0
+        throw 'Invalid packaging accepted'
+    } catch { if ($_.Exception.Message -notmatch 'PartMiB must') { throw } }
+    if ((Get-FileHash -LiteralPath (Join-Path $release 'current.json')).Hash -ne $before) { throw 'Failed packaging changed the version pointer' }
+    & (Join-Path $PSScriptRoot 'publish_release.ps1') -Executable $exe -ReleaseRoot $release -PackageDirectory $packageOutput -PartMiB 1 -Tag fixture
+    $publishedPointer=Get-Content -Raw -LiteralPath (Join-Path $release 'current.json') | ConvertFrom-Json
+    $packagedInfo=Get-Content -Raw -LiteralPath (Join-Path $packageOutput 'release-info.json') | ConvertFrom-Json
+    if ((Split-Path $publishedPointer.directory -Leaf) -ne $packagedInfo.version) { throw 'Packaged version differs from published pointer' }
+} finally { Remove-PackageTestFixture $packageOutput }
 $pointer=Get-Content -Raw (Join-Path $release 'current.json') | ConvertFrom-Json
 $publishedInfo=Get-Content -Raw (Join-Path (Join-Path $release $pointer.directory) 'release-info.json') | ConvertFrom-Json
 $expectedBaselines = @($names | Where-Object { $_ -like 'sim-*' }).Count
@@ -156,6 +204,7 @@ foreach ($relative in @('LICENSE','NOTICE.md')) {
 
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'publish_release.ps1') -Destination $changedTools
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'candidate_verification.ps1') -Destination $changedTools
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'candidate_lock.ps1') -Destination $changedTools
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'native_dependencies.ps1') -Destination $changedTools
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'compile_launcher.ps1') -Destination $changedTools
 $declarationTarget=Join-Path $fixture 'godot/chibi_remake/addons/ffmpegplayer'

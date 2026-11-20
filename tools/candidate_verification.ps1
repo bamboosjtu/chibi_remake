@@ -29,8 +29,8 @@ function Read-CandidateResults([string]$Directory) {
     return @($maps)+@($regressions)+@($native)+@($isolation)
 }
 
-function Assert-CandidateVerification([string]$Directory, $Build) {
-    $evidencePath=Join-Path $Directory 'verification.json'
+function Assert-CandidateVerification([string]$Directory, $Build, [string]$EvidencePath) {
+    if (!$EvidencePath) { $EvidencePath=Join-Path $Directory 'verification.json' }
     if (!(Test-Path -LiteralPath $evidencePath)) { throw 'Candidate has no verification evidence' }
     if ($Build -and ($Build.verification -ne 'candidate-smoke' -or $Build.verificationSha256 -ne (Get-FileHash -LiteralPath $evidencePath).Hash)) { throw 'Candidate verification evidence does not match build manifest' }
     $evidence=Get-Content -Raw -Encoding UTF8 $evidencePath | ConvertFrom-Json
@@ -49,6 +49,9 @@ function Assert-CandidateVerification([string]$Directory, $Build) {
     $exeName = [IO.Path]::ChangeExtension($packs[0].path, '.exe')
     $executables = @($evidence.artifacts | Where-Object path -eq $exeName)
     if ($executables.Count -ne 1) { throw 'Candidate PCK has no matching executable' }
+    if ($Build -and ($Build.packSha256 -ne $packs[0].sha256 -or $Build.exeSha256 -ne $executables[0].sha256)) {
+        throw 'Candidate executable or PCK differs from the build manifest'
+    }
     Assert-StandardPerformanceEvidence $evidence $packs[0].sha256 $executables[0].sha256
     $files=@(Get-ChildItem -LiteralPath $Directory -File -Recurse | Where-Object { ($_.Extension -in @('.exe','.pck','.dll') -or $_.Name -eq 'portable.txt') -and $_.Name -notlike '_validation-engine*.exe' })
     if ($files.Count -ne @($evidence.artifacts).Count) { throw 'Candidate verification artifact set changed' }
@@ -58,6 +61,54 @@ function Assert-CandidateVerification([string]$Directory, $Build) {
         if ($entry.Count -ne 1 -or $entry[0].sha256 -ne (Get-FileHash -LiteralPath $file.FullName).Hash) { throw ('Candidate changed after verification: '+$relative) }
     }
     return $evidence
+}
+
+# Call while holding the candidate lock. Replace the metadata pair only after
+# the new evidence passes and the matching manifest is ready to install.
+function Save-CandidateVerification([string]$Directory, $Evidence) {
+    $evidencePath=Join-Path $Directory 'verification.json'
+    $manifestPath=Join-Path $Directory 'build-manifest.json'
+    $prefix=$Directory.TrimEnd('\','/')+[IO.Path]::DirectorySeparatorChar
+    $temporary=Join-Path $Directory ('.verification-'+[Guid]::NewGuid().ToString('N'))
+    $pendingEvidence=$temporary+'.json'
+    $pendingManifest=$temporary+'.manifest'
+    $backup=$temporary+'.bak'
+    $encoding=New-Object System.Text.UTF8Encoding $false
+    $build=$null
+    try {
+        [IO.File]::WriteAllText($pendingEvidence, ($Evidence | ConvertTo-Json -Depth 8), $encoding)
+        if (Test-Path -LiteralPath $manifestPath -PathType Leaf) {
+            $build=Get-Content -Raw -Encoding UTF8 -LiteralPath $manifestPath | ConvertFrom-Json
+            if ($build.schemaVersion -ne 3) { throw 'Unsupported candidate build manifest' }
+            foreach ($file in $build.nativeFiles) {
+                $fullPath=[IO.Path]::GetFullPath((Join-Path $Directory $file.path))
+                if (!$fullPath.StartsWith($prefix,[StringComparison]::OrdinalIgnoreCase) -or
+                    (Get-FileHash -LiteralPath $fullPath -ErrorAction Stop).Hash -ne $file.sha256) {
+                    throw ('Candidate dependency differs from the build manifest: '+$file.path)
+                }
+            }
+            $build.verification='candidate-smoke'
+            $build.verificationNote='release_tests + all maps + deterministic baselines'
+            $build.verificationSha256=(Get-FileHash -LiteralPath $pendingEvidence).Hash
+            [IO.File]::WriteAllText($pendingManifest, ($build | ConvertTo-Json -Depth 6), $encoding)
+        }
+        $null=Assert-CandidateVerification $Directory $build $pendingEvidence
+        $hadEvidence=Test-Path -LiteralPath $evidencePath -PathType Leaf
+        if ($hadEvidence) { [IO.File]::Replace($pendingEvidence,$evidencePath,$backup) }
+        else { [IO.File]::Move($pendingEvidence,$evidencePath) }
+        try {
+            if ($build) { [IO.File]::Replace($pendingManifest,$manifestPath,[NullString]::Value) }
+        } catch {
+            if ($hadEvidence) { [IO.File]::Replace($backup,$evidencePath,[NullString]::Value) }
+            else { Remove-Item -LiteralPath $evidencePath -Force -ErrorAction Stop }
+            throw
+        }
+        if (Test-Path -LiteralPath $backup) { Remove-Item -LiteralPath $backup -Force -ErrorAction SilentlyContinue }
+    } finally {
+        foreach ($file in @($pendingEvidence,$pendingManifest)) {
+            if (Test-Path -LiteralPath $file) { Remove-Item -LiteralPath $file -Force -ErrorAction SilentlyContinue }
+        }
+    }
 }
 
 function Get-RequiredCandidateChecks([string]$Directory) {

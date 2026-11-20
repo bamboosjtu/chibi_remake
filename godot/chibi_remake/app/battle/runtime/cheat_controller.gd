@@ -2,7 +2,7 @@ extends Object
 ## research/meta: exact lowercase character matcher and battle-only hotkeys.
 const State = preload("res://simulation/state/battle_state.gd")
 const Services = preload("res://app/battle/runtime/battle_scene_state.gd")
-const Console = preload("res://presentation/battle/hud/cheat_console.gd")
+var console_factory: Callable
 const CHEAT_ACTIONS := {KEY_F2:"auto", KEY_F3:"demote", KEY_F4:"promote", KEY_F5:"ui",
 	KEY_F6:"build", KEY_F7:"invulnerable", KEY_F8:"reveal", KEY_F9:"resources"}
 var battle: State:
@@ -57,7 +57,7 @@ func _set_cheat_input(opened: bool) -> void:
 	matched = 0
 	if opened:
 		if not is_instance_valid(console):
-			console = Console.new(Callable(scene.view, "battle_rect") if scene.view != null else Callable())
+			if console_factory.is_valid(): console = console_factory.call(Callable(scene.view, "battle_rect") if scene.view != null else Callable())
 			node.add_child(console)
 		console.update_input(text)
 	elif is_instance_valid(console): console.hide()

@@ -7,11 +7,11 @@
   },
   "violations": [],
   "functions": {
-    "testing/battle_selftest.gd::run": 248,
-    "testing/gathering_checks.gd::_selftest_gather": 264,
-    "testing/groups_checks.gd::_selftest_ctrlgroup": 84,
-    "testing/navigation_checks.gd::_selftest_naval": 133,
-    "testing/technology_checks.gd::_selftest_tech": 125,
+    "testing/driver/battle_selftest.gd::run": 248,
+    "testing/checks/gathering_checks.gd::_selftest_gather": 264,
+    "testing/checks/groups_checks.gd::_selftest_ctrlgroup": 84,
+    "testing/checks/navigation_checks.gd::_selftest_naval": 133,
+    "testing/checks/technology_checks.gd::_selftest_tech": 125,
     "app/battle/startup/bootstrap.gd::_ready": 153,
     "presentation/menu/campaign_dialog.gd::_build_campaign_dialog": 98,
     "presentation/menu/controller.gd::_ready": 220,
@@ -37,27 +37,27 @@
       "reviewBy": "2027-02-16",
       "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."
     },
-    "functions:testing/battle_selftest.gd::run": {
+    "functions:testing/driver/battle_selftest.gd::run": {
       "owner": "project-maintainers",
       "reviewBy": "2027-02-16",
       "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."
     },
-    "functions:testing/gathering_checks.gd::_selftest_gather": {
+    "functions:testing/checks/gathering_checks.gd::_selftest_gather": {
       "owner": "project-maintainers",
       "reviewBy": "2027-02-16",
       "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."
     },
-    "functions:testing/groups_checks.gd::_selftest_ctrlgroup": {
+    "functions:testing/checks/groups_checks.gd::_selftest_ctrlgroup": {
       "owner": "project-maintainers",
       "reviewBy": "2027-02-16",
       "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."
     },
-    "functions:testing/navigation_checks.gd::_selftest_naval": {
+    "functions:testing/checks/navigation_checks.gd::_selftest_naval": {
       "owner": "project-maintainers",
       "reviewBy": "2027-02-16",
       "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."
     },
-    "functions:testing/technology_checks.gd::_selftest_tech": {
+    "functions:testing/checks/technology_checks.gd::_selftest_tech": {
       "owner": "project-maintainers",
       "reviewBy": "2027-02-16",
       "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."

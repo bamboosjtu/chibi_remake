@@ -1416,7 +1416,7 @@
       "package": "simulation/definitions"
     },
     {
-      "from": "testing/battle_selftest.gd",
+      "from": "testing/driver/battle_selftest.gd",
       "to": "testing/driver/battle_selftest.gd",
       "phase": "P6",
       "note": "driver",
@@ -1424,7 +1424,7 @@
       "package": "testing"
     },
     {
-      "from": "testing/full_battle_benchmark.gd",
+      "from": "testing/benchmark/full_battle_benchmark.gd",
       "to": "testing/benchmark/full_battle_benchmark.gd",
       "phase": "P6",
       "note": "benchmark",
@@ -1432,7 +1432,7 @@
       "package": "testing"
     },
     {
-      "from": "testing/gathering_checks.gd",
+      "from": "testing/checks/gathering_checks.gd",
       "to": "testing/checks/gathering_checks.gd",
       "phase": "P6",
       "note": "checks",
@@ -1440,7 +1440,7 @@
       "package": "testing"
     },
     {
-      "from": "testing/groups_checks.gd",
+      "from": "testing/checks/groups_checks.gd",
       "to": "testing/checks/groups_checks.gd",
       "phase": "P6",
       "note": "checks",
@@ -1448,7 +1448,7 @@
       "package": "testing"
     },
     {
-      "from": "testing/native_save_acceptance.gd",
+      "from": "testing/native/native_save_acceptance.gd",
       "to": "testing/native/native_save_acceptance.gd",
       "phase": "P6",
       "note": "native acceptance",
@@ -1456,7 +1456,7 @@
       "package": "testing"
     },
     {
-      "from": "testing/navigation_checks.gd",
+      "from": "testing/checks/navigation_checks.gd",
       "to": "testing/checks/navigation_checks.gd",
       "phase": "P6",
       "note": "checks",
@@ -1464,7 +1464,7 @@
       "package": "testing"
     },
     {
-      "from": "testing/technology_checks.gd",
+      "from": "testing/checks/technology_checks.gd",
       "to": "testing/checks/technology_checks.gd",
       "phase": "P6",
       "note": "checks",
@@ -1571,6 +1571,8 @@
     "P4a",
     "P4b",
     "P4c",
-    "P4d"
+    "P4d",
+    "P5",
+    "P6"
   ]
 }

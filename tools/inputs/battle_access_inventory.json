@@ -15,7 +15,7 @@
     "presentation/battle/effects/projectile_view.gd",
     "presentation/battle/world/terrain_stream.gd",
     "presentation/battle/hud/battle_hud_panel.gd",
-    "presentation/hud/software_cursor.gd",
+    "presentation/shell/software_cursor.gd",
     "presentation/battle/world/battle_fog.gd",
     "presentation/battle/world/world_layers.gd",
     "presentation/screens/battle_menu.gd",

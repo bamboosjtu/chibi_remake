@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "files": {
-    "res://app/battle/startup/bootstrap.gd": "62ddd864f63189ccdd1a36ffc6a1e97f763f873580c254f0358f85a8a618ed23",
+    "res://app/battle/startup/bootstrap.gd": "a8a6ec05bf763570a3540c168eb50389594363d4655ba528eefd36a3466c5173",
     "res://simulation/ai/ai.gd": "473c35a85a798cb75f184e8096b2444b1ea155b8e7b63991418edbfb10d02c6c",
     "res://simulation/ai/ai_config.gd": "51c48b1c71c7330d568b823051653dfd77b81047c5048c494b1cb7cf6e7aa932",
     "res://simulation/ai/ai_decisions.gd": "72e6d1f21aaea21bdf8f81c4ea311375d3f942018924dd6e10ce0669d7391735",
@@ -74,7 +74,7 @@
     "res://simulation/scenario/scenario_contract.gd": "ef217b94802e262b087b27d0d1b06154de99646bea5cd22c9cf9117ede7fc415",
     "res://simulation/scenario/scenario_rules.gd": "f5cd0756208310bdeb3a09a9eb687fb7cb17edc9ddd22b25fa6db21eb5099415",
     "res://simulation/session/session_state.gd": "4380ebb2ce4b6b634d6b609c7f7b8d0a00ea7c81d59f6e509b3508fdccd52455",
-    "res://simulation/state/battle_state.gd": "82ff12b757310faf7576552679292cc110c65532a24f7bab1babd568f46110c1",
+    "res://simulation/state/battle_state.gd": "8865e3e699d9502f66ea25d2d2f9f62d0662f42d42d9b57818460a9f0298ce86",
     "res://simulation/state/battle_state_fields.gd": "b36341597f2ea5e76c6479243f2aeb16dac75dc8b08db7580846e4c6184ac520",
     "res://simulation/technology/technology.gd": "d04bbfff3feb4f2de94dd01cf62646306ff3213f1cec05d6a1603631d7f85641",
     "res://simulation/technology/technology_state.gd": "65def32b6d41e1ef393800bfb3de9f3f0179dd6d3e3fc0894f530c076a969a67",

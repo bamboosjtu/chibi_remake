@@ -7,6 +7,7 @@ $Executable=[IO.Path]::GetFullPath($Executable)
 $candidate=Split-Path $Executable -Parent
 $pack=[IO.Path]::ChangeExtension($Executable,'.pck')
 if (!(Test-Path -LiteralPath $Executable) -or !(Test-Path -LiteralPath $pack)) { throw 'Invalid candidate EXE/PCK' }
+if (Test-Path -LiteralPath (Join-Path $candidate 'release-info.json')) { throw 'Reverify the build candidate, not an installed version' }
 if ($StageDirectory -and !(Test-Path -LiteralPath (Join-Path $StageDirectory 'release_inputs.json'))) { throw 'Explicit stage has no release input manifest' }
 $engine=Join-Path $candidate ('_validation-engine-'+[Guid]::NewGuid().ToString('N')+'.exe')
 $output=Join-Path $projectRoot ('_work/candidate-smoke/'+[Guid]::NewGuid().ToString('N'))
@@ -15,11 +16,6 @@ $validationLock=Enter-CandidateValidationLock $candidate
 $priorAcceptance = $env:CHIBI_ACCEPTANCE
 try {
 $env:CHIBI_ACCEPTANCE = '1'
-$evidencePath=Join-Path $candidate 'verification.json'
-if (Test-Path -LiteralPath $evidencePath) {
-    Copy-Item -LiteralPath $evidencePath -Destination ($evidencePath+'.previous') -Force
-    Remove-Item -LiteralPath $evidencePath -Force
-}
 $artifacts=@(Get-ChildItem -LiteralPath $candidate -File -Recurse | Where-Object { ($_.Extension -in @('.exe','.pck','.dll') -or $_.Name -eq 'portable.txt') -and $_.Name -notlike '_validation-engine*.exe' } | ForEach-Object {
     @{path=$_.FullName.Substring($candidate.Length+1).Replace('\','/');sha256=(Get-FileHash -LiteralPath $_.FullName).Hash}
 })
@@ -58,8 +54,7 @@ try {
         results=@($results | Select-Object name,ok,code,timedOut,missing)
     }
     Assert-StandardPerformanceEvidence $evidence (Get-FileHash -LiteralPath $pack).Hash (Get-FileHash -LiteralPath $Executable).Hash
-    [IO.File]::WriteAllText($evidencePath,($evidence | ConvertTo-Json -Depth 8),(New-Object System.Text.UTF8Encoding $false))
-    $null=Assert-CandidateVerification $candidate $null
+    Save-CandidateVerification $candidate $evidence
     Write-Output "CANDIDATE SMOKE PASS maps / release suite / baselines: $output"
 } finally {
     if (Test-Path -LiteralPath $engine) { Remove-Item -LiteralPath $engine -Force }

@@ -34,9 +34,49 @@ $evidence = @{
 }
 $verification=Join-Path $version 'verification.json'
 $evidence | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $verification
-@{verification='candidate-smoke';verificationSha256=(Get-FileHash -LiteralPath $verification).Hash} |
-    ConvertTo-Json | Set-Content -LiteralPath (Join-Path $version 'build-manifest.json')
+$manifestPath = Join-Path $version 'build-manifest.json'
+$noticeFiles=@(foreach ($name in @('LICENSE','NOTICE.md')) {
+    [IO.File]::WriteAllText((Join-Path $version $name), 'fixture notice')
+    @{path=$name;sha256=(Get-FileHash -LiteralPath (Join-Path $version $name)).Hash}
+})
+$licensePath=Join-Path $version 'licenses/test.txt'
+$manifest=@{
+    schemaVersion=3; commit=('a'*40); dirty=$false
+    exeSha256=$exeHash; packSha256=$packHash
+    verification='candidate-smoke'; verificationSha256=(Get-FileHash -LiteralPath $verification).Hash
+    nativeFiles=@(@{path='licenses/test.txt';sha256=(Get-FileHash -LiteralPath $licensePath).Hash})
+}
+$manifest | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $manifestPath
+$infoPath=Join-Path $version 'release-info.json'
+$info=@{
+    schemaVersion=5; version='version'; commit=$manifest.commit; dirty=$false
+    exeSha256=$exeHash; packSha256=$packHash; buildManifestSha256=(Get-FileHash -LiteralPath $manifestPath).Hash
+    verificationSha256=$manifest.verificationSha256; noticeFiles=$noticeFiles
+}
+$info | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $infoPath
+New-Item -ItemType Directory -Force (Join-Path $version 'userdata/player') | Out-Null
+[IO.File]::WriteAllText((Join-Path $version 'userdata/player/save.json'), 'private save fixture')
+[IO.File]::WriteAllText((Join-Path $version 'ChibiAcceptance.testpack'), 'local acceptance fixture')
 & (Join-Path $PSScriptRoot 'package_release.ps1') -VersionDirectory ($version+'\') -OutputDirectory $output -PartMiB 1
+$list=Get-Content -Raw -LiteralPath (Join-Path $output 'release-files.json') | ConvertFrom-Json
+if (@($list.files | Where-Object { $_.relative -like 'userdata/*' -or $_.relative -eq 'ChibiAcceptance.testpack' }).Count) {
+    throw 'Unapproved local files reached the release map'
+}
+$previousChecksum=(Get-FileHash -LiteralPath (Join-Path $output 'SHA256SUMS.txt')).Hash
+$previousPart=(Get-FileHash -LiteralPath (Join-Path $output 'ChibiRTS.pck.part001')).Hash
+[IO.File]::WriteAllText($licensePath, 'changed after publish')
+try {
+    & (Join-Path $PSScriptRoot 'package_release.ps1') -VersionDirectory $version -OutputDirectory $output -PartMiB 1
+    throw 'Changed published notice accepted'
+} catch { if ($_.Exception.Message -notmatch 'Published file changed: licenses/test.txt') { throw } }
+[IO.File]::WriteAllText($licensePath, 'notice')
+if ((Get-FileHash -LiteralPath (Join-Path $output 'SHA256SUMS.txt')).Hash -ne $previousChecksum -or
+    (Get-FileHash -LiteralPath (Join-Path $output 'ChibiRTS.pck.part001')).Hash -ne $previousPart -or
+    @(Get-ChildItem -LiteralPath (Split-Path $output -Parent) -Directory -Force -Filter '.package-*').Count) {
+    throw 'Failed packaging changed the old package or left staging files'
+}
+& (Join-Path $PSScriptRoot 'package_release.ps1') -VersionDirectory $version -OutputDirectory $output -PartMiB 1
+Write-Output 'PACKAGE TRANSACTION PASS approved files only / failed package preserved / complete retry replaces output'
 if (Test-Path -LiteralPath (Join-Path (Split-Path $output -Parent) 'release-body.md')) { throw 'Packaging wrote outside its output directory' }
 $part=Join-Path $output 'ChibiRTS.pck.part002'
 $held=Join-Path $fixture 'held-part'

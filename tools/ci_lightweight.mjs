@@ -10,7 +10,7 @@ const groups = {
   docs: ['docs_lint', 'test_docs_lint', 'test_markdown_anchors'],
   repository: ['syntax_check', 'suite_check', 'test_suite_check', 'test_repository_policy', 'test_ci_checks', 'workflow_check'],
   tooling: ['test_engine_integrity', 'test_bootstrap', 'powershell_encoding', 'test_powershell_encoding',
-    'test_godot_process', 'test_regression_result', 'test_terrain_dedup', 'test_terrain_equivalence', 'test_runtime_assets']
+    'test_godot_process', 'test_regression_result', 'test_terrain_dedup', 'test_terrain_equivalence', 'test_runtime_assets', 'test_release_source']
 };
 const args = process.argv.slice(2);
 const group = args.includes('--group') ? args[args.indexOf('--group') + 1] : 'all';

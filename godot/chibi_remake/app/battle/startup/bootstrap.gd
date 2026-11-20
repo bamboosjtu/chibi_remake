@@ -10,11 +10,12 @@ const SceneServices = preload("res://app/battle/runtime/battle_scene_state.gd")
 var scene: SceneServices
 var node: Node2D
 const SaveSvc = preload("res://app/saves/save_service.gd")    # ARCH-006：存档/读档编排
-const View = preload("res://presentation/battle/view/battle_view.gd")        # ARCH-013：表现层（HUD/相机/单位外观/框选）
+var _presentation: Object
 
-func _init(services: SceneServices, surface: Node2D) -> void:
+func _init(services: SceneServices, surface: Node2D, presentation: Object) -> void:
 	scene = services
 	node = surface
+	_presentation = presentation
 
 func _ready() -> void:
 	if not Game.startup_valid:
@@ -62,12 +63,12 @@ func _ready() -> void:
 	# ⚠️ 必须在这里就先建好：地形、单位、HUD 的节点都挂在它下面。
 	# --simtest / --noview 下**一个渲染节点都不建** —— 那样跑出来的状态摘要才叫纯模拟。
 	if want_view:
-		scene.view = View.new(node.create_view_context())
+		scene.view = _presentation.create_view(node.create_view_context())
 		node.add_child(scene.view)
 
-	scene.sfx = preload("res://presentation/audio/sfx.gd").new()
+	scene.sfx = _presentation.create_sfx()
 	node.add_child(scene.sfx)
-	scene.bgm = preload("res://presentation/audio/bgm.gd").new()
+	scene.bgm = _presentation.create_bgm()
 	node.add_child(scene.bgm)
 	scene.bgm.play("res://media/music/record01.ogg")
 	_dep_scene_controller._build_terrain()
@@ -97,7 +98,7 @@ func _ready() -> void:
 		scene.view.update_panel()
 	scene.ready_to_save = true
 	if scene.view != null:
-		scene.view.completion = preload("res://presentation/battle/hud/battle_completion.gd").new(scene.view.host)
+		scene.view.completion = _presentation.create_completion(scene.view.host)
 		scene.view.add_child(scene.view.completion)
 		if battle.game_end != 0: _dep_campaign._show_end(battle.game_end)
 	# 章节开场过场：读档进入、测试模式与 --no-intro 时跳过（battle_view 内再判一次参数）。
@@ -120,7 +121,7 @@ func _ready() -> void:
 		return
 	for argument in args:
 		if argument.begins_with("--native-save="):
-			await load("res://testing/native_save_acceptance.gd").new().run(node, argument.substr(14))
+			await load("res://testing/native/native_save_acceptance.gd").new().run(node, argument.substr(14))
 			return
 
 	if "--demo" in args:
@@ -128,11 +129,11 @@ func _ready() -> void:
 		return
 	if "--diag-nav" in args:
 		await node.get_tree().create_timer(0.5).timeout
-		load("res://testing/navigation_checks.gd").new(node, null)._diag_nav()
+		load("res://testing/checks/navigation_checks.gd").new(node, null)._diag_nav()
 		node.get_tree().quit(0)
 		return
 	if "--selftest" in args:
-		await load("res://testing/battle_selftest.gd").new(node).run()
+		await load("res://testing/driver/battle_selftest.gd").new(node).run()
 		return
 	if "--screenshot" in args:
 		await node.get_tree().create_timer(1.2).timeout

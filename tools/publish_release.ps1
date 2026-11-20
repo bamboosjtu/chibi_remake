@@ -1,4 +1,12 @@
-﻿param([Parameter(Mandatory=$true)][string]$Executable,[string]$ReleaseRoot,[switch]$FailBeforeCommit,[switch]$AllowDirty)
+﻿param(
+    [Parameter(Mandatory=$true)][string]$Executable,
+    [string]$ReleaseRoot,
+    [switch]$FailBeforeCommit,
+    [switch]$AllowDirty,
+    [string]$PackageDirectory,
+    [string]$Tag,
+    [int]$PartMiB=900
+)
 # No Godot invocation here: filesystem errors must stop before pointer commit.
 $ErrorActionPreference='Stop'
 $projectRoot=Split-Path $PSScriptRoot -Parent
@@ -9,6 +17,9 @@ $pack=[IO.Path]::ChangeExtension($Executable,'.pck')
 if (!(Test-Path -LiteralPath $Executable) -or !(Test-Path -LiteralPath $pack)) { throw 'EXE/PCK pair is incomplete' }
 # 资源包大小**不设上限**（业主明确要求）。
 $candidate=[IO.Path]::GetDirectoryName($Executable)
+. (Join-Path $PSScriptRoot 'candidate_lock.ps1')
+$candidateLock=Enter-CandidateValidationLock $candidate
+try {
 $manifestPath=Join-Path $candidate 'build-manifest.json'
 if (!(Test-Path -LiteralPath $manifestPath)) { throw 'Candidate has no build manifest' }
 $build=Get-Content -Raw -Encoding UTF8 $manifestPath | ConvertFrom-Json
@@ -47,7 +58,10 @@ $requiredNotices=@('LICENSE','NOTICE.md')
 foreach ($relative in $requiredNotices) {
     if (!(Test-Path -LiteralPath (Join-Path $projectRoot $relative))) { throw ('Missing required notice: '+$relative) }
 }
-$entry=Join-Path $ReleaseRoot 'ChibiRTS.exe' 
+$entry=Join-Path $ReleaseRoot 'ChibiRTS.exe'
+New-Item -ItemType Directory -Force $ReleaseRoot | Out-Null
+$publishLock=[IO.File]::Open((Join-Path $ReleaseRoot '.publish.lock'),[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)
+try {
 $launcherSource=Join-Path $PSScriptRoot 'launcher.cs'
 $projectVersion=Select-String -LiteralPath (Join-Path $projectRoot 'godot/chibi_remake/project.godot') -Pattern '^config/version="'
 $launcherInputs=[Text.Encoding]::UTF8.GetBytes((Get-FileHash -LiteralPath $launcherSource).Hash + (Get-FileHash -LiteralPath (Join-Path $PSScriptRoot 'compile_launcher.ps1')).Hash + $projectVersion.Line)
@@ -77,14 +91,12 @@ New-Item -ItemType Directory -Force $versionDir | Out-Null
 Copy-Item -LiteralPath $Executable -Destination (Join-Path $versionDir 'ChibiRTS.exe')
 Copy-Item -LiteralPath $pack -Destination (Join-Path $versionDir 'ChibiRTS.pck')
 $pairs=@(
-    [pscustomobject]@{ Source=$Executable; Name='ChibiRTS.exe' },
-    [pscustomobject]@{ Source=$pack; Name='ChibiRTS.pck' }
+    [pscustomobject]@{ Name='ChibiRTS.exe'; Sha256=$build.exeSha256 },
+    [pscustomobject]@{ Name='ChibiRTS.pck'; Sha256=$build.packSha256 }
 )
 foreach ($pair in $pairs) {
-    $sourceHash=(Get-FileHash -LiteralPath $pair.Source).Hash
     $targetPath=Join-Path $versionDir $pair.Name
-    $targetHash=(Get-FileHash -LiteralPath $targetPath).Hash
-    if ($sourceHash -ne $targetHash) { throw 'Version copy hash mismatch' }
+    if ($pair.Sha256 -ne (Get-FileHash -LiteralPath $targetPath).Hash) { throw 'Version copy hash mismatch' }
 }
 foreach ($file in $nativeFiles) {
     $target=Join-Path $versionDir $file.path
@@ -92,12 +104,14 @@ foreach ($file in $nativeFiles) {
     Copy-Item -LiteralPath (Join-Path $candidate $file.path) -Destination $target
     if ((Get-FileHash -LiteralPath $target).Hash -ne $file.sha256) { throw 'Native dependency copy mismatch' }
 }
-foreach ($relative in $requiredNotices) {
+$noticeFiles=@(foreach ($relative in $requiredNotices) {
     $target=Join-Path $versionDir $relative
     New-Item -ItemType Directory -Force (Split-Path $target -Parent) | Out-Null
     Copy-Item -LiteralPath (Join-Path $projectRoot $relative) -Destination $target
-    if ((Get-FileHash -LiteralPath $target).Hash -ne (Get-FileHash -LiteralPath (Join-Path $projectRoot $relative)).Hash) { throw 'Notice copy mismatch' }
-}
+    $noticeHash=(Get-FileHash -LiteralPath $target).Hash
+    if ($noticeHash -ne (Get-FileHash -LiteralPath (Join-Path $projectRoot $relative)).Hash) { throw 'Notice copy mismatch' }
+    @{path=$relative;sha256=$noticeHash}
+})
 # Build metadata only: logs and validation evidence stay in the local candidate directory.
 Copy-Item -LiteralPath $manifestPath -Destination (Join-Path $versionDir 'build-manifest.json')
 Copy-Item -LiteralPath (Join-Path $candidate 'verification.json') -Destination (Join-Path $versionDir 'verification.json')
@@ -105,14 +119,15 @@ if ((Get-FileHash -LiteralPath (Join-Path $versionDir 'verification.json')).Hash
 $info=[ordered]@{
     schemaVersion=5
     nativeFiles=$nativeFiles
+    noticeFiles=$noticeFiles
     version=$version
     commit=$build.commit
     dirty=$build.dirty
     builtAt=$build.builtAt
     publishedAt=(Get-Date).ToUniversalTime().ToString('o')
-    exeSha256=(Get-FileHash -LiteralPath $Executable).Hash
-    packSha256=(Get-FileHash -LiteralPath $pack).Hash
-    buildManifestSha256=(Get-FileHash -LiteralPath $manifestPath).Hash
+    exeSha256=$build.exeSha256
+    packSha256=$build.packSha256
+    buildManifestSha256=(Get-FileHash -LiteralPath (Join-Path $versionDir 'build-manifest.json')).Hash
     launcherSourceSha256=$launcherSourceHash
     verification=$verification
     verificationNote=$verificationNote
@@ -127,6 +142,9 @@ if (!$reuseLauncher) {
     & (Join-Path $PSScriptRoot 'compile_launcher.ps1') -Output $launcher
 }
 if ($FailBeforeCommit) { throw 'Injected failure: current version not touched' }
+if ($PackageDirectory) {
+    & (Join-Path $PSScriptRoot 'package_release.ps1') -VersionDirectory $versionDir -OutputDirectory $PackageDirectory -PartMiB $PartMiB -Tag $Tag
+}
 # Install a changed launcher before committing current.json; a locked executable
 # then leaves the previous pointer intact. Unchanged launchers need no replacement.
 if (!$reuseLauncher) {
@@ -138,3 +156,5 @@ $pointerJson=(@{directory=('versions/'+$version);schemaVersion=1} | ConvertTo-Js
 [IO.File]::WriteAllText($pointerTmp, $pointerJson, (New-Object System.Text.UTF8Encoding $false))
 if (Test-Path -LiteralPath $pointer) { [IO.File]::Replace($pointerTmp,$pointer,$pointer+'.bak',$true) } else { [IO.File]::Move($pointerTmp,$pointer) }
 Write-Output "Published immutable version: $version"
+} finally { $publishLock.Dispose() }
+} finally { $candidateLock.Dispose() }

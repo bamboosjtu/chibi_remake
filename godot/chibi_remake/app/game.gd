@@ -97,7 +97,6 @@ func _ready() -> void:
 	# 干净环境/CI 的自托管 APPDATA 下 user:// 目录可能还不存在；先建目录再写 boot/save。
 	DirAccess.make_dir_recursive_absolute(SAVE_PATH.get_base_dir() if acceptance_run else OS.get_user_data_dir())
 	_install_cjk_font()
-	if DisplayServer.get_name() != "headless": add_child(preload("res://presentation/hud/software_cursor.gd").new())
 	var f := FileAccess.open(SAVE_PATH.get_base_dir().path_join("boot.log") if acceptance_run else "user://boot.log", FileAccess.WRITE)
 	if f != null:
 		f.store_string("boot %s\nargs=%s\n" % [Time.get_datetime_string_from_system(), str(OS.get_cmdline_user_args())])

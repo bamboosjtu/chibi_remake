@@ -1,5 +1,5 @@
 extends SceneTree
-class WarmupHarness extends "res://testing/full_battle_benchmark.gd":
+class WarmupHarness extends "res://testing/benchmark/full_battle_benchmark.gd":
 	func _ready() -> void:pass
 var done:=false
 func _initialize() -> void:

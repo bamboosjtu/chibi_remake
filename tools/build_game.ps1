@@ -9,8 +9,11 @@ try {
     if ($SkipImport) { Write-Warning "-SkipImport is deprecated; new staging projects always import resources" }
     if ($SkipVerify -and !$NoPublish) { throw '-SkipVerify requires -NoPublish; unverified builds cannot be published' }
     $sourceCommit=(& git -C $BuildRoot rev-parse HEAD 2>$null)
-    if (!$sourceCommit) { $sourceCommit='unknown' }
-    $sourceDirty=@(& git -C $BuildRoot status --porcelain 2>$null).Count -gt 0
+    if ($LASTEXITCODE -ne 0 -or !$sourceCommit) { throw 'Cannot identify the build commit' }
+    $sourceChanges=@(& git -C $BuildRoot status --porcelain 2>$null)
+    if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect the build worktree' }
+    $sourceDirty=$sourceChanges.Count -gt 0
+    if ($sourceDirty -and !$NoPublish -and !$AllowDirty) { throw 'Publishing requires a clean worktree' }
     Initialize-BuildEnvironment
     if ($NoOriginalMedia) { $env:CHIBI_NO_ORIGINAL_MEDIA='1' } else { Remove-Item Env:CHIBI_NO_ORIGINAL_MEDIA -ErrorAction SilentlyContinue }
     . (Join-Path $PSScriptRoot 'engine_environment.ps1')
@@ -28,7 +31,10 @@ try {
         }
         & node tools/level_index.mjs --write
         if ($LASTEXITCODE -ne 0) { throw 'Level index generation failed' }
-        $sourceDirty=$sourceDirty -or @(& git -C $BuildRoot status --porcelain 2>$null).Count -gt 0
+        $sourceChanges=@(& git -C $BuildRoot status --porcelain 2>$null)
+        if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect the worktree after data export' }
+        $sourceDirty=$sourceDirty -or $sourceChanges.Count -gt 0
+        if ($sourceDirty -and !$NoPublish -and !$AllowDirty) { throw 'Commit the regenerated data before publishing' }
     }
     & node tools/level_index.mjs
     if ($LASTEXITCODE -ne 0) { throw 'Level index is stale' }
@@ -40,7 +46,10 @@ try {
     & node tools/compare_terrain_rebuild.mjs
     if ($LASTEXITCODE -ne 0) { throw 'Rebuilt terrain differs from historical reference' }
     $stage=Join-Path $BuildRoot ('_work/build/stage-'+$id)
-    & node tools/stage_release.mjs $stage
+    $acceptanceStage=$stage+'-acceptance'
+    $stageArgs=@('--acceptance-dir',$acceptanceStage)
+    if (!$sourceDirty) { $stageArgs+=@('--source-commit',([string]$sourceCommit).Trim()) }
+    & node tools/stage_release.mjs $stage @stageArgs
     if ($LASTEXITCODE -ne 0) { throw 'Resource dependency staging failed' }
     node tools/dedupe_terrain.mjs $stage
     if ($LASTEXITCODE -ne 0) { throw 'Terrain deduplication failed' }
@@ -56,7 +65,7 @@ try {
     & node (Join-Path $PSScriptRoot 'godot_cli.mjs') $godot --headless --path $stage --export-release 'Windows HD Art' $exe *> (Join-Path $candidate 'export.log')
     if ($LASTEXITCODE -ne 0) { throw 'Export failed' }
     [IO.File]::WriteAllText((Join-Path $candidate 'portable.txt'), 'userdata', (New-Object System.Text.UTF8Encoding $false))
-    & node (Join-Path $PSScriptRoot 'godot_cli.mjs') $godot --headless --path (Join-Path $BuildRoot 'godot/chibi_remake') --script (Join-Path $PSScriptRoot 'gd/pack_acceptance.gd') -- (Join-Path $BuildRoot 'godot/chibi_remake/testing') (Join-Path $candidate 'ChibiAcceptance.testpack')
+    & node (Join-Path $PSScriptRoot 'godot_cli.mjs') $godot --headless --path $stage --script (Join-Path $PSScriptRoot 'gd/pack_acceptance.gd') -- $acceptanceStage (Join-Path $candidate 'ChibiAcceptance.testpack')
     if ($LASTEXITCODE -ne 0) { throw 'Acceptance companion packaging failed' }
     # Launch the candidate before it can be published. A build that exports but
     # cannot load a map must fail here, not at the player's first click.
@@ -71,6 +80,12 @@ try {
         $verification='candidate-smoke'
         $verificationNote='release_tests + all maps + deterministic baselines'
         Write-Output 'Candidate smoke passed'
+    }
+    if (!$sourceDirty) {
+        $finalHead=(& git -C $BuildRoot rev-parse HEAD 2>$null)
+        if ($LASTEXITCODE -ne 0 -or $finalHead -ne $sourceCommit) { throw 'HEAD changed during the build' }
+        $sourceChanges=@(& git -C $BuildRoot status --porcelain 2>$null)
+        if ($LASTEXITCODE -ne 0 -or $sourceChanges.Count -gt 0) { throw 'Worktree changed during the clean build' }
     }
     & (Join-Path $PSScriptRoot 'write_build_manifest.ps1') -Executable $exe -SourceCommit $sourceCommit -SourceDirty:$sourceDirty -Verification $verification -VerificationNote $verificationNote
     if (!(Test-Path -LiteralPath (Join-Path $candidate 'build-manifest.json'))) { throw 'Build manifest missing' }

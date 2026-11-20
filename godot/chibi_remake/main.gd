@@ -28,6 +28,7 @@ const State = preload("res://simulation/state/battle_state.gd")
 var state: State:
 	get: return world.state
 var scene := preload("res://app/battle/runtime/battle_scene_state.gd").new()
+var presentation := preload("res://presentation/battle/view/battle_presentation_factory.gd").new()
 var _state_fields: Dictionary = {}
 var _scene_fields: Dictionary = {}
 var _presentation_diagnostics := preload("res://presentation/battle/view/event_diagnostics.gd").new()
@@ -98,10 +99,13 @@ func _init() -> void:
 	if not preload("res://simulation/definitions/rule_catalog.gd").is_ready(): return
 	for field in state.PROXY_FIELDS: _state_fields[field] = true
 	for field in scene.PROXY_FIELDS: _scene_fields[field] = true
-	bootstrap = BootstrapService.new(scene, self)
+	scene.remaster_art = presentation.create_art_catalog()
+	bootstrap = BootstrapService.new(scene, self, presentation)
 	cheat_controller = CheatControllerService.new(scene, self)
+	cheat_controller.console_factory = Callable(presentation, "create_cheat_console")
 	duel_controller = DuelControllerService.new(scene, self)
 	scene_controller = SceneControllerService.new(scene, self)
+	scene_controller.screenshotter = Callable(presentation, "screenshot")
 	_bind_controllers()
 	var report: Dictionary = world.validate_services("main", {"bootstrap":bootstrap, "cheat_controller":cheat_controller, "duel_controller":duel_controller, "scene_controller":scene_controller})
 	_api_missing = report.missing
@@ -109,8 +113,12 @@ func _init() -> void:
 
 func create_view_context() -> Node2D:
 	var queries := preload("res://app/read_models/battle_queries.gd").new(self)
-	var reader := preload("res://presentation/battle/view/battle_view_context.gd").new(scene, queries, actions, session_actions)
-	add_child(reader)
+	return create_view_context_for(queries)
+
+func create_view_context_for(queries: Object, parent: Node = null) -> Node2D:
+	var reader: Node2D = presentation.create_view_context(scene, queries, actions, session_actions)
+	var target: Node = parent if parent != null else self
+	target.add_child(reader)
 	reader.add_to_group("active_battle_queries")
 	return reader
 

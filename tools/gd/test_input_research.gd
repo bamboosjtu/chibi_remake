@@ -1,6 +1,6 @@
 extends SceneTree
 ## Focused integration checks for the supplied cursor/command research.
-const Cursor = preload("res://presentation/hud/software_cursor.gd")
+const Cursor = preload("res://presentation/shell/software_cursor.gd")
 const Metrics = preload("res://presentation/battle/hud/hud_metrics.gd")
 var battle: Node2D
 var done := false

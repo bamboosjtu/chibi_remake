@@ -8,7 +8,7 @@ func run():
 	root.content_scale_mode=Window.CONTENT_SCALE_MODE_DISABLED;root.size=Vector2i(1920,1080)
 	root.get_node("Game").current_map="chibic17"
 	var battle=load("res://main.tscn").instantiate();root.add_child(battle);battle.set_process(false)
-	var driver=load("res://testing/full_battle_benchmark.gd").new();driver.target_units=660;driver.engage=240;driver._fill(battle);driver.free()
+	var driver=load("res://testing/benchmark/full_battle_benchmark.gd").new();driver.target_units=660;driver.engage=240;driver._fill(battle);driver.free()
 	var minimap=battle.view._ui.minimap
 	for i in range(30):await process_frame
 	var game: Node=root.get_node("Game")

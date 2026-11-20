@@ -36,8 +36,7 @@ func install(live: Node2D, candidate: RefCounted, cross_map := false) -> bool:
 	var visual_rows: Array
 	if view != null:
 		var queries := preload("res://app/read_models/battle_queries.gd").new(candidate)
-		preview = preload("res://presentation/battle/view/battle_view_context.gd").new(live.scene, queries)
-		view.add_child(preview)
+		preview = live.create_view_context_for(queries, view)
 		view.host = preview
 		visual_rows = preload("res://app/read_models/unit_projection.gd").staged_units(candidate.state.units, candidate.state.sheet_by_unit)
 		var complete: bool = view.attach_loaded_world(visual_rows) == true

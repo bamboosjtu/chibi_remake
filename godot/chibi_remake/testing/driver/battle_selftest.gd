@@ -12,10 +12,10 @@ var _test_failed_labels: Array = []
 
 func _init(battle: Node2D) -> void:
 	host = battle
-	gathering = preload("res://testing/gathering_checks.gd").new(battle, self)
-	groups = preload("res://testing/groups_checks.gd").new(battle, self)
-	technology = preload("res://testing/technology_checks.gd").new(battle, self)
-	navigation = preload("res://testing/navigation_checks.gd").new(battle, self)
+	gathering = preload("res://testing/checks/gathering_checks.gd").new(battle, self)
+	groups = preload("res://testing/checks/groups_checks.gd").new(battle, self)
+	technology = preload("res://testing/checks/technology_checks.gd").new(battle, self)
+	navigation = preload("res://testing/checks/navigation_checks.gd").new(battle, self)
 
 func _check(cond: bool, label: String) -> bool:
 	if cond:

@@ -17,7 +17,7 @@ var _dep_world_orders: Object
 const SceneServices = preload("res://app/battle/runtime/battle_scene_state.gd")
 var scene: SceneServices
 var node: Node2D
-const View = preload("res://presentation/battle/view/battle_view.gd")        # ARCH-013：表现层（HUD/相机/单位外观/框选）
+var screenshotter: Callable
 
 func _init(services: SceneServices, surface: Node2D) -> void:
 	scene = services
@@ -307,7 +307,8 @@ func _fit_view() -> void:
 		scene.view.fit_view()
 
 func _screenshot() -> void:
-	await View.screenshot(node)
+	if screenshotter.is_valid(): await screenshotter.call(node)
+	else: printerr("screenshot hook is not configured")
 
 func _demo() -> void:
 	await node.get_tree().create_timer(0.4).timeout

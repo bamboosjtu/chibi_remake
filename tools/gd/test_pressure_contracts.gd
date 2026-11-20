@@ -38,7 +38,7 @@ func population_contract() -> void:
 	for capacity in [true,false]:
 		root.get_node("Game").current_map="chibic17"
 		var scene=load("res://main.tscn").instantiate();root.add_child(scene);scene.set_process(false)
-		var fixture=load("res://testing/full_battle_benchmark.gd").new()
+		var fixture=load("res://testing/benchmark/full_battle_benchmark.gd").new()
 		fixture.capacity_stress=capacity;fixture.target_units=660;fixture.engage=240
 		fixture._fill(scene)
 		var sides: Dictionary=fixture.population(scene)

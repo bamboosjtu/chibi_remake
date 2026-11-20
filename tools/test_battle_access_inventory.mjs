@@ -21,6 +21,6 @@ var d=host["build_types"]
 var e=host.task_events
 `});
 assert.deepEqual(services.map(row=>row.field),['visibility','clock','projectiles','build_types','task_events']);
-const cursor=collectReadModelUses({'presentation/hud/software_cursor.gd':'var data = host.map_data'});
+const cursor=collectReadModelUses({'presentation/shell/software_cursor.gd':'var data = host.map_data'});
 assert.equal(cursor[0].origin,'scene-facade');
 console.log('BATTLE ACCESS INVENTORY NEGATIVE PASS comments / strings / provider excluded; literal lookup and scene facade distinguished');

@@ -1,7 +1,6 @@
 extends RefCounted
 const PROXY_FIELDS := ["saver", "cam", "bgm", "sfx", "remaster_art", "view", "cheat_input_open", "hover_text", "show_units", "show_buildings", "hud_acc", "show_debug", "ready_to_save", "feedback_until", "feedback_observed", "feedback_text", "ev_count", "sec_visible", "drag_pan", "selecting", "sel_start", "sel_end"]
 ## Scene-owned services and nodes. No simulation rules.
-const RemasterArt = preload("res://presentation/battle/resources/art_catalog.gd")
 
 
 
@@ -15,7 +14,7 @@ var bgm: Node = null            # 战场 BGM
 
 var sfx: Node = null            # 原版 WAVE.EXP 音效（选中/攻击）
 
-var remaster_art := RemasterArt.new()
+var remaster_art: Object = null
 
 var view: Node2D = null                             # ARCH-013：表现层宿主（--simtest/--noview 时为 null）
 

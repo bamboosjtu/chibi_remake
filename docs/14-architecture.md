@@ -19,7 +19,7 @@
 
 | 层 | 目录 | 职责 |
 |---|---|---|
-| 场景装配 | `main.gd`、`menu.gd`、`presentation/battle/view/battle_view.gd` | 生命周期、组件连接与外部兼容入口 |
+| 场景装配 | `main.gd`、`menu.gd`、`presentation/battle/view/battle_presentation_factory.gd` | 生命周期、组件连接与表现构造边界 |
 | 应用服务 | `app/` | 世界加载、存档事务、场景节点与用户存储 |
 | 模拟 | `simulation/` | 独立状态、命令、规则、固定 tick、导航与 AI |
 | 表现 | `presentation/` | 节点、HUD、菜单、相机、动画、音视频 |
@@ -34,18 +34,18 @@
 |---|---|
 | `simulation/world/battle_world.gd` | 无场景依赖的模拟组合根；统一创建规则、命令、AI 与领域服务，正常启动和候选共用地图初始化 |
 | `app/battle/commands/battle_actions.gd`、`app/battle/session/session_actions.gd`、`app/read_models/battle_queries.gd` | 提交玩家意图、办理会话操作、读取显示投影 |
-| `simulation/state/battle_state.gd` | 唯一可写战斗状态；普通 RefCounted，不继承场景 |
+| `simulation/state/battle_state.gd` | 共享权威状态容器；普通 RefCounted，不继承场景；字段业务写入者见 `tools/inputs/battle_state_ownership.json` |
 | `app/battle/runtime/battle_scene_state.gd` | 场景拥有的表现节点和存档服务 |
 | `app/battle/startup/bootstrap.gd` | 关卡装配、应用已冻结规则、开局与开发参数 |
 | `app/battle/runtime/scene_controller.gd` | 帧投递、输入、场景退出与表现协调 |
 | `simulation/world/battle_simulation.gd` | 固定 tick 执行顺序、实体清理与摘要 |
-| `simulation/battle/` | 实体工厂、空间索引、交互路径、移动、战斗、建造、生产、武将、能力、命令、战役 |
+| `simulation/<领域>/` | `units`、`movement`、`navigation`、`combat`、`economy`、`construction`、`production`、`transport`、`technology`、`officers`、`commands`、`ai`、`cheats`、`scenario`、`visibility`、`definitions`、`diagnostics` |
 | `simulation/navigation/` | 导航状态、网格占格、路径查询与城门 |
 | `simulation/ai/ai.gd` | AI 调度、快照和稳定外部接口 |
 | `simulation/ai/ai_decisions.gd` | AI 建造、训练、研究与战术决策 |
-| `presentation/battle/components/` | HUD 创建与布局、命令模型与动作、输入、选择信息、相机、单位外观、世界图层 |
-| `presentation/menu/` | 菜单控制器、样式、关卡选择、势力选择与自动化驱动 |
-| `presentation/audio/sfx.gd` | 音效播放；随机数与模拟分离 |
+| `presentation/battle/{view,camera,input,hud,command,units,world,resources,effects}/` | 视图、相机、输入、HUD、命令面板、单位外观、世界图层、资源与特效 |
+| `presentation/menu/`、`testing/automation/` | 菜单控制器、样式、关卡选择、势力选择；自动化 harness 只在验收开关下加载 |
+| `presentation/audio/sfx.gd`、`presentation/shell/` | 音效播放；常驻 PresentationHost 与软件光标 |
 | `app/saves/` | 快照字段、完整校验、候选世界恢复与提交 |
 | `testing/` | 随候选包提供的自检套件；由原 `--selftest` 参数分派 |
 

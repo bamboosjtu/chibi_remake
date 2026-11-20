@@ -13,7 +13,7 @@ Set-Location <仓库目录>
 git lfs pull
 ```
 
-已有工作区时，进入包含 `tools`、`godot` 和 `LICENSE` 的项目根目录，准备好本次要发布的源码与素材。构建记录当前 Git 提交和工作区是否有未提交改动。
+已有工作区时，进入包含 `tools`、`godot` 和 `LICENSE` 的项目根目录，准备好本次要发布的源码与素材。正式构建使用该 Git 提交中的项目文件，LFS 运行素材按该提交中的指针校验，地形从声明的输入生成。构建清单记录 Git 提交和工作区状态。
 
 标准打包使用仓库内的关卡 JSON、规则表及 Git LFS 运行素材，不需要原始光盘、REA、研究工具或绘画母版。
 
@@ -58,7 +58,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\build_release.ps1 -S
 4. 从版本化地形源输入重建或命中缓存，保留既有编码顺序，并合并重复内容。
 5. 导入暂存工程的资源。
 6. 按 `Windows HD Art` 导出预设生成 EXE、独立 PCK 与配套 DLL。
-7. 用实际 EXE 加载全部地图，并用同一 PCK 运行 `release_tests.json` 的四项冒烟、两档确定性基线及真实 EXE 保存/重启读取；失败即终止构建。`-SkipVerify` 仅允许与 `-NoPublish` 组合。
+7. 用实际 EXE 加载全部地图，再运行同一 PCK 的发行回归、已登记的确定性基线、真实 EXE 存档与隔离测试以及三轮性能验收。失败即终止构建。`-SkipVerify` 仅可与 `-NoPublish` 一起使用。
 8. 补齐原生库声明文件，写入 `build-manifest.json`（含本次验收摘要与证据哈希）。
 
 成功后终端输出：
@@ -92,7 +92,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\publish_release.ps1 
   -Executable 'D:\项目目录\_work\build\candidate-<构建ID>\ChibiRTS.exe'
 ```
 
-发布脚本将运行产物复制到新的 `release/versions/<版本>`，随包写入构建清单，然后原子替换 `release/current.json`。此前的指针保存为 `release/current.json.bak`，旧版本目录保留。日志与验证证据不进入发布包。
+发布脚本将运行产物复制到新的 `release/versions/<版本>`，随包写入构建清单，然后原子替换 `release/current.json`。此前的指针保存为 `release/current.json.bak`。旧版本目录、构建清单和机器验收摘要随版本保留，运行日志留在候选目录。
 
 构建和发布分开执行时，不要在两步之间更改候选包的 EXE、PCK、DLL 或声明文件；发布过程会根据构建清单确认文件仍为同一套产物。
 
@@ -160,16 +160,20 @@ Copy-Item -LiteralPath (Join-Path $releaseRoot 'current.json.bak') -Destination 
 
 ## 8. 本地试玩与发布打包
 
-GitHub Actions 检查静态契约、语法和启动冒烟。PR 另行编译 Windows 启动器并验证发布安全。完整源码发布回归可手动触发，也在夜间及发布分支运行。参考机性能验收、安装、分卷和上传在本地执行。统一入口为 `tools/release.ps1`，包含 `preview` 与 `release` 两个模式。
+GitHub Actions 的 `ci` 工作流检查静态契约、语法、引擎启动和存档续跑。Windows 发布安全回归入口为 `tools/ci_windows.ps1 -ReleaseSafetyOnly`。参考机性能验收、安装、分卷和上传在本地执行。统一入口 `tools/release.ps1` 提供 `preview` 与 `release` 两个模式。
 
 ```powershell
 # 试玩：构建并安装到 release/versions，允许未提交改动
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/release.ps1 -Mode preview
 
-# 只启动当前指针指向的版本，不重新构建
+# 查看当前指针指向的版本
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/release.ps1 -Mode preview -SkipBuild
 
-# 发布包：干净工作区构建，再拆成小于 1 GiB 的资产
+# 在准备发布的提交上创建标签并推送到 origin（仅在标签尚未创建时执行）
+git tag -a v0.1.1 -m 'Release v0.1.1'
+git push origin refs/tags/v0.1.1
+
+# 构建并分卷，要求远程标签匹配构建提交
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/release.ps1 -Mode release -Tag v0.1.1
 
 # 已有干净版本只重新分卷
@@ -177,12 +181,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/release.ps1 -Mode rele
 ```
 
 - `preview` 允许 `dirty=true`，构建完成后写入 `release/versions/<时间>_<提交>_<ID>` 并切换 `release/current.json`；双击 `release\ChibiRTS.exe` 即可试玩本次构建。
-- `release` 要求干净工作区，构建后由 `tools/package_release.ps1` 以 900 MiB 为上限生成 `.partNNN` 分卷、`join-release.ps1`、`join-release.cmd`、`SHA256SUMS.txt` 和 `dist/release-body.md`，所有资产均小于 1 GiB。
+- `release` 要求干净工作区，且 `origin` 上的 `-Tag` 必须指向本次构建提交。分卷只使用构建及验证清单中的交付文件和固定的许可证、发布元数据。分卷和校验全部成功后才替换 `dist/package`，新构建随后切换本地版本指针。发布说明与分卷保存在同一个目录。每个资产小于 1 GiB。
 - 发布资产采用扁平命名，避免 GitHub 资产名不能含路径。手动上传：
 
 ```powershell
-gh release create v0.1.1 dist/package/* --title "三国赤壁 · 高清重制 v0.1.1" --notes-file dist/release-body.md --prerelease
-gh release upload v0.1.1 dist/package/* --clobber
+# 使用 release.ps1 输出的 UPLOAD 命令。该命令显式指定 origin 对应仓库及 --verify-tag。
 ```
 
 下载包后先运行 `join-release.ps1` 合并并校验，再启动 `ChibiRTS.exe`。

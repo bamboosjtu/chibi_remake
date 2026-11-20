@@ -6,7 +6,7 @@ $ErrorActionPreference='Continue'
 $root=Split-Path $PSScriptRoot -Parent
 Set-Location -LiteralPath $root
 
-foreach ($test in @('test_package_safety.ps1','test_package_join.ps1','test_publish.ps1','test_candidate_lock.ps1','test_benchmark_evidence.ps1')) {
+foreach ($test in @('test_package_safety.ps1','test_package_join.ps1','test_publish.ps1','test_release_tag.ps1','test_candidate_lock.ps1','test_benchmark_evidence.ps1')) {
     & (Join-Path $PSScriptRoot $test)
     if (!$?) { throw ('Windows tool regression failed: '+$test) }
 }
