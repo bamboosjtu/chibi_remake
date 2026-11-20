@@ -168,8 +168,8 @@ func damage_fog_and_autoplay() -> void:
 	b.world.combat._apply_hit(enemy,10,int(leader.uid)); assert(enemy.hp==enemy_hp-10)
 	key(KEY_F7); b.world.combat._apply_hit(leader,10,int(enemy.uid)); assert(leader.hp==hp-10)
 	key(KEY_F2); b.sim_tick=41
-	b.world.cheat_rules._step_auto_control(); assert(idle.state=="idle","autoplay must respect fog")
-	key(KEY_F8); b.world.cheat_rules._step_auto_control()
+	b.world.auto_control._step_auto_control(); assert(idle.state=="idle","autoplay must respect fog")
+	key(KEY_F8); b.world.auto_control._step_auto_control()
 	assert(idle.state=="attack" and is_same(idle.target,enemy))
 	assert(held.state=="idle" and busy.state=="move" and worker.state=="idle")
 	print("META RULES PASS reversible fog / no exploration pollution / melee-projectile-fire shared immunity / only own side / idle combat delegation")
