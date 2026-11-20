@@ -24,7 +24,7 @@ func _scene(mode: String) -> void:
 	assert(battle.scene.ready_to_save and not battle.units.is_empty())
 	battle.view.event_view.restore_history(); battle.view.update_panel()
 	var ui = battle.view._ui
-	var skin = load("res://presentation/hud/battle_skin.gd").new()
+	var skin = load("res://presentation/battle/hud/battle_skin.gd").new()
 	match mode:
 		"panel":
 			assert(skin.texture_for("hud_right")==null and skin.texture_for("hud_bar_tile")==null)
@@ -48,21 +48,21 @@ func _terrain_budget() -> void:
 		assert(image.save_png(filename)==OK)
 		record.lods[str(lod)]={"texture":filename,"bytes":64*lod*lod}
 	var host := Node2D.new()
-	var stream = load("res://presentation/battle/terrain_stream.gd").new(host,"__fixture__")
+	var stream = load("res://presentation/battle/world/terrain_stream.gd").new(host,"__fixture__")
 	root.add_child(stream); stream.set_process(false); stream.chunks=[record]; stream.budget=1
 	stream.update_visible(Rect2(0,0,4,4))
 	assert(not stream.loading_error.is_empty() and stream.active.is_empty() and stream._pending.is_empty() and stream._queued.is_empty())
 	stream.budget=128; stream.update_visible(Rect2(0,0,4,4))
 	assert(stream.loading_error.is_empty() and stream.active.size()==1 and stream.loaded_bytes==64)
 	stream.free()
-	stream=load("res://presentation/battle/terrain_stream.gd").new(host,"__fixture__")
+	stream=load("res://presentation/battle/world/terrain_stream.gd").new(host,"__fixture__")
 	root.add_child(stream); stream.set_process(false); stream.chunks=[record]; stream.budget=128
 	for lod in record.lods: record.lods[lod].bytes=1
 	stream.update_visible(Rect2(0,0,4,4))
 	assert(not stream.loading_error.is_empty() and stream.active.is_empty() and stream.loaded_bytes==0, "Decoded dimensions must override false byte metadata")
 	stream.free()
 	for lod in record.lods: record.lods[lod].bytes=64*int(lod)*int(lod)
-	stream=load("res://presentation/battle/terrain_stream.gd").new(host,"__fixture__")
+	stream=load("res://presentation/battle/world/terrain_stream.gd").new(host,"__fixture__")
 	root.add_child(stream); stream.set_process(false); stream.chunks=[record]; stream.budget=128
 	stream.update_visible(Rect2(0,0,4,4),false)
 	assert(not stream._pending.is_empty())

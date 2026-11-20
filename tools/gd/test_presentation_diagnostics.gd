@@ -9,7 +9,7 @@ func run() -> void:
 	var sound := Node.new()
 	battle.scene.view = view
 	battle.scene.sfx = sound
-	var diagnostics = preload("res://presentation/battle/event_diagnostics.gd").new(false)
+	var diagnostics = preload("res://presentation/battle/view/event_diagnostics.gd").new(false)
 	battle._presentation_diagnostics = diagnostics
 	var rng_before: int = battle.state.simulation_rng.state
 	var tick_before: int = battle.state.sim_tick

@@ -76,7 +76,7 @@ func _ready() -> void:
 	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	list.add_child(status)
 	_build_settings()
-	slots_dialog=preload("res://presentation/hud/save_slots_dialog.gd").new()
+	slots_dialog=preload("res://presentation/shared/dialogs/save_slots_dialog.gd").new()
 	add_child(slots_dialog)
 	slots_dialog.confirmed.connect(_slot_confirmed)
 	slots_dialog.cancelled.connect(func():panel.show())

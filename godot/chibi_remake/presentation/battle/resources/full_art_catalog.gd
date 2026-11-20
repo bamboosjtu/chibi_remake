@@ -1,7 +1,7 @@
 extends RefCounted
 ## 完整图集与武将头像。视觉采样区域独立于世界尺寸/实体状态。
 const MANIFEST := "res://art/full/manifest.json"
-const Textures = preload("res://presentation/battle/runtime_textures.gd")
+const Textures = preload("res://presentation/battle/resources/runtime_textures.gd")
 const TEAM_SHADER = preload("res://art/full/team_color.gdshader")
 const TEAM_COLORS := {0: Color("c54ea0"), 1: Color("18b9ee"), 2: Color("cf4231"), 3: Color("38b4a7"), 4: Color("57ac55")}
 var _data: Dictionary = {}

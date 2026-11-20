@@ -3,7 +3,7 @@ extends SceneTree
 ## 小地图点击+拖动、边缘滚屏、资源条与头像对齐。
 ## 运行方式（verify_candidate.ps1 用打包后的 PCK 跑一遍）：
 ##   godot --headless --main-pack ChibiRTS.pck --script tools/gd/test_battle_interaction.gd
-const Metrics = preload("res://presentation/hud/hud_metrics.gd")
+const Metrics = preload("res://presentation/battle/hud/hud_metrics.gd")
 var finished := false
 var battle: Node2D
 func _initialize() -> void:

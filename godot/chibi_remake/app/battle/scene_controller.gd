@@ -17,7 +17,7 @@ var _dep_world_orders: Object
 const SceneServices = preload("res://app/battle_scene_state.gd")
 var scene: SceneServices
 var node: Node2D
-const View = preload("res://presentation/battle/battle_view.gd")        # ARCH-013：表现层（HUD/相机/单位外观/框选）
+const View = preload("res://presentation/battle/view/battle_view.gd")        # ARCH-013：表现层（HUD/相机/单位外观/框选）
 
 func _init(services: SceneServices, surface: Node2D) -> void:
 	scene = services

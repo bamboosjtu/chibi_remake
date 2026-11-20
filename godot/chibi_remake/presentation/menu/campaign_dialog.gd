@@ -5,7 +5,7 @@ var _ui: UIState
 var surface: Control
 var _dep_controller: Object
 var _dep_menu_styles: Object
-const Textures = preload("res://presentation/battle/runtime_textures.gd")
+const Textures = preload("res://presentation/battle/resources/runtime_textures.gd")
 
 # ── 「选择势力」这一步（2a 新增）：开始游戏 → 先问曹操/刘备，再列该线关卡 ──
 

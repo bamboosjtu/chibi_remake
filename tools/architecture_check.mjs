@@ -65,7 +65,7 @@ for (const file of files(root)) {
   if((relative === 'app/save_service.gd' || relative === 'app/game.gd') && /\.transports\.reconcile\(/.test(code)) fail(`${relative}: save serialization must project transport values without mutating the world`);
   if(relative === 'app/campaign_session.gd' && /\b(?:FileAccess|DirAccess)\b/.test(executable)) fail(`${relative}: campaign queries must use the cached level catalog`);
   if (relative !== 'simulation/world/battle_world.gd' && /\bworld\.(?:_modules|_access)\b|\bworld\.(?:get|set)\(\s*['"]_(?:modules|access)['"]/.test(code)) fail(`${relative}: accesses private BattleWorld collections`);
-  if (['presentation/battle/components/camera_controller.gd','presentation/battle/build_preview.gd','presentation/battle/battle_resources.gd'].includes(relative) && /\bhost\.(?:units|selected|map_data|nav|decor_cells)\b|\bhost(?:\.(?:get|get\.bind)\(\s*|\[\s*)['"](?:units|selected|map_data|nav|decor_cells)['"]/.test(code)) fail(`${relative}: bypasses value read model`);
+  if (['presentation/battle/camera/camera_controller.gd','presentation/battle/world/build_preview.gd','presentation/battle/world/battle_resources.gd'].includes(relative) && /\bhost\.(?:units|selected|map_data|nav|decor_cells)\b|\bhost(?:\.(?:get|get\.bind)\(\s*|\[\s*)['"](?:units|selected|map_data|nav|decor_cells)['"]/.test(code)) fail(`${relative}: bypasses value read model`);
   if (relative === 'app/read_models/battle_queries.gd' && /\b(?:_?data|state)\.(?:units|selected|map_data|decor_cells)\.duplicate\(\s*true\s*\)/.test(code)) fail(`${relative}: deep-copies world data at the read boundary`);
   const budget = limits.files[relative] ?? 600;
   if (count > budget) fail(`${relative}: ${count} lines exceeds ${budget}`);

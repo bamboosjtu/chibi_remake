@@ -1,6 +1,6 @@
 extends Control
 ## Terrain persists after exploration; only current vision reveals enemy markers.
-const Metrics=preload("res://presentation/hud/hud_metrics.gd")
+const Metrics=preload("res://presentation/battle/hud/hud_metrics.gd")
 static var catalog: Dictionary = {}
 var host: Node2D
 var view: Node2D

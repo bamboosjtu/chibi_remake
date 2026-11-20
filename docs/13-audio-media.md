@@ -89,7 +89,7 @@
 | 音乐 | `presentation/audio/bgm.gd` |
 | 音效 | `presentation/audio/sfx.gd`、`data/db/audio_index.json` |
 | 视频与事件 | `presentation/media/event_view.gd`、`data/db/events.json` |
-| 开场选择 | `presentation/battle/components/controller.gd::maybe_play_intro`（由 `battle_view.gd` 转发） |
+| 开场选择 | `presentation/battle/view/controller.gd::maybe_play_intro`（由 `battle_view.gd` 转发） |
 
 ## 7. 验收要点
 

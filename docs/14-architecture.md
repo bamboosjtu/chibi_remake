@@ -19,7 +19,7 @@
 
 | 层 | 目录 | 职责 |
 |---|---|---|
-| 场景装配 | `main.gd`、`menu.gd`、`presentation/battle/battle_view.gd` | 生命周期、组件连接与外部兼容入口 |
+| 场景装配 | `main.gd`、`menu.gd`、`presentation/battle/view/battle_view.gd` | 生命周期、组件连接与外部兼容入口 |
 | 应用服务 | `app/` | 世界加载、存档事务、场景节点与用户存储 |
 | 模拟 | `simulation/` | 独立状态、命令、规则、固定 tick、导航与 AI |
 | 表现 | `presentation/` | 节点、HUD、菜单、相机、动画、音视频 |

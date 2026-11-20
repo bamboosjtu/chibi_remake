@@ -8,7 +8,7 @@ extends SceneTree
 
 var _done := false
 
-const HUD = preload("res://presentation/hud/hud_metrics.gd")
+const HUD = preload("res://presentation/battle/hud/hud_metrics.gd")
 
 func _initialize() -> void:
 	create_timer(120.0).timeout.connect(func() -> void:

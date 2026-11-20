@@ -2,7 +2,7 @@ extends RefCounted
 ## 运行素材的统一入口：全部转交完整图集清单（art/full/manifest.json）。
 ## 旧的 art/remaster 兼容清单已移除，不再保留第二套素材来源。
 
-const FullArt = preload("res://presentation/battle/full_art_catalog.gd")
+const FullArt = preload("res://presentation/battle/resources/full_art_catalog.gd")
 var _full_art := FullArt.new()
 
 func terrain_info(map_id: String) -> Dictionary:

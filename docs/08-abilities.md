@@ -144,7 +144,7 @@ power = 截断( ((兵力A% − 体力B%) × 4 / 60 + 1) × 兵力A%² × 0.006 )
 | 阵法偏移与应用 | `simulation/combat/abilities.gd` |
 | 单挑 | `main.gd::_duel_begin`、`_duel_at` |
 | 视野与远视 | `simulation/visibility/battle_visibility.gd`；施放当帧刷新，到期恢复基础半径 |
-| 计谋与阵法子菜单 | `presentation/battle/battle_view.gd` |
+| 计谋与阵法子菜单 | `presentation/battle/view/battle_view.gd` |
 
 ## 7. 验收要点
 

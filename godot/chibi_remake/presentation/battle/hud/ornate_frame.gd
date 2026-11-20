@@ -1,6 +1,6 @@
 extends Control
 ## 固定宽度九切片：透明框心由真正的控件内容填充。
-const Textures = preload("res://presentation/battle/runtime_textures.gd")
+const Textures = preload("res://presentation/battle/resources/runtime_textures.gd")
 var texture: Texture2D
 var edge := 8.0
 

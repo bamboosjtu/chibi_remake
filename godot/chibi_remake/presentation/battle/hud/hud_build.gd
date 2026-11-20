@@ -1,6 +1,6 @@
 extends Object
 ## hud build: presentation component.
-const UIState = preload("res://presentation/battle/components/battle_view_state.gd")
+const UIState = preload("res://presentation/battle/view/battle_view_state.gd")
 var _ui: UIState
 var surface: Node2D
 var _dep_command_actions: Object
@@ -9,7 +9,7 @@ var _dep_controller: Object
 var _dep_hud_input: Object
 var _dep_hud_layout: Object
 var _dep_selection_info: Object
-const Textures = preload("res://presentation/battle/runtime_textures.gd")
+const Textures = preload("res://presentation/battle/resources/runtime_textures.gd")
 
 func _init(data: UIState, node: Node2D) -> void:
 	_ui = data
@@ -36,11 +36,11 @@ func build_ui() -> void:
 	_build_top_bar(ui)          # 四个「图标 + 数字」资源槽 + 顶中红匾
 	_build_right_panel(ui)      # 小地图 / 头像框 / 兵力牌 / 命令按钮 / 属性文字
 	if _ui._topbar_original:
-		_ui.classic_panel = load("res://presentation/hud/battle_hud_panel.gd").new(_ui.host, surface)
+		_ui.classic_panel = load("res://presentation/battle/hud/battle_hud_panel.gd").new(_ui.host, surface)
 		ui.add_child(_ui.classic_panel)
-	_ui.battle_menu = load("res://presentation/hud/battle_menu.gd").new(_ui.host)
+	_ui.battle_menu = load("res://presentation/screens/battle_menu.gd").new(_ui.host)
 	surface.add_child(_ui.battle_menu)
-	_ui.briefing=preload("res://presentation/hud/mission_briefing.gd").new(_ui.host)
+	_ui.briefing=preload("res://presentation/battle/hud/mission_briefing.gd").new(_ui.host)
 	surface.add_child(_ui.briefing)
 	_build_hot_strip(ui)        # 左缘 1..10 热键条
 	_build_status(ui)           # 左下状态行（原版「训练完成」的位置）
@@ -301,7 +301,7 @@ func _build_right_panel(ui: CanvasLayer) -> void:
 		ui.add_child(_ui.panel_bg_tex)
 
 	_ui.minimap_box = _mk_panel(ui, _ui.c_mini_bg, Color(0.75, 0.72, 0.65), 1.0)
-	_ui.minimap = preload("res://presentation/battle/battle_minimap.gd").new(_ui.host,surface)
+	_ui.minimap = preload("res://presentation/battle/hud/battle_minimap.gd").new(_ui.host,surface)
 	_ui.minimap.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_ui.minimap_box.add_child(_ui.minimap)
 
@@ -333,7 +333,7 @@ func _build_right_panel(ui: CanvasLayer) -> void:
 	_ui.troop_label.clip_text = false
 	_ui.troop_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	# 武将头像沿用现成的 officer_portrait.gd（117 张真实头像，没有头像的身份自动隐藏）
-	_ui.officer_portrait = load("res://presentation/hud/officer_portrait.gd").new()
+	_ui.officer_portrait = load("res://presentation/battle/hud/officer_portrait.gd").new()
 	_ui.troop_frame.add_child(_ui.officer_portrait)
 
 	_ui.cmd_title = _mk_label(ui, 15.0, _ui.c_dim, HORIZONTAL_ALIGNMENT_LEFT)

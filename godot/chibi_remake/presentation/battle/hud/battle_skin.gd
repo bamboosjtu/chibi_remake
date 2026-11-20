@@ -1,6 +1,6 @@
 extends RefCounted
 ## 高清重绘的面板是唯一装饰母版；裁片在运行时引用，动态 UI 不烘焙进图片。
-const Textures = preload("res://presentation/battle/runtime_textures.gd")
+const Textures = preload("res://presentation/battle/resources/runtime_textures.gd")
 var _panel: Texture2D
 var _banner: Texture2D
 

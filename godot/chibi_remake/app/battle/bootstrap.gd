@@ -10,7 +10,7 @@ const SceneServices = preload("res://app/battle_scene_state.gd")
 var scene: SceneServices
 var node: Node2D
 const SaveSvc = preload("res://app/save_service.gd")    # ARCH-006：存档/读档编排
-const View = preload("res://presentation/battle/battle_view.gd")        # ARCH-013：表现层（HUD/相机/单位外观/框选）
+const View = preload("res://presentation/battle/view/battle_view.gd")        # ARCH-013：表现层（HUD/相机/单位外观/框选）
 
 func _init(services: SceneServices, surface: Node2D) -> void:
 	scene = services
@@ -97,7 +97,7 @@ func _ready() -> void:
 		scene.view.update_panel()
 	scene.ready_to_save = true
 	if scene.view != null:
-		scene.view.completion = preload("res://presentation/hud/battle_completion.gd").new(scene.view.host)
+		scene.view.completion = preload("res://presentation/battle/hud/battle_completion.gd").new(scene.view.host)
 		scene.view.add_child(scene.view.completion)
 		if battle.game_end != 0: _dep_campaign._show_end(battle.game_end)
 	# 章节开场过场：读档进入、测试模式与 --no-intro 时跳过（battle_view 内再判一次参数）。

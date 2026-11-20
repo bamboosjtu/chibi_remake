@@ -44,18 +44,18 @@
       "effects": "simulation/ports/battle_events.gd"
     },
     "view": {
-      "controller": "presentation/battle/components/controller.gd",
-      "unit_visuals": "presentation/battle/components/unit_visuals.gd",
-      "camera_controller": "presentation/battle/components/camera_controller.gd",
-      "hud_build": "presentation/battle/components/hud_build.gd",
-      "hud_layout": "presentation/battle/components/hud_layout.gd",
-      "world_layers": "presentation/battle/components/world_layers.gd",
-      "hud_input": "presentation/battle/components/hud_input.gd",
-      "selection_info": "presentation/battle/components/selection_info.gd",
-      "command_art": "presentation/battle/components/command_art.gd",
-      "command_model": "presentation/battle/components/command_model.gd",
-      "command_actions": "presentation/battle/components/command_actions.gd",
-      "legacy_layout": "presentation/battle/components/legacy_layout.gd"
+      "controller": "presentation/battle/view/controller.gd",
+      "unit_visuals": "presentation/battle/units/unit_visuals.gd",
+      "camera_controller": "presentation/battle/camera/camera_controller.gd",
+      "hud_build": "presentation/battle/hud/hud_build.gd",
+      "hud_layout": "presentation/battle/hud/hud_layout.gd",
+      "world_layers": "presentation/battle/world/world_layers.gd",
+      "hud_input": "presentation/battle/input/hud_input.gd",
+      "selection_info": "presentation/battle/units/selection_info.gd",
+      "command_art": "presentation/battle/command/command_art.gd",
+      "command_model": "presentation/battle/command/command_model.gd",
+      "command_actions": "presentation/battle/command/command_actions.gd",
+      "legacy_layout": "presentation/battle/view/legacy_layout.gd"
     },
     "menu": {
       "controller": "presentation/menu/controller.gd",

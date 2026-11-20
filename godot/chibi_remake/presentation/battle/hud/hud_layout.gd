@@ -1,6 +1,6 @@
 extends Object
 ## hud layout: presentation component.
-const UIState = preload("res://presentation/battle/components/battle_view_state.gd")
+const UIState = preload("res://presentation/battle/view/battle_view_state.gd")
 var _ui: UIState
 var surface: Node2D
 var _dep_camera_controller: Object
@@ -184,7 +184,7 @@ func _apply_metrics() -> void:
 func _decorate_frame(panel: Panel, border: float) -> void:
 	var ornament: Control = panel.get_node_or_null("OrnateFrame")
 	if ornament == null:
-		ornament = load("res://presentation/hud/ornate_frame.gd").new()
+		ornament = load("res://presentation/battle/hud/ornate_frame.gd").new()
 		ornament.name = "OrnateFrame"
 		panel.add_child(ornament)
 		ornament.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

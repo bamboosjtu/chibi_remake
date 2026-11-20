@@ -134,7 +134,7 @@ func _backup_source() -> void:
 			matched=true;break
 	assert(matched,"Fixture must preserve timestamp and length")
 	assert(game._slot_info(19).source=="backup")
-	var menu=load("res://presentation/hud/save_slots_dialog.gd").new();root.add_child(menu);menu.open(false)
+	var menu=load("res://presentation/shared/dialogs/save_slots_dialog.gd").new();root.add_child(menu);menu.open(false)
 	var row: int=menu.entries.find_custom(func(entry):return int(entry.slot)==19)
 	assert(menu.records.get_item_text(row).contains("使用备份"));menu._selected(row)
 	assert(menu.status.text.contains("备份"));menu.free()

@@ -1,11 +1,11 @@
 extends Object
-const ViewMath = preload("res://presentation/battle/view_math.gd")
+const ViewMath = preload("res://presentation/battle/camera/view_math.gd")
 ## unit visuals: presentation component.
-const UIState = preload("res://presentation/battle/components/battle_view_state.gd")
+const UIState = preload("res://presentation/battle/view/battle_view_state.gd")
 var _ui: UIState
 var surface: Node2D
 
-const Textures = preload("res://presentation/battle/runtime_textures.gd")
+const Textures = preload("res://presentation/battle/resources/runtime_textures.gd")
 var pending_visuals := {}
 var _world_dirty := false
 var sync_calls := 0
@@ -123,7 +123,7 @@ func attach_unit(u: Dictionary, sheet: String, w: int, h: int, k: float) -> void
 	if int(u.unit) in [16,17] and unit_nodes(u).skin != null:
 		var offset: Vector2 = _ui.host.remaster_art.gate_wall_offset(str(_ui.host.queries.map_id),Vector2i(int(u.A),int(u.B)))
 		var foundation: float = _ui.host.remaster_art.gate_foundation_drop(str(_ui.host.queries.map_id),Vector2i(int(u.A),int(u.B)))
-		var module = load("res://presentation/battle/gate_module.gd").new(int(u.unit),unit_nodes(u).skin.texture,unit_nodes(u).skin.material,foundation)
+		var module = load("res://presentation/battle/world/gate_module.gd").new(int(u.unit),unit_nodes(u).skin.texture,unit_nodes(u).skin.material,foundation)
 		module.scale = Vector2(k,k)
 		module.position = offset*k
 		spr.add_child(module)

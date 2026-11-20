@@ -1,6 +1,6 @@
 extends Object
 ## world layers: presentation component.
-const UIState = preload("res://presentation/battle/components/battle_view_state.gd")
+const UIState = preload("res://presentation/battle/view/battle_view_state.gd")
 var _ui: UIState
 var surface: Node2D
 var terrain: Node2D
@@ -11,11 +11,11 @@ func _init(data: UIState, node: Node2D) -> void:
 
 func build_terrain() -> void:
 	# Visual streaming must finish while the opening briefing pauses the simulation.
-	var fog: Sprite2D=load("res://presentation/battle/battle_fog.gd").new(_ui.host.queries.visibility_view, _ui.host.queries.visibility_planes)
+	var fog: Sprite2D=load("res://presentation/battle/world/battle_fog.gd").new(_ui.host.queries.visibility_view, _ui.host.queries.visibility_planes)
 	_ui.fog_sprite=fog
 	fog.process_mode=Node.PROCESS_MODE_ALWAYS
 	surface.add_child(fog)
-	_ui.resource_layer = load("res://presentation/battle/battle_resources.gd").new(_ui.host)
+	_ui.resource_layer = load("res://presentation/battle/world/battle_resources.gd").new(_ui.host)
 	_ui.resource_layer.process_mode=Node.PROCESS_MODE_ALWAYS
 	surface.add_child(_ui.resource_layer)
 	var map_id := str(_ui.host.queries.map_id)
@@ -25,7 +25,7 @@ func build_terrain() -> void:
 	else: install_terrain(map_id, plan)
 
 func terrain_plan(map_id: String) -> Dictionary:
-	return preload("res://presentation/battle/terrain_stream.gd").read_manifest(map_id)
+	return preload("res://presentation/battle/world/terrain_stream.gd").read_manifest(map_id)
 
 func prepare_opening_layers() -> void:
 	if _ui.resource_layer != null: _ui.resource_layer._process(0.0)
@@ -38,7 +38,7 @@ func install_terrain(map_id: String, plan: Dictionary, preflight := false) -> bo
 	return true
 
 func stage_terrain(map_id: String, plan: Dictionary, preflight: bool) -> Node2D:
-	var staged := preload("res://presentation/battle/terrain_stream.gd").new(_ui.host, map_id, plan)
+	var staged := preload("res://presentation/battle/world/terrain_stream.gd").new(_ui.host, map_id, plan)
 	staged.process_mode = Node.PROCESS_MODE_ALWAYS
 	surface.add_child(staged)
 	if preflight and not staged.load_opening_view():

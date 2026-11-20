@@ -214,16 +214,16 @@
 
 | 职责 | 模块 |
 |---|---|
-| HUD 构建、布局、命令面板、小地图 | `presentation/battle/battle_view.gd` |
-| HUD 度量与战场矩形 | `presentation/hud/hud_metrics.gd` |
-| 皮肤与九宫格边框 | `presentation/hud/battle_skin.gd`、`ornate_frame.gd` |
+| HUD 构建、布局、命令面板、小地图 | `presentation/battle/view/battle_view.gd` |
+| HUD 度量与战场矩形 | `presentation/battle/hud/hud_metrics.gd` |
+| 皮肤与九宫格边框 | `presentation/battle/hud/battle_skin.gd`、`ornate_frame.gd` |
 | 软件光标 | `presentation/hud/software_cursor.gd`、`data/db/cursors.json` |
-| 命令注册表与图标 | `presentation/hud/command_catalog.gd`、`data/db/commands.json` |
+| 命令注册表与图标 | `presentation/battle/command/command_catalog.gd`、`data/db/commands.json` |
 | 指令分型与权限 | `simulation/commands/command_policy.gd`、`data/db/command_variants.json` |
-| 任务开场白 | `presentation/hud/mission_briefing.gd`、`data/db/startup_briefings.json` |
+| 任务开场白 | `presentation/battle/hud/mission_briefing.gd`、`data/db/startup_briefings.json` |
 | 主菜单 | `menu.gd` |
-| 暂停菜单 | `presentation/hud/battle_menu.gd` |
-| 存档槽对话框 | `presentation/hud/save_slots_dialog.gd` |
+| 暂停菜单 | `presentation/screens/battle_menu.gd` |
+| 存档槽对话框 | `presentation/shared/dialogs/save_slots_dialog.gd` |
 
 ## 9. 验收要点
 

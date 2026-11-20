@@ -1,7 +1,7 @@
 extends Object
-const ViewMath = preload("res://presentation/battle/view_math.gd")
+const ViewMath = preload("res://presentation/battle/camera/view_math.gd")
 ## selection info: presentation component.
-const UIState = preload("res://presentation/battle/components/battle_view_state.gd")
+const UIState = preload("res://presentation/battle/view/battle_view_state.gd")
 var _ui: UIState
 var surface: Node2D
 var _dep_camera_controller: Object

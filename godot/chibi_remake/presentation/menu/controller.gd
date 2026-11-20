@@ -8,7 +8,7 @@ var _automation_driver: Object
 var _dep_campaign_dialog: Object
 var _dep_level_dialog: Object
 var _dep_menu_styles: Object
-const RemasterArt = preload("res://presentation/battle/art_catalog.gd")
+const RemasterArt = preload("res://presentation/battle/resources/art_catalog.gd")
 
 const CAMPAIGN_CAO := "chibic"             # 左格：曹操（关卡 id 前缀也是它）
 
@@ -333,7 +333,7 @@ func _on_level(id: String) -> void:
 
 func _on_load() -> void:
 	if _ui.slots_dialog==null:
-		_ui.slots_dialog=preload("res://presentation/hud/save_slots_dialog.gd").new()
+		_ui.slots_dialog=preload("res://presentation/shared/dialogs/save_slots_dialog.gd").new()
 		surface.add_child(_ui.slots_dialog)
 		_ui.slots_dialog.confirmed.connect(_load_slot)
 	_ui.slots_dialog.open(false)

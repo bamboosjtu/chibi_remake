@@ -2,7 +2,7 @@
   "description": "Migrated long functions retain their reviewed size as an incremental budget; new functions over 80 lines require review. Module limits apply to all runtime scripts. `violations` records layer breaches that existed when the rule was added: each entry is <file>::<rule>, new breaches fail, and entries should be removed once the breach is fixed.",
   "files": {
     "main.gd": 250,
-    "presentation/battle/battle_view.gd": 500,
+    "presentation/battle/view/battle_view.gd": 500,
     "menu.gd": 400
   },
   "violations": [],
@@ -16,9 +16,9 @@
     "presentation/menu/campaign_dialog.gd::_build_campaign_dialog": 98,
     "presentation/menu/controller.gd::_ready": 220,
     "presentation/menu/level_dialog.gd::_build_level_dialog": 151,
-    "presentation/battle/components/command_model.gd::_refresh_cmd_panel": 109,
-    "presentation/battle/components/hud_build.gd::_build_right_panel": 95,
-    "presentation/battle/components/hud_layout.gd::_apply_metrics": 140,
+    "presentation/battle/command/command_model.gd::_refresh_cmd_panel": 109,
+    "presentation/battle/hud/hud_build.gd::_build_right_panel": 95,
+    "presentation/battle/hud/hud_layout.gd::_apply_metrics": 140,
     "simulation/units/entity_factory.gd::_make_unit": 101
   },
   "reviews": {
@@ -27,7 +27,7 @@
       "reviewBy": "2027-02-16",
       "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."
     },
-    "files:presentation/battle/battle_view.gd": {
+    "files:presentation/battle/view/battle_view.gd": {
       "owner": "project-maintainers",
       "reviewBy": "2027-02-16",
       "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."
@@ -82,17 +82,17 @@
       "reviewBy": "2027-02-16",
       "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."
     },
-    "functions:presentation/battle/components/command_model.gd::_refresh_cmd_panel": {
+    "functions:presentation/battle/command/command_model.gd::_refresh_cmd_panel": {
       "owner": "project-maintainers",
       "reviewBy": "2027-02-16",
       "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."
     },
-    "functions:presentation/battle/components/hud_build.gd::_build_right_panel": {
+    "functions:presentation/battle/hud/hud_build.gd::_build_right_panel": {
       "owner": "project-maintainers",
       "reviewBy": "2027-02-16",
       "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."
     },
-    "functions:presentation/battle/components/hud_layout.gd::_apply_metrics": {
+    "functions:presentation/battle/hud/hud_layout.gd::_apply_metrics": {
       "owner": "project-maintainers",
       "reviewBy": "2027-02-16",
       "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."

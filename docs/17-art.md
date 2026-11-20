@@ -242,11 +242,11 @@ node tools/art_manifest.mjs --check --hash
 | 职责 | 模块/工具 |
 |---|---|
 | 素材目录与清单 | `art/full/`、`art/full/manifest.json` |
-| 图集与帧选择 | `presentation/battle/art_catalog.gd`、`full_art_catalog.gd` |
-| 地形流式加载 | `presentation/battle/terrain_stream.gd` |
-| 纹理加载与缺失分级 | `presentation/battle/runtime_textures.gd` |
-| UI 皮肤与九宫格 | `presentation/hud/battle_skin.gd`、`ornate_frame.gd` |
-| 命令图标 | `presentation/hud/command_catalog.gd` |
+| 图集与帧选择 | `presentation/battle/resources/art_catalog.gd`、`full_art_catalog.gd` |
+| 地形流式加载 | `presentation/battle/world/terrain_stream.gd` |
+| 纹理加载与缺失分级 | `presentation/battle/resources/runtime_textures.gd` |
+| UI 皮肤与九宫格 | `presentation/battle/hud/battle_skin.gd`、`ornate_frame.gd` |
+| 命令图标 | `presentation/battle/command/command_catalog.gd` |
 | 光标图集 | `presentation/hud/software_cursor.gd` |
-| 城门地形 | `presentation/battle/gate_module.gd`、`art/full/gate_apertures.gdshader` |
+| 城门地形 | `presentation/battle/world/gate_module.gd`、`art/full/gate_apertures.gdshader` |
 | 素材审计与装配 | `tools/hd/`、`tools/gd/bake_full_terrain.gd`、`tools/art_manifest.mjs` |

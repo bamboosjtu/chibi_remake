@@ -116,7 +116,7 @@ func _patch(map_id: String, map: Dictionary, gate: Vector2i, unit_id: int, compo
 	assert(canvas.save_png(ProjectSettings.globalize_path(path)) == OK)
 	var road_path := ART+"gate_terrain/%s-%d-%d-road.png" % [map_id,gate.x,gate.y]
 	assert(road.save_png(ProjectSettings.globalize_path(road_path)) == OK)
-	var architecture = preload("res://presentation/battle/gate_module.gd")
+	var architecture = preload("res://presentation/battle/world/gate_module.gd")
 	var anchor := Vector2(44*gate.x+22*(gate.y&1)+22,11*gate.y+22)
 	var top: Vector2 = anchor-Vector2(44,88)+architecture.base_origin(unit_id)+Vector2(architecture.LEGACY_WIDTH*0.5,architecture.LEGACY_WIDTH*0.5*architecture.slope(unit_id))
 	var footing: float = top.y+architecture.HEIGHT+architecture.FOOT_DEPTH

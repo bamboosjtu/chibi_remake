@@ -6,7 +6,7 @@ extends SceneTree
 # 运行：隔离 APPDATA + godot --headless --path godot/chibi_remake \
 #   --script ../../tools/gd/test_texture_states.gd -- --noview （无视图即可，纯 loader）
 
-const Tex = preload("res://presentation/battle/runtime_textures.gd")
+const Tex = preload("res://presentation/battle/resources/runtime_textures.gd")
 
 var _done := false
 

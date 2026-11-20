@@ -17,8 +17,8 @@ func prepare_opening_layers() -> void:
 ## Composition root; presentation components own their specific behavior.
 const GRID_FALLBACK := 8
 
-var _ui = preload("res://presentation/battle/components/battle_view_state.gd").new()
-var _world_nodes := preload("res://presentation/battle/world_nodes.gd").new(_ui)
+var _ui = preload("res://presentation/battle/view/battle_view_state.gd").new()
+var _world_nodes := preload("res://presentation/battle/world/world_nodes.gd").new(_ui)
 
 func stage_world_nodes() -> Dictionary: return _world_nodes.begin()
 func rollback_world_nodes(token: Dictionary) -> void: _world_nodes.rollback(token)
@@ -145,23 +145,23 @@ var art_back: TextureRect:
 
 func _init(access: Node2D) -> void:
 	_ui.host = access
-	_ui.projectile_view = preload("res://presentation/battle/projectile_view.gd").new(access)
+	_ui.projectile_view = preload("res://presentation/battle/effects/projectile_view.gd").new(access)
 	add_child(_ui.projectile_view)
-	_ui.construction_preview = preload("res://presentation/battle/build_preview.gd").new(access)
+	_ui.construction_preview = preload("res://presentation/battle/world/build_preview.gd").new(access)
 	add_child(_ui.construction_preview)
 	for field in _ui.PROXY_FIELDS: _fields[field] = true
-	controller = preload("res://presentation/battle/components/controller.gd").new(_ui, self)
-	unit_visuals = preload("res://presentation/battle/components/unit_visuals.gd").new(_ui, self)
-	camera_controller = preload("res://presentation/battle/components/camera_controller.gd").new(_ui, self)
-	hud_build = preload("res://presentation/battle/components/hud_build.gd").new(_ui, self)
-	hud_layout = preload("res://presentation/battle/components/hud_layout.gd").new(_ui, self)
-	world_layers = preload("res://presentation/battle/components/world_layers.gd").new(_ui, self)
-	hud_input = preload("res://presentation/battle/components/hud_input.gd").new(_ui, self)
-	selection_info = preload("res://presentation/battle/components/selection_info.gd").new(_ui, self)
-	command_art = preload("res://presentation/battle/components/command_art.gd").new(_ui, self)
-	command_model = preload("res://presentation/battle/components/command_model.gd").new(_ui, self)
-	command_actions = preload("res://presentation/battle/components/command_actions.gd").new(_ui, self)
-	legacy_layout = preload("res://presentation/battle/components/legacy_layout.gd").new(_ui, self)
+	controller = preload("res://presentation/battle/view/controller.gd").new(_ui, self)
+	unit_visuals = preload("res://presentation/battle/units/unit_visuals.gd").new(_ui, self)
+	camera_controller = preload("res://presentation/battle/camera/camera_controller.gd").new(_ui, self)
+	hud_build = preload("res://presentation/battle/hud/hud_build.gd").new(_ui, self)
+	hud_layout = preload("res://presentation/battle/hud/hud_layout.gd").new(_ui, self)
+	world_layers = preload("res://presentation/battle/world/world_layers.gd").new(_ui, self)
+	hud_input = preload("res://presentation/battle/input/hud_input.gd").new(_ui, self)
+	selection_info = preload("res://presentation/battle/units/selection_info.gd").new(_ui, self)
+	command_art = preload("res://presentation/battle/command/command_art.gd").new(_ui, self)
+	command_model = preload("res://presentation/battle/command/command_model.gd").new(_ui, self)
+	command_actions = preload("res://presentation/battle/command/command_actions.gd").new(_ui, self)
+	legacy_layout = preload("res://presentation/battle/view/legacy_layout.gd").new(_ui, self)
 	var components := _owned_components()
 	for component in components.values():
 		if component != null and component.has_method("bind_dependencies"): component.bind_dependencies(self)
@@ -300,11 +300,11 @@ static func screenshot(node: Node) -> void:
 # ------------------------------------------------- unit nodes & frames (A/B) ----
 
 static func frame_rect(u: Dictionary, f: int) -> Rect2:
-	return preload("res://presentation/battle/view_math.gd").frame_rect(u,f)
+	return preload("res://presentation/battle/camera/view_math.gd").frame_rect(u,f)
 static func clip_dir(u: Dictionary, clip: String, dir: int) -> Array:
-	return preload("res://presentation/battle/view_math.gd").clip_dir(u,clip,dir)
+	return preload("res://presentation/battle/camera/view_math.gd").clip_dir(u,clip,dir)
 static func clip_frame(u: Dictionary, clip: String, dir: int, step: int) -> int:
-	return preload("res://presentation/battle/view_math.gd").clip_frame(u,clip,dir,step)
+	return preload("res://presentation/battle/camera/view_math.gd").clip_frame(u,clip,dir,step)
 
 # ------------------------------------------------- selection marquee (E) ----
 

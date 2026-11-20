@@ -34,7 +34,7 @@ func _run() -> void:
 	assert(battle.view != null)
 	var stream: Node2D
 	for child in battle.view.get_children():
-		if child.get_script() == load("res://presentation/battle/terrain_stream.gd"):
+		if child.get_script() == load("res://presentation/battle/world/terrain_stream.gd"):
 			stream = child
 	assert(stream != null)
 	var deadline:=Time.get_ticks_msec()+10000

@@ -205,7 +205,7 @@ func _run() -> void:
 	print("ARCH-020 PASS: missions 14/30 proximity, 19/20/29 orders and experience, 27 event")
 	# Budget arithmetic must work in a clean checkout without baked terrain.
 	# A synthetic map avoids loading gate patches or requiring LFS textures.
-	var stream = load("res://presentation/battle/terrain_stream.gd").new(battle, "__budget_fixture__")
+	var stream = load("res://presentation/battle/world/terrain_stream.gd").new(battle, "__budget_fixture__")
 	for i in range(100):
 		stream.chunks.append({"rect":[i*256,0,256,256],"lods":{
 			"4":{"bytes":1024*1024*4},

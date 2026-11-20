@@ -1,6 +1,6 @@
 extends Object
 ## legacy layout: presentation component.
-const UIState = preload("res://presentation/battle/components/battle_view_state.gd")
+const UIState = preload("res://presentation/battle/view/battle_view_state.gd")
 var _ui: UIState
 var surface: Node2D
 var _dep_camera_controller: Object
@@ -26,7 +26,7 @@ func _apply_metrics_original(vp: Vector2, s: float) -> void:
 	if _ui.panel_bg_tex != null: _ui.panel_bg_tex.hide()
 	if _ui.bottom_tex != null: _ui.bottom_tex.hide()
 	if _ui.chrome == null:
-		_ui.chrome = load("res://presentation/hud/battle_chrome.gd").new()
+		_ui.chrome = load("res://presentation/battle/hud/battle_chrome.gd").new()
 		_ui.ui_layer.add_child(_ui.chrome)
 		_ui.ui_layer.move_child(_ui.chrome, 0)
 	_ui.hud_metrics.update(vp, bar_h, left, side, bottom)

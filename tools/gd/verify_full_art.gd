@@ -11,7 +11,7 @@ func _state(battle: Node2D) -> String:
 	return JSON.stringify([records, battle.gold, battle.wood, battle.food, battle.stone, battle.player_owner]).sha256_text()
 
 func _run() -> void:
-	var catalog = load("res://presentation/battle/art_catalog.gd").new()
+	var catalog = load("res://presentation/battle/resources/art_catalog.gd").new()
 	assert(catalog.menu_background() != null)
 	var full = catalog._full_art
 	assert(full._data.atlases.size() == 53, "27 类建筑与 26 类兵种全部接入")

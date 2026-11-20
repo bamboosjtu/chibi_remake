@@ -1,10 +1,10 @@
 extends Object
 ## camera controller: presentation component.
-const UIState = preload("res://presentation/battle/components/battle_view_state.gd")
+const UIState = preload("res://presentation/battle/view/battle_view_state.gd")
 var _ui: UIState
 var surface: Node2D
 
-const HudMetrics = preload("res://presentation/hud/hud_metrics.gd")
+const HudMetrics = preload("res://presentation/battle/hud/hud_metrics.gd")
 
 const ZOOM_MIN := 0.5
 

@@ -39,21 +39,21 @@ try{
  write('app/read_models/unit_projection.gd','extends RefCounted\nfunc bad(unit):\n\treturn unit.duplicate(true)\n');assert.notEqual(run().status,0);
  write('app/read_models/unit_projection.gd','extends RefCounted\n');
  for(const field of ['units', 'selected', 'map_data', 'nav', 'decor_cells', 'trainings', 'visibility', 'clock', 'projectiles', 'fire_fields', 'player_commands', 'build_types', 'cmd_pending_data', 'task_events', 'terrain_changes']){
-  write('presentation/battle/components/unit_visuals.gd','extends RefCounted\nfunc bad(host):\n\treturn host.'+field+'\n');assert.notEqual(run().status,0);
+  write('presentation/battle/units/unit_visuals.gd','extends RefCounted\nfunc bad(host):\n\treturn host.'+field+'\n');assert.notEqual(run().status,0);
  }
- write('presentation/battle/components/unit_visuals.gd','extends RefCounted\n');
+ write('presentation/battle/units/unit_visuals.gd','extends RefCounted\n');
  write('app/private.gd','extends RefCounted\nfunc bad(world):\n\tworld._modules.clear()\n');assert.notEqual(run().status,0);
  write('app/private.gd','extends RefCounted\n');
- write('presentation/battle/components/camera_controller.gd','extends RefCounted\nfunc bad(host):\n\treturn host.units\n');assert.notEqual(run().status,0);
- write('presentation/battle/components/camera_controller.gd','extends RefCounted\n');
+ write('presentation/battle/camera/camera_controller.gd','extends RefCounted\nfunc bad(host):\n\treturn host.units\n');assert.notEqual(run().status,0);
+ write('presentation/battle/camera/camera_controller.gd','extends RefCounted\n');
  for(const read of ['host.units','host.selected','host.map_data','host.nav',"host.get('nav')",'host["units"]']){
-  write('presentation/battle/build_preview.gd','extends RefCounted\nfunc bad(host):\n\treturn '+read+'\n');assert.notEqual(run().status,0);
+  write('presentation/battle/world/build_preview.gd','extends RefCounted\nfunc bad(host):\n\treturn '+read+'\n');assert.notEqual(run().status,0);
  }
- write('presentation/battle/build_preview.gd','extends RefCounted\n');
+ write('presentation/battle/world/build_preview.gd','extends RefCounted\n');
  for(const read of ['host.map_data','host.nav','host.decor_cells',"host.get('decor_cells')",'host["map_data"]']){
-  write('presentation/battle/battle_resources.gd','extends RefCounted\nfunc bad(host):\n\treturn '+read+'\n');assert.notEqual(run().status,0);
+  write('presentation/battle/world/battle_resources.gd','extends RefCounted\nfunc bad(host):\n\treturn '+read+'\n');assert.notEqual(run().status,0);
  }
- write('presentation/battle/battle_resources.gd','extends RefCounted\n');
+ write('presentation/battle/world/battle_resources.gd','extends RefCounted\n');
 
  for(const field of ['units','selected','map_data','decor_cells']){
   write('app/read_models/battle_queries.gd','extends RefCounted\nfunc bad(data):\n\treturn data.'+field+'.duplicate(true)\n');assert.notEqual(run().status,0);

@@ -210,7 +210,7 @@
 | 关卡表、战役参数 | `data/*.json`（`scenario`）、`tools/godot_export.mjs` |
 | 开局生成与武将登场 | `app/battle/bootstrap.gd::_apply_scenario`、`_build_units`、`_assign_officers` |
 | 任务条件与效果 | `simulation/scenario/scenario_rules.gd`、`data/db/scenario_rules.json` |
-| 开场白 | `presentation/hud/mission_briefing.gd`、`data/db/startup_briefings.json` |
+| 开场白 | `presentation/battle/hud/mission_briefing.gd`、`data/db/startup_briefings.json` |
 | 事件视频 | `presentation/media/event_view.gd`、`data/db/events.json` |
 | 胜负判定 | `main.gd::_check_end` |
 

@@ -144,8 +144,8 @@
 | 职责 | 模块 |
 |---|---|
 | 全局状态、关卡注册、存档槽 | `app/game.gd` |
-| 主菜单、势力/关卡选择、存档槽对话框 | `menu.gd`、`presentation/hud/save_slots_dialog.gd` |
+| 主菜单、势力/关卡选择、存档槽对话框 | `menu.gd`、`presentation/shared/dialogs/save_slots_dialog.gd` |
 | 战场入口、初始化顺序、固定步长主循环 | `main.gd` |
-| 暂停菜单与设置 | `presentation/hud/battle_menu.gd` |
+| 暂停菜单与设置 | `presentation/screens/battle_menu.gd` |
 | 开场与事件视频 | `presentation/media/event_view.gd` |
 | 胜负判定 | `main.gd::_check_end`、`simulation/scenario/scenario_rules.gd` |

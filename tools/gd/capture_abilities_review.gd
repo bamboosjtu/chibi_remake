@@ -1,6 +1,6 @@
 extends SceneTree
 ## Native rendering check; run without --headless and with an isolated profile.
-const Console = preload("res://presentation/hud/cheat_console.gd")
+const Console = preload("res://presentation/battle/hud/cheat_console.gd")
 var b: Node2D
 var output := "user://abilities-review"
 

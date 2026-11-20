@@ -1,6 +1,6 @@
 extends CanvasLayer
-const Textures = preload("res://presentation/battle/runtime_textures.gd")
-const Metrics = preload("res://presentation/hud/hud_metrics.gd")
+const Textures = preload("res://presentation/battle/resources/runtime_textures.gd")
+const Metrics = preload("res://presentation/battle/hud/hud_metrics.gd")
 var data: Dictionary
 var sprite: Sprite2D
 var textures := {}

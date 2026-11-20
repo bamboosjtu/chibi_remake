@@ -1,6 +1,6 @@
 extends TextureRect
 ## 武将身份只取稳定 index；没有已制作头像的身份隐藏，不能拿别人图片代替。
-const Art = preload("res://presentation/battle/art_catalog.gd")
+const Art = preload("res://presentation/battle/resources/art_catalog.gd")
 var _art := Art.new()
 var _index := -2
 

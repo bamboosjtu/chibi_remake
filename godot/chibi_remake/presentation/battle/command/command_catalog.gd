@@ -1,11 +1,11 @@
 extends RefCounted
-const Textures = preload("res://presentation/battle/runtime_textures.gd")
+const Textures = preload("res://presentation/battle/resources/runtime_textures.gd")
 var data: Dictionary
 var commands := {}
 var frames := {}
 var textures := {}
 var hotkeys: Array
-var skin := preload("res://presentation/hud/battle_skin.gd").new()
+var skin := preload("res://presentation/battle/hud/battle_skin.gd").new()
 
 func work_icon(row: Dictionary) -> Texture2D:
 	var resource := str(row.get("sell", ""))

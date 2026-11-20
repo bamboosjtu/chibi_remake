@@ -1,6 +1,6 @@
 extends Node2D
 ## Recessed double gate through the curtain wall, on the original MED footing.
-const Textures = preload("res://presentation/battle/runtime_textures.gd")
+const Textures = preload("res://presentation/battle/resources/runtime_textures.gd")
 const MATERIALS := "res://art/full/buildings/gate-materials-v6.png"
 const DRAW_WIDTH := 65.7488555908203
 const DRAW_HEIGHT := 87.0

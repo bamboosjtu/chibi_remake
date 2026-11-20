@@ -30,7 +30,7 @@ var state: State:
 var scene := preload("res://app/battle_scene_state.gd").new()
 var _state_fields: Dictionary = {}
 var _scene_fields: Dictionary = {}
-var _presentation_diagnostics := preload("res://presentation/battle/event_diagnostics.gd").new()
+var _presentation_diagnostics := preload("res://presentation/battle/view/event_diagnostics.gd").new()
 
 var ai: RefCounted:
 	get: return world.ai
@@ -109,7 +109,7 @@ func _init() -> void:
 
 func create_view_context() -> Node2D:
 	var queries := preload("res://app/read_models/battle_queries.gd").new(self)
-	var reader := preload("res://presentation/battle/battle_view_context.gd").new(scene, queries, actions, session_actions)
+	var reader := preload("res://presentation/battle/view/battle_view_context.gd").new(scene, queries, actions, session_actions)
 	add_child(reader)
 	reader.add_to_group("active_battle_queries")
 	return reader

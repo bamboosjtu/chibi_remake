@@ -1,6 +1,6 @@
 extends Object
 ## hud input: presentation component.
-const UIState = preload("res://presentation/battle/components/battle_view_state.gd")
+const UIState = preload("res://presentation/battle/view/battle_view_state.gd")
 var _ui: UIState
 var surface: Node2D
 var _armed_button: WeakRef

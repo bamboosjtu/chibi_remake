@@ -1,7 +1,7 @@
 extends Control
 ## 装饰仅沿实际控件的边界排布；不把整张带分隔线的面板拉伸为布局。
-const Textures = preload("res://presentation/battle/runtime_textures.gd")
-const Frame = preload("res://presentation/hud/ornate_frame.gd")
+const Textures = preload("res://presentation/battle/resources/runtime_textures.gd")
+const Frame = preload("res://presentation/battle/hud/ornate_frame.gd")
 var texture: Texture2D
 var relief: Texture2D
 var bands: Texture2D

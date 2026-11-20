@@ -1,5 +1,5 @@
 extends Node2D
-const Textures = preload("res://presentation/battle/runtime_textures.gd")
+const Textures = preload("res://presentation/battle/resources/runtime_textures.gd")
 var host: Node2D
 var chunks: Array = []
 var active := {}
@@ -105,7 +105,7 @@ func _setup_gate_apertures(map_id: String) -> void:
 	for u in host.queries.unit_views():
 		if int(u.unit) not in [16,17]: continue
 		var id := int(u.unit)
-		var module = preload("res://presentation/battle/gate_module.gd")
+		var module = preload("res://presentation/battle/world/gate_module.gd")
 		var offset: Vector2 = host.remaster_art.gate_wall_offset(map_id,Vector2i(int(u.A),int(u.B)))
 		var foundation: float = host.remaster_art.gate_foundation_drop(map_id,Vector2i(int(u.A),int(u.B)))
 		var p := Vector2(float(u.ax)-44,float(u.ay)-88)+module.origin(id,foundation)+offset
@@ -113,7 +113,7 @@ func _setup_gate_apertures(map_id: String) -> void:
 		slopes.append(module.slope(id))
 		for patch_sprite in gate_patches:
 			if patch_sprite.get_meta("cell")==Vector2i(int(u.A),int(u.B)):
-				preload("res://presentation/battle/gate_occlusion.gd").install(self,patch_sprite,p,module.slope(id),module.PASSAGE_HEIGHT,module.depth_vector(id).y-module.LINTEL,gate_material)
+				preload("res://presentation/battle/world/gate_occlusion.gd").install(self,patch_sprite,p,module.slope(id),module.PASSAGE_HEIGHT,module.depth_vector(id).y-module.LINTEL,gate_material)
 
 	gate_material.set_shader_parameter("gate_count",mini(apertures.size(),32))
 	apertures.resize(32); slopes.resize(32)
