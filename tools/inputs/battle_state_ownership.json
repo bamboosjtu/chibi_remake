@@ -102,7 +102,7 @@
       "policy": "INPUTS",
       "owner": "ai",
       "current_writers": [
-        "simulation/cheats/cheat_rules.gd"
+        "simulation/cheats/cheat_actions.gd"
       ],
       "readers": [
         "*"

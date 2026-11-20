@@ -125,8 +125,10 @@ func _init() -> void:
 	for field in _ui.PROXY_FIELDS: _fields[field] = true
 	var probe := Array(OS.get_cmdline_user_args()).any(func(arg: String):
 		return arg in ["--levels", "--screenshot", "--keytest", "--mousetest", "--mouseclick"] or arg.begins_with("--mouseclick="))
-	if probe:
-		automation_driver = load("res://app/automation/menu_driver.gd").new(_ui, self)
+	if probe and Game.acceptance_enabled:
+		automation_driver = load("res://testing/automation/menu_harness.gd").new(_ui, self)
+	elif probe:
+		push_error("Menu probes require the acceptance companion")
 	controller = preload("res://presentation/menu/controller.gd").new(_ui, self)
 	menu_styles = preload("res://presentation/menu/menu_styles.gd").new(_ui, self)
 	campaign_dialog = preload("res://presentation/menu/campaign_dialog.gd").new(_ui, self)

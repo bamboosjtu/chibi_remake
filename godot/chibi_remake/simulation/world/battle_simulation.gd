@@ -19,7 +19,7 @@ const State = preload("res://simulation/state/battle_state.gd")
 const ProfileClock = preload("res://simulation/core/profile_clock.gd")
 var battle: State
 var _dep_campaign: Object
-var _dep_cheat_rules: Object
+var _dep_auto_control: Object
 var _dep_combat: Object
 var _dep_construction_orders: Object
 var _dep_movement: Object
@@ -95,7 +95,7 @@ func _sim_step(dt: float) -> void:
 	# so a start-of-tick pass would only rescan the unchanged previous state.
 	battle.sim_tick += 1
 	_player_commands.apply_tick(battle.sim_tick)
-	_dep_cheat_rules._step_auto_control()
+	_dep_auto_control._step_auto_control()
 	_projectiles.step() # 本tick新击发的弹体从下一个逻辑tick推进。
 	if profile_enabled:phase=_profile_time("projectiles",phase)
 	if _ai != null:
@@ -196,7 +196,7 @@ func _profile_time(key: String, at: int) -> int:
 
 func bind_dependencies(world: Object) -> void:
 	_dep_campaign = world.campaign
-	_dep_cheat_rules = world.cheat_rules
+	_dep_auto_control = world.auto_control
 	_dep_combat = world.combat
 	_dep_construction_orders = world.construction_orders
 	_dep_movement = world.movement

@@ -11,7 +11,8 @@
     "res://simulation/ai/ai_state.gd": "9eead6eb653d9fff2a85434b3f277b9771fdb287efa84c87a92c6cf464c2d952",
     "res://simulation/ai/ai_targets.gd": "9e8e7d34245ec878da4914e7aa5972fb5110be88123df0309c6f967486871a2b",
     "res://simulation/ai/ai_training_slots.gd": "53f01fe844057c65d3917d8ab19db9f895c590d36b3f11085d3f985b7a0e181d",
-    "res://simulation/cheats/cheat_rules.gd": "11135dc97f09d7d52facce263f92a9abd679d619865e3c1d80681fb9ea284e64",
+    "res://simulation/ai/auto_control.gd": "c2a305e731994b7cfeaf63de9b8f97af96df004248a3a148c0c85c81f1183265",
+    "res://simulation/cheats/cheat_actions.gd": "ecd582215c6a8f001dfdec114e28bab5b98dc72cde92cd11f8106c99bc14e4d7",
     "res://simulation/combat/abilities.gd": "558abbc24c299ac0f5190034cbfb39939fee1fa0899acaff0b1baa0cff855a13",
     "res://simulation/combat/animation_rules.gd": "71b5f6f1bf3705a92d33edc3f1384133a271b9d0437d415f9b4bdf0eeb9e545f",
     "res://simulation/combat/combat.gd": "437709c80b9acb5e1f4b2ec010a8420e4043b6796ad799281d38f4bb9ea22287",
@@ -83,7 +84,7 @@
     "res://simulation/units/unit_actions.gd": "ce80f880295df21cbcceabf20b1005f6ea862053a315ec3bdab112977cc6d087",
     "res://simulation/units/unit_schema.gd": "cd64100388051f46f6eb48e651d1bb27ca3e39919997e2f1f522ac6befd921e4",
     "res://simulation/visibility/battle_visibility.gd": "ea2b9a072f017f5874cd6833e7af9c104c45f55ca00a151800f0206bd733b447",
-    "res://simulation/world/battle_simulation.gd": "15d24223cbc7711b7ab750e1c29ac4935136c4525138c82dd73a96986dc3d0d7",
-    "res://simulation/world/battle_world.gd": "2606d32da5ab94e50b7e50f88238b92a327c8e1288010b7041c8cf5a62575c41"
+    "res://simulation/world/battle_simulation.gd": "b2eb50c758140c289758d43576eb5065cdaf012590367fabdf21f0f96d9baade",
+    "res://simulation/world/battle_world.gd": "40ef1fe44b1b9bb9e6459c276068a53eb18583e90791738602134b3680704a4d"
   }
 }

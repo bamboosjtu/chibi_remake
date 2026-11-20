@@ -37,8 +37,10 @@ const BattleSimulationService = preload("res://simulation/world/battle_simulatio
 var battle_simulation: BattleSimulationService
 const CampaignService = preload("res://simulation/scenario/campaign.gd")
 var campaign: CampaignService
-const CheatRulesService = preload("res://simulation/cheats/cheat_rules.gd")
-var cheat_rules: CheatRulesService
+const AutoControlService = preload("res://simulation/ai/auto_control.gd")
+var auto_control: AutoControlService
+const CheatActionsService = preload("res://simulation/cheats/cheat_actions.gd")
+var cheat_actions: CheatActionsService
 const CombatService = preload("res://simulation/combat/combat.gd")
 var combat: CombatService
 const CommandGroupsService = preload("res://simulation/commands/command_groups.gd")
@@ -86,7 +88,8 @@ func _init() -> void:
 	ai_orders = AiOrdersService.new(state)
 	battle_simulation = BattleSimulationService.new(state)
 	campaign = CampaignService.new(state)
-	cheat_rules = CheatRulesService.new(state)
+	auto_control = AutoControlService.new(state)
+	cheat_actions = CheatActionsService.new(state)
 	combat = CombatService.new(state)
 	command_groups = CommandGroupsService.new(state)
 	construction_orders = ConstructionOrdersService.new(state)
@@ -169,7 +172,8 @@ func _owned_services() -> Dictionary:
 		"ai_orders": ai_orders,
 		"battle_simulation": battle_simulation,
 		"campaign": campaign,
-		"cheat_rules": cheat_rules,
+		"auto_control": auto_control,
+		"cheat_actions": cheat_actions,
 		"combat": combat,
 		"command_groups": command_groups,
 		"construction_orders": construction_orders,

@@ -3,17 +3,6 @@
   "description": "Historical dependency edges the P0 gate must tolerate until the named stage removes them. Each entry records the current file edge and why it exists; stale entries fail the gate.",
   "edges": [
     {
-      "from": "testing/automation/menu_driver.gd",
-      "to": "presentation/menu/menu_state.gd",
-      "fromPackage": "app",
-      "toPackage": "presentation",
-      "kind": "import",
-      "line": 3,
-      "reason": "Menu automation driver still lives in app until the P4c harness move; the edge disappears with the move.",
-      "removeByStage": "P4c",
-      "reviewBy": "2026-12-31"
-    },
-    {
       "from": "app/battle/startup/bootstrap.gd",
       "to": "presentation/battle/view/battle_view.gd",
       "fromPackage": "app/battle",

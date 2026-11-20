@@ -4,10 +4,11 @@
   "sourceFiles": 181,
   "generated": "2026-11-20T08:08:10.200Z",
   "statusCounts": {
-    "moved": 126,
-    "split": 4,
-    "renamed": 4,
-    "retained": 47
+    "moved": 125,
+    "renamed": 5,
+    "split": 3,
+    "retained": 47,
+    "deleted": 1
   },
   "phaseCounts": {
     "P4b": 13,
@@ -15,8 +16,9 @@
     "P5": 4,
     "P0": 32,
     "P4a": 41,
-    "P2": 60,
+    "P2": 59,
     "P1": 13,
+    "P4d": 1,
     "P6": 8,
     "P3": 9
   },
@@ -31,10 +33,10 @@
     },
     {
       "from": "app/automation/menu_driver.gd",
-      "to": "testing/automation/menu_driver.gd",
+      "to": "testing/automation/menu_harness.gd",
       "phase": "P4c",
-      "note": "test driver leaves production",
-      "status": "moved",
+      "note": "acceptance harness; loaded only when Game.acceptance_enabled and a menu probe is requested",
+      "status": "renamed",
       "package": "testing"
     },
     {
@@ -783,10 +785,10 @@
     },
     {
       "from": "simulation/battle/cheat_rules.gd",
-      "to": "simulation/cheats/cheat_rules.gd",
-      "phase": "P2",
-      "note": "cheats (P4d splits)",
-      "status": "split",
+      "to": null,
+      "phase": "P4d",
+      "note": "split into simulation/ai/auto_control.gd + simulation/cheats/cheat_actions.gd",
+      "status": "deleted",
       "package": "simulation/cheats"
     },
     {
@@ -1567,6 +1569,8 @@
     "P2",
     "P3",
     "P4a",
-    "P4b"
+    "P4b",
+    "P4c",
+    "P4d"
   ]
 }

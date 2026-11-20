@@ -8,6 +8,12 @@ var _automation_driver: Object
 var _dep_campaign_dialog: Object
 var _dep_level_dialog: Object
 var _dep_menu_styles: Object
+
+func _probe_missing() -> bool:
+	if _automation_driver != null: return false
+	printerr("MENU HARNESS FAIL: acceptance driver unavailable")
+	surface.get_tree().quit(1)
+	return true
 const RemasterArt = preload("res://presentation/battle/resources/art_catalog.gd")
 
 const CAMPAIGN_CAO := "chibic"             # 左格：曹操（关卡 id 前缀也是它）
@@ -155,6 +161,7 @@ func _ready() -> void:
 	# --keytest：把合成按键塞进视口输入流，验证「选择势力」那一步真的吃键盘
 	#（← / → / A / D 换边、Enter 确定、Esc 取消）。放在截图之前，跑完直接退出。
 	if "--keytest" in args:
+		if _probe_missing(): return
 		await _automation_driver._run_keytest()
 		surface.get_tree().quit()
 		return
@@ -165,6 +172,7 @@ func _ready() -> void:
 	# outside = 面板外的固定点（80,80，点在遮罩上）；x,y = 显式视口坐标；
 	# confirm = 金凸「确定」，cancel = 金凸「取消」。--mousetest 是完整矩阵，跑完即退。
 	if "--mousetest" in args:
+		if _probe_missing(): return
 		await _automation_driver._run_mouse_matrix()
 		surface.get_tree().quit()
 		return
@@ -177,6 +185,7 @@ func _ready() -> void:
 			mc_cmd = "unspecified"
 			break
 	if mc_cmd != "":
+		if _probe_missing(): return
 		await _automation_driver._run_mouse_click(mc_cmd)
 		# 不带 --screenshot/--levels 时点完即退（否则挂在菜单上等人）；带了就落下去
 		# 走截图那一段（它自己负责截图和退出）。
@@ -191,6 +200,7 @@ func _ready() -> void:
 	if "--screenshot" in args or "--levels" in args:
 		await surface.get_tree().create_timer(0.8).timeout
 		if "--levels" in args:
+			if _probe_missing(): return
 			_automation_driver._report_level_dialog()
 			for a in args:
 				if a.begins_with("--scroll="):
@@ -202,11 +212,13 @@ func _ready() -> void:
 			await surface.get_tree().process_frame
 			await surface.get_tree().process_frame
 			if "--levels" in args:
+				if _probe_missing(): return
 				_automation_driver._report_scroll_state()
 		elif want_campaign:
 			await surface.get_tree().process_frame
 			await surface.get_tree().process_frame
 			_dep_campaign_dialog._refresh_campaign_cursor()
+			if _probe_missing(): return
 			_automation_driver._report_campaign_dialog()
 		if "--screenshot" in args: await _save_menu_screenshot(args)
 		surface.get_tree().quit()

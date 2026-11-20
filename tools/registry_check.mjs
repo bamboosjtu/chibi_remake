@@ -13,7 +13,7 @@ if(args.includes('--runtime-log')){
   if(!report?.[name]||report[name].missing.length)throw Error('Invalid '+name);
   const actual=Object.fromEntries(Object.entries(report[name].services).map(([key,file])=>[key,file.replace(/^res:\/\//,'')]));
   const expected = {...manifest.hosts[name]};
-  if (name === 'menu' && Object.hasOwn(actual, 'automation_driver')) expected.automation_driver = 'app/automation/menu_driver.gd';
+  if (name === 'menu' && Object.hasOwn(actual, 'automation_driver')) expected.automation_driver = 'testing/automation/menu_harness.gd';
   assert.deepEqual(actual,expected,name+': runtime services differ from composition manifest');
   console.log('REGISTRY '+name+' PASS concrete runtime service scripts');
  }
@@ -30,7 +30,7 @@ const rootFiles = {
 };
 for (const [name, files] of Object.entries(rootFiles)) {
  const owners = {...manifest.hosts[name]};
- if (name === 'menu') owners.automation_driver = 'app/automation/menu_driver.gd';
+ if (name === 'menu') owners.automation_driver = 'testing/automation/menu_harness.gd';
  const wiring = files.map(read).join('\n');
  for (const [service, file] of Object.entries(owners)) {
   // Require the named factory itself, not a substring of it: `rules` matched
@@ -43,7 +43,7 @@ for (const [name, files] of Object.entries(rootFiles)) {
   const code = read(file);
   for (const match of code.matchAll(/\b_dep_(\w+)\.(\w+)\b/g)) {
    const [, peer, method] = match;
-   assert(owners[peer] && new RegExp('^func ' + method + '\\(', 'm').test(read(owners[peer])), file + ': missing ' + peer + '.' + method);
+   assert(owners[peer] && new RegExp('^(?:static )?func ' + method + '\\(', 'm').test(read(owners[peer])), file + ': missing ' + peer + '.' + method);
   }
  }
 }

@@ -9,7 +9,7 @@ var battle: State:
 	get: return node.state
 var scene: Services
 var node: Node2D
-var _dep_cheat_rules: Object
+var _dep_cheat_actions: Object
 var _dep_scene_controller: Object
 var text := ""
 var matched := 0
@@ -40,7 +40,7 @@ func handle_cheat_input(event: InputEvent) -> bool:
 			if battle.cheats_enabled: _cheat_level(-1 if event.keycode == KEY_BRACKETLEFT else 1)
 			return battle.cheats_enabled
 	if event.keycode >= KEY_F2 and event.keycode <= KEY_F10:
-		var message = _dep_cheat_rules._cheat_action(str(CHEAT_ACTIONS.get(event.keycode, "")))
+		var message = _dep_cheat_actions.action(str(CHEAT_ACTIONS.get(event.keycode, "")))
 		if message != "": node.world.effects.feedback(message)
 		if scene.view != null:
 			scene.view.update_panel()
@@ -107,5 +107,5 @@ func _cheat_adjacent_level(levels: Array, current: String, direction: int) -> St
 	return ""
 
 func bind_dependencies(scene_root: Object) -> void:
-	_dep_cheat_rules = scene_root.world.cheat_rules
+	_dep_cheat_actions = scene_root.world.cheat_actions
 	_dep_scene_controller = scene_root.scene_controller
