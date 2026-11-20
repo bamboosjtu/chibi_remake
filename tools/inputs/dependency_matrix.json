@@ -154,7 +154,8 @@
         "simulation/production",
         "simulation/technology",
         "simulation/native",
-        "root"
+        "root",
+        "simulation/core"
       ]
     },
     "simulation/economy": {
@@ -170,7 +171,8 @@
         "simulation/combat",
         "simulation/commands",
         "simulation/technology",
-        "root"
+        "root",
+        "simulation/movement"
       ]
     },
     "simulation/construction": {
@@ -238,7 +240,8 @@
         "simulation/commands",
         "simulation/production",
         "simulation/technology",
-        "root"
+        "root",
+        "simulation/movement"
       ]
     },
     "simulation/commands": {
@@ -340,7 +343,7 @@
   },
   "fileExceptions": [
     {
-      "file": "simulation/units/unit_actions.gd",
+      "file": "simulation/world/unit_tick_coordinator.gd",
       "allow": [
         "simulation/combat",
         "simulation/commands",

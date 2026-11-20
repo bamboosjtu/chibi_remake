@@ -9,9 +9,13 @@ const EffectsRuntime = preload("res://simulation/ports/battle_events.gd")
 var _effects: EffectsRuntime
 var _construction: RefCounted
 const Roles = preload("res://simulation/definitions/unit_roles.gd")
+const ProfileClock = preload("res://simulation/core/profile_clock.gd")
+const Config = preload("res://simulation/definitions/battle_config.gd")
 ## combat: composed battle behavior.
 const State = preload("res://simulation/state/battle_state.gd")
 var battle: State
+var profile_enabled := false
+var profile: Dictionary={}
 var _dep_abilities: Object
 var _dep_battle_simulation: Object
 var _dep_command_groups: Object
@@ -196,3 +200,79 @@ func bind_dependencies(world: Object) -> void:
 	_projectiles = world.projectiles
 	_transports = world.transports
 	_visibility = world.visibility
+
+
+func _profile_time(key: String, at: int) -> int:
+	var now:=ProfileClock.now(profile_enabled);profile[key]=int(profile.get(key,0))+now-at;return now
+
+func step_attack(u: Dictionary,delta: float,tower: bool) -> void:
+	var phase:=ProfileClock.now(profile_enabled)
+	var raw_target = u.target
+	if not (raw_target is Dictionary) or not raw_target.alive or raw_target.die_t >= 0 or raw_target.get("attached",false) or not _dep_spatial_index._contains_unit(raw_target):
+		_dep_command_groups._cancel_unit_command(u)
+	else:
+		if profile_enabled:phase=_profile_time("validTarget",phase)
+		var t: Dictionary=raw_target
+		var attack_range: float=preload("res://simulation/definitions/combat_rules.gd").effective_range(u)
+		var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel()
+		var prepared: int
+		if kernel!=null:prepared=kernel.prepare_combat(u,t,attack_range,battle.tile_w,tower,_nav.native_query_context())
+		else:prepared=preload("res://simulation/movement/action_clock.gd").prepare_attack_script(u,t,attack_range,battle.tile_w,tower)
+		var strike: bool=(prepared&1)!=0
+		if profile_enabled:phase=_profile_time("clock",phase)
+		var in_reach: bool=(prepared&2)!=0
+		# 近战按**近距离格**判定：不叠格后，等距邻格/斜邻格的脚点距离可到 66px，
+		# 仍应视为贴脸可攻击（否则会被前面的单位卡在 66px 外）。
+		# R06：放宽到两格时必须同时确认中间没有墙/不可通行地形/封闭建筑，
+		# 否则会“隔墙扣血”。远程越墙仍走独立规则（不在此补偿内）。
+		if attack_range <= 1 and kernel==null:
+			if not in_reach:
+				var uc: Vector2i = _dep_spatial_index._unit_cell(u);var tc: Vector2i = _dep_spatial_index._unit_cell(t)
+				in_reach=maxi(absi(uc.x-tc.x),absi(uc.y-tc.y))<=2
+			in_reach=in_reach and _melee_line_clear(u,t)
+		if profile_enabled:phase=_profile_time("contact",phase)
+		if in_reach:
+			u.route_failures=0
+			u.path = []; u.pi = 0
+			if strike:
+				_fire_attack(u,t)
+		elif tower:
+			_dep_command_groups._cancel_unit_command(u)
+		else:
+			if strike: preload("res://simulation/movement/action_clock.gd").reset(u) # 击发时射程失效，重发同一攻击重新等待。
+			u.repath -= delta
+			if u.repath <= 0:
+				repath_attack(u,t,attack_range)
+			_dep_movement._follow(u,delta)
+
+	if profile_enabled:phase=_profile_time("hitOrFollow",phase)
+
+func repath_attack(u: Dictionary,t: Dictionary,attack_range: float) -> void:
+	# 近战不能把“敌方占格”当终点（不叠格会停在两格外），
+	# 改寻到目标占格旁的落脚格；远程仍寻到目标本身。
+	if attack_range <= 1:
+		u.path = _dep_interaction_paths._edge_interaction_path(u, t)
+	else:
+		u.path = _dep_movement._path_to(u,Vector2(t.ax,t.ay),false)
+	u.pi = 0
+	u.route_failures=mini(3,int(u.get("route_failures",0))+1) if u.path.is_empty() else 0
+	# Stable UID phases spread synchronized retry bursts without using
+	# wall time or RNG; the remaining delay is saved with the order.
+	u.repath=0.8*pow(2.0,maxi(0,int(u.route_failures)-1))+(int(u.uid)%11)*Config.SIM_DT
+
+func try_native_attack(u: Dictionary,delta: float,kernel: Object) -> bool:
+	var at:=ProfileClock.now(profile_enabled)
+	var result: int=kernel.attack_fast(u,delta,_nav.native_query_context(),battle._target_owner,battle._targets,battle.units,battle._index_units_ref,battle._index_units_size)
+	if profile_enabled:at=_profile_time("nativePrepare",at)
+	if result<0:return false
+	if result&1:_fire_attack(u,u.target)
+	# Same range source as the script path (ambush units use their vision radius).
+	if result&2:repath_attack(u,u.target,preload("res://simulation/definitions/combat_rules.gd").effective_range(u))
+	if result&4:_dep_movement._follow(u,delta)
+	u.anim+=delta
+	if profile_enabled:at=_profile_time("nativeApply",at)
+	if kernel.finish_or_separate(u,battle._cell_index,_nav.native_query_context()):
+		_dep_spatial_index._separate_unit(u)
+		kernel.finish_plain_attack(u)
+	if profile_enabled:_profile_time("nativeFinalize",at)
+	return true

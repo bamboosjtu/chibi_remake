@@ -239,3 +239,18 @@ func bind_dependencies(world: Object) -> void:
 	_dep_spatial_index = world.spatial_index
 	_effects = world.effects
 	_nav = world.nav
+
+
+func step_action(u: Dictionary, delta: float) -> void:
+	# REQ-003：行军被新占地截断 → 按**新世界**重寻路（A* 已反映新占地）。
+	# 绕得开就继续走向原目的地；绕不开（目的地不可达）才弃单转 idle。
+	# 连续被堵却一步都没走出去（blocked_n>2，见 _follow）同样弃单 —— 不会原地无限重试。
+	if u.path.is_empty() and u.has("repath_to"):
+		var dest: Vector2 = u["repath_to"]
+		u.erase("repath_to")
+		u.path = _path_to(u, dest, true)
+		u.pi = 0
+		if u.path.is_empty():
+			u.state = "idle"
+	if _follow(u, delta):
+		u.state = "idle"

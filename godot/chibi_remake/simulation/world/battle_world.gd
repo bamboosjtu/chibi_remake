@@ -69,7 +69,7 @@ const TechnologyService = preload("res://simulation/technology/technology.gd")
 var technology: TechnologyService
 const TransportOrdersService = preload("res://simulation/transport/transport_orders.gd")
 var transport_orders: TransportOrdersService
-const UnitActionsService = preload("res://simulation/units/unit_actions.gd")
+const UnitActionsService = preload("res://simulation/world/unit_tick_coordinator.gd")
 var unit_actions: UnitActionsService
 const WorldOrdersService = preload("res://simulation/commands/world_orders.gd")
 var world_orders: WorldOrdersService

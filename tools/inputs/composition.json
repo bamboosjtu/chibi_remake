@@ -22,7 +22,7 @@
       "spatial_index": "simulation/navigation/spatial_index.gd",
       "technology": "simulation/technology/technology.gd",
       "transport_orders": "simulation/transport/transport_orders.gd",
-      "unit_actions": "simulation/units/unit_actions.gd",
+      "unit_actions": "simulation/world/unit_tick_coordinator.gd",
       "world_orders": "simulation/commands/world_orders.gd",
       "bootstrap": "app/battle/startup/bootstrap.gd",
       "cheat_controller": "app/battle/runtime/cheat_controller.gd",

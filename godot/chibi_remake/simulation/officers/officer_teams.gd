@@ -4,6 +4,7 @@ var _nav: NavRuntime
 const EffectsRuntime = preload("res://simulation/ports/battle_events.gd")
 var _effects: EffectsRuntime
 const Balance = preload("res://simulation/definitions/balance_rules.gd")
+const Config = preload("res://simulation/definitions/battle_config.gd")
 ## officer teams: composed battle behavior.
 const State = preload("res://simulation/state/battle_state.gd")
 var battle: State
@@ -13,6 +14,7 @@ var _dep_combat: Object
 var _dep_command_groups: Object
 var _dep_entity_factory: Object
 var _dep_interaction_paths: Object
+var _dep_movement: Object
 var _dep_officer_pool: Object
 var _dep_production: Object
 var _dep_spatial_index: Object
@@ -230,9 +232,31 @@ func bind_dependencies(world: Object) -> void:
 	_dep_command_groups = world.command_groups
 	_dep_entity_factory = world.entity_factory
 	_dep_interaction_paths = world.interaction_paths
+	_dep_movement = world.movement
 	_dep_officer_pool = world.officer_pool
 	_dep_production = world.production
 	_dep_spatial_index = world.spatial_index
 	_dep_technology = world.technology
 	_effects = world.effects
 	_nav = world.nav
+
+
+func step_join(u: Dictionary, delta: float) -> void:
+	var leader: Dictionary = {}
+	for candidate in battle.units:
+		if int(candidate.uid) == int(u.get("join_target_uid", -1)): leader = candidate; break
+	if leader.is_empty() or not bool(leader.alive) or leader.die_t >= 0 or leader.get("officer", {}).is_empty() or int(leader.owner) != int(u.owner):
+		_dep_command_groups._cancel_unit_command(u)
+	elif _dep_interaction_paths._edge_cell_distance(u, leader) <= Config.EDGE_DISTANCE:
+		var idx := int(leader.officer.index)
+		var members: Array = battle.units.filter(func(member): return bool(member.alive) and member.die_t < 0 and int(member.owner) == int(u.owner) and int(member.get("group_officer", -1)) == idx)
+		_dep_command_groups._cancel_unit_command(u)
+		if members.size() < Balance.team_max_members():
+			u.group_officer = idx
+			_auto_assign_new_team(idx)
+			_effects.feedback("已加入%s的队伍" % str(leader.officer.name).replace(" ", ""))
+		else: _effects.feedback("该队伍已满15名成员")
+	else:
+		if u.path.is_empty(): u.path = _dep_interaction_paths._edge_interaction_path(u, leader); u.pi = 0
+		if u.path.is_empty(): _dep_command_groups._cancel_unit_command(u); _effects.feedback("无法靠近该队伍")
+		else: _dep_movement._follow(u, delta)

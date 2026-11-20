@@ -1,0 +1,15 @@
+extends RefCounted
+## Per-unit lifecycle and idle-state actions. Tick coordination lives in world/unit_tick_coordinator.gd.
+const Balance = preload("res://simulation/definitions/balance_rules.gd")
+
+func _step_rest(u: Dictionary, delta: float) -> void:
+	# 休息（模式 4，FUN_004602e0）：每 REST_TICKS 个逻辑 tick HP +1，满编即结束。
+	if float(u.hp) >= float(u.maxhp) - 0.001:
+		u.state = "idle"; u.rest_t = 0
+	else:
+		u.rest_t = int(u.get("rest_t", 0)) + 1
+		if int(u.rest_t) >= int(Balance.work().restTicks):
+			u.rest_t = 0
+			u.hp = minf(float(u.maxhp), float(u.hp) + float(Balance.work().restHp))
+		if float(u.hp) >= float(u.maxhp):
+			u.state = "idle"; u.rest_t = 0

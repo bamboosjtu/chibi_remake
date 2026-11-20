@@ -10,12 +10,16 @@ var _state: RefCounted
 var _dep_interaction_paths: Object
 var _dep_movement: Object
 var _dep_spatial_index: Object
+var _dep_transport_orders: Object
+var _effects: RefCounted
 
 func _init(h: Object) -> void:
 	_state = h.state
 	_dep_interaction_paths = h.interaction_paths
 	_dep_movement = h.movement
 	_dep_spatial_index = h.spatial_index
+	_dep_transport_orders = h.transport_orders
+	_effects = h.effects
 
 func valid_unit(unit: Dictionary) -> bool:
 	return not unit.is_empty() and _state.units.any(func(u):return is_same(u,unit)) and bool(unit.get("alive",false)) and float(unit.get("die_t",-1))<0
@@ -170,3 +174,24 @@ func valid_snapshot(ids: Dictionary) -> bool:
 
 func bind_dependencies(world: Object) -> void:
 	_nav = world.nav
+
+
+func step_board(u: Dictionary, delta: float) -> void:
+	# 装载（模式 0xC）：走到运输船旁 → 附着上船（船计数 +1、HP 累加）。
+	var bship = u.get("board_target", null)
+	if not (bship is Dictionary) or not valid_ship(bship) or str(bship.state)=="unload" \
+			or int(bship.get("unit", -1)) != Roles.transport_id() \
+			or int(bship.get("owner", -1)) != int(u.get("owner", -1)):
+		u.state = "idle"; u.board_target = null
+	elif int(bship.get("carry_n", 0)) >= Balance.transport_capacity():
+		u.state = "idle"; u.board_target = null
+		_effects.feedback("运输船已满（%d）" % Balance.transport_capacity())
+	elif not adjacent(u,bship):
+		if u.path.is_empty():
+			u.path = boarding_path(u,bship); u.pi = 0
+		if u.path.is_empty():
+			u.state = "idle"; u.board_target = null; _effects.feedback("无法靠近运输船")
+		else: _dep_movement._follow(u, delta)
+	else:
+		u.path = []
+		_dep_transport_orders._attach_to_ship(u, bship)

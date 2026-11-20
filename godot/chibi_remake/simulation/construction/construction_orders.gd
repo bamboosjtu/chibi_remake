@@ -332,3 +332,38 @@ func bind_dependencies(world: Object) -> void:
 	_economy = world.economy
 	_effects = world.effects
 	_nav = world.nav
+
+
+func step_repair(u: Dictionary, delta: float) -> void:
+	var rt = u.get("repair_target",null)
+	if not (rt is Dictionary) or not rt.get("alive",false) or float(rt.get("die_t",-1)) >= 0 or rt.get("attached",false) or int(rt.owner) != int(u.owner) or not _dep_spatial_index._contains_unit(rt):
+		_dep_command_groups._cancel_unit_command(u)
+	elif float(rt.hp) >= float(rt.maxhp):
+		_dep_command_groups._cancel_unit_command(u)
+	elif not _economy.can_pay(int(u.owner),Balance.work().repairCost):
+		_dep_command_groups._cancel_unit_command(u); _effects.feedback("修理：四种资源都须多于15")
+	elif _dep_interaction_paths._dist_to_obj(u,rt) > Config.GATHER_REACH:
+		preload("res://simulation/movement/action_clock.gd").reset(u)
+		if u.path.is_empty(): u.path = _dep_interaction_paths._interaction_path(u,rt,Config.GATHER_REACH); u.pi = 0
+		if u.path.is_empty(): _dep_command_groups._cancel_unit_command(u); _effects.feedback("工人无法到达该修理目标")
+		else: _dep_movement._follow(u,delta)
+	else:
+		u.path = []
+		var offset := Vector2(rt.ax-u.ax,rt.ay-u.ay)
+		u.dir = int(round(offset.angle()/(PI/4.0))) & 7
+		if preload("res://simulation/movement/action_clock.gd").step(u,"repair",int(rt.uid)):
+			if not _do_repair(u,rt) or float(rt.hp) >= float(rt.maxhp): _dep_command_groups._cancel_unit_command(u)
+
+func step_build(u: Dictionary, delta: float) -> void:
+	# 建造（模式 8，FUN_0045c320）：走到工地旁，**每 4 tick 给工地 +2 HP**（多工人叠加）。
+	var bt = u.get("build_target", null)
+	if not (bt is Dictionary) or not _valid_build_worker(u, bt):
+		u.state = "idle"; u.build_target = null; u.build_t = 0
+	elif _dep_interaction_paths._edge_cell_distance(u, bt) != Config.EDGE_DISTANCE:
+		if u.path.is_empty():
+			u.path = _site_entry_path(u, bt); u.pi = 0
+		if u.path.is_empty():
+			u.state = "idle"; u.build_target = null; u.build_t = 0; _effects.feedback("工人无法到达工地")
+		else: _dep_movement._follow(u, delta)
+	else:
+		_construction.enter(u, bt)
