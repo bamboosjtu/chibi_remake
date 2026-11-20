@@ -14,7 +14,7 @@ func run() -> void:
 	game.slot_catalog=preload("res://app/saves/slot_catalog.gd").new(reader.read_slot,game.save_slot_path,game.SAVE_SLOTS)
 	game.repository.changed.connect(game.slot_catalog.invalidate)
 	game.SAVE_PATH = OS.get_environment("LOCALAPPDATA").path_join("metadata-fixture/save.json")
-	var store = preload("res://app/json_store.gd")
+	var store = preload("res://app/saves/json_store.gd")
 	assert(store.commit(game.save_slot_path(20),fixture(game, "first"),game.is_valid_save))
 	assert(game.has_save())
 	var initial: int = reader.reads

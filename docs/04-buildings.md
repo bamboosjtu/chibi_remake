@@ -209,7 +209,7 @@
 | 职责 | 模块 |
 |---|---|
 | 建筑定义与费用 | `data/*.json`（`units`）、`data/db/production_units.json` |
-| 可建清单、前置、选址校验 | `app/battle/bootstrap.gd`（可建清单）、`main.gd::building_block_reason`、`build_placement_at` |
+| 可建清单、前置、选址校验 | `app/battle/startup/bootstrap.gd`（可建清单）、`main.gd::building_block_reason`、`build_placement_at` |
 | 工地、施工、进出 | `simulation/construction/construction_interior.gd`、`main.gd::_build_site_at` |
 | 修理 | `main.gd::_order_repair`、`_do_repair` |
 | 占地与形状 | `simulation/navigation/unit_footprint.gd`、`simulation/navigation/nav.gd::building_footprint` |

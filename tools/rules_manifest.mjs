@@ -4,7 +4,7 @@ const native=JSON.parse(fs.readFileSync('godot/chibi_remake/data/db/native_math.
 if(native.sourceSignature!==crypto.createHash('sha256').update(nativeSource).digest('hex'))throw Error('Native math source identity stale; rebuild with tools/native/sim_math/build.py');
 const root='godot/chibi_remake',target=root+'/data/db/rules_manifest.json';
 const walk=dir=>fs.readdirSync(dir,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name,'en')).flatMap(e=>e.isDirectory()?walk(dir+'/'+e.name):e.name.endsWith('.gd')?[dir+'/'+e.name]:[]);
-const files=[...walk(root+'/simulation'),root+'/app/battle/bootstrap.gd'].sort();
+const files=[...walk(root+'/simulation'),root+'/app/battle/startup/bootstrap.gd'].sort();
 const manifest={schemaVersion:1,files:Object.fromEntries(files.map(file=>['res://'+path.relative(root,file).replaceAll('\\','/'),crypto.createHash('sha256').update(fs.readFileSync(file,'utf8').replace(/^\uFEFF/,'').replaceAll('\r\n','\n')).digest('hex')]))};
 const text=JSON.stringify(manifest,null,2)+'\n';
 if(process.argv.includes('--write'))fs.writeFileSync(target,text);

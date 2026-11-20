@@ -109,7 +109,7 @@ static func _has_slots(directory: String) -> bool:
 	return false
 
 func commit(path: String, text: String, validator: Callable, backup_validator: Callable = Callable()) -> bool:
-	var store = preload("res://app/json_store.gd")
+	var store = preload("res://app/saves/json_store.gd")
 	attempts.clear()
 	var roots: Array[String] = [path.get_base_dir()]
 	if not pinned:

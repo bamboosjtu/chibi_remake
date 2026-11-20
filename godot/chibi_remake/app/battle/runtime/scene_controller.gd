@@ -14,7 +14,7 @@ var _dep_command_groups: Object
 var _dep_harvest_orders: Object
 var _dep_selection: Object
 var _dep_world_orders: Object
-const SceneServices = preload("res://app/battle_scene_state.gd")
+const SceneServices = preload("res://app/battle/runtime/battle_scene_state.gd")
 var scene: SceneServices
 var node: Node2D
 const View = preload("res://presentation/battle/view/battle_view.gd")        # ARCH-013：表现层（HUD/相机/单位外观/框选）

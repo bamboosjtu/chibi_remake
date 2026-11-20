@@ -1,5 +1,5 @@
 extends CanvasLayer
-const SessionActions = preload("res://app/session_actions.gd")
+const SessionActions = preload("res://app/battle/session/session_actions.gd")
 signal media_finished
 var pause_token := 0
 var host:Node

@@ -4,7 +4,7 @@ const World = preload("res://simulation/world/battle_world.gd")
 const State = preload("res://simulation/state/battle_state.gd")
 const Balance = preload("res://simulation/definitions/balance_rules.gd")
 const Config = preload("res://simulation/definitions/battle_config.gd")
-const Campaign = preload("res://app/campaign_session.gd")
+const Campaign = preload("res://app/campaign/campaign_session.gd")
 var world: World
 var battle: State
 
@@ -119,7 +119,7 @@ func _build_build_types() -> void:
 	print("build types: ", battle.build_types)
 
 func _load_officers() -> void:
-	battle._officer_pool=preload("res://simulation/definitions/opening_officers.gd").pool(battle.scenario_sides)
+	battle._officer_pool=preload("res://app/battle/startup/opening_officers.gd").pool(battle.scenario_sides)
 	battle._officer_initial_state=world.officer_pool._officer_pool_state()
 	print("officers loaded: 117 in %d blocks" % battle._officer_pool.size())
 

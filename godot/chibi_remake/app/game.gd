@@ -2,7 +2,7 @@ extends Node
 ## Current-format save codec and application lifecycle.
 const Repository = preload("res://app/saves/save_repository.gd")
 const Catalog = preload("res://app/saves/slot_catalog.gd")
-const CampaignSession = preload("res://app/campaign_session.gd")
+const CampaignSession = preload("res://app/campaign/campaign_session.gd")
 var campaign := CampaignSession.new()
 var repository := Repository.new(is_valid_save, can_rotate_save)
 var slot_catalog := Catalog.new(repository.read_slot, save_slot_path, SAVE_SLOTS)
@@ -54,7 +54,7 @@ var SAVE_PATH: String:
 		if slot_catalog != null: slot_catalog.invalidate()
 const SAVE_VERSION = preload("res://app/saves/save_format.gd").VERSION
 const SAVE_SLOTS = Repository.SAVE_SLOTS
-const Store = preload("res://app/json_store.gd")
+const Store = preload("res://app/saves/json_store.gd")
 const UnitSchema = preload("res://simulation/units/unit_schema.gd")
 const Relations = preload("res://app/saves/unit_relations.gd")
 const Envelope = preload("res://app/saves/save_envelope.gd")
@@ -84,8 +84,8 @@ func _ready() -> void:
 		push_error("Automation requires the acceptance companion")
 		get_tree().quit(1)
 		return
-	pauses = preload("res://app/pause_stack.gd").new(); add_child(pauses)
-	var acceptance := preload("res://app/acceptance_storage.gd").configure(storage, args)
+	pauses = preload("res://app/battle/session/pause_stack.gd").new(); add_child(pauses)
+	var acceptance := preload("res://app/saves/acceptance_storage.gd").configure(storage, args)
 	if not acceptance.valid:
 		push_error(acceptance.error); get_tree().quit(1); return
 	if not _rule_errors.is_empty():

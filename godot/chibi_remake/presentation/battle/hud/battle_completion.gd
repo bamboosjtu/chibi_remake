@@ -1,5 +1,5 @@
 extends CanvasLayer
-const SessionActions = preload("res://app/session_actions.gd")
+const SessionActions = preload("res://app/battle/session/session_actions.gd")
 ## Presentation owns the short victory countdown; Game owns chapter selection.
 var host: Node2D
 var panel: PanelContainer

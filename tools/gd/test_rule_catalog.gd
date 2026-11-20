@@ -72,7 +72,7 @@ func _contracts() -> void:
 	assert(not Contract.valid("unit_definitions.json", bad))
 	var installed := Catalog.get_catalog("unit_tuning.json")
 	assert(not Catalog.install(documents).is_empty() and is_same(installed, Catalog.get_catalog("unit_tuning.json")))
-	var opening = preload("res://simulation/definitions/opening_officers.gd")
+	var opening = preload("res://app/battle/startup/opening_officers.gd")
 	var first: Array = opening.pool([]); var second: Array = opening.pool([])
 	first[0][0].level = 9
 	assert(second[0][0].level == 5 and Catalog.get_catalog("officers.json").blocks[0].officers[0].level == 0)

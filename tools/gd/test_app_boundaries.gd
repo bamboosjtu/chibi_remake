@@ -1,7 +1,7 @@
 extends SceneTree
-const LevelCatalog = preload("res://app/level_catalog.gd")
-const Campaign = preload("res://app/campaign_session.gd")
-const Storage = preload("res://app/user_storage.gd")
+const LevelCatalog = preload("res://app/campaign/level_catalog.gd")
+const Campaign = preload("res://app/campaign/campaign_session.gd")
+const Storage = preload("res://app/saves/user_storage.gd")
 func _initialize() -> void: run.call_deferred()
 func run() -> void:
 	_catalog_and_transitions()

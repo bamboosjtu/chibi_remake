@@ -1,5 +1,5 @@
 extends SceneTree
-const Store = preload("res://app/json_store.gd")   # batch2：json_store 迁入 app/，此处引用同步
+const Store = preload("res://app/saves/json_store.gd")   # batch2：json_store 迁入 app/，此处引用同步
 var _done := false                                # 看门狗：断言失败中止 _run 后改由超时退出
 
 func _initialize() -> void:

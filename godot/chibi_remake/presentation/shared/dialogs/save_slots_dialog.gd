@@ -1,5 +1,5 @@
 extends CanvasLayer
-const SessionActions = preload("res://app/session_actions.gd")
+const SessionActions = preload("res://app/battle/session/session_actions.gd")
 ## Shared save/load picker for the campaign menu and paused battle.
 signal confirmed(slot: int, title: String)
 signal cancelled

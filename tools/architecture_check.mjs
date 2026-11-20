@@ -60,10 +60,10 @@ for (const file of files(root)) {
   const code = source.replace(/("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|#[^\r\n]*/g,(all,string)=>string??'');
   const executable = code.replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g, '""');
   const count = source.trimEnd().split('\n').length;
-  if(relative !== 'app/pause_stack.gd' && /\.\s*paused\s*=(?!=)|\.(?:set|set_deferred)\(\s*['"]paused['"]/.test(code)) fail(`${relative}: SceneTree pause writes belong to PauseStack`);
+  if(relative !== 'app/battle/session/pause_stack.gd' && /\.\s*paused\s*=(?!=)|\.(?:set|set_deferred)\(\s*['"]paused['"]/.test(code)) fail(`${relative}: SceneTree pause writes belong to PauseStack`);
   if(/^app\/battle\/(?:bootstrap|scene_controller|cheat_controller|duel_controller)\.gd$/.test(relative) && /func _init\(\s*data\s*:/.test(code)) fail(`${relative}: application controllers must bind the live scene, not ignore an injected state`);
-  if((relative === 'app/save_service.gd' || relative === 'app/game.gd') && /\.transports\.reconcile\(/.test(code)) fail(`${relative}: save serialization must project transport values without mutating the world`);
-  if(relative === 'app/campaign_session.gd' && /\b(?:FileAccess|DirAccess)\b/.test(executable)) fail(`${relative}: campaign queries must use the cached level catalog`);
+  if((relative === 'app/saves/save_service.gd' || relative === 'app/game.gd') && /\.transports\.reconcile\(/.test(code)) fail(`${relative}: save serialization must project transport values without mutating the world`);
+  if(relative === 'app/campaign/campaign_session.gd' && /\b(?:FileAccess|DirAccess)\b/.test(executable)) fail(`${relative}: campaign queries must use the cached level catalog`);
   if (relative !== 'simulation/world/battle_world.gd' && /\bworld\.(?:_modules|_access)\b|\bworld\.(?:get|set)\(\s*['"]_(?:modules|access)['"]/.test(code)) fail(`${relative}: accesses private BattleWorld collections`);
   if (['presentation/battle/camera/camera_controller.gd','presentation/battle/world/build_preview.gd','presentation/battle/world/battle_resources.gd'].includes(relative) && /\bhost\.(?:units|selected|map_data|nav|decor_cells)\b|\bhost(?:\.(?:get|get\.bind)\(\s*|\[\s*)['"](?:units|selected|map_data|nav|decor_cells)['"]/.test(code)) fail(`${relative}: bypasses value read model`);
   if (relative === 'app/read_models/battle_queries.gd' && /\b(?:_?data|state)\.(?:units|selected|map_data|decor_cells)\.duplicate\(\s*true\s*\)/.test(code)) fail(`${relative}: deep-copies world data at the read boundary`);
@@ -91,7 +91,7 @@ for (const file of files(root)) {
     waive(`${relative}::gameplay-rng`, `${relative}: gameplay randomness rolled outside simulation`);
   }
   if(relative.startsWith('app/') && /\bview\._ui\b/.test(code))fail(`${relative}: app reaches private presentation state`);
-  if((relative==='app/save_service.gd'||relative.startsWith('app/saves/')) && /\bview\.(?:unit_nodes|event_view|completion|end_label|projectile_view)\b/.test(code))fail(`${relative}: save pipeline bypasses loaded-view API`);
+  if((relative==='app/saves/save_service.gd'||relative.startsWith('app/saves/')) && /\bview\.(?:unit_nodes|event_view|completion|end_label|projectile_view)\b/.test(code))fail(`${relative}: save pipeline bypasses loaded-view API`);
   if(relative.startsWith('presentation/')&& /\bhost\.(?:units|selected|map_data|nav|decor_cells|trainings|visibility|clock|projectiles|fire_fields|player_commands|build_types|cmd_pending_data|task_events|terrain_changes)\b|\bhost(?:\.(?:get|get\.bind)\(\s*|\[\s*)['"](?:units|selected|map_data|nav|decor_cells|trainings|visibility|clock|projectiles|fire_fields|player_commands|build_types|cmd_pending_data|task_events|terrain_changes)['"]/.test(code))fail(`${relative}: presentation bypasses value read model`);
   if(relative==='app/read_models/battle_queries.gd'&&/^var (?:units|selected|map_data|nav|decor_cells|trainings|visibility|clock|projectiles|fire_fields|player_commands|build_types|cmd_pending_data|task_events|terrain_changes):/m.test(code))fail(`${relative}: retired mutable getter restored`);
   if(relative==='app/read_models/unit_projection.gd'&&/\b(?:unit|data\.(?:units|selected|map_data))\.duplicate\(\s*true\s*\)/.test(code))fail(`${relative}: copies whole domain records instead of selecting fields`);

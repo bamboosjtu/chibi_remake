@@ -33,11 +33,11 @@
 | 模块 | 职责 |
 |---|---|
 | `simulation/world/battle_world.gd` | 无场景依赖的模拟组合根；统一创建规则、命令、AI 与领域服务，正常启动和候选共用地图初始化 |
-| `app/battle_actions.gd`、`app/session_actions.gd`、`app/read_models/battle_queries.gd` | 提交玩家意图、办理会话操作、读取显示投影 |
+| `app/battle/commands/battle_actions.gd`、`app/battle/session/session_actions.gd`、`app/read_models/battle_queries.gd` | 提交玩家意图、办理会话操作、读取显示投影 |
 | `simulation/state/battle_state.gd` | 唯一可写战斗状态；普通 RefCounted，不继承场景 |
-| `app/battle_scene_state.gd` | 场景拥有的表现节点和存档服务 |
-| `app/battle/bootstrap.gd` | 关卡装配、应用已冻结规则、开局与开发参数 |
-| `app/battle/scene_controller.gd` | 帧投递、输入、场景退出与表现协调 |
+| `app/battle/runtime/battle_scene_state.gd` | 场景拥有的表现节点和存档服务 |
+| `app/battle/startup/bootstrap.gd` | 关卡装配、应用已冻结规则、开局与开发参数 |
+| `app/battle/runtime/scene_controller.gd` | 帧投递、输入、场景退出与表现协调 |
 | `simulation/world/battle_simulation.gd` | 固定 tick 执行顺序、实体清理与摘要 |
 | `simulation/battle/` | 实体工厂、空间索引、交互路径、移动、战斗、建造、生产、武将、能力、命令、战役 |
 | `simulation/navigation/` | 导航状态、网格占格、路径查询与城门 |

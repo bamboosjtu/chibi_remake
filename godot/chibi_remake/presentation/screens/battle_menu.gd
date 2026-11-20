@@ -1,5 +1,5 @@
 extends CanvasLayer
-const SessionActions = preload("res://app/session_actions.gd")
+const SessionActions = preload("res://app/battle/session/session_actions.gd")
 ## 战场菜单独立拥有暂停和模态输入；保存／恢复仍走宿主的存档服务。
 var host: Node2D
 var overlay: ColorRect

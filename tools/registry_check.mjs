@@ -47,7 +47,7 @@ for (const [name, files] of Object.entries(rootFiles)) {
   }
  }
 }
-for(const file of ['simulation/state/battle_state.gd','app/battle_scene_state.gd','presentation/menu/menu_state.gd','presentation/battle/view/battle_view_state.gd','simulation/navigation/navigation_state.gd','simulation/ai/ai_state.gd']){
+for(const file of ['simulation/state/battle_state.gd','app/battle/runtime/battle_scene_state.gd','presentation/menu/menu_state.gd','presentation/battle/view/battle_view_state.gd','simulation/navigation/navigation_state.gd','simulation/ai/ai_state.gd']){
  const source=read(file),declared=JSON.parse(source.match(/^const PROXY_FIELDS := (.+)$/m)?.[1]??'null');
  assert.deepEqual(declared,[...source.matchAll(/^var (\w+)/gm)].map(m=>m[1]),file+': explicit property surface is stale');
 }

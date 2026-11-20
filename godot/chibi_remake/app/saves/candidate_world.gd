@@ -16,7 +16,7 @@ func prepare(source: RefCounted, definition: Dictionary = {}) -> bool:
 
 func prepare_map_id(map_id: String) -> String:
 	if not _connect(): return "候选战场装配失败"
-	var opening := preload("res://app/battle/battle_opening.gd").new(world)
+	var opening := preload("res://app/battle/startup/battle_opening.gd").new(world)
 	var error := opening.prepare_map(map_id)
 	if not error.is_empty(): return error
 	return "" if opening.populate(false) else "地图实体已经初始化"
@@ -24,7 +24,7 @@ func prepare_map_id(map_id: String) -> String:
 func _connect() -> bool:
 	var report: Dictionary = world.validate_services("snapshot", {}, false)
 	if not report.missing.is_empty(): return false
-	saver = preload("res://app/save_service.gd").new(self)
+	saver = preload("res://app/saves/save_service.gd").new(self)
 	return true
 
 func dispose() -> void:

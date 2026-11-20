@@ -1,5 +1,5 @@
 extends Object
-const SessionActions = preload("res://app/session_actions.gd")
+const SessionActions = preload("res://app/battle/session/session_actions.gd")
 ## controller: presentation component.
 const UIState = preload("res://presentation/menu/menu_state.gd")
 var _ui: UIState

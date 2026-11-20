@@ -102,28 +102,6 @@
       "reviewBy": "2026-12-31"
     },
     {
-      "from": "app/battle/runtime/battle_runtime.gd",
-      "to": "presentation/battle/view/battle_view.gd",
-      "fromPackage": "app/battle",
-      "toPackage": "presentation",
-      "kind": "import",
-      "line": 20,
-      "reason": "Scene controller owns frame/input/view coordination; P5 splits it into battle_runtime plus presentation input/frame controllers.",
-      "removeByStage": "P5",
-      "reviewBy": "2026-12-31"
-    },
-    {
-      "from": "app/battle/runtime/battle_runtime_state.gd",
-      "to": "presentation/battle/resources/art_catalog.gd",
-      "fromPackage": "app/battle",
-      "toPackage": "presentation",
-      "kind": "import",
-      "line": 4,
-      "reason": "Scene state carries camera/audio/view/art fields; P5 splits it into app runtime state and presentation state.",
-      "removeByStage": "P5",
-      "reviewBy": "2026-12-31"
-    },
-    {
       "from": "app/game.gd",
       "to": "presentation/shell/software_cursor.gd",
       "fromPackage": "app",
@@ -165,6 +143,28 @@
       "line": 13,
       "reason": "State preloads officer progression only for a static helper; P1 removes the static dependency or routes it through definitions.",
       "removeByStage": "P1",
+      "reviewBy": "2026-12-31"
+    },
+    {
+      "from": "app/battle/runtime/scene_controller.gd",
+      "to": "presentation/battle/view/battle_view.gd",
+      "fromPackage": "app/battle",
+      "toPackage": "presentation",
+      "kind": "import",
+      "line": 20,
+      "reason": "Intermediate name at P4b; P5 splits into battle_runtime plus presentation controllers.",
+      "removeByStage": "P5",
+      "reviewBy": "2026-12-31"
+    },
+    {
+      "from": "app/battle/runtime/battle_scene_state.gd",
+      "to": "presentation/battle/resources/art_catalog.gd",
+      "fromPackage": "app/battle",
+      "toPackage": "presentation",
+      "kind": "import",
+      "line": 4,
+      "reason": "Intermediate name at P4b; P5 splits into app runtime state plus presentation state.",
+      "removeByStage": "P5",
       "reviewBy": "2026-12-31"
     }
   ]

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "files": {
-    "res://app/battle/bootstrap.gd": "ae2ec660b7279c720795dd1e85a686f2b3bc8dbe41bea2484fe2e25d63cadf40",
+    "res://app/battle/startup/bootstrap.gd": "62ddd864f63189ccdd1a36ffc6a1e97f763f873580c254f0358f85a8a618ed23",
     "res://simulation/ai/ai.gd": "473c35a85a798cb75f184e8096b2444b1ea155b8e7b63991418edbfb10d02c6c",
     "res://simulation/ai/ai_config.gd": "51c48b1c71c7330d568b823051653dfd77b81047c5048c494b1cb7cf6e7aa932",
     "res://simulation/ai/ai_decisions.gd": "72e6d1f21aaea21bdf8f81c4ea311375d3f942018924dd6e10ce0669d7391735",
@@ -37,7 +37,6 @@
     "res://simulation/definitions/contracts/rule_contract.gd": "ad1627039220c8d45e39206c16b35a590ae31583848fb796aa00c65e4b56a090",
     "res://simulation/definitions/frozen_data.gd": "7e33ab9cad122cf35b5a8fffbcfbc5fadb4c8731bf7f7a222b34a41fcb208696",
     "res://simulation/definitions/officer_grades.gd": "7317ee11041f3e95221193a6cd78c49f1dd64aca3f0e65eeed53b1dc1584ec15",
-    "res://simulation/definitions/opening_officers.gd": "ea25801a069f7b077c683300c285ba2196c585c4cbef653498862455b26748a1",
     "res://simulation/definitions/resource_cost.gd": "d5f99cb61909507f1980f79ab3bf23b068ae15a92097edd0407e13b918396eb4",
     "res://simulation/definitions/rule_catalog.gd": "be8a558b8ea9f89d6b55d04ca2a9852c8c475008d230a3843d6ce5d49735a0fd",
     "res://simulation/definitions/status_fields.gd": "c0b7e2227b8b5f1051fd379fbd2f2bdcf84460d76d0be9f993c60b1caa79439d",

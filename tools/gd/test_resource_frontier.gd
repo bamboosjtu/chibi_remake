@@ -10,7 +10,7 @@ func _initialize() -> void:
 
 func fixture(phase: int) -> Node2D:
 	var sim:Node2D=load("res://main.gd").new()
-	sim.saver=load("res://app/save_service.gd").new(sim)
+	sim.saver=load("res://app/saves/save_service.gd").new(sim)
 	sim.map_id="chibil1";sim.player_owner=2;sim.food=0;sim.wood=0
 	var walk:Array=[];walk.resize(40*60);walk.fill(1)
 	var decor:Array=[]

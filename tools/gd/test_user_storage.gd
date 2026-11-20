@@ -1,7 +1,7 @@
 extends SceneTree
 
 func _initialize() -> void:
-	var storage = preload("res://app/user_storage.gd")
+	var storage = preload("res://app/saves/user_storage.gd")
 	var directory := OS.get_environment("LOCALAPPDATA").path_join("not-created/nested/saves")
 	for attempt in range(20): assert(storage.writable(directory))
 	assert(not DirAccess.dir_exists_absolute(directory.get_base_dir().get_base_dir()))

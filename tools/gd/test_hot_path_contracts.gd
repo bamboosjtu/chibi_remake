@@ -97,7 +97,7 @@ func blocked_contract() -> void:
 
 func world_exchange_contract(actor: Dictionary) -> void:
 	var game: Node=root.get_node("Game")
-	sim.saver=load("res://app/save_service.gd").new(sim)
+	sim.saver=load("res://app/saves/save_service.gd").new(sim)
 	var data: Dictionary=sim.map_data.duplicate(true)
 	data.decor=[[14,20,0],[15,20,0]]
 	sim.map_data=data;sim.nav.setup(sim.map_data);sim.world.harvest_orders._build_decor_targets()

@@ -12,7 +12,7 @@
     "testing/groups_checks.gd::_selftest_ctrlgroup": 84,
     "testing/navigation_checks.gd::_selftest_naval": 133,
     "testing/technology_checks.gd::_selftest_tech": 125,
-    "app/battle/bootstrap.gd::_ready": 153,
+    "app/battle/startup/bootstrap.gd::_ready": 153,
     "presentation/menu/campaign_dialog.gd::_build_campaign_dialog": 98,
     "presentation/menu/controller.gd::_ready": 220,
     "presentation/menu/level_dialog.gd::_build_level_dialog": 151,
@@ -62,7 +62,7 @@
       "reviewBy": "2027-02-16",
       "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."
     },
-    "functions:app/battle/bootstrap.gd::_ready": {
+    "functions:app/battle/startup/bootstrap.gd::_ready": {
       "owner": "project-maintainers",
       "reviewBy": "2027-02-16",
       "reason": "Reviewed pre-existing size budget; reduce incrementally without enlarging it."

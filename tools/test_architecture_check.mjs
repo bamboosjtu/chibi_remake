@@ -28,12 +28,12 @@ try{
   write('app/private.gd','extends RefCounted\nfunc bad(tree):\n\t'+mutation+'\n');assert.notEqual(run().status,0,mutation);
  }
  write('app/private.gd','extends RefCounted\n');
- write('app/battle/scene_controller.gd','extends RefCounted\nfunc _init(data: State, scene, node):\n\tpass\n');assert.notEqual(run().status,0);
- write('app/battle/scene_controller.gd','extends RefCounted\n');
- write('app/save_service.gd','extends RefCounted\nfunc save(host):\n\thost.transports.reconcile()\n');assert.notEqual(run().status,0);
- write('app/save_service.gd','extends RefCounted\n');
- write('app/campaign_session.gd','extends RefCounted\nfunc levels():\n\treturn FileAccess.open("map.json",1)\n');assert.notEqual(run().status,0);
- write('app/campaign_session.gd','extends RefCounted\n');
+ write('app/battle/runtime/scene_controller.gd','extends RefCounted\nfunc _init(data: State, scene, node):\n\tpass\n');assert.notEqual(run().status,0);
+ write('app/battle/runtime/scene_controller.gd','extends RefCounted\n');
+ write('app/saves/save_service.gd','extends RefCounted\nfunc save(host):\n\thost.transports.reconcile()\n');assert.notEqual(run().status,0);
+ write('app/saves/save_service.gd','extends RefCounted\n');
+ write('app/campaign/campaign_session.gd','extends RefCounted\nfunc levels():\n\treturn FileAccess.open("map.json",1)\n');assert.notEqual(run().status,0);
+ write('app/campaign/campaign_session.gd','extends RefCounted\n');
  write('app/saves/probe.gd','extends RefCounted\nfunc bad(view):\n\tview.unit_nodes({}).spr.visible=false\n');assert.notEqual(run().status,0);
  write('app/saves/probe.gd','extends RefCounted\n');
  write('app/read_models/unit_projection.gd','extends RefCounted\nfunc bad(unit):\n\treturn unit.duplicate(true)\n');assert.notEqual(run().status,0);

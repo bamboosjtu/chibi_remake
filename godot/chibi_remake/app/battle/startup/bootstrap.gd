@@ -6,10 +6,10 @@ var battle: State:
 	get: return node.state
 var _dep_campaign: Object
 var _dep_scene_controller: Object
-const SceneServices = preload("res://app/battle_scene_state.gd")
+const SceneServices = preload("res://app/battle/runtime/battle_scene_state.gd")
 var scene: SceneServices
 var node: Node2D
-const SaveSvc = preload("res://app/save_service.gd")    # ARCH-006：存档/读档编排
+const SaveSvc = preload("res://app/saves/save_service.gd")    # ARCH-006：存档/读档编排
 const View = preload("res://presentation/battle/view/battle_view.gd")        # ARCH-013：表现层（HUD/相机/单位外观/框选）
 
 func _init(services: SceneServices, surface: Node2D) -> void:
@@ -44,7 +44,7 @@ func _ready() -> void:
 	if "--load" in args and not Game.startup_load_consumed:
 		Game.pending_load = true    # 供自动化验证读档路径（等价于点菜单的「读取进度」）
 		Game.startup_load_consumed = true
-	var opening := preload("res://app/battle/battle_opening.gd").new(node.world)
+	var opening := preload("res://app/battle/startup/battle_opening.gd").new(node.world)
 	var map_error := opening.prepare_map(battle.map_id)
 	if not map_error.is_empty():
 		_dep_scene_controller._fatal(map_error)

@@ -37,7 +37,7 @@ func run() -> void:
 	spent.gatherRef.unit=24.5
 	assert(not preload("res://simulation/units/unit_schema.gd").valid_snapshot(spent))
 	var path: String = game.SAVE_PATH.get_base_dir().path_join("validity.json")
-	var store = preload("res://app/json_store.gd")
+	var store = preload("res://app/saves/json_store.gd")
 	assert(store.commit(path,JSON.stringify(good),game.is_valid_save,game.can_rotate_save))
 	assert(store.commit(path,JSON.stringify(good),game.is_valid_save,game.can_rotate_save))
 	var backup_hash := FileAccess.get_sha256(path+".bak")

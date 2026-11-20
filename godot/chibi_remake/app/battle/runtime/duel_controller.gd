@@ -4,7 +4,7 @@ const State = preload("res://simulation/state/battle_state.gd")
 var battle: State:
 	get: return node.state
 
-const SceneServices = preload("res://app/battle_scene_state.gd")
+const SceneServices = preload("res://app/battle/runtime/battle_scene_state.gd")
 var scene: SceneServices
 var node: Node2D
 

@@ -1,9 +1,9 @@
 extends RefCounted
 signal changed
 ## File/slot addressing and checked write transactions.
-const Store = preload("res://app/json_store.gd")
+const Store = preload("res://app/saves/json_store.gd")
 const SAVE_SLOTS := 20
-var storage = preload("res://app/user_storage.gd").new()
+var storage = preload("res://app/saves/user_storage.gd").new()
 var path := "user://save.json"
 var last_error := {}
 var force_failure := false

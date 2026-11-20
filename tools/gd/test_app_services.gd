@@ -30,7 +30,7 @@ func run() -> void:
 	repository.force_failure=true
 	assert(not repository.begin_save(2) and repository.load_slot(2).probe==1)
 	catalog.invalidate(); catalog.entries(); assert(reads.count>count)
-	var campaign = load("res://app/campaign_session.gd").new()
+	var campaign = load("res://app/campaign/campaign_session.gd").new()
 	campaign.pending_load=true; campaign.pending_load_slot=9
 	var next: Dictionary = campaign.next_level("chibil1")
 	assert(not next.is_empty() and campaign.advance("chibil1"))

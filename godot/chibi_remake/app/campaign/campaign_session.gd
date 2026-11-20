@@ -7,7 +7,7 @@ var startup_map_consumed := false
 var startup_load_consumed := false
 var startup_video_seen := false
 var last_load_error := ""
-var catalog := preload("res://app/level_catalog.gd").new()
+var catalog := preload("res://app/campaign/level_catalog.gd").new()
 
 static func campaign_caption(id: String) -> String:
 	var campaign := "刘备战役" if id.begins_with("chibil") else "曹操战役"

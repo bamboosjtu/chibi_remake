@@ -13,21 +13,21 @@ const EDGE_DISTANCE = Config.EDGE_DISTANCE
 const DEPOSIT_EDGE_PX = Config.DEPOSIT_EDGE_PX
 const SCRIPTED_OBJECTIVES = Config.SCRIPTED_OBJECTIVES
 const SPECIAL_OBJECTIVE_MISSIONS = Config.SPECIAL_OBJECTIVE_MISSIONS
-const BootstrapService = preload("res://app/battle/bootstrap.gd")
+const BootstrapService = preload("res://app/battle/startup/bootstrap.gd")
 var bootstrap: BootstrapService
-const CheatControllerService = preload("res://app/battle/cheat_controller.gd")
+const CheatControllerService = preload("res://app/battle/runtime/cheat_controller.gd")
 var cheat_controller: CheatControllerService
-const DuelControllerService = preload("res://app/battle/duel_controller.gd")
+const DuelControllerService = preload("res://app/battle/runtime/duel_controller.gd")
 var duel_controller: DuelControllerService
-const SceneControllerService = preload("res://app/battle/scene_controller.gd")
+const SceneControllerService = preload("res://app/battle/runtime/scene_controller.gd")
 var scene_controller: SceneControllerService
-var actions := preload("res://app/battle_actions.gd").new(self)
-var session_actions := preload("res://app/session_actions.gd").new(self)
+var actions := preload("res://app/battle/commands/battle_actions.gd").new(self)
+var session_actions := preload("res://app/battle/session/session_actions.gd").new(self)
 var world := preload("res://simulation/world/battle_world.gd").new()
 const State = preload("res://simulation/state/battle_state.gd")
 var state: State:
 	get: return world.state
-var scene := preload("res://app/battle_scene_state.gd").new()
+var scene := preload("res://app/battle/runtime/battle_scene_state.gd").new()
 var _state_fields: Dictionary = {}
 var _scene_fields: Dictionary = {}
 var _presentation_diagnostics := preload("res://presentation/battle/view/event_diagnostics.gd").new()

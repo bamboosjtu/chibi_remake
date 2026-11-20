@@ -7,7 +7,7 @@ class Storage extends RefCounted:
 		resolved = true
 		return "/player-slots/save.json"
 func _initialize() -> void:
-	var policy = preload("res://app/acceptance_storage.gd")
+	var policy = preload("res://app/saves/acceptance_storage.gd")
 	for arguments in [["--selftest"],["--native-save=write"],["--native-save=read","--save-test-id=repeatable"]]:
 		var storage := Storage.new()
 		var result: Dictionary = policy.configure(storage,PackedStringArray(arguments))

@@ -1,7 +1,7 @@
 extends SceneTree
 const Semantics = preload("res://app/saves/snapshot_semantics.gd")
 const Limits = preload("res://app/saves/json_limits.gd")
-const Store = preload("res://app/json_store.gd")
+const Store = preload("res://app/saves/json_store.gd")
 var battle: Node2D
 var game: Node
 var done := false
