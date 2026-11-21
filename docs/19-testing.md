@@ -184,7 +184,7 @@ powershell -NoProfile -File tools/ci_windows.ps1 -FullRegression
 
 ### 原片播放与死亡编队
 
-`test_original_media` 校验 47 个 AVI 的原始哈希，逐个建立真实 Indeo3 播放，验证原始尺寸、640/1280/1920 窗口下物理像素 1:1 居中、自然结束/跳过/读档取消/暂停恢复、LDAN 按结果直接定位原片段；原生图形检查另验证 PCM 音频信号正常幅度。
+`test_original_media` 校验 13 个共享 AVI 的原始哈希，逐个建立真实 Indeo3 播放，验证原始尺寸、640/1280/1920 窗口下物理像素 1:1 居中、自然结束/跳过/读档取消/暂停恢复、LDAN 按结果直接定位原片段；原生图形检查另验证 PCM 音频信号正常幅度。test_campaign_media 验证本机安装的全部 34 个关卡 MP4 原生播放、720p 等比缩放、跳过与自然结束。
 
 `test_research_rules` 覆盖真实 `_kill` 当帧释放槽位；`test_team_lifecycle` 覆盖仅含成员的控制组、混合控制组保留其他单位、死亡动画中存读及最终解绑。发布测试将原生 DLL 和 EXE/PCK 共同校验、复制；任一 DLL 被更改时保持旧启动指针。
 

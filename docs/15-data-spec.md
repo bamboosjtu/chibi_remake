@@ -103,7 +103,7 @@
 ```json
 "scenario": {
   "missionId": 17,
-  "avi": "cao1.AVI",
+  "avi": "CAO1.mp4",
   "sides": [
     {
       "owner": 3,

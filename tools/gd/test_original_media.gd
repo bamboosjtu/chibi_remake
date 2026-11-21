@@ -12,11 +12,13 @@ func run() -> void:
 	b.set_process(false);b.cli_mode=true;b.ai=null
 	var media=b.view.event_view
 	assert(media.catalog.size()==47 and ClassDB.class_exists("VideoStreamFFmpeg"))
-	for name in media.catalog:
+	var shared: Array = media.catalog.keys().filter(func(name): return not media.catalog[name].get("localOnly",false))
+	assert(shared.size()==13)
+	for name in shared:
 		var row:Dictionary=media.catalog[name]
 		assert(FileAccess.file_exists(row.path) and FileAccess.get_sha256(row.path)==row.sha256)
-	print("ORIGINAL MEDIA BYTES PASS 47 supplied AVI files / exact SHA256 / no conversion products")
-	for name in media.catalog:
+	print("ORIGINAL MEDIA BYTES PASS 13 retained shared AVI files / exact SHA256")
+	for name in shared:
 		var row:Dictionary=media.catalog[name]
 		assert(media.play_media(row.path) and paused and media.player.is_playing(),name)
 		assert(media.player.stream.file==row.path and media.player.stream.resource_path==row.path)
@@ -24,7 +26,7 @@ func run() -> void:
 		await create_timer(0.10,true).timeout
 		media._finish_media();assert(not paused)
 	# The game's canvas stretch must never enlarge or shrink a video pixel.
-	assert(media.play_media("res://media/videos/LIU1.AVI"))
+	assert(media.play_media("res://media/videos/START.AVI"))
 	for size in [Vector2i(640,480),Vector2i(1280,720),Vector2i(1920,1080)]:
 		root.size=size;await process_frame;await process_frame
 		media._layout_video(media.media_path)
@@ -34,7 +36,7 @@ func run() -> void:
 		var origin:Vector2=screen*Vector2.ZERO
 		assert(origin.is_equal_approx((Vector2(size)-Vector2(320,240))*0.5),"native image centered on black")
 	media._finish_media()
-	print("ORIGINAL MEDIA PLAYBACK PASS 47 Indeo3 AVI / native dimensions / 640-1280-1920 window pixel scale1 / centered / no stretch")
+	print("ORIGINAL MEDIA PLAYBACK PASS 13 retained Indeo3 AVI / native dimensions / 640-1280-1920 window pixel scale1 / centered / no stretch")
 	assert(media.play_media("res://media/videos/LDAN.AVI",func():callbacks+=1,"test","result",14.0,[[24.0,38.0],[78.0,87.0]]))
 	media.player.stream_position=38.0;media._process(0)
 	assert(media.segment_index==1 and is_equal_approx(media.player.stream_position,78.0) and media.caption.text=="result")
@@ -44,10 +46,10 @@ func run() -> void:
 	assert(media.play_media("res://media/videos/EVENT6.AVI",func():callbacks+=1))
 	var skip:=InputEventKey.new();skip.keycode=KEY_ESCAPE;skip.pressed=true
 	media._input(skip);assert(callbacks==2 and not paused and not media.active)
-	assert(media.play_media("res://media/videos/LIU1.AVI",func():callbacks+=1))
+	assert(media.play_media("res://media/videos/START.AVI",func():callbacks+=1))
 	media.restore_history();assert(callbacks==2 and not paused and media.player.stream==null)
 	# Natural end, rather than a manually emitted finished signal, releases pause.
-	assert(media.play_media("res://media/videos/LIU1.AVI",func():callbacks+=1))
+	assert(media.play_media("res://media/videos/START.AVI",func():callbacks+=1))
 	media.player.stream_position=media.player.get_stream_length()-0.15
 	for step in range(40):
 		await create_timer(0.05,true).timeout

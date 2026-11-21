@@ -16,40 +16,40 @@
 
 | 编号 | 地图 ID | 关名 | 任务号 | 开场片 | 参战方（归属） | 玩家 |
 |---|---|---|---:|---|---|---|
-| C1 | chibic1 | 侦察新野 | 17 | cao1.AVI | 3 / 2 | o3 |
-| C2 | chibic2 | 南征准备 | 18 | cao2.AVI | 3 / 2 | o3 |
-| C3 | chibic3 | 进取博望 | 19 | cao3.AVI | 3 / 2 | o3 |
-| C4 | chibic4 | 南征先锋 | 20 | cao4.AVI | 3 / 2 | o3 |
-| C5 | chibic5 | 进攻樊城 | 21 | cao5.AVI | 3 / 2 | o3 |
-| C6 | chibic6 | 襄阳招降 | 22 | cao6.AVI | 3 / 2 / 4 | o3 |
-| C7 | chibic7 | 当阳长坂 | 23 | cao7.AVI | 3 / 2 | o3 |
-| C8 | chibic8 | 南取江陵 | 24 | cao8.AVI | 3 / 4 | o3 |
-| C9 | chibic9 | 东征夏口 | 25 | cao9.AVI | 3 / 2 | o3 |
-| C10 | chibic10 | 初识水战 | 26 | cao10.AVI | 3 / 1 | o3 |
-| C11 | chibic11 | 误斩蔡张 | 27 | cao11.AVI | 3 / 1 | o3 |
-| C12 | chibic12 | 连环战船 | 28 | cao12.AVI | 3 / 1 | o3 |
-| C13 | chibic13 | 赤壁水战 | 29 | cao13.AVI | 3 / 1 / 2 | o3 |
-| C14 | chibic14 | 兵败乌林 | 30 | cao14a.AVI | 3 / 2 | o3 |
-| C15 | chibic15 | 南郡攻防 | 31 | cao15a.AVI | 3 / 2 / 1 | o3 |
-| C16 | chibic16 | 歼灭周瑜 | 32 | cao14.AVI | 3 / 2 / 1 | o3 |
-| C17 | chibic17 | 决战柴桑 | 33 | cao15.AVI | 3 / 2 / 1 | o3 |
-| L1 | chibil1 | 二吕进犯 | 0 | liu1.AVI | 2 / 3 | o2 |
-| L2 | chibil2 | 计取樊城 | 1 | liu2.AVI | 2 / 3 | o2 |
-| L3 | chibil3 | 博望用计 | 2 | liu3.AVI | 2 / 3 | o2 |
-| L4 | chibil4 | 兵临城下 | 3 | liu4.AVI | 2 / 3 | o2 |
-| L5 | chibil5 | 坚守樊城 | 4 | liu5.AVI | 2 / 3 | o2 |
-| L6 | chibil6 | 投奔襄阳 | 5 | liu6.AVI | 2 / 4 | o2 |
-| L7A | chibil7a | 蔡瑁追击 | 6 | liu7.AVI | 2 / 4 | o2 |
-| L7B | chibil7b | 固守襄阳 | 7 | liu8.AVI | 2 / 3 | o2 |
-| L8 | chibil8 | 长坂救主 | 8 | liu9.AVI | 2 / 3 | o2 |
-| L9 | chibil9 | 江夏退敌 | 9 | liu10.AVI | 2 / 3 | o2 |
-| L10 | chibil10 | 三江水战 | 10 | liu11.AVI | 1 / 3 | o1 |
-| L11 | chibil11 | 大战于禁 | 11 | liu12.AVI | 1 / 3 | o1 |
-| L12 | chibil12 | 连环战船 | 12 | liu13.AVI | 1 / 3 | o1 |
-| L13 | chibil13 | 火烧赤壁 | 13 | liu14.AVI | 1 / 3 | o1 |
-| L14 | chibil14 | 乌林截击 | 14 | liu15.AVI | 2 / 3 | o2 |
-| L15 | chibil15 | 攻略南郡 | 15 | liu16.AVI | 2 / 3 | o2 |
-| L16 | chibil16 | 再战赤壁 | 16 | liu17.AVI | 2 / 1 | o2 |
+| C1 | chibic1 | 侦察新野 | 17 | CAO1.mp4 | 3 / 2 | o3 |
+| C2 | chibic2 | 南征准备 | 18 | CAO2.mp4 | 3 / 2 | o3 |
+| C3 | chibic3 | 进取博望 | 19 | CAO3.mp4 | 3 / 2 | o3 |
+| C4 | chibic4 | 南征先锋 | 20 | CAO4.mp4 | 3 / 2 | o3 |
+| C5 | chibic5 | 进攻樊城 | 21 | CAO5.mp4 | 3 / 2 | o3 |
+| C6 | chibic6 | 襄阳招降 | 22 | CAO6.mp4 | 3 / 2 / 4 | o3 |
+| C7 | chibic7 | 当阳长坂 | 23 | CAO7.mp4 | 3 / 2 | o3 |
+| C8 | chibic8 | 南取江陵 | 24 | CAO8.mp4 | 3 / 4 | o3 |
+| C9 | chibic9 | 东征夏口 | 25 | CAO9.mp4 | 3 / 2 | o3 |
+| C10 | chibic10 | 初识水战 | 26 | CAO10.mp4 | 3 / 1 | o3 |
+| C11 | chibic11 | 误斩蔡张 | 27 | CAO11.mp4 | 3 / 1 | o3 |
+| C12 | chibic12 | 连环战船 | 28 | CAO12.mp4 | 3 / 1 | o3 |
+| C13 | chibic13 | 赤壁水战 | 29 | CAO13.mp4 | 3 / 1 / 2 | o3 |
+| C14 | chibic14 | 兵败乌林 | 30 | CAO14A.mp4 | 3 / 2 | o3 |
+| C15 | chibic15 | 南郡攻防 | 31 | CAO15A.mp4 | 3 / 2 / 1 | o3 |
+| C16 | chibic16 | 歼灭周瑜 | 32 | CAO14.mp4 | 3 / 2 / 1 | o3 |
+| C17 | chibic17 | 决战柴桑 | 33 | CAO15.mp4 | 3 / 2 / 1 | o3 |
+| L1 | chibil1 | 二吕进犯 | 0 | LIU1.mp4 | 2 / 3 | o2 |
+| L2 | chibil2 | 计取樊城 | 1 | LIU2.mp4 | 2 / 3 | o2 |
+| L3 | chibil3 | 博望用计 | 2 | LIU3.mp4 | 2 / 3 | o2 |
+| L4 | chibil4 | 兵临城下 | 3 | LIU4.mp4 | 2 / 3 | o2 |
+| L5 | chibil5 | 坚守樊城 | 4 | LIU5.mp4 | 2 / 3 | o2 |
+| L6 | chibil6 | 投奔襄阳 | 5 | LIU6.mp4 | 2 / 4 | o2 |
+| L7A | chibil7a | 蔡瑁追击 | 6 | LIU7.mp4 | 2 / 4 | o2 |
+| L7B | chibil7b | 固守襄阳 | 7 | LIU8.mp4 | 2 / 3 | o2 |
+| L8 | chibil8 | 长坂救主 | 8 | LIU9.mp4 | 2 / 3 | o2 |
+| L9 | chibil9 | 江夏退敌 | 9 | LIU10.mp4 | 2 / 3 | o2 |
+| L10 | chibil10 | 三江水战 | 10 | LIU11.mp4 | 1 / 3 | o1 |
+| L11 | chibil11 | 大战于禁 | 11 | LIU12.mp4 | 1 / 3 | o1 |
+| L12 | chibil12 | 连环战船 | 12 | LIU13.mp4 | 1 / 3 | o1 |
+| L13 | chibil13 | 火烧赤壁 | 13 | LIU14.mp4 | 1 / 3 | o1 |
+| L14 | chibil14 | 乌林截击 | 14 | LIU15.mp4 | 2 / 3 | o2 |
+| L15 | chibil15 | 攻略南郡 | 15 | LIU16.mp4 | 2 / 3 | o2 |
+| L16 | chibil16 | 再战赤壁 | 16 | LIU17.mp4 | 2 / 1 | o2 |
 
 阵营代号：1 孙权军、2 刘备军、3 曹操军、4 荆州军、0 中立。
 

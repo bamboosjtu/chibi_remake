@@ -40,8 +40,11 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(func():
 		if active:_layout_video(media_path))
 
-static func original_path(name:String) -> String:
-	return "res://media/videos/"+name.get_file().to_upper()
+func campaign_path(name:String) -> String:
+	var file := name.get_file()
+	if file != name or file.get_extension() != "mp4":return ""
+	var entry:Dictionary=catalog.get(file,{})
+	return str(entry.get("path","")) if entry.get("localOnly",false) else ""
 
 func _native_size(path:String) -> Vector2:
 	var entry:Dictionary=catalog.get(path.get_file(),{})
@@ -54,8 +57,11 @@ func _layout_video(path:String) -> void:
 	var physical:Vector2=get_viewport().get_visible_rect().size*stretch.get_scale()
 	var native:Vector2=_native_size(path)
 	backdrop.position=Vector2.ZERO;backdrop.size=physical
-	player.scale=Vector2.ONE;player.expand=false;player.size=native
-	player.position=((physical-native)*0.5).floor()
+	var hd := path.get_extension() == "mp4"
+	var fit := minf(1.0,minf(physical.x/native.x,physical.y/native.y)) if hd else 1.0
+	player.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR if hd else CanvasItem.TEXTURE_FILTER_NEAREST
+	player.scale=Vector2(fit,fit);player.expand=false;player.size=native
+	player.position=((physical-native*fit)*0.5).floor()
 	caption.position=player.position-Vector2(0,64);caption.size=Vector2(native.x,60)
 
 func restore_history() -> void:
@@ -66,9 +72,9 @@ func restore_history() -> void:
 	player.stop();player.stream=null;player.hide();backdrop.hide();text.text=""
 	SessionActions.resume(pause_token);pause_token=0
 
-## AVI bytes are read by the native decoder. No intermediate video is produced.
+## Canonical MP4 / AVI bytes are read directly by the native FFmpeg decoder.
 func play_media(path:String,completed:=Callable(),heading:="",ending:="",ending_start:=-1.0,spans:Array=[]) -> bool:
-	if active or not FileAccess.file_exists(path) or not ClassDB.class_exists("VideoStreamFFmpeg"):return false
+	if path.is_empty() or active or not FileAccess.file_exists(path) or not ClassDB.class_exists("VideoStreamFFmpeg"):return false
 	var stream:VideoStream=ClassDB.instantiate("VideoStreamFFmpeg")
 	stream.file=path;stream.resource_path=path
 	player.stream=stream

@@ -9,6 +9,7 @@
 | `godot/chibi_remake/**/*.gd`、`tools/**`、`docs/**` | 本项目作者编写 | 按根目录 `LICENSE`（非商业社区 MOD） | 随仓库分发，保留 LICENSE/NOTICE |
 | `art/full/**` 重绘头像、建筑、兵种、UI、地形 | 社区重绘与图像生成后人工筛选 | 新绘制部分按 `LICENSE`；因参考原作轮廓与人物形象，存在演绎权风险 | 保留来源记录；不单独售卖 |
 | `data/chibi*.json` | 由发行素材转换 | 原作数据的演绎/转换，未获权利人授权 | 仅随非商业 MOD 分发；提示用户自备原作 |
+| `media/videos/*.mp4` | 用户提供的战役高清重制片 | 未获得分发授权 | 只限本机开发及不发布的私有包；不纳入 Git 或默认发布包 |
 | `media/videos/*.AVI` | 原作原始过场 | 原作媒体，未获授权 | 默认随包分发；提供 `-NoOriginalMedia` 排除选项，许可边界不变 |
 | `godot/chibi_remake/art/production/references/**` | 原作截图/位图提取 | 仅作绘制参考 | 不随发布包分发 |
 | 字体 `NotoSansCJKsc-Regular.otf` | Noto CJK | SIL OFL 1.1 | 随包分发，附 `OFL.txt` |

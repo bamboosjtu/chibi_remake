@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import {createHash} from 'node:crypto';
 import {execFileSync, spawnSync} from 'node:child_process';
 import {copyAcceptanceScripts, copyReleaseInput, isReleaseScript, readReleaseSnapshot} from './lib/release_source.mjs';
 import {assertRulesManifest, manifestPath, rulesManifestText} from './rules_manifest.mjs';
@@ -42,6 +43,8 @@ const listSource=directory=>{
 };
 // Public mode excludes original video/audio; procedural BGM and SFX remain available.
 const noOriginalMedia=process.env.CHIBI_NO_ORIGINAL_MEDIA==='1'||process.argv.includes('--no-original-media');
+const includeLocalCampaign=!noOriginalMedia&&process.argv.includes('--include-local-campaign-media');
+const localCampaign=new Set();
 if(!stage||fs.existsSync(stage))throw new Error('Use a new staging directory.');
 const selected=new Set();
 function add(file){
@@ -89,8 +92,19 @@ for(const file of ['assets/fonts/NotoSansCJKsc-Regular.otf','assets/fonts/OFL.tx
 for(const file of listSource('data/db').filter(x=>x.endsWith('.json')))add('data/db/'+file);
 const events=JSON.parse(readSource('data/db/events.json'));
 for(const event of Object.values(events.events))if(event.video&&!noOriginalMedia)add(event.video);
-// Direct playback uses the supplied AVI bytes and the native decoder, never OGV derivatives.
-if(!noOriginalMedia)for(const file of listSource('media/videos'))if(/\.avi$/i.test(file))add('media/videos/'+file);
+// Shared originals may be exported. The campaign remaster is local-only unless a
+// private staging run explicitly opts in; NoOriginalMedia vetoes both.
+const videoCatalog=JSON.parse(readSource('data/db/video_catalog.json')).files;
+for(const [name,entry] of Object.entries(videoCatalog)){
+  if(!/^(?:[A-Z0-9]+\.AVI|(?:CAO|LIU)[0-9]+[A-Z]?\.mp4)$/.test(name)||entry.path!=='res://media/videos/'+name)throw Error('Invalid video catalog path: '+name);
+  if((entry.localOnly===true)!==name.endsWith('.mp4'))throw Error('Invalid campaign media classification: '+name);
+  if(noOriginalMedia)continue;
+  if(!entry.localOnly){add(entry.path);continue;}
+  if(!includeLocalCampaign)continue;
+  const file='media/videos/'+name, bytes=fs.readFileSync(resolveInput(file));
+  if(bytes.length!==entry.bytes||createHash('sha256').update(bytes).digest('hex')!==entry.sha256)throw Error('Local campaign media differs from catalog: '+name);
+  localCampaign.add(file);selected.add(file);
+}
 // Music WAVs exist only as the source for the shipped OGG tracks; no runtime path
 // loads them. Keep the OGG playback set in the package and leave the masters local.
 const audioIndex=JSON.parse(readSource('data/db/audio_index.json'));
@@ -108,6 +122,7 @@ add('art/full/terrain_events/manifest.json');
 for(const entry of Object.values(JSON.parse(readSource('art/full/terrain_events/manifest.json'))))add(entry.texture);
 for(const filename of listSource('data').filter(x=>x.startsWith('chibi')&&x.endsWith('.json'))){
   const level=JSON.parse(readSource('data/'+filename));
+  if(!videoCatalog[level.scenario?.avi]?.localOnly)throw Error('Campaign chapter does not select canonical HD: '+filename);
   if(level.artMode !== 'hd-catalog')throw new Error('Re-export HD metadata: '+filename);
   add('data/'+filename);
   const chunkPath='art/full/terrain_chunks/'+filename.slice(0,-5)+'/manifest.json';add(chunkPath);
@@ -119,7 +134,11 @@ fs.mkdirSync(stage,{recursive:true});
 for(const file of selected){
 
   const target=path.join(stage,file);fs.mkdirSync(path.dirname(target),{recursive:true});
-  if(snapshot&&!generated(file)){
+  if(localCampaign.has(file)){
+    fs.copyFileSync(resolveInput(file),target);
+    const bytes=fs.readFileSync(target),entry=videoCatalog[path.basename(file)];
+    if(bytes.length!==entry.bytes||createHash('sha256').update(bytes).digest('hex')!==entry.sha256)throw Error('Staged local campaign media differs from catalog: '+file);
+  }else if(snapshot&&!generated(file)){
     copyReleaseInput(snapshot,file,resolveInput(file),target);
   }else if(/\.(png|jpg|ogv|bin)$/.test(file)){
     // 已选定的二进制素材只读；同卷构建链接避免数万文件的重复复制。
@@ -135,7 +154,7 @@ for(const file of selected){
 
 }
 
-let cfg=readSource('export_presets.cfg').replace(/include_filter="[^"]*"/g,'include_filter="*.json,*.txt,*.otf,*.bin,*.AVI"');
+let cfg=readSource('export_presets.cfg').replace(/include_filter="[^"]*"/g,'include_filter="*.json,*.txt,*.otf,*.bin,*.AVI,*.mp4"');
 const version=readSource('project.godot').match(/^config\/version="(\d+\.\d+\.\d+)"$/m)?.[1];
 if(!version) throw Error('Missing project version');
 cfg=cfg.replace(/^application\/(?:file_version|product_version)="[^"]*"/gm, setting=>setting.replace(/"[^"]*"/, '"'+version+'.0"'));

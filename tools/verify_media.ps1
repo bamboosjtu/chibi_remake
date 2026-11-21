@@ -9,4 +9,6 @@ try {
  if($LASTEXITCODE -ne 0) { throw 'Media project import failed' }
  & (Join-Path $root 'Godot_v4.7.2-stable_win64_console.exe') --headless --path (Join-Path $root 'godot/chibi_remake') --script (Join-Path $PSScriptRoot 'gd/test_original_media.gd') -- --no-intro
  if($LASTEXITCODE -ne 0) { throw 'Original media verification failed' }
+ & (Join-Path $root 'Godot_v4.7.2-stable_win64_console.exe') --headless --path (Join-Path $root 'godot/chibi_remake') --script (Join-Path $PSScriptRoot 'gd/test_campaign_media.gd')
+ if($LASTEXITCODE -ne 0) { throw 'HD campaign media verification failed' }
 } finally { $env:APPDATA=$oldRoaming; $env:LOCALAPPDATA=$oldLocal }

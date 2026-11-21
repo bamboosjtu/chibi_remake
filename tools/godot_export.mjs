@@ -370,7 +370,8 @@ const data = {
   // null = 未在战役表里找到，调用方必须回退到原型规则并显式标注。
   scenario: scen ? {
     missionId: scen.id,
-    avi: scen.aviName,
+    avi: /^(?:CAO|LIU)[0-9]+[A-Z]?\.AVI$/i.test(scen.aviName)
+      ? scen.aviName.slice(0,-4).toUpperCase()+".mp4" : scen.aviName,
     sides: scen.sides.map((x) => ({
       owner: x.owner,
       init: x.init,

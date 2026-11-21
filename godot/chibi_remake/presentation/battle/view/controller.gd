@@ -19,7 +19,7 @@ func maybe_play_intro(avi: String) -> void:
 		if s == "--no-intro" or s == "--selftest" or s == "--noview" or s == "--smoketest" \
 				or s == "--demo" or s == "--screenshot" or s == "--diag-nav" or s.begins_with("--simtest"):
 			return
-	var path:String=preload("res://presentation/media/event_view.gd").original_path(avi)
+	var path := "" if _ui.event_view == null else str(_ui.event_view.campaign_path(avi))
 	if _ui.event_view != null and _ui.event_view.play_media(path):
 		_ui.opening_pending=true
 		print("INTRO: ", path)

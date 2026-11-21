@@ -48,6 +48,7 @@ try {
     $stage=Join-Path $BuildRoot ('_work/build/stage-'+$id)
     $acceptanceStage=$stage+'-acceptance'
     $stageArgs=@('--acceptance-dir',$acceptanceStage)
+    if ($NoPublish -and !$NoOriginalMedia) { $stageArgs+=@('--include-local-campaign-media') }
     if (!$sourceDirty) { $stageArgs+=@('--source-commit',([string]$sourceCommit).Trim()) }
     & node tools/stage_release.mjs $stage @stageArgs
     if ($LASTEXITCODE -ne 0) { throw 'Resource dependency staging failed' }
