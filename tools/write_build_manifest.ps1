@@ -3,7 +3,8 @@ param(
     [string]$SourceCommit,
     [switch]$SourceDirty,
     [ValidateSet('candidate-smoke','skipped','unverified')][string]$Verification = 'unverified',
-    [string]$VerificationNote = ''
+    [string]$VerificationNote = '',
+    [switch]$IncludesLocalCampaignMedia
 )
 # Packaging metadata plus how the candidate was exercised. `unverified` records
 # a build that was never launched, so publish_release can report it instead of
@@ -45,6 +46,7 @@ $manifest=[ordered]@{
     schemaVersion=3
     commit=([string]$SourceCommit).Trim()
     dirty=[bool]$SourceDirty
+    includesLocalCampaignMedia=[bool]$IncludesLocalCampaignMedia
     builtAt=(Get-Date).ToUniversalTime().ToString('o')
     engine='4.7.2.stable'
     verification=$Verification

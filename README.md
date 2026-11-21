@@ -57,7 +57,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\release.ps1 -Mode pr
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\release.ps1 -Mode release -Tag v0.1.1
 ```
 
-`release.ps1` 的 `preview` 只安装到本机 `release/versions`，完成后双击 `release\ChibiRTS.exe` 试玩；`release` 额外调用 `package_release.ps1` 生成上传用分卷。底层仍由 `tools/build_release.ps1` 完成暂存、地形编译、导入、导出、**全地图载入、候选包冒烟与确定性基线**、构建清单和不可变发布；`-SkipBuild` 只重新打印或分卷当前版本。发布会拒绝无证据、覆盖不全或产物已变化的候选。机器验收覆盖载入、核心交互及确定性，画面与玩法验收仍由人工完成。绿色发行物默认显式使用本地 `userdata`；`-NoPublish` 生成并验证候选，`-NoOriginalMedia` 可排除原作音视频。逐步操作见 [release.md](release.md)。
+`release.ps1` 的 `preview` 只安装到本机 `release/versions`，完成后双击 `release\ChibiRTS.exe` 试玩；`release` 额外调用 `package_release.ps1` 生成上传用分卷。底层仍由 `tools/build_release.ps1` 完成暂存、地形编译、导入、导出、**全地图载入、候选包冒烟与确定性基线**、构建清单和不可变发布；`-SkipBuild` 只重新打印或分卷当前版本。发布会拒绝无证据、覆盖不全或产物已变化的候选。机器验收覆盖载入、核心交互及确定性，画面与玩法验收仍由人工完成。绿色发行物默认显式使用本地 `userdata`；`-NoPublish` 生成并验证候选，`-NoOriginalMedia` 可排除原作音视频。逐步操作见 [release.md](release.md)。 本机私有高清候选须显式加 `-NoPublish -IncludeLocalCampaignMedia`，不能分卷上传。
 
 仓库版本管理源码、关卡 JSON、规则、配置，以及运行和标准构建需要的最小素材集。当前运行图集、UI、字体、图标、音视频和解码 DLL 使用 Git LFS；参考图、烘焙整图、额外生产母版和过程稿仅本地保存。新克隆先获取 LFS 素材，再安装引擎和导出模板：
 

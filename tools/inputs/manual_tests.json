@@ -2,6 +2,12 @@
   "description": "Explicit non-suite ownership. Manual/packaged entries are not a claim of automated CI coverage. Every tools/gd script must occur in a suite or here.",
   "tests": [
     {
+      "script": "test_campaign_media",
+      "category": "wrapper",
+      "reason": "Tests canonical campaign MP4 playback; needs all 34 locally installed videos, which are absent in hosted and public builds.",
+      "command": "powershell -File tools/verify_media.ps1"
+    },
+    {
       "script": "pack_acceptance",
       "category": "tool",
       "reason": "Builds the validation companion outside the player pack.",

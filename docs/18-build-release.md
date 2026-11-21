@@ -18,7 +18,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\build_release.ps1 -S
 |---|---|
 | `-SkipData` | 复用现有 `data/*.json`，日常修改采用此方式 |
 | `-NoPublish` | 只生成候选包，不改变当前版本 |
-| `-NoOriginalMedia` | 排除原作过场、音乐与音效 |
+| `-NoOriginalMedia` | 排除本地高清开场、共享 AVI、原作音乐和音效 |
+| `-IncludeLocalCampaignMedia` | 私有候选显式纳入 34 个本地高清开场；必须搭配 `-NoPublish`，不可与 `-NoOriginalMedia` 同用；分发入口拒绝此类候选 |
 | `-SkipImport` | 仅为旧调用保留；新暂存工程仍会导入资源 |
 | `-SkipVerify` | 跳过候选冒烟；清单记 `verification=skipped`，只允许与 `-NoPublish` 一起使用；未验证候选不可发布 |
 

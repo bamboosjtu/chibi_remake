@@ -8,13 +8,13 @@
 |---|---:|---|---|
 | 背景音乐 | 13 | `media/music/` | OGG（12 首入音频索引，含未接入的结局曲） |
 | 音效 | 110 | `media/sfx/` | WAV（8-bit / 11 kHz / 单声道） |
-| 关卡开场 | 34 | `media/videos/` | 原始 AVI（Indeo3 + PCM） |
+| 关卡开场 | 34 | `media/videos/` | 本机私有 720p MP4（H.264 / 双声道 AAC） |
 | 事件视频 | 10 | `media/videos/` | 原始 AVI |
 | 启动、历史与单挑 | 3 | `media/videos/` | START / LISHI / LDAN 原始 AVI |
 
-47 个 AVI 原片共 400383226 字节。`tools/import_original_media.py` 只逐字节复制原片并用 ffprobe 读取尺寸/帧率/时长；`data/db/video_catalog.json` 记录原始 SHA256。旧 OGV 衍生片不进入正式包。音乐与音效使用 OGG/WAV；12 首原曲 WAV 只作为 OGG 导出母版，留在本地工作目录，不随包分发。
+共享原片仅保留 13 个 AVI，逐文件沿用原作 SHA256。34 个战役开场的 MP4 与共享 AVI 均记录在 `data/db/video_catalog.json`；运行时无 OGV 中间产物。音乐与音效仍用 OGG/WAV，原始 WAV 母版保留本地。
 
-音频重导使用 `tools/export_audio.ps1`，从本地声音输入复制 WAV 并生成 OGG 音乐及音频索引。视频导入只使用 `tools/import_original_media.py`；单挑按播放时间段定位 AVI，无需生成剪辑文件。
+音频重导使用 `tools/export_audio.ps1`。 `tools/import_original_media.py` 仅恢复共享原片 AVI，`tools/install_campaign_media.mjs` 安装本地高清 MP4。单挑仍按时间段直接播放 LDAN.AVI，无需剪辑或转码。
 
 ## 2. 背景音乐
 
@@ -66,7 +66,7 @@
 
 ### 4.2 章节、事件、启动与历史
 
-- 章节使用 `scenario.avi` 对应的原 AVI；读档、测试与 `--no-intro` 跳过，结束后进入已有任务开场白。
+- 新开局按 `scenario.avi`（沿用旧字段名）直接播放对应高清 MP4。读档、`--no-intro`、无媒体包或缺少文件时直接显示关卡简报，不回退低清。
 - 事件仍由 `events.json` 映射；事件4没有对应原片，保留文本。读档恢复事件游标而不重播历史。
 - 正常首次启动菜单直接播放START.AVI，每进程一次；历史简介按钮播放LISHI.AVI。
 - 缺少媒体时跳过或保留文本，不阻塞游戏。
@@ -101,6 +101,6 @@
 
 ## 本机高清战役视频
 
-34 个战役条目直接使用目录中的 MP4（保留 scenario.avi 旧字段名），不回退到低清战役 AVI。只有关卡开场替换，原版片头、历史介绍、战中事件和单挑仍保持原文件。缺少本地高清资源时显示关卡简报，不阻塞开局。
+34 个战役条目直接使用目录中的 MP4（保留 scenario.avi 旧字段名），不回退到低清战役 AVI。只有关卡开场替换，原作片头、历史介绍、战中事件和单挑仍保持原文件。缺少本地高清资源时显示关卡简报，不阻塞开局。
 
-提供已经校验的一集一个 MP4 的本地目录，然后运行 node tools/install_campaign_media.mjs <本地目录>。安装工具按 video_catalog.json 校验长度与 SHA256，不下载、不覆盖不匹配文件。高清文件放在 godot/chibi_remake/media/videos/，不纳入 Git；原版共享 AVI 可按目录校验从原片重新安装。-NoPublish 本机构建会纳入已安装的高清素材，默认分发包不纳入未再授权的高清素材；-NoOriginalMedia 同时排除高清 MP4 和共享 AVI（以及原版音频）。未经授权不得另行分发本地高清素材。
+提供已经校验的一集一个 MP4 的本地目录，然后运行 node tools/install_campaign_media.mjs <本地目录>。安装工具按 video_catalog.json 校验长度与 SHA256，不下载、不覆盖不匹配文件。高清文件放在 godot/chibi_remake/media/videos/，不纳入 Git；原作共享 AVI 可按目录校验从原片重新安装。显式使用 -NoPublish -IncludeLocalCampaignMedia 才会将已校验的高清素材纳入本机候选，默认分发包不纳入未再授权的高清素材；-NoOriginalMedia 同时排除高清 MP4 和共享 AVI（以及原作音频）。含本地高清的构建清单会标记私有媒体，分卷/分发入口拒绝该版本。未经授权不得另行分发本地高清素材。

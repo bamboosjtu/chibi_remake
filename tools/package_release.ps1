@@ -1,4 +1,4 @@
-﻿param(
+param(
     [string]$VersionDirectory = "",
     [string]$OutputDirectory = "",
     [int]$PartMiB = 900,
@@ -62,6 +62,10 @@ function Get-VersionFile([string]$Relative) {
 if (!(Test-Path -LiteralPath (Join-Path $VersionDirectory 'build-manifest.json') -PathType Leaf)) { throw 'Published build manifest is missing' }
 $manifestFile = Get-VersionFile 'build-manifest.json'
 $manifest = Get-Content -Raw -Encoding UTF8 -LiteralPath $manifestFile.FullName | ConvertFrom-Json
+if ($manifest.PSObject.Properties.Name -contains 'includesLocalCampaignMedia') {
+    if ($manifest.includesLocalCampaignMedia -isnot [bool]) { throw 'Invalid local campaign media flag in build manifest' }
+    if ($manifest.includesLocalCampaignMedia) { throw 'Local campaign media cannot be packaged for distribution' }
+}
 if ($manifest.schemaVersion -ne 3 -or $manifest.dirty -isnot [bool] -or $manifest.dirty -or
     $manifest.commit -notmatch '^(?:[a-f0-9]{40}|[a-f0-9]{64})$') { throw 'Packaging requires a clean published build manifest' }
 $infoFile = Get-VersionFile 'release-info.json'

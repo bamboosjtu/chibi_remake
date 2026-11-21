@@ -1,4 +1,4 @@
-﻿# 不能用 Stop：Godot 的证书警告会经原生 stderr 变成终止性错误，
+# 不能用 Stop：Godot 的证书警告会经原生 stderr 变成终止性错误，
 # 整个构建当场中断（本项目已因此踩坑三次）。错误处理靠 try/catch + $LASTEXITCODE。
 $ErrorActionPreference='Continue'
 $root=Split-Path $PSScriptRoot -Parent
@@ -28,6 +28,7 @@ $head=(& git -C $root rev-parse HEAD 2>$null)
 $build=Get-Content -Raw (Join-Path $candidate 'build-manifest.json') | ConvertFrom-Json
 if ($build.commit -ne $head) { throw 'Default manifest generation must preserve the actual Git commit' }
 if ($build.PSObject.Properties.Name -contains 'validated') { throw 'Build metadata must not claim acceptance' }
+if ($build.includesLocalCampaignMedia -isnot [bool] -or $build.includesLocalCampaignMedia) { throw 'Default candidate must not contain local campaign media' }
 [IO.File]::WriteAllText((Join-Path $release 'current.json'),'{"directory":"versions/old"}')
 $before=(Get-FileHash -LiteralPath (Join-Path $release 'current.json')).Hash
 try { & (Join-Path $PSScriptRoot 'publish_release.ps1') -Executable $exe -ReleaseRoot $release; throw 'Unverified candidate accepted' }
@@ -175,6 +176,34 @@ catch { if ($_.Exception.Message -notmatch 'does not match HEAD') { throw } }
 if ((Get-FileHash -LiteralPath (Join-Path $release 'current.json')).Hash -ne $dirtyBefore) { throw 'Stale commit rejection changed pointer' }
 [IO.File]::WriteAllText($manifestPath,$manifestText,(New-Object System.Text.UTF8Encoding $false))
 Write-Output 'CLEAN SOURCE PASS dirty build or stale commit rejected before publish'
+# A verified private build can be installed for local play, but neither package
+# route may prepare shareable files, even if that private version is current.
+$localPackage=Join-Path $root ('_work/package-outputs/private-publish-'+[Guid]::NewGuid().ToString('N'))
+try {
+    & (Join-Path $PSScriptRoot 'write_build_manifest.ps1') -Executable $exe -SourceCommit $head -Verification candidate-smoke -IncludesLocalCampaignMedia
+    $privateBuild=Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
+    if ($privateBuild.includesLocalCampaignMedia -isnot [bool] -or !$privateBuild.includesLocalCampaignMedia) { throw 'Private candidate must carry the local campaign media flag' }
+    $privateBefore=(Get-FileHash -LiteralPath (Join-Path $release 'current.json')).Hash
+    try {
+        & (Join-Path $PSScriptRoot 'publish_release.ps1') -Executable $exe -ReleaseRoot $release -PackageDirectory $localPackage
+        throw 'Private candidate accepted by publisher packaging route'
+    } catch { if ($_.Exception.Message -notmatch 'Local campaign media cannot be packaged') { throw } }
+    if ((Get-FileHash -LiteralPath (Join-Path $release 'current.json')).Hash -ne $privateBefore) { throw 'Private packaging changed the current pointer' }
+    & (Join-Path $PSScriptRoot 'publish_release.ps1') -Executable $exe -ReleaseRoot $release
+    $privatePointer=Get-Content -Raw -LiteralPath (Join-Path $release 'current.json') | ConvertFrom-Json
+    $privateVersion=Join-Path $release $privatePointer.directory
+    $privateInfo=Get-Content -Raw -LiteralPath (Join-Path $privateVersion 'release-info.json') | ConvertFrom-Json
+    if (!$privateInfo.includesLocalCampaignMedia) { throw 'Local install did not retain the private media flag' }
+    try {
+        & (Join-Path $PSScriptRoot 'package_release.ps1') -VersionDirectory $privateVersion -OutputDirectory $localPackage
+        throw 'Installed private version accepted by direct packaging route'
+    } catch { if ($_.Exception.Message -notmatch 'Local campaign media cannot be packaged') { throw } }
+    if (Test-Path -LiteralPath $localPackage) { throw 'Private footage packaging created output' }
+} finally {
+    [IO.File]::WriteAllText($manifestPath,$manifestText,(New-Object System.Text.UTF8Encoding $false))
+    if (Test-Path -LiteralPath $localPackage) { Remove-PackageTestFixture $localPackage }
+}
+Write-Output 'PRIVATE CAMPAIGN MEDIA PASS explicit flag preserved; local install allowed; both distribution packaging routes rejected'
 $nativeBefore=(Get-FileHash -LiteralPath (Join-Path $release 'current.json')).Hash
 [IO.File]::WriteAllText($nativeFile,'tampered-native')
 try { & (Join-Path $PSScriptRoot 'publish_release.ps1') -Executable $exe -ReleaseRoot $release; throw 'Modified native dependency was accepted' }

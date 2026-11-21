@@ -184,9 +184,6 @@ func _die_step(u: Dictionary, delta: float) -> void:
 	_dep_battle_simulation._set_frame(u,frame)
 	_dep_battle_simulation._fade_unit(u,rule.alpha(u,float(u.die_t)))
 
-func _clip_dir(u: Dictionary, clip: String, dir: int) -> Array:
-	return preload("res://simulation/combat/animation_rules.gd").clip_dir(u, clip, dir)
-
 func _clip_frame(u: Dictionary, clip: String, dir: int, step: int) -> int:
 	return preload("res://simulation/combat/animation_rules.gd").clip_frame(u, clip, dir, step)
 

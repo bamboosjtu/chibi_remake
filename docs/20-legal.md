@@ -50,7 +50,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/build_release.ps1 -Ski
 
 | 选项 | 影响 |
 |---|---|
-| `-NoOriginalMedia` | 排除原作视频、音乐、音效；声音使用原创程序音调（非对照规则语音），关卡数据仍保留 |
+| `-NoOriginalMedia` | 排除本地高清开场、共享 AVI、原作音乐和音效；缺视频直接进入游戏或简报 |
 | 默认构建 | 包含过场、音乐、音效与关卡数据；按既定社区 MOD 范围分发 |
 | 素材母版 | 不进入发布包，仅用于构建 |
 
@@ -59,6 +59,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/build_release.ps1 -Ski
 ## 6. 验收要点
 
 - 发布包包含 `LICENSE`、`NOTICE.md`；不包含 `docs/`、测试日志或验证证据。
-- 默认构建保留原作素材；显式选择 `-NoOriginalMedia` 时核实音视频已排除。
+- 默认分发构建不带私有高清；`-NoOriginalMedia` 进一步排除共享 AVI 和原作音乐/音效。分卷工具拒绝标记为私有高清的版本。
 - 素材交付记录保留来源与提示词，可追溯。
 - 字体附带 OFL 许可证。

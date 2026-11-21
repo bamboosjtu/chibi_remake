@@ -1,4 +1,4 @@
-﻿param(
+param(
     [Parameter(Mandatory=$true)][string]$Executable,
     [string]$ReleaseRoot,
     [switch]$FailBeforeCommit,
@@ -26,6 +26,10 @@ try {
 $manifestPath=Join-Path $candidate 'build-manifest.json'
 if (!(Test-Path -LiteralPath $manifestPath)) { throw 'Candidate has no build manifest' }
 $build=Get-Content -Raw -Encoding UTF8 $manifestPath | ConvertFrom-Json
+if ($build.PSObject.Properties.Name -contains 'includesLocalCampaignMedia' -and $build.includesLocalCampaignMedia -isnot [bool]) {
+    throw 'Invalid local campaign media flag in build manifest'
+}
+if ($build.includesLocalCampaignMedia -and $PackageDirectory) { throw 'Local campaign media cannot be packaged for distribution' }
 # Record how the candidate was exercised. Never claim a manual pass we cannot see.
 $verification=if ($build.PSObject.Properties.Name -contains 'verification') { [string]$build.verification } else { 'unverified' }
 $verificationNote=if ($build.PSObject.Properties.Name -contains 'verificationNote') { [string]$build.verificationNote } else { 'manifest has no verification field' }
@@ -126,6 +130,7 @@ $info=[ordered]@{
     version=$version
     commit=$build.commit
     dirty=$build.dirty
+    includesLocalCampaignMedia=($build.includesLocalCampaignMedia -eq $true)
     builtAt=$build.builtAt
     publishedAt=(Get-Date).ToUniversalTime().ToString('o')
     exeSha256=$build.exeSha256

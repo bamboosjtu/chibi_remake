@@ -71,13 +71,6 @@ func _trainable_meta(uid: int, owner: int) -> Dictionary:
 	var meta: Dictionary = battle.map_data.units.get(str(uid), {})
 	return meta if not meta.is_empty() and _dep_entity_factory._sheet_ref_for(uid, owner) != "" else {}
 
-func _train_list_for_selection() -> Array:
-	for u in battle.selected:
-		if bool(u.get("alive", false)) and bool(u.is_building) and int(u.get("owner", -1)) == battle.player_owner \
-				and not bool(u.get("site", false)):
-			return train_types_for(int(u.unit))
-	return []
-
 func _army_count(owner: int) -> int:
 	return battle.units.filter(func(u): return u.alive and u.die_t < 0 and int(u.owner) == owner).size()
 
@@ -104,9 +97,6 @@ func _queue_train(owner: int, building: Dictionary, uid: int) -> bool:
 	var hp := int(meta.hp)
 	battle.trainings.append({"b": building, "unit": uid, "t": float(hp), "cost": cost, "owner": owner, "ticks": true})
 	return true
-
-func _start_train(opt: Dictionary) -> void:
-	_order_train(int(opt.unit), battle.selected)
 
 func _order_train(unit_id: int, actors: Array) -> bool:
 	if battle.game_end != 0: return false

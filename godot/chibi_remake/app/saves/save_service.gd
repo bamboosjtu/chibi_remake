@@ -109,6 +109,15 @@ func _map_projection(data: Dictionary) -> Dictionary:
 	var simulation := {}
 	for key in ["rows","cols","tileW","terrainW","terrainH","walkable","terrainWalkable","scenario","navigation","units","objects","waterWalkable","decor"]:
 		simulation[key] = data.get(key)
+	var scenario = simulation.scenario
+	if scenario is Dictionary:
+		var opening := str(scenario.get("avi", ""))
+		# Replacing these presentation files with HD does not change the world.
+		# Preserve the v9 spelling for identity only; runtime keeps the MP4 path.
+		var campaign_hd := RegEx.create_from_string("^(CAO([1-9]|1[0-5]|14A|15A)|LIU([1-9]|1[0-7]))[.]mp4$")
+		if campaign_hd.search(opening) != null:
+			simulation.scenario = scenario.duplicate()
+			simulation.scenario.avi = opening.get_basename().to_lower() + ".AVI"
 	for entry in simulation.units.values():
 		entry.erase("sheet"); entry.erase("sheetK")
 	if simulation.objects == null: simulation.objects = []

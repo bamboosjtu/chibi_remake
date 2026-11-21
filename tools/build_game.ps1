@@ -1,4 +1,4 @@
-﻿param([switch]$SkipData,[switch]$SkipImport,[switch]$NoOriginalMedia,[switch]$NoPublish,[switch]$AllowDirty,[switch]$SkipVerify)
+param([switch]$SkipData,[switch]$SkipImport,[switch]$NoOriginalMedia,[switch]$NoPublish,[switch]$AllowDirty,[switch]$SkipVerify,[switch]$IncludeLocalCampaignMedia)
 # 注意：**不能**用 'Stop' —— Godot 在 stderr 上会打印一条无害的
 # "Failed to read the root certificate store"，被 PowerShell 当成 NativeCommandError，
 # 直接中断整个构建。改为 'Continue'，每个原生调用都已显式检查 $LASTEXITCODE。
@@ -11,6 +11,8 @@ try {
     $workspaceLock=Enter-WorkspaceLock $BuildRoot 'build'
     if ($SkipImport) { Write-Warning "-SkipImport is deprecated; new staging projects always import resources" }
     if ($SkipVerify -and !$NoPublish) { throw '-SkipVerify requires -NoPublish; unverified builds cannot be published' }
+    if ($IncludeLocalCampaignMedia -and !$NoPublish) { throw '-IncludeLocalCampaignMedia requires -NoPublish; HD campaign footage is local-only' }
+    if ($IncludeLocalCampaignMedia -and $NoOriginalMedia) { throw '-IncludeLocalCampaignMedia cannot be combined with -NoOriginalMedia' }
     $sourceCommit=(& git -C $BuildRoot rev-parse HEAD 2>$null)
     if ($LASTEXITCODE -ne 0 -or !$sourceCommit) { throw 'Cannot identify the build commit' }
     $sourceChanges=@(& git -C $BuildRoot status --porcelain 2>$null)
@@ -52,7 +54,7 @@ try {
     $stage=Join-Path $BuildRoot ('_work/build/stage-'+$id)
     $acceptanceStage=$stage+'-acceptance'
     $stageArgs=@('--acceptance-dir',$acceptanceStage)
-    if ($NoPublish -and !$NoOriginalMedia) { $stageArgs+=@('--include-local-campaign-media') }
+    if ($IncludeLocalCampaignMedia) { $stageArgs+=@('--include-local-campaign-media') }
     if (!$sourceDirty) { $stageArgs+=@('--source-commit',([string]$sourceCommit).Trim()) }
     Write-Output ('== Stage release inputs: '+$stage+' ==')
     & node tools/stage_release.mjs $stage @stageArgs
@@ -60,6 +62,8 @@ try {
     node tools/dedupe_terrain.mjs $stage
     if ($LASTEXITCODE -ne 0) { throw 'Terrain deduplication failed' }
     $inputs=Get-Content -Raw (Join-Path $stage 'release_inputs.json') | ConvertFrom-Json
+    $hasLocalCampaignMedia=@($inputs.files | Where-Object { $_ -match '^media/videos/(?:CAO|LIU)[0-9]+[A-Z]?\.mp4$' }).Count -gt 0
+    if ($hasLocalCampaignMedia -ne [bool]$IncludeLocalCampaignMedia) { throw 'Staged local campaign media does not match the explicit build selection' }
     foreach ($file in $inputs.files) { if (!(Test-Path -LiteralPath (Join-Path $stage $file))) { throw ('Missing staged resource: '+$file) } }
     $log=Join-Path $BuildRoot ('_work/build/import-'+$id+'.log')
     $importCache=Join-Path $BuildRoot '_work/build/import-cache'
@@ -100,7 +104,7 @@ try {
         $sourceChanges=@(& git -C $BuildRoot status --porcelain 2>$null)
         if ($LASTEXITCODE -ne 0 -or $sourceChanges.Count -gt 0) { throw 'Worktree changed during the clean build' }
     }
-    & (Join-Path $PSScriptRoot 'write_build_manifest.ps1') -Executable $exe -SourceCommit $sourceCommit -SourceDirty:$sourceDirty -Verification $verification -VerificationNote $verificationNote
+    & (Join-Path $PSScriptRoot 'write_build_manifest.ps1') -Executable $exe -SourceCommit $sourceCommit -SourceDirty:$sourceDirty -Verification $verification -VerificationNote $verificationNote -IncludesLocalCampaignMedia:$hasLocalCampaignMedia
     if (!(Test-Path -LiteralPath (Join-Path $candidate 'build-manifest.json'))) { throw 'Build manifest missing' }
     if (!$NoPublish) { & (Join-Path $PSScriptRoot 'publish_release.ps1') -Executable $exe -AllowDirty:$AllowDirty }
     Write-Output "Built candidate: $candidate"

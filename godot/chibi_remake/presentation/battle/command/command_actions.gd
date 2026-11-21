@@ -10,9 +10,6 @@ func _init(data: UIState, node: Node2D) -> void:
 	_ui = data
 	surface = node
 
-func _order_stop(_hold: bool) -> void:
-	_ui.host.actions.submit_command("stop")
-
 func _act_build(idx: int) -> void:
 	var bts: Array = _ui.host.queries.commands.build_options()
 	if idx < 0 or idx >= bts.size():

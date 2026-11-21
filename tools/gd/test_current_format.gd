@@ -68,6 +68,15 @@ func _verify_head_fixtures(game: Node) -> void:
 		assert(result.ok and result.cross_map == (slot == 19))
 		assert(result.source == ("backup" if slot == 19 else "primary"))
 		assert(current_scene == battle and battle.map_id == fixture.map and game.current_map == fixture.map)
+		var current_map: Dictionary = battle.world.definition
+		var opening := str(current_map.scenario.avi)
+		assert(opening.ends_with(".mp4"), "Runtime must retain the canonical HD opening")
+		assert(battle.saver.content_revision() == snapshot.simulation.contentRevision)
+		assert(current_map.scenario.avi == opening, "Save identity projection must not mutate the runtime opening")
+		var unrelated: Dictionary = current_map.duplicate(true)
+		unrelated.scenario.avi = "custom.mp4"
+		var projected: Dictionary = battle.saver._map_projection(unrelated)
+		assert(projected.scenario.avi == "custom.mp4", "Only recognized campaign replacements keep the old identity")
 		assert(game.save_checksum(battle.saver.continuation_snapshot(game)) == fixture.at31)
 		for tick in range(7): battle.world.battle_simulation._sim_step(battle.SIM_DT)
 		assert(game.save_checksum(battle.saver.continuation_snapshot(game)) == fixture.at38)
