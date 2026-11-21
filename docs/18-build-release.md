@@ -30,12 +30,16 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\build_release.ps1 -S
 2. 按参数导出或复用关卡数据，核对运行资源白名单与全部输入的 SHA-256。
 3. `stage_release.mjs` 创建独立暂存工程与 `release_inputs.json`，干净构建从对应提交读取脚本、场景、配置和测试脚本，并校验该提交的 LFS 指针。
 4. `build_terrain.mjs` 验证 `source/terrain` 的版本化源输入，并按源内容、地图、烘焙器及编码参数重建或命中 `_work/terrain`；`dedupe_terrain.mjs` 合并同内容分块并重写引用。
-5. 导入资源，按 `Windows HD Art` 导出独立 EXE/PCK、配套原生库和显式绿色存储配置。
+5. 在新暂存工程中复用 `_work/build/import-cache` 里匹配的 Godot 导入结果，导入其余资源，再按 `Windows HD Art` 导出独立 EXE/PCK、配套原生库和绿色存储配置。
 6. 先用实际 EXE 加载全部地图，再用启用断言的临时引擎挂载同一 PCK，运行发布回归、确定性基线、连续三轮标准性能，以及真实 EXE 的绿色/系统模式保存与重启读取，写出绑定 EXE/PCK/DLL/存储配置哈希的 `verification.json`。
 7. `write_build_manifest.ps1` 补齐原生库声明文件并生成 `build-manifest.json`。
 8. 按参数保留候选，或调用 `publish_release.ps1` 安装正式版本。
 
 构建仍处理缺失输入、非零导出退出码、EXE/PCK 配套及原生依赖完整性等产物错误。候选冒烟通过不代表游戏已完成人工验收。
+
+地形缓存按地图复用，缓存命中时保留已指向同一内容的文件链接。图集、音频和字体按文件复用导入结果，检查素材、导入配置、引擎和生成件的哈希。暂存工程每次新建，Godot 仍扫描该工程。改动素材、导入配置或引擎会使相关结果失效，缺失或损坏的导入结果会重新生成。PCK 每次完整封装，新候选继续运行全部机器验收。已经验收且对应当前提交的同一候选可直接交给 `publish_release.ps1`，省去重新构建。
+
+构建、Windows CI、候选验证和清理在同一工作树中串行。资源导入和导出各有 30 分钟上限，验收伴生包封装有 3 分钟上限。命令输出对应的日志路径及超时时距最后一条输出的时间。机械盘上同时进行其他磁盘密集工作会增加加载耗时，独立 SSD 工作树可用于复测。
 
 ## 4. 构建清单与发布
 
@@ -82,7 +86,7 @@ release/
 
 回滚只恢复指针，操作命令见 [release.md](../release.md#7-产物位置与回滚)。保留当前和备份指针引用的版本。清理仅针对已确认可重建且不再被引用的暂存、缓存和候选目录；素材母版、玩家存档和正式版本不参与自动清理。
 
-当前清理入口为 `tools/cleanup_project.ps1`：先预览，确认后加 `-Execute`。清理报告写入 `docs/cleanup-report.json`（默认不跟踪）。当前清理回收约 48.25 GiB / 196,839 个文件，保留 `_work/terrain` 烘焙缓存、`release/versions`、`release/current.json` 和 `dist/package`；`.godot` 导入缓存、旧 `_work/build` 暂存、候选冒烟副本和旧测试沙箱已删除。
+清理入口是 `tools/cleanup_project.ps1`。先预览，确认后加 `-Execute`。清理与构建、Windows CI 和发布互斥，活动期间命令会报出占用。执行可清除暂存、候选、可重建导入缓存及测试沙箱，保留地形烘焙缓存、已安装版本、版本指针与 `dist/package`。报告写入 `docs/cleanup-report.json`（默认不跟踪）。
 
 ## 7. 本地试玩与发布打包
 

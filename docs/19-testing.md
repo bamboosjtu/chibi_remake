@@ -59,7 +59,7 @@ SIMTEST: 15.0s tick=450 digest=<FNV-1a>
 ```
 
 - 脚本为 `SceneTree`，自行加载 `main.tscn`、关闭渲染与 AI 后直接驱动模拟。
-- 断言失败即退出非零；脚本带超时保护。
+- 断言失败或超时即退出非零。引擎日志连续写盘，超时报告包含用例时限、距最后一条输出的时间及日志路径。Windows CI 与同一工作树的构建互斥，并直接检查已声明的运行资源，无需扫描构建用的地形暂存树。
 - 所有写盘使用隔离 `APPDATA`，不触碰玩家存档。
 - 回归入口应与被改动的系统对应，不要求每次构建跑全部脚本。
 
@@ -309,7 +309,7 @@ pwsh -NoProfile -File tools/bench_full_battle.ps1 -ReleasePack <候选目录>/Ch
 
 - `node tools/dependency_check.mjs`：用 `tools/dependency_report.mjs` 扫描 `preload/load/extends`、`_dep_` 绑定、`world.<svc>` 调用、构造函数注入和动态加载，输出 `_work/refactor/dependency-graph.json`（含 SCC）；新增未登记违规或已失效的基线边都失败。
 - `node tools/unit_schema_ownership_check.mjs`：`unit_schema_ownership.json` 的键集与 `UnitSchema.FIELDS` 精确相等，owner 唯一，`persist`/`derived` 与 Schema 一致。
-- `node tools/native_write_check.mjs` 解析 `tools/native/sim_math/sim_math.cpp` 的 `Keys` 结构及 20 个原生单位字段写入，校验每个字段在 `unit_schema_ownership.json` 中有 owner，并与 `native_write_review.json` 逐项比对；新增或失效原生写入即失败。
+- 轻量 CI 架构组及 Windows CI 运行 `node tools/native_write_check.mjs`。检查解析 `sim_math.cpp` 的 `Keys` 和原生单位字段写入，将字段、所有者与写入方同 `native_write_review.json` 逐项比对。新增、失效、重复或归属错误都会使 CI 失败。`test_native_write_check.mjs` 覆盖这些负例。
 - `node tools/battle_state_write_check.mjs` 根据战斗状态和单位字段的 ownership 记录，检查赋值、容器修改、代理及可静态追踪的别名写入。P7 要求 `battle_state_write_baseline.json` 为空。有限字段的初始化、快照恢复、代理转发和计时按有界合同检查，其他写入由字段所属领域负责。GDScript 静态写入与 Native 直接写入分别由上述两个门禁覆盖。`test_battle_state_write_check.mjs` 覆盖比较式、重复违规、单位与动态写入。
 - `node tools/battle_state_ownership_check.mjs`：`battle_state_ownership.json` 覆盖 69 个属性，12 个代理指向 `session.<field>`，策略与 `BattleStateFields` 一致；`auto_control` 归 AI，`selected` 归 Commands，`tile_*` 归 Navigation 只读。
 - `node tools/test_dependency_report.mjs` 与 `node tools/test_ownership_checks.mjs`：正负夹具，验证合法边通过、非法边失败、基线可消解、字段缺失/重复/错误 owner 失败。

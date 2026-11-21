@@ -110,7 +110,8 @@ const failed = results.filter(result => !result.ok && !result.knownFailure);
 if (failed.length) {
   console.error(`REGRESSIONS FAILED ${failed.length}/${results.length}:`);
   for (const result of failed) {
-    console.error(`  ${result.name} code=${result.code} timedOut=${result.timedOut} missing=${JSON.stringify(result.missing ?? [])} log=${result.log}`);
+    const deadline = result.timedOut ? ` limit=${result.timeoutSeconds}s idle=${result.idleSeconds.toFixed(1)}s` : '';
+    console.error(`  ${result.name} code=${result.code} timedOut=${result.timedOut}${deadline} missing=${JSON.stringify(result.missing ?? [])} log=${result.log}`);
   }
 }
 console.log(`REGRESSIONS ${failed.length ? 'FAIL' : 'PASS'} ${results.length - failed.length}/${results.length} jobs`);

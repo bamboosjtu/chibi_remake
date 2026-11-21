@@ -11,6 +11,9 @@ if (Test-Path -LiteralPath (Join-Path $candidate 'release-info.json')) { throw '
 if ($StageDirectory -and !(Test-Path -LiteralPath (Join-Path $StageDirectory 'release_inputs.json'))) { throw 'Explicit stage has no release input manifest' }
 $engine=Join-Path $candidate ('_validation-engine-'+[Guid]::NewGuid().ToString('N')+'.exe')
 $output=Join-Path $projectRoot ('_work/candidate-smoke/'+[Guid]::NewGuid().ToString('N'))
+. (Join-Path $PSScriptRoot 'workspace_lock.ps1')
+$workspaceLock=Enter-WorkspaceLock $projectRoot 'candidate verification'
+try {
 . (Join-Path $PSScriptRoot 'candidate_lock.ps1')
 $validationLock=Enter-CandidateValidationLock $candidate
 $priorAcceptance = $env:CHIBI_ACCEPTANCE
@@ -63,3 +66,4 @@ try {
     $env:CHIBI_ACCEPTANCE = $priorAcceptance
     $validationLock.Dispose()
 }
+} finally { Exit-WorkspaceLock $workspaceLock }

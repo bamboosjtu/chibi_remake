@@ -4,8 +4,11 @@
 # 直接中断整个构建。改为 'Continue'，每个原生调用都已显式检查 $LASTEXITCODE。
 $ErrorActionPreference='Continue'
 . (Join-Path $PSScriptRoot 'build_environment.ps1')
+. (Join-Path $PSScriptRoot 'workspace_lock.ps1')
 Set-Location -LiteralPath $BuildRoot
+$workspaceLock=$null
 try {
+    $workspaceLock=Enter-WorkspaceLock $BuildRoot 'build'
     if ($SkipImport) { Write-Warning "-SkipImport is deprecated; new staging projects always import resources" }
     if ($SkipVerify -and !$NoPublish) { throw '-SkipVerify requires -NoPublish; unverified builds cannot be published' }
     $sourceCommit=(& git -C $BuildRoot rev-parse HEAD 2>$null)
@@ -39,6 +42,7 @@ try {
     & node tools/level_index.mjs
     if ($LASTEXITCODE -ne 0) { throw 'Level index is stale' }
     $id=(Get-Date -Format 'yyyyMMdd_HHmmss')+'_'+[Guid]::NewGuid().ToString('N').Substring(0,8)
+    Write-Output '== Terrain cache and release input verification =='
     & node tools/build_terrain.mjs --engine $godot
     if ($LASTEXITCODE -ne 0) { throw "Terrain source rebuild failed" }
 	& node tools/runtime_assets.mjs --check --hash
@@ -50,6 +54,7 @@ try {
     $stageArgs=@('--acceptance-dir',$acceptanceStage)
     if ($NoPublish -and !$NoOriginalMedia) { $stageArgs+=@('--include-local-campaign-media') }
     if (!$sourceDirty) { $stageArgs+=@('--source-commit',([string]$sourceCommit).Trim()) }
+    Write-Output ('== Stage release inputs: '+$stage+' ==')
     & node tools/stage_release.mjs $stage @stageArgs
     if ($LASTEXITCODE -ne 0) { throw 'Resource dependency staging failed' }
     node tools/dedupe_terrain.mjs $stage
@@ -57,16 +62,23 @@ try {
     $inputs=Get-Content -Raw (Join-Path $stage 'release_inputs.json') | ConvertFrom-Json
     foreach ($file in $inputs.files) { if (!(Test-Path -LiteralPath (Join-Path $stage $file))) { throw ('Missing staged resource: '+$file) } }
     $log=Join-Path $BuildRoot ('_work/build/import-'+$id+'.log')
-    # A new staging checkout must import its declared resources, even when old caches exist.
-    & node (Join-Path $PSScriptRoot 'godot_cli.mjs') $godot --headless --path $stage --import *> $log
+    $importCache=Join-Path $BuildRoot '_work/build/import-cache'
+    Write-Output ('== Godot import: '+$log+' ==')
+    & node tools/import_cache.mjs prepare $stage $godot $importCache
+    if ($LASTEXITCODE -ne 0) { throw 'Could not prepare staged imports' }
+    # Godot rescans the fresh stage and imports inputs whose cache keys changed.
+    & node (Join-Path $PSScriptRoot 'godot_cli.mjs') --timeout 1800 --log $log $godot --headless --path $stage --import
     if ($LASTEXITCODE -ne 0) { throw 'Stage import failed' }
+    & node tools/import_cache.mjs store $stage $godot $importCache
+    if ($LASTEXITCODE -ne 0) { Write-Warning 'Could not save import cache; this export can continue' }
     $candidate=Join-Path $BuildRoot ('_work/build/candidate-'+$id)
     New-Item -ItemType Directory -Force $candidate | Out-Null
     $exe=Join-Path $candidate 'ChibiRTS.exe'
-    & node (Join-Path $PSScriptRoot 'godot_cli.mjs') $godot --headless --path $stage --export-release 'Windows HD Art' $exe *> (Join-Path $candidate 'export.log')
+    Write-Output ('== Godot export: '+$exe+' ==')
+    & node (Join-Path $PSScriptRoot 'godot_cli.mjs') --timeout 1800 --log (Join-Path $candidate 'export.log') $godot --headless --path $stage --export-release 'Windows HD Art' $exe
     if ($LASTEXITCODE -ne 0) { throw 'Export failed' }
     [IO.File]::WriteAllText((Join-Path $candidate 'portable.txt'), 'userdata', (New-Object System.Text.UTF8Encoding $false))
-    & node (Join-Path $PSScriptRoot 'godot_cli.mjs') $godot --headless --path $stage --script (Join-Path $PSScriptRoot 'gd/pack_acceptance.gd') -- $acceptanceStage (Join-Path $candidate 'ChibiAcceptance.testpack')
+    & node (Join-Path $PSScriptRoot 'godot_cli.mjs') --timeout 180 --log (Join-Path $candidate 'acceptance-pack.log') $godot --headless --path $stage --script (Join-Path $PSScriptRoot 'gd/pack_acceptance.gd') -- $acceptanceStage (Join-Path $candidate 'ChibiAcceptance.testpack')
     if ($LASTEXITCODE -ne 0) { throw 'Acceptance companion packaging failed' }
     # Launch the candidate before it can be published. A build that exports but
     # cannot load a map must fail here, not at the player's first click.
@@ -92,5 +104,8 @@ try {
     if (!(Test-Path -LiteralPath (Join-Path $candidate 'build-manifest.json'))) { throw 'Build manifest missing' }
     if (!$NoPublish) { & (Join-Path $PSScriptRoot 'publish_release.ps1') -Executable $exe -AllowDirty:$AllowDirty }
     Write-Output "Built candidate: $candidate"
-} catch { Write-Error $_; exit 1 } finally { Restore-BuildEnvironment }
+} catch { Write-Error $_; exit 1 } finally {
+    Restore-BuildEnvironment
+    if ($workspaceLock) { Exit-WorkspaceLock $workspaceLock }
+}
 exit 0

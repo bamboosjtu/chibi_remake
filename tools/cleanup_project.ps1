@@ -3,6 +3,14 @@
 # 整个构建当场中断（本项目已因此踩坑三次）。错误处理靠 try/catch + $LASTEXITCODE。
 $ErrorActionPreference='Continue'
 $cleanupRoot = [IO.Path]::GetFullPath((Split-Path $PSScriptRoot -Parent))
+. (Join-Path $PSScriptRoot 'workspace_lock.ps1')
+$workspaceLock=Enter-WorkspaceLock $cleanupRoot 'cleanup'
+$publishLock=$null
+try {
+$releaseRoot=Join-Path $cleanupRoot 'release'
+if (!$WorkOnly -and !$RetiredMediaOnly -and (Test-Path -LiteralPath $releaseRoot -PathType Container)) {
+    $publishLock=[IO.File]::Open((Join-Path $releaseRoot '.publish.lock'),[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)
+}
 $workRoot = Join-Path $cleanupRoot '_work'
 $reportAbsolute = [IO.Path]::GetFullPath((Join-Path $cleanupRoot $ReportPath))
 if (!$reportAbsolute.StartsWith($cleanupRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) { throw "Outside project report: $reportAbsolute" }
@@ -42,11 +50,9 @@ Get-ChildItem -LiteralPath (Join-Path $cleanupRoot '_tools') -File | Where-Objec
 # HD replacement is complete. Native sheets and superseded bake outputs are disposable.
 foreach ($relative in @('godot/chibi_remake/sprites','godot/chibi_remake/sprites_hd','godot/chibi_remake/terrain_hd','godot/chibi_remake/art/remake_hd','godot/chibi_remake/art/source_fallback','godot/chibi_remake/art/full/team_masks','godot/chibi_remake/terrain.png','godot/chibi_remake/terrain.png.import','godot/chibi_remake/menu_bg.png','godot/chibi_remake/menu_bg.png.import')) { Add-CleanupTarget $relative }
 Get-ChildItem -LiteralPath (Join-Path $cleanupRoot 'godot/chibi_remake') -File | Where-Object { $_.Name -match '^terrain_chibi.*\.png(\.import)?$' } | ForEach-Object { Add-CleanupTarget ((Get-RelativePath $cleanupRoot $_.FullName)) }
-$runningBuild = @(Get-CimInstance Win32_Process | Where-Object { $_.Name -match '^Godot.*\.exe$' -and $_.CommandLine -match '[\\/]_work[\\/]build[\\/](stage|candidate)-' })
-if ($runningBuild.Count) { throw 'A Godot build is running; finish it before cleanup.' }
 $buildRoot = Join-Path $cleanupRoot '_work/build'
 if (Test-Path -LiteralPath $buildRoot) {
-    Get-ChildItem -LiteralPath $buildRoot -Force | Where-Object { $_.Name -match '^(stage-|candidate-|jpeg-size-test$|temp$|local$|.*\.(log|err)$)' } | ForEach-Object { Add-CleanupTarget ((Get-RelativePath $cleanupRoot $_.FullName)) }
+    Get-ChildItem -LiteralPath $buildRoot -Force | Where-Object { $_.Name -match '^(stage-|candidate-|import-cache$|jpeg-size-test$|temp$|local$|.*\.(log|err)$)' } | ForEach-Object { Add-CleanupTarget ((Get-RelativePath $cleanupRoot $_.FullName)) }
 }
 foreach ($relative in @('_work/architecture-tests','_work/chibil1-fix','_work/chibil1-polish','_work/decor_probe','_work/levelshots','_work/panel-check','_work/shots','_work/ui_probe','_work/worker-groups','_work/gate-check','_work/hud','_work/chibil1-manual.json','_work/view-report.json','_work/godot_appdata/Godot/cache')) { Add-CleanupTarget $relative }
 # 已迁入 tools/gd 的回归及已归档发布证据，不再保留多轮沙箱和旧工程副本。
@@ -106,3 +112,7 @@ if ($Execute) {
 }
 Write-Output ("Cleanup execute={0} targets={1} files={2} reclaimedGiB={3:N2}" -f [bool]$Execute,$removed.Count,$files,($bytes/1GB))
 Write-Output ("Skipped in-use targets: {0}" -f $skipped.Count)
+} finally {
+    if ($publishLock) { $publishLock.Dispose() }
+    Exit-WorkspaceLock $workspaceLock
+}

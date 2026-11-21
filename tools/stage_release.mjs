@@ -16,6 +16,8 @@ const option=(name,fallback)=>{
 const terrainRoot=option('--terrain-root','_work/terrain/current');
 const commit=option('--source-commit',null);
 const acceptanceDir=option('--acceptance-dir',null);
+const listInputs=process.argv.includes('--list-inputs');
+const omitGeneratedTerrain=listInputs&&process.argv.includes('--omit-generated-terrain');
 const snapshot=commit?readReleaseSnapshot(commit):null;
 const generated=file=>file.startsWith('art/full/terrain_chunks/');
 const resolveInput=file=>path.join(generated(file)?terrainRoot:source,file);
@@ -125,11 +127,12 @@ for(const filename of listSource('data').filter(x=>x.startsWith('chibi')&&x.ends
   if(!videoCatalog[level.scenario?.avi]?.localOnly)throw Error('Campaign chapter does not select canonical HD: '+filename);
   if(level.artMode !== 'hd-catalog')throw new Error('Re-export HD metadata: '+filename);
   add('data/'+filename);
+  if(omitGeneratedTerrain)continue;
   const chunkPath='art/full/terrain_chunks/'+filename.slice(0,-5)+'/manifest.json';add(chunkPath);
   const chunks=JSON.parse(fs.readFileSync(resolveInput(chunkPath)));
   for(const chunk of chunks.chunks)for(const lod of Object.values(chunk.lods))add(lod.texture);
 }
-if(process.argv.includes('--list-inputs')){console.log(JSON.stringify([...selected].sort()));process.exit(0);}
+if(listInputs){console.log(JSON.stringify([...selected].sort()));process.exit(0);}
 fs.mkdirSync(stage,{recursive:true});
 for(const file of selected){
 

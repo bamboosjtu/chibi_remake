@@ -15,7 +15,11 @@ function identity(bytes){fs.writeFileSync(fakeEngine,bytes);const r=spawnSync(pr
 assert.notDeepEqual(identity('engine build A'),identity('engine build B'),'Same version with different engine bytes must invalidate the cache');
 build(['--fail-before-publish'],1);
 assert(!fs.existsSync(path.join(cache,'maps')),'Interrupted generation must not publish completion');
-assert.match(build(),/1 rebuilt/);assert.match(build(),/0 rebuilt/);
+assert.match(build(),/1 rebuilt/);assert.match(build(),/0 rebuilt.*\/ 0 projected files updated/);
+const projection=path.join(cache,'current/art/full/terrain_chunks/chibil1/manifest.json');
+fs.unlinkSync(projection);
+assert.match(build(),/0 rebuilt.*\/ 1 projected files updated/);
+assert.ok(fs.existsSync(projection));
 layout.revision=1;writeLayout();refresh();assert.match(build(),/1 rebuilt/);
 const pointer=JSON.parse(fs.readFileSync(path.join(cache,'current/build.json'))),entry=path.join(cache,'maps',pointer.maps.chibil1,'runtime');
 const bin=fs.readdirSync(entry).find(name=>name.endsWith('.bin'));fs.writeFileSync(path.join(entry,bin),'corrupt');assert.match(build(),/1 rebuilt/);

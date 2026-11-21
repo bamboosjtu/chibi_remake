@@ -56,7 +56,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\build_release.ps1 -S
 2. 读取已有 `godot/chibi_remake/data/*.json` 和运行资源清单。
 3. 将源码、规则、UI、图集、音视频及原生扩展暂存到 `_work/build/stage-<构建ID>`。
 4. 从版本化地形源输入重建或命中缓存，保留既有编码顺序，并合并重复内容。
-5. 导入暂存工程的资源。
+5. 复用未变化的地形和 Godot 导入结果。暂存工程仍由 Godot 扫描，变化或缺失的资源重新导入。
 6. 按 `Windows HD Art` 导出预设生成 EXE、独立 PCK 与配套 DLL。
 7. 用实际 EXE 加载全部地图，再运行同一 PCK 的发行回归、已登记的确定性基线、真实 EXE 存档与隔离测试以及三轮性能验收。失败即终止构建。`-SkipVerify` 仅可与 `-NoPublish` 一起使用。
 8. 补齐原生库声明文件，写入 `build-manifest.json`（含本次验收摘要与证据哈希）。

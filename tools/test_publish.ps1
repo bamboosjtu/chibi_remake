@@ -205,6 +205,7 @@ foreach ($relative in @('LICENSE','NOTICE.md')) {
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'publish_release.ps1') -Destination $changedTools
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'candidate_verification.ps1') -Destination $changedTools
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'candidate_lock.ps1') -Destination $changedTools
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'workspace_lock.ps1') -Destination $changedTools
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'native_dependencies.ps1') -Destination $changedTools
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'compile_launcher.ps1') -Destination $changedTools
 $declarationTarget=Join-Path $fixture 'godot/chibi_remake/addons/ffmpegplayer'

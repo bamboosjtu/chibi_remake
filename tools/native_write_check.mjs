@@ -7,7 +7,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import process from 'node:process';
+import {fileURLToPath} from 'node:url';
 
 const SOURCE = 'tools/native/sim_math/sim_math.cpp';
 const REVIEW = 'tools/inputs/native_write_review.json';
@@ -17,12 +17,13 @@ export function scan(source) {
   const start = source.indexOf('struct Keys {');
   const end = source.indexOf('} k;', start);
   if (start < 0 || end < 0) throw new Error('sim_math.cpp: Keys struct not found');
-  const keys = {};
-  for (const match of source.slice(start, end).matchAll(/(\w+)\{"([^"]+)"\}/g)) keys[match[1]] = match[2];
+  const keys = new Map();
+  for (const [, alias, field] of source.slice(start, end).matchAll(/(\w+)\{"([^"]+)"\}/g)) keys.set(alias, field);
   const fields = new Set();
-  for (const match of source.matchAll(/u\[k\.(\w+)\]\s*(?:\+|-|\*|\/|%|&|\||\^|<<|>>)?=/g)) {
-    if (!keys[match[1]]) throw new Error('sim_math.cpp: unknown key alias ' + match[1]);
-    fields.add(keys[match[1]]);
+  const code = source.replace(/\/\*[\s\S]*?\*\/|\/\/[^\r\n]*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g, ' ');
+  for (const [, alias] of code.matchAll(/\bu\s*\[\s*k\s*\.\s*(\w+)\s*\]\s*(?:<<|>>|[+\-*/%&|^])?=(?!=)/g)) {
+    if (!keys.has(alias)) throw new Error('sim_math.cpp: unknown key alias ' + alias);
+    fields.add(keys.get(alias));
   }
   return [...fields].sort();
 }
@@ -33,27 +34,40 @@ function main() {
   const source = fs.readFileSync(SOURCE, 'utf8');
   const ownership = JSON.parse(fs.readFileSync(OWNERSHIP, 'utf8')).fields;
   const fields = scan(source);
-  const missing = fields.filter((field) => !ownership[field]);
-  if (missing.length) {
-    console.error('NATIVE WRITE: fields absent from unit ownership: ' + missing.join(', '));
-    process.exit(1);
-  }
+  const missing = fields.filter(field => !Object.hasOwn(ownership, field) ||
+    typeof ownership[field]?.owner !== 'string' || !ownership[field].owner.trim());
+  if (missing.length) throw Error('NATIVE WRITE: fields lack a unit owner: ' + missing.join(', '));
   const entries = fields.map((field) => ({field, owner: ownership[field].owner, writer: 'sim_math.cpp'}));
   if (write) {
     fs.writeFileSync(REVIEW, JSON.stringify({schemaVersion: 1, source: SOURCE, entries}, null, 2) + '\n');
     console.log(`NATIVE WRITE REVIEW WRITE ${entries.length} fields`);
     return;
   }
-  const review = JSON.parse(fs.readFileSync(REVIEW, 'utf8')).entries || [];
-  const reviewed = new Set(review.map((entry) => entry.field));
-  const current = new Set(fields);
-  const added = fields.filter((field) => !reviewed.has(field));
-  const stale = [...reviewed].filter((field) => !current.has(field));
-  console.log(`NATIVE WRITE: ${fields.length} fields, ${added.length} new, ${stale.length} stale`);
-  for (const field of added) console.error(`  NEW ${field}`);
-  for (const field of stale) console.error(`  STALE ${field}`);
-  if (added.length || stale.length) process.exit(1);
-  console.log('NATIVE WRITE PASS');
+  const review = JSON.parse(fs.readFileSync(REVIEW, 'utf8'));
+  if (review.schemaVersion !== 1 || review.source !== SOURCE || !Array.isArray(review.entries)) {
+    throw Error('Invalid native write review header');
+  }
+  const reviewed = new Map();
+  for (const record of review.entries) {
+    if (typeof record?.field !== 'string' || !record.field) throw Error('Invalid native write review entry');
+    if (reviewed.has(record.field)) throw Error('Duplicate native write review entry: ' + record.field);
+    reviewed.set(record.field, record);
+  }
+  const errors = [];
+  for (const expected of entries) {
+    const record = reviewed.get(expected.field);
+    if (!record) errors.push('NEW ' + expected.field);
+    else if (record.owner !== expected.owner || record.writer !== expected.writer) {
+      errors.push(`MISMATCH ${expected.field}: expected ${expected.owner} / ${expected.writer}, found ${record.owner} / ${record.writer}`);
+    }
+    reviewed.delete(expected.field);
+  }
+  for (const field of reviewed.keys()) errors.push('STALE ' + field);
+  if (errors.length) throw Error('Native write review differs from source:\n' + errors.join('\n'));
+  console.log(`NATIVE WRITE PASS ${fields.length} reviewed fields / owners / writers`);
 }
 
-if (process.argv[1]?.endsWith('native_write_check.mjs')) main();
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  try { main(); }
+  catch (error) { console.error(error.message); process.exitCode = 1; }
+}

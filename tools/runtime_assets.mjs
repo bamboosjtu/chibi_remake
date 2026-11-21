@@ -5,11 +5,13 @@ import {PROJECT,SNAPSHOT,collectAssets,readAssets,ignoreAllowlist} from './lib/r
 
 const args=process.argv.slice(2),write=args.includes('--write'),hash=args.includes('--hash');
 const versionedOnly=!write&&args.includes('--versioned-only');
+const sourceCi=!write&&args.includes('--source-ci');
 const noOriginalMedia=!write&&(args.includes('--no-original-media')||process.env.CHIBI_NO_ORIGINAL_MEDIA==='1');
 if(!write&&!args.includes('--check'))throw Error('Usage: node tools/runtime_assets.mjs --write | --check [--hash]');
 let expected;
 if(!versionedOnly){
- const listed=spawnSync(process.execPath,['tools/stage_release.mjs',`_work/runtime-assets-${process.pid}`,'--list-inputs'],{encoding:'utf8',maxBuffer:16*1024*1024,env:{...process.env,CHIBI_NO_ORIGINAL_MEDIA:noOriginalMedia?'1':'0'}});
+ const listed=spawnSync(process.execPath,['tools/stage_release.mjs','_work/runtime-assets-'+process.pid,'--list-inputs',
+  ...(sourceCi?['--omit-generated-terrain']:[])],{encoding:'utf8',maxBuffer:16*1024*1024,env:{...process.env,CHIBI_NO_ORIGINAL_MEDIA:noOriginalMedia?'1':'0'}});
  if(listed.status!==0)throw Error(listed.stderr);
  expected=collectAssets(JSON.parse(listed.stdout));
 }

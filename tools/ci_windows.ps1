@@ -5,8 +5,11 @@ param([switch]$SkipArtCheck,[switch]$FullRegression,[switch]$ReleaseSafetyOnly)
 $ErrorActionPreference='Continue'
 $root=Split-Path $PSScriptRoot -Parent
 Set-Location -LiteralPath $root
+. (Join-Path $PSScriptRoot 'workspace_lock.ps1')
+$workspaceLock=Enter-WorkspaceLock $root 'Windows CI'
+try {
 
-foreach ($test in @('test_package_safety.ps1','test_package_join.ps1','test_publish.ps1','test_release_tag.ps1','test_candidate_lock.ps1','test_benchmark_evidence.ps1')) {
+foreach ($test in @('test_package_safety.ps1','test_package_join.ps1','test_publish.ps1','test_release_tag.ps1','test_candidate_lock.ps1','test_workspace_lock.ps1','test_benchmark_evidence.ps1')) {
     & (Join-Path $PSScriptRoot $test)
     if (!$?) { throw ('Windows tool regression failed: '+$test) }
 }
@@ -18,7 +21,7 @@ if ($LASTEXITCODE -ne 0) { throw 'docs_lint failed' }
 
 if (!$SkipArtCheck -and (Test-Path 'godot/chibi_remake/art/full/manifest.json')) {
     Write-Host '== declared runtime assets (size check) =='
-    node tools/runtime_assets.mjs --check
+    node tools/runtime_assets.mjs --check --source-ci
     if ($LASTEXITCODE -ne 0) { throw 'runtime asset check failed' }
 } else {
     Write-Host '== art manifest skipped (no art masters or -SkipArtCheck) =='
@@ -31,8 +34,12 @@ New-Item -ItemType Directory -Force $env:APPDATA,$env:LOCALAPPDATA | Out-Null
 $godot=Resolve-ChibiEngine $root
 
 Write-Host '== architecture boundaries and regression suites =='
+node tools/test_import_cache.mjs --engine $godot
+if ($LASTEXITCODE -ne 0) { throw 'Import cache regression failed' }
 node tools/architecture_check.mjs
 if ($LASTEXITCODE -ne 0) { throw 'Architecture boundary check failed' }
+node tools/native_write_check.mjs
+if ($LASTEXITCODE -ne 0) { throw 'Native write ownership check failed' }
 node tools/registry_check.mjs
 if ($LASTEXITCODE -ne 0) { throw 'Composition registry check failed' }
 node tools/data_check.mjs
@@ -69,3 +76,4 @@ if ($FullRegression) {
     if ($LASTEXITCODE -ne 0) { throw 'Native source integrity checks failed' }
 }
 Write-Host 'CI OK'
+} finally { Exit-WorkspaceLock $workspaceLock }

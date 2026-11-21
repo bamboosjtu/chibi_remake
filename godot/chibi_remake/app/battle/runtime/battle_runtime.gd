@@ -49,7 +49,7 @@ func _fatal(msg: String) -> void:
 	scene.cam.make_current()
 	if "--screenshot" in OS.get_cmdline_user_args():
 		await node.get_tree().create_timer(0.6).timeout
-		if screenshotter.is_valid(): await screenshotter.call(node)
+		if screenshotter.is_valid(): await screenshotter.call()
 		node.get_tree().quit()
 	elif "--smoketest" in OS.get_cmdline_user_args():
 		node.get_tree().quit()

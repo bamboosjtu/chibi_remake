@@ -17,6 +17,9 @@ $pack=[IO.Path]::ChangeExtension($Executable,'.pck')
 if (!(Test-Path -LiteralPath $Executable) -or !(Test-Path -LiteralPath $pack)) { throw 'EXE/PCK pair is incomplete' }
 # 资源包大小**不设上限**（业主明确要求）。
 $candidate=[IO.Path]::GetDirectoryName($Executable)
+. (Join-Path $PSScriptRoot 'workspace_lock.ps1')
+$workspaceLock=Enter-WorkspaceLock $projectRoot 'publication'
+try {
 . (Join-Path $PSScriptRoot 'candidate_lock.ps1')
 $candidateLock=Enter-CandidateValidationLock $candidate
 try {
@@ -158,3 +161,4 @@ if (Test-Path -LiteralPath $pointer) { [IO.File]::Replace($pointerTmp,$pointer,$
 Write-Output "Published immutable version: $version"
 } finally { $publishLock.Dispose() }
 } finally { $candidateLock.Dispose() }
+} finally { Exit-WorkspaceLock $workspaceLock }

@@ -38,6 +38,7 @@ const restore=()=>{
 };
 const cases=[
  {name:'scene-startup',scene:'res://main.tscn',markers:['ARCH-013: view=false'],args:['--noview','--map=chibic1','--smoketest']},
+ {name:'invalid-map-screenshot',scene:'res://main.tscn',markers:['res://data/chibi-invalid-screenshot-test.json','screenshot skipped (headless)'],args:['--map=chibi-invalid-screenshot-test','--screenshot']},
  {name:'runtime-no-files',script:'test_rule_catalog',markers:['RULE CATALOG PASS'],args:['--rules-delete-fixture='+project]},
  {name:'missing',change:()=>fs.unlinkSync(path.join(project,'data/db/unit_tuning.json')),errors:['unit_tuning.json: cannot read']},
  {name:'parse',change:()=>write('command_variants','{broken'),errors:['command_variants.json: JSON line']},

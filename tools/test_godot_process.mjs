@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import fs from 'node:fs';
+import {spawnSync} from 'node:child_process';
 import {runGodot} from './lib/godot_process.mjs';
 
 const run = (name, code, options = {}) => runGodot({engine: process.execPath,
@@ -23,4 +24,18 @@ const stream = await run('stream-log', 'const text="实时性能日志🧭".repe
 assert.ok(stream.ok);assert.equal(stream.output,text);assert.equal(fs.readFileSync(stream.log,'utf8'),text);
 const timeout = await run('timeout', 'setInterval(()=>{},1000)', {timeout: 0.1});
 assert.ok(timeout.timedOut && !timeout.ok && timeout.seconds < 5);
+assert.equal(timeout.timeoutSeconds, 0.1);
+assert.ok(timeout.idleSeconds > 0);
+const split = await run('split-error', 'process.stderr.write("SCRIPT ER");setTimeout(()=>process.stderr.write("ROR: split"),30);setInterval(()=>{},1000)', {timeout: 10});
+assert.ok(!split.ok && !split.timedOut && split.seconds < 5);
+const tree = await run('child-tree', `import {spawn} from 'node:child_process';
+  const child=spawn(process.execPath,['-e','setInterval(()=>{},1000)'],{stdio:'inherit',windowsHide:true});
+  console.log('child pid '+child.pid);setInterval(()=>{},1000);`, {timeout: 1, markers:['child pid']});
+assert.ok(tree.timedOut && tree.seconds < 5 && !tree.missing.length);
+const log = path.resolve('_work/process-runner-tests/build-cli-timeout.log');
+const cli = spawnSync(process.execPath, ['tools/godot_cli.mjs', '--timeout', '0.5', '--log', log,
+  process.execPath, '-e', 'console.log("import phase");setInterval(()=>{},1000)'], {encoding:'utf8', timeout:8000});
+assert.equal(cli.status, 1, cli.stdout + cli.stderr);
+assert.match(cli.stderr, /exceeded 0\.5s.*since last output/);
+assert.match(fs.readFileSync(log, 'utf8'), /import phase/);
 console.log('ENGINE PROCESS PASS exit / markers / script errors / deadline / process termination / Windows and XDG profile isolation');
