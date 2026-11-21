@@ -1,4 +1,4 @@
-param(
+﻿param(
     [string]$VersionDirectory = "",
     [string]$OutputDirectory = "",
     [int]$PartMiB = 900,

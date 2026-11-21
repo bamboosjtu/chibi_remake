@@ -1,4 +1,4 @@
-param([switch]$SkipData,[switch]$SkipImport,[switch]$NoOriginalMedia,[switch]$NoPublish,[switch]$AllowDirty,[switch]$SkipVerify,[switch]$IncludeLocalCampaignMedia)
+﻿param([switch]$SkipData,[switch]$SkipImport,[switch]$NoOriginalMedia,[switch]$NoPublish,[switch]$AllowDirty,[switch]$SkipVerify,[switch]$IncludeLocalCampaignMedia)
 # 注意：**不能**用 'Stop' —— Godot 在 stderr 上会打印一条无害的
 # "Failed to read the root certificate store"，被 PowerShell 当成 NativeCommandError，
 # 直接中断整个构建。改为 'Continue'，每个原生调用都已显式检查 $LASTEXITCODE。
