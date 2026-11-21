@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "source": "tools/native/sim_math/sim_math.cpp",
+  "entries": [
+    {
+      "field": "action_kind",
+      "owner": "movement",
+      "writer": "sim_math.cpp"
+    },
+    {
+      "field": "action_phase",
+      "owner": "movement",
+      "writer": "sim_math.cpp"
+    },
+    {
+      "field": "action_started",
+      "owner": "movement",
+      "writer": "sim_math.cpp"
+    },
+    {
+      "field": "action_target_uid",
+      "owner": "movement",
+      "writer": "sim_math.cpp"
+    },
+    {
+      "field": "action_wait",
+      "owner": "movement",
+      "writer": "sim_math.cpp"
+    },
+    {
+      "field": "anim",
+      "owner": "movement",
+      "writer": "sim_math.cpp"
+    },
+    {
+      "field": "dir",
+      "owner": "movement",
+      "writer": "sim_math.cpp"
+    },
+    {
+      "field": "effect_task",
+      "owner": "combat",
+      "writer": "sim_math.cpp"
+    },
+    {
+      "field": "effect_tasks",
+      "owner": "combat",
+      "writer": "sim_math.cpp"
+    },
+    {
+      "field": "move_facing",
+      "owner": "movement",
+      "writer": "sim_math.cpp"
+    },
+    {
+      "field": "move_started",
+      "owner": "movement",
+      "writer": "sim_math.cpp"
+    },
+    {
+      "field": "move_turning",
+      "owner": "movement",
+      "writer": "sim_math.cpp"
+    },
+    {
+      "field": "moved",
+      "owner": "movement",
+      "writer": "sim_math.cpp"
+    },
+    {
+      "field": "path",
+      "owner": "movement",
+      "writer": "sim_math.cpp"
+    },
+    {
+      "field": "pi",
+      "owner": "movement",
+      "writer": "sim_math.cpp"
+    },
+    {
+      "field": "repath",
+      "owner": "movement",
+      "writer": "sim_math.cpp"
+    },
+    {
+      "field": "rolling_ticks",
+      "owner": "combat",
+      "writer": "sim_math.cpp"
+    },
+    {
+      "field": "route_failures",
+      "owner": "movement",
+      "writer": "sim_math.cpp"
+    },
+    {
+      "field": "turn_tick",
+      "owner": "movement",
+      "writer": "sim_math.cpp"
+    },
+    {
+      "field": "walk_tick",
+      "owner": "movement",
+      "writer": "sim_math.cpp"
+    }
+  ]
+}

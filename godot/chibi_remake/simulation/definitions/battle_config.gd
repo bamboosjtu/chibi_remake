@@ -7,6 +7,7 @@ const OFFICER_BLOCK_FOR_OWNER := {0: 2, 1: 3, 2: 1, 3: 2, 4: 3}
 
 const GRID_FALLBACK := 8        # 数据里没有 frames.cols 时的图集列数
 
+const DEFAULT_MAP := "chibic1"
 const SPEED := 110.0
 # ARCH-013：缩放/平移限幅的唯一来源是 battle_view.gd（相机归它管）
 

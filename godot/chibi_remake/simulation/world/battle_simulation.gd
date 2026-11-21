@@ -86,6 +86,9 @@ func _clear_control_group_for(uid: int) -> void:
 func _update_gates() -> void:
 	_automatic_gates.update(_nav, battle.units)
 
+func advance(dt: float) -> void:
+	_sim_step(dt)
+
 func _sim_step(dt: float) -> void:
 	if battle.game_end != 0: return
 	var tick_begin:=ProfileClock.now(profile_enabled or timing_enabled)

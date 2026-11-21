@@ -23,7 +23,6 @@ var _world_nodes := preload("res://presentation/battle/world/world_nodes.gd").ne
 func stage_world_nodes() -> Dictionary: return _world_nodes.begin()
 func rollback_world_nodes(token: Dictionary) -> void: _world_nodes.rollback(token)
 func commit_world_nodes(token: Dictionary) -> void: _world_nodes.commit(token)
-func world_nodes_complete(units: Array) -> bool: return _world_nodes.complete(units)
 
 func attach_loaded_world(rows: Array) -> bool:
 	for row: Dictionary in rows:

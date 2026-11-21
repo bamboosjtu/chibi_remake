@@ -64,10 +64,10 @@
     },
     {
       "from": "app/battle/duel_controller.gd",
-      "to": "app/battle/runtime/duel_controller.gd",
-      "phase": "P4b",
+      "to": "app/battle/runtime/duel_session.gd",
+      "phase": "P5",
       "note": "moved during P4b; presentation dependency injected in P5",
-      "status": "moved",
+      "status": "renamed",
       "package": "app/battle"
     },
     {
@@ -1611,6 +1611,41 @@
       "to": "simulation/world/world_inputs.gd",
       "phase": "P7",
       "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "app/battle/runtime/battle_runtime.gd",
+      "phase": "P5",
+      "reason": "application lifecycle split from scene controller"
+    },
+    {
+      "to": "app/battle/runtime/battle_runtime_state.gd",
+      "phase": "P5",
+      "reason": "app save/ready state split from scene state"
+    },
+    {
+      "to": "presentation/battle/controller/battle_input_controller.gd",
+      "phase": "P5",
+      "reason": "input policy split from scene controller"
+    },
+    {
+      "to": "presentation/battle/controller/battle_frame_controller.gd",
+      "phase": "P5",
+      "reason": "frame/HUD policy split from scene controller"
+    },
+    {
+      "to": "presentation/battle/input/cheat_input.gd",
+      "phase": "P5",
+      "reason": "cheat console lifecycle"
+    },
+    {
+      "to": "presentation/battle/view/battle_presentation_state.gd",
+      "phase": "P5",
+      "reason": "presentation nodes/UI state"
+    },
+    {
+      "to": "app/battle/runtime/view_ops.gd",
+      "phase": "P5",
+      "reason": "narrow view transaction capability"
     }
   ],
   "appliedStages": [

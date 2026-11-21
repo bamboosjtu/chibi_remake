@@ -26,7 +26,7 @@
 | 数据 | `data/`、`media/`、`art/` | 稳定数据格式与素材 |
 | 工具 | `tools/` | 导出、构建、回归、验证与发布 |
 
-模拟不引用应用或表现模块，不持有场景节点。场景通过 `battle_effects` 同步接收外观与声音请求；有视图与无视图使用相同模拟数据。跨层调用使用显式能力接口。领域服务在模拟层共享 BattleState，各自负责所属领域的写入。表现组件通过 `app/read_models/battle_queries.gd` 读取标量，以及通过 `unit`、`map`、`commands`、`status` 读取各领域投影，不保留完整战场场景。单位、选择、资源、视野、时钟和效果通过冻结值投影、标量查询或独立字节缓冲读取；投影按世界身份、领域版本和视口复用，禁止逐帧深拷贝完整世界。配置容器也不暴露可变引用。存档服务不向表现层暴露。P7 的业务变更由字段所属领域的具名操作写入，包括单位位置、选择、世界装配和资源余额。跨域调用只开放所需的具体接口文件。
+模拟不引用应用或表现模块，不持有场景节点。场景通过 `battle_effects` 同步接收外观与声音请求；有视图与无视图使用相同模拟数据。读模型和 `ViewOps` 是跨层窄入口；存量 App/Presentation 对模拟服务的私有调用仍由依赖与注册门禁逐项治理。领域服务在模拟层共享 BattleState，各自负责所属领域的写入。表现组件通过 `app/read_models/battle_queries.gd` 读取标量，以及通过 `unit`、`map`、`commands`、`status` 读取各领域投影，不保留完整战场场景。单位、选择、资源、视野、时钟和效果通过冻结值投影、标量查询或独立字节缓冲读取；投影按世界身份、领域版本和视口复用，禁止逐帧深拷贝完整世界。配置容器也不暴露可变引用。存档服务不向表现层暴露。P7 的业务变更由字段所属领域的具名操作写入，包括单位位置、选择、世界装配和资源余额。跨域调用的新增面必须走所需的具体接口文件；存量私有调用按门禁清单逐步收敛。
 
 ## 3. 组合模块
 
@@ -35,9 +35,9 @@
 | `simulation/world/battle_world.gd` | 无场景依赖的模拟组合根；统一创建规则、命令、AI 与领域服务，正常启动和候选共用地图初始化 |
 | `app/battle/commands/battle_actions.gd`、`app/battle/session/session_actions.gd`、`app/read_models/battle_queries.gd` | 提交玩家意图、办理会话操作、读取显示投影 |
 | `simulation/state/battle_state.gd` | 共享权威状态容器；普通 RefCounted，不继承场景；字段业务写入者见 `tools/inputs/battle_state_ownership.json` |
-| `app/battle/runtime/battle_scene_state.gd` | 场景拥有的表现节点和存档服务 |
+| `app/battle/runtime/battle_runtime.gd`、`app/battle/runtime/battle_scene_state.gd` | 应用生命周期、存档/冒烟/关闭请求；场景状态门面 |
 | `app/battle/startup/bootstrap.gd` | 关卡装配、应用已冻结规则、开局与开发参数 |
-| `app/battle/runtime/scene_controller.gd` | 帧投递、输入、场景退出与表现协调 |
+| `app/battle/runtime/scene_controller.gd`、`presentation/battle/controller/`、`presentation/battle/input/` | 场景门面；输入、帧与秘籍输入控制器 |
 | `simulation/world/battle_simulation.gd` | 固定 tick 执行顺序、实体清理与摘要 |
 | `simulation/<领域>/` | `units`、`movement`、`navigation`、`combat`、`economy`、`construction`、`production`、`transport`、`technology`、`officers`、`commands`、`ai`、`cheats`、`scenario`、`visibility`、`definitions`、`diagnostics` |
 | `simulation/navigation/` | 导航状态、网格占格、路径查询与城门 |
@@ -46,7 +46,8 @@
 | `presentation/battle/{view,camera,input,hud,command,units,world,resources,effects}/` | 视图、相机、输入、HUD、命令面板、单位外观、世界图层、资源与特效 |
 | `presentation/menu/`、`testing/automation/` | 菜单控制器、样式、关卡选择、势力选择；自动化 harness 只在验收开关下加载 |
 | `presentation/audio/sfx.gd`、`presentation/shell/` | 音效播放；常驻 PresentationHost 与软件光标 |
-| `app/saves/` | 快照字段、完整校验、候选世界恢复与提交 |
+| `app/battle/runtime/battle_runtime_state.gd`、`presentation/battle/view/battle_presentation_state.gd` | App 存档/就绪状态与表现节点/UI 瞬态分离 |
+| `app/saves/`、`app/battle/runtime/view_ops.gd` | 快照字段、完整校验、候选世界恢复与提交；读档事务的表现能力接口 |
 | `testing/` | 随候选包提供的自检套件；由原 `--selftest` 参数分派 |
 
 科技和武将使用组合服务；模拟状态由 `simulation/state/battle_state.gd` 持有，科技服务在 `simulation/technology/technology.gd`，不保留按旧资源路径命名的兼容脚本。场景同名方法仅保留仍有外部调用的转发。

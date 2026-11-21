@@ -4,6 +4,7 @@ const PROXY_FIELDS := ["geometry", "session", "units", "selected", "_officer_poo
 const OFFICER_BLOCK_FOR_OWNER = preload("res://simulation/definitions/battle_config.gd").OFFICER_BLOCK_FOR_OWNER
 const GRID_FALLBACK = preload("res://simulation/definitions/battle_config.gd").GRID_FALLBACK
 const SPEED = preload("res://simulation/definitions/battle_config.gd").SPEED
+const DEFAULT_MAP = preload("res://simulation/definitions/battle_config.gd").DEFAULT_MAP
 const HUD_HZ = preload("res://simulation/definitions/battle_config.gd").HUD_HZ
 var geometry: Object = null
 const SIM_HZ = preload("res://simulation/definitions/battle_config.gd").SIM_HZ
@@ -79,7 +80,7 @@ var _officer_initial_state: Dictionary = {}
 
 var map_data: Dictionary = {}
 
-var map_id := "chibic1"
+var map_id := DEFAULT_MAP
 
 
 

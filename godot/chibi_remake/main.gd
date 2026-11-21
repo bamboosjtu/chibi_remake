@@ -18,8 +18,8 @@ const BootstrapService = preload("res://app/battle/startup/bootstrap.gd")
 var bootstrap: BootstrapService
 const CheatControllerService = preload("res://app/battle/runtime/cheat_controller.gd")
 var cheat_controller: CheatControllerService
-const DuelControllerService = preload("res://app/battle/runtime/duel_controller.gd")
-var duel_controller: DuelControllerService
+const DuelSessionService = preload("res://app/battle/runtime/duel_session.gd")
+var duel_session: DuelSessionService
 const SceneControllerService = preload("res://app/battle/runtime/scene_controller.gd")
 var scene_controller: SceneControllerService
 var actions := preload("res://app/battle/commands/battle_actions.gd").new(self)
@@ -100,16 +100,17 @@ func _init() -> void:
 	if not preload("res://simulation/definitions/rule_catalog.gd").is_ready(): return
 	for field in state.PROXY_FIELDS: _state_fields[field] = true
 	for field in scene.PROXY_FIELDS: _scene_fields[field] = true
+	scene.presentation = presentation.create_scene_state()
 	scene.remaster_art = presentation.create_art_catalog()
 	bootstrap = BootstrapService.new(scene, self, presentation)
 	cheat_controller = CheatControllerService.new(scene, self)
-	cheat_controller.console_factory = Callable(presentation, "create_cheat_console")
-	duel_controller = DuelControllerService.new(scene, self)
+	cheat_controller.cheat_input = presentation.create_cheat_input(self, scene)
+	duel_session = DuelSessionService.new(scene, self)
 	scene_controller = SceneControllerService.new(scene, self)
 	scene_controller.screenshotter = Callable(presentation, "screenshot")
-	_bind_controllers()
-	var report: Dictionary = world.validate_services("main", {"bootstrap":bootstrap, "cheat_controller":cheat_controller, "duel_controller":duel_controller, "scene_controller":scene_controller})
-	_api_missing = report.missing
+	scene_controller.input_controller = presentation.create_input_controller(scene, self, scene_controller.screenshotter)
+	scene_controller.frame_controller = presentation.create_frame_controller(scene, self, scene_controller); _bind_controllers()
+	var report: Dictionary = world.validate_services("main", {"bootstrap":bootstrap, "cheat_controller":cheat_controller, "duel_session":duel_session, "scene_controller":scene_controller}); _api_missing = report.missing
 	if _api_missing.is_empty(): _activate_world()
 func run_acceptance(kind: String, argument: String = "") -> void:
 	if not Game.acceptance_enabled: push_error("Acceptance script requested without the companion"); get_tree().quit(1); return
@@ -219,14 +220,13 @@ func dispose_services() -> void:
 	if _disposed: return
 	_disposed = true
 	_presentation_diagnostics.report()
-	for service in [bootstrap, cheat_controller, duel_controller, scene_controller]:
+	for service in [bootstrap, cheat_controller, duel_session, scene_controller]:
 		if is_instance_valid(service): service.free()
 	world.dispose()
 
 
-
 func _on_duel(outcome: String, onm: String, enm: String) -> void:
-	duel_controller._present_duel(outcome, onm, enm)
+	duel_session._present_duel(outcome, onm, enm)
 
 func exchange_world(next_world: RefCounted) -> RefCounted:
 	var previous: RefCounted = world

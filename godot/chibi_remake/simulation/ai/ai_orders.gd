@@ -25,10 +25,6 @@ func ai_order_rally(owner: int, skip_groups: Array = []) -> void:
 		if Vector2(u.ax, u.ay).distance_to(Vector2(b.ax, b.ay)) > 900.0:
 			_player_commands.apply_autonomous("move", owner, int(u.uid), -1, -1, "", Vector2(b.ax, b.ay))
 
-func ai_order_assault_l1(owner: int, skip_groups: Array = []) -> void:
-	# Kept for older command clients; all maps now use the same confirmed policy.
-	ai_order_assault(owner,skip_groups)
-
 func _l1_target(player: int) -> Dictionary:
 	for u in battle.units:
 		if int(u.get("owner", -1)) != player or not bool(u.get("alive", false)) or float(u.get("die_t", -1)) >= 0.0:

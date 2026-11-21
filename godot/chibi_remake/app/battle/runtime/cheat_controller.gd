@@ -3,7 +3,7 @@ const CheatSession = preload("res://simulation/cheats/cheat_session.gd")
 ## research/meta: exact lowercase character matcher and battle-only hotkeys.
 const State = preload("res://simulation/state/battle_state.gd")
 const Services = preload("res://app/battle/runtime/battle_scene_state.gd")
-var console_factory: Callable
+var cheat_input: Object
 const CHEAT_ACTIONS := {KEY_F2:"auto", KEY_F3:"demote", KEY_F4:"promote", KEY_F5:"ui",
 	KEY_F6:"build", KEY_F7:"invulnerable", KEY_F8:"reveal", KEY_F9:"resources"}
 var battle: State:
@@ -14,7 +14,6 @@ var _dep_cheat_actions: Object
 var _dep_scene_controller: Object
 var text := ""
 var matched := 0
-var console: CanvasLayer
 
 func _init(services: Services, surface: Node2D) -> void:
 	scene = services
@@ -57,11 +56,10 @@ func _set_cheat_input(opened: bool) -> void:
 	text = ""
 	matched = 0
 	if opened:
-		if not is_instance_valid(console):
-			if console_factory.is_valid(): console = console_factory.call(Callable(scene.view, "battle_rect") if scene.view != null else Callable())
-			node.add_child(console)
-		console.update_input(text)
-	elif is_instance_valid(console): console.hide()
+		if cheat_input != null:
+			cheat_input.open()
+			cheat_input.update_input(text)
+	elif cheat_input != null: cheat_input.hide()
 
 func _cheat_type(event: InputEventKey) -> void:
 	if event.keycode in [KEY_ENTER, KEY_KP_ENTER, KEY_ESCAPE]:
@@ -78,7 +76,7 @@ func _cheat_type(event: InputEventKey) -> void:
 		if matched == 5:
 			CheatSession.set_cheats_enabled(battle, not battle.cheats_enabled)
 			node.world.effects.feedback("秘籍已开启" if battle.cheats_enabled else "秘籍已关闭")
-	if is_instance_valid(console): console.update_input(text)
+	if cheat_input != null: cheat_input.update_input(text)
 
 func _cheat_camera_enemy() -> void:
 	if scene.cam == null: return

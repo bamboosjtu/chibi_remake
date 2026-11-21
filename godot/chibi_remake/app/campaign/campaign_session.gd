@@ -1,6 +1,7 @@
 extends RefCounted
 ## Campaign selection and pending-load state; scene navigation remains in Game.
-var current_map := "chibic1"
+const DEFAULT_MAP = preload("res://simulation/definitions/battle_config.gd").DEFAULT_MAP
+var current_map := DEFAULT_MAP
 var pending_load := false
 var pending_load_slot := 0
 var startup_map_consumed := false

@@ -305,11 +305,12 @@ pwsh -NoProfile -File tools/bench_full_battle.ps1 -ReleasePack <候选目录>/Ch
 
 ### 架构依赖与字段所有权基线
 
-`tools/inputs/module_map.json` 保存 181 个源文件的逐文件目标路径（moved/renamed/retained/deleted 与阶段），`tools/inputs/dependency_matrix.json` 是目标包允许集与文件级例外，`tools/inputs/dependency_baseline.json` 记录尚未消除的历史边（含 `removeByStage` 与 `reviewBy`）。三者由以下门禁消费：
+`tools/inputs/module_map.json` 保存 181 个源文件的逐文件目标路径（moved/renamed/retained/deleted 与阶段），并单列 35 个新增交付文件；`tools/inputs/dependency_matrix.json` 是目标包允许集与文件级例外，`tools/inputs/dependency_baseline.json` 当前为空；历史边已全部撤销，新增边会直接失败。三者由以下门禁消费：
 
 - `node tools/dependency_check.mjs`：用 `tools/dependency_report.mjs` 扫描 `preload/load/extends`、`_dep_` 绑定、`world.<svc>` 调用、构造函数注入和动态加载，输出 `_work/refactor/dependency-graph.json`（含 SCC）；新增未登记违规或已失效的基线边都失败。
 - `node tools/unit_schema_ownership_check.mjs`：`unit_schema_ownership.json` 的键集与 `UnitSchema.FIELDS` 精确相等，owner 唯一，`persist`/`derived` 与 Schema 一致。
-- `node tools/battle_state_write_check.mjs` 根据战斗状态和单位字段的 ownership 记录，检查赋值、容器修改、代理及可静态追踪的别名写入。P7 要求 `battle_state_write_baseline.json` 为空。有限字段的初始化、快照恢复、代理转发和计时按有界合同检查，其他写入由字段所属领域负责。`test_battle_state_write_check.mjs` 覆盖比较式、重复违规、单位与动态写入。
+- `node tools/native_write_check.mjs` 解析 `tools/native/sim_math/sim_math.cpp` 的 `Keys` 结构及 20 个原生单位字段写入，校验每个字段在 `unit_schema_ownership.json` 中有 owner，并与 `native_write_review.json` 逐项比对；新增或失效原生写入即失败。
+- `node tools/battle_state_write_check.mjs` 根据战斗状态和单位字段的 ownership 记录，检查赋值、容器修改、代理及可静态追踪的别名写入。P7 要求 `battle_state_write_baseline.json` 为空。有限字段的初始化、快照恢复、代理转发和计时按有界合同检查，其他写入由字段所属领域负责。GDScript 静态写入与 Native 直接写入分别由上述两个门禁覆盖。`test_battle_state_write_check.mjs` 覆盖比较式、重复违规、单位与动态写入。
 - `node tools/battle_state_ownership_check.mjs`：`battle_state_ownership.json` 覆盖 69 个属性，12 个代理指向 `session.<field>`，策略与 `BattleStateFields` 一致；`auto_control` 归 AI，`selected` 归 Commands，`tile_*` 归 Navigation 只读。
 - `node tools/test_dependency_report.mjs` 与 `node tools/test_ownership_checks.mjs`：正负夹具，验证合法边通过、非法边失败、基线可消解、字段缺失/重复/错误 owner 失败。
 

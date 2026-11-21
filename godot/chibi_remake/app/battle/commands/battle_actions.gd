@@ -17,6 +17,12 @@ func handle_cheat_input(event: InputEvent) -> bool:
 func unhandled_input(event: InputEvent) -> void:
 	_battle.scene_controller._unhandled_input(event)
 
+func gather_at(resource: Dictionary, position: Vector2) -> void:
+	_battle.world.player_commands.submit("gather", _battle.state.selected, position, int(resource.uid), -1, str(resource.get("cell", "")))
+
+func allows_context(id: int) -> bool:
+	return _battle.world.command_rules.allows_context(id)
+
 func submit_command(kind: String, uid := -1, parameter := -1) -> int:
 	if not _battle.scene.ready_to_save or _battle.get_tree().paused or _battle.session_actions.waiting_for_commands: return 0
 	return _battle.world.player_commands.submit(kind, _battle.state.selected, Vector2.ZERO, uid, parameter)

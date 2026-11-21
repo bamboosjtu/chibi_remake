@@ -26,7 +26,7 @@
       "world_orders": "simulation/commands/world_orders.gd",
       "bootstrap": "app/battle/startup/bootstrap.gd",
       "cheat_controller": "app/battle/runtime/cheat_controller.gd",
-      "duel_controller": "app/battle/runtime/duel_controller.gd",
+      "duel_session": "app/battle/runtime/duel_session.gd",
       "scene_controller": "app/battle/runtime/scene_controller.gd",
       "player_commands": "simulation/commands/player_commands.gd",
       "economy": "simulation/economy/economy.gd",

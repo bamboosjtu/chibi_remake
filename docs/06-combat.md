@@ -192,7 +192,7 @@
 | 攻防计算、伤害 | `simulation/definitions/combat_rules.gd` |
 | 攻击节拍 | `simulation/movement/action_clock.gd` |
 | 弹体与命中 | `simulation/combat/projectiles.gd`、`simulation/combat/combat.gd::_projectile_arrived`、`main.gd::_fire_attack` |
-| 攻击状态机、近战补偿 | `simulation/units/unit_actions.gd::_step_unit_inner`、`simulation/combat/combat.gd::_melee_line_clear` |
+| 攻击状态机、近战补偿 | `simulation/world/unit_tick_coordinator.gd::_step_unit_inner`、`simulation/combat/combat.gd::_melee_line_clear` |
 | 箭楼索敌 | `main.gd::_step_unit_inner`、`_nearest_enemy` |
 | 击杀、经验、官职 | `main.gd::_kill`、`_grant_officer_exp`、`officer_rank_name` |
 
