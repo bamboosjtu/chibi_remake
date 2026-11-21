@@ -32,7 +32,10 @@ Add-CleanupTarget 'godot/chibi_remake/Godot'
 if (!$RetiredMediaOnly) {
 foreach ($relative in @('godot/chibi_remake/.godot','_rea-cache','_rea-logs','_work/--list','_work/arch006','_work/battleview_base','_work/bv_backup','_work/png','_work/sheets','_work/tmp','_work/ghidra_proj','_work/art-v1-build/temp','_work/art-v1-build/local','_work/art-v1-build/roaming/Godot/app_userdata','_work/godot_appdata/Godot/app_userdata','_tools/ghidra_home/tmp')) { Add-CleanupTarget $relative }
 Get-ChildItem -LiteralPath (Join-Path $cleanupRoot '_work') -File | Where-Object { $_.Extension -in @('.mjs','.ps1','.txt','.log','.png','.py','.bak','.err') -or $_.Name -in @('menu_gd_stage0_backup.gd','battleview_map.md','menu_map.md','scenario_s4.md') } | ForEach-Object { Add-CleanupTarget ((Get-RelativePath $cleanupRoot $_.FullName)) }
-Get-ChildItem -LiteralPath (Join-Path $cleanupRoot '_work/hd') -Directory | Where-Object { $_.Name -notin @('sprites4_rgba','terrain4') } | ForEach-Object { Add-CleanupTarget ((Get-RelativePath $cleanupRoot $_.FullName)) }
+$hdRoot = Join-Path $cleanupRoot '_work/hd'
+if (Test-Path -LiteralPath $hdRoot) {
+    Get-ChildItem -LiteralPath $hdRoot -Directory | Where-Object { $_.Name -notin @('sprites4_rgba','terrain4') } | ForEach-Object { Add-CleanupTarget ((Get-RelativePath $cleanupRoot $_.FullName)) }
+}
 Get-ChildItem -LiteralPath (Join-Path $cleanupRoot 'release') -File | Where-Object { $_.Name -notin @('ChibiRTS.exe','ChibiRTS.pck','ChibiRTS.console.exe','launcher.previous.exe') -and $_.Name -match '\.(exe|pck|tmp|truncated)$' } | ForEach-Object { Add-CleanupTarget ((Get-RelativePath $cleanupRoot $_.FullName)) }
 Get-ChildItem -LiteralPath (Join-Path $cleanupRoot 'godot/chibi_remake/art/production') -Recurse -File | Where-Object { $_.Name -match '\.(log|log\.err|stderr|stdout)$' } | ForEach-Object { Add-CleanupTarget ((Get-RelativePath $cleanupRoot $_.FullName)) }
 Get-ChildItem -LiteralPath (Join-Path $cleanupRoot '_tools') -File | Where-Object { $_.Extension -in @('.zip','.msi') } | ForEach-Object { Add-CleanupTarget ((Get-RelativePath $cleanupRoot $_.FullName)) }
@@ -41,7 +44,10 @@ foreach ($relative in @('godot/chibi_remake/sprites','godot/chibi_remake/sprites
 Get-ChildItem -LiteralPath (Join-Path $cleanupRoot 'godot/chibi_remake') -File | Where-Object { $_.Name -match '^terrain_chibi.*\.png(\.import)?$' } | ForEach-Object { Add-CleanupTarget ((Get-RelativePath $cleanupRoot $_.FullName)) }
 $runningBuild = @(Get-CimInstance Win32_Process | Where-Object { $_.Name -match '^Godot.*\.exe$' -and $_.CommandLine -match '[\\/]_work[\\/]build[\\/](stage|candidate)-' })
 if ($runningBuild.Count) { throw 'A Godot build is running; finish it before cleanup.' }
-Get-ChildItem -LiteralPath (Join-Path $cleanupRoot '_work/build') -Force | Where-Object { $_.Name -match '^(stage-|candidate-|jpeg-size-test$|temp$|local$|.*\.(log|err)$)' } | ForEach-Object { Add-CleanupTarget ((Get-RelativePath $cleanupRoot $_.FullName)) }
+$buildRoot = Join-Path $cleanupRoot '_work/build'
+if (Test-Path -LiteralPath $buildRoot) {
+    Get-ChildItem -LiteralPath $buildRoot -Force | Where-Object { $_.Name -match '^(stage-|candidate-|jpeg-size-test$|temp$|local$|.*\.(log|err)$)' } | ForEach-Object { Add-CleanupTarget ((Get-RelativePath $cleanupRoot $_.FullName)) }
+}
 foreach ($relative in @('_work/architecture-tests','_work/chibil1-fix','_work/chibil1-polish','_work/decor_probe','_work/levelshots','_work/panel-check','_work/shots','_work/ui_probe','_work/worker-groups','_work/gate-check','_work/hud','_work/chibil1-manual.json','_work/view-report.json','_work/godot_appdata/Godot/cache')) { Add-CleanupTarget $relative }
 # 已迁入 tools/gd 的回归及已归档发布证据，不再保留多轮沙箱和旧工程副本。
 foreach ($relative in @('_work/ci','_work/m0','_work/resource-fix','_work/plan-implementation','_work/review','_work/review-current','_work/mousestudio')) { Add-CleanupTarget $relative }

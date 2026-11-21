@@ -82,6 +82,8 @@ release/
 
 回滚只恢复指针，操作命令见 [release.md](../release.md#7-产物位置与回滚)。保留当前和备份指针引用的版本。清理仅针对已确认可重建且不再被引用的暂存、缓存和候选目录；素材母版、玩家存档和正式版本不参与自动清理。
 
+当前清理入口为 `tools/cleanup_project.ps1`：先预览，确认后加 `-Execute`。清理报告写入 `docs/cleanup-report.json`（默认不跟踪）。当前清理回收约 48.25 GiB / 196,839 个文件，保留 `_work/terrain` 烘焙缓存、`release/versions`、`release/current.json` 和 `dist/package`；`.godot` 导入缓存、旧 `_work/build` 暂存、候选冒烟副本和旧测试沙箱已删除。
+
 ## 7. 本地试玩与发布打包
 
 GitHub Actions 只有一个 `ci` 工作流、四个作业：`contracts`（静态契约、克隆输入声明、工作流自检、PowerShell 解析）、`simulation`（确定性基线、34 图启动、存档套件）、`engine`（Godot 脚本套件、组合注册表、启动拒绝负例、地形管线）、`continuation`（四图续跑矩阵）。引擎自检、完整源码发布套件、缺表现资源恢复、热路径预算、Windows 启动器编译与打包安全套件属于发布验收，由本地 `tools/ci_windows.ps1 -FullRegression`、`tools/release.ps1` 与 `verify_candidate.ps1` 执行；CI 不拉取美术母版。统一入口 `tools/release.ps1` 提供两个模式。
