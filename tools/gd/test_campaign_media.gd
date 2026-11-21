@@ -34,6 +34,11 @@ func run() -> void:
 		finished = true
 		quit(0)
 		return
+	assert(events.play_startup_intro() and events.media_path == HD_ROOT + "START.mp4" and paused)
+	assert(events.player.get_video_texture().get_size() == Vector2(1280, 720))
+	assert(absf(events.player.get_stream_length() - float(events.catalog["START.mp4"].duration)) < 0.07)
+	events._finish_media()
+	assert(not paused)
 	var files := DirAccess.get_files_at("res://data")
 	var mapped := {}
 	for name in files:

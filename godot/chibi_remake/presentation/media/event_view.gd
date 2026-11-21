@@ -46,6 +46,9 @@ func campaign_path(name:String) -> String:
 	var entry:Dictionary=catalog.get(file,{})
 	return str(entry.get("path","")) if entry.get("localOnly",false) else ""
 
+func play_startup_intro() -> bool:
+	return play_media(campaign_path("START.mp4")) or play_media("res://media/videos/START.AVI")
+
 func _native_size(path:String) -> Vector2:
 	var entry:Dictionary=catalog.get(path.get_file(),{})
 	return Vector2(float(entry.get("width",320)),float(entry.get("height",240)))

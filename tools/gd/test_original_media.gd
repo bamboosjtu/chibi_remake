@@ -11,13 +11,16 @@ func run() -> void:
 	b=load("res://main.tscn").instantiate();root.add_child(b)
 	b.set_process(false);b.cli_mode=true;b.ai=null
 	var media=b.view.event_view
-	assert(media.catalog.size()==47 and ClassDB.class_exists("VideoStreamFFmpeg"))
+	assert(media.catalog.size()==48 and ClassDB.class_exists("VideoStreamFFmpeg"))
 	var shared: Array = media.catalog.keys().filter(func(name): return not media.catalog[name].get("localOnly",false))
 	assert(shared.size()==13)
 	for name in shared:
 		var row:Dictionary=media.catalog[name]
 		assert(FileAccess.file_exists(row.path) and FileAccess.get_sha256(row.path)==row.sha256)
-	print("ORIGINAL MEDIA BYTES PASS 13 retained shared AVI files / exact SHA256")
+	print("ORIGINAL MEDIA BYTES PASS 13 retained original AVI files / exact SHA256")
+	assert(media.play_startup_intro())
+	assert(media.media_path == ("res://media/videos/START.mp4" if FileAccess.file_exists("res://media/videos/START.mp4") else "res://media/videos/START.AVI"))
+	media._finish_media()
 	for name in shared:
 		var row:Dictionary=media.catalog[name]
 		assert(media.play_media(row.path) and paused and media.player.is_playing(),name)

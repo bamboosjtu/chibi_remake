@@ -97,11 +97,16 @@ for(const event of Object.values(events.events))if(event.video&&!noOriginalMedia
 // Shared originals may be exported. The campaign remaster is local-only unless a
 // private staging run explicitly opts in; NoOriginalMedia vetoes both.
 const videoCatalog=JSON.parse(readSource('data/db/video_catalog.json')).files;
+if(!videoCatalog['START.mp4']?.localOnly||!videoCatalog['START.AVI']||videoCatalog['START.AVI'].localOnly)throw Error('Startup video must declare both the private remaster and the original fallback');
 for(const [name,entry] of Object.entries(videoCatalog)){
-  if(!/^(?:[A-Z0-9]+\.AVI|(?:CAO|LIU)[0-9]+[A-Z]?\.mp4)$/.test(name)||entry.path!=='res://media/videos/'+name)throw Error('Invalid video catalog path: '+name);
+  if(!/^(?:[A-Z0-9]+\.AVI|(?:START|(?:CAO|LIU)[0-9]+[A-Z]?)\.mp4)$/.test(name)||entry.path!=='res://media/videos/'+name)throw Error('Invalid video catalog path: '+name);
   if((entry.localOnly===true)!==name.endsWith('.mp4'))throw Error('Invalid campaign media classification: '+name);
   if(noOriginalMedia)continue;
-  if(!entry.localOnly){add(entry.path);continue;}
+  if(!entry.localOnly){
+    // The unchanged legacy intro is for original/default builds, not HD builds.
+    if(!(includeLocalCampaign&&name==='START.AVI'))add(entry.path);
+    continue;
+  }
   if(!includeLocalCampaign)continue;
   const file='media/videos/'+name, bytes=fs.readFileSync(resolveInput(file));
   if(bytes.length!==entry.bytes||createHash('sha256').update(bytes).digest('hex')!==entry.sha256)throw Error('Local campaign media differs from catalog: '+name);
@@ -124,7 +129,7 @@ add('art/full/terrain_events/manifest.json');
 for(const entry of Object.values(JSON.parse(readSource('art/full/terrain_events/manifest.json'))))add(entry.texture);
 for(const filename of listSource('data').filter(x=>x.startsWith('chibi')&&x.endsWith('.json'))){
   const level=JSON.parse(readSource('data/'+filename));
-  if(!videoCatalog[level.scenario?.avi]?.localOnly)throw Error('Campaign chapter does not select canonical HD: '+filename);
+  if(level.scenario?.avi==='START.mp4'||!videoCatalog[level.scenario?.avi]?.localOnly)throw Error('Campaign chapter does not select canonical HD: '+filename);
   if(level.artMode !== 'hd-catalog')throw new Error('Re-export HD metadata: '+filename);
   add('data/'+filename);
   if(omitGeneratedTerrain)continue;

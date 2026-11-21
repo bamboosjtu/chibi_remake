@@ -12,7 +12,7 @@
 | 事件视频 | 10 | `media/videos/` | 原始 AVI |
 | 启动、历史与单挑 | 3 | `media/videos/` | START / LISHI / LDAN 原始 AVI |
 
-共享原片仅保留 13 个 AVI，逐文件沿用原作 SHA256。34 个战役开场的 MP4 与共享 AVI 均记录在 `data/db/video_catalog.json`；运行时无 OGV 中间产物。音乐与音效仍用 OGG/WAV，原始 WAV 母版保留本地。
+原片保留 13 个 AVI（含备用原作片头），逐文件沿用原作 SHA256。私有高清版的 34 个战役开场和 1 个启动片，以及原片均记录在 `data/db/video_catalog.json`；运行时无 OGV 中间产物。音乐与音效仍用 OGG/WAV，原始 WAV 母版保留本地。
 
 音频重导使用 `tools/export_audio.ps1`。 `tools/import_original_media.py` 仅恢复共享原片 AVI，`tools/install_campaign_media.mjs` 安装本地高清 MP4。单挑仍按时间段直接播放 LDAN.AVI，无需剪辑或转码。
 
@@ -68,7 +68,7 @@
 
 - 新开局按 `scenario.avi`（沿用旧字段名）直接播放对应高清 MP4。读档、`--no-intro`、无媒体包或缺少文件时直接显示关卡简报，不回退低清。
 - 事件仍由 `events.json` 映射；事件4没有对应原片，保留文本。读档恢复事件游标而不重播历史。
-- 正常首次启动菜单直接播放START.AVI，每进程一次；历史简介按钮播放LISHI.AVI。
+- 正常首次启动在主菜单前播放片头，每进程一次。私有构建优先播放 START.mp4；默认构建保留 START.AVI，原作媒体排除构建直接跳过。历史简介按钮仍播放 LISHI.AVI。
 - 缺少媒体时跳过或保留文本，不阻塞游戏。
 
 ### 4.3 单挑
@@ -101,6 +101,6 @@
 
 ## 本机高清战役视频
 
-34 个战役条目直接使用目录中的 MP4（保留 scenario.avi 旧字段名），不回退到低清战役 AVI。只有关卡开场替换，原作片头、历史介绍、战中事件和单挑仍保持原文件。缺少本地高清资源时显示关卡简报，不阻塞开局。
+34 个战役条目直接使用目录中的 MP4（保留 scenario.avi 旧字段名），不回退到低清战役 AVI。私有构建另使用高清启动片，保留原作封面、封尾和音轨；历史介绍、战中事件和单挑保持原文件。缺少本地高清资源时显示关卡简报，不阻塞开局。
 
 提供已经校验的一集一个 MP4 的本地目录，然后运行 node tools/install_campaign_media.mjs <本地目录>。安装工具按 video_catalog.json 校验长度与 SHA256，不下载、不覆盖不匹配文件。高清文件放在 godot/chibi_remake/media/videos/，不纳入 Git；原作共享 AVI 可按目录校验从原片重新安装。显式使用 -NoPublish -IncludeLocalCampaignMedia 才会将已校验的高清素材纳入本机候选，默认分发包不纳入未再授权的高清素材；-NoOriginalMedia 同时排除高清 MP4 和共享 AVI（以及原作音频）。含本地高清的构建清单会标记私有媒体，分卷/分发入口拒绝该版本。未经授权不得另行分发本地高清素材。

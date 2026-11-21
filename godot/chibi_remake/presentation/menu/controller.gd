@@ -217,7 +217,7 @@ func _show_menu_intro(args: PackedStringArray) -> void:
 	var visible_args := Array(args).filter(func(arg): return not str(arg).begins_with("--portable-root=") and str(arg) != "--portable" and not str(arg).begins_with("--storage-mode="))
 	if not Game.startup_video_seen and DisplayServer.get_name()!="headless" and visible_args.is_empty():
 		Game.startup_video_seen=true
-		_ui.media_view.play_media("res://media/videos/START.AVI")
+		_ui.media_view.play_startup_intro()
 
 func _capture_menu_probe(args: PackedStringArray, want_campaign: bool) -> void:
 	# 发布版自测截图：--screenshot（菜单本身）。

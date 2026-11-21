@@ -62,8 +62,10 @@ try {
     node tools/dedupe_terrain.mjs $stage
     if ($LASTEXITCODE -ne 0) { throw 'Terrain deduplication failed' }
     $inputs=Get-Content -Raw (Join-Path $stage 'release_inputs.json') | ConvertFrom-Json
-    $hasLocalCampaignMedia=@($inputs.files | Where-Object { $_ -match '^media/videos/(?:CAO|LIU)[0-9]+[A-Z]?\.mp4$' }).Count -gt 0
+    $localCampaignMedia=@($inputs.files | Where-Object { $_ -match '^media/videos/(?:START|(?:CAO|LIU)[0-9]+[A-Z]?)\.mp4$' })
+    $hasLocalCampaignMedia=$localCampaignMedia.Count -gt 0
     if ($hasLocalCampaignMedia -ne [bool]$IncludeLocalCampaignMedia) { throw 'Staged local campaign media does not match the explicit build selection' }
+    if ($hasLocalCampaignMedia -and ($localCampaignMedia.Count -ne 35 -or $localCampaignMedia -notcontains 'media/videos/START.mp4' -or $inputs.files -contains 'media/videos/START.AVI')) { throw 'Private build must stage the revised startup and all 34 chapter intros, without the original startup' }
     foreach ($file in $inputs.files) { if (!(Test-Path -LiteralPath (Join-Path $stage $file))) { throw ('Missing staged resource: '+$file) } }
     $log=Join-Path $BuildRoot ('_work/build/import-'+$id+'.log')
     $importCache=Join-Path $BuildRoot '_work/build/import-cache'

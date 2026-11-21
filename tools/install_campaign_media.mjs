@@ -4,7 +4,7 @@ import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 
 const input=process.argv[2];
-if(!input||process.argv.length!==3)throw Error('Usage: node tools/install_campaign_media.mjs <local folder of approved chapter MP4s>');
+if(!input||process.argv.length!==3)throw Error('Usage: node tools/install_campaign_media.mjs <local folder of approved startup and chapter MP4s>');
 const project=fileURLToPath(new URL('../godot/chibi_remake/',import.meta.url));
 const media=path.join(project,'media/videos');
 const catalog=JSON.parse(fs.readFileSync(path.join(project,'data/db/video_catalog.json'),'utf8')).files;
@@ -16,7 +16,7 @@ const verify=(file,entry)=>{
   }
 };
 for(const [name,entry] of entries){
-  if(!/^(CAO|LIU)[0-9]+[A-Z]?\.mp4$/.test(name))throw Error('Unsafe campaign video name: '+name);
+  if(!/^(?:START|(?:CAO|LIU)[0-9]+[A-Z]?)\.mp4$/.test(name))throw Error('Unsafe campaign video name: '+name);
   verify(path.join(input,name),entry);
   const target=path.join(media,name);
   if(fs.existsSync(target))verify(target,entry);

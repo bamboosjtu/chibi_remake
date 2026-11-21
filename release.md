@@ -83,7 +83,7 @@ candidate-<构建ID>/
 
 `-NoPublish` 只生成候选包，不改变 `release/current.json`。
 
-本机高清：安装目录登记的 34 个 MP4 后，显式加 `-NoPublish -IncludeLocalCampaignMedia` 生成并验证私有候选。它可以设置为本机当前版本，但分卷与分发入口拒绝该版本；公开构建不得加入此开关。`-NoOriginalMedia` 会排除全部原作视频/音频和私有高清，两开关不能并用。
+本机高清：安装目录登记的 35 个 MP4（1 个启动片、34 个关卡开场）后，显式加 `-NoPublish -IncludeLocalCampaignMedia` 生成并验证私有候选。它可以设置为本机当前版本，但分卷与分发入口拒绝该版本；公开构建不得加入此开关。`-NoOriginalMedia` 会排除全部原作视频/音频和私有高清，两开关不能并用。
 
 ## 4. 安装为正式版本
 
