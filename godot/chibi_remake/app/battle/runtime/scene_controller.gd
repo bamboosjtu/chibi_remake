@@ -74,11 +74,6 @@ func _build_terrain() -> void:
 	if scene.view != null:
 		scene.view.build_terrain()
 
-func _sheet(p: String) -> Texture2D:
-	if scene.view == null:
-		return null
-	return scene.view.unit_visuals._sheet(p)
-
 func _build_ui() -> void:
 	# ARCH-013：HUD 全部交给 battle_view.gd（同名转发，调用点不变）
 	if scene.view == null:
