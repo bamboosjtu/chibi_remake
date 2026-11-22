@@ -1,0 +1,347 @@
+{
+  "schemaVersion": 1,
+  "levels": [
+    {
+      "id": "chibic1",
+      "map": "chibic1",
+      "name": "侦察新野",
+      "objects": 37,
+      "campaign": "曹操",
+      "chapter": "第1章",
+      "title": "侦察新野"
+    },
+    {
+      "id": "chibic10",
+      "map": "chibic10",
+      "name": "初识水战",
+      "objects": 111,
+      "campaign": "曹操",
+      "chapter": "第10章",
+      "title": "初识水战"
+    },
+    {
+      "id": "chibic11",
+      "map": "chibic11",
+      "name": "误斩蔡张",
+      "objects": 139,
+      "campaign": "曹操",
+      "chapter": "第11章",
+      "title": "误斩蔡张"
+    },
+    {
+      "id": "chibic12",
+      "map": "chibic12",
+      "name": "连环战船",
+      "objects": 182,
+      "campaign": "曹操",
+      "chapter": "第12章",
+      "title": "连环战船"
+    },
+    {
+      "id": "chibic13",
+      "map": "chibic13",
+      "name": "赤壁水战",
+      "objects": 336,
+      "campaign": "曹操",
+      "chapter": "第13章",
+      "title": "赤壁水战"
+    },
+    {
+      "id": "chibic14",
+      "map": "chibic14",
+      "name": "兵败乌林",
+      "objects": 136,
+      "campaign": "曹操",
+      "chapter": "第14章",
+      "title": "兵败乌林"
+    },
+    {
+      "id": "chibic15",
+      "map": "chibic15",
+      "name": "南郡攻防",
+      "objects": 214,
+      "campaign": "曹操",
+      "chapter": "第15章",
+      "title": "南郡攻防"
+    },
+    {
+      "id": "chibic16",
+      "map": "chibic16",
+      "name": "歼灭周瑜",
+      "objects": 248,
+      "campaign": "曹操",
+      "chapter": "第16章",
+      "title": "歼灭周瑜"
+    },
+    {
+      "id": "chibic17",
+      "map": "chibic17",
+      "name": "决战柴桑",
+      "objects": 287,
+      "campaign": "曹操",
+      "chapter": "第17章",
+      "title": "决战柴桑"
+    },
+    {
+      "id": "chibic2",
+      "map": "chibic2",
+      "name": "南征准备",
+      "objects": 42,
+      "campaign": "曹操",
+      "chapter": "第2章",
+      "title": "南征准备"
+    },
+    {
+      "id": "chibic3",
+      "map": "chibic3",
+      "name": "进取博望",
+      "objects": 102,
+      "campaign": "曹操",
+      "chapter": "第3章",
+      "title": "进取博望"
+    },
+    {
+      "id": "chibic4",
+      "map": "chibic4",
+      "name": "南征先锋",
+      "objects": 95,
+      "campaign": "曹操",
+      "chapter": "第4章",
+      "title": "南征先锋"
+    },
+    {
+      "id": "chibic5",
+      "map": "chibic5",
+      "name": "进攻樊城",
+      "objects": 108,
+      "campaign": "曹操",
+      "chapter": "第5章",
+      "title": "进攻樊城"
+    },
+    {
+      "id": "chibic6",
+      "map": "chibic6",
+      "name": "襄阳招降",
+      "objects": 118,
+      "campaign": "曹操",
+      "chapter": "第6章",
+      "title": "襄阳招降"
+    },
+    {
+      "id": "chibic7",
+      "map": "chibic7",
+      "name": "当阳长坂",
+      "objects": 172,
+      "campaign": "曹操",
+      "chapter": "第7章",
+      "title": "当阳长坂"
+    },
+    {
+      "id": "chibic8",
+      "map": "chibic8",
+      "name": "南取江陵",
+      "objects": 137,
+      "campaign": "曹操",
+      "chapter": "第8章",
+      "title": "南取江陵"
+    },
+    {
+      "id": "chibic9",
+      "map": "chibic9",
+      "name": "东征夏口",
+      "objects": 112,
+      "campaign": "曹操",
+      "chapter": "第9章",
+      "title": "东征夏口"
+    },
+    {
+      "id": "chibil1",
+      "map": "chibil1",
+      "name": "二吕进犯",
+      "objects": 50,
+      "campaign": "刘备",
+      "chapter": "第1章",
+      "title": "二吕进犯"
+    },
+    {
+      "id": "chibil10",
+      "map": "chibil10",
+      "name": "三江水战",
+      "objects": 95,
+      "campaign": "刘备",
+      "chapter": "第11章",
+      "title": "三江水战"
+    },
+    {
+      "id": "chibil11",
+      "map": "chibil11",
+      "name": "大战于禁",
+      "objects": 166,
+      "campaign": "刘备",
+      "chapter": "第12章",
+      "title": "大战于禁"
+    },
+    {
+      "id": "chibil12",
+      "map": "chibil12",
+      "name": "连环战船",
+      "objects": 150,
+      "campaign": "刘备",
+      "chapter": "第13章",
+      "title": "连环战船"
+    },
+    {
+      "id": "chibil13",
+      "map": "chibil13",
+      "name": "火烧赤壁",
+      "objects": 221,
+      "campaign": "刘备",
+      "chapter": "第14章",
+      "title": "火烧赤壁"
+    },
+    {
+      "id": "chibil14",
+      "map": "chibil14",
+      "name": "乌林截击",
+      "objects": 136,
+      "campaign": "刘备",
+      "chapter": "第15章",
+      "title": "乌林截击"
+    },
+    {
+      "id": "chibil15",
+      "map": "chibil15",
+      "name": "攻略南郡",
+      "objects": 160,
+      "campaign": "刘备",
+      "chapter": "第16章",
+      "title": "攻略南郡"
+    },
+    {
+      "id": "chibil16",
+      "map": "chibil16",
+      "name": "再战赤壁",
+      "objects": 131,
+      "campaign": "刘备",
+      "chapter": "第17章",
+      "title": "再战赤壁"
+    },
+    {
+      "id": "chibil2",
+      "map": "chibil2",
+      "name": "计取樊城",
+      "objects": 57,
+      "campaign": "刘备",
+      "chapter": "第2章",
+      "title": "计取樊城"
+    },
+    {
+      "id": "chibil3",
+      "map": "chibil3",
+      "name": "博望用计",
+      "objects": 126,
+      "campaign": "刘备",
+      "chapter": "第3章",
+      "title": "博望用计"
+    },
+    {
+      "id": "chibil4",
+      "map": "chibil4",
+      "name": "兵临城下",
+      "objects": 116,
+      "campaign": "刘备",
+      "chapter": "第4章",
+      "title": "兵临城下"
+    },
+    {
+      "id": "chibil5",
+      "map": "chibil5",
+      "name": "坚守樊城",
+      "objects": 99,
+      "campaign": "刘备",
+      "chapter": "第5章",
+      "title": "坚守樊城"
+    },
+    {
+      "id": "chibil6",
+      "map": "chibil6",
+      "name": "投奔襄阳",
+      "objects": 175,
+      "campaign": "刘备",
+      "chapter": "第6章",
+      "title": "投奔襄阳"
+    },
+    {
+      "id": "chibil7a",
+      "map": "chibil7a",
+      "name": "蔡瑁追击",
+      "objects": 157,
+      "campaign": "刘备",
+      "chapter": "第7章",
+      "title": "蔡瑁追击"
+    },
+    {
+      "id": "chibil7b",
+      "map": "chibil7b",
+      "name": "固守襄阳",
+      "objects": 117,
+      "campaign": "刘备",
+      "chapter": "第8章",
+      "title": "固守襄阳"
+    },
+    {
+      "id": "chibil8",
+      "map": "chibil8",
+      "name": "长坂救主",
+      "objects": 243,
+      "campaign": "刘备",
+      "chapter": "第9章",
+      "title": "长坂救主"
+    },
+    {
+      "id": "chibil9",
+      "map": "chibil9",
+      "name": "江夏退敌",
+      "objects": 97,
+      "campaign": "刘备",
+      "chapter": "第10章",
+      "title": "江夏退敌"
+    }
+  ],
+  "order": [
+    "chibil1",
+    "chibil2",
+    "chibil3",
+    "chibil4",
+    "chibil5",
+    "chibil6",
+    "chibil7a",
+    "chibil7b",
+    "chibil8",
+    "chibil9",
+    "chibil10",
+    "chibil11",
+    "chibil12",
+    "chibil13",
+    "chibil14",
+    "chibil15",
+    "chibil16",
+    "chibic1",
+    "chibic2",
+    "chibic3",
+    "chibic4",
+    "chibic5",
+    "chibic6",
+    "chibic7",
+    "chibic8",
+    "chibic9",
+    "chibic10",
+    "chibic11",
+    "chibic12",
+    "chibic13",
+    "chibic14",
+    "chibic15",
+    "chibic16",
+    "chibic17"
+  ]
+}

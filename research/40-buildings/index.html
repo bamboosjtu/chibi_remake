@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>原版《赤壁》建筑与建造机制</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; padding: 32px; background: #12141a; color: #e6e6e6;
+         font: 15px/1.65 "Segoe UI", "Microsoft YaHei", sans-serif; }
+  h1, h2, h3 { font-weight: 600; letter-spacing: .02em; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  h2 { margin: 40px 0 12px; font-size: 19px; color: #ffd27a; }
+  h3 { margin: 22px 0 8px; font-size: 15px; color: #ffd27a; }
+  .sub { color: #9aa0ad; margin-bottom: 24px; }
+  code { background: #1d212b; padding: 1px 5px; border-radius: 4px; color: #a8d5ff; }
+  img.sheet { max-width: 100%; image-rendering: pixelated; border: 1px solid #2a2f3a; background: #0b0d12; }
+  .cards { display: flex; gap: 12px; flex-wrap: wrap; }
+  .stat { background: #181c24; border: 1px solid #2a2f3a; border-radius: 10px; padding: 12px 18px; min-width: 120px; }
+  .stat b { display: block; font-size: 24px; color: #ffd27a; }
+  .stat span { color: #9aa0ad; font-size: 13px; }
+  table { border-collapse: collapse; width: 100%; margin-top: 8px; }
+  th, td { border-bottom: 1px solid #262b35; padding: 6px 9px; text-align: left; vertical-align: middle; }
+  th { color: #9aa0ad; font-weight: 500; font-size: 13px; white-space: nowrap; }
+  td.icon { width: 92px; }
+  td.icon img { width: 80px; image-rendering: pixelated; display: block;
+                background: repeating-conic-gradient(#1b1f28 0% 25%, #141820 0% 50%) 50% / 12px 12px; }
+  .scroll { overflow-x: auto; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 18px; align-items: start; }
+  .panel { background: #181c24; border: 1px solid #2a2f3a; border-radius: 10px; padding: 14px; }
+  .panel img { width: 100%; image-rendering: pixelated; }
+  .panel .cap { color: #9aa0ad; font-size: 13px; margin-top: 8px; }
+  .flow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+  .flow div { background: #1b202a; border: 1px solid #303746; border-radius: 8px; padding: 8px 12px; font-size: 13px; }
+  .flow i { color: #ffd27a; font-style: normal; }
+  .note { background: #1b1f27; border-left: 3px solid #ffd27a; padding: 10px 14px; border-radius: 4px; color: #c9ced8; }
+  .warn { border-left-color: #ff9d6e; }
+  a { color: #8ec5ff; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; background: #232936; color: #9aa0ad; font-size: 12px; margin-right: 6px; }
+  .ok { color: #8fe3a3; } .no { color: #ff9d9d; }
+</style>
+</head>
+<body>
+<h1>原版《赤壁》建筑与建造机制</h1>
+<div class="sub">CB.EXE <code>2db7cc10…c5798cb7</code> · DATA.EXP / UNIT.EXP / INTERFAC.EXP / PROMPT · BMP.LWC / UNIT.LWC · REA/Ghidra 静态分析</div>
+
+<div class="cards">
+  <div class="stat"><b>27</b><span>建筑/资源点类型</span></div>
+  <div class="stat"><b>13</b><span>建造类别</span></div>
+  <div class="stat"><b>9</b><span>0x111DE 第一页</span></div>
+  <div class="stat"><b>+2 HP</b><span>每工人 / 4 tick</span></div>
+  <div class="stat"><b>10000</b><span>帅帐/粮仓粮容</span></div>
+  <div class="stat"><b>500</b><span>民居金</span></div>
+</div>
+
+<div class="note" style="margin-top:20px">
+  费用字段已按运行时映射订正：建筑 <b>金 = v[10]</b>、<b>木 = v[9]</b>、<b>粮 = v[8]</b>、<b>铁 = v[7]</b>。
+  所以帅帐是 <b>金 30 / 木 500 / 粮 1000 / 铁 500</b>，不是“金 1000 / 粮 0”。工人是 <b>金 400 / 木 50 / 粮 50 / 铁 0</b>。
+</div>
+
+<h2>27 类建筑/资源点</h2>
+<img class="sheet" src="assets/buildings_overview.png" alt="建筑总览">
+<p class="meta">总览按 ID 0–26 排列，每个取 frame 0（完好/满存量），6 列。逐类帧见 <code>assets/building_XX_frames.png</code>。</p>
+
+<div class="scroll">
+<table>
+  <tr><th>ID</th><th>图</th><th>名称</th><th>HP</th><th>攻B</th><th>防A/B</th><th>视野</th><th>射程</th><th>占地</th><th>帧</th><th>金</th><th>木</th><th>粮</th><th>铁</th><th>功能</th></tr>
+  <tr><td>0</td><td class="icon"><img src="assets/building_00_icon.png" alt="帅帐"></td><td>帅帐</td><td>2400</td><td>—</td><td>9/9</td><td>5</td><td>0</td><td>3×3</td><td>10</td><td>30</td><td>500</td><td>1000</td><td>500</td><td>大本营：训练工人、升级大本营、+10000 粮容</td></tr>
+  <tr><td>1</td><td class="icon"><img src="assets/building_01_icon.png" alt="帅帐"></td><td>帅帐</td><td>2400</td><td>—</td><td>9/9</td><td>5</td><td>0</td><td>3×3</td><td>8</td><td>30</td><td>500</td><td>1000</td><td>500</td><td>大本营（另一阵营美术）</td></tr>
+  <tr><td>2</td><td class="icon"><img src="assets/building_02_icon.png" alt="武器库"></td><td>武器库</td><td>1600</td><td>—</td><td>9/9</td><td>5</td><td>0</td><td>3×3</td><td>2</td><td>30</td><td>400</td><td>600</td><td>400</td><td>兵器/甲胄研究</td></tr>
+  <tr><td>3</td><td class="icon"><img src="assets/building_03_icon.png" alt="武器库"></td><td>武器库</td><td>1600</td><td>—</td><td>9/9</td><td>5</td><td>0</td><td>3×3</td><td>2</td><td>30</td><td>400</td><td>600</td><td>400</td><td>兵器/甲胄研究（另一阵营美术）</td></tr>
+  <tr><td>4</td><td class="icon"><img src="assets/building_04_icon.png" alt="木材场"></td><td>木材场</td><td>1200</td><td>—</td><td>9/9</td><td>5</td><td>0</td><td>3×3</td><td>2</td><td>30</td><td>300</td><td>500</td><td>200</td><td>弓术研究</td></tr>
+  <tr><td>5</td><td class="icon"><img src="assets/building_05_icon.png" alt="木材场"></td><td>木材场</td><td>1200</td><td>—</td><td>9/9</td><td>5</td><td>0</td><td>3×3</td><td>2</td><td>30</td><td>300</td><td>500</td><td>200</td><td>弓术研究（另一阵营美术）</td></tr>
+  <tr><td>6</td><td class="icon"><img src="assets/building_06_icon.png" alt="骑兵所"></td><td>骑兵所</td><td>1600</td><td>—</td><td>9/9</td><td>5</td><td>0</td><td>3×3</td><td>2</td><td>30</td><td>400</td><td>700</td><td>300</td><td>训练骑兵 100/200/500</td></tr>
+  <tr><td>7</td><td class="icon"><img src="assets/building_07_icon.png" alt="骑兵所"></td><td>骑兵所</td><td>1600</td><td>—</td><td>9/9</td><td>5</td><td>0</td><td>3×3</td><td>2</td><td>30</td><td>400</td><td>700</td><td>300</td><td>训练骑兵（另一阵营美术）</td></tr>
+  <tr><td>8</td><td class="icon"><img src="assets/building_08_icon.png" alt="车兵所"></td><td>车兵所</td><td>1600</td><td>—</td><td>9/9</td><td>5</td><td>0</td><td>3×3</td><td>2</td><td>30</td><td>200</td><td>500</td><td>500</td><td>训练车兵；投石车研究</td></tr>
+  <tr><td>9</td><td class="icon"><img src="assets/building_09_icon.png" alt="车兵所"></td><td>车兵所</td><td>1600</td><td>—</td><td>9/9</td><td>5</td><td>0</td><td>3×3</td><td>2</td><td>30</td><td>200</td><td>500</td><td>500</td><td>训练车兵（另一阵营美术）</td></tr>
+  <tr><td>10</td><td class="icon"><img src="assets/building_10_icon.png" alt="粮仓"></td><td>粮仓</td><td>800</td><td>—</td><td>9/9</td><td>5</td><td>0</td><td>2×2</td><td>2</td><td>30</td><td>100</td><td>200</td><td>100</td><td>+10000 粮容</td></tr>
+  <tr><td>11</td><td class="icon"><img src="assets/building_11_icon.png" alt="粮仓"></td><td>粮仓</td><td>800</td><td>—</td><td>9/9</td><td>5</td><td>0</td><td>2×2</td><td>2</td><td>30</td><td>100</td><td>200</td><td>100</td><td>+10000 粮容（另一阵营美术）</td></tr>
+  <tr><td>12</td><td class="icon"><img src="assets/building_12_icon.png" alt="步兵所"></td><td>步兵所</td><td>1600</td><td>—</td><td>9/9</td><td>5</td><td>0</td><td>2×2</td><td>2</td><td>30</td><td>400</td><td>600</td><td>200</td><td>训练步兵 100/200/500/1000</td></tr>
+  <tr><td>13</td><td class="icon"><img src="assets/building_13_icon.png" alt="步兵所"></td><td>步兵所</td><td>1600</td><td>—</td><td>9/9</td><td>5</td><td>0</td><td>2×2</td><td>2</td><td>30</td><td>400</td><td>600</td><td>200</td><td>训练步兵（另一阵营美术）</td></tr>
+  <tr><td>14</td><td class="icon"><img src="assets/building_14_icon.png" alt="弓兵所"></td><td>弓兵所</td><td>1600</td><td>—</td><td>9/9</td><td>5</td><td>0</td><td>2×2</td><td>2</td><td>30</td><td>400</td><td>600</td><td>200</td><td>训练弓兵 100/200/500/1000</td></tr>
+  <tr><td>15</td><td class="icon"><img src="assets/building_15_icon.png" alt="弓兵所"></td><td>弓兵所</td><td>1600</td><td>—</td><td>9/9</td><td>5</td><td>0</td><td>2×2</td><td>2</td><td>30</td><td>400</td><td>600</td><td>200</td><td>训练弓兵（另一阵营美术）</td></tr>
+  <tr><td>16</td><td class="icon"><img src="assets/building_16_icon.png" alt="城门"></td><td>城门</td><td>1400</td><td>—</td><td>9/9</td><td>6</td><td>0</td><td>2×2</td><td>2</td><td>30</td><td>500</td><td>700</td><td>300</td><td>通行控制：开/关</td></tr>
+  <tr><td>17</td><td class="icon"><img src="assets/building_17_icon.png" alt="城门"></td><td>城门</td><td>1400</td><td>—</td><td>9/9</td><td>6</td><td>0</td><td>2×2</td><td>2</td><td>30</td><td>500</td><td>700</td><td>300</td><td>通行控制（另一阵营美术）</td></tr>
+  <tr><td>18</td><td class="icon"><img src="assets/building_18_icon.png" alt="箭楼"></td><td>箭楼</td><td>350</td><td>30</td><td>8/8</td><td>8</td><td>8</td><td>1×1</td><td>2</td><td>30</td><td>400</td><td>600</td><td>200</td><td>防御塔：攻击 30 / 射程 8 / 视野 8</td></tr>
+  <tr><td>19</td><td class="icon"><img src="assets/building_19_icon.png" alt="箭楼"></td><td>箭楼</td><td>350</td><td>30</td><td>8/8</td><td>8</td><td>8</td><td>1×1</td><td>2</td><td>30</td><td>400</td><td>600</td><td>200</td><td>防御塔（另一阵营美术）</td></tr>
+  <tr><td>20</td><td class="icon"><img src="assets/building_20_icon.png" alt="船坞"></td><td>船坞</td><td>1600</td><td>—</td><td>9/9</td><td>5</td><td>0</td><td>3×3</td><td>3</td><td>30</td><td>400</td><td>700</td><td>300</td><td>训练快船/运输船/战船/连船；水军研究</td></tr>
+  <tr><td>21</td><td class="icon"><img src="assets/building_21_icon.png" alt="特殊"></td><td>特殊</td><td>200</td><td>—</td><td>9/9</td><td>5</td><td>0</td><td>1×1</td><td>6</td><td>30</td><td>50</td><td>100</td><td>20</td><td>场景特殊物件（非普通建筑）</td></tr>
+  <tr><td>22</td><td class="icon"><img src="assets/building_22_icon.png" alt="铁矿"></td><td>铁矿</td><td>10000</td><td>—</td><td>9/9</td><td>0</td><td>0</td><td>3×3</td><td>3</td><td>—</td><td>—</td><td>—</td><td>—</td><td>铁资源点（不可建造）</td></tr>
+  <tr><td>23</td><td class="icon"><img src="assets/building_23_icon.png" alt="钱庄"></td><td>钱庄</td><td>1600</td><td>—</td><td>9/9</td><td>6</td><td>0</td><td>3×3</td><td>2</td><td>30</td><td>400</td><td>800</td><td>200</td><td>出售木材/粮食/铁</td></tr>
+  <tr><td>24</td><td class="icon"><img src="assets/building_24_icon.png" alt="民居"></td><td>民居</td><td>800</td><td>—</td><td>9/9</td><td>0</td><td>0</td><td>2×2</td><td>3</td><td>—</td><td>—</td><td>—</td><td>—</td><td>金资源点（不可建造）</td></tr>
+  <tr><td>25</td><td class="icon"><img src="assets/building_25_icon.png" alt="民居"></td><td>民居</td><td>800</td><td>—</td><td>9/9</td><td>0</td><td>0</td><td>2×2</td><td>2</td><td>—</td><td>—</td><td>—</td><td>—</td><td>金资源点（另一阵营美术）</td></tr>
+  <tr><td>26</td><td class="icon"><img src="assets/building_26_icon.png" alt="大旗"></td><td>大旗</td><td>1000</td><td>—</td><td>9/9</td><td>6</td><td>0</td><td>1×1</td><td>2</td><td>30</td><td>300</td><td>1000</td><td>300</td><td>士气旗；被摧毁时己方全体士气 -50</td></tr>
+</table>
+</div>
+<p class="meta">攻B 只有箭楼 18/19 非 0；资源点 22/24/25 的费用为 0。frame 0 = 完好/满存量，末帧 = 最残破/枯竭；多帧不等于全部施工阶段（帅帐 0/1 只用 9→8→1→0）。</p>
+
+<h2>建造菜单：13 类、A/B 两套美术</h2>
+<p>原版建造命令是 <code>16150 + typeId</code>（<code>0x3F16 + typeId</code>），覆盖 0–26。BMP 图标帧 58–73 为 A 套，74–89 为 B 套。</p>
+<div class="scroll">
+<table>
+  <tr><th>类别</th><th>代表 ID</th><th>A 套命令/帧</th><th>B 套命令/帧</th><th>重制可建</th><th>原版页面/备注</th></tr>
+  <tr><td>帅帐</td><td>0/1</td><td>16150 / 58</td><td>16151 / 74</td><td><span class="ok">✓</span></td><td>第一页</td></tr>
+  <tr><td>粮仓</td><td>10/11</td><td>16160 / 59</td><td>16161 / 75</td><td><span class="ok">✓</span></td><td>第一页</td></tr>
+  <tr><td>木材场</td><td>4/5</td><td>16154 / 60</td><td>16155 / 76</td><td><span class="ok">✓</span></td><td>第一页</td></tr>
+  <tr><td>武器库</td><td>2/3</td><td>16152 / 61</td><td>16153 / 77</td><td><span class="ok">✓</span></td><td>第一页</td></tr>
+  <tr><td>钱庄</td><td>23</td><td>16173 / 62</td><td>16173 / 78</td><td><span class="ok">✓</span></td><td>第一页</td></tr>
+  <tr><td>步兵所</td><td>12/13</td><td>16162 / 63</td><td>16163 / 79</td><td><span class="ok">✓</span></td><td>第一页</td></tr>
+  <tr><td>弓兵所</td><td>14/15</td><td>16164 / 65</td><td>16165 / 81</td><td><span class="ok">✓</span></td><td>第一页</td></tr>
+  <tr><td>骑兵所</td><td>6/7</td><td>16156 / 64</td><td>16157 / 80</td><td><span class="ok">✓</span></td><td>第一页</td></tr>
+  <tr><td>车兵所</td><td>8/9</td><td>16158 / 66</td><td>16159 / 82</td><td><span class="no">✗</span></td><td>第一页</td></tr>
+  <tr><td>船坞</td><td>20</td><td>16170 / 67</td><td>16170 / 83</td><td><span class="no">✗</span></td><td>第二页</td></tr>
+  <tr><td>箭楼</td><td>18/19</td><td>16168 / 68</td><td>16169 / 84</td><td><span class="ok">✓</span></td><td>第二页</td></tr>
+  <tr><td>大旗</td><td>26</td><td>16176 / 69</td><td>16176 / 85</td><td><span class="ok">✓</span></td><td>第二页</td></tr>
+  <tr><td>城门</td><td>16/17</td><td>16166 / 70</td><td>16167 / 86</td><td><span class="no">✗</span></td><td>第二页</td></tr>
+  <tr><td>民居（信息）</td><td>24/25</td><td>16186 / 73</td><td>16187 / 89</td><td><span class="no">✗</span></td><td>信息图标</td></tr>
+</table>
+</div>
+<p class="meta">0x111DE 第一页 9 项：帅帐、粮仓、木材场、武器库、钱庄、步兵所、弓兵所、骑兵所、车兵所。车兵所/船坞/城门在原版命令表存在，重制设计不放行。民居只有信息图标 16186/16187，不可建造。</p>
+
+<div class="grid2" style="margin-top:14px">
+  <div class="panel"><h3>建造菜单第一页（示意）</h3><img src="assets/build_menu_mock.png" alt="建造菜单第一页">
+    <div class="cap">3×3 排布仅用于展示 9 个条目；实际面板为 0x111DE，图标来自 BMP 帧 58–66。</div></div>
+  <div class="panel"><h3>A 套建造图标</h3><img src="assets/build_icons_A.png" alt="A 套建造图标">
+    <div class="cap">帧 58–73：13 类 + 翻页 + 民居信息。民居 73 是 40×40 单态。</div></div>
+</div>
+
+<h2>建造前置：原版代码 vs 重制设计</h2>
+<div class="grid2">
+  <div class="panel">
+    <h3>原版：FUN_00428810 菜单掩码</h3>
+    <table>
+      <tr><th>目标</th><th>原版代码前置</th></tr>
+      <tr><td>钱庄 23</td><td>帅帐 0/1</td></tr>
+      <tr><td>步兵所 12/13</td><td>粮仓 10/11</td></tr>
+      <tr><td>弓兵所 14/15</td><td>木材场 4/5</td></tr>
+      <tr><td>骑兵所 6/7</td><td>粮仓 10/11 + 木材场 4/5</td></tr>
+      <tr><td>帅帐、粮仓、木材场、武器库、车兵所</td><td>无</td></tr>
+    </table>
+    <div class="cap">由 0x4A1818 指针顺序（bit4 钱庄、bit5 步兵、bit6 弓兵、bit7 骑兵）和掩码清位反推；武器库标志用于第二菜单，尚未逐位截图核对。</div>
+  </div>
+  <div class="panel">
+    <h3>重制/docs 设计</h3>
+    <table>
+      <tr><th>目标</th><th>设计前置</th></tr>
+      <tr><td>步兵所 12/13</td><td>粮仓 10/11</td></tr>
+      <tr><td>弓兵所 14/15</td><td>木材场 4/5</td></tr>
+      <tr><td>箭楼 18/19</td><td>木材场 4/5</td></tr>
+      <tr><td>骑兵所 6/7</td><td>武器库 2/3</td></tr>
+    </table>
+    <div class="cap">重制版写进 <code>main.gd::prerequisites</code>；与原版第一页掩码的骑兵前置不同，保留差异。</div>
+  </div>
+</div>
+<div class="note warn">关键差异：原版第一页掩码不读取武器库标志；骑兵所由粮仓+木材场控制。武器库标志用于 <code>uVar2</code> 第二建造菜单（船坞/箭楼/大旗/城门/建筑侧），逐位映射待实机核对。</div>
+
+<h2>建造流程与工地</h2>
+<div class="flow">
+  <div>选带工武将队伍</div><i>→</i>
+  <div>「建造」选条目</div><i>→</i>
+  <div><code>FUN_0041FF30</code> 查四资源</div><i>→</i>
+  <div><code>FUN_00457860</code> 预览</div><i>→</i>
+  <div><code>FUN_0045C320</code> 落工地 HP=0</div><i>→</i>
+  <div>工人每 4 tick +2 HP</div><i>→</i>
+  <div><code>FUN_0045E130</code> 1/3、2/3、满换帧/完工</div>
+</div>
+<div class="grid2" style="margin-top:14px">
+  <div class="panel"><h3>帅帐工地帧（type 0/1）</h3><img src="assets/hq_frames.png" alt="帅帐帧">
+    <div class="cap">上 10 帧属于帅帐 0，下 8 帧属于帅帐 1。工地 HP 0 → firstFrame+9，≥1/3 → +8，≥2/3 → +1，满 → +0。frame 0 是完好，末帧最残破。</div></div>
+  <div class="panel"><h3>步兵所帧（12/13）</h3><img src="assets/barracks_frames.png" alt="步兵所帧">
+    <div class="cap">多数建筑只有 2 帧：完好 / 损毁；工地阈值仍是 0、1/3、2/3、满，由 FUN_0045E130 选帧。</div></div>
+</div>
+<p class="meta">工人 +2 HP/4 tick、取消退款 75%（FUN_00420070 *0x4B/100）与修理 +16 HP/各资源 −16（FUN_00421DC0）均有原版代码证据；训练周期=单位最大HP（FUN_0045CC50），v13=20 只解析不读取。</p>
+
+<h2>产出：训练单位</h2>
+<div class="scroll">
+<table>
+  <tr><th>建筑</th><th>档位</th><th>单位</th><th>HP</th><th>金</th><th>木</th><th>粮</th><th>铁</th><th>周期 tick</th></tr>
+  <tr><td>帅帐 0/1</td><td>工人</td><td>工人 30 / 100</td><td>100</td><td>400</td><td>50</td><td>50</td><td>0</td><td>100</td></tr>
+  <tr><td>骑兵所 6/7</td><td>100</td><td>骑兵 36 / 100</td><td>100</td><td>800</td><td>100</td><td>200</td><td>100</td><td>100</td></tr>
+  <tr><td>骑兵所 6/7</td><td>200</td><td>骑兵 37 / 200</td><td>200</td><td>1600</td><td>200</td><td>400</td><td>200</td><td>200</td></tr>
+  <tr><td>骑兵所 6/7</td><td>500</td><td>骑兵 40 / 500</td><td>500</td><td>2400</td><td>300</td><td>1000</td><td>300</td><td>500</td></tr>
+  <tr><td>车兵所 8/9</td><td>车兵</td><td>车兵 34 / 100</td><td>100</td><td>800</td><td>300</td><td>100</td><td>400</td><td>100</td></tr>
+  <tr><td>步兵所 12/13</td><td>100</td><td>步兵 32 / 100</td><td>100</td><td>600</td><td>0</td><td>100</td><td>100</td><td>100</td></tr>
+  <tr><td>步兵所 12/13</td><td>200</td><td>步兵 38 / 200</td><td>200</td><td>1200</td><td>0</td><td>200</td><td>200</td><td>200</td></tr>
+  <tr><td>步兵所 12/13</td><td>500</td><td>步兵 41 / 500</td><td>500</td><td>1800</td><td>0</td><td>500</td><td>300</td><td>500</td></tr>
+  <tr><td>步兵所 12/13</td><td>1000</td><td>步兵 43 / 1000</td><td>1000</td><td>2400</td><td>0</td><td>1000</td><td>400</td><td>1000</td></tr>
+  <tr><td>弓兵所 14/15</td><td>100</td><td>弓兵 45 / 100</td><td>100</td><td>500</td><td>100</td><td>100</td><td>50</td><td>100</td></tr>
+  <tr><td>弓兵所 14/15</td><td>200</td><td>弓兵 39 / 200</td><td>200</td><td>1000</td><td>200</td><td>200</td><td>100</td><td>200</td></tr>
+  <tr><td>弓兵所 14/15</td><td>500</td><td>弓兵 42 / 500</td><td>500</td><td>1500</td><td>300</td><td>500</td><td>150</td><td>500</td></tr>
+  <tr><td>弓兵所 14/15</td><td>1000</td><td>弓兵 44 / 1000</td><td>1000</td><td>2000</td><td>400</td><td>1000</td><td>200</td><td>1000</td></tr>
+  <tr><td>船坞 20</td><td>快船</td><td>水兵 46 / 200</td><td>200</td><td>700</td><td>200</td><td>200</td><td>100</td><td>200</td></tr>
+  <tr><td>船坞 20</td><td>运输船</td><td>运输船 47 / 100</td><td>100</td><td>500</td><td>200</td><td>100</td><td>100</td><td>100</td></tr>
+  <tr><td>船坞 20</td><td>战船</td><td>水兵 48 / 1000</td><td>1000</td><td>2100</td><td>600</td><td>1500</td><td>300</td><td>1000</td></tr>
+  <tr><td>船坞 20</td><td>连船</td><td>连船 49 / 2000</td><td>2000</td><td>2800</td><td>800</td><td>2000</td><td>400</td><td>2000</td></tr>
+</table>
+</div>
+<div class="note">周期 = 单位基础 HP 个 tick（100 HP=100 tick；FUN_0045CC50）。500/1000 档在 DATA.EXP 和菜单掩码中存在；重制当前只列 100/200。原版 <code>DAT_004b8d29</code> 由建筑/大本营状态写入（FUN_0046C710），<b>不是关卡 init[0]</b>。</div>
+
+<h2>产出：研究 / 出售 / 粮容</h2>
+<div class="grid2">
+  <div class="panel"><h3>研究</h3>
+    <table>
+      <tr><th>建筑</th><th>线 / 等级</th><th>费用（金/木/铁）</th></tr>
+      <tr><td>木材场 4/5</td><td>弓术 1/2/3</td><td>800/400/0；1500/400/100；2000/800/500</td></tr>
+      <tr><td>武器库 2/3</td><td>兵器 1/2/3</td><td>800/0/100；2000/600/300；3000/1000/500</td></tr>
+      <tr><td>武器库 2/3</td><td>甲胄 1/2/3</td><td>600/300/100；1200/600/200；1600/900/300</td></tr>
+      <tr><td>车兵所 8/9</td><td>投石车 1/2</td><td>1500/500/400；3000/1000/800</td></tr>
+      <tr><td>船坞 20</td><td>快船/战船/装甲</td><td>700/400/400；1500/1000/800；800/500/500</td></tr>
+      <tr><td>帅帐 0/1</td><td>升二/三/四级</td><td>2000/1000/700；3000/2000/1000；5000/3000/2000</td></tr>
+    </table>
+    <div class="cap">研究占 200 tick（FUN_0045ECD0）；同建筑同时一项；取消退 75%（FUN_00420070）。</div>
+  </div>
+  <div class="panel"><h3>钱庄出售</h3>
+    <table>
+      <tr><th>项</th><th>支出</th><th>获得金</th></tr>
+      <tr><td>卖木一千</td><td>木 1000</td><td>500</td></tr>
+      <tr><td>卖铁一千</td><td>铁 1000</td><td>800</td></tr>
+      <tr><td>卖粮一千</td><td>粮 1000</td><td>1000</td></tr>
+      <tr><td>卖木五千</td><td>木 5000</td><td>2500</td></tr>
+      <tr><td>卖铁五千</td><td>铁 5000</td><td>4000</td></tr>
+      <tr><td>卖粮五千</td><td>粮 5000</td><td>5000</td></tr>
+    </table>
+    <div class="cap">按 DATA.EXP 费用行 12–17 与 M_ESTABL 6 行列表；docs 的粮/铁 1000 档价格写反，本文按原始行订正。</div>
+  </div>
+</div>
+<div class="note"><b>粮容</b>：每座已建成帅帐 0/1 或粮仓 10/11 提供 +10000。代码：FUN_00442970/42B90 增删计数，FUN_004262F0 用 count×10000 判断。敌方粮仓也可作为粮食资源点被采集，粮池耗尽后销毁。</div>
+
+<h2>资源点：铁矿 / 民居（不可建造）</h2>
+<div class="grid2">
+  <div class="panel"><h3>民居 24 / 25</h3><img src="assets/house_frames.png" alt="民居帧">
+    <div class="cap">24 有 3 帧，25 有 2 帧；800 HP，2×2，视野 0，500 金。工人三趟 200/200/100 取完，建筑消失。没有 16174/16175 建造命令；16186/16187 只是信息图标。</div></div>
+  <div class="panel"><h3>铁矿 22</h3><img src="assets/iron_frames.png" alt="铁矿帧">
+    <div class="cap">10000 HP，3×3，视野 0，铁资源点；3 帧按存量从满到枯竭。不可建造，无 16172 建造图标。</div></div>
+</div>
+<div class="panel" style="margin-top:14px"><h3>特殊 21（6 帧）</h3><img src="assets/special_frames.png" alt="特殊帧">
+  <div class="cap">原图包含树/金堆/土堆等场景物件组合，不是普通经济建筑；无建造图标，作关卡脚本/障碍/目标使用。是否 6 帧全是阶段仍是未知项。</div></div>
+
+<h2>素材与帧语义</h2>
+<div class="grid2">
+  <div class="panel"><h3>城门 16/17</h3><img src="assets/gate_frames.png" alt="城门帧">
+    <div class="cap">两帧开/关；2×2，1400 HP，视野 6。重制/文档：门洞通行随开闭，敌军不能触发开启。</div></div>
+  <div class="panel"><h3>船坞 20</h3><img src="assets/dock_frames.png" alt="船坞帧">
+    <div class="cap">3 帧；3×3，1600 HP；训练快船/运输船/战船/连船，水军研究。</div></div>
+</div>
+<p class="meta">素材：<code>assets/building_XX_frames.png</code> 逐类全帧，<code>build_icons_A/B.png</code> 建造图标，<code>original_build_menu_sheet.png</code> 三状态带标注总表。精灵 UNIT.LWC + BATTLE.PAL；图标 BMP.LWC + SCORE.PAL；索引 0 透明。</p>
+
+<h2>证据</h2>
+<table>
+  <tr><th>结论</th><th>Evidence / 地址</th></tr>
+  <tr><td>四资源费用检查</td><td><code>FUN_0041FF30</code> · ev_a84eba1b…</td></tr>
+  <tr><td>建造菜单前置掩码</td><td><code>FUN_00428810</code> · ev_fec20239…</td></tr>
+  <tr><td>建造命令 → 预览/模式</td><td><code>FUN_00428A50</code> · ev_b55dca03…</td></tr>
+  <tr><td>工人 +2 HP / 4 tick</td><td><code>FUN_0045C320</code> · ev_82c3b230…</td></tr>
+  <tr><td>工地 1/3、2/3、满 / 完工经验</td><td><code>FUN_0045E130</code> · ev_104394d0…</td></tr>
+  <tr><td>粮容 / 粮仓计数</td><td><code>FUN_004262F0</code> · <code>FUN_00442970</code> · <code>FUN_00442B90</code></td></tr>
+  <tr><td>生产/研究面板掩码</td><td><code>FUN_00426E40</code> · ev_c65228d1…</td></tr>
+  <tr><td>建筑存在标志</td><td><code>FUN_00460610</code> · ev_e3a6b5d4…</td></tr>
+  <tr><td>16150–16187 按钮表</td><td><code>FUN_00411400</code> · ev_a8bc19ad…</td></tr>
+</table>
+
+<h2>文件</h2>
+<ul>
+  <li><a href="data/buildings.json">data/buildings.json</a> — 27 类建筑、费用、帧、前置、产出、证据</li>
+  <li><a href="data/build_menu.json">data/build_menu.json</a> — A/B 建造菜单、命令/帧、前置掩码</li>
+  <li><a href="data/production.json">data/production.json</a> — 生产/研究/出售数据</li>
+  <li><a href="data/buildings.csv">data/buildings.csv</a> — 平表</li>
+  <li><a href="tools/extract_buildings.mjs">tools/extract_buildings.mjs</a> — 可重复提取脚本</li>
+</ul>
+</body>
+</html>

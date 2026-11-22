@@ -1,0 +1,495 @@
+{
+  "schemaVersion": 1,
+  "generated": "2026-10-29",
+  "source": {
+    "file": "CB.EXE",
+    "sha256": "2db7cc102e6fde547ab05d77cfddabc2079f5bc9be9b6b59b17bf435c5798cb7",
+    "path": "_work/iso/CB.EXE",
+    "dataFile": "_work/iso/SET/DATA.EXP",
+    "decompiled": "_work/ghidra_export/CB.EXE.decompiled.c",
+    "note": "仅以原版 CB.EXE 静态分析为准；docs/ 与重制实现只用于差异对照。"
+  },
+  "global": {
+    "tickDefinition": "一次主循环（FUN_00454280 → FUN_0045AFE0 逻辑，再 FUN_0041F040 更新特效）",
+    "statusDurationTicks": 800,
+    "statusTimerRule": "FUN_00443550 置 flag 并把 unit+0x48+2*status 清零；FUN_0045B4E0 每个活跃状态每单位更新 +1，799 < timer 时清除（即第 800 次）。",
+    "statusFlags": {
+      "1": "激励",
+      "2": "加速",
+      "3": "减速",
+      "4": "远视",
+      "5": "混乱",
+      "6": "埋伏",
+      "7": "滚木"
+    },
+    "targetModel": {
+      "collectFunction": "FUN_00424980(1, target, list, 15)",
+      "teamMembersMax": 15,
+      "note": "除火攻/恢复外，点击目标后作用于目标所属队伍成员；不是以点击点为中心 2 格。"
+    },
+    "costTable": {
+      "16210": 50,
+      "16211": 100,
+      "16212": 100,
+      "16213": 100,
+      "16214": 200,
+      "16215": 100,
+      "16216": 100,
+      "16217": 10,
+      "16218": 100
+    },
+    "unlockMasks": {
+      "0": "0x000 (0 skills)",
+      "1": "0x001 (1 skill)",
+      "2": "0x181 (3 skills)",
+      "3": "0x1C1 (4 skills)",
+      "4": "0x1C9 (5 skills)",
+      "5": "0x1CF (7 skills)",
+      "6": "0x1EF (8 skills)",
+      "7-9": "0x1FF (9 skills)"
+    }
+  },
+  "skills": [
+    {
+      "order": 0,
+      "command": 16210,
+      "name": "激励",
+      "cost": 50,
+      "target": "己方队伍",
+      "status": 1,
+      "durationTicks": 800,
+      "effectKind": "strategyRegen",
+      "effect": {
+        "strategyPerPulse": 5,
+        "pulseEveryGlobalTicks": 100,
+        "cap": "2 × 智力 + 15",
+        "moraleDelta": 0,
+        "note": "只加谋略，不直接加士气；每 100 个全局更新结算一次。"
+      },
+      "code": [
+        "FUN_0045F8B0 case 1",
+        "FUN_0045B410",
+        "FUN_00443550"
+      ],
+      "evidence": [
+        "ev_67de12c79eb7cb6526deba7d5b91f7c988f42b0e9c305aede00b2f769b236b6a",
+        "ev_4adf2cb50fb2a0e080e4c89d27c2ceedb49c6b822a2cef6889b13085397ddaa1",
+        "ev_0a2476588107307eb3bca33061a20bca1ea98f12173e824369bbcff6e9fdb107"
+      ],
+      "confidence": "code"
+    },
+    {
+      "order": 1,
+      "command": 16211,
+      "name": "加速",
+      "cost": 100,
+      "target": "己方队伍",
+      "status": 2,
+      "durationTicks": 800,
+      "effectKind": "speedBuff",
+      "effect": {
+        "movementMultiplier": 2,
+        "attackRateMultiplier": 2,
+        "attackPeriod": "floor(1000 / (baseRate × 2))",
+        "clearsStatus": 3,
+        "note": "移动为每更新 2 个子格步进；攻击 rate 直接 ×2。不是 ×1.5。"
+      },
+      "code": [
+        "FUN_0045F8B0 case 2",
+        "FUN_0045B910",
+        "FUN_0045D440 / FUN_0045DD90"
+      ],
+      "evidence": [
+        "ev_67de12c79eb7cb6526deba7d5b91f7c988f42b0e9c305aede00b2f769b236b6a",
+        "ev_f459b4ce4800d84b111d24ab280c8684a3cfa9a2154c14a21205c1e446b0147d",
+        "ev_ccf1943e91410bd0d608b1700f6e4b1a608ac5aea4b3b5725de0cc8c7cee668e",
+        "ev_b5bb45330d1429de0c2d77140d4dbc87aef745b3f61c253f96bf0ede2d662d70"
+      ],
+      "confidence": "code"
+    },
+    {
+      "order": 2,
+      "command": 16212,
+      "name": "减速",
+      "cost": 100,
+      "target": "敌方队伍",
+      "status": 3,
+      "durationTicks": 800,
+      "effectKind": "speedDebuff",
+      "effect": {
+        "movementMultiplier": 0.5,
+        "attackRateMultiplier": 0.5,
+        "attackPeriod": "floor(1000 / (baseRate >> 1))",
+        "clearsStatus": 2,
+        "note": "移动只在奇数单位更新推进 1 步；攻击 rate 右移 1 位（奇数 rate 会取整）。"
+      },
+      "code": [
+        "FUN_0045F8B0 case 3",
+        "FUN_0045B910",
+        "FUN_0045D440 / FUN_0045DD90"
+      ],
+      "evidence": [
+        "ev_67de12c79eb7cb6526deba7d5b91f7c988f42b0e9c305aede00b2f769b236b6a",
+        "ev_f459b4ce4800d84b111d24ab280c8684a3cfa9a2154c14a21205c1e446b0147d",
+        "ev_ccf1943e91410bd0d608b1700f6e4b1a608ac5aea4b3b5725de0cc8c7cee668e",
+        "ev_b5bb45330d1429de0c2d77140d4dbc87aef745b3f61c253f96bf0ede2d662d70"
+      ],
+      "confidence": "code"
+    },
+    {
+      "order": 3,
+      "command": 16213,
+      "name": "远视",
+      "cost": 100,
+      "target": "己方队伍",
+      "status": 4,
+      "durationTicks": 800,
+      "effectKind": "visionOverride",
+      "effect": {
+        "visionCells": 10,
+        "mode": "override",
+        "baseVisionRestoredOnExpiry": true,
+        "note": "有效视野固定为 10 格，不是基础视野 +10；状态 4 写入后 FUN_00426280 直接返回 10。"
+      },
+      "code": [
+        "FUN_0045F8B0 case 4",
+        "FUN_00426280",
+        "FUN_004583E0",
+        "FUN_00457E60",
+        "FUN_0045B4E0"
+      ],
+      "evidence": [
+        "ev_67de12c79eb7cb6526deba7d5b91f7c988f42b0e9c305aede00b2f769b236b6a",
+        "ev_5ba5e8eb90eeefe767b581b111ea113d3719006625e4fc7212764093868dc824",
+        "ev_90dbf2b059cbc0c86345dca228d0094df8cc9effcb21f2a6935831adfb40e16e"
+      ],
+      "confidence": "code"
+    },
+    {
+      "order": 4,
+      "command": 16214,
+      "name": "混乱",
+      "cost": 200,
+      "target": "敌方队伍",
+      "status": 5,
+      "durationTicks": 800,
+      "effectKind": "actionBlock",
+      "effect": {
+        "actionCode": "0x1B",
+        "immediateInterrupt": false,
+        "behavior": "向阵营任务队列追加 0x1B 空转任务；该任务在状态 5 存在时不结束。它不会立即打断当前动作，队列轮到后才空转；状态结束后 0x1B 完成。",
+        "randomMovement": false,
+        "damage": 0
+      },
+      "code": [
+        "FUN_0045F8B0 case 5",
+        "FUN_0042AC00",
+        "FUN_0045FFF0"
+      ],
+      "evidence": [
+        "ev_67de12c79eb7cb6526deba7d5b91f7c988f42b0e9c305aede00b2f769b236b6a",
+        "ev_5dce2749b2cbb280ecb6faafbe6c8b3c7543d0d612b8855ad88b5828217135b6",
+        "ev_3497ae54c743bcf492d599f020da950370b579854bcc5824f6995eb01a3f42be"
+      ],
+      "confidence": "code"
+    },
+    {
+      "order": 5,
+      "command": 16215,
+      "name": "滚木",
+      "cost": 100,
+      "target": "己方队伍",
+      "status": 7,
+      "durationTicks": 800,
+      "effectKind": "moraleAttack",
+      "effect": {
+        "scanEveryTicks": 30,
+        "scanRange": "caster vision (10 if status 4)",
+        "targetsPerScan": 1,
+        "moraleDelta": -50,
+        "hpDamage": 0,
+        "clearOnHit": true,
+        "note": "每个受术单位独立执行 0x1C 任务；取扫描列表第一个敌人，作用于其武将士气；不是 2 格 40 伤害。"
+      },
+      "code": [
+        "FUN_0045F8B0 case 7",
+        "FUN_004247A0",
+        "FUN_00460020"
+      ],
+      "evidence": [
+        "ev_67de12c79eb7cb6526deba7d5b91f7c988f42b0e9c305aede00b2f769b236b6a",
+        "ev_fe985a299d60f4f0ed1a12a64eaae3f9f4cc05b75ac803e2736e5c17553cdc68",
+        "ev_2b3a0a263699f41c1efe6a9ad1cf03786f96993a8179696f1e85dfb6d6a3118d"
+      ],
+      "confidence": "code"
+    },
+    {
+      "order": 6,
+      "command": 16216,
+      "name": "埋伏",
+      "cost": 100,
+      "target": "己方队伍",
+      "status": 6,
+      "durationTicks": 800,
+      "effectKind": "ambushAttack",
+      "effect": {
+        "affectedTypes": [
+          32,
+          45
+        ],
+        "affectedNames": [
+          "步兵",
+          "弓兵"
+        ],
+        "rangeMode": "vision",
+        "ranges": {
+          "32": 5,
+          "45": 7
+        },
+        "attackDamage": 30,
+        "damageKind": "fixed raw (effect type 8)",
+        "stealth": false,
+        "note": "只对步兵/弓兵改变攻击分支；不是隐身，不会被索敌/选目标过滤。"
+      },
+      "code": [
+        "FUN_0045F8B0 case 6",
+        "FUN_00424C70",
+        "FUN_0045D440",
+        "FUN_00421050",
+        "FUN_00453580"
+      ],
+      "evidence": [
+        "ev_67de12c79eb7cb6526deba7d5b91f7c988f42b0e9c305aede00b2f769b236b6a",
+        "ev_3ea0fda78ace29ad6a807fedfbd2e6ebd295dcb4c48a3f831cf7822e797029b7",
+        "ev_9a099924b552e8a29c128ffa14446f514dd3c9bf18758061881d5a62ab870ad7",
+        "ev_de0356c2393602dd99716ed7448cd26b42a1b035f4cd959f413e0e336ad6677d"
+      ],
+      "confidence": "code; type 32/45 identified from DATA.EXP"
+    },
+    {
+      "order": 7,
+      "command": 16217,
+      "name": "恢复",
+      "cost": 10,
+      "target": "己方队伍",
+      "status": null,
+      "durationTicks": 0,
+      "effectKind": "heal",
+      "effect": {
+        "hpDelta": 50,
+        "target": "selected group leader",
+        "teamWide": false,
+        "clampToMax": true,
+        "note": "只给目标队伍的主将/武将本体 +50 HP；不是全队治疗。"
+      },
+      "code": [
+        "FUN_0045F8B0 case 8",
+        "FUN_004254D0"
+      ],
+      "evidence": [
+        "ev_67de12c79eb7cb6526deba7d5b91f7c988f42b0e9c305aede00b2f769b236b6a"
+      ],
+      "confidence": "code"
+    },
+    {
+      "order": 8,
+      "command": 16218,
+      "name": "火攻",
+      "cost": 100,
+      "target": "地面格",
+      "status": null,
+      "durationTicks": 100,
+      "effectKind": "fireField",
+      "effect": {
+        "aoeRadiusCells": 0,
+        "damagePerHit": 10,
+        "damageIntervalTicks": 4,
+        "durationTicks": 100,
+        "firstHitTick": 5,
+        "lastHitTick": 97,
+        "maxHits": 24,
+        "maxTotalDamage": 240,
+        "nominalSlots": 25,
+        "defenseApplies": false,
+        "friendlyFire": true,
+        "note": "单个地面格；每 4 次主循环对格上单位直接扣 10 HP；100 次后结束。首击在第 5 次更新，因此 100 次窗口内是 24 次命中（240 HP），不是 25 次。"
+      },
+      "code": [
+        "FUN_0045F8B0 case 9",
+        "FUN_00453A80",
+        "FUN_00453060 case 7",
+        "FUN_00453D10",
+        "FUN_00453EF0"
+      ],
+      "evidence": [
+        "ev_67de12c79eb7cb6526deba7d5b91f7c988f42b0e9c305aede00b2f769b236b6a",
+        "ev_fc3c4a6936ab09d5d4888356132007249dafa382fb53f2f7c134dfe41ff6e472",
+        "ev_a86ab41e5e39a2aa8102a8042ef648902ec3d6e44da18e4f7b3daa7a95b59136",
+        "ev_9b70a3193f9509cae873856a07ec8f3de887f54bf4b9b030472cdb861edf12a0",
+        "ev_88d3d5984c3664f824cdccf56577153387a97bc5776c10a0655887c6a3177c01"
+      ],
+      "confidence": "code"
+    }
+  ],
+  "fire": {
+    "command": 16218,
+    "function": "FUN_00453A80(x, y, 100, 4, 1)",
+    "effectType": 7,
+    "damagePerHit": 10,
+    "damageIntervalTicks": 4,
+    "durationTicks": 100,
+    "firstHitTick": 5,
+    "lastHitTick": 97,
+    "maxHits": 24,
+    "maxTotalDamage": 240,
+    "nominalSlots": 25,
+    "aoeRadiusCells": 0,
+    "target": "clicked ground tile",
+    "defenseApplies": false,
+    "ownerCheck": false,
+    "friendlyFire": true,
+    "wallClock": {
+      "20ms/tick": "2.0 s, 120 HP/s",
+      "30ms/tick": "3.0 s, 80 HP/s",
+      "50ms/tick": "5.0 s, 48 HP/s",
+      "100ms/tick": "10.0 s, 24 HP/s"
+    },
+    "expiry": "FUN_00453EF0：结束时可在 tile<4 的地形上加 8（焦土变体）并清理火场。",
+    "note": "100 次主循环，不是 20 DPS × 6 秒；伤害为固定 10，不经过防御公式，不检查阵营。首击在 update 5，100 tick 内实际 24 次命中（240 HP）。"
+  },
+  "speed": {
+    "movement": {
+      "normal": 1,
+      "haste": 2,
+      "slow": 0.5,
+      "rule": "FUN_0045B910：iVar13=2 时子格步进×2；iVar13=0 时只在奇数单位更新推进一次；状态 2/3 互斥。",
+      "note": "普通地面单位以 1 为基准；部分特殊单位原本就是 2 步，不因加速额外叠加。"
+    },
+    "attack": {
+      "baseRateField": "DAT_004AF58F[type]",
+      "periodFormula": "period = floor(1000 / rate)",
+      "haste": "rate × 2 → 周期约减半",
+      "slow": "rate >> 1 → 周期约加倍",
+      "integerNote": "rate 为奇数时右移会截断，实际不是精确 0.5×；周期用整数除法。",
+      "functions": [
+        "FUN_0045D440",
+        "FUN_0045DD90"
+      ],
+      "note": "只确认攻击/动作两支；没有在修理函数看到 status2/3 读取，不能直接断言修理也受影响。"
+    }
+  },
+  "farsight": {
+    "command": 16213,
+    "status": 4,
+    "visionCells": 10,
+    "mode": "override",
+    "durationTicks": 800,
+    "baseVisionRestored": true,
+    "code": "FUN_00426280: if status4 (unit+0x64) == 1 return 10; else DATA.EXP v5",
+    "reveal": "FUN_004583E0 / FUN_00457E60",
+    "target": "target team members",
+    "note": "10 格是覆盖值，不是 +10；状态到期时先按 10 格移除，再按基础视野重新标记。"
+  },
+  "remakeDeltas": [
+    {
+      "topic": "状态持续",
+      "docsOrRemake": "部分旧研究仍写“800 tick 未确认”；docs 的 800 是正确方向。",
+      "original": "800 次单位更新，FUN_0045B4E0 在 799 < timer 时清除。",
+      "action": "以 800 tick 为准；按游戏速度换算墙钟。"
+    },
+    {
+      "topic": "激励",
+      "docsOrRemake": "士气 +15，并进入激励。",
+      "original": "状态 1；每 100 个全局 tick 谋略 +5，上限 2×智+15；没有直接士气 +15。",
+      "action": "移除直接士气加成，改为谋略回复。"
+    },
+    {
+      "topic": "加速",
+      "docsOrRemake": "移动 ×1.5，攻击/修理 ×2。",
+      "original": "移动 ×2；攻击 rate ×2；未在修理函数看到状态读取。",
+      "action": "移动改 ×2；不要写修理 ×2，除非另找证据。"
+    },
+    {
+      "topic": "减速",
+      "docsOrRemake": "移动 ×0.5，攻击/修理 ÷2。",
+      "original": "移动 ×0.5（奇数更新走 1 步）；攻击 rate >>1；修理未确认。",
+      "action": "移动/攻击方向正确；修理需分开验证。"
+    },
+    {
+      "topic": "远视",
+      "docsOrRemake": "揭雾半径固定 10 格。",
+      "original": "状态 4 覆盖有效视野为 10 格，800 tick；到期恢复基础视野。",
+      "action": "方向正确；实现为覆盖，不是 +10。"
+    },
+    {
+      "topic": "混乱",
+      "docsOrRemake": "暂停一切行动，保留命令/目标/进度。",
+      "original": "设置状态 5，并向阵营任务队列追加 0x1B 空转任务；不立即打断当前动作，队列轮到后空转，状态结束才完成。",
+      "action": "不要当成即时硬控；按队列语义实现或明确简化。"
+    },
+    {
+      "topic": "滚木",
+      "docsOrRemake": "目标 2 格内敌方非建筑立即 40 伤害。",
+      "original": "状态 7 + 每单位 0x1C 任务；每 30 tick 在施法者视野内取第一个敌人，对其武将士气 −50；无 HP 伤害；命中后清状态。",
+      "action": "移除 2 格/40 伤害，改为视野索敌 + 士气 −50。"
+    },
+    {
+      "topic": "埋伏",
+      "docsOrRemake": "进入隐蔽，不被索敌/选为目标。",
+      "original": "状态 6；仅步兵(32)/弓兵(45)：攻击射程改为视野（5/7），攻击改为固定 30 伤害的特效；没有隐身。",
+      "action": "不要实现隐身；按类型 32/45 的射程/伤害分支处理。"
+    },
+    {
+      "topic": "恢复",
+      "docsOrRemake": "当前兵力 +50，不超过最大 HP。",
+      "original": "目标队伍主将 +50 HP，封顶；单体，非全队。",
+      "action": "保留 +50；确认目标是 leader。"
+    },
+    {
+      "topic": "火攻",
+      "docsOrRemake": "1.5 格内敌人，20 伤害/秒，持续 6 秒。",
+      "original": "单格火场；每次 10 HP，每 4 次更新一次，寿命 100 次更新；最多 25 次/250 HP；无防御/阵营检查。",
+      "action": "移除 AOE/20 DPS/6 秒模型，按单格 100 tick 火场实现。"
+    },
+    {
+      "topic": "群体目标",
+      "docsOrRemake": "以目标为中心 2 格内同方单位，最多 15。",
+      "original": "FUN_00424980 直接收集目标所属队伍成员，最多 15；不是 2 格范围。",
+      "action": "以队伍成员为目标集合。"
+    }
+  ],
+  "evidence": {
+    "dispatch": "ev_67de12c79eb7cb6526deba7d5b91f7c988f42b0e9c305aede00b2f769b236b6a",
+    "statusSet": "ev_0a2476588107307eb3bca33061a20bca1ea98f12173e824369bbcff6e9fdb107",
+    "statusGet": "ev_ac48a6f3826f5e7e51c57f84d77dfc25e65482355694e4350508f64ce9bef8db",
+    "statusExpiry": "ev_90dbf2b059cbc0c86345dca228d0094df8cc9effcb21f2a6935831adfb40e16e",
+    "inspire": "ev_4adf2cb50fb2a0e080e4c89d27c2ceedb49c6b822a2cef6889b13085397ddaa1",
+    "movement": "ev_f459b4ce4800d84b111d24ab280c8684a3cfa9a2154c14a21205c1e446b0147d",
+    "attackMelee": "ev_ccf1943e91410bd0d608b1700f6e4b1a608ac5aea4b3b5725de0cc8c7cee668e",
+    "attackRanged": "ev_b5bb45330d1429de0c2d77140d4dbc87aef745b3f61c253f96bf0ede2d662d70",
+    "fireCreate": "ev_fc3c4a6936ab09d5d4888356132007249dafa382fb53f2f7c134dfe41ff6e472",
+    "fireUpdate": "ev_a86ab41e5e39a2aa8102a8042ef648902ec3d6e44da18e4f7b3daa7a95b59136",
+    "fireDamage": "ev_9b70a3193f9509cae873856a07ec8f3de887f54bf4b9b030472cdb861edf12a0",
+    "fireEnd": "ev_88d3d5984c3664f824cdccf56577153387a97bc5776c10a0655887c6a3177c01",
+    "vision": "ev_5ba5e8eb90eeefe767b581b111ea113d3719006625e4fc7212764093868dc824",
+    "findEnemies": "ev_fe985a299d60f4f0ed1a12a64eaae3f9f4cc05b75ac803e2736e5c17553cdc68",
+    "collectTeam": "ev_a38bf4602cb5cb9ef1747106b6330ea4970e476e69ea75187fbc99c809684bf7",
+    "ambushEffect": "ev_9a099924b552e8a29c128ffa14446f514dd3c9bf18758061881d5a62ab870ad7",
+    "ambushRange": "ev_3ea0fda78ace29ad6a807fedfbd2e6ebd295dcb4c48a3f831cf7822e797029b7",
+    "attackHit": "ev_de0356c2393602dd99716ed7448cd26b42a1b035f4cd959f413e0e336ad6677d",
+    "fireQueue": "ev_7c9be711a29e8fd1ab597f540a7ca4b1597f629404780b15b99e68306d6907f0",
+    "actionQueue": "ev_5dce2749b2cbb280ecb6faafbe6c8b3c7543d0d612b8855ad88b5828217135b6",
+    "confusionAction": "ev_3497ae54c743bcf492d599f020da950370b579854bcc5824f6995eb01a3f42be",
+    "logs": "ev_2b3a0a263699f41c1efe6a9ad1cf03786f96993a8179696f1e85dfb6d6a3118d",
+    "mainLoop": "ev_56b24492606ec0fb456e373ad309a9f9b0dc5e8120b723fba88c1f07ba0a8f4a",
+    "effectFrame": "ev_1895a83b14da94856e63ed57449a2a6268b25f9aba595e35c33d2348728d4042",
+    "gameUpdate": "ev_39bb4716bb0535b7b4bb9e0080024395f0dc75f2d77f2f3e4682cf2c92b0d6f1"
+  },
+  "assets": {
+    "iconSheet": "assets/stratagems_sheet.png",
+    "statusTimeline": "assets/status_timeline.svg",
+    "speedCompare": "assets/speed_compare.svg",
+    "fireTimeline": "assets/fire_timeline.svg",
+    "farsightGrid": "assets/farsight_grid.svg"
+  }
+}

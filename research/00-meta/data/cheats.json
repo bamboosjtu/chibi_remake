@@ -1,0 +1,287 @@
+{
+  "schemaVersion": 1,
+  "generated": "2026-10-28",
+  "source": {
+    "file": "CB.EXE",
+    "sha256": "2db7cc102e6fde547ab05d77cfddabc2079f5bc9be9b6b59b17bf435c5798cb7",
+    "size": 595968,
+    "eternalFileOffset": 538616,
+    "eternalVA": "0x484BF8"
+  },
+  "headline": "原版作弊模式：Enter 信息条 → 输入 eternal → 清关 flag 0x484BEC=1；之后 F2–F9 的作弊键才生效。",
+  "activation": {
+    "openInput": "Enter（0x0D）→ FUN_0040E3E0(1)，切换 DAT_00482A10 信息输入条",
+    "code": "eternal",
+    "codeVA": "0x484BF8",
+    "inputIndex": "DAT_00484BF0",
+    "requiredPrefix": "etern",
+    "matchLength": 5,
+    "flag": "DAT_00484BEC",
+    "toggle": "每匹配一轮：flag = 1 - flag（开启/关闭）",
+    "case": "代码比较的是字符串小写字节；用英文小写 eternal 最稳。",
+    "confirm": "第 5 个字符 n 时已匹配并翻转；完整输入 eternal 仍可，后两个字符不会撤销。",
+    "note": "历史文章写 Enter → Eternal → Enter 开启；代码只检查前 5 个字符，因此 etern 也能触发。"
+  },
+  "cheats": [
+    {
+      "key": "F2",
+      "vk": "0x71",
+      "codeAddress": "0x454571",
+      "name": "自动进行游戏 / 小兵自动",
+      "kind": "toggle",
+      "global": "DAT_00485318",
+      "effect": "切换自动/托管标志；主更新 FUN_0045AFE0 根据它改变各势力的 AI 更新分支。",
+      "requiresCheat": true,
+      "evidence": [
+        "CB.EXE 0x454571",
+        "FUN_0045AFE0",
+        "ev_39bb4716…"
+      ],
+      "confidence": "code + historical cheat list"
+    },
+    {
+      "key": "F3",
+      "vk": "0x72",
+      "codeAddress": "0x454593",
+      "name": "选中武将降级",
+      "kind": "decrement",
+      "global": "DAT_004AE144[officer]",
+      "effect": "对当前选中的武将调用 FUN_0042B190(0)：等级 -1（最低 0），并刷新官职/面板。",
+      "requiresCheat": true,
+      "evidence": [
+        "CB.EXE 0x454593",
+        "FUN_0042B190",
+        "ev_31c38143…"
+      ],
+      "confidence": "code"
+    },
+    {
+      "key": "F4",
+      "vk": "0x73",
+      "codeAddress": "0x4545AF",
+      "name": "选中武将升级",
+      "kind": "increment",
+      "global": "DAT_004AE144[officer]",
+      "effect": "对当前选中的武将调用 FUN_0042B190(1)：等级 +1（最高 9），并刷新官职/面板。",
+      "requiresCheat": true,
+      "evidence": [
+        "CB.EXE 0x4545AF",
+        "FUN_0042B190",
+        "ev_31c38143…"
+      ],
+      "confidence": "code"
+    },
+    {
+      "key": "F5",
+      "vk": "0x74",
+      "codeAddress": "0x4545CB",
+      "name": "界面/指针显示开关（待实机确认）",
+      "kind": "toggle",
+      "global": "DAT_00483190 + DAT_00484C00",
+      "effect": "同时翻转 UI 命中区域计数/标志与光标刷新状态，并调用 FUN_00402840 重置光标矩形。具体画面表现需逐帧截图确认。",
+      "requiresCheat": true,
+      "evidence": [
+        "CB.EXE 0x4545CB",
+        "FUN_00402840",
+        "FUN_0041CDA0",
+        "ev_f052ea80…"
+      ],
+      "confidence": "code confirms flags; visual label inferred"
+    },
+    {
+      "key": "F6",
+      "vk": "0x75",
+      "codeAddress": "0x45460B",
+      "name": "取消建造前置/菜单限制",
+      "kind": "toggle",
+      "global": "DAT_00483424",
+      "effect": "FUN_00428810 在开启时把建造菜单两组掩码直接设为 0xFFFF；FUN_00428A50 的建造流程在该标志为 1 时绕过“前置/位置”失败分支。资源是否仍扣减需按具体建造入口分别验证。",
+      "requiresCheat": true,
+      "evidence": [
+        "CB.EXE 0x45460B",
+        "FUN_00428810",
+        "FUN_00428A50",
+        "ev_fec20239…",
+        "ev_b55dca03…"
+      ],
+      "confidence": "code"
+    },
+    {
+      "key": "F7",
+      "vk": "0x76",
+      "codeAddress": "0x45462D",
+      "name": "无敌",
+      "kind": "toggle",
+      "global": "DAT_00483428",
+      "effect": "FUN_0041FE90/FUN_0041FEE0 中，若标志为 1 且受击方 owner 等于当前 side，伤害强制为 0。注意：外网有文章把它写成“建造/行进加速”，与代码不符。",
+      "requiresCheat": true,
+      "evidence": [
+        "CB.EXE 0x45462D",
+        "FUN_0041FE90",
+        "FUN_0041FEE0",
+        "ev_9e41ceee…",
+        "ev_6e7e59d6…"
+      ],
+      "confidence": "code"
+    },
+    {
+      "key": "F8",
+      "vk": "0x77",
+      "codeAddress": "0x45464F",
+      "name": "地图全开",
+      "kind": "toggle",
+      "global": "DAT_004850C8",
+      "effect": "翻转地图可见性/揭示标志；FUN_00459A00 写入该标志并调用 FUN_00441AC0(1-flag) 刷新。",
+      "requiresCheat": true,
+      "evidence": [
+        "CB.EXE 0x45464F",
+        "FUN_00459A00",
+        "FUN_00441AC0",
+        "ev_53ef46c3…"
+      ],
+      "confidence": "code + historical cheat list"
+    },
+    {
+      "key": "F9",
+      "vk": "0x78",
+      "codeAddress": "0x454676",
+      "name": "四项资源 +10000",
+      "kind": "add",
+      "global": "gold/food/wood/iron of current side",
+      "effect": "给当前 side 的金、粮、木、铁各加 0x2710（10000）；每按一次累加，不设上限。部分旧文章写成 +1000，与代码不符。",
+      "requiresCheat": true,
+      "evidence": [
+        "CB.EXE 0x454676 (0x2710)"
+      ],
+      "confidence": "code"
+    },
+    {
+      "key": "F10",
+      "vk": "0x79",
+      "codeAddress": "0x454F9A",
+      "name": "无动作",
+      "kind": "noop",
+      "global": null,
+      "effect": "F10 的分发表项直接跳到返回，未发现作弊效果。",
+      "requiresCheat": false,
+      "evidence": [
+        "CB.EXE jump table 0x454FEC"
+      ],
+      "confidence": "code"
+    },
+    {
+      "key": "F11",
+      "vk": "0x7A",
+      "codeAddress": "0x454713",
+      "name": "截图",
+      "kind": "action",
+      "global": null,
+      "effect": "调用 FUN_0041ACA0 抓取当前画面并写 BMP 到游戏目录（Screen*.bmp）；该分支不检查秘籍 flag。",
+      "requiresCheat": false,
+      "evidence": [
+        "CB.EXE 0x454713",
+        "FUN_0041ACA0",
+        "ev_ca3d2a83…"
+      ],
+      "confidence": "code"
+    }
+  ],
+  "hiddenKeys": [
+    {
+      "key": "Enter",
+      "vk": "0x0D",
+      "codeAddress": "0x4544D1",
+      "name": "打开/关闭信息输入条",
+      "effect": "调用 FUN_0040E3E0(1) 并切换 DAT_00482A10；信息输入条用于输入秘籍。",
+      "evidence": [
+        "CB.EXE 0x4544D1",
+        "FUN_0040E3E0"
+      ]
+    },
+    {
+      "key": "Esc",
+      "vk": "0x1B",
+      "codeAddress": "0x454562",
+      "name": "关闭信息输入/返回",
+      "effect": "调用 FUN_0040E3E0(0)，关闭信息输入条。",
+      "evidence": [
+        "CB.EXE 0x454562"
+      ]
+    },
+    {
+      "key": "[",
+      "vk": "0x5B",
+      "codeAddress": "0x454792",
+      "name": "选前一关（秘籍开启时）",
+      "effect": "调用 FUN_0045B4A0(-2)；历史秘籍表与代码分支一致，具体关卡切换由后续消息处理。",
+      "evidence": [
+        "CB.EXE 0x454792",
+        "FUN_0045B4A0"
+      ]
+    },
+    {
+      "key": "]",
+      "vk": "0x5D",
+      "codeAddress": "0x4547A1",
+      "name": "选后一关（秘籍开启时）",
+      "effect": "设置 DAT_0048531C=1，主更新/消息路径继续处理关卡切换。",
+      "evidence": [
+        "CB.EXE 0x4547A1",
+        "DAT_0048531C"
+      ]
+    },
+    {
+      "key": "P",
+      "vk": "0x50/0x70",
+      "codeAddress": "0x4547B0",
+      "name": "画面移到敌人",
+      "effect": "在战斗状态下调用 FUN_00471A00 / FUN_0041D590，把镜头移到敌人附近；不需要秘籍 flag。",
+      "evidence": [
+        "CB.EXE 0x4547B0",
+        "FUN_00471A00",
+        "FUN_0041D590"
+      ]
+    },
+    {
+      "key": "Ctrl",
+      "vk": null,
+      "codeAddress": "selection helper",
+      "name": "选中同队全部",
+      "effect": "点击士兵时按 Ctrl，选择同部队成员；历史操作说明，代码入口在框选/点击选择路径。",
+      "evidence": [
+        "historical control list; not part of cheat flag"
+      ]
+    },
+    {
+      "key": "Shift",
+      "vk": null,
+      "codeAddress": "selection helper",
+      "name": "加入已选部队",
+      "effect": "先选一支部队，再按 Shift 框选目标士兵以加入；属于操作方式，不是秘籍。",
+      "evidence": [
+        "historical control list; not part of cheat flag"
+      ]
+    }
+  ],
+  "caveats": [
+    "F7 的代码效果是免疫伤害（当前 side 受击伤害=0），不是部分旧文章写的建造/行进加速。",
+    "F9 代码是每项 +0x2710=10000；部分旧文章写 +1000，与 CB.EXE 不符。",
+    "F5 的两个全局标志与 UI 命中/光标刷新有关，但“界面/指针”的名称仍需实机逐帧确认。",
+    "F6 的代码确认取消建造菜单前置/失败分支；资源是否仍扣减取决于具体建造入口，不能直接等价于“免费建造”。",
+    "秘籍 flag 0x484BEC 不在本轮看到的存档块列表中，可能是单局状态；F2 的 DAT_00485318 参与存档。",
+    "外部秘籍表只用于对照；具体效果以 CB.EXE 代码和此 EXE 哈希为准。"
+  ],
+  "evidence": {
+    "string": "ev_71f29ad1b0f4b1650c07b73b7697e84a177d1577bfd5f13f8ef8859aa42e64b2",
+    "string_xref": "ev_057ee83dc5c06a5df030981700603ae886c33780d1f7a443173c5f7528d678cf",
+    "key_handler_bytes": "ev_6d0d41500871d01385fe7afa5d0208de4303fd54e4657c07dc5466b07529579a",
+    "f3f4": "ev_31c3814350b95f21d87e216797cee34bd002204a389671f91510bb82ba76c7c4",
+    "f6_menu": "ev_fec20239e6584afd286317b89f7b342ce09b2a3e9f49ad04267c1a3e60c5b24b",
+    "f6_build": "ev_b55dca032e42e52d9935eb669412cbc5a309f9aeb72f6d07ff3c11fc663b615d",
+    "f7_phys": "ev_9e41ceee7ec32ba3482f3ea6836761d1846a129e00a3d292df36dcbf9230b424",
+    "f7_magic": "ev_6e7e59d6f1f85fe927cc00d71de56776915648c941f8ebd843bbbbfc20582997",
+    "f8": "ev_53ef46c3643648a2445c47f527f47960c5395cad248c6e6d8d81f86566ad0f67",
+    "f11": "ev_ca3d2a8348320849056acf29db5e763a9195f6606597044d58a4e30efd240c99",
+    "loop": "ev_39bb4716bb0535b7b4bb9e0080024395f0dc75f2d77f2f3e4682cf2c92b0d6f1"
+  }
+}

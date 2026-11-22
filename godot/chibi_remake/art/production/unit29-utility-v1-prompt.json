@@ -1,0 +1,9 @@
+[
+  {
+    "assetId": "unit29-utility-v1",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/unit29-patches-source.png"
+    ],
+    "prompt": "Use case: precise-object-edit. Faithfully redraw these TWO small original utility silhouette shapes for the 三国赤壁 sprite atlas. Exactly two equal cells side by side, ONE row. Preserve exact source footprint, the separate lobes, open gap and outline of EACH of the two shapes. These are intentionally FLAT SOLID CYAN source utility masks. Keep them flat solid cyan (#239fd2) with smooth clean antialiased high resolution outlines, not enlarged staircase pixels. DO NOT interpret them as ponds, rocks, plants, cloaks, fallen people, scenery or objects. No interior texture, no lighting or drop shadow. Keep source relative positions at bottom of each cell, preserve large transparent margin above and the small separate cyan fragments. Match canvas aspect768:304. Genuine transparent alpha everywhere outside the two shapes, no background/checkerboard/grid/text/numbers/labels."
+  }
+]

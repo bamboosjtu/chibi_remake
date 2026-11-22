@@ -1,0 +1,109 @@
+﻿param([switch]$SkipData,[switch]$SkipImport,[switch]$NoPublish,[switch]$AllowDirty,[switch]$SkipVerify)
+# 注意：**不能**用 'Stop' —— Godot 在 stderr 上会打印一条无害的
+# "Failed to read the root certificate store"，被 PowerShell 当成 NativeCommandError，
+# 直接中断整个构建。改为 'Continue'，每个原生调用都已显式检查 $LASTEXITCODE。
+$ErrorActionPreference='Continue'
+. (Join-Path $PSScriptRoot 'build_environment.ps1')
+. (Join-Path $PSScriptRoot 'workspace_lock.ps1')
+Set-Location -LiteralPath $BuildRoot
+$workspaceLock=$null
+try {
+    $workspaceLock=Enter-WorkspaceLock $BuildRoot 'build'
+    if ($SkipImport) { Write-Warning "-SkipImport is deprecated; new staging projects always import resources" }
+    if ($SkipVerify -and !$NoPublish) { throw '-SkipVerify requires -NoPublish; unverified builds cannot be published' }
+    $sourceCommit=(& git -C $BuildRoot rev-parse HEAD 2>$null)
+    if ($LASTEXITCODE -ne 0 -or !$sourceCommit) { throw 'Cannot identify the build commit' }
+    $sourceChanges=@(& git -C $BuildRoot status --porcelain 2>$null)
+    if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect the build worktree' }
+    $sourceDirty=$sourceChanges.Count -gt 0
+    if ($sourceDirty -and !$NoPublish -and !$AllowDirty) { throw 'Publishing requires a clean worktree' }
+    Initialize-BuildEnvironment
+    . (Join-Path $PSScriptRoot 'engine_environment.ps1')
+    $godot=Resolve-ChibiEngine $BuildRoot
+    & node tools/verify_engine.mjs --platform win32_release --engine (Join-Path $BuildRoot '_work/build/roaming/Godot/export_templates/4.7.2.stable/windows_release_x86_64.exe')
+    if ($LASTEXITCODE -ne 0) { throw 'Export template integrity check failed' }
+    if (!$SkipData) {
+        $meds=Join-Path $BuildRoot '_work/iso/MEDS'
+        if (!(Test-Path -LiteralPath $meds)) { throw '缺少 _work/iso/MEDS；请补齐原版文件，或显式使用 -SkipData 复用现有 data/*.json' }
+        $medFiles=@(Get-ChildItem -LiteralPath $meds -Filter '*.MED')
+        if ($medFiles.Count -eq 0) { throw '_work/iso/MEDS 中没有 .MED 文件；拒绝静默打包旧关卡数据' }
+        foreach ($med in $medFiles) {
+            & node tools/godot_export.mjs godot/chibi_remake --map $med.BaseName --hd --hd-sprites
+            if ($LASTEXITCODE -ne 0) { throw 'Level export failed' }
+        }
+        & node tools/level_index.mjs --write
+        if ($LASTEXITCODE -ne 0) { throw 'Level index generation failed' }
+        $sourceChanges=@(& git -C $BuildRoot status --porcelain 2>$null)
+        if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect the worktree after data export' }
+        $sourceDirty=$sourceDirty -or $sourceChanges.Count -gt 0
+        if ($sourceDirty -and !$NoPublish -and !$AllowDirty) { throw 'Commit the regenerated data before publishing' }
+    }
+    & node tools/level_index.mjs
+    if ($LASTEXITCODE -ne 0) { throw 'Level index is stale' }
+    $id=(Get-Date -Format 'yyyyMMdd_HHmmss')+'_'+[Guid]::NewGuid().ToString('N').Substring(0,8)
+    Write-Output '== Terrain cache and release input verification =='
+    & node tools/build_terrain.mjs --engine $godot
+    if ($LASTEXITCODE -ne 0) { throw "Terrain source rebuild failed" }
+	& node tools/runtime_assets.mjs --check --hash
+	if ($LASTEXITCODE -ne 0) { throw 'Declared runtime asset check failed' }
+    & node tools/compare_terrain_rebuild.mjs
+    if ($LASTEXITCODE -ne 0) { throw 'Rebuilt terrain differs from historical reference' }
+    $stage=Join-Path $BuildRoot ('_work/build/stage-'+$id)
+    $acceptanceStage=$stage+'-acceptance'
+    $stageArgs=@('--acceptance-dir',$acceptanceStage)
+    if (!$sourceDirty) { $stageArgs+=@('--source-commit',([string]$sourceCommit).Trim()) }
+    Write-Output ('== Stage release inputs: '+$stage+' ==')
+    & node tools/stage_release.mjs $stage @stageArgs
+    if ($LASTEXITCODE -ne 0) { throw 'Resource dependency staging failed' }
+    node tools/dedupe_terrain.mjs $stage
+    if ($LASTEXITCODE -ne 0) { throw 'Terrain deduplication failed' }
+    $inputs=Get-Content -Raw (Join-Path $stage 'release_inputs.json') | ConvertFrom-Json
+    foreach ($file in $inputs.files) { if (!(Test-Path -LiteralPath (Join-Path $stage $file))) { throw ('Missing staged resource: '+$file) } }
+    $log=Join-Path $BuildRoot ('_work/build/import-'+$id+'.log')
+    $importCache=Join-Path $BuildRoot '_work/build/import-cache'
+    Write-Output ('== Godot import: '+$log+' ==')
+    & node tools/import_cache.mjs prepare $stage $godot $importCache
+    if ($LASTEXITCODE -ne 0) { throw 'Could not prepare staged imports' }
+    # Godot rescans the fresh stage and imports inputs whose cache keys changed.
+    & node (Join-Path $PSScriptRoot 'godot_cli.mjs') --timeout 1800 --log $log $godot --headless --path $stage --import
+    if ($LASTEXITCODE -ne 0) { throw 'Stage import failed' }
+    & node tools/import_cache.mjs store $stage $godot $importCache
+    if ($LASTEXITCODE -ne 0) { Write-Warning 'Could not save import cache; this export can continue' }
+    $candidate=Join-Path $BuildRoot ('_work/build/candidate-'+$id)
+    New-Item -ItemType Directory -Force $candidate | Out-Null
+    $exe=Join-Path $candidate 'ChibiRTS.exe'
+    Write-Output ('== Godot export: '+$exe+' ==')
+    & node (Join-Path $PSScriptRoot 'godot_cli.mjs') --timeout 1800 --log (Join-Path $candidate 'export.log') $godot --headless --path $stage --export-release 'Windows HD Art' $exe
+    if ($LASTEXITCODE -ne 0) { throw 'Export failed' }
+    [IO.File]::WriteAllText((Join-Path $candidate 'portable.txt'), 'userdata', (New-Object System.Text.UTF8Encoding $false))
+    & node (Join-Path $PSScriptRoot 'godot_cli.mjs') --timeout 180 --log (Join-Path $candidate 'acceptance-pack.log') $godot --headless --path $stage --script (Join-Path $PSScriptRoot 'gd/pack_acceptance.gd') -- $acceptanceStage (Join-Path $candidate 'ChibiAcceptance.testpack')
+    if ($LASTEXITCODE -ne 0) { throw 'Acceptance companion packaging failed' }
+    # Launch the candidate before it can be published. A build that exports but
+    # cannot load a map must fail here, not at the player's first click.
+    $verification='unverified'; $verificationNote=''
+    if ($SkipVerify) {
+        $verification='skipped'; $verificationNote='-SkipVerify'
+        Write-Warning 'Candidate was not launched (-SkipVerify); the manifest records verification=skipped'
+    } else {
+        # The same reviewed engine resolved above is used by candidate verification.
+        & (Join-Path $PSScriptRoot 'verify_candidate.ps1') -Executable $exe -StageDirectory $stage
+        if ($LASTEXITCODE -ne 0) { throw ('Candidate verification failed: exit ' + $LASTEXITCODE) }
+        $verification='candidate-smoke'
+        $verificationNote='release_tests + all maps + deterministic baselines'
+        Write-Output 'Candidate smoke passed'
+    }
+    if (!$sourceDirty) {
+        $finalHead=(& git -C $BuildRoot rev-parse HEAD 2>$null)
+        if ($LASTEXITCODE -ne 0 -or $finalHead -ne $sourceCommit) { throw 'HEAD changed during the build' }
+        $sourceChanges=@(& git -C $BuildRoot status --porcelain 2>$null)
+        if ($LASTEXITCODE -ne 0 -or $sourceChanges.Count -gt 0) { throw 'Worktree changed during the clean build' }
+    }
+    & (Join-Path $PSScriptRoot 'write_build_manifest.ps1') -Executable $exe -SourceCommit $sourceCommit -SourceDirty:$sourceDirty -Verification $verification -VerificationNote $verificationNote
+    if (!(Test-Path -LiteralPath (Join-Path $candidate 'build-manifest.json'))) { throw 'Build manifest missing' }
+    if (!$NoPublish) { & (Join-Path $PSScriptRoot 'publish_release.ps1') -Executable $exe -AllowDirty:$AllowDirty }
+    Write-Output "Built candidate: $candidate"
+} catch { Write-Error $_; exit 1 } finally {
+    Restore-BuildEnvironment
+    if ($workspaceLock) { Exit-WorkspaceLock $workspaceLock }
+}
+exit 0

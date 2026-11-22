@@ -1,0 +1,20 @@
+[
+  {
+    "assetId": "command-icons-v3",
+    "reference": "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/command-icons-source.png",
+    "transparent": false,
+    "prompt": "Use case: style-transfer. Production HD command icon atlas for Chinese historical RTS 三国赤壁. Redraw the reference ALL 35 icons in EXACT seven columns and five equal rows, same row-major ordering and EXACT subject/symbol/color frame in each cell. Each icon fills its square cell from border to border; no outer canvas padding. Sharp painted metallic weapon edges, silk, wood grain, fire, gold ornaments, crisp original colorful square icon borders and dark navy/teal/burgundy backgrounds. Original tiny symbolic magic/formation marks remain the SAME symbols, not generic warriors. Preserve the source layout and contrasts; each original icon must remain independently recognizable. Aim 1792x1280 or larger. Do not add lettering, numbers, watermarks, labels, extra icons, extra rows, modern UI, rounded corners or perspective. This is a true detailed repaint, not enlarged pixel art or a blurred filter. NO screenshot, no game scene, only the 35 precisely fitted square icons."
+  },
+  {
+    "assetId": "resource-icons-v3",
+    "reference": "C:/Users/bambo/AppData/Local/Temp/codex-clipboard-8c513db1-2923-4e39-8003-b00fc8192e15.png",
+    "transparent": true,
+    "prompt": "Use case: stylized-concept. Four small production transparent resource icons for the Chinese historical RTS 三国赤壁, matching the resource shapes and hand-painted gold/stone/wood palette in the top bar of the reference. EXACT 2 columns x 2 rows, equal square cells, one centered icon per cell, even generous transparent margins, no text, no frames or background. Top left: a worn round dark bronze Chinese coin with square center hole, subtle antique gold edge highlights. Top right: the ORIGINAL yellow tied cylindrical grain-provision bundle, three rounded golden-yellow sections with dark brown ties, lying diagonally down-right; keep its yellow bundle silhouette rather than inventing a sack. Bottom left: a short small stack of two cut reddish-brown timber logs, diagonal down-right, warm wood grain and cut ends. Bottom right: a compact irregular pile of charcoal-grey iron ore, pale mineral flecks, triangular heap silhouette. Crisp richly hand-painted 1990s strategy game asset with upper-left light, realistic restrained volume and clean edges. Transparent alpha immediately around every icon, no opaque tile backdrop, cast shadow rectangle, checkerboard, letters, captions, modern style or extra objects. Canvas ideally 1024x1024."
+  },
+  {
+    "assetId": "units-033-page-00",
+    "reference": "D:\\Games\\3DMGAME_chibi.CHS.Green\\docs\\art\\full-remaster\\references\\units-033-page-00-source-v2.png",
+    "transparent": true,
+    "prompt": "Use case: style-transfer. Finished production HD transparent animation sprite atlas for 三国赤壁, original unit type 33 bow-carrying commander. Repaint ALL 20 source cells in EXACTLY 5 equal columns and 4 equal rows with the SAME row-major pose/facing order and bottom anchors. Each source figure keeps its exact body silhouette, gold-edged bow, dark headgear, blue/cyan team cloth and grey/gold armor. Fine hand-painted silk folds, bronze and steel detail, restrained proportions, warm upper-left lighting. Keep the same character design in every cell, source blue remains blue for runtime team recoloring. Do NOT reorganize facings or invent different poses; walking, attack and prone gestures remain distinct. Source-empty or numeric dimension-label cells remain transparent, no label or text. Preserve original canvas aspect and aim at least fourfold source dimensions. Genuine transparent alpha around sprites, no colored halos, black rectangle, checkerboard, decorative tile, ground scenery or shadow backdrop. Every cell is required; never repeat one idle pose to fill the atlas."
+  }
+]

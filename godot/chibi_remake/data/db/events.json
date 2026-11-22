@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "events": {
+    "0": {
+      "text": "（触发情节《文字.txt》中）"
+    },
+    "1": {
+      "video": "res://media/videos/EVENT1.AVI",
+      "source": "event1.avi"
+    },
+    "2": {
+      "video": "res://media/videos/EVENT2.AVI",
+      "source": "event2.avi"
+    },
+    "3": {
+      "video": "res://media/videos/EVENT3.AVI",
+      "source": "event3.avi"
+    },
+    "4": {
+      "text": "在长坂坡救回糜竺，经验增加。"
+    },
+    "5": {
+      "video": "res://media/videos/EVENT5.AVI",
+      "source": "event5.avi"
+    },
+    "6": {
+      "video": "res://media/videos/EVENT6.AVI",
+      "source": "event6.avi"
+    },
+    "7": {
+      "video": "res://media/videos/EVENT7.AVI",
+      "source": "event7.avi"
+    },
+    "8": {
+      "video": "res://media/videos/EVENT8.AVI",
+      "source": "event8.avi"
+    },
+    "9": {
+      "video": "res://media/videos/EVENT9.AVI",
+      "source": "event9.avi"
+    },
+    "10": {
+      "video": "res://media/videos/EVENT10.AVI",
+      "source": "event10.avi"
+    },
+    "11": {
+      "video": "res://media/videos/EVENT11.AVI",
+      "source": "event11.avi"
+    },
+    "12": {
+      "text": "曹军势大，刘备被迫撤出战场。"
+    },
+    "13": {
+      "text": "蔡瑁，张允率荆州军投降。"
+    },
+    "14": {
+      "text": "曹军势大，荆州军被迫投降。"
+    },
+    "15": {
+      "text": "黄盖诈降，曹军疏于防备，连锁战船被烧。"
+    },
+    "16": {
+      "text": "曹操遇上关羽，关羽顾念旧情放走曹操"
+    }
+  }
+}

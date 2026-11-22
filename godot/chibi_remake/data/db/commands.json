@@ -1,0 +1,1675 @@
+{
+  "schemaVersion": 1,
+  "generated": "2026-10-27",
+  "binary": {
+    "name": "CB.EXE",
+    "sha256": "2db7cc102e6fde547ab05d77cfddabc2079f5bc9be9b6b59b17bf435c5798cb7"
+  },
+  "sources": {
+    "icons": "BMP/BMP.LWC",
+    "registry": "SET/INTERFAC.EXP (XOR 0x22)",
+    "strings": "SET/PROMPT.EXT (XOR 0x46) + PROMPT.EDX",
+    "palette": "RES/SCORE.PAL (Main Palette)"
+  },
+  "icon_geometry": {
+    "width": 40,
+    "height": 40,
+    "states": [
+      "normal",
+      "pressed",
+      "hover"
+    ],
+    "note": "40x120 frames stack the 3 states vertically; state 3 (disabled) falls outside this strip."
+  },
+  "hotkeys": {
+    "order": [
+      "Q",
+      "W",
+      "E",
+      "A",
+      "S",
+      "D",
+      "Z",
+      "X",
+      "C"
+    ],
+    "note": "DAT_00482a24[0..8] ↔ Q/W/E/A/S/D/Z/X/C (FUN_0040de80)."
+  },
+  "panels": {
+    "combat": {
+      "title": "战斗队伍 3×3",
+      "slots": [
+        16130,
+        16131,
+        16132,
+        16133,
+        16135,
+        16134,
+        16136,
+        16142,
+        16137
+      ]
+    },
+    "worker": {
+      "title": "工人队伍 3×3",
+      "slots": [
+        16130,
+        16131,
+        16138,
+        16139,
+        16141,
+        16134,
+        16136,
+        16142,
+        null
+      ]
+    }
+  },
+  "panel_capacity": 15,
+  "commands": [
+    {
+      "command": 16025,
+      "frame": 170,
+      "name": "取消",
+      "mode": "0x16/0x17/0x18",
+      "hotkey": null,
+      "note": "取消建造/生产/研究",
+      "panels": []
+    },
+    {
+      "command": 16130,
+      "frame": 154,
+      "name": "移动",
+      "mode": "2",
+      "hotkey": "Q",
+      "panels": [
+        "combat:1/Q",
+        "worker:1/Q"
+      ]
+    },
+    {
+      "command": 16131,
+      "frame": 155,
+      "name": "攻击",
+      "mode": "1",
+      "hotkey": "W",
+      "panels": [
+        "combat:2/W",
+        "worker:2/W"
+      ]
+    },
+    {
+      "command": 16132,
+      "frame": 156,
+      "name": "警戒",
+      "mode": "3",
+      "hotkey": "E",
+      "panels": [
+        "combat:3/E"
+      ]
+    },
+    {
+      "command": 16133,
+      "frame": 157,
+      "name": "列阵",
+      "mode": "menu → 16190–16199",
+      "hotkey": "A",
+      "panels": [
+        "combat:4/A"
+      ]
+    },
+    {
+      "command": 16134,
+      "frame": 158,
+      "name": "休息",
+      "mode": "4",
+      "hotkey": "D",
+      "panels": [
+        "combat:6/D",
+        "worker:6/D"
+      ]
+    },
+    {
+      "command": 16135,
+      "frame": 159,
+      "name": "计谋",
+      "mode": "menu → 16210–16218",
+      "hotkey": "S",
+      "panels": [
+        "combat:5/S"
+      ]
+    },
+    {
+      "command": 16136,
+      "frame": 160,
+      "name": "解散",
+      "mode": "6",
+      "hotkey": "Z",
+      "panels": [
+        "combat:7/Z",
+        "worker:7/Z"
+      ]
+    },
+    {
+      "command": 16137,
+      "frame": 161,
+      "name": "单挑",
+      "mode": "0x0B",
+      "hotkey": "C",
+      "panels": [
+        "combat:9/C"
+      ]
+    },
+    {
+      "command": 16138,
+      "frame": 162,
+      "name": "运输",
+      "mode": "7",
+      "hotkey": "E",
+      "panels": [
+        "worker:3/E"
+      ]
+    },
+    {
+      "command": 16139,
+      "frame": 163,
+      "name": "建造",
+      "mode": "menu 0x111de（工人）",
+      "hotkey": "A",
+      "panels": [
+        "worker:4/A"
+      ]
+    },
+    {
+      "command": 16140,
+      "frame": 163,
+      "name": "建造",
+      "mode": "menu 0x11210（建筑侧）",
+      "hotkey": null,
+      "note": "建筑侧建造/生产入口；不在 3×3 主面板",
+      "panels": []
+    },
+    {
+      "command": 16141,
+      "frame": 164,
+      "name": "修理",
+      "mode": "9",
+      "hotkey": "S",
+      "panels": [
+        "worker:5/S"
+      ]
+    },
+    {
+      "command": 16142,
+      "frame": 165,
+      "name": "上船",
+      "mode": "0x0C",
+      "hotkey": "X",
+      "panels": [
+        "combat:8/X",
+        "worker:8/X"
+      ]
+    },
+    {
+      "command": 16143,
+      "frame": 166,
+      "name": "下船",
+      "mode": "0x0D",
+      "hotkey": "C",
+      "note": "装员运输船第 9 格替换单挑",
+      "panels": []
+    },
+    {
+      "command": 16144,
+      "frame": 167,
+      "name": "组建",
+      "mode": "0x0E",
+      "hotkey": null,
+      "note": "不在 3×3 主面板",
+      "panels": []
+    },
+    {
+      "command": 16145,
+      "frame": 168,
+      "name": "加入",
+      "mode": "0x0F",
+      "hotkey": null,
+      "note": "不在 3×3 主面板",
+      "panels": []
+    },
+    {
+      "command": 16146,
+      "frame": 169,
+      "name": "返回/采集",
+      "mode": "0x19",
+      "hotkey": null,
+      "note": "采集监督；不在 3×3 主面板",
+      "panels": []
+    }
+  ],
+  "registry": [
+    {
+      "frame": 170,
+      "command": 16025,
+      "category": "core",
+      "name": "取消",
+      "mode": "0x16/0x17/0x18",
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 154,
+      "command": 16130,
+      "category": "core",
+      "name": "移动",
+      "mode": "2",
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 155,
+      "command": 16131,
+      "category": "core",
+      "name": "攻击",
+      "mode": "1",
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 156,
+      "command": 16132,
+      "category": "core",
+      "name": "警戒",
+      "mode": "3",
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 157,
+      "command": 16133,
+      "category": "core",
+      "name": "列阵",
+      "mode": "menu → 16190–16199",
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 158,
+      "command": 16134,
+      "category": "core",
+      "name": "休息",
+      "mode": "4",
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 159,
+      "command": 16135,
+      "category": "core",
+      "name": "计谋",
+      "mode": "menu → 16210–16218",
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 160,
+      "command": 16136,
+      "category": "core",
+      "name": "解散",
+      "mode": "6",
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 161,
+      "command": 16137,
+      "category": "core",
+      "name": "单挑",
+      "mode": "0x0B",
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 162,
+      "command": 16138,
+      "category": "core",
+      "name": "运输",
+      "mode": "7",
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 163,
+      "command": 16139,
+      "category": "core",
+      "name": "建造",
+      "mode": "menu 0x111de（工人）",
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 163,
+      "command": 16140,
+      "category": "core",
+      "name": "建造",
+      "mode": "menu 0x11210（建筑侧）",
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 164,
+      "command": 16141,
+      "category": "core",
+      "name": "修理",
+      "mode": "9",
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 165,
+      "command": 16142,
+      "category": "core",
+      "name": "上船",
+      "mode": "0x0C",
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 166,
+      "command": 16143,
+      "category": "core",
+      "name": "下船",
+      "mode": "0x0D",
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 167,
+      "command": 16144,
+      "category": "core",
+      "name": "组建",
+      "mode": "0x0E",
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 168,
+      "command": 16145,
+      "category": "core",
+      "name": "加入",
+      "mode": "0x0F",
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 169,
+      "command": 16146,
+      "category": "core",
+      "name": "返回/采集",
+      "mode": "0x19",
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 113,
+      "command": 16190,
+      "category": "formation",
+      "name": "一字长蛇阵",
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 114,
+      "command": 16191,
+      "category": "formation",
+      "name": "二龙出水阵",
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 115,
+      "command": 16192,
+      "category": "formation",
+      "name": "三才天地阵",
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 116,
+      "command": 16193,
+      "category": "formation",
+      "name": "四象奇门阵",
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 117,
+      "command": 16194,
+      "category": "formation",
+      "name": "五行梅花阵",
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 118,
+      "command": 16195,
+      "category": "formation",
+      "name": "六合连环阵",
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 119,
+      "command": 16196,
+      "category": "formation",
+      "name": "七星北斗阵",
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 120,
+      "command": 16197,
+      "category": "formation",
+      "name": "八门金锁阵",
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 121,
+      "command": 16198,
+      "category": "formation",
+      "name": "九宫八卦阵",
+      "mode": null,
+      "size": [
+        40,
+        121
+      ],
+      "states": 3
+    },
+    {
+      "frame": 122,
+      "command": 16199,
+      "category": "formation",
+      "name": "十面埋伏阵",
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 124,
+      "command": 16200,
+      "category": "paging",
+      "name": "向上翻页",
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 123,
+      "command": 16201,
+      "category": "paging",
+      "name": "向下翻页",
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 98,
+      "command": 16210,
+      "category": "stratagem",
+      "name": "激励",
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 99,
+      "command": 16211,
+      "category": "stratagem",
+      "name": "加速",
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 100,
+      "command": 16212,
+      "category": "stratagem",
+      "name": "减速",
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 101,
+      "command": 16213,
+      "category": "stratagem",
+      "name": "远视",
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 102,
+      "command": 16214,
+      "category": "stratagem",
+      "name": "混乱",
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 103,
+      "command": 16215,
+      "category": "stratagem",
+      "name": "滚木",
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 104,
+      "command": 16216,
+      "category": "stratagem",
+      "name": "埋伏",
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 105,
+      "command": 16217,
+      "category": "stratagem",
+      "name": "恢复",
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 106,
+      "command": 16218,
+      "category": "stratagem",
+      "name": "火攻",
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 58,
+      "command": 16150,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 59,
+      "command": 16160,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 60,
+      "command": 16154,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 61,
+      "command": 16152,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 62,
+      "command": 16173,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 63,
+      "command": 16162,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 64,
+      "command": 16156,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 65,
+      "command": 16164,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 66,
+      "command": 16158,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 67,
+      "command": 16170,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 68,
+      "command": 16168,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 69,
+      "command": 16176,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 70,
+      "command": 16166,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 71,
+      "command": 16180,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 72,
+      "command": 16181,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 73,
+      "command": 16186,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        40
+      ],
+      "states": 1
+    },
+    {
+      "frame": 74,
+      "command": 16151,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 75,
+      "command": 16161,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 76,
+      "command": 16155,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 77,
+      "command": 16153,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 78,
+      "command": 16173,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 79,
+      "command": 16163,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 80,
+      "command": 16157,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 81,
+      "command": 16165,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 82,
+      "command": 16159,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 83,
+      "command": 16170,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 84,
+      "command": 16169,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 85,
+      "command": 16176,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 86,
+      "command": 16167,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 87,
+      "command": 16183,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 88,
+      "command": 16184,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 89,
+      "command": 16187,
+      "category": "build",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        40
+      ],
+      "states": 1
+    },
+    {
+      "frame": 125,
+      "command": 16030,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 126,
+      "command": 16031,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 127,
+      "command": 16032,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 128,
+      "command": 16033,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 129,
+      "command": 16034,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 130,
+      "command": 16035,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 131,
+      "command": 16036,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 110,
+      "command": 16040,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 111,
+      "command": 16041,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 112,
+      "command": 16042,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 148,
+      "command": 16050,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 149,
+      "command": 16051,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 150,
+      "command": 16052,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 151,
+      "command": 16053,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 152,
+      "command": 16054,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 153,
+      "command": 16055,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 132,
+      "command": 16060,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 133,
+      "command": 16061,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 134,
+      "command": 16062,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 135,
+      "command": 16063,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 136,
+      "command": 16064,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 137,
+      "command": 16065,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 94,
+      "command": 16070,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 95,
+      "command": 16076,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 96,
+      "command": 16079,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 97,
+      "command": 16081,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 107,
+      "command": 16090,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 108,
+      "command": 16091,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 109,
+      "command": 16094,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 90,
+      "command": 16107,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 91,
+      "command": 16101,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 92,
+      "command": 16104,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 93,
+      "command": 16106,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 145,
+      "command": 16110,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 146,
+      "command": 16111,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 147,
+      "command": 16112,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 138,
+      "command": 16120,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 139,
+      "command": 16122,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 140,
+      "command": 16121,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 141,
+      "command": 16124,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 142,
+      "command": 16125,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 143,
+      "command": 16126,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 144,
+      "command": 16123,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 57,
+      "command": 16028,
+      "category": "production",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        40
+      ],
+      "states": 1
+    },
+    {
+      "frame": 228,
+      "command": 0,
+      "category": "other",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    },
+    {
+      "frame": 227,
+      "command": 0,
+      "category": "other",
+      "name": null,
+      "mode": null,
+      "size": [
+        40,
+        120
+      ],
+      "states": 3
+    }
+  ],
+  "runtimeActions": {
+    "16130": "move",
+    "16131": "attack",
+    "16132": "watch",
+    "16133": "formation",
+    "16134": "rest",
+    "16135": "jimou",
+    "16136": "disband",
+    "16137": "duel",
+    "16138": "transport",
+    "16139": "build",
+    "16140": "build",
+    "16141": "repair",
+    "16142": "board",
+    "16143": "unload",
+    "16144": "form",
+    "16145": "join",
+    "16146": "return"
+  }
+}

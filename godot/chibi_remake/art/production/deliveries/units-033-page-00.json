@@ -1,0 +1,21 @@
+{
+  "assetId": "units-033-page-00",
+  "bytes": 1608231.0,
+  "colorType": 6.0,
+  "generatedAt": "2026-10-17T14:52:36.617Z",
+  "generator": "built-in image_gen",
+  "height": 985.0,
+  "prompt": "Use case: style-transfer. Finished production HD transparent animation sprite atlas for 三国赤壁, original unit type 33 bow-carrying commander. Repaint ALL 20 source cells in EXACTLY 5 equal columns and 4 equal rows with the SAME row-major pose/facing order and bottom anchors. Each source figure keeps its exact body silhouette, gold-edged bow, dark headgear, blue/cyan team cloth and grey/gold armor. Fine hand-painted silk folds, bronze and steel detail, restrained proportions, warm upper-left lighting. Keep the same character design in every cell, source blue remains blue for runtime team recoloring. Do NOT reorganize facings or invent different poses; walking, attack and prone gestures remain distinct. Source-empty or numeric dimension-label cells remain transparent, no label or text. Preserve original canvas aspect and aim at least fourfold source dimensions. Genuine transparent alpha around sprites, no colored halos, black rectangle, checkerboard, decorative tile, ground scenery or shadow backdrop. Every cell is required; never repeat one idle pose to fill the atlas.",
+  "promptFile": "godot/chibi_remake/art/production/ui-unit-prompts-v3.json",
+  "sha256": "b2e5b5f5bd2ea0ee03baa5ae2a2441518791e412206efce3bf9c2d93eba60262",
+  "sourceGeneratedFile": "C:/Users/bambo/.codex/generated_images/01a13348-db65-7b23-b66a-63227eb4490d/exec-466a662c-8409-4dc0-a2fd-03c0ee3909ab.png",
+  "status": "generated-awaiting-validation",
+  "texture": "godot/chibi_remake/art/full/units/033/page-00-v2.png",
+  "validation": {
+    "excludedSourceLabelsOrBlanks": 0,
+    "structure": "pass",
+    "visual": "pending",
+    "visualFrameCount": 20
+  },
+  "width": 1597.0
+}

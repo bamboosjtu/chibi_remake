@@ -1,0 +1,242 @@
+extends RefCounted
+## Owned value records, not copies of unit dictionaries. This object never
+## retains a world, a source unit, navigation, or a service.
+const Frozen = preload("res://simulation/definitions/frozen_data.gd")
+const FIELDS := ["uid","unit","owner","name","alive","die_t","is_building","ax","ay","A","B",
+	"hp","maxhp","w","h","k","grid","count","build_frame","state","dir","moved","walk_tick",
+	"move_facing","move_started","move_turning","action_phase","attached","site_inside_uid","site_follow_uid",
+	"site","gate_open","carry","carry_kind","carry_n","carry_hp","group_officer","officer_might",
+	"officer_intellect","mou","status_173","attack","defence","atk_range","vision","stock"]
+const OFFICER_FIELDS := ["index","name","tier","level","exp","hasExp","might","intellect","heroType"]
+const ROSTER_FIELDS := ["uid","unit","owner","name","alive","die_t","is_building","ax","ay","A","B","hp","maxhp","w","h","attached","site_inside_uid","group_officer","site"]
+const VISUAL_FIELDS := ["uid","unit","owner","alive","die_t","is_building","ax","ay","hp","maxhp","w","h","k","grid","count","build_frame","state","dir","moved","walk_tick","move_facing","action_phase","attached","site_inside_uid","site","gate_open","carry","carry_kind"]
+var _world := -1
+var _revision := 0
+var _units_key: Array = []
+var _units: Array = []
+var _selected_key: Array = []
+var _selected: Array = []
+var _sprites := {}
+var _footprints := {}
+var _indices := {}
+var _visuals := {}
+var _empty_geometry := Frozen.copy({"cells":[],"outline":[]})
+var metrics := {"unitBuilds":0,"selectionBuilds":0,"spriteBuilds":0,"visualBuilds":0}
+
+func invalidate() -> void:
+	if _units_key.is_empty() and _selected_key.is_empty(): return
+	_revision += 1
+	_units_key = []
+	_selected_key = []
+	_visuals.clear()
+
+func _ensure(data: Object) -> void:
+	var identity: int = data.world.get_instance_id()
+	if identity == _world: return
+	_world = identity
+	_units_key = []; _units = []; _selected_key = []; _selected = []
+	_sprites.clear(); _footprints.clear(); _indices.clear(); _visuals.clear()
+
+func units(data: Object) -> Array:
+	_ensure(data)
+	var key := [_world, data.sim_tick, data.units.size(), _revision, data.nav.get_instance_id(), data.nav.geometry_revision,
+		data.visibility.get_instance_id(),data.visibility.revision,data.player_owner]
+	if key == _units_key: return _units
+	var result := []
+	var members := {}
+	_indices.clear(); _visuals.clear()
+	for unit: Dictionary in data.units:
+		_indices[int(unit.uid)] = result.size()
+		var row := _scalars(unit,ROSTER_FIELDS)
+		row.visible = int(unit.owner)==int(data.player_owner) or data.visibility.is_visible(Vector2(unit.ax,unit.ay))
+		var officer: Dictionary = unit.get("officer",{})
+		row.officer = {"index":int(officer.index),"name":str(officer.get("name",""))} if not officer.is_empty() else {}
+		row.officer.make_read_only(); row.make_read_only()
+		result.append(row); members[int(unit.uid)] = true
+	for uid in _footprints.keys():
+		if not members.has(uid): _footprints.erase(uid)
+	result.make_read_only()
+	_units_key = key; _units = result; metrics.unitBuilds += 1
+	return result
+
+func selection(data: Object) -> Array:
+	_ensure(data)
+	# Selection/health may change while paused, outside a simulation update.
+	# Compare only displayed scalars; never key a cache with source dictionaries.
+	var key: Array = [_world,_revision,data.sim_tick,data.nav.get_instance_id(),data.nav.geometry_revision]
+	for unit: Dictionary in data.selected:
+		var officer: Dictionary = unit.get("officer", {})
+		key.append_array([unit.uid,unit.hp,unit.maxhp,unit.alive,unit.die_t,unit.state,unit.get("site"),
+			unit.get("carry"),unit.get("carry_n"),unit.get("stock"),unit.get("group_officer"),officer.get("index"),
+			officer.get("tier"),officer.get("level"),officer.get("exp"),officer.get("hasExp")])
+	if key == _selected_key: return _selected
+	var result := []
+	for unit: Dictionary in data.selected: result.append(_record(data,unit))
+	result.make_read_only()
+	_selected_key = key; _selected = result; metrics.selectionBuilds += 1
+	return result
+
+func roster(data: Object, uid: int) -> Dictionary:
+	var rows := units(data)
+	var index: int = _indices.get(uid, -1)
+	return rows[index] if index >= 0 else {}
+
+func minimap_markers(data: Object) -> Array:
+	var markers := []
+	var player := int(data.player_owner)
+	var visibility = data.visibility
+	for unit: Dictionary in data.units:
+		if not unit.alive or unit.die_t >= 0 or unit.get("attached", false) or int(unit.get("site_inside_uid", -1)) >= 0:
+			continue
+		var owner := int(unit.owner)
+		var point := Vector2(unit.ax, unit.ay)
+		if owner != player and not visibility.is_visible(point): continue
+		markers.append({"position":point, "owner":owner, "is_building":bool(unit.is_building)})
+		markers.back().make_read_only()
+	markers.make_read_only()
+	return markers
+
+func team_soldiers(data: Object, owner: int, officer_index: int) -> int:
+	var soldiers := 0
+	for unit: Dictionary in data.units:
+		if unit.alive and int(unit.owner) == owner and int(unit.get("group_officer", -1)) == officer_index:
+			soldiers += int(unit.hp)
+	return soldiers
+
+func commander_name(data: Object, owner: int, officer_index: int) -> String:
+	for unit: Dictionary in data.units:
+		if not unit.alive or int(unit.owner) != owner: continue
+		var officer: Dictionary = unit.get("officer", {})
+		if int(officer.get("index", -2)) == officer_index:
+			return str(officer.get("name", "")).replace(" ", "")
+	return "—"
+
+func visual(data: Object, uid: int) -> Dictionary:
+	units(data) # Rebuild scalar UID -> array-index lookup at the same boundary.
+	if _visuals.has(uid): return _visuals[uid]
+	var index: int = _indices.get(uid,-1)
+	if index<0 or index>=data.units.size(): return Frozen.copy({})
+	var source: Dictionary = data.units[index]
+	if int(source.uid) != uid:
+		invalidate(); return visual(data,uid)
+	var result := _visual_record(data, source)
+	_visuals[uid] = result
+	return result
+
+func renderable(data: Object, context: Dictionary) -> Array:
+	_ensure(data)
+	var result := []
+	for unit: Dictionary in data.units:
+		if not context.sides.get(int(unit.owner), true): continue
+		if unit.is_building:
+			if not context.buildings: continue
+		elif not context.units or unit.get("attached", false) or int(unit.get("site_inside_uid", -1)) >= 0:
+			continue
+		if context.camera:
+			var position := Vector2(float(unit.ax) - float(unit.w) * 0.5, float(unit.ay) - float(unit.h))
+			if not (context.area as Rect2).intersects(Rect2(position, Vector2(unit.w, unit.h))): continue
+		if int(unit.owner) != int(context.player) and not data.visibility.is_visible(Vector2(unit.ax, unit.ay)): continue
+		result.append(_visual_record(data, unit))
+	return result
+
+func _visual_record(data: Object, unit: Dictionary) -> Dictionary:
+	var result := _scalars(unit,VISUAL_FIELDS)
+	result.clips = _sprite(unit)
+	var footprint := _footprint(data,unit)
+	result.occupied_cells = footprint.cells
+	result.footprint_outline = footprint.outline
+	result.make_read_only()
+	metrics.visualBuilds += 1
+	return result
+
+func _scalars(unit: Dictionary, fields: Array) -> Dictionary:
+	var result := {"world_id":_world}
+	for field in fields:
+		if unit.has(field): result[field] = unit[field]
+	return result
+
+func _record(data: Object, unit: Dictionary) -> Dictionary:
+	var result := _scalars(unit,FIELDS)
+	result.path_count = unit.get("path",[]).size()
+	var source_officer: Dictionary = unit.get("officer",{})
+	var officer := {}
+	for field in OFFICER_FIELDS:
+		if source_officer.has(field): officer[field] = source_officer[field]
+	result.officer = officer
+	officer.make_read_only()
+	result.make_read_only()
+	return result
+
+func _sprite(unit: Dictionary) -> Dictionary:
+	var key := [unit.unit,unit.w,unit.h,unit.grid,unit.count,unit.k]
+	if not _sprites.has(key):
+		_sprites[key] = Frozen.copy(unit.get("clips",{}))
+		metrics.spriteBuilds += 1
+	return _sprites[key]
+
+func _footprint(data: Object, unit: Dictionary) -> Dictionary:
+	if not unit.is_building: return _empty_geometry
+	var cells: Array = unit.get("occupied_cells",[])
+	var key := [unit.unit,unit.ax,unit.ay,unit.w,data.nav.get_instance_id(),data.nav.geometry_revision,cells.hash()]
+	var uid := int(unit.uid)
+	if _footprints.has(uid) and _footprints[uid].key == key: return _footprints[uid].value
+	if cells.is_empty(): cells = data.nav.building_footprint(int(unit.unit),Vector2(unit.ax,unit.ay),float(unit.w))
+	var outline := Array(data.nav.footprint_outline(cells))
+	if not outline.is_empty(): outline.append(outline[0])
+	var value := {"cells":cells.duplicate(),"outline":outline}
+	Frozen.freeze(value)
+	_footprints[uid] = {"key":key,"value":value}
+	return value
+
+func motion(data: Object, visible = null) -> Array:
+	var result := []
+	for unit: Dictionary in data.units:
+		if visible != null and not visible.has(int(unit.uid)): continue
+		result.append({"uid":int(unit.uid),"is_building":bool(unit.is_building),"ax":float(unit.ax),"ay":float(unit.ay),"walk_tick":float(unit.get("walk_tick",0))})
+	Frozen.freeze(result)
+	return result
+
+func training(data: Object) -> Array:
+	var result := []
+	for order in data.trainings:
+		result.append({"buildingUid":int(order.b.uid),"unit":int(order.unit),"t":float(order.t)})
+	Frozen.freeze(result)
+	return result
+
+func work(data: Object, uid: int) -> Dictionary:
+	_ensure(data)
+	# Queue reads share a single world and tick. Values contain no live entity references.
+	var result := {"world_id":_world, "revision":int(data.sim_tick), "busy":false, "training":{}, "research":{}}
+	var building := roster(data, uid)
+	if not building.is_empty() and building.is_building:
+		for order in data.trainings:
+			if int(order.b.uid) != uid: continue
+			result.training = {"buildingUid":uid,"unit":int(order.unit),"t":float(order.t)}
+			break
+		for job in data.research_jobs:
+			if int(job.buildingUid) != uid: continue
+			result.research = {"tech":int(job.tech),"t":int(job.t),"owner":int(job.owner)}
+			break
+		result.busy = bool(building.get("site", false)) or not result.training.is_empty() or not result.research.is_empty()
+	Frozen.freeze(result)
+	return result
+
+## Immediate view notifications may precede insertion or follow removal.
+## Select display scalars from the supplied entity without looking it up by UID.
+static func event_record(unit: Dictionary) -> Dictionary:
+	var result := {}
+	for field in ["uid","unit","owner","ax","ay","A","B","w","h","k","count","grid","is_building","alive","die_t","attached","site_inside_uid"]:
+		if unit.has(field): result[field] = unit[field]
+	result.make_read_only()
+	return result
+
+static func staged_units(units: Array, sheets: Dictionary) -> Array:
+	var rows := []
+	for unit: Dictionary in units:
+		var visual := event_record(unit)
+		var sheet := str(sheets.get("%d_%d" % [unit.unit, unit.owner], ""))
+		var row := {"visual":visual, "sheet":sheet}
+		row.make_read_only()
+		rows.append(row)
+	rows.make_read_only()
+	return rows

@@ -1,0 +1,978 @@
+{
+  "byBuilding": {
+    "0": {
+      "label": "帅帐",
+      "tiers": [
+        {
+          "kind": "unit",
+          "unit": 30,
+          "tier": "工人",
+          "maskBit": 1,
+          "note": "训练一百工兵"
+        },
+        {
+          "kind": "hqUpgrade",
+          "targetLevel": 2,
+          "costRow": 0,
+          "maskBit": 2
+        },
+        {
+          "kind": "hqUpgrade",
+          "targetLevel": 3,
+          "costRow": 1,
+          "maskBit": 4
+        },
+        {
+          "kind": "hqUpgrade",
+          "targetLevel": 4,
+          "costRow": 2,
+          "maskBit": 8
+        }
+      ]
+    },
+    "6": {
+      "label": "骑兵所",
+      "tiers": [
+        {
+          "kind": "unit",
+          "unit": 36,
+          "tier": "100",
+          "maskBit": 1
+        },
+        {
+          "kind": "unit",
+          "unit": 37,
+          "tier": "200",
+          "maskBit": 2
+        },
+        {
+          "kind": "unit",
+          "unit": 40,
+          "tier": "500",
+          "maskBit": 4
+        }
+      ]
+    },
+    "8": {
+      "label": "车兵所",
+      "tiers": [
+        {
+          "kind": "unit",
+          "unit": 34,
+          "tier": "车兵",
+          "maskBit": 1
+        },
+        {
+          "kind": "siegeResearch",
+          "level": 1,
+          "costRow": 18,
+          "maskBit": 2
+        },
+        {
+          "kind": "siegeResearch",
+          "level": 2,
+          "costRow": 19,
+          "maskBit": 4
+        }
+      ]
+    },
+    "12": {
+      "label": "步兵所",
+      "tiers": [
+        {
+          "kind": "unit",
+          "unit": 32,
+          "tier": "100",
+          "maskBit": 1
+        },
+        {
+          "kind": "unit",
+          "unit": 38,
+          "tier": "200",
+          "maskBit": 2
+        },
+        {
+          "kind": "unit",
+          "unit": 41,
+          "tier": "500",
+          "maskBit": 4
+        },
+        {
+          "kind": "unit",
+          "unit": 43,
+          "tier": "1000",
+          "maskBit": 8
+        }
+      ]
+    },
+    "14": {
+      "label": "弓兵所",
+      "tiers": [
+        {
+          "kind": "unit",
+          "unit": 45,
+          "tier": "100",
+          "maskBit": 1
+        },
+        {
+          "kind": "unit",
+          "unit": 39,
+          "tier": "200",
+          "maskBit": 2
+        },
+        {
+          "kind": "unit",
+          "unit": 42,
+          "tier": "500",
+          "maskBit": 4
+        },
+        {
+          "kind": "unit",
+          "unit": 44,
+          "tier": "1000",
+          "maskBit": 8
+        }
+      ]
+    },
+    "20": {
+      "label": "船坞",
+      "tiers": [
+        {
+          "kind": "unit",
+          "unit": 46,
+          "tier": "快船",
+          "maskBit": 1
+        },
+        {
+          "kind": "unit",
+          "unit": 47,
+          "tier": "运输船",
+          "maskBit": 2
+        },
+        {
+          "kind": "unit",
+          "unit": 48,
+          "tier": "战船",
+          "maskBit": 4
+        },
+        {
+          "kind": "unit",
+          "unit": 49,
+          "tier": "连船",
+          "maskBit": 8
+        },
+        {
+          "kind": "navyResearch",
+          "line": "快船升级",
+          "costRow": 20,
+          "maskBit": 1
+        },
+        {
+          "kind": "navyResearch",
+          "line": "战船升级",
+          "costRow": 21,
+          "maskBit": 16
+        },
+        {
+          "kind": "navyResearch",
+          "line": "装甲升级",
+          "costRow": 22,
+          "maskBit": 32
+        }
+      ]
+    }
+  },
+  "units": {
+    "30": {
+      "id": 30,
+      "name": "工人",
+      "hp": 100,
+      "attackA": 7,
+      "attackB": 0,
+      "defenceA": 0,
+      "defenceB": 0,
+      "vision": 4,
+      "range": 1,
+      "cost": {
+        "iron": 0,
+        "food": 50,
+        "wood": 50,
+        "gold": 400
+      },
+      "trainTicks": 100,
+      "expGain": 1,
+      "moraleGain": 1,
+      "sprite": {
+        "w": 72,
+        "h": 49,
+        "firstFrame": 240,
+        "count": 144,
+        "cols": 3,
+        "rows": 48
+      }
+    },
+    "32": {
+      "id": 32,
+      "name": "步兵",
+      "hp": 100,
+      "attackA": 12,
+      "attackB": 0,
+      "defenceA": 4,
+      "defenceB": 4,
+      "vision": 5,
+      "range": 1,
+      "cost": {
+        "iron": 100,
+        "food": 100,
+        "wood": 0,
+        "gold": 600
+      },
+      "trainTicks": 100,
+      "expGain": 2,
+      "moraleGain": 1,
+      "sprite": {
+        "w": 64,
+        "h": 45,
+        "firstFrame": 486,
+        "count": 112,
+        "cols": 7,
+        "rows": 16
+      }
+    },
+    "34": {
+      "id": 34,
+      "name": "车兵",
+      "hp": 100,
+      "attackA": 150,
+      "attackB": 150,
+      "defenceA": 1,
+      "defenceB": 2,
+      "vision": 10,
+      "range": 10,
+      "cost": {
+        "iron": 400,
+        "food": 100,
+        "wood": 300,
+        "gold": 800
+      },
+      "trainTicks": 100,
+      "expGain": 15,
+      "moraleGain": 2,
+      "sprite": {
+        "w": 88,
+        "h": 67,
+        "firstFrame": 678,
+        "count": 68,
+        "cols": 4,
+        "rows": 17
+      }
+    },
+    "36": {
+      "id": 36,
+      "name": "骑兵",
+      "hp": 100,
+      "attackA": 17,
+      "attackB": 0,
+      "defenceA": 6,
+      "defenceB": 2,
+      "vision": 5,
+      "range": 1,
+      "cost": {
+        "iron": 100,
+        "food": 200,
+        "wood": 100,
+        "gold": 800
+      },
+      "trainTicks": 100,
+      "expGain": 5,
+      "moraleGain": 1,
+      "sprite": {
+        "w": 72,
+        "h": 54,
+        "firstFrame": 906,
+        "count": 144,
+        "cols": 6,
+        "rows": 24
+      }
+    },
+    "37": {
+      "id": 37,
+      "name": "骑兵",
+      "hp": 200,
+      "attackA": 27,
+      "attackB": 0,
+      "defenceA": 7,
+      "defenceB": 3,
+      "vision": 5,
+      "range": 1,
+      "cost": {
+        "iron": 200,
+        "food": 400,
+        "wood": 200,
+        "gold": 1600
+      },
+      "trainTicks": 200,
+      "expGain": 10,
+      "moraleGain": 2,
+      "sprite": {
+        "w": 104,
+        "h": 60,
+        "firstFrame": 1050,
+        "count": 136,
+        "cols": 4,
+        "rows": 34
+      }
+    },
+    "38": {
+      "id": 38,
+      "name": "步兵",
+      "hp": 200,
+      "attackA": 16,
+      "attackB": 0,
+      "defenceA": 6,
+      "defenceB": 6,
+      "vision": 5,
+      "range": 1,
+      "cost": {
+        "iron": 200,
+        "food": 200,
+        "wood": 0,
+        "gold": 1200
+      },
+      "trainTicks": 200,
+      "expGain": 4,
+      "moraleGain": 2,
+      "sprite": {
+        "w": 72,
+        "h": 58,
+        "firstFrame": 1186,
+        "count": 84,
+        "cols": 4,
+        "rows": 21
+      }
+    },
+    "39": {
+      "id": 39,
+      "name": "弓兵",
+      "hp": 200,
+      "attackA": 16,
+      "attackB": 16,
+      "defenceA": 3,
+      "defenceB": 5,
+      "vision": 7,
+      "range": 6,
+      "cost": {
+        "iron": 100,
+        "food": 200,
+        "wood": 200,
+        "gold": 1000
+      },
+      "trainTicks": 200,
+      "expGain": 4,
+      "moraleGain": 2,
+      "sprite": {
+        "w": 64,
+        "h": 53,
+        "firstFrame": 1270,
+        "count": 95,
+        "cols": 5,
+        "rows": 19
+      }
+    },
+    "40": {
+      "id": 40,
+      "name": "骑兵",
+      "hp": 500,
+      "attackA": 38,
+      "attackB": 0,
+      "defenceA": 11,
+      "defenceB": 5,
+      "vision": 5,
+      "range": 1,
+      "cost": {
+        "iron": 300,
+        "food": 1000,
+        "wood": 300,
+        "gold": 2400
+      },
+      "trainTicks": 500,
+      "expGain": 25,
+      "moraleGain": 4,
+      "sprite": {
+        "w": 120,
+        "h": 78,
+        "firstFrame": 1365,
+        "count": 184,
+        "cols": 4,
+        "rows": 46
+      }
+    },
+    "41": {
+      "id": 41,
+      "name": "步兵",
+      "hp": 500,
+      "attackA": 23,
+      "attackB": 0,
+      "defenceA": 8,
+      "defenceB": 8,
+      "vision": 5,
+      "range": 1,
+      "cost": {
+        "iron": 300,
+        "food": 500,
+        "wood": 0,
+        "gold": 1800
+      },
+      "trainTicks": 500,
+      "expGain": 8,
+      "moraleGain": 3,
+      "sprite": {
+        "w": 104,
+        "h": 65,
+        "firstFrame": 1549,
+        "count": 132,
+        "cols": 4,
+        "rows": 33
+      }
+    },
+    "42": {
+      "id": 42,
+      "name": "弓兵",
+      "hp": 500,
+      "attackA": 23,
+      "attackB": 23,
+      "defenceA": 5,
+      "defenceB": 8,
+      "vision": 7,
+      "range": 6,
+      "cost": {
+        "iron": 150,
+        "food": 500,
+        "wood": 300,
+        "gold": 1500
+      },
+      "trainTicks": 500,
+      "expGain": 8,
+      "moraleGain": 3,
+      "sprite": {
+        "w": 88,
+        "h": 62,
+        "firstFrame": 1681,
+        "count": 160,
+        "cols": 4,
+        "rows": 40
+      }
+    },
+    "43": {
+      "id": 43,
+      "name": "步兵",
+      "hp": 1000,
+      "attackA": 38,
+      "attackB": 0,
+      "defenceA": 9,
+      "defenceB": 9,
+      "vision": 5,
+      "range": 1,
+      "cost": {
+        "iron": 400,
+        "food": 1000,
+        "wood": 0,
+        "gold": 2400
+      },
+      "trainTicks": 1000,
+      "expGain": 20,
+      "moraleGain": 4,
+      "sprite": {
+        "w": 112,
+        "h": 70,
+        "firstFrame": 1841,
+        "count": 164,
+        "cols": 4,
+        "rows": 41
+      }
+    },
+    "44": {
+      "id": 44,
+      "name": "弓兵",
+      "hp": 1000,
+      "attackA": 38,
+      "attackB": 38,
+      "defenceA": 7,
+      "defenceB": 9,
+      "vision": 7,
+      "range": 6,
+      "cost": {
+        "iron": 200,
+        "food": 1000,
+        "wood": 400,
+        "gold": 2000
+      },
+      "trainTicks": 1000,
+      "expGain": 20,
+      "moraleGain": 4,
+      "sprite": {
+        "w": 88,
+        "h": 70,
+        "firstFrame": 2005,
+        "count": 198,
+        "cols": 6,
+        "rows": 33
+      }
+    },
+    "45": {
+      "id": 45,
+      "name": "弓兵",
+      "hp": 100,
+      "attackA": 12,
+      "attackB": 12,
+      "defenceA": 2,
+      "defenceB": 4,
+      "vision": 7,
+      "range": 6,
+      "cost": {
+        "iron": 50,
+        "food": 100,
+        "wood": 100,
+        "gold": 500
+      },
+      "trainTicks": 100,
+      "expGain": 2,
+      "moraleGain": 1,
+      "sprite": {
+        "w": 56,
+        "h": 40,
+        "firstFrame": 2203,
+        "count": 165,
+        "cols": 5,
+        "rows": 33
+      }
+    },
+    "46": {
+      "id": 46,
+      "name": "水兵",
+      "hp": 200,
+      "attackA": 30,
+      "attackB": 30,
+      "defenceA": 3,
+      "defenceB": 3,
+      "vision": 8,
+      "range": 7,
+      "cost": {
+        "iron": 100,
+        "food": 200,
+        "wood": 200,
+        "gold": 700
+      },
+      "trainTicks": 200,
+      "expGain": 10,
+      "moraleGain": 1,
+      "sprite": {
+        "w": 72,
+        "h": 55,
+        "firstFrame": 2368,
+        "count": 68,
+        "cols": 4,
+        "rows": 17
+      }
+    },
+    "47": {
+      "id": 47,
+      "name": "运输船",
+      "hp": 100,
+      "attackA": 0,
+      "attackB": 0,
+      "defenceA": 0,
+      "defenceB": 0,
+      "vision": 5,
+      "range": 0,
+      "cost": {
+        "iron": 100,
+        "food": 100,
+        "wood": 200,
+        "gold": 500
+      },
+      "trainTicks": 100,
+      "expGain": 20,
+      "moraleGain": 2,
+      "sprite": {
+        "w": 96,
+        "h": 74,
+        "firstFrame": 2436,
+        "count": 68,
+        "cols": 4,
+        "rows": 17
+      }
+    },
+    "48": {
+      "id": 48,
+      "name": "水兵",
+      "hp": 1000,
+      "attackA": 70,
+      "attackB": 70,
+      "defenceA": 3,
+      "defenceB": 3,
+      "vision": 8,
+      "range": 7,
+      "cost": {
+        "iron": 300,
+        "food": 1500,
+        "wood": 600,
+        "gold": 2100
+      },
+      "trainTicks": 1000,
+      "expGain": 25,
+      "moraleGain": 2,
+      "sprite": {
+        "w": 88,
+        "h": 76,
+        "firstFrame": 2504,
+        "count": 68,
+        "cols": 4,
+        "rows": 17
+      }
+    },
+    "49": {
+      "id": 49,
+      "name": "连船",
+      "hp": 2000,
+      "attackA": 110,
+      "attackB": 110,
+      "defenceA": 3,
+      "defenceB": 3,
+      "vision": 8,
+      "range": 7,
+      "cost": {
+        "iron": 400,
+        "food": 2000,
+        "wood": 800,
+        "gold": 2800
+      },
+      "trainTicks": 2000,
+      "expGain": 50,
+      "moraleGain": 4,
+      "sprite": {
+        "w": 144,
+        "h": 114,
+        "firstFrame": 2572,
+        "count": 64,
+        "cols": 4,
+        "rows": 16
+      }
+    }
+  },
+  "research": [
+    {
+      "building": "木材场",
+      "buildingIds": [
+        4,
+        5
+      ],
+      "panel": "0x11490",
+      "line": "弓术",
+      "levels": [
+        3,
+        4,
+        5
+      ],
+      "costs": [
+        {
+          "row": 3,
+          "values": [
+            800,
+            400,
+            0,
+            0,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        {
+          "row": 4,
+          "values": [
+            1500,
+            400,
+            100,
+            0,
+            4,
+            6,
+            8,
+            10
+          ]
+        },
+        {
+          "row": 5,
+          "values": [
+            2000,
+            800,
+            500,
+            0,
+            6,
+            9,
+            12,
+            15
+          ]
+        }
+      ],
+      "effect": "提高弓兵系攻击 B"
+    },
+    {
+      "building": "武器库",
+      "buildingIds": [
+        2,
+        3
+      ],
+      "panel": "0x114f4",
+      "line": "兵器",
+      "levels": [
+        6,
+        7,
+        8
+      ],
+      "costs": [
+        {
+          "row": 6,
+          "values": [
+            800,
+            0,
+            100,
+            0,
+            3,
+            4,
+            5,
+            6
+          ]
+        },
+        {
+          "row": 7,
+          "values": [
+            2000,
+            600,
+            300,
+            0,
+            6,
+            8,
+            10,
+            12
+          ]
+        },
+        {
+          "row": 8,
+          "values": [
+            3000,
+            1000,
+            500,
+            0,
+            9,
+            12,
+            15,
+            18
+          ]
+        }
+      ],
+      "effect": "提高近战系攻击 A"
+    },
+    {
+      "building": "武器库",
+      "buildingIds": [
+        2,
+        3
+      ],
+      "panel": "0x114f4",
+      "line": "甲胄",
+      "levels": [
+        9,
+        10,
+        11
+      ],
+      "costs": [
+        {
+          "row": 9,
+          "values": [
+            600,
+            300,
+            100,
+            0,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        {
+          "row": 10,
+          "values": [
+            1200,
+            600,
+            200,
+            0,
+            4,
+            6,
+            8,
+            10
+          ]
+        },
+        {
+          "row": 11,
+          "values": [
+            1600,
+            900,
+            300,
+            0,
+            6,
+            9,
+            12,
+            15
+          ]
+        }
+      ],
+      "effect": "提高军事单位防御 A/B"
+    },
+    {
+      "building": "车兵所",
+      "buildingIds": [
+        8,
+        9
+      ],
+      "panel": "0x116e8",
+      "line": "投石车",
+      "levels": [
+        18,
+        19
+      ],
+      "costs": [
+        {
+          "row": 18,
+          "values": [
+            1500,
+            500,
+            400,
+            0,
+            10,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "row": 19,
+          "values": [
+            3000,
+            1000,
+            800,
+            0,
+            20,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "effect": "投石车攻击 B +10/+20"
+    },
+    {
+      "building": "船坞",
+      "buildingIds": [
+        20
+      ],
+      "panel": "0x1174c",
+      "line": "水军",
+      "levels": [
+        20,
+        21,
+        22
+      ],
+      "costs": [
+        {
+          "row": 20,
+          "values": [
+            700,
+            400,
+            400,
+            0,
+            6,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "row": 21,
+          "values": [
+            1500,
+            1000,
+            800,
+            0,
+            15,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "row": 22,
+          "values": [
+            800,
+            500,
+            500,
+            0,
+            6,
+            10,
+            0,
+            0
+          ]
+        }
+      ],
+      "effect": "快船/战船/装甲升级"
+    }
+  ],
+  "sell": [
+    {
+      "resource": "木材",
+      "amount": 1000,
+      "gold": 500,
+      "rawRow": 12,
+      "prompt": 110
+    },
+    {
+      "resource": "铁",
+      "amount": 1000,
+      "gold": 800,
+      "rawRow": 13,
+      "prompt": 112,
+      "note": "raw cost row 13 = gold800/iron1000"
+    },
+    {
+      "resource": "粮食",
+      "amount": 1000,
+      "gold": 1000,
+      "rawRow": 14,
+      "prompt": 111,
+      "note": "raw cost row 14 = gold1000/food1000"
+    },
+    {
+      "resource": "木材",
+      "amount": 5000,
+      "gold": 2500,
+      "rawRow": 15,
+      "prompt": 113
+    },
+    {
+      "resource": "铁",
+      "amount": 5000,
+      "gold": 4000,
+      "rawRow": 16,
+      "prompt": 115,
+      "note": "raw cost row 16 = gold4000/iron5000"
+    },
+    {
+      "resource": "粮食",
+      "amount": 5000,
+      "gold": 5000,
+      "rawRow": 17,
+      "prompt": 114,
+      "note": "raw cost row 17 = gold5000/food5000"
+    }
+  ]
+}

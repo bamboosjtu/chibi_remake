@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-17",
+  "generator": "built-in image_gen",
+  "assets": [
+    {
+      "assetId": "battle-hud-panel-v2",
+      "target": "godot/chibi_remake/art/full/ui/hud_right-redraw-v2.png",
+      "sourceGeneratedFile": "C:/Users/bambo/.codex/generated_images/01a13348-db65-7b23-b66a-63227eb4490d/exec-da1d3c46-76e9-495e-a0c0-a3620b6fc414.png",
+      "reference": "godot/chibi_remake/art/full/ui/hud_right.png",
+      "prompt": "Use case: style-transfer. Asset type: production 2D game HUD right-side panel texture for the faithful HD remaster of the 1990s Chinese RTS 三国赤壁. The supplied image is the edit target and exact layout reference. Repaint it in sharp detailed hand-painted high definition, keep its tall narrow aspect ratio and precise compartment geometry: gold narrow outer trim, top black empty minimap compartment taking top 25 percent, central dark burgundy lacquer panel taking next 43 percent with subtle embossed coiling Han Chinese dragon, thin straight gold dividers at 25 and 69 percent height, bottom dark burgundy command panel. Retain original warm ochre antique gold, deep oxblood red, embossed dragon motif and flat front-on view. The current gold dragon pattern is muddy; redraw crisp carved dragon scales, elegant restrained relief with readable dark quiet areas for dynamic cream-colored text and icons. Keep gold ornament concentrated at edges and in subtle dark relief, reduce visual noise in middle. All compartments EMPTY, absolutely no characters, numbers, portraits, icons, labels, watermarks or added panels. No perspective, no gradients outside frame, no background scene. The output fills the image rectangle, opaque texture.",
+      "sha256": "600250572693b98aa9a8b2e72042faa309957a2f397dc6bd0bd80fde17136e61",
+      "bytes": 2639738,
+      "width": 778,
+      "height": 2021
+    },
+    {
+      "assetId": "battle-hud-banner-v2",
+      "target": "godot/chibi_remake/art/full/ui/hud_banner-redraw-v2.png",
+      "sourceGeneratedFile": "C:/Users/bambo/.codex/generated_images/01a13348-db65-7b23-b66a-63227eb4490d/exec-893ac798-d4ee-4277-9c16-cb90b556a469.png",
+      "transparent": true,
+      "prompt": "Use case: historical-scene. Asset type: transparent production game UI logo plaque for 三国赤壁 faithful HD remaster. Make one single very wide horizontal oval red lacquer cartouche, width to height ratio approximately 4.7:1. A thin antique gold beveled rim. Rich deep cinnabar lacquer, restrained worn edges and subtle hand-painted highlights, original late-1990s Chinese historical strategy-game aesthetic, crisp detailed high definition. EXACTLY two clearly legible large Chinese brush-calligraphy characters in warm red-gold centered horizontally: 赤壁. Faithful flat front-on gold-red oval emblem, no dragon heads jutting out, no extra ornament or objects, no subtitle, no English. Entire plaque fully inside canvas, occupy most width with modest transparent padding. Outside the oval fully transparent. Text (verbatim): 赤壁.",
+      "sha256": "b6955e4ba670910ce378fd63025098695a4fbe71bdb2d0cf905fcdea96a374c1",
+      "bytes": 2326942,
+      "width": 2152,
+      "height": 731
+    }
+  ]
+}

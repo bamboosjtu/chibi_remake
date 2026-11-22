@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>原版《赤壁》对战模式</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:32px; background:#12141a; color:#e6e6e6; font:15px/1.65 "Segoe UI","Microsoft YaHei",sans-serif; }
+  h1,h2,h3 { font-weight:600; letter-spacing:.02em; }
+  h1 { font-size:28px; margin:0 0 4px; }
+  h2 { margin:38px 0 12px; font-size:19px; color:#ffd27a; }
+  h3 { margin:20px 0 8px; font-size:15px; color:#ffd27a; }
+  .sub { color:#9aa0ad; margin-bottom:20px; }
+  code { background:#1d212b; padding:1px 5px; border-radius:4px; color:#a8d5ff; }
+  .note { background:#1b1f27; border-left:3px solid #ffd27a; padding:10px 14px; border-radius:4px; color:#c9ced8; }
+  .warn { border-left-color:#ff9d6e; }
+  .cards { display:flex; gap:12px; flex-wrap:wrap; margin:18px 0; }
+  .stat { background:#181c24; border:1px solid #2a2f3a; border-radius:10px; padding:12px 18px; min-width:150px; }
+  .stat b { display:block; font-size:24px; color:#ffd27a; }
+  .stat span { color:#9aa0ad; font-size:13px; }
+  table { border-collapse:collapse; width:100%; margin-top:8px; }
+  th,td { border-bottom:1px solid #262b35; padding:6px 9px; text-align:left; vertical-align:top; }
+  th { color:#9aa0ad; font-weight:500; font-size:13px; white-space:nowrap; }
+  .scroll { overflow-x:auto; }
+  .panel { background:#181c24; border:1px solid #2a2f3a; border-radius:10px; padding:14px; margin-top:10px; }
+  .panel img { max-width:100%; display:block; background:#0b0d12; border:1px solid #2a2f3a; }
+  .button { width:225px; height:30px; image-rendering:pixelated; display:block; margin:2px 0; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .meta { color:#9aa0ad; font-size:13px; }
+  .ok { color:#8fe3a3; } .bad { color:#ff9d9d; } .hot { color:#ffd27a; }
+  ul { margin-top:6px; }
+  @media (max-width:900px){ .grid2 { grid-template-columns:1fr; } body { padding:18px; } }
+</style>
+</head>
+<body>
+<h1>原版《赤壁》对战模式</h1>
+<div class="sub">CB.EXE <code>2db7cc10…c5798cb7</code> · 主菜单第三项 · M_*.EXP 菜单资源 · 静态分析</div>
+
+<div class="note warn">
+  <b>结论</b>：第三项「对战模式」有按钮素材，但 <code>command 21000</code> 在 <code>FUN_00409d70</code> 中没有处理动作。原版没有可玩的单机/热座/联网对战；代码里只残留多人菜单 UI 和加载分支，且没有网络传输导入。
+</div>
+
+<div class="cards">
+  <div class="stat"><b>21000</b><span>对战模式 command</span></div>
+  <div class="stat"><b>无动作</b><span>21000 分支为空</span></div>
+  <div class="stat"><b>4</b><span>残留多人菜单</span></div>
+  <div class="stat"><b>0</b><span>网络传输 DLL</span></div>
+</div>
+
+<h2>1. 主菜单第三项</h2>
+<div class="grid2">
+  <div class="panel">
+    <img src="assets/main_menu_items.png" alt="主菜单五项">
+    <p class="meta">主菜单五项目录，第三项为「对战模式」。素材来自原版 BMP.LWC，使用 MAINBACK.PAL。</p>
+  </div>
+  <div class="panel">
+    <img src="assets/main_menu_battle_states.png" alt="对战模式四态">
+    <p class="meta">「对战模式」按钮四态：普通 / 悬停 / 按下 / 灰色禁用。按钮存在不等于功能存在。</p>
+  </div>
+</div>
+
+<div class="scroll">
+<table>
+  <tr><th>#</th><th>标签</th><th>frame</th><th>command</th><th>位置 (x,y,w,h)</th><th>行为</th></tr>
+  <tr><td>0</td><td>开始游戏</td><td>171</td><td>20100</td><td>207,252,225,30</td><td>进入新游戏</td></tr>
+  <tr><td>1</td><td>读取进度</td><td>53</td><td>20200</td><td>207,292,225,30</td><td>读档</td></tr>
+  <tr><td>2</td><td><b>对战模式</b></td><td><b>273</b></td><td><b>21000</b></td><td><b>207,332,225,30</b></td><td class="bad">无处理分支 → 无动作</td></tr>
+  <tr><td>3</td><td>历史简介</td><td>29</td><td>26000</td><td>207,372,225,30</td><td>历史视频</td></tr>
+  <tr><td>4</td><td>退出游戏</td><td>26</td><td>27000</td><td>207,412,225,30</td><td>退出</td></tr>
+</table>
+</div>
+
+<h2>2. 代码级死链</h2>
+<div class="panel">
+<pre style="white-space:pre-wrap;color:#c9ced8;font-size:13px">else if (param_2 &lt; 0x5209) {
+    if (param_2 != 21000) {
+        // 0x4F1C / 0x4F1D 的 M_NET 分支在这里
+    }
+    // 21000 直接落到返回：没有 PostMessage，没有 FUN_00405e80
+}</pre>
+  <ul>
+    <li><code>M_MAIN.EXP</code> 是 XOR <code>0x22</code> 的 ASCII 菜单布局；</li>
+    <li>第三项：frame 273，command 21000，x207 y332 w225 h30；</li>
+    <li><code>FUN_00409d70</code> 的 21000 分支没有 else；</li>
+    <li>没有加载场景、提示或网络菜单。</li>
+  </ul>
+</div>
+
+<h2>3. 残留的多人菜单</h2>
+<div class="panel"><img src="assets/battle_mode_flow.svg" alt="对战模式死链与残留菜单"></div>
+<div class="grid2">
+  <div class="panel">
+    <h3 style="margin-top:0">M_NET（连接方式）</h3>
+    <img class="button" src="assets/net_internet.png" alt="INTERNET连接">
+    <img class="button" src="assets/net_lan.png" alt="网络连接">
+    <img class="button" src="assets/net_modem.png" alt="调制解调器连接">
+    <img class="button" src="assets/net_name.png" alt="请输入您的姓名" style="height:45px;object-fit:cover;">
+    <img class="button" src="assets/net_cancel.png" alt="取消">
+    <p class="meta">M_NET 加载器：<code>FUN_00405e80(0x5209)</code>；主菜单 21000 不调用它。</p>
+  </div>
+  <div class="panel">
+    <h3 style="margin-top:0">M_IPX（战局列表）</h3>
+    <img class="button" src="assets/ipx_create.png" alt="创建战局">
+    <img class="button" src="assets/ipx_join.png" alt="加入战局">
+    <img class="button" src="assets/ipx_watch.png" alt="观看战局">
+    <img class="button" src="assets/ipx_cancel.png" alt="取消">
+    <p class="meta">M_IPX 加载器：<code>FUN_00405e80(0x55f1)</code>；有“观看战局”和列表翻页。</p>
+  </div>
+</div>
+<div class="grid2">
+  <div class="panel">
+    <h3 style="margin-top:0">M_MODEM（拨号）</h3>
+    <img class="button" src="assets/modem_dial.png" alt="拨号">
+    <img class="button" src="assets/modem_wait.png" alt="等待拨号">
+    <img class="button" src="assets/modem_cancel.png" alt="取消">
+    <p class="meta">加载器：<code>FUN_00405e80(0x59d9)</code>；仅 UI，未发现 TAPI/调制解调器 API。</p>
+  </div>
+  <div class="panel">
+    <h3 style="margin-top:0">M_SERIAL（串口/直连）</h3>
+    <img class="button" src="assets/serial_create.png" alt="创建战局">
+    <img class="button" src="assets/serial_join.png" alt="加入战局">
+    <img class="button" src="assets/serial_cancel.png" alt="取消">
+    <p class="meta">加载器：<code>FUN_00405e80(0x5dc1)</code>；未发现串口通信 API。</p>
+  </div>
+</div>
+
+<h2>4. 为什么不能当作可用模式</h2>
+<div class="grid2">
+  <div class="panel">
+    <h3 style="margin-top:0">没有传输层</h3>
+    <p>CB.EXE 导入：</p>
+    <pre style="white-space:pre-wrap;color:#c9ced8;font-size:12px">KERNEL32  USER32  GDI32  DDRAW  DSOUND
+WINMM     IMM32   AVIFIL32  MSVFW32</pre>
+    <p>没有 Winsock、IPX、TAPI、串口 DCB/COMM 传输路径。</p>
+  </div>
+  <div class="panel">
+    <h3 style="margin-top:0">没有入口</h3>
+    <ul>
+      <li>21000 → 无动作；</li>
+      <li>M_NET/M_IPX/M_MODEM/M_SERIAL 只在残留网络菜单链中；</li>
+      <li>没有 AI 遭遇战/热座入口。</li>
+    </ul>
+  </div>
+</div>
+
+<h2>5. 与 docs/重制版对照</h2>
+<div class="scroll">
+<table>
+  <tr><th>主题</th><th>docs/重制</th><th>原版</th></tr>
+  <tr><td>主菜单第三项</td><td>保留入口，提示暂未开放</td><td>保留按钮；21000 无处理动作，未找到提示</td></tr>
+  <tr><td>多人/联网</td><td>明确无</td><td>有残留菜单资源，但无传输 API 与主菜单入口</td></tr>
+  <tr><td>本地遭遇战/热座</td><td>无</td><td>未发现入口</td></tr>
+  <tr><td>可玩性</td><td>不提供</td><td><b>不可玩；不是隐藏模式</b></td></tr>
+</table>
+</div>
+<p class="meta">docs 的“暂未开放”方向是对的；但原版更像空处理/死按钮，而不是弹提示。重制若显示提示，是重制新增行为。</p>
+
+<h2>6. 证据</h2>
+<div class="scroll">
+<table>
+  <tr><th>结论</th><th>位置/函数</th><th>Evidence</th></tr>
+  <tr><td>菜单 XOR 0x22 / 读取</td><td><code>FUN_0041bb20</code> / <code>FUN_0041ba50</code></td><td>ev_d0731b4f… / ev_7873f82d…</td></tr>
+  <tr><td>21000 空分支</td><td><code>FUN_00409d70</code> 0x409D70</td><td><code>if (param_2 != 21000)</code> 无 else</td></tr>
+  <tr><td>M_NET 加载</td><td><code>FUN_00405e80(0x5209)</code></td><td>0x405E80</td></tr>
+  <tr><td>M_IPX 引用/加载</td><td><code>0x406B52</code> / <code>0x55F1</code></td><td>ev_d72adfe1…</td></tr>
+  <tr><td>M_MODEM / M_SERIAL</td><td><code>0x59D9</code> / <code>0x5DC1</code></td><td>0x405E80</td></tr>
+  <tr><td>导入表无网络</td><td>PE imports</td><td>data/battle.json</td></tr>
+</table>
+</div>
+
+<h2>7. 文件</h2>
+<ul>
+  <li><a href="README.md">README.md</a> — 完整分析、菜单表、限制</li>
+  <li><a href="data/battle.json">data/battle.json</a> — 主菜单/21000/网络菜单/导入/证据</li>
+  <li><a href="data/menus.json">data/menus.json</a> — M_*.EXP XOR 后文本与哈希</li>
+  <li><a href="data/battle.csv">data/battle.csv</a> — 平表</li>
+  <li><a href="data/assets.json">data/assets.json</a> — 素材索引</li>
+  <li><a href="tools/extract_battle_mode.mjs">tools/extract_battle_mode.mjs</a> — 菜单解码/数据/流程图</li>
+  <li><a href="tools/extract_battle_menu_icons.py">tools/extract_battle_menu_icons.py</a> — 按钮帧裁切</li>
+</ul>
+
+<p class="meta">限制：静态分析，未运行原版点击逐帧验证；按钮文案直接读取 BMP.LWC 帧。没有修改任何重制玩法代码。</p>
+</body>
+</html>

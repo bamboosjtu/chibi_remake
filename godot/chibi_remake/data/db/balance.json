@@ -1,0 +1,64 @@
+{
+  "armyCap": 200,
+  "commanderCap": 20,
+  "teamMaxMembers": 15,
+  "transportCapacity": 16,
+  "harvest": {
+    "periodTicks": 100,
+    "pollTicks": 4,
+    "carryCapacity": 200,
+    "extractAmount": 200,
+    "deposits": {
+      "wood": [
+        4,
+        5,
+        0,
+        1
+      ],
+      "food": [
+        10,
+        11,
+        0,
+        1
+      ],
+      "stone": [
+        2,
+        3,
+        0,
+        1
+      ],
+      "gold": [
+        23,
+        0,
+        1
+      ]
+    }
+  },
+  "work": {
+    "restTicks": 10,
+    "restHp": 1,
+    "repairHp": 16,
+    "repairCost": {
+      "gold": 16,
+      "wood": 16,
+      "food": 16,
+      "stone": 16
+    },
+    "buildTicks": 4,
+    "buildHp": 2
+  },
+  "abilities": {
+    "cost": [
+      50,
+      100,
+      100,
+      100,
+      200,
+      100,
+      100,
+      10,
+      100
+    ],
+    "rangeCells": 10
+  }
+}

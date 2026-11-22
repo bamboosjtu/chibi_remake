@@ -1,0 +1,12 @@
+{
+  "assetId": "unit29-utility-v1",
+  "generator": "built-in image_gen",
+  "sourceGeneratedFile": "C:/Users/bambo/.codex/generated_images/01a13348-db65-7b23-b66a-63227eb4490d/exec-56f71fa9-7022-47b4-b2b8-78daa7110c7c.png",
+  "texture": "godot/chibi_remake/art/full/units/029/utility-v1.png",
+  "width": 1993,
+  "height": 789,
+  "sha256": "25ed48b1703d39b73a9f697573711f3ce8bbba2d77036ebf8277520b299e34eb",
+  "promptFile": "godot/chibi_remake/art/production/unit29-utility-v1-prompt.json",
+  "prompt": "Use case: precise-object-edit. Faithfully redraw these TWO small original utility silhouette shapes for the 三国赤壁 sprite atlas. Exactly two equal cells side by side, ONE row. Preserve exact source footprint, the separate lobes, open gap and outline of EACH of the two shapes. These are intentionally FLAT SOLID CYAN source utility masks. Keep them flat solid cyan (#239fd2) with smooth clean antialiased high resolution outlines, not enlarged staircase pixels. DO NOT interpret them as ponds, rocks, plants, cloaks, fallen people, scenery or objects. No interior texture, no lighting or drop shadow. Keep source relative positions at bottom of each cell, preserve large transparent margin above and the small separate cyan fragments. Match canvas aspect768:304. Genuine transparent alpha everywhere outside the two shapes, no background/checkerboard/grid/text/numbers/labels.",
+  "generatedAt": "2026-10-18T00:42:46.919Z"
+}

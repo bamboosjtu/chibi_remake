@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>原版《赤壁》单位、武将与素材</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; padding: 32px; background: #12141a; color: #e6e6e6;
+         font: 15px/1.65 "Segoe UI", "Microsoft YaHei", sans-serif; }
+  h1, h2, h3 { font-weight: 600; letter-spacing: .02em; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  h2 { margin: 40px 0 12px; font-size: 19px; color: #ffd27a; }
+  h3 { margin: 22px 0 8px; font-size: 15px; color: #ffd27a; }
+  .sub { color: #9aa0ad; margin-bottom: 24px; }
+  code { background: #1d212b; padding: 1px 5px; border-radius: 4px; color: #a8d5ff; }
+  img.sheet { max-width: 100%; image-rendering: pixelated; border: 1px solid #2a2f3a; background: #0b0d12; }
+  .cards { display: flex; gap: 12px; flex-wrap: wrap; }
+  .stat { background: #181c24; border: 1px solid #2a2f3a; border-radius: 10px; padding: 12px 18px; min-width: 120px; }
+  .stat b { display: block; font-size: 24px; color: #ffd27a; }
+  .stat span { color: #9aa0ad; font-size: 13px; }
+  table { border-collapse: collapse; width: 100%; margin-top: 8px; }
+  th, td { border-bottom: 1px solid #262b35; padding: 6px 9px; text-align: left; vertical-align: middle; }
+  th { color: #9aa0ad; font-weight: 500; font-size: 13px; white-space: nowrap; }
+  td.icon { width: 64px; }
+  td.icon img { width: 56px; image-rendering: pixelated; display: block;
+                background: repeating-conic-gradient(#1b1f28 0% 25%, #141820 0% 50%) 50% / 12px 12px; }
+  .scroll { overflow-x: auto; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 18px; align-items: start; }
+  .panel { background: #181c24; border: 1px solid #2a2f3a; border-radius: 10px; padding: 14px; }
+  .panel img { width: 100%; image-rendering: pixelated; }
+  .panel .cap { color: #9aa0ad; font-size: 13px; margin-top: 8px; }
+  .flow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+  .flow div { background: #1b202a; border: 1px solid #303746; border-radius: 8px; padding: 8px 12px; font-size: 13px; }
+  .flow i { color: #ffd27a; font-style: normal; }
+  .note { background: #1b1f27; border-left: 3px solid #ffd27a; padding: 10px 14px; border-radius: 4px; color: #c9ced8; }
+  .warn { border-left-color: #ff9d6e; }
+  a { color: #8ec5ff; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; background: #232936; color: #9aa0ad; font-size: 12px; margin-right: 6px; }
+  .ok { color: #8fe3a3; } .no { color: #ff9d9d; }
+  .heroGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 10px; margin-top: 10px; }
+  .hero { background: #181c24; border: 1px solid #2a2f3a; border-radius: 8px; padding: 8px; display: flex; gap: 8px; align-items: flex-start; }
+  .hero img { width: 59px; height: 74px; image-rendering: pixelated; flex: 0 0 auto; border: 1px solid #303746; }
+  .hero .hn { font-weight: 600; color: #ffd27a; }
+  .hero .hs, .hero .hr { color: #9aa0ad; font-size: 12px; line-height: 1.4; }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .filters button { background: #1b202a; border: 1px solid #303746; color: #c9ced8; border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+  .filters button:hover { border-color: #ffd27a; color: #ffd27a; }
+</style>
+</head>
+<body>
+<h1>原版《赤壁》单位、武将与素材</h1>
+<div class="sub">CB.EXE <code>2db7cc10…c5798cb7</code> · DATA.EXP / UNIT.EXP / ANISEQ01/02 · UNIT.LWC / BMP.LWC · REA/Ghidra 静态分析</div>
+
+<div class="note warn">
+  <b>口径</b>：分析只以原版代码/数据为准；<code>docs/</code> 与重制实现只用于差异对照，未由原版证明的内容标“待验证”。重制差异统一进入后期修复 backlog：
+  <a href="REMAKE_FIXES.md">REMAKE_FIXES.md</a> · <a href="data/remake_deltas.json">data/remake_deltas.json</a>。
+</div>
+
+<div class="cards">
+  <div class="stat"><b>26</b><span>可动单位类型 27–52</span></div>
+  <div class="stat"><b>117</b><span>武将（吴33/蜀14/魏51/群19）</span></div>
+  <div class="stat"><b>15</b><span>队伍成员上限</span></div>
+  <div class="stat"><b>16</b><span>满编实体 / 运输载员</span></div>
+  <div class="stat"><b>9</b><span>计谋 / 10 阵法</span></div>
+  <div class="stat"><b>5 行</b><span>walk/act1-3/die</span></div>
+  <div class="stat"><b>10</b><span>重制修复项</span></div>
+</div>
+
+<div class="note" style="margin-top:20px">
+  单位费用按运行时映射：<b>铁=v9、粮=v10、木=v11、金=v12</b>。工人实际为 <b>金 400 / 木 50 / 粮 50 / 铁 0</b>，不是 docs 的“金 50 / 粮 400”。
+  武将本体 HP 500；`DATA.EXP` 的 100 HP 会被装载器覆盖。
+</div>
+
+<h2>26 个单位类型</h2>
+<img class="sheet" src="assets/units_overview.png" alt="单位总览">
+<p class="meta">按 ID 27–52 排列，每个取 walk 首帧，6 列。全帧图集与动作条见每类素材链接。</p>
+
+<div class="scroll">
+<table>
+  <tr><th>ID</th><th>图</th><th>名称</th><th>类别</th><th>HP</th><th>攻A/B</th><th>防A/B</th><th>射程</th><th>视野</th><th>速率</th><th>金/木/粮/铁</th><th>占地</th><th>帧</th><th>生产/来源</th><th>定位</th><th>素材</th></tr>
+  <tr><td>27</td><td class="icon"><img src="assets/unit_27_icon.png" alt="男平民"></td><td>男平民</td><td>civilian</td><td>100</td><td>0/0</td><td>0/0</td><td>0</td><td>4</td><td>0→100</td><td>—/—/—/—</td><td>1</td><td>40</td><td>地图/武将</td><td>男平民：class 11，可采集、可修理、可击杀，无攻击；不能建造</td><td><a href="assets/unit_27_atlas.png">图集</a> · <a href="assets/unit_27_clips.png">动作</a></td></tr>
+  <tr><td>28</td><td class="icon"><img src="assets/unit_28_icon.png" alt="女平民"></td><td>女平民</td><td>civilian</td><td>100</td><td>0/0</td><td>0/0</td><td>0</td><td>4</td><td>0→100</td><td>—/—/—/—</td><td>1</td><td>40</td><td>地图/武将</td><td>女平民：class 11，可采集、可修理、可击杀，无攻击；不能建造</td><td><a href="assets/unit_28_atlas.png">图集</a> · <a href="assets/unit_28_clips.png">动作</a></td></tr>
+  <tr><td>29</td><td class="icon"><img src="assets/unit_29_icon.png" alt="文将"></td><td>文将</td><td>hero</td><td>500</td><td>28/0</td><td>4/4</td><td>1</td><td>5</td><td>100</td><td>—/—/—/—</td><td>1</td><td>85</td><td>地图/武将</td><td>文将本体（武将，不直接生产）</td><td><a href="assets/unit_29_atlas.png">图集</a> · <a href="assets/unit_29_clips.png">动作</a></td></tr>
+  <tr><td>30</td><td class="icon"><img src="assets/unit_30_icon.png" alt="工人"></td><td>工人</td><td>worker</td><td>100</td><td>7/0</td><td>0/0</td><td>1</td><td>4</td><td>100</td><td>400/50/50/—</td><td>1</td><td>144</td><td>帅帐 0/1</td><td>工人：采集、建造、修理、运输</td><td><a href="assets/unit_30_atlas.png">图集</a> · <a href="assets/unit_30_clips.png">动作</a></td></tr>
+  <tr><td>31</td><td class="icon"><img src="assets/unit_31_icon.png" alt="步将"></td><td>步将</td><td>hero</td><td>500</td><td>50/0</td><td>6/6</td><td>1</td><td>5</td><td>100</td><td>—/—/—/—</td><td>1</td><td>102</td><td>地图/武将</td><td>步将本体（武将，不直接生产）</td><td><a href="assets/unit_31_atlas.png">图集</a> · <a href="assets/unit_31_clips.png">动作</a></td></tr>
+  <tr><td>32</td><td class="icon"><img src="assets/unit_32_icon.png" alt="步兵"></td><td>步兵</td><td>infantry</td><td>100</td><td>12/0</td><td>4/4</td><td>1</td><td>5</td><td>100</td><td>600/—/100/100</td><td>1</td><td>112</td><td>步兵所 12/13</td><td>步兵 100 人档</td><td><a href="assets/unit_32_atlas.png">图集</a> · <a href="assets/unit_32_clips.png">动作</a></td></tr>
+  <tr><td>33</td><td class="icon"><img src="assets/unit_33_icon.png" alt="弓将"></td><td>弓将</td><td>hero</td><td>500</td><td>40/40</td><td>6/6</td><td>6</td><td>7</td><td>30</td><td>—/—/—/—</td><td>1</td><td>80</td><td>地图/武将</td><td>弓将本体（武将，不直接生产）</td><td><a href="assets/unit_33_atlas.png">图集</a> · <a href="assets/unit_33_clips.png">动作</a></td></tr>
+  <tr><td>34</td><td class="icon"><img src="assets/unit_34_icon.png" alt="车兵"></td><td>车兵</td><td>siege</td><td>100</td><td>150/150</td><td>1/2</td><td>10</td><td>10</td><td>10</td><td>800/300/100/400</td><td>4</td><td>68</td><td>车兵所 8/9</td><td>车兵/投石车：远程攻城，4 格占地</td><td><a href="assets/unit_34_atlas.png">图集</a> · <a href="assets/unit_34_clips.png">动作</a></td></tr>
+  <tr><td>35</td><td class="icon"><img src="assets/unit_35_icon.png" alt="骑将"></td><td>骑将</td><td>hero</td><td>500</td><td>70/0</td><td>6/6</td><td>1</td><td>5</td><td>100</td><td>—/—/—/—</td><td>1</td><td>160</td><td>地图/武将</td><td>骑将本体（武将，不直接生产）</td><td><a href="assets/unit_35_atlas.png">图集</a> · <a href="assets/unit_35_clips.png">动作</a></td></tr>
+  <tr><td>36</td><td class="icon"><img src="assets/unit_36_icon.png" alt="骑兵"></td><td>骑兵</td><td>cavalry</td><td>100</td><td>17/0</td><td>6/2</td><td>1</td><td>5</td><td>100</td><td>800/100/200/100</td><td>1</td><td>144</td><td>骑兵所 6/7</td><td>骑兵 100 人档</td><td><a href="assets/unit_36_atlas.png">图集</a> · <a href="assets/unit_36_clips.png">动作</a></td></tr>
+  <tr><td>37</td><td class="icon"><img src="assets/unit_37_icon.png" alt="骑兵"></td><td>骑兵</td><td>cavalry</td><td>200</td><td>27/0</td><td>7/3</td><td>1</td><td>5</td><td>100</td><td>1600/200/400/200</td><td>4</td><td>136</td><td>骑兵所 6/7</td><td>骑兵 200 人档</td><td><a href="assets/unit_37_atlas.png">图集</a> · <a href="assets/unit_37_clips.png">动作</a></td></tr>
+  <tr><td>38</td><td class="icon"><img src="assets/unit_38_icon.png" alt="步兵"></td><td>步兵</td><td>infantry</td><td>200</td><td>16/0</td><td>6/6</td><td>1</td><td>5</td><td>100</td><td>1200/—/200/200</td><td>1</td><td>84</td><td>步兵所 12/13</td><td>步兵 200 人档</td><td><a href="assets/unit_38_atlas.png">图集</a> · <a href="assets/unit_38_clips.png">动作</a></td></tr>
+  <tr><td>39</td><td class="icon"><img src="assets/unit_39_icon.png" alt="弓兵"></td><td>弓兵</td><td>archer</td><td>200</td><td>16/16</td><td>3/5</td><td>6</td><td>7</td><td>30</td><td>1000/200/200/100</td><td>1</td><td>95</td><td>弓兵所 14/15</td><td>弓兵 200 人档</td><td><a href="assets/unit_39_atlas.png">图集</a> · <a href="assets/unit_39_clips.png">动作</a></td></tr>
+  <tr><td>40</td><td class="icon"><img src="assets/unit_40_icon.png" alt="骑兵"></td><td>骑兵</td><td>cavalry</td><td>500</td><td>38/0</td><td>11/5</td><td>1</td><td>5</td><td>100</td><td>2400/300/1000/300</td><td>4</td><td>184</td><td>骑兵所 6/7</td><td>骑兵 500 人档（原版大本营等级2可开放；重制当前不生产）</td><td><a href="assets/unit_40_atlas.png">图集</a> · <a href="assets/unit_40_clips.png">动作</a></td></tr>
+  <tr><td>41</td><td class="icon"><img src="assets/unit_41_icon.png" alt="步兵"></td><td>步兵</td><td>infantry</td><td>500</td><td>23/0</td><td>8/8</td><td>1</td><td>5</td><td>100</td><td>1800/—/500/300</td><td>4</td><td>132</td><td>步兵所 12/13</td><td>步兵 500 人档（原版大本营等级2可开放；重制当前不生产）</td><td><a href="assets/unit_41_atlas.png">图集</a> · <a href="assets/unit_41_clips.png">动作</a></td></tr>
+  <tr><td>42</td><td class="icon"><img src="assets/unit_42_icon.png" alt="弓兵"></td><td>弓兵</td><td>archer</td><td>500</td><td>23/23</td><td>5/8</td><td>6</td><td>7</td><td>30</td><td>1500/300/500/150</td><td>4</td><td>160</td><td>弓兵所 14/15</td><td>弓兵 500 人档（原版大本营等级2可开放；重制当前不生产）</td><td><a href="assets/unit_42_atlas.png">图集</a> · <a href="assets/unit_42_clips.png">动作</a></td></tr>
+  <tr><td>43</td><td class="icon"><img src="assets/unit_43_icon.png" alt="步兵"></td><td>步兵</td><td>infantry</td><td>1000</td><td>38/0</td><td>9/9</td><td>1</td><td>5</td><td>100</td><td>2400/—/1000/400</td><td>4</td><td>164</td><td>步兵所 12/13</td><td>步兵 1000 人档（原版大本营等级3可开放；重制当前不生产）</td><td><a href="assets/unit_43_atlas.png">图集</a> · <a href="assets/unit_43_clips.png">动作</a></td></tr>
+  <tr><td>44</td><td class="icon"><img src="assets/unit_44_icon.png" alt="弓兵"></td><td>弓兵</td><td>archer</td><td>1000</td><td>38/38</td><td>7/9</td><td>6</td><td>7</td><td>30</td><td>2000/400/1000/200</td><td>4</td><td>198</td><td>弓兵所 14/15</td><td>弓兵 1000 人档（原版大本营等级3可开放；重制当前不生产）</td><td><a href="assets/unit_44_atlas.png">图集</a> · <a href="assets/unit_44_clips.png">动作</a></td></tr>
+  <tr><td>45</td><td class="icon"><img src="assets/unit_45_icon.png" alt="弓兵"></td><td>弓兵</td><td>archer</td><td>100</td><td>12/12</td><td>2/4</td><td>6</td><td>7</td><td>30</td><td>500/100/100/50</td><td>1</td><td>165</td><td>弓兵所 14/15</td><td>弓兵 100 人档</td><td><a href="assets/unit_45_atlas.png">图集</a> · <a href="assets/unit_45_clips.png">动作</a></td></tr>
+  <tr><td>46</td><td class="icon"><img src="assets/unit_46_icon.png" alt="水兵"></td><td>水兵</td><td>ship</td><td>200</td><td>30/30</td><td>3/3</td><td>7</td><td>8</td><td>30</td><td>700/200/200/100</td><td>1</td><td>68</td><td>船坞 20</td><td>快船（水兵 46）：水军</td><td><a href="assets/unit_46_atlas.png">图集</a> · <a href="assets/unit_46_clips.png">动作</a></td></tr>
+  <tr><td>47</td><td class="icon"><img src="assets/unit_47_icon.png" alt="运输船"></td><td>运输船</td><td>transport</td><td>100</td><td>0/0</td><td>0/0</td><td>0</td><td>5</td><td>0→100</td><td>500/200/100/100</td><td>4</td><td>68</td><td>船坞 20</td><td>运输船：载员 16，无攻击</td><td><a href="assets/unit_47_atlas.png">图集</a> · <a href="assets/unit_47_clips.png">动作</a></td></tr>
+  <tr><td>48</td><td class="icon"><img src="assets/unit_48_icon.png" alt="水兵"></td><td>水兵</td><td>ship</td><td>1000</td><td>70/70</td><td>3/3</td><td>7</td><td>8</td><td>30</td><td>2100/600/1500/300</td><td>4</td><td>68</td><td>船坞 20</td><td>战船（水兵 48）：水军</td><td><a href="assets/unit_48_atlas.png">图集</a> · <a href="assets/unit_48_clips.png">动作</a></td></tr>
+  <tr><td>49</td><td class="icon"><img src="assets/unit_49_icon.png" alt="连船"></td><td>连船</td><td>ship</td><td>2000</td><td>110/110</td><td>3/3</td><td>7</td><td>8</td><td>30</td><td>2800/800/2000/400</td><td>16</td><td>64</td><td>船坞 20</td><td>连船：大型水军，4×4 占地</td><td><a href="assets/unit_49_atlas.png">图集</a> · <a href="assets/unit_49_clips.png">动作</a></td></tr>
+  <tr><td>50</td><td class="icon"><img src="assets/unit_50_icon.png" alt="短云梯"></td><td>短云梯</td><td>ladder</td><td>100</td><td>0/0</td><td>0/0</td><td>0</td><td>6</td><td>0</td><td>400/200/100/50</td><td>1</td><td>36</td><td>保留</td><td>短云梯：保留类型，当前 34 关导出无放置</td><td><a href="assets/unit_50_atlas.png">图集</a> · <a href="assets/unit_50_clips.png">动作</a></td></tr>
+  <tr><td>51</td><td class="icon"><img src="assets/unit_51_icon.png" alt="长云梯"></td><td>长云梯</td><td>ladder</td><td>200</td><td>0/0</td><td>0/0</td><td>0</td><td>6</td><td>0</td><td>800/400/200/100</td><td>1</td><td>36</td><td>保留</td><td>长云梯：保留类型，当前 34 关导出无放置</td><td><a href="assets/unit_51_atlas.png">图集</a> · <a href="assets/unit_51_clips.png">动作</a></td></tr>
+  <tr><td>52</td><td class="icon"><img src="assets/unit_52_icon.png" alt="旗舰"></td><td>旗舰</td><td>flagship</td><td>1000</td><td>70/70</td><td>3/3</td><td>6</td><td>7</td><td>30</td><td>2100/600/1500/300</td><td>4</td><td>68</td><td>保留</td><td>旗舰：保留类型，不参与单挑</td><td><a href="assets/unit_52_atlas.png">图集</a> · <a href="assets/unit_52_clips.png">动作</a></td></tr>
+</table>
+</div>
+<p class="meta"><b>速率列</b>：<code>DATA.EXP v8</code> 是动作/攻击/修理速率（<code>1000/rate</code>），不是移动 px/s；移动/动画时钟见 <a href="../movements/index.html">research/movements</a>。</p>
+<p class="meta"><b>生产档位</b>：<code>FUN_0046C710</code> 从建筑/大本营状态写 <code>DAT_004b8d29</code>；<code>FUN_00426E40</code> 将 0/1/2/&gt;2 映射为 <code>1/3/7/0xF</code> 行。步兵/弓兵 <code>1/3/7/0xF</code>、骑兵 <code>1/3/7</code>；原版 500/1000 行都有定义（等级2/3）。重制当前只列 100/200，门控方向接近原版，缺行见 <a href="REMAKE_FIXES.md">U-05</a>。<br><span class="no">旧稿“生产档来自关卡 init[0]”的推断已撤销（A-01）。</span></p>
+
+<h2>武将：117 人、等级与官职</h2>
+<div class="grid2">
+  <div class="panel"><h3>头像总表（10×12，59×74/格）</h3><img src="assets/heroes_sheet.png" alt="117 武将头像">
+    <div class="cap">`BMP.LWC` 帧 281，590×888；索引 0–116 与 DATA.EXP 四个武将块一致。<br>吴 33 / 蜀 14 / 魏 51 / 群 19。</div></div>
+  <div class="panel"><h3>开局/成长</h3>
+    <table>
+      <tr><th>项</th><th>值</th></tr>
+      <tr><td>HP / 士气 / 谋略</td><td>500 / 70 / 10</td></tr>
+      <tr><td>谋略上限</td><td>2×智 + 15</td></tr>
+      <tr><td>恢复</td><td>每 100 tick：激励中谋略+5；否则 HP+10（封顶）</td></tr>
+      <tr><td>等级</td><td>0–9；阈值 200/500/1000/1800/3000/5000/8000/12000/18000</td></tr>
+      <tr><td>开局等级</td><td>索引 1–33 且等级 0 → 5（FUN_0042B790 已确认）</td></tr>
+      <tr><td>攻击</td><td>floor((武+品级)×类型攻/100)</td></tr>
+      <tr><td>防御</td><td>floor(武×类型防/100)；升级不加防御</td></tr>
+      <tr><td>单挑体力</td><td>武 + 品级；×100/120 显示</td></tr>
+      <tr><td>单挑</td><td>≤10 格；旗舰 52 不参与</td></tr>
+    </table>
+    <div class="cap">官职/品级按等级×类型列查表；完整 0–9 级数据见 <code>data/heroes.json</code>。</div>
+  </div>
+</div>
+
+<h3>等级 / 品级表</h3>
+<div class="scroll">
+<table>
+  <tr><th>等级</th><th>步</th><th>骑</th><th>弓</th><th>文</th></tr>
+  <tr><td>0</td><td>步兵校尉（3）</td><td>屯骑校尉（2）</td><td>射声校尉（1）</td><td>虎贲校尉（0）</td></tr>
+  <tr><td>1</td><td>步兵中郎将（5）</td><td>屯骑中郎将（4）</td><td>射声中郎将（2）</td><td>虎贲中郎将（3）</td></tr>
+  <tr><td>2</td><td>裨将（3）</td><td>偏将（6）</td><td>偏将（6）</td><td>裨将（3）</td></tr>
+  <tr><td>3</td><td>旗门将军（4）</td><td>牙门将军（8）</td><td>牙门将军（8）</td><td>旗门将军（4）</td></tr>
+  <tr><td>4</td><td>车骑将军（6）</td><td>骠骑将军（9）</td><td>骠骑将军（9）</td><td>车骑将军（6）</td></tr>
+  <tr><td>5</td><td>虎威将军（6）</td><td>龙骧将军（12）</td><td>龙骧将军（12）</td><td>虎威将军（6）</td></tr>
+  <tr><td>6</td><td>前将军（14）</td><td>后将军（12）</td><td>左将军（7）</td><td>右将军（9）</td></tr>
+  <tr><td>7</td><td>镇南将军（16）</td><td>镇西将军（8）</td><td>镇东将军（10）</td><td>镇北将军（14）</td></tr>
+  <tr><td>8</td><td>征东将军（18）</td><td>征西将军（9）</td><td>征南将军（11）</td><td>征北将军（16）</td></tr>
+  <tr><td>9</td><td>大将军（20）</td><td>大将军（20）</td><td>大将军（20）</td><td>大将军（20）</td></tr>
+</table>
+</div>
+
+<details style="margin-top:14px"><summary style="cursor:pointer;color:#ffd27a">展开 117 名武将</summary>
+<div class="filters">
+  <button data-r="all">全部</button><button data-r="吴">吴 33</button><button data-r="蜀">蜀 14</button><button data-r="魏">魏 51</button><button data-r="群">群 19</button>
+</div>
+<div class="heroGrid" id="heroGrid">
+  <div class="hero" data-r="吴"><img src="assets/hero_000.png" alt="甘宁"><div><div class="hn">甘宁 <span class="pill">0</span></div><div class="hs">吴 · 骑将 · 武93 智67</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_001.png" alt="太史慈"><div><div class="hn">太史慈 <span class="pill">1</span></div><div class="hs">吴 · 骑将 · 武92 智52</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_002.png" alt="凌统"><div><div class="hn">凌统 <span class="pill">2</span></div><div class="hs">吴 · 步将 · 武87 智43</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_003.png" alt="韩当"><div><div class="hn">韩当 <span class="pill">3</span></div><div class="hs">吴 · 步将 · 武85 智70</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_004.png" alt="吕蒙"><div><div class="hn">吕蒙 <span class="pill">4</span></div><div class="hs">吴 · 弓将 · 武85 智72</div><div class="hr">L0 射声校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_005.png" alt="周泰"><div><div class="hn">周泰 <span class="pill">5</span></div><div class="hs">吴 · 弓将 · 武85 智25</div><div class="hr">L0 射声校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_006.png" alt="黄盖"><div><div class="hn">黄盖 <span class="pill">6</span></div><div class="hs">吴 · 弓将 · 武84 智80</div><div class="hr">L0 射声校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_007.png" alt="程普"><div><div class="hn">程普 <span class="pill">7</span></div><div class="hs">吴 · 弓将 · 武82 智68</div><div class="hr">L0 射声校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_008.png" alt="徐盛"><div><div class="hn">徐盛 <span class="pill">8</span></div><div class="hs">吴 · 骑将 · 武81 智41</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_009.png" alt="丁奉"><div><div class="hn">丁奉 <span class="pill">9</span></div><div class="hs">吴 · 骑将 · 武80 智58</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_010.png" alt="蒋钦"><div><div class="hn">蒋钦 <span class="pill">10</span></div><div class="hs">吴 · 步将 · 武79 智32</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_011.png" alt="潘璋"><div><div class="hn">潘璋 <span class="pill">11</span></div><div class="hs">吴 · 步将 · 武79 智46</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_012.png" alt="周瑜"><div><div class="hn">周瑜 <span class="pill">12</span></div><div class="hs">吴 · 骑将 · 武76 智98</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_013.png" alt="陆逊"><div><div class="hn">陆逊 <span class="pill">13</span></div><div class="hs">吴 · 弓将 · 武75 智96</div><div class="hr">L0 射声校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_014.png" alt="孙权"><div><div class="hn">孙权 <span class="pill">14</span></div><div class="hs">吴 · 骑将 · 武72 智75</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_015.png" alt="朱桓"><div><div class="hn">朱桓 <span class="pill">15</span></div><div class="hs">吴 · 步将 · 武72 智39</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_016.png" alt="董袭"><div><div class="hn">董袭 <span class="pill">16</span></div><div class="hs">吴 · 弓将 · 武71 智42</div><div class="hr">L0 射声校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_017.png" alt="陈武"><div><div class="hn">陈武 <span class="pill">17</span></div><div class="hs">吴 · 步将 · 武67 智42</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_018.png" alt="宋谦"><div><div class="hn">宋谦 <span class="pill">18</span></div><div class="hs">吴 · 骑将 · 武67 智28</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_019.png" alt="朱治"><div><div class="hn">朱治 <span class="pill">19</span></div><div class="hs">吴 · 弓将 · 武67 智62</div><div class="hr">L0 射声校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_020.png" alt="吕范"><div><div class="hn">吕范 <span class="pill">20</span></div><div class="hs">吴 · 文将 · 武37 智76</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_021.png" alt="顾雍"><div><div class="hn">顾雍 <span class="pill">21</span></div><div class="hs">吴 · 文将 · 武36 智83</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_022.png" alt="阚泽"><div><div class="hn">阚泽 <span class="pill">22</span></div><div class="hs">吴 · 文将 · 武36 智85</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_023.png" alt="步骘"><div><div class="hn">步骘 <span class="pill">23</span></div><div class="hs">吴 · 文将 · 武35 智74</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_024.png" alt="鲁肃"><div><div class="hn">鲁肃 <span class="pill">24</span></div><div class="hs">吴 · 文将 · 武35 智92</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_025.png" alt="诸葛瑾"><div><div class="hn">诸葛瑾 <span class="pill">25</span></div><div class="hs">吴 · 文将 · 武34 智90</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_026.png" alt="虞翻"><div><div class="hn">虞翻 <span class="pill">26</span></div><div class="hs">吴 · 文将 · 武31 智73</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_027.png" alt="华歆"><div><div class="hn">华歆 <span class="pill">27</span></div><div class="hs">吴 · 文将 · 武29 智82</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_028.png" alt="张泓"><div><div class="hn">张泓 <span class="pill">28</span></div><div class="hs">吴 · 文将 · 武29 智87</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_029.png" alt="陆绩"><div><div class="hn">陆绩 <span class="pill">29</span></div><div class="hs">吴 · 文将 · 武27 智81</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_030.png" alt="严畯"><div><div class="hn">严畯 <span class="pill">30</span></div><div class="hs">吴 · 文将 · 武26 智69</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_031.png" alt="薛综"><div><div class="hn">薛综 <span class="pill">31</span></div><div class="hs">吴 · 文将 · 武25 智72</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="吴"><img src="assets/hero_032.png" alt="张昭"><div><div class="hn">张昭 <span class="pill">32</span></div><div class="hs">吴 · 文将 · 武23 智89</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="蜀"><img src="assets/hero_033.png" alt="赵云"><div><div class="hn">赵云 <span class="pill">33</span></div><div class="hs">蜀 · 骑将 · 武100 智87</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="蜀"><img src="assets/hero_034.png" alt="张飞"><div><div class="hn">张飞 <span class="pill">34</span></div><div class="hs">蜀 · 骑将 · 武99 智31</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="蜀"><img src="assets/hero_035.png" alt="关羽"><div><div class="hn">关羽 <span class="pill">35</span></div><div class="hs">蜀 · 骑将 · 武98 智82</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="蜀"><img src="assets/hero_036.png" alt="周仓"><div><div class="hn">周仓 <span class="pill">36</span></div><div class="hs">蜀 · 步将 · 武83 智37</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="蜀"><img src="assets/hero_037.png" alt="关平"><div><div class="hn">关平 <span class="pill">37</span></div><div class="hs">蜀 · 骑将 · 武82 智73</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="蜀"><img src="assets/hero_038.png" alt="廖化"><div><div class="hn">廖化 <span class="pill">38</span></div><div class="hs">蜀 · 弓将 · 武74 智42</div><div class="hr">L0 射声校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="蜀"><img src="assets/hero_039.png" alt="刘备"><div><div class="hn">刘备 <span class="pill">39</span></div><div class="hs">蜀 · 步将 · 武73 智84</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="蜀"><img src="assets/hero_040.png" alt="刘封"><div><div class="hn">刘封 <span class="pill">40</span></div><div class="hs">蜀 · 弓将 · 武71 智63</div><div class="hr">L0 射声校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="蜀"><img src="assets/hero_041.png" alt="诸葛亮"><div><div class="hn">诸葛亮 <span class="pill">41</span></div><div class="hs">蜀 · 文将 · 武69 智100</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="蜀"><img src="assets/hero_042.png" alt="徐庶"><div><div class="hn">徐庶 <span class="pill">42</span></div><div class="hs">蜀 · 文将 · 武66 智96</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="蜀"><img src="assets/hero_043.png" alt="糜芳"><div><div class="hn">糜芳 <span class="pill">43</span></div><div class="hs">蜀 · 步将 · 武62 智57</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="蜀"><img src="assets/hero_044.png" alt="糜竺"><div><div class="hn">糜竺 <span class="pill">44</span></div><div class="hs">蜀 · 文将 · 武41 智79</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="蜀"><img src="assets/hero_045.png" alt="简雍"><div><div class="hn">简雍 <span class="pill">45</span></div><div class="hs">蜀 · 文将 · 武37 智83</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="蜀"><img src="assets/hero_046.png" alt="孙乾"><div><div class="hn">孙乾 <span class="pill">46</span></div><div class="hs">蜀 · 文将 · 武34 智82</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_047.png" alt="许褚"><div><div class="hn">许褚 <span class="pill">47</span></div><div class="hs">魏 · 骑将 · 武97 智25</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_048.png" alt="徐晃"><div><div class="hn">徐晃 <span class="pill">48</span></div><div class="hs">魏 · 骑将 · 武93 智63</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_049.png" alt="张辽"><div><div class="hn">张辽 <span class="pill">49</span></div><div class="hs">魏 · 骑将 · 武92 智83</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_050.png" alt="夏侯惇"><div><div class="hn">夏侯惇 <span class="pill">50</span></div><div class="hs">魏 · 骑将 · 武92 智32</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_051.png" alt="夏侯渊"><div><div class="hn">夏侯渊 <span class="pill">51</span></div><div class="hs">魏 · 骑将 · 武91 智65</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_052.png" alt="曹洪"><div><div class="hn">曹洪 <span class="pill">52</span></div><div class="hs">魏 · 步将 · 武89 智71</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_053.png" alt="曹仁"><div><div class="hn">曹仁 <span class="pill">53</span></div><div class="hs">魏 · 弓将 · 武86 智80</div><div class="hr">L0 射声校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_054.png" alt="于禁"><div><div class="hn">于禁 <span class="pill">54</span></div><div class="hs">魏 · 步将 · 武83 智74</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_055.png" alt="李典"><div><div class="hn">李典 <span class="pill">55</span></div><div class="hs">魏 · 弓将 · 武80 智71</div><div class="hr">L0 射声校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_056.png" alt="乐进"><div><div class="hn">乐进 <span class="pill">56</span></div><div class="hs">魏 · 骑将 · 武79 智67</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_057.png" alt="夏侯兰"><div><div class="hn">夏侯兰 <span class="pill">57</span></div><div class="hs">魏 · 弓将 · 武73 智36</div><div class="hr">L0 射声校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_058.png" alt="臧霸"><div><div class="hn">臧霸 <span class="pill">58</span></div><div class="hs">魏 · 步将 · 武71 智27</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_059.png" alt="曹操"><div><div class="hn">曹操 <span class="pill">59</span></div><div class="hs">魏 · 骑将 · 武70 智90</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_060.png" alt="鲜于辅"><div><div class="hn">鲜于辅 <span class="pill">60</span></div><div class="hs">魏 · 步将 · 武70 智42</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_061.png" alt="朱灵"><div><div class="hn">朱灵 <span class="pill">61</span></div><div class="hs">魏 · 弓将 · 武69 智48</div><div class="hr">L0 射声校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_062.png" alt="张南"><div><div class="hn">张南 <span class="pill">62</span></div><div class="hs">魏 · 骑将 · 武68 智47</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_063.png" alt="韩浩"><div><div class="hn">韩浩 <span class="pill">63</span></div><div class="hs">魏 · 骑将 · 武68 智33</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_064.png" alt="晏明"><div><div class="hn">晏明 <span class="pill">64</span></div><div class="hs">魏 · 步将 · 武67 智51</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_065.png" alt="刘岱"><div><div class="hn">刘岱 <span class="pill">65</span></div><div class="hs">魏 · 弓将 · 武67 智39</div><div class="hr">L0 射声校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_066.png" alt="吕旷"><div><div class="hn">吕旷 <span class="pill">66</span></div><div class="hs">魏 · 步将 · 武64 智41</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_067.png" alt="吕翔"><div><div class="hn">吕翔 <span class="pill">67</span></div><div class="hs">魏 · 骑将 · 武63 智35</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_068.png" alt="马延"><div><div class="hn">马延 <span class="pill">68</span></div><div class="hs">魏 · 弓将 · 武62 智37</div><div class="hr">L0 射声校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_069.png" alt="张郃"><div><div class="hn">张郃 <span class="pill">69</span></div><div class="hs">魏 · 步将 · 武61 智46</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_070.png" alt="王必"><div><div class="hn">王必 <span class="pill">70</span></div><div class="hs">魏 · 弓将 · 武58 智35</div><div class="hr">L0 射声校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_071.png" alt="王忠"><div><div class="hn">王忠 <span class="pill">71</span></div><div class="hs">魏 · 骑将 · 武57 智37</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_072.png" alt="桓阶"><div><div class="hn">桓阶 <span class="pill">72</span></div><div class="hs">魏 · 步将 · 武57 智28</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_073.png" alt="焦触"><div><div class="hn">焦触 <span class="pill">73</span></div><div class="hs">魏 · 步将 · 武53 智31</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_074.png" alt="淳于导"><div><div class="hn">淳于导 <span class="pill">74</span></div><div class="hs">魏 · 弓将 · 武52 智47</div><div class="hr">L0 射声校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_075.png" alt="袁涣"><div><div class="hn">袁涣 <span class="pill">75</span></div><div class="hs">魏 · 步将 · 武52 智31</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_076.png" alt="杜袭"><div><div class="hn">杜袭 <span class="pill">76</span></div><div class="hs">魏 · 弓将 · 武48 智45</div><div class="hr">L0 射声校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_077.png" alt="陈群"><div><div class="hn">陈群 <span class="pill">77</span></div><div class="hs">魏 · 文将 · 武45 智81</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_078.png" alt="李孚"><div><div class="hn">李孚 <span class="pill">78</span></div><div class="hs">魏 · 文将 · 武42 智80</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_079.png" alt="温恢"><div><div class="hn">温恢 <span class="pill">79</span></div><div class="hs">魏 · 文将 · 武42 智67</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_080.png" alt="吕虔"><div><div class="hn">吕虔 <span class="pill">80</span></div><div class="hs">魏 · 文将 · 武37 智73</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_081.png" alt="夏侯恩"><div><div class="hn">夏侯恩 <span class="pill">81</span></div><div class="hs">魏 · 骑将 · 武56 智52</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_082.png" alt="刘晔"><div><div class="hn">刘晔 <span class="pill">82</span></div><div class="hs">魏 · 文将 · 武34 智82</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_083.png" alt="董昭"><div><div class="hn">董昭 <span class="pill">83</span></div><div class="hs">魏 · 文将 · 武34 智67</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_084.png" alt="程昱"><div><div class="hn">程昱 <span class="pill">84</span></div><div class="hs">魏 · 文将 · 武32 智94</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_085.png" alt="曹纯"><div><div class="hn">曹纯 <span class="pill">85</span></div><div class="hs">魏 · 步将 · 武77 智32</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_086.png" alt="蒋济"><div><div class="hn">蒋济 <span class="pill">86</span></div><div class="hs">魏 · 文将 · 武31 智67</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_087.png" alt="毛玠"><div><div class="hn">毛玠 <span class="pill">87</span></div><div class="hs">魏 · 文将 · 武69 智31</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_088.png" alt="辛毗"><div><div class="hn">辛毗 <span class="pill">88</span></div><div class="hs">魏 · 文将 · 武29 智83</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_089.png" alt="满宠"><div><div class="hn">满宠 <span class="pill">89</span></div><div class="hs">魏 · 文将 · 武28 智79</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_090.png" alt="荀攸"><div><div class="hn">荀攸 <span class="pill">90</span></div><div class="hs">魏 · 文将 · 武27 智96</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_091.png" alt="贾逵"><div><div class="hn">贾逵 <span class="pill">91</span></div><div class="hs">魏 · 文将 · 武27 智73</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_092.png" alt="张既"><div><div class="hn">张既 <span class="pill">92</span></div><div class="hs">魏 · 骑将 · 武90 智69</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_093.png" alt="荀彧"><div><div class="hn">荀彧 <span class="pill">93</span></div><div class="hs">魏 · 文将 · 武25 智96</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_094.png" alt="高柔"><div><div class="hn">高柔 <span class="pill">94</span></div><div class="hs">魏 · 文将 · 武25 智64</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_095.png" alt="牛金"><div><div class="hn">牛金 <span class="pill">95</span></div><div class="hs">魏 · 文将 · 武25 智64</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_096.png" alt="贾诩"><div><div class="hn">贾诩 <span class="pill">96</span></div><div class="hs">魏 · 文将 · 武23 智92</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="魏"><img src="assets/hero_097.png" alt="何夔"><div><div class="hn">何夔 <span class="pill">97</span></div><div class="hs">魏 · 文将 · 武21 智73</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="群"><img src="assets/hero_098.png" alt="魏延"><div><div class="hn">魏延 <span class="pill">98</span></div><div class="hs">群 · 骑将 · 武96 智80</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="群"><img src="assets/hero_099.png" alt="文聘"><div><div class="hn">文聘 <span class="pill">99</span></div><div class="hs">群 · 骑将 · 武84 智62</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="群"><img src="assets/hero_100.png" alt="张允"><div><div class="hn">张允 <span class="pill">100</span></div><div class="hs">群 · 弓将 · 武75 智51</div><div class="hr">L0 射声校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="群"><img src="assets/hero_101.png" alt="蔡瑁"><div><div class="hn">蔡瑁 <span class="pill">101</span></div><div class="hs">群 · 步将 · 武72 智53</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="群"><img src="assets/hero_102.png" alt="宋忠"><div><div class="hn">宋忠 <span class="pill">102</span></div><div class="hs">群 · 弓将 · 武71 智28</div><div class="hr">L0 射声校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="群"><img src="assets/hero_103.png" alt="王威"><div><div class="hn">王威 <span class="pill">103</span></div><div class="hs">群 · 步将 · 武68 智41</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="群"><img src="assets/hero_104.png" alt="刘先"><div><div class="hn">刘先 <span class="pill">104</span></div><div class="hs">群 · 骑将 · 武66 智39</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="群"><img src="assets/hero_105.png" alt="邓义"><div><div class="hn">邓义 <span class="pill">105</span></div><div class="hs">群 · 骑将 · 武64 智42</div><div class="hr">L0 屯骑校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="群"><img src="assets/hero_106.png" alt="蔡中"><div><div class="hn">蔡中 <span class="pill">106</span></div><div class="hs">群 · 步将 · 武61 智35</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="群"><img src="assets/hero_107.png" alt="蔡和"><div><div class="hn">蔡和 <span class="pill">107</span></div><div class="hs">群 · 弓将 · 武58 智36</div><div class="hr">L0 射声校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="群"><img src="assets/hero_108.png" alt="蔡勋"><div><div class="hn">蔡勋 <span class="pill">108</span></div><div class="hs">群 · 步将 · 武53 智45</div><div class="hr">L0 步兵校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="群"><img src="assets/hero_109.png" alt="刘表"><div><div class="hn">刘表 <span class="pill">109</span></div><div class="hs">群 · 文将 · 武46 智79</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="群"><img src="assets/hero_110.png" alt="蒯越"><div><div class="hn">蒯越 <span class="pill">110</span></div><div class="hs">群 · 文将 · 武36 智83</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="群"><img src="assets/hero_111.png" alt="刘琦"><div><div class="hn">刘琦 <span class="pill">111</span></div><div class="hs">群 · 文将 · 武35 智74</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="群"><img src="assets/hero_112.png" alt="李傕"><div><div class="hn">李傕 <span class="pill">112</span></div><div class="hs">群 · 文将 · 武35 智72</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="群"><img src="assets/hero_113.png" alt="傅巽"><div><div class="hn">傅巽 <span class="pill">113</span></div><div class="hs">群 · 文将 · 武34 智74</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="群"><img src="assets/hero_114.png" alt="伊籍"><div><div class="hn">伊籍 <span class="pill">114</span></div><div class="hs">群 · 文将 · 武33 智84</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="群"><img src="assets/hero_115.png" alt="王粲"><div><div class="hn">王粲 <span class="pill">115</span></div><div class="hs">群 · 文将 · 武28 智74</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+  <div class="hero" data-r="群"><img src="assets/hero_116.png" alt="刘琮"><div><div class="hn">刘琮 <span class="pill">116</span></div><div class="hs">群 · 文将 · 武12 智52</div><div class="hr">L0 虎贲校尉 · L9 大将军</div></div></div>
+</div>
+</details>
+
+<h3>九种计谋</h3>
+<div class="scroll">
+<table>
+  <tr><th>序</th><th>命令</th><th>名称</th><th>谋略</th><th>目标</th><th>效果</th></tr>
+  <tr><td>0</td><td>16210</td><td>激励</td><td>50</td><td>己方</td><td>状态1；每100 tick 谋略+5（上限2×智+15）；未发现直接士气+15</td></tr>
+  <tr><td>1</td><td>16211</td><td>加速</td><td>100</td><td>己方</td><td>状态2、清除状态3；倍率待验证</td></tr>
+  <tr><td>2</td><td>16212</td><td>减速</td><td>100</td><td>敌方</td><td>状态3、清除状态2；倍率待验证</td></tr>
+  <tr><td>3</td><td>16213</td><td>远视</td><td>100</td><td>己方</td><td>雾/视野刷新；固定10格待验证</td></tr>
+  <tr><td>4</td><td>16214</td><td>混乱</td><td>200</td><td>敌方</td><td>状态5；结束行动；800 tick待验证</td></tr>
+  <tr><td>5</td><td>16215</td><td>滚木</td><td>100</td><td>己方</td><td>状态7+任务；每30 tick 附近敌方士气−50，非40伤害</td></tr>
+  <tr><td>6</td><td>16216</td><td>埋伏</td><td>100</td><td>己方</td><td>状态6；800 tick待验证</td></tr>
+  <tr><td>7</td><td>16217</td><td>恢复</td><td>10</td><td>己方</td><td>当前兵力+50，封顶</td></tr>
+  <tr><td>8</td><td>16218</td><td>火攻</td><td>100</td><td>地面</td><td><code>FUN_00453A80(x,y,100,4,1)</code>；伤害/持续待验证</td></tr>
+</table>
+</div>
+<p class="meta"><b>目标模型</b>：<code>FUN_0045F8B0</code> 取点击目标后，用 <code>FUN_00424980</code> 收集目标队伍成员，最多15；不是点击点2格范围。<b>解锁</b>：0–2 级 3 个（0x007）、3–4 级 6 个（0x03F）、5 级 8 个（0x0FF）、6–9 级 9 个（0x1FF）。<b>阵法</b>：0.一字长蛇阵（16190）…9.十面埋伏阵（16199）（纯队形，不加属性）。<br><b>谋略费用表</b>：VA <code>0x48532C</code> = 50/100/100/100/200/100/100/10/100；<code>FUN_0045F8B0</code> 施法时扣除。<span class="no">800 tick 未在原版代码找到倒计时证据。</span></p>
+<div class="note"><b>单挑伤害（代码确认）</b>：<code>截断(((体力A−体力B)×4/60+1)×rand(4..8)×兵力A%×体力A%×0.001)</code>；败者阵亡，胜者保留约 90% 兵力%。<br>
+<b>接受判定（汇编）</b>：参数（兵力A、体力A、兵力B、体力B）；<code>截断(((兵力A−体力B)×4/60+1)×兵力A²×0.006) ≥ 兵力B</code>，否则 20%。重制 <code>_duel_accept()</code> 当前写成“体力差、兵力×体力”，与原版不同，已列为 <a href="REMAKE_FIXES.md">U-02（P0）</a>；伤害公式不要跟着改。</div>
+<div class="grid2" style="margin-top:14px">
+  <div class="panel"><h3>十阵法图标</h3><img src="assets/hero_formations.png" alt="十阵法"><div class="cap">阵法只改队形几何，不加攻防/速度。</div></div>
+  <div class="panel"><h3>九计谋图标</h3><img src="assets/hero_stratagems.png" alt="九计谋"><div class="cap">谋略消耗、等级解锁与目标类型见计谋表。</div></div>
+</div>
+
+<h2>工人、士兵与动作素材</h2>
+<div class="grid2">
+  <div class="panel"><h3>工人 30</h3><img src="assets/unit_30_clips.png" alt="工人动作">
+    <div class="cap">walk / act1 / act2 / act3 / die。采集载重 200、装载 100 tick、每 4 tick 轮询；建造 +2 HP/4 tick。</div></div>
+  <div class="panel"><h3>骑将本体 35</h3><img src="assets/unit_35_clips.png" alt="骑将动作">
+    <div class="cap">武将本体 HP500；实际攻防按武力/品级公式；与士兵队编组作战。</div></div>
+  <div class="panel"><h3>步兵 32</h3><img src="assets/unit_32_clips.png" alt="步兵动作">
+    <div class="cap">100 人档近战；A 口径；100/200/500/1000 档。</div></div>
+  <div class="panel"><h3>弓兵 45</h3><img src="assets/unit_45_clips.png" alt="弓兵动作">
+    <div class="cap">100 人档远程，射程 6，B 口径；箭速 16 px/tick。</div></div>
+  <div class="panel"><h3>骑兵 36</h3><img src="assets/unit_36_clips.png" alt="骑兵动作">
+    <div class="cap">100 人档近战，速度 100；200/500 档提高 HP/攻防。</div></div>
+  <div class="panel"><h3>车兵/投石车 34</h3><img src="assets/unit_34_clips.png" alt="车兵动作">
+    <div class="cap">4 格占地，射程 10，B 口径；投石 8 px/tick，落点格判定，可命中友军。</div></div>
+  <div class="panel"><h3>运输船 47</h3><img src="assets/unit_47_clips.png" alt="运输船动作">
+    <div class="cap">载员 16（FUN_0045F340 容量检查），无攻击；上船原版要求1格邻接，重制当前80px（<a href="REMAKE_FIXES.md">U-09</a>）；下船每4 tick 1人，原版落点是船体边缘落位表（FUN_00426130），重制当前“点选4格+1–10圈”（<a href="REMAKE_FIXES.md">U-03</a>）。</div></div>
+  <div class="panel"><h3>战船 48 / 旗舰 52</h3><img src="assets/unit_48_clips.png" alt="战船动作">
+    <div class="cap">水军 46/48/49 与旗舰 52 使用水图层；旗舰有定义但当前地图未放置，且不参与单挑。云梯 50/51 也未放置，代码只把它们当作放置阻挡。</div></div>
+</div>
+
+<h2>战斗、编队与运输</h2>
+<div class="grid2">
+  <div class="panel"><h3>战斗</h3>
+    <table>
+      <tr><th>项</th><th>规则</th></tr>
+      <tr><td>伤害</td><td>max(1, 截断(攻击−防御))；武将用武力/品级</td></tr>
+      <tr><td>B 口径</td><td>18,19,33,34,39,42,44,45,46,48,49,52</td></tr>
+      <tr><td>攻击周期</td><td>floor(1000/速率)；加速×2/减速÷2</td></tr>
+      <tr><td>弹体</td><td>箭16 px/tick 锁目标；投石8 px/tick 落点格</td></tr>
+      <tr><td>索敌</td><td>普通单位不自动；箭楼 18/19 自动打玩家方</td></tr>
+      <tr><td>击杀</td><td>经验/士气入所辖武将；大旗被毁全体士气−50</td></tr>
+    </table>
+  </div>
+  <div class="panel"><h3>编队（代码确认）</h3>
+    <table>
+      <tr><th>项</th><th>上限/规则</th></tr>
+      <tr><td>每方武将/实体</td><td>20 / 200</td></tr>
+      <tr><td>每队成员 / 满编</td><td>15 / 16（武将另计）</td></tr>
+      <tr><td>组建/加入</td><td>未编组单位；加入走到队长边缘；满15拒绝</td></tr>
+      <tr><td>解散/阵亡</td><td>将本体撤下/身份解除；成员保留或移除；控制组清除</td></tr>
+      <tr><td>队长跟随</td><td>空闲且距离&gt;2格时移动跟随</td></tr>
+    </table>
+    <div class="cap">FUN_00442E40 武将 20；FUN_00459E20 实体 200；FUN_0045D8D0 成员槽 15；满编 16。</div>
+  </div>
+  <div class="panel"><h3>工人/平民</h3>
+    <table>
+      <tr><th>项</th><th>规则</th></tr>
+      <tr><td>采集者</td><td>工人30、男/女平民27/28（class 11）</td></tr>
+      <tr><td>载重/装载</td><td>200；100 tick；每4 tick轮询</td></tr>
+      <tr><td>交付</td><td>木→木场/帅帐；粮→粮仓/帅帐；铁→武器库/帅帐；金→钱庄/帅帐</td></tr>
+      <tr><td>建造</td><td>仅 class 10 工人可建造；平民不能建造（重制当前允许，<a href="REMAKE_FIXES.md">U-04</a>）</td></tr>
+      <tr><td>修理</td><td>FUN_00421DC0：四资源均&gt;15 → +16 HP，各−16，HP封顶</td></tr>
+    </table>
+  </div>
+  <div class="panel"><h3>运输/水军（容量/节拍代码确认）</h3>
+    <table>
+      <tr><th>项</th><th>规则</th></tr>
+      <tr><td>载员</td><td>16（代码确认）；下船4tick/人（代码确认）</td></tr>
+      <tr><td>上船</td><td>原版1格邻接校验（<a href="REMAKE_FIXES.md">U-09</a>）；重制当前80px</td></tr>
+      <tr><td>落点</td><td>原版船体边缘落位表；重制当前点选4格+1–10圈（<a href="REMAKE_FIXES.md">U-03</a>）</td></tr>
+      <tr><td>装载后</td><td>隐藏、退出占格/索敌；状态继续计时</td></tr>
+      <tr><td>沉船</td><td>逐个销毁载员</td></tr>
+      <tr><td>水图层</td><td>46/48/49/52；运输船47</td></tr>
+    </table>
+  </div>
+</div>
+
+<h2>重制修复清单（原版→重制差异）</h2>
+<div class="note warn">只列原版代码/数据已经确认的差异；更多细节、证据和验收标准见 <a href="REMAKE_FIXES.md">REMAKE_FIXES.md</a>，机器可读版本见 <a href="data/remake_deltas.json">data/remake_deltas.json</a>。</div>
+<div class="scroll">
+<table>
+  <tr><th>编号</th><th>优先级</th><th>差异</th><th>原版基准 / 修法</th></tr>
+  <tr><td>U-01</td><td>P0</td><td>工人费用金/粮反了</td><td>原版金400/木50/粮50/铁0；重制 50/50/400，需换回。</td></tr>
+  <tr><td>U-02</td><td>P0</td><td>单挑接受公式</td><td>原版 <code>((兵力A−体力B)×4/60+1)×兵力A²×0.006</code>；重制用了体力差/兵力×体力。</td></tr>
+  <tr><td>U-03</td><td>P0</td><td>运输船下船落点</td><td>原版船体边缘落位表；重制要求点选4格内并1–10圈外扩。</td></tr>
+  <tr><td>U-04</td><td>P0</td><td>平民建造</td><td>原版仅 class 10 工人可建；重制把 class 11 平民也算工人。</td></tr>
+  <tr><td>U-05</td><td>P0</td><td>500/1000档生产行</td><td>原版按大本营/建筑等级开放1–4行（500在等级2、1000在等级3）；重制只列100/200，需补40–44行。</td></tr>
+  <tr><td>U-06</td><td>P1</td><td>车兵/水军玩家生产链</td><td>原版车兵所8/9、船坞20有面板；重制玩家入口被移除，仅AI可用。</td></tr>
+  <tr><td>U-07</td><td>P1</td><td>生产数据/费用顺序</td><td>补齐40–44/46–49；以 canonical 金/木/粮/铁为准，禁止按 map_data 旧顺序猜。</td></tr>
+  <tr><td>U-08</td><td>P2</td><td>显示名</td><td>DATA.EXP 原名车兵/水兵；重制别名投石车/快船/战船，需显示原名或并列。</td></tr>
+  <tr><td>U-09</td><td>P1</td><td>上船距离</td><td>原版1格邻接（FUN_00424C70 参数1）；重制当前80px。</td></tr>
+  <tr><td>U-10</td><td>P1</td><td>计谋目标/效果</td><td>原版目标队伍≤15、状态旗标、恢复+50；重制用2格范围/800tick/士气+15等，需重写。</td></tr>
+</table>
+</div>
+<div class="note">
+  <b>本轮更正</b>：A-01 生产档位不是关卡 <code>init[0]</code>（由建筑/大本营等级写 <code>DAT_004b8d29</code>）；A-02 <code>DATA.EXP v13=20</code> 只解析不读取，训练周期=最大HP；A-03 士气只写UI/任务，不直接参与战斗。
+</div>
+
+<h2>素材与数据</h2>
+<div class="grid2">
+  <div class="panel"><h3>单位总览</h3><img src="assets/units_overview.png" alt="单位总览"><div class="cap">26 类单位，walk 首帧。</div></div>
+  <div class="panel"><h3>武将头像总表</h3><img src="assets/heroes_sheet.png" alt="武将头像"><div class="cap">117 张，10×12 格。</div></div>
+</div>
+<p class="meta">每个单位还有 <code>assets/unit_XX_atlas.png</code>（全帧原图集）和 <code>assets/unit_XX_clips.png</code>（walk/act1/act2/act3/die 动作条）。单位图集使用 <code>UNIT.LWC + BATTLE.PAL</code>；头像使用 <code>BMP.LWC 帧281 + BATTLE.PAL</code>。</p>
+
+<h2>证据</h2>
+<table>
+  <tr><th>结论</th><th>Evidence / 地址</th></tr>
+  <tr><td>DATA.EXP 装载 / 武将 HP/等级</td><td><code>FUN_00446380</code> · ev_ba4cf1aa…</td></tr>
+  <tr><td>武将攻击 / 防御公式</td><td><code>FUN_004255C0</code> / <code>FUN_00425B50</code> · ev_7732f456… / ev_bbbaf241…</td></tr>
+  <tr><td>击杀经验 / 士气</td><td><code>FUN_00422A20</code> · ev_b63301bf…</td></tr>
+  <tr><td>官职索引 / 单挑体力</td><td><code>FUN_00426340</code> / <code>FUN_00426530</code></td></tr>
+  <tr><td>单位创建 / 模式分派</td><td><code>FUN_00442970</code> / <code>FUN_0045B4E0</code></td></tr>
+  <tr><td>工人 +2 HP/4 tick / 工地阶段</td><td><code>FUN_0045C320</code> / <code>FUN_0045E130</code></td></tr>
+  <tr><td>修理 +16 / 各资源 −16</td><td><code>FUN_00421DC0</code> · ev_2051f5df…</td></tr>
+  <tr><td>运输容量 16 / 下船 4 tick</td><td><code>FUN_0045F340</code> · ev_5148049f… / <code>FUN_0045F5F0</code> · ev_528137f8…</td></tr>
+  <tr><td>队伍 15 / 武将 20 / 实体 200</td><td><code>FUN_0045D8D0</code> / <code>FUN_00442E40</code> / <code>FUN_00459E20</code></td></tr>
+  <tr><td>武将开局 1–33 级 0→5</td><td><code>FUN_0042B790</code> · ev_6f89552f…</td></tr>
+  <tr><td>云梯 50/51 放置阻挡</td><td><code>FUN_0042EA50</code> · ev_82f94e73…</td></tr>
+  <tr><td>生产等级 → DAT_004b8d29</td><td><code>FUN_0046C710</code> · ev_38a27e6d…</td></tr>
+  <tr><td>生产面板掩码 1/3/7/0xF</td><td><code>FUN_00426E40</code> · ev_c65228d1…</td></tr>
+  <tr><td>平民建造 class 10 检查</td><td><code>FUN_00424F40</code> · ev_6f413043…</td></tr>
+  <tr><td>取消退款75% / 训练周期 / 士气UI / 上船1格</td><td><code>FUN_00420070</code> · ev_c38ea1c6… / <code>FUN_0045CC50</code> · ev_ae1a4558… / <code>FUN_00426260</code> / <code>FUN_00424C70</code> · ev_3ea0fda7…</td></tr>
+  <tr><td>计谋目标队伍≤15</td><td><code>FUN_0045F8B0</code> / <code>FUN_00424980</code> · ev_a38bf460…</td></tr>
+  <tr><td>单挑伤害 / 接受</td><td><code>FUN_004603E0</code> · ev_4ec41466… / <code>FUN_004266B0</code> · ev_01871c74…</td></tr>
+  <tr><td>阵法 301 偏移表</td><td><code>FUN_00401970</code> / <code>FUN_00401950</code></td></tr>
+  <tr><td>计谋费用表 50/100/…/10/100</td><td><code>VA 0x48532C</code> · <code>FUN_0045F8B0</code></td></tr>
+  <tr><td>计谋效果 switch 1–9</td><td><code>FUN_0045F8B0</code> · ev_67de12c7…</td></tr>
+  <tr><td>头像来源</td><td><code>BMP.LWC</code> 帧 281；<code>FUN_00405E80</code> 59×74 rect</td></tr>
+</table>
+
+<h2>文件</h2>
+<ul>
+  <li><a href="data/units.json">data/units.json</a> — 26 单位属性/费用/占地/动画/机制</li>
+  <li><a href="data/heroes.json">data/heroes.json</a> — 117 武将 + 0–9 级攻防/官职/体力</li>
+  <li><a href="data/hero_levels.csv">data/hero_levels.csv</a> — 117×10 级平表</li>
+  <li><a href="data/units.csv">data/units.csv</a> — 单位平表</li>
+  <li><a href="data/anim_clips.json">data/anim_clips.json</a> — 动作帧映射</li>
+  <li><a href="data/remake_deltas.json">data/remake_deltas.json</a> — 10 项原版→重制差异/生产等级行/撤销的旧推断/未确认项</li>
+  <li><a href="REMAKE_FIXES.md">REMAKE_FIXES.md</a> — 后期修复清单 U-01–U-10 及 A-01–A-03 更正</li>
+  <li><a href="tools/extract_units.mjs">tools/extract_units.mjs</a> — 可重复提取脚本</li>
+</ul>
+
+<script>
+  const cards = [...document.querySelectorAll('#heroGrid .hero')];
+  document.querySelectorAll('.filters button').forEach((b) => b.addEventListener('click', () => {
+    const r = b.dataset.r;
+    cards.forEach((c) => { c.style.display = (r === 'all' || c.dataset.r === r) ? 'flex' : 'none'; });
+  }));
+</script>
+</body>
+</html>

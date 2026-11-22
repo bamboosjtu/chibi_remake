@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+import {buildLevelIndex} from './lib/level_index.mjs';
+const root='godot/chibi_remake/data',target=root+'/db/level_index.json';
+const read=file=>JSON.parse(fs.readFileSync(root+'/'+file,'utf8'));
+const maps=fs.readdirSync(root).filter(file=>/^chibi.*\.json$/.test(file)).map(file=>[file.slice(0,-5),read(file)]);
+const index=buildLevelIndex(maps,read('db/startup_briefings.json'));
+const text=JSON.stringify(index,null,2)+'\n';
+if(process.argv.includes('--write'))fs.writeFileSync(target,text);
+else if(!fs.existsSync(target)||fs.readFileSync(target,'utf8').replaceAll('\r\n','\n')!==text)throw Error('Level index stale; run node tools/level_index.mjs --write');
+console.log('LEVEL INDEX PASS '+index.levels.length+' maps / campaign order / generated menu projection');

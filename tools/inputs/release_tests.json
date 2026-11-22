@@ -1,0 +1,277 @@
+{
+ "description": "Required candidate gate: menu/save slots, core interaction and state continuity; verify_candidate also requires all maps and deterministic baselines.",
+ "tests": [
+  {
+   "script": "test_battle_interaction",
+   "markers": [
+    "INTERACTION PASS",
+    "BUILDING SELECTION PASS",
+    "BUILDING WORK HUD PASS"
+   ]
+  },
+  {
+   "script": "test_m0",
+   "markers": [
+    "M0 MENU PASS",
+    "SAVE SLOTS PASS",
+    "SAVE SLOTS CROSS MAP PASS"
+   ]
+  },
+  {
+   "script": "test_review_contracts",
+   "markers": [
+    "REVIEW CONTRACTS PASS"
+   ]
+  },
+  {
+   "script": "test_save_roundtrip",
+   "markers": [
+    "SAVE ROUNDTRIP PASS"
+   ],
+   "args": [
+    "--noview"
+   ]
+  },
+  {
+   "script": "test_save_validity",
+   "markers": [
+    "SAVE VALIDITY PASS",
+    "CURRENT REQUIRED FIELDS PASS"
+   ],
+   "args": [
+    "--noview"
+   ],
+   "timeout": 120
+  },
+  {
+   "script": "test_unit_schema",
+   "markers": [
+    "UNIT SCHEMA PASS",
+    "UNIT RECORD SCHEMA PASS"
+   ],
+   "args": [
+    "--noview"
+   ],
+   "timeout": 150
+  },
+  {
+   "script": "test_restore_safety",
+   "markers": [
+    "RESTORE SAFETY PASS"
+   ],
+   "args": [
+    "--noview"
+   ],
+   "timeout": 100
+  },
+  {
+   "script": "test_acceptance_isolation",
+   "markers": [
+    "ACCEPTANCE ISOLATION PASS"
+   ]
+  },
+  {
+   "script": "test_duel_save",
+   "markers": [
+    "DUEL SAVE PASS"
+   ]
+  },
+  {
+   "script": "test_slot_metadata",
+   "markers": [
+    "SLOT METADATA PASS"
+   ]
+  },
+  {
+   "script": "test_continuation_coverage",
+   "markers": [
+    "CONTINUATION COVERAGE PASS"
+   ],
+   "args": [
+    "--noview"
+   ],
+   "timeout": 240
+  },
+  {
+   "script": "test_ai_research",
+   "markers": [
+    "AI RESEARCH PASS"
+   ],
+   "args": [
+    "--noview"
+   ],
+   "timeout": 240
+  },
+  {
+   "script": "test_campaign_integrity",
+   "markers": [
+    "CAMPAIGN FIRST TICK PASS",
+    "L14 REAL CHAPTER PASS",
+    "CAMPAIGN OBJECTIVES PASS"
+   ],
+   "args": [
+    "--noview"
+   ],
+   "timeout": 600
+  },
+  {
+   "script": "test_current_format",
+   "markers": [
+    "CURRENT FORMAT PASS"
+   ],
+   "timeout": 240
+  },
+  {
+   "script": "test_contact_and_occupancy",
+   "markers": [
+    "CONTACT PASS",
+    "OCCUPANCY PASS"
+   ],
+   "args": [
+    "--noview"
+   ]
+  },
+  {
+   "script": "test_rules_scope",
+   "markers": [
+    "RULES SCOPE PASS"
+   ],
+   "args": [
+    "--noview"
+   ]
+  },
+  {
+   "script": "test_camera_read_model",
+   "markers": [
+    "CAMERA READ MODEL PASS"
+   ],
+   "args": [
+    "--noview"
+   ]
+  },
+  {
+   "script": "test_app_services",
+   "markers": [
+    "APP SERVICES PASS"
+   ],
+   "args": [
+    "--noview"
+   ]
+  },
+  {
+   "script": "test_snapshot_stages",
+   "markers": [
+    "SNAPSHOT STAGES PASS"
+   ],
+   "args": [
+    "--noview"
+   ]
+  },
+  {
+   "script": "test_build_preview_read_model",
+   "markers": [
+    "BUILD PREVIEW READ MODEL PASS"
+   ],
+   "timeout": 150
+  },
+  {
+   "script": "test_resource_layer_read_model",
+   "markers": [
+    "RESOURCE READ MODEL PASS"
+   ],
+   "timeout": 180
+  },
+  {
+   "script": "test_invalid_unit_removal",
+   "markers": [
+    "INVALID UNIT REMOVAL PASS"
+   ],
+   "args": [
+    "--noview"
+   ]
+  },
+  {
+   "script": "test_save_semantics",
+   "markers": [
+    "SAVE SEMANTICS PASS"
+   ],
+   "args": [
+    "--noview"
+   ],
+   "timeout": 150
+  },
+  {
+   "script": "test_unit_action_states",
+   "markers": [
+    "UNIT ACTION STATES PASS"
+   ],
+   "args": [
+    "--noview"
+   ]
+  },
+  {
+   "script": "test_unit_state_transitions",
+   "markers": [
+    "UNIT STATE TRANSITIONS PASS"
+   ],
+   "args": [
+    "--noview"
+   ]
+  },
+  {
+   "script": "test_hot_path_contracts",
+   "markers": [
+    "HOT PATH CONTRACTS PASS"
+   ],
+   "args": [
+    "--noview"
+   ]
+  },
+  {
+   "script": "test_save_boundaries",
+   "markers": [
+    "SAVE BOUNDARIES PASS"
+   ],
+   "args": [
+    "--noview"
+   ],
+   "timeout": 150
+  },
+  {
+   "script": "test_unit_read_models",
+   "markers": [
+    "UNIT READ MODELS PASS"
+   ],
+   "timeout": 120
+  },
+  {
+   "script": "test_context_read_models",
+   "markers": [
+    "CONTEXT READ MODELS PASS"
+   ],
+   "timeout": 120
+  },
+  {
+   "script": "test_pause_ownership",
+   "markers": [
+    "PAUSE OWNERSHIP PASS",
+    "PAUSE MODALS PASS"
+   ]
+  },
+  {
+   "script": "test_app_boundaries",
+   "markers": [
+    "APP BOUNDARIES PASS"
+   ]
+  },
+  {
+   "script": "test_command_determinism",
+   "markers": [
+    "COMMAND DETERMINISM PASS"
+   ],
+   "args": [
+    "--noview"
+   ]
+  }
+ ]
+}

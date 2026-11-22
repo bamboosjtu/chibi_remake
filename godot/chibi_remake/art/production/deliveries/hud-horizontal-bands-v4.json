@@ -1,0 +1,12 @@
+{
+  "assetId": "hud-horizontal-bands-v4",
+  "generator": "built-in image_gen",
+  "sourceGeneratedFile": "C:/Users/bambo/.codex/generated_images/01a13348-db65-7b23-b66a-63227eb4490d/exec-90e0ab82-fd54-4d52-8237-c37056dddcbc.png",
+  "texture": "godot/chibi_remake/art/full/ui/hud-horizontal-bands-v4.png",
+  "width": 1983,
+  "height": 793,
+  "sha256": "e4f884ee995aee69020e36444b6ceafa2e274b5cf3a3279577b67103067d5cb5",
+  "promptFile": "godot/chibi_remake/art/production/wall-ui-final-prompts.json",
+  "prompt": "Use case: stylized-concept. Production raster UI ornament sheet for faithful Chinese Three Kingdoms RTS 三国赤壁. Canvas very wide, aspect 8:1. EXACT TWO horizontal ornament bands stacked in equal rows with no space between, each row full width. Each band has aspect16:1. Row1: elegant thin gold carved Chinese dragon and cloud relief on dark antique gold and burgundy, two dragons flanking an EMPTY central dark burgundy area reserved for a separate oval logo. No text or logo painted. Row2: one continuous gold carved dragon and cloud relief base bar, symmetrical dragons facing center. Both have fine straight gold outer rails and square key-fret corners, restrained old game gold, clearly readable small sculpted scales, no blur, no huge stretched loops. Each strip fills its row edge to edge, no outer padding, no mockup, no interface content, no icons, numbers or words. Painted sharp metal detail matching late Han ornate game UI, lit from above, opaque. Aim 2560x320.",
+  "generatedAt": "2026-10-18T00:42:46.633Z"
+}

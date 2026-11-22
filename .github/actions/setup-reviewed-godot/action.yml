@@ -1,0 +1,14 @@
+name: Setup reviewed Linux Godot
+description: Fetch and verify the exact engine used by simulation baselines
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        curl -fsSL --retry 3 -o "$RUNNER_TEMP/godot.zip" \
+          https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip
+        mkdir -p "$RUNNER_TEMP/godot"
+        unzip -p "$RUNNER_TEMP/godot.zip" Godot_v4.7.2-stable_linux.x86_64 > "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+        node tools/verify_engine.mjs --platform linux --engine "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+        chmod +x "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+        echo "GODOT_ENGINE=$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" >> "$GITHUB_ENV"

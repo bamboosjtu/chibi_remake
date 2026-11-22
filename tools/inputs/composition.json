@@ -1,0 +1,72 @@
+{
+  "hosts": {
+    "main": {
+      "abilities": "simulation/combat/abilities.gd",
+      "ai_economy": "simulation/ai/ai_economy.gd",
+      "ai_orders": "simulation/ai/ai_orders.gd",
+      "battle_simulation": "simulation/world/battle_simulation.gd",
+      "campaign": "simulation/scenario/campaign.gd",
+      "auto_control": "simulation/ai/auto_control.gd",
+      "cheat_actions": "simulation/cheats/cheat_actions.gd",
+      "combat": "simulation/combat/combat.gd",
+      "command_groups": "simulation/commands/command_groups.gd",
+      "construction_orders": "simulation/construction/construction_orders.gd",
+      "entity_factory": "simulation/units/entity_factory.gd",
+      "harvest_orders": "simulation/economy/harvest_orders.gd",
+      "interaction_paths": "simulation/navigation/interaction_paths.gd",
+      "movement": "simulation/movement/movement.gd",
+      "officer_pool": "simulation/officers/officer_pool.gd",
+      "officer_teams": "simulation/officers/officer_teams.gd",
+      "production": "simulation/production/production.gd",
+      "selection": "simulation/commands/selection.gd",
+      "spatial_index": "simulation/navigation/spatial_index.gd",
+      "technology": "simulation/technology/technology.gd",
+      "transport_orders": "simulation/transport/transport_orders.gd",
+      "unit_actions": "simulation/world/unit_tick_coordinator.gd",
+      "world_orders": "simulation/commands/world_orders.gd",
+      "bootstrap": "app/battle/startup/bootstrap.gd",
+      "cheat_controller": "app/battle/runtime/cheat_controller.gd",
+      "duel_session": "app/battle/runtime/duel_session.gd",
+      "scene_controller": "app/battle/runtime/scene_controller.gd",
+      "player_commands": "simulation/commands/player_commands.gd",
+      "economy": "simulation/economy/economy.gd",
+      "projectiles": "simulation/combat/projectiles.gd",
+      "fire_fields": "simulation/combat/fire_fields.gd",
+      "transports": "simulation/transport/transports.gd",
+      "harvesting": "simulation/economy/harvesting.gd",
+      "construction": "simulation/construction/construction_interior.gd",
+      "stratagems": "simulation/combat/stratagem_rules.gd",
+      "command_rules": "simulation/commands/command_policy.gd",
+      "rules": "simulation/scenario/scenario_rules.gd",
+      "nav": "simulation/navigation/nav.gd",
+      "visibility": "simulation/visibility/battle_visibility.gd",
+      "automatic_gates": "simulation/navigation/automatic_gates.gd",
+      "clock": "simulation/core/battle_clock.gd",
+      "effects": "simulation/ports/battle_events.gd"
+    },
+    "view": {
+      "controller": "presentation/battle/view/controller.gd",
+      "unit_visuals": "presentation/battle/units/unit_visuals.gd",
+      "camera_controller": "presentation/battle/camera/camera_controller.gd",
+      "hud_build": "presentation/battle/hud/hud_build.gd",
+      "hud_layout": "presentation/battle/hud/hud_layout.gd",
+      "world_layers": "presentation/battle/world/world_layers.gd",
+      "hud_input": "presentation/battle/input/hud_input.gd",
+      "selection_info": "presentation/battle/units/selection_info.gd",
+      "command_art": "presentation/battle/command/command_art.gd",
+      "command_model": "presentation/battle/command/command_model.gd",
+      "command_actions": "presentation/battle/command/command_actions.gd",
+      "legacy_layout": "presentation/battle/view/legacy_layout.gd"
+    },
+    "menu": {
+      "controller": "presentation/menu/controller.gd",
+      "menu_styles": "presentation/menu/menu_styles.gd",
+      "campaign_dialog": "presentation/menu/campaign_dialog.gd",
+      "level_dialog": "presentation/menu/level_dialog.gd"
+    },
+    "nav": {
+      "grid": "simulation/navigation/navigation_grid.gd",
+      "paths": "simulation/navigation/path_queries.gd"
+    }
+  }
+}

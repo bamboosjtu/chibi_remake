@@ -1,0 +1,87 @@
+{
+  "assetId": "resource-decor-v1",
+  "texture": "godot/chibi_remake/art/full/ui/resource-decor-redraw-v1.png",
+  "generator": "built-in image_gen",
+  "sha256": "a5e24917a53dff2fa903156b7c837c6eea61123ec7eb251fa302b3e75fcc71c5",
+  "width": 878,
+  "height": 1792,
+  "frames": [
+    {
+      "region": [
+        17,
+        23,
+        454,
+        693
+      ],
+      "draw": [
+        3,
+        4,
+        39,
+        52
+      ]
+    },
+    {
+      "region": [
+        576,
+        575,
+        220,
+        142
+      ],
+      "draw": [
+        17,
+        44,
+        15,
+        10
+      ]
+    },
+    {
+      "region": [
+        11,
+        897,
+        472,
+        383
+      ],
+      "draw": [
+        0,
+        27,
+        44,
+        32
+      ]
+    },
+    {
+      "region": [
+        496,
+        1053,
+        371,
+        201
+      ],
+      "draw": [
+        2,
+        38,
+        39,
+        20
+      ]
+    },
+    {
+      "region": [
+        79,
+        1492,
+        350,
+        278
+      ],
+      "draw": [
+        9,
+        35,
+        28,
+        21
+      ]
+    },
+    {
+      "skip": true,
+      "reason": "empty-source-phase"
+    }
+  ],
+  "structure": "pass",
+  "sourceGeneratedFile": "C:/Users/bambo/.codex/generated_images/01a13348-db65-7b23-b66a-63227eb4490d/exec-96daac7b-802b-4416-b47f-5d0e1d3ecafb.png",
+  "prompt": "Use case: style-transfer. Repaint this original 三国赤壁 resource-prop sprite atlas in high definition. EXACT 2 equal columns x 3 equal rows and same row-major six source phases. Preserve each shape, size WITHIN ITS CELL and foot baseline: top-left tall dense dark-green pine tree, top-right very small brown chopped stump, middle-left square clump of ripe standing golden wheat, middle-right scattered small golden grain kernels, bottom-left compact irregular yellow/gold mineral pile, bottom-right the same small grouped angular pointed yellow/gold source prop. Keep empty space above short props; do NOT scale them all to the tall tree height. Fine hand-painted pine needles, cut wood and bark, wheat heads, individual grains and mineral facets. Same source palette, 2:1 game perspective and upper-left light. True transparent alpha immediately around all six props, no tile platform, painted ground, background, labels, grid, text, checkerboard, colored outline, invented sacks, carts or extra objects. Canvas aspect exactly 88:180, aim at 1056x2160. All six slots are required and must stay separate, not a landscape."
+}

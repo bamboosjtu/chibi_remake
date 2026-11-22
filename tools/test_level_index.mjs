@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {buildLevelIndex} from './lib/level_index.mjs';
+const map={kind:'level',name:'Test',objects:[{}],walkable:[1],terrainW:1,terrainH:1,rows:1,cols:1};
+const book={levels:[{map:'chibil1',campaign:'liu',chapter:'1',title:'First'},{map:'chibil2',campaign:'liu',chapter:'2',title:'Second'}]};
+const maps=[['chibil2',map],['chibil1',map]];
+const result=buildLevelIndex(maps,book);
+assert.deepEqual(result.levels.map(row=>row.id),['chibil1','chibil2']);assert.deepEqual(result.order,['chibil1','chibil2']);assert.equal(result.levels[0].objects,1);
+assert.throws(()=>buildLevelIndex([['chibil1',{...map,kind:'database'}]],book),/Invalid indexed/);
+assert.throws(()=>buildLevelIndex(maps,{levels:[book.levels[0],book.levels[0]]}),/Invalid campaign/);
+assert.throws(()=>buildLevelIndex(maps,{levels:[book.levels[0]]}),/Every level/);
+assert.throws(()=>buildLevelIndex(maps,{levels:[{...book.levels[0],title:null},book.levels[1]]}),/Missing title/);
+assert.deepEqual(maps[0][1],map,'Generation does not mutate source maps');
+console.log('LEVEL INDEX NEGATIVE PASS malformed maps / duplicate and missing progression / required metadata / source isolation');

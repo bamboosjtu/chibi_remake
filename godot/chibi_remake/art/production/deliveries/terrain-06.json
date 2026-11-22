@@ -1,0 +1,21 @@
+{
+  "assetId": "terrain-06",
+  "bytes": 2862082.0,
+  "colorType": 6.0,
+  "generatedAt": "2026-10-17T23:56:26.267Z",
+  "generator": "built-in image_gen",
+  "height": 887.0,
+  "prompt": "Use case: precise-object-edit. Repaint the FIRST image into a production HD seamless wall tile atlas for 三国赤壁. EXACTLY seven columns by two rows; row2 col3 remains empty. Keep the EXACT ORIGINAL silhouettes, individual visible faces, flat cut-away faces, orientation, height and relative anchor of every tile. These are narrow adjacent SLICES of a continuous tall city wall, NOT isolated buildings or towers. No taper changes, no added side faces, no perspective changes, no towers, roofed posts, finials, turrets, crenellations or decorations above the source top. Repaint only source grey masonry, stair treads, wall walk and subtle moss. Small regular dark charcoal-grey stone bricks, restrained upper-left light, fine bevels and mortar details, flat broad joined planes. Preserve dark grey source brightness, not beige. Along both lateral edges the brick courses must continue at source heights. ALL transparent source spaces remain transparent. Crisp hand-painted stone detail instead of pixel scaling. EXACT source atlas aspect308:154; no canvas padding, no omitted tiles, no text or grid. Genuine transparent alpha.",
+  "promptFile": "godot/chibi_remake/art/production/wall-ui-final-prompts.json",
+  "sha256": "f08884d3aa1dd6bb5c498d07121f46360141268286eaea840d48a33846b43919",
+  "sourceGeneratedFile": "C:/Users/bambo/.codex/generated_images/01a13348-db65-7b23-b66a-63227eb4490d/exec-8c354230-e7bb-4294-b0f5-8ed95120791b.png",
+  "status": "generated-awaiting-validation",
+  "texture": "godot/chibi_remake/art/full/terrain/06-atlas-v3.png",
+  "validation": {
+    "excludedSourceLabelsOrBlanks": 1,
+    "structure": "pass",
+    "visual": "pending",
+    "visualFrameCount": 13
+  },
+  "width": 1774.0
+}

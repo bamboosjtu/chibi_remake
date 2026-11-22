@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>原版《赤壁》武将升级与经验</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; padding: 32px; background: #12141a; color: #e6e6e6;
+         font: 15px/1.65 "Segoe UI", "Microsoft YaHei", sans-serif; }
+  h1 { font-size: 26px; margin: 0 0 4px; font-weight: 600; }
+  h2 { margin: 40px 0 12px; font-size: 19px; color: #ffd27a; }
+  h3 { margin: 22px 0 8px; font-size: 15px; color: #ffd27a; }
+  .sub { color: #9aa0ad; margin-bottom: 22px; }
+  code { background: #1d212b; padding: 1px 5px; border-radius: 4px; color: #a8d5ff; }
+  .cards { display: flex; gap: 12px; flex-wrap: wrap; }
+  .stat { background: #181c24; border: 1px solid #2a2f3a; border-radius: 10px; padding: 12px 18px; min-width: 130px; }
+  .stat b { display: block; font-size: 24px; color: #ffd27a; }
+  .stat span { color: #9aa0ad; font-size: 13px; }
+  .note { background: #1b1f27; border-left: 3px solid #ffd27a; padding: 10px 14px; border-radius: 4px; color: #c9ced8; margin: 14px 0; }
+  table { border-collapse: collapse; width: 100%; margin-top: 8px; }
+  th, td { border-bottom: 1px solid #262b35; padding: 6px 9px; text-align: left; vertical-align: top; }
+  th { color: #9aa0ad; font-weight: 500; font-size: 13px; }
+  .bar { height: 8px; background: #2a303b; border-radius: 4px; overflow: hidden; min-width: 120px; }
+  .bar i { display: block; height: 100%; background: linear-gradient(90deg, #b8862e, #ffd27a); }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 18px; align-items: start; }
+  .panel { background: #181c24; border: 1px solid #2a2f3a; border-radius: 10px; padding: 14px 16px; }
+  .panel h3 { margin-top: 0; }
+  .panel p { margin: 6px 0; }
+  .meta { color: #7f8794; font-size: 12px; }
+  .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 10px 0; }
+  select, input { background: #1b202a; color: #e6e6e6; border: 1px solid #303746; border-radius: 6px; padding: 6px 8px; }
+  .tablewrap { max-height: 620px; overflow: auto; border: 1px solid #262b35; border-radius: 8px; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  a { color: #8ec5ff; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; background: #232936; color: #9aa0ad; font-size: 12px; margin-right: 6px; }
+</style>
+</head>
+<body>
+<h1>原版《赤壁》武将升级与经验</h1>
+<div class="sub">CB.EXE <code>2db7cc10…c5798cb7</code> · DATA.EXP 品级/武将 · 击杀/建造/交付/事件经验 · 0–9 级</div>
+
+<div class="cards">
+  <div class="stat"><b>0–9</b><span>等级范围（10 级）</span></div>
+  <div class="stat"><b>49,500</b><span>0 级练到 9 级累计经验</span></div>
+  <div class="stat"><b>117</b><span>武将</span></div>
+  <div class="stat"><b>29</b><span>称号</span></div>
+  <div class="stat"><b>4</b><span>经验来源</span></div>
+</div>
+
+<div class="note">
+  升级只升 <b>单挑体力上限</b> 与 <b>攻A/攻B</b>；<b>防A/防B 和将本体 500 HP 不变</b>，升级也不直接回血。
+  经验按“击杀死者类型 / 建筑完工类型 / 每次交付 +1 / 事件参数”结算。
+</div>
+
+<h2>经验阈值</h2>
+<table>
+  <tr><th>当前等级</th><th>升到</th><th class="num">需要经验</th><th class="num">累计</th><th>相对 27000</th></tr>
+  <tr><td>0</td><td>1</td><td class="num">200</td><td class="num">200</td><td><div class="bar"><i style="width:0.7%"></i></div></td></tr>
+  <tr><td>1</td><td>2</td><td class="num">500</td><td class="num">700</td><td><div class="bar"><i style="width:1.9%"></i></div></td></tr>
+  <tr><td>2</td><td>3</td><td class="num">1,000</td><td class="num">1,700</td><td><div class="bar"><i style="width:3.7%"></i></div></td></tr>
+  <tr><td>3</td><td>4</td><td class="num">1,800</td><td class="num">3,500</td><td><div class="bar"><i style="width:6.7%"></i></div></td></tr>
+  <tr><td>4</td><td>5</td><td class="num">3,000</td><td class="num">6,500</td><td><div class="bar"><i style="width:11.1%"></i></div></td></tr>
+  <tr><td>5</td><td>6</td><td class="num">5,000</td><td class="num">11,500</td><td><div class="bar"><i style="width:18.5%"></i></div></td></tr>
+  <tr><td>6</td><td>7</td><td class="num">8,000</td><td class="num">19,500</td><td><div class="bar"><i style="width:29.6%"></i></div></td></tr>
+  <tr><td>7</td><td>8</td><td class="num">12,000</td><td class="num">31,500</td><td><div class="bar"><i style="width:44.4%"></i></div></td></tr>
+  <tr><td>8</td><td>9</td><td class="num">18,000</td><td class="num">49,500</td><td><div class="bar"><i style="width:66.7%"></i></div></td></tr>
+  <tr><td>9</td><td>封顶</td><td class="num">27,000</td><td class="num">—</td><td><div class="bar"><i style="width:100%"></i></div><span class="meta">9→10 的残留值，永不消费</span></td></tr>
+</table>
+<p class="meta">一次获得经验最多升 1 级；溢出保留。9 级后经验仍累加但不再升级。</p>
+
+<h2>经验来源</h2>
+<div class="grid2">
+  <div class="panel"><h3>击杀</h3><p>击杀者所辖武将获得 <b>死者类型的击杀经验</b>；同时按士气列调整双方士气。</p><p class="meta">例：民居 +40/+1、大旗 +50/+2、将本体 +10/+3、运输船 +20/+2。与伤害量无关，最后一击拿全额。</p></div>
+  <div class="panel"><h3>建造完工</h3><p>施工队所辖武将获得 <b>该建筑类型的击杀经验</b>。</p><p class="meta">例：帅帐 150、粮仓 15、民居 40、大旗 50、步兵所 50。</p></div>
+  <div class="panel"><h3>资源交付</h3><p>每次交付/入库 <b>+1 经验</b>（非工程队分支），与 200 载重无关。</p><p class="meta">采集节点采空不经过击杀路径，不给击杀经验。</p></div>
+  <div class="panel"><h3>事件</h3><p>如“在长坂坡救回糜竺，经验增加”；数值由任务参数 <code>eventExperience</code> 决定。</p><p class="meta">“斩夏侯恩，武力上升”是永久武力，不是经验。</p></div>
+</div>
+
+<h2>升级效果</h2>
+<table>
+  <tr><th>属性</th><th>公式</th><th>升级影响</th></tr>
+  <tr><td>单挑体力</td><td><code>武 + 品级</code>（0–120；UI ×100/120）</td><td>↑</td></tr>
+  <tr><td>攻A / 攻B</td><td><code>floor((品级 + 武) × 类型攻A/B / 100)</code></td><td>↑</td></tr>
+  <tr><td>防A / 防B</td><td><code>floor(武 × 类型防A/B / 100)</code></td><td>不变</td></tr>
+  <tr><td>将本体 HP</td><td>类型 HP（500）</td><td>不变（不回血）</td></tr>
+</table>
+
+<h3>称号/品级阶梯</h3>
+<table>
+  <tr><th>等级</th><th>骑将</th><th>步将</th><th>弓将</th><th>文将</th></tr>
+  <tr><td>0</td><td>屯骑校尉 2</td><td>步兵校尉 3</td><td>射声校尉 1</td><td>虎贲校尉 0</td></tr>
+  <tr><td>1</td><td>屯骑中郎将 4</td><td>步兵中郎将 5</td><td>射声中郎将 2</td><td>虎贲中郎将 3</td></tr>
+  <tr><td>2</td><td>偏将 6</td><td>裨将 3</td><td>偏将 6</td><td>裨将 3</td></tr>
+  <tr><td>3</td><td>牙门将军 8</td><td>旗门将军 4</td><td>牙门将军 8</td><td>旗门将军 4</td></tr>
+  <tr><td>4</td><td>骠骑将军 9</td><td>车骑将军 6</td><td>骠骑将军 9</td><td>车骑将军 6</td></tr>
+  <tr><td>5</td><td>龙骧将军 12</td><td>虎威将军 6</td><td>龙骧将军 12</td><td>虎威将军 6</td></tr>
+  <tr><td>6</td><td>后将军 12</td><td>前将军 14</td><td>左将军 7</td><td>右将军 9</td></tr>
+  <tr><td>7</td><td>镇西将军 8</td><td>镇南将军 16</td><td>镇东将军 10</td><td>镇北将军 14</td></tr>
+  <tr><td>8</td><td>征西将军 9</td><td>征东将军 18</td><td>征南将军 11</td><td>征北将军 16</td></tr>
+  <tr><td>9</td><td>大将军 20</td><td>大将军 20</td><td>大将军 20</td><td>大将军 20</td></tr>
+</table>
+<p class="meta">数字 = 品级值；称号本身不加属性。</p>
+
+<h2>武将成长表</h2>
+<div class="controls">
+  <label>等级 <select id="level"></select></label>
+  <label>名册 <select id="roster"><option value="">全部</option><option>吴</option><option>蜀</option><option>魏</option><option>群</option></select></label>
+  <label>类别 <select id="cat"><option value="">全部</option><option value="1">骑将</option><option value="2">步将</option><option value="3">弓将</option><option value="4">文将</option></select></label>
+  <input id="search" placeholder="搜索武将名">
+  <span class="meta" id="count"></span>
+</div>
+<div class="tablewrap">
+  <table>
+    <thead><tr><th>#</th><th>名册</th><th>武将</th><th>类别</th><th class="num">武</th><th class="num">智</th><th>称号</th><th class="num">品级</th><th class="num">单挑体力</th><th class="num">攻A</th><th class="num">攻B</th><th class="num">防A</th><th class="num">防B</th><th class="num">本体HP</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+</div>
+<p class="meta">基础等级 0（DATA.EXP 的 1 在装载时减 1）；每关实际初始等级由 BATTLE.EXP 的“档次”设置（等级 = 档次 − 1）。</p>
+
+<h2>击杀经验（节选）</h2>
+<table>
+  <tr><th>类型</th><th>名称</th><th class="num">击杀经验</th><th class="num">士气摆动</th></tr>
+  <tr><td>0</td><td>帅帐</td><td class="num">150</td><td class="num">+4</td></tr>
+  <tr><td>10</td><td>粮仓</td><td class="num">15</td><td class="num">+1</td></tr>
+  <tr><td>24/25</td><td>民居</td><td class="num">40</td><td class="num">+1</td></tr>
+  <tr><td>26</td><td>大旗</td><td class="num">50</td><td class="num">+2</td></tr>
+  <tr><td>29/31/33/35</td><td>文/步/弓/骑将本体</td><td class="num">10</td><td class="num">+3</td></tr>
+  <tr><td>47</td><td>运输船</td><td class="num">20</td><td class="num">+2</td></tr>
+</table>
+
+<h2>文件</h2>
+<ul>
+  <li><a href="README.md">README.md</a> — 完整机制、公式、证据与空缺</li>
+  <li><a href="data/exp_level.json">data/exp_level.json</a> — 阈值/来源/品级/称号/公式</li>
+  <li><a href="data/heroes.json">data/heroes.json</a> — 117 武将 × 10 级</li>
+  <li><a href="data/hero_levels.csv">data/hero_levels.csv</a> — 展平表（1170 行）</li>
+  <li><a href="data/kill_xp.json">data/kill_xp.json</a> — 53 类击杀经验</li>
+</ul>
+
+<script src="data/heroes.js"></script>
+<script>
+const heroes = window.HEROES || [];
+const levelSel = document.getElementById("level");
+for (let i = 0; i <= 9; i++) {
+  const o = document.createElement("option");
+  o.value = i; o.textContent = "L" + i + (i === 9 ? "（封顶）" : "");
+  levelSel.appendChild(o);
+}
+levelSel.value = "0";
+const rosterSel = document.getElementById("roster");
+const catSel = document.getElementById("cat");
+const search = document.getElementById("search");
+const rows = document.getElementById("rows");
+const count = document.getElementById("count");
+
+function render() {
+  const lv = Number(levelSel.value);
+  const r = rosterSel.value, c = catSel.value, q = search.value.trim();
+  const list = heroes.filter(h => (!r || h.r === r) && (!c || String(h.c) === c) && (!q || h.n.includes(q)));
+  count.textContent = `${list.length} / ${heroes.length}`;
+  rows.innerHTML = list.map(h => {
+    const l = h.l[lv];
+    return `<tr><td>${h.i + 1}</td><td>${h.r}</td><td>${h.n}</td><td>${h.cn}</td><td class="num">${h.w}</td><td class="num">${h.z}</td><td>${l[0]}</td><td class="num">${l[1]}</td><td class="num">${l[2]}</td><td class="num">${l[3]}</td><td class="num">${l[4]}</td><td class="num">${l[5]}</td><td class="num">${l[6]}</td><td class="num">500</td></tr>`;
+  }).join("");
+}
+for (const el of [levelSel, rosterSel, catSel]) el.addEventListener("change", render);
+search.addEventListener("input", render);
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+[
+  {
+    "key": "headquarters-blue-stages",
+    "reference": "D:\\Games\\3DMGAME_chibi.CHS.Green\\godot\\chibi_remake\\sprites_hd\\sheet_001_o2.png",
+    "transparent": true,
+    "prompt": "Use case: style-transfer. Production transparent building-stage atlas for classic Chinese RTS 三国赤壁. Repaint EVERY one of the EIGHT buildings in the reference atlas, keeping the exact order and the same gold roofs, ivory walls, red doors, blue team panels, grey stone diamond bases and isometric camera. NEW OUTPUT LAYOUT: square canvas split into EXACTLY 4 equal columns and 2 equal rows. Move reference left-to-right cells 0..7 into new row-major cells 0..7. Each cell contains only its corresponding building, preserving each building's construction stage and silhouette. Fully redraw crisp hand-painted wood beams, gold tiles and stone, upper-left light, faithful nostalgic palette. Do not invent different stages, do not merge cells. Scale each old 144x120 frame to fit inside its new cell keeping aspect and bottom alignment. True transparent alpha between/around all eight objects. No black rectangle, no checkerboard, no labels, no text or grid lines. All eight cells required. This is the full eight-stage building atlas, not a single concept render."
+  },
+  {
+    "key": "zhaoyun-033",
+    "transparent": false,
+    "prompt": "Use case: historical-scene. Asset type: finished square officer portrait for classic 三国赤壁 RTS remaster. ONE bust portrait of 赵云 Zhao Yun, Chinese male around 30, handsome calm narrow face, clean-shaven, straight brows, focused grey-brown eyes, white-silver late Han helmet and lamellar shoulder armor, azure-white cloth, no facial scar. Three-quarter face slightly left. Faithful 1990s Chinese historical strategy game hand-painted portrait style, fine brushwork, restrained realistic proportions, warm upper-left light, readable at 96 pixels, dark warm brown unadorned painterly background. Head and both shoulders visible with 8 percent margins, distinctive identity. No text, frame, watermark or modern elements. Keep colors bright and controlled; not cinematic photograph, not anime."
+  },
+  {
+    "key": "zhugeliang-041",
+    "transparent": false,
+    "prompt": "Use case: historical-scene. Asset type: finished square officer portrait for classic 三国赤壁 RTS remaster. ONE bust portrait of 诸葛亮 Zhuge Liang, Chinese male around 35, slender oval face, long straight black moustache and pointed beard, intelligent composed eyes, tall black scholar guan headdress, ivory layered robe with muted dark teal collar, white feather fan partly visible at chest. Three-quarter face slightly left. Faithful 1990s Chinese historical strategy game hand-painted portrait style, fine brushwork, restrained realistic proportions, warm upper-left light, readable at 96 pixels, dark warm brown unadorned painterly background. Head and both shoulders with 8 percent margin, distinctive identity. No text, frame, watermark, modern elements or anime."
+  }
+]

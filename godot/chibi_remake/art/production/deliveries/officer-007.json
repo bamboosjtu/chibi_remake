@@ -1,0 +1,31 @@
+{
+  "assetId": "officer-007",
+  "bytes": 2581375.0,
+  "colorType": 2.0,
+  "generatedAt": "2026-10-13T09:12:49.440Z",
+  "generator": "built-in image_gen",
+  "height": 1254.0,
+  "prompt": "Use case: identity-preserve / style-transfer. Finished high-definition square officer portrait for 三国赤壁 remaster. The reference is the ORIGINAL in-game portrait of 程普, ID 7. Faithfully repaint THIS individual: preserve exact facial structure, age appearance, expression, head angle, eye direction, skin tone, moustache/beard shape, hairstyle, headdress/helmet shape and colors, armor/robe colors, and visible collar. Do not substitute a generic face or reinterpret the character from folklore. Clean detailed hand-painted classic Chinese strategy-game portrait, crisp metal/fabric/hair, warm subtle upper-left light consistent with source. Fit the full source head and collar into a square portrait with modest side padding, preserve source background tone. A true repaint with new detail, not enlarged pixels or a photographic filter. No text, frame, watermark, modern elements or anime. Preserve the original identity and costume above all else.",
+  "promptFile": "godot/chibi_remake/art/production/source-faithful-prompts-v2.json",
+  "sha256": "5932eec4ee43c65fecdc0996e0d7d88affbc7cc1b5c61b0504d0de125158277d",
+  "sourceGeneratedFile": "C:\\Users\\bambo\\.codex\\generated_images\\01a13348-db65-7b23-b66a-63227eb4490d\\exec-2dead322-379e-4adf-901a-69674a1a090a.png",
+  "status": "generated-awaiting-validation",
+  "texture": "godot/chibi_remake/art/full/officers/007-portrait-v2.png",
+  "userAcceptance": {
+    "date": "2026-10-13",
+    "reason": "用户已人工验证高清图，要求直接替换对应素材，不再逐项美术复核。",
+    "reviewer": "user"
+  },
+  "validation": {
+    "structure": "pass",
+    "visual": "pass"
+  },
+  "visualReview": {
+    "reason": "Original face, head angle, age appearance, expression and costume remain recognizable; detailed painterly series replaces source dithering.",
+    "reviewedAt": "2026-10-13T13:43:42.149Z",
+    "reviewedSha256": "5932eec4ee43c65fecdc0996e0d7d88affbc7cc1b5c61b0504d0de125158277d",
+    "reviewer": "Codex paired source/candidate contact sheets",
+    "state": "pass"
+  },
+  "width": 1254.0
+}

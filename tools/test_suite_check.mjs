@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {suites, checkInventory} from './lib/suite_inventory.mjs';
+const inputs = Object.fromEntries([...suites, 'manual_tests'].map(name => [name, JSON.parse(fs.readFileSync(`tools/inputs/${name}.json`, 'utf8'))]));
+assert.deepEqual(checkInventory('tools/gd', inputs), []);
+const missing = structuredClone(inputs); missing.release_tests.tests.shift();
+assert(checkInventory('tools/gd', missing).some(error => error.includes('Unclassified')));
+const bad = structuredClone(inputs); bad.manual_tests.tests[0].reason = '';
+assert(checkInventory('tools/gd', bad).some(error => error.includes('classification')));
+const duplicate = structuredClone(inputs); duplicate.release_tests.tests.push(duplicate.release_tests.tests[0]);
+assert(checkInventory('tools/gd', duplicate).some(error => error.includes('duplicate')));
+console.log('SUITE INVENTORY NEGATIVE PASS orphan / duplicate / undocumented manual exclusion');

@@ -1,0 +1,9 @@
+{
+  "checkpoint": "c79b4b821f1ed7a5619538f3a4d423b66cace830",
+  "description": "Reviewed values captured before the refactor. Update only for deliberate gameplay changes; never regenerate in CI.",
+  "sha256": {
+    "tech": "b56feff2b5a3262a8b10f9280b5d06abd7eccf4b154d734d872cfcc43d2be6ad",
+    "unit_roles": "e2f2cdb3ac9c04546b767861dbf2220c6bd482de318cbfed881a3716f46ff781",
+    "balance": "15b7a417f8dc2af90ae42a52aa450217a8e0945c60f778019e897831ba968f39"
+  }
+}

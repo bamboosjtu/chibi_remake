@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>《赤壁》原版人口/实体上限</title>
+<style>
+:root{--bg:#10141b;--panel:#181f2a;--line:#2b3647;--text:#dce4ef;--muted:#9aa7b8;--gold:#ffd27a;--blue:#8ec5ff;--green:#8fe3a3;--red:#ff8f9a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.7 "Microsoft YaHei",system-ui,sans-serif}
+main{max-width:1050px;margin:auto;padding:36px 20px 70px}h1{color:var(--gold);font-size:28px;margin:0 0 8px}h2{color:var(--gold);font-size:19px;margin:24px 0 10px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:16px 0}.muted{color:var(--muted);font-size:12px}.big{color:var(--gold);font-size:40px;line-height:1;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.stat{background:#141b25;border:1px solid var(--line);border-radius:10px;padding:14px}.stat span{color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px solid #293444;padding:7px 8px;text-align:left}th{color:var(--gold)}
+code{color:var(--blue);font-family:ui-monospace,Consolas,monospace;font-size:12px}.good{color:var(--green)}.warn{color:var(--gold)}.bad{color:var(--red)}
+@media(max-width:700px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body><main>
+<h1>原版《赤壁》人口/实体上限</h1>
+<p class="muted">CB.EXE SHA-256 <code>2db7cc102e6fde547ab05d77cfddabc2079f5bc9be9b6b59b17bf435c5798cb7</code> · 静态 Ghidra 分析</p>
+
+<section class="panel">
+<h2>结论</h2>
+<div class="grid">
+<div class="stat"><div class="big">200</div><span>每方实体槽位（设计/数组上限）</span></div>
+<div class="stat"><div class="big">20</div><span>每方武将槽位</span></div>
+<div class="stat"><div class="big">10000</div><span>每座帅帐/粮仓粮容</span></div>
+</div>
+<ul>
+<li>没有独立人口资源，也没有住房/人口建筑；所谓人口上限是<b>每方 200 个实体记录槽</b>。</li>
+<li>部队、工人、武将本体、建筑、船只和地图初始对象都占同一套实体槽。</li>
+<li>武将另受每方 <b>20 个武将槽</b>限制，并同时占一个实体槽。</li>
+<li>粮食上限是资源容量：每座已建成帅帐/大本营或粮仓 +10000，不是单位人口。</li>
+<li>实体槽满时分配器报 <code>No room</code>；代码分配器一次最多扫描 199 个候选槽，存在满员边缘的 off-by-one 细节。</li>
+</ul>
+</section>
+
+<section class="panel">
+<h2>代码证据</h2>
+<table>
+<tr><th>函数</th><th>作用</th></tr>
+<tr><td><code>FUN_00442970</code></td><td>通用实体创建入口</td></tr>
+<tr><td><code>FUN_00459e20</code></td><td>按 side 分配实体槽；空槽失败输出 <code>No room</code></td></tr>
+<tr><td><code>FUN_00459d70</code></td><td>释放实体记录；活跃计数 −1</td></tr>
+<tr><td><code>FUN_0045AFE0</code></td><td>按 side 统计 200 个实体槽</td></tr>
+<tr><td><code>FUN_00442E40</code></td><td>扫描 20 个武将槽</td></tr>
+<tr><td><code>FUN_004262F0</code></td><td>粮容 = 帅帐/粮仓数 × 10000</td></tr>
+<tr><td><code>FUN_00421B50</code></td><td>粮食超容 <code>Food Exceeded</code></td></tr>
+</table>
+</section>
+
+<section class="panel">
+<h2>重要区分</h2>
+<table>
+<tr><th>项目</th><th>是否有人口上限</th><th>说明</th></tr>
+<tr><td>实体/单位</td><td class="warn">是：每方 200 槽</td><td>建筑、工人、武将本体也占槽</td></tr>
+<tr><td>武将</td><td class="warn">是：每方 20 槽</td><td>同时占用一个实体槽</td></tr>
+<tr><td>粮食</td><td class="good">不是人口</td><td>只限制粮食库存：每座帅帐/粮仓 +10000</td></tr>
+<tr><td>生产订单</td><td class="muted">原版没有确认预占</td><td>实际创建时才在 <code>FUN_00459e20</code> 分配槽位</td></tr>
+</table>
+<p class="muted">完整说明、边界与证据见同目录 <code>README.md</code>；机器可读常量见 <code>data/limits.json</code>。</p>
+</section>
+</main></body></html>

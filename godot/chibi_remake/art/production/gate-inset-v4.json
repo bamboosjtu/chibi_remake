@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-26",
+  "generator": "built-in image_gen",
+  "sourceFile": "C:/Users/bambo/.codex/generated_images/01a17875-a996-7c43-9e4b-0243bb8577dc/exec-fa4cc128-e492-47d8-a68c-a0f4879be6c6.png",
+  "texture": "res://art/full/buildings/gate-inset-v4.png",
+  "sha256": "16b8cc37098050af480fb25f167fca8e13449c263231ed4a34e68269c76f6ef7",
+  "size": [
+    2048,
+    768
+  ],
+  "closedRegion": [
+    94,
+    36,
+    837,
+    680
+  ],
+  "openRegion": [
+    1118,
+    36,
+    837,
+    680
+  ],
+  "geometry": {
+    "doorWidth": 31.5,
+    "doorHeight": 24,
+    "facadeWidth": 43.151391162029455,
+    "diagonalSlopes": [
+      0.5,
+      -0.5
+    ]
+  },
+  "wallBaseline": "53c77c654e2dd2c48bdaa57e2ba75dbcfc959d0f",
+  "wallRestoration": "14 terrain definitions identical to baseline; 691 terrain/chibil1 chunk hashes match baseline; no other map was baked",
+  "prompt": "Use case: stylized-concept. Production game texture atlas, not a scene or screenshot. Create ONE atlas containing TWO aligned front-elevation sprites side by side, left CLOSED recessed city gate, right OPEN version of the EXACT SAME recessed city gate. Transparent background, no text. This texture will be affinely mapped onto a 2:1 isometric stone wall face in an existing 1997 Chinese Three Kingdoms RTS remaster. CRITICAL: draw perfectly FLAT STRAIGHT-ON FRONT ELEVATION, NO isometric slant, no perspective on the outside silhouette. Each sprite is a compact rectangular doorway facade of identical size, about 640 px wide by 480 px high, aspect 4:3. Overall canvas wide 3:1, transparent gutter between sprites. Each facade has a narrow frame of 2-3 courses of DARK cool gray small square-cut stone bricks, subtle moss and warm gray mortar, convincingly fitted into surrounding masonry. The top lintel and vertical jambs are straight and square. OUTER frame is only 10% of total width on either side and 12% of total height at top, no sill protrusion. Brick courses small and closely spaced, about 18 bricks across entire facade, suitable for existing detailed gray castle walls. NO tower, NO roof, NO crenellations, NO parapet, NO walkway above gate, NO standalone building, NO exterior side wall, NO terrain outside the rectangle. Door opening is rectangular, NOT round, height about 84% facade height. CLOSED left: double wooden plank door, slightly recessed behind stone jamb returns; wood colored cyan-blue for game team tinting, restrained warm gold studs and bottom straps, aged detailed planks, some metal dark hinges. OPEN right: the exact same stone frame, wooden door leaves swung inward almost flat against tunnel side walls, clearly a deep passage with an actual warmly gray cobblestone road receding through it; visible small stone block side reveals, dark ceiling and top shadow. Fill interior with real subtle stone-road perspective texture, do NOT make it transparent, do NOT make a featureless black rectangle; deeper opening dim, threshold brighter, game lighting upper left. Both sprites have identical rectangle outer bounds, same jambs, same top and bottom registration. Polished realistic hand-painted 2D strategy game materials with restrained contrast, readable at 40x30 world pixels. The small outer stone frame must be neutral dark gray, never colored blue; cyan is confined to the wooden doors. No shadows outside facade silhouette, no glow, no lettering, no watermark."
+}

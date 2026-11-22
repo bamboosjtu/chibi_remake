@@ -1,0 +1,332 @@
+{
+  "sampleAssets": {
+    "30": {
+      "name": "工人",
+      "walk": {
+        "file": "walk_30_dirs.png",
+        "width": 400,
+        "height": 456,
+        "directions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "framesPerDirection": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ]
+      },
+      "turn": {
+        "file": "turn_30_dirs.png",
+        "width": 320,
+        "height": 456,
+        "directions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "framesPerDirection": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ]
+      },
+      "single": {
+        "file": "walk_30_d0_frames.png",
+        "width": 376,
+        "height": 57,
+        "dir": 0,
+        "frames": [
+          336,
+          337,
+          338,
+          363,
+          364
+        ]
+      }
+    },
+    "32": {
+      "name": "步兵",
+      "walk": {
+        "file": "walk_32_dirs.png",
+        "width": 288,
+        "height": 424,
+        "directions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "framesPerDirection": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ]
+      },
+      "turn": {
+        "file": "turn_32_dirs.png",
+        "width": 288,
+        "height": 424,
+        "directions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "framesPerDirection": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ]
+      },
+      "single": {
+        "file": "walk_32_d0_frames.png",
+        "width": 268,
+        "height": 53,
+        "dir": 0,
+        "frames": [
+          489,
+          490,
+          491,
+          492
+        ]
+      }
+    },
+    "34": {
+      "name": "车兵",
+      "walk": {
+        "file": "walk_34_dirs.png",
+        "width": 384,
+        "height": 600,
+        "directions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "framesPerDirection": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ]
+      },
+      "turn": {
+        "file": "turn_34_dirs.png",
+        "width": 384,
+        "height": 600,
+        "directions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "framesPerDirection": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ]
+      },
+      "single": {
+        "file": "walk_34_d0_frames.png",
+        "width": 364,
+        "height": 75,
+        "dir": 0,
+        "frames": [
+          710,
+          711,
+          712,
+          713
+        ]
+      }
+    },
+    "36": {
+      "name": "骑兵",
+      "walk": {
+        "file": "walk_36_dirs.png",
+        "width": 320,
+        "height": 496,
+        "directions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "framesPerDirection": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ]
+      },
+      "turn": {
+        "file": "turn_36_dirs.png",
+        "width": 320,
+        "height": 496,
+        "directions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "framesPerDirection": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ]
+      },
+      "single": {
+        "file": "walk_36_d0_frames.png",
+        "width": 300,
+        "height": 62,
+        "dir": 0,
+        "frames": [
+          954,
+          955,
+          956,
+          957
+        ]
+      }
+    },
+    "45": {
+      "name": "弓兵",
+      "walk": {
+        "file": "walk_45_dirs.png",
+        "width": 320,
+        "height": 384,
+        "directions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "framesPerDirection": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ]
+      },
+      "turn": {
+        "file": "turn_45_dirs.png",
+        "width": 256,
+        "height": 384,
+        "directions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "framesPerDirection": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ]
+      },
+      "single": {
+        "file": "walk_45_d0_frames.png",
+        "width": 296,
+        "height": 48,
+        "dir": 0,
+        "frames": [
+          2243,
+          2244,
+          2245,
+          2246,
+          2247
+        ]
+      }
+    }
+  },
+  "timing": "assets/timing_compare.svg"
+}

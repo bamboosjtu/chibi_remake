@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "binary": "CB.EXE",
+    "sha256": "2db7cc102e6fde547ab05d77cfddabc2079f5bc9be9b6b59b17bf435c5798cb7",
+    "analysis": "Ghidra 静态反编译"
+  },
+  "limits": {
+    "entitySlotsPerSide": 200,
+    "entitySlotIndexRange": [0, 199],
+    "entitySlotStrideBytes": 372,
+    "entitySlotBase": "DAT_004b8d3c + side * 0x12358",
+    "activeEntityCount": "DAT_004b8d38[side]",
+    "allocationScanAttempts": 199,
+    "allocationScanNote": "数组有 200 个槽位；FUN_00459e20 的 do/while 最多检查 199 个候选槽，满员边缘可能提前 No room",
+    "heroSlotsPerSide": 20,
+    "heroSlotScanLimit": "0x14 = 20",
+    "heroOccupiesEntitySlot": true,
+    "foodCapacityPerHqOrGranary": 10000,
+    "foodCapacityBuildingTypes": [0, 1, 10, 11],
+    "foodCapacityFormula": "DAT_004b8d34[side] * 10000",
+    "populationResource": false,
+    "populationUpkeepNotFound": true,
+    "sharedByPlayerAndAi": true,
+    "entityKindsUsingSlots": [
+      "combat_units",
+      "workers",
+      "officer_bodies",
+      "buildings",
+      "ships_and_transports",
+      "map_initial_objects"
+    ]
+  },
+  "productionOrderReservation": {
+    "originalCodeConfirmed": false,
+    "note": "原版在实体实际创建时由 FUN_00459e20 分配槽位；未发现入队时把未出生订单永久计入 DAT_004b8d38 的检查。重制稿的“订单预占”不能直接当作原版结论。"
+  },
+  "evidence": {
+    "entityCreate": "FUN_00442970",
+    "entityAllocate": "FUN_00459e20",
+    "entityFree": "FUN_00459d70",
+    "entityCountLoop": "FUN_0045AFE0",
+    "heroSlotScan": "FUN_00442E40",
+    "foodCapacity": "FUN_004262F0",
+    "foodExceeded": "FUN_00421B50",
+    "foodCapacityBuildingCounter": "FUN_00442970 / FUN_00442B90"
+  },
+  "notes": [
+    "每方实体槽独立，不是全场合计 200。",
+    "建筑、工人、武将本体都占实体槽；20 名武将不是额外的 20 人口，而是 200 个实体中的一部分。",
+    "粮容每座帅帐/大本营或粮仓 +10000，只限制粮食库存，不是人口上限。"
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "assetId": "units-035-page-08",
+  "bytes": 1300155.0,
+  "colorType": 6.0,
+  "generatedAt": "2026-10-18T00:07:25.261Z",
+  "generator": "built-in image_gen",
+  "height": 1397.0,
+  "prompt": "Use case: precise-object-edit / style-transfer. Repaint FIRST image EXACT pose grid for faithful HD 三国赤壁 animation atlas, 骑将 type35, page8. SECOND image is ONE design/material swatch ONLY, never a pose guide. Exactly 3 EQUAL COLUMNS x 4 EQUAL ROWS. Preserve source row-major pose order and EACH cell facing, limbs, horse or cart angle, weapon, silhouette and relative anchor. Do not invent or rearrange directions, or substitute repeated idle figures. Same character costume, horse color, metal/wood and palette across cells; blue/cyan is team cloth. Detailed hand-painted steel rivets, silk, leather and hair, warm upper-left light. A true detailed repaint, no enlarged pixels. Every cell contains its source pose.  Preserve low prone/fallen silhouettes ONLY where the FIRST image has them. Other cells must stay upright. Do not copy the style swatch pose to all cells. Preserve source relative footprint and transparent margins. Canvas aspect 216:268, NO external padding or extra rows/columns. Genuine transparent alpha immediately around sprites. No text, labels, grid, watermark, halo, colored backdrop, checkerboard or scene.",
+  "promptFile": "godot/chibi_remake/art/production/unit-034-036-final-prompts.json",
+  "sha256": "f9f3afb17bd71eb8094e6a9adef116b7d392a7b63b74ad610d8d4a28b4d00073",
+  "sourceGeneratedFile": "C:\\Users\\bambo\\.codex\\generated_images\\01a13348-db65-7b23-b66a-63227eb4490d\\exec-3a44b41c-f0de-4a32-9d28-f26889f906e2.png",
+  "status": "generated-awaiting-validation",
+  "texture": "godot/chibi_remake/art/full/units/035/page-08-v2.png",
+  "validation": {
+    "excludedSourceLabelsOrBlanks": 4,
+    "structure": "pass",
+    "visual": "pending",
+    "visualFrameCount": 12
+  },
+  "width": 1126.0
+}

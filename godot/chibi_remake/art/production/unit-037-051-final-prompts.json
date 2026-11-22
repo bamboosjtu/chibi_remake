@@ -1,0 +1,1352 @@
+[
+  {
+    "assetId": "units-037-page-00",
+    "parent": 37,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/037/page-00-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-037-page-00.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 骑兵, native type37, animation page0. FIRST IMAGE is a hard POSE/GEOMETRY reference.  EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 416:240. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-037-page-01",
+    "parent": 37,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/037/page-01-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-037-page-01.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-037-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 骑兵, native type37, animation page1. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 416:240. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-037-page-02",
+    "parent": 37,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/037/page-02-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-037-page-02.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-037-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 骑兵, native type37, animation page2. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 416:240. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-037-page-03",
+    "parent": 37,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/037/page-03-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-037-page-03.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-037-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 骑兵, native type37, animation page3. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 416:240. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-037-page-04",
+    "parent": 37,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/037/page-04-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-037-page-04.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-037-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 骑兵, native type37, animation page4. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 416:240. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose. Source flat cyan utility silhouettes 7 retain exact flat cyan outline: no invented rocks, ponds or scenery. Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-037-page-05",
+    "parent": 37,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/037/page-05-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-037-page-05.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-037-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 骑兵, native type37, animation page5. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 416:240. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-037-page-06",
+    "parent": 37,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/037/page-06-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-037-page-06.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-037-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 骑兵, native type37, animation page6. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 416:240. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-037-page-07",
+    "parent": 37,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/037/page-07-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-037-page-07.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-037-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 骑兵, native type37, animation page7. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 416:240. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-037-page-08",
+    "parent": 37,
+    "columns": 4,
+    "rows": 2,
+    "target": "godot/chibi_remake/art/full/units/037/page-08-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-037-page-08.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-037-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 骑兵, native type37, animation page8. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 2 EQUAL ROWS, 8 cell positions, canvas aspect 416:120. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. ZERO-BASED cells 7 remain completely EMPTY/transparent, no placeholder. Source flat cyan utility silhouettes 1,3,4,5,6 retain exact flat cyan outline: no invented rocks, ponds or scenery. Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-038-page-00",
+    "parent": 38,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/038/page-00-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-038-page-00.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type38, animation page0. FIRST IMAGE is a hard POSE/GEOMETRY reference.  EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 288:232. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-038-page-01",
+    "parent": 38,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/038/page-01-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-038-page-01.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-038-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type38, animation page1. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 288:232. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-038-page-02",
+    "parent": 38,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/038/page-02-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-038-page-02.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-038-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type38, animation page2. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 288:232. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-038-page-03",
+    "parent": 38,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/038/page-03-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-038-page-03.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-038-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type38, animation page3. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 288:232. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-038-page-04",
+    "parent": 38,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/038/page-04-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-038-page-04.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-038-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type38, animation page4. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 288:232. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose. Source flat cyan utility silhouettes 7,8,9,14,15 retain exact flat cyan outline: no invented rocks, ponds or scenery. Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-038-page-05",
+    "parent": 38,
+    "columns": 2,
+    "rows": 1,
+    "target": "godot/chibi_remake/art/full/units/038/page-05-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-038-page-05.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-038-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type38, animation page5. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 2 EQUAL COLUMNS x 1 EQUAL ROWS, 2 cell positions, canvas aspect 144:58. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose. Source flat cyan utility silhouettes 0 retain exact flat cyan outline: no invented rocks, ponds or scenery. Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-039-page-00",
+    "parent": 39,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/039/page-00-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-039-page-00.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type39, animation page0. FIRST IMAGE is a hard POSE/GEOMETRY reference.  EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 256:212. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-039-page-01",
+    "parent": 39,
+    "columns": 5,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/039/page-01-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-039-page-01.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-039-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type39, animation page1. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 5 EQUAL COLUMNS x 4 EQUAL ROWS, 20 cell positions, canvas aspect 320:212. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. ZERO-BASED cells 4,9 remain completely EMPTY/transparent, no placeholder. Source flat cyan utility silhouettes 19 retain exact flat cyan outline: no invented rocks, ponds or scenery. Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-039-page-02",
+    "parent": 39,
+    "columns": 5,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/039/page-02-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-039-page-02.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-039-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type39, animation page2. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 5 EQUAL COLUMNS x 4 EQUAL ROWS, 20 cell positions, canvas aspect 320:212. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-039-page-03",
+    "parent": 39,
+    "columns": 5,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/039/page-03-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-039-page-03.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-039-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type39, animation page3. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 5 EQUAL COLUMNS x 4 EQUAL ROWS, 20 cell positions, canvas aspect 320:212. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-039-page-04",
+    "parent": 39,
+    "columns": 5,
+    "rows": 3,
+    "target": "godot/chibi_remake/art/full/units/039/page-04-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-039-page-04.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-039-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type39, animation page4. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 5 EQUAL COLUMNS x 3 EQUAL ROWS, 15 cell positions, canvas aspect 320:159. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose. Source flat cyan utility silhouettes 8,9,13,14 retain exact flat cyan outline: no invented rocks, ponds or scenery. Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-040-page-00",
+    "parent": 40,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/040/page-00-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-040-page-00.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 骑兵, native type40, animation page0. FIRST IMAGE is a hard POSE/GEOMETRY reference.  EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 480:312. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-040-page-01",
+    "parent": 40,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/040/page-01-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-040-page-01.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-040-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 骑兵, native type40, animation page1. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 480:312. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-040-page-02",
+    "parent": 40,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/040/page-02-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-040-page-02.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-040-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 骑兵, native type40, animation page2. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 480:312. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-040-page-03",
+    "parent": 40,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/040/page-03-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-040-page-03.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-040-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 骑兵, native type40, animation page3. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 480:312. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-040-page-04",
+    "parent": 40,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/040/page-04-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-040-page-04.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-040-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 骑兵, native type40, animation page4. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 480:312. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-040-page-05",
+    "parent": 40,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/040/page-05-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-040-page-05.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-040-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 骑兵, native type40, animation page5. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 480:312. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-040-page-06",
+    "parent": 40,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/040/page-06-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-040-page-06.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-040-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 骑兵, native type40, animation page6. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 480:312. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-040-page-07",
+    "parent": 40,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/040/page-07-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-040-page-07.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-040-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 骑兵, native type40, animation page7. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 480:312. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-040-page-08",
+    "parent": 40,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/040/page-08-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-040-page-08.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-040-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 骑兵, native type40, animation page8. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 480:312. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-040-page-09",
+    "parent": 40,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/040/page-09-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-040-page-09.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-040-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 骑兵, native type40, animation page9. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 480:312. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-040-page-10",
+    "parent": 40,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/040/page-10-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-040-page-10.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-040-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 骑兵, native type40, animation page10. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 480:312. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-040-page-11",
+    "parent": 40,
+    "columns": 4,
+    "rows": 2,
+    "target": "godot/chibi_remake/art/full/units/040/page-11-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-040-page-11.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-040-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 骑兵, native type40, animation page11. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 2 EQUAL ROWS, 8 cell positions, canvas aspect 480:156. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. ZERO-BASED cells 7 remain completely EMPTY/transparent, no placeholder. Source flat cyan utility silhouettes 1,4,5,6 retain exact flat cyan outline: no invented rocks, ponds or scenery. Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-041-page-00",
+    "parent": 41,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/041/page-00-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-041-page-00.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type41, animation page0. FIRST IMAGE is a hard POSE/GEOMETRY reference.  EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 416:260. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-041-page-01",
+    "parent": 41,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/041/page-01-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-041-page-01.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-041-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type41, animation page1. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 416:260. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-041-page-02",
+    "parent": 41,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/041/page-02-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-041-page-02.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-041-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type41, animation page2. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 416:260. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-041-page-03",
+    "parent": 41,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/041/page-03-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-041-page-03.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-041-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type41, animation page3. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 416:260. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-041-page-04",
+    "parent": 41,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/041/page-04-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-041-page-04.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-041-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type41, animation page4. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 416:260. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-041-page-05",
+    "parent": 41,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/041/page-05-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-041-page-05.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-041-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type41, animation page5. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 416:260. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-041-page-06",
+    "parent": 41,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/041/page-06-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-041-page-06.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-041-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type41, animation page6. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 416:260. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-041-page-07",
+    "parent": 41,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/041/page-07-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-041-page-07.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-041-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type41, animation page7. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 416:260. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose. Source flat cyan utility silhouettes 7,8,9,10,11,12,13,14,15 retain exact flat cyan outline: no invented rocks, ponds or scenery. Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-041-page-08",
+    "parent": 41,
+    "columns": 1,
+    "rows": 1,
+    "target": "godot/chibi_remake/art/full/units/041/page-08-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-041-page-08.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-041-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type41, animation page8. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 1 EQUAL COLUMNS x 1 EQUAL ROWS, 1 cell positions, canvas aspect 104:65. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose. Source flat cyan utility silhouettes 0 retain exact flat cyan outline: no invented rocks, ponds or scenery. Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-042-page-00",
+    "parent": 42,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/042/page-00-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-042-page-00.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type42, animation page0. FIRST IMAGE is a hard POSE/GEOMETRY reference.  EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 352:248. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-042-page-01",
+    "parent": 42,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/042/page-01-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-042-page-01.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-042-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type42, animation page1. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 352:248. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-042-page-02",
+    "parent": 42,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/042/page-02-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-042-page-02.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-042-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type42, animation page2. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 352:248. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. ZERO-BASED cells 9,10,11 remain completely EMPTY/transparent, no placeholder.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-042-page-03",
+    "parent": 42,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/042/page-03-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-042-page-03.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-042-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type42, animation page3. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 352:248. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. ZERO-BASED cells 9,10,11 remain completely EMPTY/transparent, no placeholder.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-042-page-04",
+    "parent": 42,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/042/page-04-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-042-page-04.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-042-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type42, animation page4. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 352:248. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. ZERO-BASED cells 5,6,7 remain completely EMPTY/transparent, no placeholder.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-042-page-05",
+    "parent": 42,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/042/page-05-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-042-page-05.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-042-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type42, animation page5. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 352:248. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. ZERO-BASED cells 5,6,7 remain completely EMPTY/transparent, no placeholder.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-042-page-06",
+    "parent": 42,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/042/page-06-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-042-page-06.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-042-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type42, animation page6. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 352:248. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. ZERO-BASED cells 1,2,3 remain completely EMPTY/transparent, no placeholder.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-042-page-07",
+    "parent": 42,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/042/page-07-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-042-page-07.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-042-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type42, animation page7. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 352:248. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. ZERO-BASED cells 1,2,3,13,14,15 remain completely EMPTY/transparent, no placeholder.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-042-page-08",
+    "parent": 42,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/042/page-08-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-042-page-08.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-042-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type42, animation page8. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 352:248. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. ZERO-BASED cells 13,14,15 remain completely EMPTY/transparent, no placeholder.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-042-page-09",
+    "parent": 42,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/042/page-09-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-042-page-09.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-042-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type42, animation page9. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 352:248. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose. Source flat cyan utility silhouettes 9,10,11,12,13,14,15 retain exact flat cyan outline: no invented rocks, ponds or scenery. Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-043-page-00",
+    "parent": 43,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/043/page-00-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-043-page-00.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type43, animation page0. FIRST IMAGE is a hard POSE/GEOMETRY reference.  EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 448:280. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-043-page-01",
+    "parent": 43,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/043/page-01-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-043-page-01.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-043-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type43, animation page1. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 448:280. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-043-page-02",
+    "parent": 43,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/043/page-02-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-043-page-02.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-043-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type43, animation page2. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 448:280. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-043-page-03",
+    "parent": 43,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/043/page-03-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-043-page-03.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-043-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type43, animation page3. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 448:280. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-043-page-04",
+    "parent": 43,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/043/page-04-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-043-page-04.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-043-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type43, animation page4. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 448:280. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-043-page-05",
+    "parent": 43,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/043/page-05-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-043-page-05.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-043-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type43, animation page5. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 448:280. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-043-page-06",
+    "parent": 43,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/043/page-06-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-043-page-06.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-043-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type43, animation page6. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 448:280. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-043-page-07",
+    "parent": 43,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/043/page-07-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-043-page-07.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-043-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type43, animation page7. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 448:280. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-043-page-08",
+    "parent": 43,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/043/page-08-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-043-page-08.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-043-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type43, animation page8. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 448:280. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-043-page-09",
+    "parent": 43,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/043/page-09-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-043-page-09.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-043-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type43, animation page9. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 448:280. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose. Source flat cyan utility silhouettes 8,9,10,11,12,13,14,15 retain exact flat cyan outline: no invented rocks, ponds or scenery. Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-043-page-10",
+    "parent": 43,
+    "columns": 1,
+    "rows": 1,
+    "target": "godot/chibi_remake/art/full/units/043/page-10-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-043-page-10.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-043-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 步兵, native type43, animation page10. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 1 EQUAL COLUMNS x 1 EQUAL ROWS, 1 cell positions, canvas aspect 112:70. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose. Source flat cyan utility silhouettes 0 retain exact flat cyan outline: no invented rocks, ponds or scenery. Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-044-page-00",
+    "parent": 44,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/044/page-00-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-044-page-00.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type44, animation page0. FIRST IMAGE is a hard POSE/GEOMETRY reference.  EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 352:280. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-044-page-01",
+    "parent": 44,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/044/page-01-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-044-page-01.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-044-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type44, animation page1. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 352:280. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-044-page-02",
+    "parent": 44,
+    "columns": 6,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/044/page-02-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-044-page-02.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-044-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type44, animation page2. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 6 EQUAL COLUMNS x 4 EQUAL ROWS, 24 cell positions, canvas aspect 528:280. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-044-page-03",
+    "parent": 44,
+    "columns": 6,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/044/page-03-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-044-page-03.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-044-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type44, animation page3. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 6 EQUAL COLUMNS x 4 EQUAL ROWS, 24 cell positions, canvas aspect 528:280. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. ZERO-BASED cells 21,22,23 remain completely EMPTY/transparent, no placeholder.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-044-page-04",
+    "parent": 44,
+    "columns": 6,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/044/page-04-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-044-page-04.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-044-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type44, animation page4. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 6 EQUAL COLUMNS x 4 EQUAL ROWS, 24 cell positions, canvas aspect 528:280. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-044-page-05",
+    "parent": 44,
+    "columns": 6,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/044/page-05-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-044-page-05.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-044-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type44, animation page5. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 6 EQUAL COLUMNS x 4 EQUAL ROWS, 24 cell positions, canvas aspect 528:280. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-044-page-06",
+    "parent": 44,
+    "columns": 6,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/044/page-06-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-044-page-06.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-044-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type44, animation page6. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 6 EQUAL COLUMNS x 4 EQUAL ROWS, 24 cell positions, canvas aspect 528:280. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. ZERO-BASED cells 15,16,17 remain completely EMPTY/transparent, no placeholder.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-044-page-07",
+    "parent": 44,
+    "columns": 6,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/044/page-07-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-044-page-07.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-044-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type44, animation page7. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 6 EQUAL COLUMNS x 4 EQUAL ROWS, 24 cell positions, canvas aspect 528:280. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose. Source flat cyan utility silhouettes 21,22,23 retain exact flat cyan outline: no invented rocks, ponds or scenery. Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-044-page-08",
+    "parent": 44,
+    "columns": 5,
+    "rows": 1,
+    "target": "godot/chibi_remake/art/full/units/044/page-08-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-044-page-08.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-044-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type44, animation page8. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 5 EQUAL COLUMNS x 1 EQUAL ROWS, 5 cell positions, canvas aspect 440:70. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose. Source flat cyan utility silhouettes 0,1,2,3 retain exact flat cyan outline: no invented rocks, ponds or scenery. Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-045-page-00",
+    "parent": 45,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/045/page-00-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-045-page-00.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type45, animation page0. FIRST IMAGE is a hard POSE/GEOMETRY reference.  EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 224:160. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-045-page-01",
+    "parent": 45,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/045/page-01-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-045-page-01.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-045-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type45, animation page1. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 224:160. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-045-page-02",
+    "parent": 45,
+    "columns": 5,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/045/page-02-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-045-page-02.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-045-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type45, animation page2. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 5 EQUAL COLUMNS x 4 EQUAL ROWS, 20 cell positions, canvas aspect 280:160. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-045-page-03",
+    "parent": 45,
+    "columns": 5,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/045/page-03-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-045-page-03.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-045-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type45, animation page3. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 5 EQUAL COLUMNS x 4 EQUAL ROWS, 20 cell positions, canvas aspect 280:160. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-045-page-04",
+    "parent": 45,
+    "columns": 5,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/045/page-04-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-045-page-04.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-045-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type45, animation page4. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 5 EQUAL COLUMNS x 4 EQUAL ROWS, 20 cell positions, canvas aspect 280:160. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. ZERO-BASED cells 8,9,13,14,18,19 remain completely EMPTY/transparent, no placeholder.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-045-page-05",
+    "parent": 45,
+    "columns": 3,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/045/page-05-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-045-page-05.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-045-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type45, animation page5. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 3 EQUAL COLUMNS x 4 EQUAL ROWS, 12 cell positions, canvas aspect 168:160. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-045-page-06",
+    "parent": 45,
+    "columns": 3,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/045/page-06-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-045-page-06.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-045-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type45, animation page6. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 3 EQUAL COLUMNS x 4 EQUAL ROWS, 12 cell positions, canvas aspect 168:160. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-045-page-07",
+    "parent": 45,
+    "columns": 3,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/045/page-07-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-045-page-07.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-045-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type45, animation page7. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 3 EQUAL COLUMNS x 4 EQUAL ROWS, 12 cell positions, canvas aspect 168:160. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-045-page-08",
+    "parent": 45,
+    "columns": 4,
+    "rows": 1,
+    "target": "godot/chibi_remake/art/full/units/045/page-08-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-045-page-08.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-045-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 弓兵, native type45, animation page8. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 1 EQUAL ROWS, 4 cell positions, canvas aspect 224:40. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-046-page-00",
+    "parent": 46,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/046/page-00-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-046-page-00.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 水兵, native type46, animation page0. FIRST IMAGE is a hard POSE/GEOMETRY reference.  EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 288:220. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-046-page-01",
+    "parent": 46,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/046/page-01-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-046-page-01.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-046-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 水兵, native type46, animation page1. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 288:220. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-046-page-02",
+    "parent": 46,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/046/page-02-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-046-page-02.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-046-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 水兵, native type46, animation page2. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 288:220. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-046-page-03",
+    "parent": 46,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/046/page-03-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-046-page-03.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-046-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 水兵, native type46, animation page3. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 288:220. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. ZERO-BASED cells 15 remain completely EMPTY/transparent, no placeholder.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-046-page-04",
+    "parent": 46,
+    "columns": 2,
+    "rows": 1,
+    "target": "godot/chibi_remake/art/full/units/046/page-04-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-046-page-04.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-046-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 水兵, native type46, animation page4. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 2 EQUAL COLUMNS x 1 EQUAL ROWS, 2 cell positions, canvas aspect 144:55. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-047-page-00",
+    "parent": 47,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/047/page-00-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-047-page-00.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 运输船, native type47, animation page0. FIRST IMAGE is a hard POSE/GEOMETRY reference.  EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 384:296. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-047-page-01",
+    "parent": 47,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/047/page-01-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-047-page-01.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-047-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 运输船, native type47, animation page1. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 384:296. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-047-page-02",
+    "parent": 47,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/047/page-02-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-047-page-02.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-047-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 运输船, native type47, animation page2. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 384:296. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-047-page-03",
+    "parent": 47,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/047/page-03-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-047-page-03.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-047-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 运输船, native type47, animation page3. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 384:296. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-047-page-04",
+    "parent": 47,
+    "columns": 2,
+    "rows": 1,
+    "target": "godot/chibi_remake/art/full/units/047/page-04-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-047-page-04.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-047-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 运输船, native type47, animation page4. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 2 EQUAL COLUMNS x 1 EQUAL ROWS, 2 cell positions, canvas aspect 192:74. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-048-page-00",
+    "parent": 48,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/048/page-00-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-048-page-00.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 水兵, native type48, animation page0. FIRST IMAGE is a hard POSE/GEOMETRY reference.  EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 352:304. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-048-page-01",
+    "parent": 48,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/048/page-01-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-048-page-01.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-048-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 水兵, native type48, animation page1. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 352:304. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-048-page-02",
+    "parent": 48,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/048/page-02-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-048-page-02.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-048-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 水兵, native type48, animation page2. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 352:304. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-048-page-03",
+    "parent": 48,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/048/page-03-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-048-page-03.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-048-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 水兵, native type48, animation page3. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 352:304. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-048-page-04",
+    "parent": 48,
+    "columns": 1,
+    "rows": 1,
+    "target": "godot/chibi_remake/art/full/units/048/page-04-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-048-page-04.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-048-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 水兵, native type48, animation page4. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 1 EQUAL COLUMNS x 1 EQUAL ROWS, 1 cell positions, canvas aspect 88:76. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose. Source flat cyan utility silhouettes 0 retain exact flat cyan outline: no invented rocks, ponds or scenery. Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-049-page-00",
+    "parent": 49,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/049/page-00-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-049-page-00.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 连船, native type49, animation page0. FIRST IMAGE is a hard POSE/GEOMETRY reference.  EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 576:456. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-049-page-01",
+    "parent": 49,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/049/page-01-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-049-page-01.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-049-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 连船, native type49, animation page1. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 576:456. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-049-page-02",
+    "parent": 49,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/049/page-02-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-049-page-02.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-049-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 连船, native type49, animation page2. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 576:456. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-049-page-03",
+    "parent": 49,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/049/page-03-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-049-page-03.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-049-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 连船, native type49, animation page3. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 576:456. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-050-page-00",
+    "parent": 50,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/050/page-00-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-050-page-00.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 短云梯, native type50, animation page0. FIRST IMAGE is a hard POSE/GEOMETRY reference.  EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 192:284. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-050-page-01",
+    "parent": 50,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/050/page-01-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-050-page-01.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-050-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 短云梯, native type50, animation page1. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 192:284. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-050-page-02",
+    "parent": 50,
+    "columns": 1,
+    "rows": 1,
+    "target": "godot/chibi_remake/art/full/units/050/page-02-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-050-page-02.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-050-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 短云梯, native type50, animation page2. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 1 EQUAL COLUMNS x 1 EQUAL ROWS, 1 cell positions, canvas aspect 48:71. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-051-page-00",
+    "parent": 51,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/051/page-00-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-051-page-00.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 长云梯, native type51, animation page0. FIRST IMAGE is a hard POSE/GEOMETRY reference.  EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 224:376. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-051-page-01",
+    "parent": 51,
+    "columns": 4,
+    "rows": 4,
+    "target": "godot/chibi_remake/art/full/units/051/page-01-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-051-page-01.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-051-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 长云梯, native type51, animation page1. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 4 EQUAL COLUMNS x 4 EQUAL ROWS, 16 cell positions, canvas aspect 224:376. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  },
+  {
+    "assetId": "units-051-page-02",
+    "parent": 51,
+    "columns": 1,
+    "rows": 1,
+    "target": "godot/chibi_remake/art/full/units/051/page-02-v2.png",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-051-page-02.png",
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/units-051-style.png"
+    ],
+    "transparent": true,
+    "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted sprite atlas, faithful 三国赤壁 HD remaster. Subject 长云梯, native type51, animation page2. FIRST IMAGE is a hard POSE/GEOMETRY reference. SECOND IMAGE is ONE small design/material swatch ONLY, NOT a pose or layout guide. EXACTLY 1 EQUAL COLUMNS x 1 EQUAL ROWS, 1 cell positions, canvas aspect 56:94. No outer padding. Match EVERY source cell row-major pose, facing, limb angle, weapon, equipment, ground footprint and transparent foot anchor. Multi-person groups retain EXACT same number of riders/footmen and spatial formation in EACH cell. Boats/ladders retain SAME construction, sail or rungs, direction and scale. Do not replace group cells with single soldiers or change horse color, original blue/cyan cloth, brown wood, gold and steel. Same character/ship design across all poses; crisp painted silk/leather/metal/wood/hair instead of enlarged pixels. Warm upper-left light and classic RTS hand-painted style. Preserve walking/attack/gesture/falling/wreck/sinking changes; prone or disintegrating source cells remain low silhouettes, never upright clones. All cells have their exact source pose.  Never copy the design swatch pose over the actual source page. No extra row, column or invented figures. Genuine transparent alpha immediately around each sprite, no background, floor rectangle, halo, checkerboard, grid, text, numbers, labels, watermarks or modern elements."
+  }
+]

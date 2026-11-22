@@ -1,0 +1,26 @@
+{
+  "assetId": "units-027-page-00",
+  "bytes": 2122271.0,
+  "colorType": 6.0,
+  "generatedAt": "2026-10-13T10:00:11.430Z",
+  "generator": "built-in image_gen",
+  "height": 1305.0,
+  "prompt": "Use case: style-transfer. Finished transparent full animation sprite atlas of 男平民, type 27, for 三国赤壁 HD redraw. Repaint ALL reference visual cells with EXACTLY 4 equal columns and 8 equal rows, keeping same row-major ordering, cell poses, directions, world silhouette, proportions and bottom anchors. 32 source cells; unused cells and dimension-label cards remain fully transparent. Preserve original bright gold, wood, grey stone, red, blue/cyan palette. Blue/cyan cloth or panels are designated team color; introduce no unrelated blue. Fully redraw crisp hand-painted material details with upper-left light, consistent character identity/equipment in every pose. Preserve construction/ruin stages or movement/attack/death shapes exactly; do not replace them with repeated idle sprites. Keep reference canvas aspect 192:208; at least fourfold source resolution if possible. No text/grid/watermark/background rectangle/checkerboard. Genuine transparent alpha surrounding each separate sprite. ",
+  "promptFile": "godot/chibi_remake/art/production/unit-pages-prompts-01.json",
+  "sha256": "521577f5f8dfd0a8253d924dc9c409464b46d24cab9c8eb89e2dcaa3415b7128",
+  "sourceGeneratedFile": "C:\\Users\\bambo\\.codex\\generated_images\\01a13348-db65-7b23-b66a-63227eb4490d\\exec-f571df17-f4b3-4f09-ad18-af790d3d9490.png",
+  "status": "generated-awaiting-validation",
+  "texture": "godot/chibi_remake/art/full/units/027/page-00-v1.png",
+  "userAcceptance": {
+    "date": "2026-10-13",
+    "reason": "用户已人工验证高清图，要求直接替换对应素材，不再逐项美术复核。",
+    "reviewer": "user"
+  },
+  "validation": {
+    "excludedSourceLabelsOrBlanks": 0,
+    "structure": "pass",
+    "visual": "pass",
+    "visualFrameCount": 32
+  },
+  "width": 1205.0
+}

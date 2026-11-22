@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-13",
+  "direction": "忠于原版：保留轮廓与配色，重绘材质和细节",
+  "generator": "built-in image_gen",
+  "assets": [
+    {
+      "path": "godot/chibi_remake/art/remaster/menu-study-v1.png",
+      "bytes": 2032508,
+      "sha256": "d4ddd37bd2808aaf5532ff08efc12d27d30868266983206f9b5a2bfce59b7adc",
+      "width": 1672,
+      "height": 941,
+      "pngColorType": 2
+    },
+    {
+      "path": "godot/chibi_remake/art/remaster/barracks-blue-v1.png",
+      "bytes": 1745055,
+      "sha256": "42209db4ebdf78076ea73bee7fab46a98ba9a68fdac72c6b0f896d3a30b0b76b",
+      "width": 1254,
+      "height": 1254,
+      "pngColorType": 6
+    },
+    {
+      "path": "godot/chibi_remake/art/remaster/residence-neutral-v1.png",
+      "bytes": 1187392,
+      "sha256": "59b80fa7f3d8df5b79411027ba255a20dde02134d781a88277590b18af5bd6fe",
+      "width": 1254,
+      "height": 1254,
+      "pngColorType": 6
+    },
+    {
+      "path": "release/ChibiRTS_ArtV1.exe",
+      "bytes": 322136192,
+      "sha256": "9c8a2161d3b96c6e63a816381b20caa9b21a8c8faffe511f5aba5f3b2cac88c9"
+    }
+  ],
+  "verification": {
+    "source": true,
+    "packed": true,
+    "maps": [
+      "chibic1",
+      "chibil1",
+      "chibil8"
+    ],
+    "scope": "3 images; completed building stage only"
+  }
+}

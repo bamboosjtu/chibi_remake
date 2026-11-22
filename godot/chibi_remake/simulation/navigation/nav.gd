@@ -1,0 +1,173 @@
+extends RefCounted
+const Roles = preload("res://simulation/definitions/unit_roles.gd")
+## Stable navigation API backed by grid and path-query components.
+var _geometry := preload("res://simulation/navigation/navigation_state.gd").new()
+var state: RefCounted:
+	get: return _geometry
+var grid := preload("res://simulation/navigation/navigation_grid.gd").new(_geometry)
+var paths := preload("res://simulation/navigation/path_queries.gd").new(_geometry)
+var tile_w: float:
+	get: return _geometry.tile_w
+	set(value):
+		_geometry.tile_w=value;_geometry.geometry_revision+=1;_geometry.version+=1
+var tile_hw: float:
+	get: return _geometry.tile_hw
+	set(value):
+		_geometry.tile_hw=value;_geometry.geometry_revision+=1;_geometry.version+=1
+var tile_hh: float:
+	get: return _geometry.tile_hh
+	set(value):
+		_geometry.tile_hh=value;_geometry.geometry_revision+=1;_geometry.version+=1
+var has_water: bool:
+	get: return _geometry.has_water
+	set(value): _geometry.has_water=value
+var version: int:
+	get: return _geometry.version
+	set(value): _geometry.version=value
+var map_data: Dictionary:
+	get: return _geometry.map_data
+	set(value):
+		_geometry.map_data=value;_geometry.geometry_revision+=1;_geometry.version+=1
+
+var _native_context: Dictionary={}
+var _native_context_version := -1
+var _fields: Dictionary = {}
+var _api_missing: Array = []
+
+func _init() -> void:
+	for field in _geometry.PROXY_FIELDS: _fields[field] = true
+	paths.bind_dependencies(self)
+	var services := {"grid": grid, "paths": paths}
+	var report := preload("res://composition_contract.gd").wire(services, "nav")
+	_api_missing = report.missing
+
+func _get(key: StringName):
+	if _fields.has(key): return _geometry.get(key)
+	preload("res://property_contract.gd").reject(self,key)
+	return null
+
+func _set(key: StringName, value) -> bool:
+	if _fields.has(key): _geometry.set(key, value); return true
+	preload("res://property_contract.gd").reject(self,key)
+	return false
+
+func setup(md: Dictionary) -> void:
+	grid.setup(md)
+func _id(c: Vector2i) -> int:
+	return grid._id(c)
+func _cell_of_id(id: int) -> Vector2i:
+	return grid._cell_of_id(id)
+func _grid(layer: int) -> AStar2D:
+	return grid._grid(layer)
+func neighbors(c: Vector2i) -> Array[Vector2i]:
+	return grid.neighbors(c)
+func cell_of_px(px: float, py: float) -> Vector2i:
+	return grid.cell_of_px(px, py)
+func anchor_of(a: int, b: int) -> Vector2:
+	return grid.anchor_of(a, b)
+func near_walkable(c: Vector2i, layer := 0) -> Vector2i:
+	return grid.near_walkable(c, layer)
+func is_solid(c: Vector2i, layer := 0) -> bool:
+	return grid.is_solid(c, layer)
+func is_solid_for_order(c: Vector2i, owner: int, layer := 0) -> bool:
+	return grid.is_solid_for_order(c, owner, layer)
+func is_water(c: Vector2i) -> bool:
+	return grid.is_water(c)
+func _land_terrain_blocked(id: int) -> bool:
+	return grid._land_terrain_blocked(id)
+func set_resources(objects: Array) -> void:
+	grid.set_resources(objects)
+func clear_resource(cell: Vector2i) -> void:
+	grid.clear_resource(cell)
+func block(c: Vector2i) -> void:
+	grid.block(c)
+func unblock(c: Vector2i) -> void:
+	grid.unblock(c)
+func find_path(from_px: Vector2, to_px: Vector2, exact: bool, layer := 0, owner := -1, unit_id := -1) -> Array:
+	return paths.find_path(from_px, to_px, exact, layer, owner, unit_id)
+func find_path_avoiding(from_px: Vector2, to_px: Vector2, exact: bool, avoid_cells: Array, layer := 0, owner := -1, unit_id := -1) -> Array:
+	return paths.find_path_avoiding(from_px, to_px, exact, avoid_cells, layer, owner, unit_id)
+func _smooth_path(origin: Vector2, points: Array, layer: int, cls: int) -> Array:
+	return paths._smooth_path(origin, points, layer, cls)
+func _shortcut_clear(a: Vector2, b: Vector2, layer: int, cls: int) -> bool:
+	return paths._shortcut_clear(a, b, layer, cls)
+func _anchor_fits(anchor: Vector2i, layer: int, cls: int) -> bool:
+	return paths._anchor_fits(anchor, layer, cls)
+func _in_bounds(c: Vector2i) -> bool:
+	return grid._in_bounds(c)
+func _near_fitting(cell: Vector2i, layer: int, cls: int) -> Vector2i:
+	return paths._near_fitting(cell, layer, cls)
+func _segment_clear_for(a: Vector2, b: Vector2, layer: int, cls: int) -> bool:
+	return paths._segment_clear_for(a, b, layer, cls)
+func _escape_clear_for(a: Vector2, b: Vector2, layer: int, cls: int) -> bool:
+	return paths._escape_clear_for(a, b, layer, cls)
+func body_segment_clear_from(a: Vector2, b: Vector2, layer: int, cls: int) -> bool:
+	return paths.body_segment_clear_from(a, b, layer, cls)
+func _grid_for(layer: int, cls: int) -> AStar2D:
+	return paths._grid_for(layer, cls)
+func _shape_key(layer: int, cls: int) -> String:
+	return paths._shape_key(layer, cls)
+func _shape_graph(layer: int, cls: int) -> AStar2D:
+	return paths._shape_graph(layer, cls)
+func _mark_shape_dirty(cells: Array, layer: int) -> void:
+	grid._mark_shape_dirty(cells, layer)
+func _shape_apply_dirty(layer: int, cls: int) -> void:
+	paths._shape_apply_dirty(layer, cls)
+func segment_clear(a: Vector2, b: Vector2, layer := 0) -> bool:
+	return paths.segment_clear(a, b, layer)
+func segment_clear_from(a: Vector2, b: Vector2, layer := 0) -> bool:
+	return paths.segment_clear_from(a, b, layer)
+func footprint(anchor: Vector2, width: float, depth: float) -> Array[Vector2i]:
+	return grid.footprint(anchor, width, depth)
+func can_place(cells: Array[Vector2i]) -> bool:
+	return grid.can_place(cells)
+func building_footprint(unit_id: int, anchor: Vector2, _width: float) -> Array[Vector2i]:
+	return grid.building_footprint(unit_id, anchor, _width)
+func footprint_outline(cells: Array) -> PackedVector2Array:
+	return grid.footprint_outline(cells)
+func occupy(cells: Array, delta: int) -> void:
+	grid.occupy(cells, delta)
+func register_gate(gate: Dictionary) -> void:
+	grid.register_gate(gate)
+func set_gate_open(gate: Dictionary, opened: bool) -> void:
+	grid.set_gate_open(gate, opened)
+func remove_gate(gate: Dictionary) -> void:
+	grid.remove_gate(gate)
+func _refresh_gate_points() -> void:
+	grid._refresh_gate_points()
+func rebuild_buildings(units: Array) -> void:
+	grid.rebuild_buildings(units)
+
+func contact_clear(a: Vector2,b: Vector2,ignore: Dictionary,layer: int) -> bool:
+	return paths.contact_clear(a,b,ignore,layer)
+func performance_counters() -> Dictionary:
+	return paths.metrics.duplicate()
+
+func set_profiling(enabled: bool) -> void:
+	paths.profile_enabled = enabled
+
+## Materialize possible mobile footprints during world preparation, rather than
+## stopping a live battle when the first cavalry/ship order needs a new graph.
+func warm_runtime_shapes() -> void:
+	var prepared: Dictionary={}
+	for key in _geometry.map_data.get("units",{}):
+		var uid:=int(key)
+		if uid<27:continue
+		var cls:=preload("res://simulation/navigation/unit_footprint.gd").class_of(uid)
+		if cls==0:continue
+		var water: bool=Roles.is_naval(uid)
+		if water and not _geometry.has_water:continue
+		var layer:=1 if water else 0;var shape:=Vector2i(layer,cls)
+		if prepared.has(shape):continue
+		paths._grid_for(layer,cls);paths._shape_apply_dirty(layer,cls);prepared[shape]=true
+
+func native_query_context() -> Dictionary:
+	if _native_context_version!=_geometry.version:
+		_native_context={"w":_geometry.tile_w,"rows":int(_geometry.map_data.rows),"cols":int(_geometry.map_data.cols),"terrainW":float(_geometry.map_data.terrainW),"terrainH":float(_geometry.map_data.terrainH),"version":_geometry.version,"land":_geometry.astar,"water":_geometry.water_astar,"hasWater":_geometry.has_water,"occupancy":_geometry.occupancy}
+		var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel()
+		if kernel!=null:_native_context["nativeQuery"]=kernel.make_query(_native_context)
+		_native_context.make_read_only();_native_context_version=_geometry.version
+	return _native_context
+
+func release_runtime_queries() -> void:
+	_native_context={};_native_context_version=-1

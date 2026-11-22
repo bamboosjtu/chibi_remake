@@ -1,0 +1,924 @@
+{
+  "schemaVersion": 1,
+  "source": "godot/chibi_remake/simulation/state/battle_state.gd",
+  "fieldCount": 69,
+  "fields": {
+    "geometry": {
+      "kind": "object",
+      "policy": "OBJECTS",
+      "owner": "navigation",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.geometry"
+    },
+    "session": {
+      "kind": "object",
+      "policy": "OBJECTS",
+      "owner": "session",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.session"
+    },
+    "units": {
+      "kind": "storage",
+      "policy": "RESTORED",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.units"
+    },
+    "selected": {
+      "kind": "proxy",
+      "policy": "RESTORED",
+      "owner": "commands",
+      "current_writers": [
+        "simulation/commands/selection.gd",
+        "simulation/commands/command_groups.gd"
+      ],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "session",
+      "restorer": "snapshot_restorer",
+      "backing_store": "session.selected"
+    },
+    "_officer_pool": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "officers",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state._officer_pool"
+    },
+    "player_owner": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "world",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.player_owner"
+    },
+    "cheats_enabled": {
+      "kind": "proxy",
+      "policy": "INPUTS",
+      "owner": "cheats",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "session",
+      "restorer": "none",
+      "backing_store": "session.cheats_enabled"
+    },
+    "auto_control": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "ai",
+      "current_writers": [
+        "simulation/cheats/cheat_actions.gd"
+      ],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.auto_control"
+    },
+    "cheat_build_any": {
+      "kind": "proxy",
+      "policy": "INPUTS",
+      "owner": "cheats",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "session",
+      "restorer": "none",
+      "backing_store": "session.cheat_build_any"
+    },
+    "cheat_invulnerable": {
+      "kind": "proxy",
+      "policy": "INPUTS",
+      "owner": "cheats",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "session",
+      "restorer": "none",
+      "backing_store": "session.cheat_invulnerable"
+    },
+    "cheat_reveal": {
+      "kind": "proxy",
+      "policy": "INPUTS",
+      "owner": "cheats",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "session",
+      "restorer": "none",
+      "backing_store": "session.cheat_reveal"
+    },
+    "trainings": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "production",
+      "current_writers": [
+        "simulation/production/production.gd"
+      ],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.trainings"
+    },
+    "player_tech": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "technology",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.player_tech"
+    },
+    "research_jobs": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "technology",
+      "current_writers": [
+        "simulation/technology/technology.gd"
+      ],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.research_jobs"
+    },
+    "army_tech": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "technology",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.army_tech"
+    },
+    "scenario_sides": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "scenario",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.scenario_sides"
+    },
+    "game_end": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "scenario",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.game_end"
+    },
+    "_officer_initial_state": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "officers",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state._officer_initial_state"
+    },
+    "map_data": {
+      "nested_mutation": "simulation/scenario/scenario_rules.gd::_make_terrain_walkable",
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "world",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.map_data"
+    },
+    "map_id": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "world",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.map_id"
+    },
+    "gold": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "economy",
+      "current_writers": [
+        "simulation/economy/economy.gd"
+      ],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.gold"
+    },
+    "wood": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "economy",
+      "current_writers": [
+        "simulation/economy/economy.gd"
+      ],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.wood"
+    },
+    "food": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "economy",
+      "current_writers": [
+        "simulation/economy/economy.gd"
+      ],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.food"
+    },
+    "stone": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "economy",
+      "current_writers": [
+        "simulation/economy/economy.gd"
+      ],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.stone"
+    },
+    "resource_revision": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "economy",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.resource_revision"
+    },
+    "sheet_by_unit": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "world",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.sheet_by_unit"
+    },
+    "train_types": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "world",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.train_types"
+    },
+    "build_types": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "world",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.build_types"
+    },
+    "next_uid": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "units",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.next_uid"
+    },
+    "_cell_index": {
+      "kind": "derived",
+      "policy": "RESTORED",
+      "owner": "navigation",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "world",
+      "restorer": "none",
+      "backing_store": "state._cell_index"
+    },
+    "_cell_index_cell": {
+      "kind": "derived",
+      "policy": "RESTORED",
+      "owner": "navigation",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "world",
+      "restorer": "none",
+      "backing_store": "state._cell_index_cell"
+    },
+    "_cell_index_layer": {
+      "kind": "derived",
+      "policy": "RESTORED",
+      "owner": "navigation",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "world",
+      "restorer": "none",
+      "backing_store": "state._cell_index_layer"
+    },
+    "_cell_index_cells": {
+      "kind": "derived",
+      "policy": "RESTORED",
+      "owner": "navigation",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "world",
+      "restorer": "none",
+      "backing_store": "state._cell_index_cells"
+    },
+    "_index_unit_id": {
+      "kind": "derived",
+      "policy": "RESTORED",
+      "owner": "navigation",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "world",
+      "restorer": "none",
+      "backing_store": "state._index_unit_id"
+    },
+    "_foot_cache": {
+      "kind": "derived",
+      "policy": "INPUTS",
+      "owner": "navigation",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "world",
+      "restorer": "none",
+      "backing_store": "state._foot_cache"
+    },
+    "_targets": {
+      "kind": "derived",
+      "policy": "RESTORED",
+      "owner": "navigation",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "world",
+      "restorer": "none",
+      "backing_store": "state._targets"
+    },
+    "_target_owner": {
+      "kind": "derived",
+      "policy": "RESTORED",
+      "owner": "navigation",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "world",
+      "restorer": "none",
+      "backing_store": "state._target_owner"
+    },
+    "_index_units_ref": {
+      "kind": "derived",
+      "policy": "RESTORED",
+      "owner": "navigation",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "world",
+      "restorer": "none",
+      "backing_store": "state._index_units_ref"
+    },
+    "_index_units_size": {
+      "kind": "derived",
+      "policy": "RESTORED",
+      "owner": "navigation",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "world",
+      "restorer": "none",
+      "backing_store": "state._index_units_size"
+    },
+    "cnt_player": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "scenario",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.cnt_player"
+    },
+    "cnt_enemy": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "scenario",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.cnt_enemy"
+    },
+    "tile_w": {
+      "kind": "readonly",
+      "policy": "READ_ONLY",
+      "owner": "navigation",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "world",
+      "restorer": "none",
+      "backing_store": "state.tile_w"
+    },
+    "tile_hw": {
+      "kind": "readonly",
+      "policy": "READ_ONLY",
+      "owner": "navigation",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "world",
+      "restorer": "none",
+      "backing_store": "state.tile_hw"
+    },
+    "tile_hh": {
+      "kind": "readonly",
+      "policy": "READ_ONLY",
+      "owner": "navigation",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "world",
+      "restorer": "none",
+      "backing_store": "state.tile_hh"
+    },
+    "scenario_source": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "scenario",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.scenario_source"
+    },
+    "scenario_mission": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "scenario",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.scenario_mission"
+    },
+    "scenario_avi": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "scenario",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.scenario_avi"
+    },
+    "ai_res": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "ai",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.ai_res"
+    },
+    "sim_acc": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "world",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.sim_acc"
+    },
+    "simulation_rng": {
+      "kind": "object",
+      "policy": "OBJECTS",
+      "owner": "world",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.simulation_rng"
+    },
+    "sim_tick": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "world",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.sim_tick"
+    },
+    "simtest_seconds": {
+      "kind": "proxy",
+      "policy": "INPUTS",
+      "owner": "session",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "session",
+      "restorer": "none",
+      "backing_store": "session.simtest_seconds"
+    },
+    "cnt_enemy_buildings": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "scenario",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.cnt_enemy_buildings"
+    },
+    "task_latches": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "scenario",
+      "current_writers": [
+        "simulation/scenario/scenario_rules.gd"
+      ],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.task_latches"
+    },
+    "terrain_changes": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "scenario",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.terrain_changes"
+    },
+    "terrain_base": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "scenario",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.terrain_base"
+    },
+    "officer_progress": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "officers",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.officer_progress"
+    },
+    "task_events": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "scenario",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.task_events"
+    },
+    "objective_done": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "scenario",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.objective_done"
+    },
+    "officer_policy": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "officers",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.officer_policy"
+    },
+    "cli_mode": {
+      "kind": "proxy",
+      "policy": "INPUTS",
+      "owner": "session",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "session",
+      "restorer": "none",
+      "backing_store": "session.cli_mode"
+    },
+    "jimou_pending": {
+      "kind": "proxy",
+      "policy": "RESET",
+      "owner": "commands",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "session",
+      "restorer": "none",
+      "backing_store": "session.jimou_pending"
+    },
+    "jimou_caster": {
+      "kind": "proxy",
+      "policy": "RESET",
+      "owner": "commands",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "session",
+      "restorer": "none",
+      "backing_store": "session.jimou_caster"
+    },
+    "duel_pending": {
+      "kind": "proxy",
+      "policy": "RESET",
+      "owner": "commands",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "session",
+      "restorer": "none",
+      "backing_store": "session.duel_pending"
+    },
+    "cmd_pending": {
+      "kind": "proxy",
+      "policy": "RESET",
+      "owner": "commands",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "session",
+      "restorer": "none",
+      "backing_store": "session.cmd_pending"
+    },
+    "cmd_pending_data": {
+      "kind": "proxy",
+      "policy": "RESET",
+      "owner": "commands",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": false,
+      "initializer": "session",
+      "restorer": "none",
+      "backing_store": "session.cmd_pending_data"
+    },
+    "decor_targets": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "economy",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.decor_targets"
+    },
+    "decor_cells": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "economy",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.decor_cells"
+    },
+    "control_groups": {
+      "kind": "storage",
+      "policy": "INPUTS",
+      "owner": "commands",
+      "current_writers": [],
+      "readers": [
+        "*"
+      ],
+      "persist": true,
+      "initializer": "world",
+      "restorer": "snapshot_restorer",
+      "backing_store": "state.control_groups"
+    }
+  }
+}

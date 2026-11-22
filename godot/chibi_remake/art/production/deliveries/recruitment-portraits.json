@@ -1,0 +1,62 @@
+{
+  "assetId": "recruitment-portraits",
+  "generator": "built-in image_gen",
+  "texture": "godot/chibi_remake/art/full/ui/recruitment-portraits-v1.png",
+  "width": 224,
+  "height": 224,
+  "cellSize": 112,
+  "sha256": "deb792a180555d39df6853ce87b0b3c1ba87a8de5190d74291b5e40943a3ddd0",
+  "prompt": "Create a single original 2-by-2 square raster art atlas for recruitment buttons in a historical Three Kingdoms strategy game. Four independent head-and-shoulder portraits in exactly equal square quadrants, with hard boundary at the horizontal and vertical center, no margins, no decorative frames or text or numerals. The face occupies most of each tile and is legible at 30 pixels wide, with the bottom 15% kept dark and visually quiet for a separate number badge. Upper left: a worker with a burnt-orange cloth head wrap, three-quarter facing right, dark moss-green background. Upper right: an anonymous heavy cavalry commander with a charcoal Han-style iron helmet, cheek guards, dark short moustache, steady direct look, on a visibly deep crimson red background. Lower left: an anonymous infantry soldier with a warm brick-red cloth coif and light lamellar collar facing slightly left, on an oxblood red background. Lower right: a bowman in a plum cloth cap and narrow armored collar, clear right-facing profile with just a trace of bow and deep plum-dusk background. Chinese late Eastern Han era, original likenesses, distinct gear and silhouettes. Painterly rendered game miniatures, strong light-and-shadow, dark warm tone, compact silhouettes and selective golden key light. Keep heads comfortably within their own tiles. No battle scene, no horses, no typography, no borders, no copied characters or assets.",
+  "reference": {
+    "roles": "research/40-buildings/data/production.json",
+    "commands": "research/50-commands/data/registry.json",
+    "sourceArt": "research/40-buildings/assets/original_production_sheet.png",
+    "sourceMetadata": "The original CB.EXE production commands map command IDs to unit types; INTERFAC.EXP maps those commands to BMP.LWC frames.",
+    "byUnit": {
+      "30": {
+        "command": 16030,
+        "frame": 125
+      },
+      "32": {
+        "command": 16070,
+        "frame": 94
+      },
+      "38": {
+        "command": 16076,
+        "frame": 95
+      },
+      "41": {
+        "command": 16079,
+        "frame": 96
+      },
+      "43": {
+        "command": 16081,
+        "frame": 97
+      },
+      "36": {
+        "command": 16090,
+        "frame": 107
+      },
+      "37": {
+        "command": 16091,
+        "frame": 108
+      },
+      "45": {
+        "command": 16107,
+        "frame": 90
+      },
+      "39": {
+        "command": 16101,
+        "frame": 91
+      },
+      "42": {
+        "command": 16104,
+        "frame": 92
+      },
+      "44": {
+        "command": 16106,
+        "frame": 93
+      }
+    }
+  }
+}

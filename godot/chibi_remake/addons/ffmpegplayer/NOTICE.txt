@@ -1,0 +1,17 @@
+ChibiRTS original AVI playback
+
+VideoStreamFFmpeg is derived from KirbyKid256/FFmpegPlayer v1.0.1,
+https://github.com/KirbyKid256/FFmpegPlayer/tree/v1.0.1
+and EIRTeam.FFmpeg (MIT; LICENSE-EIRTeam-gdextension.txt).
+
+Godot C++ bindings are MIT (LICENSE-godot-cpp.txt).
+FFmpeg 6.1.2 shared libraries are LGPL v3 or later (LICENSE-ffmpeg.txt).
+Corresponding FFmpeg source: https://github.com/FFmpeg/FFmpeg/tree/n6.1.2
+Library build configuration is recorded in ffmpeg-build.json.
+These shared libraries can be replaced by ABI-compatible builds.
+
+Local source and reproducible build: tools/native/avi_decoder/.
+Local changes normalize original PCM for the float audio mixer, exclude
+alignment padding from audio samples, and release native synchronization
+objects correctly. Supplied AVI files are copied byte for byte; playback
+decodes them directly and generates no re-encoded video files.

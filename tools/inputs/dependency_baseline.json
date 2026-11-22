@@ -1,0 +1,5 @@
+{
+  "schemaVersion": 1,
+  "description": "Historical dependency edges the P0 gate must tolerate until the named stage removes them. Each entry records the current file edge and why it exists; stale entries fail the gate.",
+  "edges": []
+}

@@ -1,0 +1,21 @@
+{
+  "assetId": "units-034-page-00",
+  "bytes": 1461709.0,
+  "colorType": 6.0,
+  "generatedAt": "2026-10-17T23:58:10.667Z",
+  "generator": "built-in image_gen",
+  "height": 1094.0,
+  "prompt": "Use case: precise-object-edit / style-transfer. Production detailed hand-painted animation sprite atlas of 车兵 type34 for faithful HD 三国赤壁 remaster. Repaint this EXACT ORIGINAL pose grid, 4 columns and 4 rows, 16 source cells. Preserve every cell facing, limb position, weapon shape, walking stride, source equipment and relative size/foot anchor. The image is the pose reference, not final enlarged art. Same character and horse or siege device design across all cells. Preserve source palette, blue/cyan team cloth, gold/steel/wood, horse color exactly. Do not add weapons or props not in source. Detailed cloth folds, metal rivets, leather and horse hair, upper-left light, classic RTS painted art, not pixel art. EXACT reference row-major layout and canvas aspect 352:268. Each row uses its SOURCE facing; never rearrange directions. Do not repeat idle poses instead of animation. Blank source cells remain TRANSPARENT. No new death poses unless source is low/prone. Preserve transparent margins at original positions. No scene, text, grid, labels, halo, checkerboard, opaque background or modern elements. Genuine alpha transparency.",
+  "promptFile": "godot/chibi_remake/art/production/unit-batch-final-prompts.json",
+  "sha256": "d86e0af8cd580a1fbadacd4f4437ec9024808afe3815c9c8b321a4714b758415",
+  "sourceGeneratedFile": "C:\\Users\\bambo\\.codex\\generated_images\\01a13348-db65-7b23-b66a-63227eb4490d\\exec-d014d6d8-d9a6-40ff-abf1-03f4e8a73367.png",
+  "status": "generated-awaiting-validation",
+  "texture": "godot/chibi_remake/art/full/units/034/page-00-v2.png",
+  "validation": {
+    "excludedSourceLabelsOrBlanks": 0,
+    "structure": "pass",
+    "visual": "pending",
+    "visualFrameCount": 16
+  },
+  "width": 1438.0
+}

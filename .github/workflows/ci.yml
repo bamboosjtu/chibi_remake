@@ -1,0 +1,196 @@
+name: ci
+
+# Single hosted workflow. Everything here runs without art masters or export
+# templates and gates every push / pull request.
+#
+#   contracts     static contracts (architecture, registry, data, docs,
+#                 repository inventory, tooling), clone-input declarations and
+#                 PowerShell parsing. No engine.
+#   simulation    deterministic baselines, all 34 map startups and the save
+#                 suite. Selftests need runtime art and stay local.
+#   engine        Godot script suite, runtime composition registry, four
+#                 "must refuse to start" negatives and the terrain pipeline.
+#   continuation  four-map state/AI continuation matrix (one process per map).
+#
+# Release acceptance stays local: the full source release suite (31 tests),
+# missing-presentation recovery, hot-path budgets, packaging safety and the
+# Windows launcher are executed by tools/release.ps1 / verify_candidate.ps1 /
+# tools/ci_windows.ps1 -FullRegression on the reference machine. CI is not a
+# substitute for Windows EXE, GPU or performance acceptance.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  contracts:
+    name: contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # One aggregating entry point: every group runs even when an earlier check
+      # fails, per-check results land in _work/lightweight, exit code is final.
+      - name: Architecture, registry, data, docs, repository and tooling gates
+        run: node tools/ci_lightweight.mjs
+      - name: Indexed clone inputs and terrain source declarations
+        run: |
+          node tools/audit_clone_inputs.mjs --index
+          node tools/terrain_sources.mjs --index
+      # Not covered by ci_lightweight: the PowerShell parser catches syntax that
+      # Windows PowerShell 5.1 and pwsh disagree on.
+      - name: PowerShell parse
+        shell: pwsh
+        run: |
+          $failed = @()
+          foreach ($file in (git ls-files '*.ps1')) {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path -LiteralPath $file).Path, [ref]$tokens, [ref]$errors) | Out-Null
+            if ($errors.Count -gt 0) {
+              $failed += ($file + ': ' + $errors[0].Message)
+            }
+          }
+          if ($failed.Count -gt 0) {
+            $failed | ForEach-Object { Write-Error $_ }
+            exit 1
+          }
+          Write-Output 'POWERSHELL SYNTAX PASS'
+      - name: Upload gate summaries
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract-results
+          path: _work/lightweight
+          retention-days: 7
+
+  simulation:
+    name: simulation
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # A recorded digest may only move together with a reviewed note that
+      # carries the new checksum.
+      - name: Require evidence for baseline changes
+        if: ${{ github.event_name != 'workflow_dispatch' }}
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [ -n "$BASE_SHA" ] && [ "$BASE_SHA" != "0000000000000000000000000000000000000000" ] &&
+             ! git diff --quiet "$BASE_SHA" HEAD -- tools/inputs/baselines.json; then
+            evidence=research/todo/baselines.md
+            if git diff --quiet "$BASE_SHA" HEAD -- "$evidence"; then
+              echo "Baseline changes require a reviewed update to $evidence."
+              exit 1
+            fi
+            checksum=$(sha256sum tools/inputs/baselines.json | cut -d ' ' -f 1)
+            grep -Fq "$checksum" "$evidence"
+          fi
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: ./.github/actions/setup-reviewed-godot
+      # One invocation, sequential engine runs: baselines (tick + digest +
+      # subsystems + full), 34 map startups and the save suite. A failing group
+      # does not skip later groups; the final exit code is the aggregate.
+      #
+      # --selftests is deliberately absent: the selftest attaches unit visuals,
+      # and this job runs without LFS art, so restore fails on missing atlases.
+      # Selftests run in tools/ci_windows.ps1 -FullRegression and candidate
+      # verification, where runtime assets are materialized. The runner also
+      # refuses --selftests when the declared assets are still LFS pointers.
+      - name: Deterministic baselines, map startups and save suite
+        run: |
+          node tools/run_regressions.mjs --engine "$GODOT_ENGINE" \
+            --baselines --maps \
+            --suite tools/inputs/save_tests.json \
+            --output _work/ci-simulation
+      - name: Upload simulation evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: simulation-evidence
+          path: _work/ci-simulation
+          retention-days: 7
+
+  engine:
+    name: engine
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: ./.github/actions/setup-reviewed-godot
+      - name: Godot script suite and composition dump
+        run: |
+          node tools/run_regressions.mjs \
+            --suite tools/inputs/ci_godot_tests.json \
+            --engine "$GODOT_ENGINE" \
+            --project godot/chibi_remake \
+            --scripts tools/gd \
+            --output _work/ci-godot
+      - name: Engine composition contracts
+        run: node tools/registry_check.mjs --runtime-log _work/ci-godot/dump_composition.log
+      - name: Invalid compositions must exit nonzero
+        run: node tools/test_registry_runtime.mjs --engine "$GODOT_ENGINE"
+      - name: Rule startup faults and tick without catalog files
+        run: node tools/test_rule_startup.mjs --engine "$GODOT_ENGINE" --cpu-only --output _work/ci-rule-startup
+      - name: Invalid portable roots must refuse startup
+        run: node tools/test_portable_startup.mjs --engine "$GODOT_ENGINE" --output _work/ci-portable-startup
+      # The terrain pipeline needs the two declared source images (LFS).
+      - name: Fetch minimal terrain source fixture
+        run: git lfs pull --include="source/terrain/paint/00.png,source/terrain/masks/terrain-00-source.png"
+      - name: Rebuildable terrain cache and failure recovery
+        run: node tools/test_terrain_pipeline.mjs --engine "$GODOT_ENGINE"
+      - name: Upload engine logs
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine-logs
+          path: |
+            _work/ci-godot
+            _work/ci-rule-startup
+            _work/ci-portable-startup
+          retention-days: 7
+
+  continuation:
+    name: continuation (${{ matrix.map }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        map: [chibic1, chibil1, chibic10, chibic17]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: ./.github/actions/setup-reviewed-godot
+      # One process per map: a hang in one map cannot mask the others, and the
+      # 600 s per-map watchdog stays inside this job's budget.
+      - name: State and AI continuation for ${{ matrix.map }}
+        run: node tools/test_continuation_coverage.mjs --engine "$GODOT_ENGINE" --map "${{ matrix.map }}" --output _work/ci-continuation
+      - name: Upload continuation logs
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: continuation-logs-${{ matrix.map }}
+          path: _work/ci-continuation
+          retention-days: 7

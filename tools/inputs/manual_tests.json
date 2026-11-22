@@ -1,0 +1,209 @@
+{
+  "description": "Explicit non-suite ownership. Manual/packaged entries are not a claim of automated CI coverage. Every tools/gd script must occur in a suite or here.",
+  "tests": [
+    {
+      "script": "test_campaign_media",
+      "category": "wrapper",
+      "reason": "Tests canonical campaign MP4 playback; needs all 34 locally installed videos, which are absent in hosted and public builds.",
+      "command": "powershell -File tools/verify_media.ps1"
+    },
+    {
+      "script": "pack_acceptance",
+      "category": "tool",
+      "reason": "Builds the validation companion outside the player pack.",
+      "command": "tools/build_game.ps1"
+    },
+    {
+      "script": "bake_full_terrain",
+      "category": "tool",
+      "reason": "Offline asset/review artifact producer; writes outputs and requires declared source assets.",
+      "command": "Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/bake_full_terrain.gd -- --no-intro --save-test-id=manual-bake_full_terrain"
+    },
+    {
+      "script": "bench_full_battle",
+      "category": "wrapper",
+      "reason": "Performance workload driven by the benchmark runner with hardware-specific budgets.",
+      "command": "powershell -File tools/bench_full_battle.ps1"
+    },
+    {
+      "script": "build_gate_terrain",
+      "category": "tool",
+      "reason": "Offline asset/review artifact producer; writes outputs and requires declared source assets.",
+      "command": "Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/build_gate_terrain.gd -- --no-intro --save-test-id=manual-build_gate_terrain"
+    },
+    {
+      "script": "build_terrain_lods",
+      "category": "tool",
+      "reason": "Offline asset/review artifact producer; writes outputs and requires declared source assets.",
+      "command": "Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/build_terrain_lods.gd -- --no-intro --save-test-id=manual-build_terrain_lods"
+    },
+    {
+      "script": "capture_abilities_review",
+      "category": "manual",
+      "reason": "Native visual/art acceptance; requires runtime art and a rendering window or review of generated evidence.",
+      "command": "Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/capture_abilities_review.gd -- --no-intro --save-test-id=manual-capture_abilities_review"
+    },
+    {
+      "script": "capture_building_review",
+      "category": "manual",
+      "reason": "Native visual/art acceptance; requires runtime art and a rendering window or review of generated evidence.",
+      "command": "Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/capture_building_review.gd -- --no-intro --save-test-id=manual-capture_building_review"
+    },
+    {
+      "script": "capture_chibil1",
+      "category": "manual",
+      "reason": "Native visual/art acceptance; requires runtime art and a rendering window or review of generated evidence.",
+      "command": "Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/capture_chibil1.gd -- --no-intro --save-test-id=manual-capture_chibil1"
+    },
+    {
+      "script": "capture_content_revisions",
+      "category": "manual",
+      "reason": "Native visual/art acceptance; requires runtime art and a rendering window or review of generated evidence.",
+      "command": "Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/capture_content_revisions.gd -- --no-intro --save-test-id=manual-capture_content_revisions"
+    },
+    {
+      "script": "capture_duel_review",
+      "category": "manual",
+      "reason": "Native visual/art acceptance; requires runtime art and a rendering window or review of generated evidence.",
+      "command": "Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/capture_duel_review.gd -- --no-intro --save-test-id=manual-capture_duel_review"
+    },
+    {
+      "script": "capture_exploration_review",
+      "category": "manual",
+      "reason": "Native visual/art acceptance; requires runtime art and a rendering window or review of generated evidence.",
+      "command": "Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/capture_exploration_review.gd -- --no-intro --save-test-id=manual-capture_exploration_review"
+    },
+    {
+      "script": "capture_gate_review",
+      "category": "manual",
+      "reason": "Native visual/art acceptance; requires runtime art and a rendering window or review of generated evidence.",
+      "command": "Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/capture_gate_review.gd -- --no-intro --save-test-id=manual-capture_gate_review"
+    },
+    {
+      "script": "capture_input_review",
+      "category": "manual",
+      "reason": "Native visual/art acceptance; requires runtime art and a rendering window or review of generated evidence.",
+      "command": "Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/capture_input_review.gd -- --no-intro --save-test-id=manual-capture_input_review"
+    },
+    {
+      "script": "capture_movement_review",
+      "category": "manual",
+      "reason": "Native visual/art acceptance; requires runtime art and a rendering window or review of generated evidence.",
+      "command": "Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/capture_movement_review.gd -- --no-intro --save-test-id=manual-capture_movement_review"
+    },
+    {
+      "script": "capture_research_review",
+      "category": "manual",
+      "reason": "Native visual/art acceptance; requires runtime art and a rendering window or review of generated evidence.",
+      "command": "Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/capture_research_review.gd -- --no-intro --save-test-id=manual-capture_research_review"
+    },
+    {
+      "script": "economy_fixture",
+      "category": "fixture",
+      "reason": "RefCounted helper loaded by economy tests; not an executable SceneTree test.",
+      "command": "node tools/run_regressions.mjs --suite tools/inputs/development_tests.json"
+    },
+    {
+      "script": "generate_minimap_terrain",
+      "category": "tool",
+      "reason": "Offline asset/review artifact producer; writes outputs and requires declared source assets.",
+      "command": "Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/generate_minimap_terrain.gd -- --no-intro --save-test-id=manual-generate_minimap_terrain"
+    },
+    {
+      "script": "inspect_full_art",
+      "category": "tool",
+      "reason": "Offline asset/review artifact producer; writes outputs and requires declared source assets.",
+      "command": "Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/inspect_full_art.gd -- --no-intro --save-test-id=manual-inspect_full_art"
+    },
+    {
+      "script": "portrait_contact_qa",
+      "category": "tool",
+      "reason": "Offline asset/review artifact producer; writes outputs and requires declared source assets.",
+      "command": "Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/portrait_contact_qa.gd -- --no-intro --save-test-id=manual-portrait_contact_qa"
+    },
+    {
+      "script": "prepare_art_references",
+      "category": "tool",
+      "reason": "Offline asset/review artifact producer; writes outputs and requires declared source assets.",
+      "command": "Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/prepare_art_references.gd -- --no-intro --save-test-id=manual-prepare_art_references"
+    },
+    {
+      "script": "terrain_events",
+      "category": "tool",
+      "reason": "Offline asset/review artifact producer; writes outputs and requires declared source assets.",
+      "command": "Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/terrain_events.gd -- --no-intro --save-test-id=manual-terrain_events"
+    },
+    {
+      "script": "test_exit_safety",
+      "category": "wrapper",
+      "reason": "Automated by the process-level runner over multiple exit cases; needs native windows.",
+      "command": "node tools/test_exit_safety.mjs"
+    },
+    {
+      "script": "test_gpu_minimap",
+      "category": "manual",
+      "reason": "Native visual/art acceptance; requires runtime art and a rendering window or review of generated evidence.",
+      "command": "Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/test_gpu_minimap.gd -- --no-intro --save-test-id=manual-test_gpu_minimap"
+    },
+    {
+      "script": "test_public_audio",
+      "category": "packaged",
+      "reason": "Requires the stripped public PCK with original media absent; source checkout violates its precondition.",
+      "command": "Godot_v4.7.2-stable_win64.exe --main-pack <public.pck> --script tools/gd/test_public_audio.gd -- --no-intro --save-test-id=public-acceptance"
+    },
+    {
+      "script": "test_public_duel",
+      "category": "packaged",
+      "reason": "Requires the stripped public PCK with original media absent; source checkout violates its precondition.",
+      "command": "Godot_v4.7.2-stable_win64.exe --main-pack <public.pck> --script tools/gd/test_public_duel.gd -- --no-intro --save-test-id=public-acceptance"
+    },
+    {
+      "script": "test_public_media",
+      "category": "packaged",
+      "reason": "Requires the stripped public PCK with original media absent; source checkout violates its precondition.",
+      "command": "Godot_v4.7.2-stable_win64.exe --main-pack <public.pck> --script tools/gd/test_public_media.gd -- --no-intro --save-test-id=public-acceptance"
+    },
+    {
+      "script": "verify_architecture_view",
+      "category": "manual",
+      "reason": "Native visual/art acceptance; requires runtime art and a rendering window or review of generated evidence.",
+      "command": "Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/verify_architecture_view.gd -- --no-intro --save-test-id=manual-verify_architecture_view"
+    },
+    {
+      "script": "verify_chibil1",
+      "category": "manual",
+      "reason": "Native visual/art acceptance; requires runtime art and a rendering window or review of generated evidence.",
+      "command": "Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/verify_chibil1.gd -- --no-intro --save-test-id=manual-verify_chibil1"
+    },
+    {
+      "script": "verify_full_art",
+      "category": "manual",
+      "reason": "Native visual/art acceptance; requires runtime art and a rendering window or review of generated evidence.",
+      "command": "Godot_v4.7.2-stable_win64.exe --path godot/chibi_remake --script tools/gd/verify_full_art.gd -- --no-intro --save-test-id=manual-verify_full_art"
+    },
+    {
+      "script": "test_missing_presentation",
+      "category": "wrapper",
+      "reason": "Executed by the wrapper against an isolated project with missing/corrupt assets and terrain budgets; must not run the missing-file assertions in the normal project.",
+      "command": "node tools/test_missing_presentation.mjs"
+    },
+    {
+      "script": "bench_hot_paths",
+      "category": "wrapper",
+      "reason": "CPU hot-path benchmarks with explicit P95 and query budgets; optional historical-source comparison.",
+      "command": "node tools/benchmark_hot_paths.mjs"
+    },
+    {
+      "script": "test_rule_startup_failure",
+      "category": "wrapper",
+      "reason": "Expected startup refusal and exit 1; isolated catalog faults must run through the wrapper.",
+      "command": "node tools/test_rule_startup.mjs"
+    },
+    {
+      "script": "test_app_startup_failure",
+      "category": "wrapper",
+      "reason": "Expected application startup refusal and exit 1; run through isolated startup wrappers.",
+      "command": "node tools/test_portable_startup.mjs"
+    }
+  ]
+}

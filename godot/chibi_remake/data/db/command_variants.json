@@ -1,0 +1,499 @@
+{
+  "schemaVersion": 1,
+  "generated": "2026-10-27",
+  "binary": {
+    "name": "CB.EXE",
+    "sha256": "2db7cc102e6fde547ab05d77cfddabc2079f5bc9be9b6b59b17bf435c5798cb7"
+  },
+  "three_layer_model": {
+    "leader": {
+      "description": "将本体/队伍级：完整队伍命令",
+      "worker": [
+        16130,
+        16131,
+        16138,
+        16139,
+        16141,
+        16134,
+        16136,
+        16142
+      ],
+      "workerVariant": [
+        16130,
+        16131,
+        16138,
+        16140,
+        16141,
+        16134,
+        16136,
+        16142
+      ],
+      "combat": [
+        16130,
+        16131,
+        16132,
+        16133,
+        16135,
+        16134,
+        16136,
+        16142,
+        16137
+      ]
+    },
+    "member": {
+      "description": "成员/个体级：只保留移动、队伍管理、上船；不能单独发队伍级命令",
+      "worker": [
+        16130,
+        16136,
+        16142
+      ],
+      "combat": [
+        16130,
+        16144,
+        16145,
+        16142
+      ]
+    },
+    "ungrouped": {
+      "description": "未编组/预备级：把散兵/散工并成队伍",
+      "commands": [
+        16130,
+        16144,
+        16145,
+        16142
+      ]
+    },
+    "transport": {
+      "description": "运输船：移动 + 下船（载员时）",
+      "commands": [
+        16130,
+        16143
+      ]
+    }
+  },
+  "selection_conditions": {
+    "leader_slot": "unit+0x150：0xFFFF = 未编组；否则为武将索引",
+    "engineering": "FUN_00424f40：unit[0] == 0x0A（工程队/工人）",
+    "worker_leader_body": "FUN_00424f30：unit[0] == 0x0C（带工人的武将本体）",
+    "combat_leader_flag": "FUN_00425020：unit[0] == 0x07 或 0x0D",
+    "transport_ship": "FUN_00425060：unit+0x10 == 0x2F（运输船 47）",
+    "member_worker": "leader slot != 0xFFFF 且 unit[0] == 0x0A（工人成员）",
+    "member_combat": "leader slot != 0xFFFF 且 unit[0] 为 3/7/8/11（战斗成员）",
+    "group_creation": {
+      "function": "FUN_0045D810 (mode 0x0E) → FUN_00442E40",
+      "engineering_to_category": "0x0A → 0x0C（工人队）",
+      "other_to_category": "FUN_00425020 true → 0x09，false → 0x0D（战斗队变体）",
+      "hero_type_map": "category 1→type 0x23(35骑), 2→0x1F(31步), 3→0x21(33弓), 4→0x1D(29文)"
+    }
+  },
+  "panels": [
+    {
+      "id": "0x11171",
+      "role": "无选择/默认",
+      "slots": 0,
+      "mask": "0xFFFFFFFF",
+      "commands": [],
+      "confidence": "observed"
+    },
+    {
+      "id": "0x111D4",
+      "role": "将本体/队伍级 · 带工人（category 12）",
+      "slots": 8,
+      "mask": "0xFFFF",
+      "commands": [
+        16130,
+        16131,
+        16138,
+        16139,
+        16141,
+        16134,
+        16136,
+        16142
+      ],
+      "icons": [
+        154,
+        155,
+        162,
+        163,
+        164,
+        158,
+        160,
+        165
+      ],
+      "confidence": "observed-panel / prior-research-slots"
+    },
+    {
+      "id": "0x11206",
+      "role": "将本体/队伍级 · 带工人变体；DAT_004b8cb8 != 0 时（第 4 格用 16140 建筑）",
+      "slots": 8,
+      "mask": "0xFFFF",
+      "commands": [
+        16130,
+        16131,
+        16138,
+        16140,
+        16141,
+        16134,
+        16136,
+        16142
+      ],
+      "icons": [
+        154,
+        155,
+        162,
+        163,
+        164,
+        158,
+        160,
+        165
+      ],
+      "confidence": "observed-panel / 0x49B1B0 按全局按钮表顺序推断为 16140 建造"
+    },
+    {
+      "id": "0x11238",
+      "role": "将本体/队伍级 · 带士兵（category 9/13 或其它）",
+      "slots": 9,
+      "mask": "0xFFFF",
+      "commands": [
+        16130,
+        16131,
+        16132,
+        16133,
+        16135,
+        16134,
+        16136,
+        16142,
+        16137
+      ],
+      "icons": [
+        154,
+        155,
+        156,
+        157,
+        159,
+        158,
+        160,
+        165,
+        161
+      ],
+      "confidence": "observed-panel / user-screenshot / prior-research-slots"
+    },
+    {
+      "id": "0x1129C",
+      "role": "成员/未编组/多选 · 战斗成员或预备单位（4 项）",
+      "slots": 4,
+      "mask": "0x0F（有载货时 |0x10，第 5 槽）",
+      "commands": [
+        16130,
+        16144,
+        16145,
+        16142
+      ],
+      "icons": [
+        154,
+        167,
+        168,
+        165
+      ],
+      "extra": [
+        16146
+      ],
+      "confidence": "observed-panel / button-table-confirmed / extra slot 0x4A1D90 inferred 16146 返回"
+    },
+    {
+      "id": "0x11300",
+      "role": "成员/多选 · 工人成员（有将）或工人队（3 项）",
+      "slots": 3,
+      "mask": "0x07（有载货时 |0x0F，第 4 槽）",
+      "commands": [
+        16130,
+        16136,
+        16142
+      ],
+      "icons": [
+        154,
+        160,
+        165
+      ],
+      "extra": [
+        16146
+      ],
+      "confidence": "observed-panel / button-table-confirmed / extra slot 0x4A1D90 inferred 16146 返回"
+    },
+    {
+      "id": "0x11364",
+      "role": "单个运输船（type 47）",
+      "slots": 1,
+      "mask": "0x3（载员） / 0x1（空船）",
+      "commands": [
+        16130,
+        16143
+      ],
+      "icons": [
+        154,
+        166
+      ],
+      "confidence": "observed-panel / slots-inferred"
+    },
+    {
+      "id": "0x111DE",
+      "role": "工人建造菜单（16139）",
+      "slots": "menu",
+      "mask": "0xFFFF",
+      "commands": [
+        16150
+      ],
+      "icons": [
+        58
+      ],
+      "confidence": "observed (FUN_00428A50 case 0x3F0B)"
+    },
+    {
+      "id": "0x11210",
+      "role": "建筑侧建造/生产菜单（16140）",
+      "slots": "menu",
+      "mask": "0xFFFF",
+      "commands": [
+        16150
+      ],
+      "icons": [
+        58
+      ],
+      "confidence": "observed (FUN_00428A50 case 0x3F0C)"
+    }
+  ],
+  "button_slot_mapping": {
+    "source": "FUN_00411400 0x4183EB-0x418D4D（全局按钮表 0x4A0B30 + 面板数组）",
+    "registers": {
+      "EDX": "0x4A2308 = 16130 移动",
+      "ESI": "0x4937D8 = 16131 攻击",
+      "EDI": "0x493488 = 16134 休息",
+      "EBX": "0x494920 = 16136 解散",
+      "EAX": "0x495700 = 16142 上船"
+    },
+    "buttons": {
+      "0x496828": "16132 警戒",
+      "0x4A14C8": "16133 列阵",
+      "0x493E78": "16135 计谋",
+      "0x4981D8": "16137 单挑",
+      "0x496B78": "16138 运输",
+      "0x49F450": "16139 建造",
+      "0x49B1B0": "16140 建造（建筑/生产菜单）",
+      "0x49ABF0": "16141 修理",
+      "0x4953B0": "16143 下船",
+      "0x4A03D8": "16144 组建",
+      "0x49C9A8": "16145 加入",
+      "0x4A3398": "16146 返回",
+      "0x4A1D90": "推断 16146 返回（限制面板的载货/返回槽，与 0x4A3398 同指令不同图标）"
+    },
+    "panel_arrays": {
+      "0x4994A8 (0x111D4)": "[EDX, ESI, 0x496B78, 0x49F450, 0x49ABF0, EDI, EBX, EAX]",
+      "0x4A2198 (0x11206)": "[EDX, ESI, 0x496B78, 0x49B1B0, 0x49ABF0, EDI, EBX, EAX]",
+      "0x4993F0 (0x11238)": "[EDX, ESI, 0x496828, 0x4A14C8, 0x493E78, EDI, EBX, EAX, 0x4981D8]",
+      "0x496420 (0x1129C)": "[EDX, 0x4A03D8, 0x49C9A8, EAX, 0x4A1D90]",
+      "0x496D60 (0x11300)": "[EDX, EBX, EAX, 0x4A1D90]",
+      "0x49A8D8 (0x11364)": "[EDX, 0x4953B0]"
+    }
+  },
+  "command_availability": [
+    {
+      "command": 16130,
+      "name": "移动",
+      "ungrouped": true,
+      "workerTeam": true,
+      "combatTeam": true,
+      "transport": true,
+      "note": "所有己方单位"
+    },
+    {
+      "command": 16131,
+      "name": "攻击",
+      "ungrouped": false,
+      "workerTeam": true,
+      "combatTeam": true,
+      "transport": false,
+      "note": "工人队也可攻击"
+    },
+    {
+      "command": 16132,
+      "name": "警戒",
+      "ungrouped": false,
+      "workerTeam": false,
+      "combatTeam": true,
+      "transport": false,
+      "note": "仅战斗队"
+    },
+    {
+      "command": 16133,
+      "name": "列阵",
+      "ungrouped": false,
+      "workerTeam": false,
+      "combatTeam": true,
+      "transport": false,
+      "note": "仅战斗队"
+    },
+    {
+      "command": 16134,
+      "name": "休息",
+      "ungrouped": false,
+      "workerTeam": true,
+      "combatTeam": true,
+      "transport": false,
+      "note": "成组后"
+    },
+    {
+      "command": 16135,
+      "name": "计谋",
+      "ungrouped": false,
+      "workerTeam": false,
+      "combatTeam": true,
+      "transport": false,
+      "note": "仅战斗队"
+    },
+    {
+      "command": 16136,
+      "name": "解散",
+      "ungrouped": false,
+      "workerTeam": true,
+      "combatTeam": true,
+      "transport": false,
+      "note": "未编组没有解散"
+    },
+    {
+      "command": 16137,
+      "name": "单挑",
+      "ungrouped": false,
+      "workerTeam": false,
+      "combatTeam": true,
+      "transport": false,
+      "note": "仅战斗队"
+    },
+    {
+      "command": 16138,
+      "name": "运输",
+      "ungrouped": false,
+      "workerTeam": true,
+      "combatTeam": false,
+      "transport": false,
+      "note": "工人队/带工武将"
+    },
+    {
+      "command": 16139,
+      "name": "建造",
+      "ungrouped": false,
+      "workerTeam": true,
+      "combatTeam": false,
+      "transport": false,
+      "note": "工人队/带工武将（野外建造，0x111D4）"
+    },
+    {
+      "command": 16140,
+      "name": "建造（建筑/生产）",
+      "ungrouped": false,
+      "workerTeam": true,
+      "combatTeam": false,
+      "transport": false,
+      "note": "0x11206 变体第 4 格（0x49B1B0）"
+    },
+    {
+      "command": 16141,
+      "name": "修理",
+      "ungrouped": false,
+      "workerTeam": true,
+      "combatTeam": false,
+      "transport": false,
+      "note": "工人队/带工武将"
+    },
+    {
+      "command": 16142,
+      "name": "上船",
+      "ungrouped": true,
+      "workerTeam": true,
+      "combatTeam": true,
+      "transport": false,
+      "note": "陆地单位"
+    },
+    {
+      "command": 16143,
+      "name": "下船",
+      "ungrouped": false,
+      "workerTeam": false,
+      "combatTeam": false,
+      "transport": true,
+      "note": "运输船载员时"
+    },
+    {
+      "command": 16144,
+      "name": "组建",
+      "ungrouped": true,
+      "workerTeam": false,
+      "combatTeam": false,
+      "transport": false,
+      "note": "未编组单位"
+    },
+    {
+      "command": 16145,
+      "name": "加入",
+      "ungrouped": true,
+      "workerTeam": false,
+      "combatTeam": false,
+      "transport": false,
+      "note": "未编组单位"
+    },
+    {
+      "command": 16146,
+      "name": "返回/采集",
+      "ungrouped": false,
+      "workerTeam": true,
+      "combatTeam": false,
+      "transport": false,
+      "note": "工人队运输链；限制面板载货槽（0x1129C/0x11300，推断）"
+    },
+    {
+      "command": 16025,
+      "name": "取消",
+      "ungrouped": false,
+      "workerTeam": false,
+      "combatTeam": false,
+      "transport": false,
+      "note": "建造/生产/研究菜单"
+    }
+  ],
+  "icon_map": {
+    "154": "移动",
+    "155": "攻击",
+    "156": "警戒",
+    "157": "列阵",
+    "158": "休息",
+    "159": "计谋",
+    "160": "解散",
+    "161": "单挑",
+    "162": "运输",
+    "163": "建造",
+    "164": "修理",
+    "165": "上船",
+    "166": "下船",
+    "167": "组建",
+    "168": "加入",
+    "169": "返回/采集"
+  },
+  "evidence": {
+    "panel_selection": "ev_3bc9a6fd7090816184ac9d68d688eb00396e0e144603a935bf29c50910d1de86",
+    "panel_switch_mask": "ev_ea8e84999c9f189804f45337a679f3d3c9f845535f7bcbd57abc1ba0c4a77da2",
+    "panel_button_table": "ev_a8bc19ad2048ea0fdd3ebf8b74fdb7e990f1a08d65c3593abcb8b8c03a27fecd",
+    "worker_leader_category": "ev_7f483f55105d9ff919697b033da5275ccf47e61b6ecb4bfa68e7f57765884dfe",
+    "engineering_category": "ev_6f4130432c2b2b58c05a5b84993dd9f81c32202aa1940d2144da2260634f5c3a",
+    "transport_type": "ev_7cfb4f06064af0c06eb1483f8ab55aa71a1c423612385971dcfbabcc8342ffc3",
+    "group_creation": "ev_a4f5390801ee48c4a0b20be8818f0fad014e4171c4f4eecc59b46ee3d7d04bbd",
+    "group_create_categories": "ev_af92f2b8923426b5532dbc4e06c4e290068b3baf7ca7476dcbc78835d2efbcdf",
+    "command_handler": "ev_b55dca032e42e52d9935eb669412cbc5a309f9aeb72f6d07ff3c11fc663b615d",
+    "post_command": "ev_5a957f1e87e0b0ace493a74a1f6afb26904a4fab5333713e6b8bffb22c630528"
+  },
+  "unknowns": [
+    "0x1129C / 0x11300 的 4/3 个基础槽位已由按钮表确认；第 5/4 个载货槽（0x4A1D90）推断为 16146 返回，仍需截图核对图标/文本。",
+    "0x1129C 对战斗成员显示“组建/加入”时，这两项是否被二级可用性检查禁用（而不是从面板移除）未确认。",
+    "DAT_004b8cb8 的含义（决定 0x111D4 用 16139 建造 还是 0x11206 用 16140 建筑）未确认。",
+    "运输船 0x11364 的 mask 0x3/0x1 与 +0x164 字段的精确含义未确认（按载员/空船解释）。",
+    "组建后 category 9 与 13 的区别（FUN_00425020 的 7/13 分支）未完全追踪。"
+  ]
+}

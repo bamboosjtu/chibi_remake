@@ -1,0 +1,135 @@
+{
+ "schemaVersion": 3,
+ "engine": "4.7.2.stable",
+ "updatedAt": "2026-11-22",
+ "note": "在 7ddf81a 的审核引擎上对四图录制 450/1800 tick。2026-11-22 规则身份随 unit_roles 拆分变化。刘备第 1 关四座城门的通行格修正后，更新了该关的完整快照摘要。SIMTEST 整数和各子系统摘要保持原值。",
+ "selftest": {
+  "maps": [
+   "chibic1",
+   "chibil1",
+   "chibic17"
+  ]
+ },
+ "simtest": [
+  {
+   "map": "chibic1",
+   "seconds": 15,
+   "tick": 450,
+   "digest": "953901439071641629",
+   "subsystems": {
+    "ai": "05e6be05043bfd607946127473e3d5a63937a930d7a161eada2b8a2d3f62f912",
+    "combat": "24fd6ae68c1cf10c7d055fe4584ec622e82fa2d1911aec6bdba38e2ff4c5139e",
+    "economy": "216e2a94bac4281f7f66e07fd54a96688f4fcde0bdffc6e6c77a9710e8d86291",
+    "scenario": "67d9273e3bda883e0d9f876027bac9ee7d18ffec1461e78353a66e41df9f1ce4",
+    "total": "766cd1b011b7360834d835d02bb198b333f6c05f7e8864af97e8f4ae27ba355d",
+    "world": "4392aeb41da6665d15029558e9aa56658b976967cb8abf25d55fae10527c1d7d"
+   },
+   "full": "944ca191771dbbd773502fabdd31b4a79a720ac499df54a18259c0e35da7d861"
+  },
+  {
+   "map": "chibic1",
+   "seconds": 60,
+   "tick": 1800,
+   "digest": "8631791175089160207",
+   "subsystems": {
+    "ai": "43faded902a1d1e87fafe1e125ec26ac18672c53f102911888f9230f6547c50d",
+    "combat": "a4cc762cd4744ddce0823fb5d46198e286eb72081a592c6bd79d998c58b57a6a",
+    "economy": "216e2a94bac4281f7f66e07fd54a96688f4fcde0bdffc6e6c77a9710e8d86291",
+    "scenario": "67d9273e3bda883e0d9f876027bac9ee7d18ffec1461e78353a66e41df9f1ce4",
+    "total": "2592526defc533e3dbc2ebce47f83f10afe2f93ca29b5a59dad472b0f35e2026",
+    "world": "5ebb172932e58140b12468e3910059a8f98d3f802abefa903a74f984d00eb4f8"
+   },
+   "full": "d2ebce8d2729b9741d9fda3b27829e422393b2dc00dbe344f855ebcb8ea67a8c"
+  },
+  {
+   "map": "chibil1",
+   "seconds": 15,
+   "tick": 450,
+   "digest": "5687121321625847009",
+   "subsystems": {
+    "ai": "3c93bf52b2b56cbd8c063ccfb4c7fc5391dd65d1d98754ade1de5422091df730",
+    "combat": "d2a340f635b7a8846af7a2674c0b7b390c8d5d6416f8bb2a6058ced498e1c374",
+    "economy": "b70894b73549ba8075146261fe347535d31466c3229a0586284612502c4724ba",
+    "scenario": "67d9273e3bda883e0d9f876027bac9ee7d18ffec1461e78353a66e41df9f1ce4",
+    "total": "83ae7e392cdd0d6913dca0bbae1a498b65da76032b74b1a807a2f71501454b76",
+    "world": "5ba87deb382f91931830365f533032fecfe3f18d71fccf67914f7c9de5d70b7b"
+   },
+   "full": "cdc9332541a2edecc9c1e7bbb2d3733e8ed64294648f714adc36fdbc7fd3c41b"
+  },
+  {
+   "map": "chibil1",
+   "seconds": 60,
+   "tick": 1800,
+   "digest": "5687121321625847009",
+   "subsystems": {
+    "ai": "f6c0dd8d84f650228997ab52a55b27dfdb8f71ee509067b5e6421b24c5d2a154",
+    "combat": "d2a340f635b7a8846af7a2674c0b7b390c8d5d6416f8bb2a6058ced498e1c374",
+    "economy": "b70894b73549ba8075146261fe347535d31466c3229a0586284612502c4724ba",
+    "scenario": "67d9273e3bda883e0d9f876027bac9ee7d18ffec1461e78353a66e41df9f1ce4",
+    "total": "3aa9d0ee3dcf422ca749cd71cab4260c48120a260180d66568b103e9ef6d9712",
+    "world": "5ba87deb382f91931830365f533032fecfe3f18d71fccf67914f7c9de5d70b7b"
+   },
+   "full": "65c66723664bef66bcf057325128f1a27e52e2acb48394edcd957cbf61943ae5"
+  },
+  {
+   "map": "chibic10",
+   "seconds": 15,
+   "tick": 450,
+   "digest": "756393460821595832",
+   "subsystems": {
+    "ai": "64c8ef04a43349d9628a034047a1d45474c4daf014fb0008d2a3a5397946740b",
+    "combat": "eaf889b7a9ed52c9fd5b5ddf056a9ba62b8e938e57890d00af0d61e4ac407f18",
+    "economy": "c36701ab164ec959fbc6370238abcd3ae528af9748bac14ca94071b271a42411",
+    "scenario": "67d9273e3bda883e0d9f876027bac9ee7d18ffec1461e78353a66e41df9f1ce4",
+    "total": "738fc9711d710ca16bd50466f156b1fabd70700e9cafb0a9963b13c2d0888f19",
+    "world": "90e878c0cc9afb0321e259be3d48f2a666192a3c78a06b82d9c316bc8f67f9e3"
+   },
+   "full": "6bded7032964a9130163cb4993985226c75291f9481ce1d91c3f049b346f7829"
+  },
+  {
+   "map": "chibic10",
+   "seconds": 60,
+   "tick": 1800,
+   "digest": "80482320890684679",
+   "subsystems": {
+    "ai": "bd8d5ae98a47a6b3167808522061aed92e84c019ba129233eac6f50550a4ebe1",
+    "combat": "6d4c4c09550fa0dce15db7196e54afd3e1fbb93c9b4dcb8f82417dba70ec7d8b",
+    "economy": "8f3ca6b14ef84a59a6ebd940a552cd5dc560393c4cfb02e370fad3f3fba29b14",
+    "scenario": "67d9273e3bda883e0d9f876027bac9ee7d18ffec1461e78353a66e41df9f1ce4",
+    "total": "f089f2d96d120956c4c0fa40a3295d85002e03c077e5a5b0f3b60bed1a64e36c",
+    "world": "9ad77a133ee5aff2384e2a4488fc144f0bfbced1365a500ffd9db35fa2d9acbf"
+   },
+   "full": "7df863556899df7e2c0119537085e8a4ee38db3b858d4db1bc9c4eaddac4e4ee"
+  },
+  {
+   "map": "chibic17",
+   "seconds": 15,
+   "tick": 450,
+   "digest": "4817841055524442326",
+   "subsystems": {
+    "ai": "7fd66d7e26153932228c7d488d5f6c4986ed7dd650a733011de178853241af0b",
+    "combat": "d059bafb04f0f5d92138dcb72c9b2dcb2eca0ad37ab29adbfd947a9b9cc95e63",
+    "economy": "a16f174bff140656f9d8c21dd37da54bac1262597a20e138f8292b4f2e0a0413",
+    "scenario": "67d9273e3bda883e0d9f876027bac9ee7d18ffec1461e78353a66e41df9f1ce4",
+    "total": "5c28e2e98b449b94f62c19798b581fc5e21610a61f32832f04dd9d97f5dcc45c",
+    "world": "006f6fe70e7b55d23dbdb91114cca12e03c5d4781b50a3a8b769ccbe3c028b4d"
+   },
+   "full": "7952d3f301944377bd614594244e84154137d813f5aaa5d4750530ef994ee956"
+  },
+  {
+   "map": "chibic17",
+   "seconds": 60,
+   "tick": 1800,
+   "digest": "4179184756481360859",
+   "subsystems": {
+    "ai": "758c243745549d6de7b028a79184a03b4cc60ede19e321e458a478472cf1e0c6",
+    "combat": "e31120210c79abe7d5cea05e41ed67bbc924dc1e94a0c375c74bec748f3cdf8d",
+    "economy": "e88b62608c555f33430f677d72d80e73832ace3a88ab32199637bccf1deb2393",
+    "scenario": "67d9273e3bda883e0d9f876027bac9ee7d18ffec1461e78353a66e41df9f1ce4",
+    "total": "530c3374c1828a6ae4298e1394168906b0660ea8cd35f13c33b1a518e202a8ff",
+    "world": "41c957582bfe85c6888c7db7b31c78b04928a3d637be311fe95ee1b1955ca32f"
+   },
+   "full": "9d015c1b49b028db98c2368e3a9028afc42ca8e167f10d23fa4adb11fef5e02e"
+  }
+ ]
+}

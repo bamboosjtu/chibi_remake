@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>原版《赤壁》科技树与素材</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:32px; background:#12141a; color:#e6e6e6; font:15px/1.65 "Segoe UI","Microsoft YaHei",sans-serif; }
+  h1,h2,h3 { font-weight:600; letter-spacing:.02em; }
+  h1 { font-size:28px; margin:0 0 4px; }
+  h2 { margin:38px 0 12px; font-size:19px; color:#ffd27a; }
+  h3 { margin:20px 0 8px; font-size:15px; color:#ffd27a; }
+  .sub { color:#9aa0ad; margin-bottom:20px; }
+  code { background:#1d212b; padding:1px 5px; border-radius:4px; color:#a8d5ff; }
+  .note { background:#1b1f27; border-left:3px solid #ffd27a; padding:10px 14px; border-radius:4px; color:#c9ced8; }
+  .warn { border-left-color:#ff9d6e; }
+  .cards { display:flex; gap:12px; flex-wrap:wrap; margin:18px 0; }
+  .stat { background:#181c24; border:1px solid #2a2f3a; border-radius:10px; padding:12px 18px; min-width:145px; }
+  .stat b { display:block; font-size:24px; color:#ffd27a; }
+  .stat span { color:#9aa0ad; font-size:13px; }
+  table { border-collapse:collapse; width:100%; margin-top:8px; }
+  th,td { border-bottom:1px solid #262b35; padding:6px 9px; text-align:left; vertical-align:top; }
+  th { color:#9aa0ad; font-weight:500; font-size:13px; white-space:nowrap; }
+  .scroll { overflow-x:auto; }
+  .panel { background:#181c24; border:1px solid #2a2f3a; border-radius:10px; padding:14px; margin-top:10px; }
+  .panel img { width:100%; background:#0b0d12; border:1px solid #2a2f3a; display:block; }
+  .icon { width:40px; height:40px; image-rendering:pixelated; border:1px solid #303746; border-radius:4px; background:#0b0d12; }
+  .branchicon { width:48px; height:48px; image-rendering:pixelated; border:1px solid #303746; border-radius:4px; background:#0b0d12; }
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:12px; }
+  .card { background:#181c24; border:1px solid #2a2f3a; border-radius:10px; padding:12px; }
+  .card h3 { margin:0 0 4px; font-size:14px; }
+  .meta { color:#9aa0ad; font-size:13px; }
+  .hot { color:#ffd27a; } .ok { color:#8fe3a3; } .bad { color:#ff9d9d; }
+  ul { margin-top:6px; }
+  @media (max-width:900px){ .grid { grid-template-columns:1fr 1fr; } body { padding:18px; } }
+</style>
+</head>
+<body>
+<h1>原版《赤壁》科技树与素材</h1>
+<div class="sub">CB.EXE <code>2db7cc10…c5798cb7</code> · 17 项升级 + 6 项出售 · 200 tick 研究 · 代码级核对</div>
+
+<div class="note warn">
+  <b>口径</b>：原版代码/费用行优先；docs 与重制实现只作对照。原版面板提示是「大本营升一级/二级/三级」，docs 的「升二级/三级/四级」是显示等级偏移写法。
+</div>
+
+<div class="cards">
+  <div class="stat"><b>17</b><span>实际升级科技</span></div>
+  <div class="stat"><b>+6</b><span>钱庄出售操作</span></div>
+  <div class="stat"><b>200</b><span>研究 tick</span></div>
+  <div class="stat"><b>75%</b><span>取消退款</span></div>
+</div>
+
+<h2>1. 科技树总览</h2>
+<div class="panel"><img src="assets/tech_tree.svg" alt="原版科技树"></div>
+<p class="meta">六个分支：大本营、弓术、兵器、甲胄、投石车、水军。下方出售区是 6 项钱庄操作，不计入战斗科技加成。</p>
+
+<h2>2. 科技表</h2>
+<div class="scroll">
+<table>
+  <tr><th>图标</th><th>分支</th><th>等级</th><th>指令</th><th>费用（金/木/铁）</th><th>效果</th></tr>
+  <tr><td><img class="icon" src="assets/tech_16031_hq_up_1_a.png" alt=""></td><td>大本营</td><td>1</td><td>16031 / 16034</td><td>2000 / 1000 / 700</td><td>HP +400；开放 100/200 档</td></tr>
+  <tr><td><img class="icon" src="assets/tech_16032_hq_up_2_a.png" alt=""></td><td>大本营</td><td>2</td><td>16032 / 16035</td><td>3000 / 2000 / 1000</td><td>再 +400 HP；开放 500 档</td></tr>
+  <tr><td><img class="icon" src="assets/tech_16033_hq_up_3_a.png" alt=""></td><td>大本营</td><td>3</td><td>16033 / 16036</td><td>5000 / 3000 / 2000</td><td>再 +400 HP；开放 1000 档</td></tr>
+  <tr><td><img class="icon" src="assets/tech_16040_bow_1.png" alt=""></td><td>弓术</td><td>1</td><td>16040</td><td>800 / 400 / 0</td><td>攻击 B +2/3/4/5</td></tr>
+  <tr><td><img class="icon" src="assets/tech_16041_bow_2.png" alt=""></td><td>弓术</td><td>2</td><td>16041</td><td>1500 / 400 / 100</td><td>攻击 B +4/6/8/10</td></tr>
+  <tr><td><img class="icon" src="assets/tech_16042_bow_3.png" alt=""></td><td>弓术</td><td>3</td><td>16042</td><td>2000 / 800 / 500</td><td>攻击 B +6/9/12/15</td></tr>
+  <tr><td><img class="icon" src="assets/tech_16050_weapon_1.png" alt=""></td><td>兵器</td><td>1</td><td>16050</td><td>800 / 0 / 100</td><td>攻击 A +3/4/5/6</td></tr>
+  <tr><td><img class="icon" src="assets/tech_16051_weapon_2.png" alt=""></td><td>兵器</td><td>2</td><td>16051</td><td>2000 / 600 / 300</td><td>攻击 A +6/8/10/12</td></tr>
+  <tr><td><img class="icon" src="assets/tech_16052_weapon_3.png" alt=""></td><td>兵器</td><td>3</td><td>16052</td><td>3000 / 1000 / 500</td><td>攻击 A +9/12/15/18</td></tr>
+  <tr><td><img class="icon" src="assets/tech_16053_armor_1.png" alt=""></td><td>甲胄</td><td>1</td><td>16053</td><td>600 / 300 / 100</td><td>防御 A/B +2/3/4/5</td></tr>
+  <tr><td><img class="icon" src="assets/tech_16054_armor_2.png" alt=""></td><td>甲胄</td><td>2</td><td>16054</td><td>1200 / 600 / 200</td><td>防御 A/B +4/6/8/10</td></tr>
+  <tr><td><img class="icon" src="assets/tech_16055_armor_3.png" alt=""></td><td>甲胄</td><td>3</td><td>16055</td><td>1600 / 900 / 300</td><td>防御 A/B +6/9/12/15</td></tr>
+  <tr><td><img class="icon" src="assets/tech_16111_catapult_1.png" alt=""></td><td>投石车</td><td>1</td><td>16111</td><td>1500 / 500 / 400</td><td>投石车攻击 B +10</td></tr>
+  <tr><td><img class="icon" src="assets/tech_16112_catapult_2.png" alt=""></td><td>投石车</td><td>2</td><td>16112</td><td>3000 / 1000 / 800</td><td>投石车攻击 B +20</td></tr>
+  <tr><td><img class="icon" src="assets/tech_16124_navy_fast.png" alt=""></td><td>水军</td><td>快船</td><td>16124</td><td>700 / 400 / 400</td><td>快船攻击 B +6</td></tr>
+  <tr><td><img class="icon" src="assets/tech_16125_navy_war.png" alt=""></td><td>水军</td><td>战船</td><td>16125</td><td>1500 / 1000 / 800</td><td>战船攻击 B +15</td></tr>
+  <tr><td><img class="icon" src="assets/tech_16126_navy_armor.png" alt=""></td><td>水军</td><td>装甲</td><td>16126</td><td>800 / 500 / 500</td><td>舰船防御 A +6 / B +10</td></tr>
+</table>
+</div>
+<p class="meta">四档对应单位：0=32/36/45/46，1=37/38/39/48，2=40/41/42，3=43/44。只取当前等级，不叠加。</p>
+
+<h2>3. 大本营升级</h2>
+<div class="grid">
+  <div class="card"><h3>等级与 HP</h3><p>内部 `DAT_004b8d29=1/2/3`；每级当前 HP +400（`DAT_004b01c0`），最大 HP 通过 `DAT_004b8d0c`。新建单位继承最大 HP。</p></div>
+  <div class="card"><h3>生产解锁</h3><p>0=100；1=100/200；2=100/200/500；3=100/200/500/1000。骑兵线只到 500，步兵/弓兵到 1000。</p></div>
+  <div class="card"><h3>前置</h3><p>一级/二级：木材场+武器库条件、campaign gate &gt;1/&gt;2；三级：campaign gate &gt;3，弓术/兵器均 &gt;1。</p></div>
+</div>
+
+<h2>4. 研究规则</h2>
+<div class="grid">
+  <div class="card"><h3>完成</h3><p>`FUN_0045ECD0` 在 200 tick 后调用 `FUN_00422330`；科技字段全势力共享。</p></div>
+  <div class="card"><h3>取消/并发</h3><p>取消退 75%（`FUN_00420070`）；不同建筑可并行，同建筑同一时间一项。</p></div>
+  <div class="card"><h3>不叠加</h3><p>只读取当前等级一档；同势力同科技不能重复完成。武将走独立公式，建筑/工人不参与普通科技。</p></div>
+</div>
+
+<h2>5. 原版素材</h2>
+<div class="panel"><img src="assets/production_sheet.png" alt="原版生产/研究图标总表"></div>
+<p class="meta">原版 BMP.LWC 帧 90–153；总表为 2× 放大。单项科技图标已裁切为 `assets/tech_<command>_<name>.png`。</p>
+
+<h2>6. 与 docs/重制版对照</h2>
+<div class="scroll">
+<table>
+  <tr><th>主题</th><th>docs/重制</th><th>原版</th></tr>
+  <tr><td>“23 项科技”</td><td>23 项科技</td><td>23 个 action case = 17 项升级 + 6 项出售</td></tr>
+  <tr><td>大本营等级</td><td>升二级/三级/四级</td><td>提示/字段为升一级/二级/三级（1/2/3）</td></tr>
+  <tr><td>研究周期</td><td>200 tick</td><td>200 tick</td></tr>
+  <tr><td>取消退款</td><td>75%</td><td>75%</td></tr>
+  <tr><td>科技加成</td><td>四档、当前等级</td><td>四档字段、当前等级，不叠加</td></tr>
+</table>
+</div>
+
+<h2>7. 证据</h2>
+<div class="scroll">
+<table>
+  <tr><th>结论</th><th>位置</th><th>Evidence</th></tr>
+  <tr><td>研究命令分派</td><td><code>FUN_00428A50</code></td><td>0x428A50</td></tr>
+  <tr><td>200 tick 完成</td><td><code>FUN_0045ECD0</code></td><td>0x45ECD0</td></tr>
+  <tr><td>科技生效 case 0–0x16</td><td><code>FUN_00422330</code></td><td>0x422330</td></tr>
+  <tr><td>面板掩码/前置</td><td><code>FUN_00426E40</code></td><td>ev_c65228d1…</td></tr>
+  <tr><td>费用检查/退款</td><td><code>FUN_0041FF30</code> / <code>FUN_00420070</code></td><td>ev_a84eba1b…</td></tr>
+  <tr><td>攻击/防御字段</td><td><code>FUN_004255C0</code> / <code>FUN_00425800</code> / <code>FUN_00425B50</code> / <code>FUN_00425E40</code></td><td>0x4255C0 / 0x425800 / 0x425B50 / 0x425E40</td></tr>
+</table>
+</div>
+
+<h2>8. 文件</h2>
+<ul>
+  <li><a href="README.md">README.md</a> — 完整科技表、前置、代码字段、限制</li>
+  <li><a href="data/tech.json">data/tech.json</a> — 结构化科技树</li>
+  <li><a href="data/tech.csv">data/tech.csv</a> — 平表</li>
+  <li><a href="data/assets.json">data/assets.json</a> — 素材索引</li>
+  <li><a href="tools/extract_tech.mjs">tools/extract_tech.mjs</a> — 数据/科技树生成</li>
+  <li><a href="tools/crop_tech_icons.py">tools/crop_tech_icons.py</a> — 原版图标裁切</li>
+</ul>
+
+<p class="meta">限制：本轮未重新读取原始 COST.EXP（当前工作区 ISO 不完整）；费用/加成行来自既有 production.json 提取，代码侧核对字段/等级/生效路径。未运行原版逐级研究验证；没有修改重制代码。</p>
+</body>
+</html>

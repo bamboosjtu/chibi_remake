@@ -1,0 +1,20 @@
+[
+  {
+    "assetId": "terrain-06",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/terrain-06-source.png"
+    ],
+    "prompt": "Use case: precise-object-edit. Repaint the FIRST image into a production HD seamless wall tile atlas for 三国赤壁. EXACTLY seven columns by two rows; row2 col3 remains empty. Keep the EXACT ORIGINAL silhouettes, individual visible faces, flat cut-away faces, orientation, height and relative anchor of every tile. These are narrow adjacent SLICES of a continuous tall city wall, NOT isolated buildings or towers. No taper changes, no added side faces, no perspective changes, no towers, roofed posts, finials, turrets, crenellations or decorations above the source top. Repaint only source grey masonry, stair treads, wall walk and subtle moss. Small regular dark charcoal-grey stone bricks, restrained upper-left light, fine bevels and mortar details, flat broad joined planes. Preserve dark grey source brightness, not beige. Along both lateral edges the brick courses must continue at source heights. ALL transparent source spaces remain transparent. Crisp hand-painted stone detail instead of pixel scaling. EXACT source atlas aspect308:154; no canvas padding, no omitted tiles, no text or grid. Genuine transparent alpha."
+  },
+  {
+    "assetId": "terrain-09",
+    "references": [
+      "D:/Games/3DMGAME_chibi.CHS.Green/_work/remaster-final/pose-references/terrain-09-source.png"
+    ],
+    "prompt": "Use case: precise-object-edit. Repaint this EXACT thirteen columns by two rows tile atlas for 三国赤壁. Each cell is a 44x50 continuous wall-walk slice. EXACTLY26 positions, row2 col3 EMPTY. Reproduce each source silhouette, edge, height, direction, straight wall/corner/stair geometry and flat cut-away face. Fine grey stone bricks, understated warm grey walk slabs, small battlements; existing tiny post accents may be charcoal and dark red. NEVER add towers or roofs, big freestanding cubes, battlements in source plain cells, extra thickness or scenery. Neighboring slices must join into one continuous wall with regular small brick courses, not separate miniature castles. Keep source alpha cutouts and source canvas ratio572:100, no outer padding. HD detailed hand-painted masonry with restrained light from upper left, same dark grey palette. Genuine transparency. No labels, text, grid, background or black rectangles."
+  },
+  {
+    "assetId": "hud-horizontal-bands-v4",
+    "prompt": "Use case: stylized-concept. Production raster UI ornament sheet for faithful Chinese Three Kingdoms RTS 三国赤壁. Canvas very wide, aspect 8:1. EXACT TWO horizontal ornament bands stacked in equal rows with no space between, each row full width. Each band has aspect16:1. Row1: elegant thin gold carved Chinese dragon and cloud relief on dark antique gold and burgundy, two dragons flanking an EMPTY central dark burgundy area reserved for a separate oval logo. No text or logo painted. Row2: one continuous gold carved dragon and cloud relief base bar, symmetrical dragons facing center. Both have fine straight gold outer rails and square key-fret corners, restrained old game gold, clearly readable small sculpted scales, no blur, no huge stretched loops. Each strip fills its row edge to edge, no outer padding, no mockup, no interface content, no icons, numbers or words. Painted sharp metal detail matching late Han ornate game UI, lit from above, opaque. Aim 2560x320."
+  }
+]

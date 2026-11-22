@@ -1,0 +1,217 @@
+{
+  "schemaVersion": 1,
+  "generated": "2026-10-27",
+  "binary": {
+    "name": "CB.EXE",
+    "path": "_work/iso/CB.EXE",
+    "sha256": "2db7cc102e6fde547ab05d77cfddabc2079f5bc9be9b6b59b17bf435c5798cb7",
+    "format": "PE32 x86",
+    "note": "原版光盘与安装目录中的 CB.EXE 哈希相同（见 docs/research/BINARY.md）。"
+  },
+  "source_files": {
+    "lwc": "RES/MOUSE.LWC",
+    "idx": "RES/MOUSE.IDX",
+    "frame_table": "SET/MOUSE.EXP",
+    "preview_palette": "RES/SCORE.PAL（CBGame.set 的 Main Palette）",
+    "bank_c_preview_palette": "RES/ARROW_T.PAL（Palette，离开战场/菜单路径）",
+    "alternate_previews": ["RES/ARROW_T.PAL", "RES/BATTLE.PAL"],
+    "palette_note": "MOUSE.LWC 是 8-bit 调色板索引位图；预览颜色取决于当前调色板。CBGame.set 启动时加载 res\\score.pal（代码中的 Main Palette，DAT_00519768）与 res\\arrow_t.pal（Palette，DAT_005197b0）。bank A 主预览用 SCORE.PAL：它能把剑的绿色（友方）/红色（敌方）护手正确还原；ARROW_T.PAL 会把同一批像素整体变成米棕色，BATTLE.PAL 与 SCORE 接近。bank C 主预览用 ARROW_T（离开战场/菜单路径的 Palette），同一帧在 SCORE 下为白色旗。CB.EXE 内没有 battle.pal 字符串，各画面实际调色板未截屏证实。"
+  },
+  "lwc_frames": [
+    { "index": 0, "offset": 0, "width": 216, "height": 350, "row_size": 216, "role": "bank A 状态图集" },
+    { "index": 1, "offset": 75616, "width": 24, "height": 192, "row_size": 24, "role": "bank B 边缘滚动方向箭头" },
+    { "index": 2, "offset": 80240, "width": 216, "height": 32, "row_size": 216, "role": "bank C 旗帜光标" }
+  ],
+  "banks": [
+    {
+      "id": "A",
+      "runtime_global": "DAT_00519800",
+      "source_frame": 0,
+      "rows": 10,
+      "columns": 4,
+      "cell": [54, 35],
+      "row_frame_counts": [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+      "hotspots": [[1, 3], [26, 17], [26, 17], [26, 17], [24, 19], [24, 19], [26, 17], [26, 17], [1, 3], [26, 17]],
+      "use": "战场/菜单主光标；每行一个状态，每状态 4 帧动画"
+    },
+    {
+      "id": "B",
+      "runtime_global": "DAT_00519960",
+      "source_frame": 1,
+      "rows": 8,
+      "columns": 1,
+      "cell": [24, 24],
+      "row_frame_counts": [1, 1, 1, 1, 1, 1, 1, 1],
+      "hotspots": [[0, 0], [10, 0], [23, 0], [23, 10], [23, 23], [13, 23], [0, 23], [0, 13]],
+      "use": "摄像机边缘滚动光标，8 个方向各一帧",
+      "direction_order": ["NW", "N", "NE", "E", "SE", "S", "SW", "W"]
+    },
+    {
+      "id": "C",
+      "runtime_global": "DAT_00519ac0",
+      "source_frame": 2,
+      "rows": 1,
+      "columns": 4,
+      "cell": [54, 32],
+      "row_frame_counts": [4],
+      "hotspots": [[1, 3]],
+      "use": "红旗（帅旗）光标，4 帧飘动动画；离开战场回菜单的路径会切换到它"
+    }
+  ],
+  "cursor_object": {
+    "active_bank_global": "DAT_00482460",
+    "constructor": "FUN_00402990",
+    "fields": {
+      "+0x60": "可见/启用标志",
+      "+0x64": "重绘开关（AVI 播放时置 0）",
+      "+0x6c/+0x70": "单帧宽/高（由整张图除以列数/行数得到）",
+      "+0x74/+0x78": "当前屏幕坐标（GetCursorPos）",
+      "+0x7c": "ClipCursor 裁剪矩形",
+      "+0x8c": "当前状态行",
+      "+0x90": "上一状态行",
+      "+0x94": "当前动画列",
+      "+0x98": "上一动画列",
+      "+0x9c": "每个动画帧持续的 tick 数 = 5",
+      "+0xa0": "每行热点 (x,y) 对",
+      "+0x120": "每行动画帧数"
+    }
+  },
+  "timing": {
+    "cursor_tick_ms": 32,
+    "ticks_per_animation_frame": 5,
+    "animation_frame_ms": 160,
+    "four_frame_cycle_ms": 640,
+    "note": "FUN_004552d0 在 timeGetTime 间隔 > 0x20ms 时调用 FUN_00403480；FUN_00402db0 每 5 个 tick 前进一列动画。"
+  },
+  "states": [
+    {
+      "row": 0,
+      "name": "红旗/帅旗指针",
+      "art": "红色旗面、金边、左上银色矛尖；与 row 8 像素完全相同",
+      "hotspot": [1, 3],
+      "frames": 4,
+      "trigger": "光标不在战场视口矩形 DAT_00482ff0..DAT_00482ffc 内；或默认模式下光标下没有单位（空地面）；或进入战场时由 FUN_00423c20(0,1) 预置",
+      "code": ["FUN_00423c80 越界分支", "FUN_00423c20(0,1)"],
+      "confidence": "observed"
+    },
+    {
+      "row": 1,
+      "name": "攻击（基础）",
+      "art": "交叉双剑，金色护手",
+      "hotspot": [26, 17],
+      "frames": 4,
+      "trigger": "攻击命令激活（模式 1），且未悬停到可触发变体的单位",
+      "code": ["FUN_00428a50 case 0x3f03 → FUN_00423c20(1,0)"],
+      "confidence": "observed"
+    },
+    {
+      "row": 2,
+      "name": "攻击 / 友方变体（绿）",
+      "art": "交叉双剑，绿色护手与白色描边",
+      "hotspot": [26, 17],
+      "frames": 4,
+      "trigger": "攻击模式下悬停单位，且 FUN_004250f0(本方, 目标所属) 为真（同阵营，或关系表值为 0/1）→ 友方，不可攻击",
+      "code": ["FUN_00423c80 case 1 → FUN_004250f0"],
+      "confidence": "observed"
+    },
+    {
+      "row": 3,
+      "name": "攻击 / 敌方变体（红）",
+      "art": "交叉双剑，红色护手",
+      "hotspot": [26, 17],
+      "frames": 4,
+      "trigger": "攻击模式下悬停单位，且上述关系判定为假 → 敌方，可攻击",
+      "code": ["FUN_00423c80 case 1"],
+      "confidence": "observed"
+    },
+    {
+      "row": 4,
+      "name": "运输/采集（基础）",
+      "art": "弯镰（银刃、金色箍）",
+      "hotspot": [24, 19],
+      "frames": 4,
+      "trigger": "运输命令激活（模式 7）",
+      "code": ["FUN_00428a50 case 0x3f0a → FUN_00423c20(4,0)"],
+      "confidence": "observed"
+    },
+    {
+      "row": 5,
+      "name": "运输/采集 / 资源变体",
+      "art": "弯镰，青绿色描边",
+      "hotspot": [24, 19],
+      "frames": 4,
+      "trigger": "运输模式下悬停可采集资源物件：FUN_00425220 返回 2（类型 0x16=铁矿 22）或 3（类型 0x18/0x19=民居 24/25）",
+      "code": ["FUN_00423c80 case 4 → FUN_00425220"],
+      "confidence": "observed"
+    },
+    {
+      "row": 6,
+      "name": "单位悬停手形（选择光标）",
+      "art": "手持简牍/卷轴（金色手）",
+      "hotspot": [26, 17],
+      "frames": 4,
+      "trigger": "默认模式 0 且光标命中任意单位",
+      "code": ["FUN_00423c80 case 0"],
+      "confidence": "observed"
+    },
+    {
+      "row": 7,
+      "name": "拖拽/框选",
+      "art": "四向箭头十字",
+      "hotspot": [26, 17],
+      "frames": 4,
+      "trigger": "框选拖拽进行中（DAT_00483400=1；FUN_00423900 开始，FUN_00423a40 更新橡皮筋框，FUN_004239a0 结束）",
+      "code": ["FUN_00423900", "FUN_00423a40", "FUN_004239a0", "FUN_00423c80"],
+      "confidence": "observed"
+    },
+    {
+      "row": 8,
+      "name": "加入/编组（基础）",
+      "art": "与 row 0 相同的红旗指针（像素完全一致）",
+      "hotspot": [1, 3],
+      "frames": 4,
+      "trigger": "命令 0x3f11 激活（模式 0xF，加入/编组），未悬停可加入单位",
+      "code": ["FUN_00428a50 case 0x3f11 → FUN_00423c20(8,0)"],
+      "confidence": "observed"
+    },
+    {
+      "row": 9,
+      "name": "加入/编组 / 目标变体",
+      "art": "手持方框（青绿色边框）",
+      "hotspot": [26, 17],
+      "frames": 4,
+      "trigger": "加入模式下悬停本方单位且该单位能解析出队长（FUN_00425190 为真、FUN_00425570 非空）",
+      "code": ["FUN_00423c80 case 8"],
+      "confidence": "observed"
+    }
+  ],
+  "command_bindings": [
+    { "command_id": "0x3f03", "slot": "战斗面板第 1 格", "mode": 1, "cursor_row": 1, "meaning": "攻击" },
+    { "command_id": "0x3f0a", "slot": "面板第 8 格", "mode": 7, "cursor_row": 4, "meaning": "运输/采集" },
+    { "command_id": "0x3f11", "slot": "工人面板（建造/加入格）", "mode": "0x0F", "cursor_row": 8, "meaning": "加入/编组（FUN_0045d8d0 内有 GroupAdd 警告串）" }
+  ],
+  "edge_scroll": {
+    "function": "FUN_0041ca90",
+    "trigger": "鼠标贴住 640x480 客户区四边（x==0/0x27f，y==0/0x1df）",
+    "behavior": "按 8 方向更新摄像机滚动向量，切换到 bank B 并把行设为方向号；方向为 -1（不在边缘）或摄像机被地图边界顶住时恢复 bank A",
+    "gate": "进入方向箭头时调用 FUN_00423ed0(0) 冻结普通状态判定，恢复时 FUN_00423ed0(1)",
+    "directions": ["NW", "N", "NE", "E", "SE", "S", "SW", "W"]
+  },
+  "drag": {
+    "start": "FUN_00423900：DAT_00483400=1，记录锚点/选择矩形，FUN_00402d00 用 ClipCursor 限制光标",
+    "update": "FUN_00423a40：先刷新光标状态，再更新选择矩形端点",
+    "end": "FUN_004239a0：DAT_00483400=0，恢复屏幕裁剪矩形"
+  },
+  "switches": {
+    "active_bank": "FUN_00403440(&DAT_00519800 / &DAT_00519960 / &DAT_00519ac0)",
+    "storyboard": "离开战场（窗口消息 0x4e21 的 0 分支，FUN_00409d70）切换到 bank C；进入战场/初始化时切回 bank A",
+    "hide_during_video": "FUN_00447110 / FUN_00447310 将光标对象 +0x64 置 0，AVI 播放期间不重绘"
+  },
+  "unknowns": [
+    "FUN_004250f0 使用的关系表 DAT_004b8ce8（步长 0x48d6）由谁、按什么规则填充尚未确认。画面与谓词一致（绿=同阵营/关系表为真=不可攻击，红=其它=可攻击），但“其它”是否等同全部敌对阵营未逐一验证。",
+    "命令 0x3f11 的面板文字未从资源中直接解出；“加入/编组”依据 FUN_0045d8d0 的 GroupAdd 字符串与 FUN_00423c80 case 8 的自方单位判定推断。",
+    "MOUSE.LWC 在实机中使用的调色板未截屏验证；预览使用 ARROW_T.PAL，BATTLE.PAL 下会变灰阶。",
+    "未运行原版做逐状态像素比对；所有状态变化均来自静态调用链。",
+    "bank C 在主菜单中是否长期使用未跟踪（只确认离开战场的路径会切换过去）。"
+  ]
+}

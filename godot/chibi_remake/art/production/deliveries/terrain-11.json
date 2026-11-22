@@ -1,0 +1,26 @@
+{
+  "assetId": "terrain-11",
+  "bytes": 1466786.0,
+  "colorType": 6.0,
+  "generatedAt": "2026-10-13T09:30:53.880Z",
+  "generator": "built-in image_gen",
+  "height": 725.0,
+  "prompt": "Use case: style-transfer. Finished transparent terrain tile atlas 草坡 for 三国赤壁 HD redraw. Repaint ALL cells in the reference atlas while preserving EXACT canvas proportions, original layout, diamond ground silhouettes, cliff/wall heights, edge cutouts and seamless neighboring variants. Each tile originally 44x41; exact 10 columns x 2 rows. Preserve original color palette, isometric 2:1 orthographic perspective and upper-left light. Fully redraw detailed hand-painted grass/earth/water/stone/wood material appropriate to reference; no change to geography, no scenery or extra objects. Fourfold reference resolution if possible. True transparent alpha wherever reference is transparent. No labels/grid/text/black rectangle/checkerboard/watermark. All variants required, not one isolated tile. Keep all source-empty cells empty and each occupied cell in its EXACT source position. Do not compact, rearrange or evenly fill the atlas. Never move any tile to another row or column.",
+  "promptFile": "godot/chibi_remake/art/production/source-faithful-prompts-v2.json",
+  "sha256": "09e6c0ca3ff3b73c863906ded85a4bee7613f46d9dc933938750576f2e718504",
+  "sourceGeneratedFile": "C:\\Users\\bambo\\.codex\\generated_images\\01a13348-db65-7b23-b66a-63227eb4490d\\exec-b5f7385e-fcfe-406e-a3e2-a2e137944b2c.png",
+  "status": "generated-awaiting-validation",
+  "texture": "godot/chibi_remake/art/full/terrain/11-atlas-v1.png",
+  "userAcceptance": {
+    "date": "2026-10-13",
+    "reason": "用户已人工验证高清图，要求直接替换对应素材，不再逐项美术复核。",
+    "reviewer": "user"
+  },
+  "validation": {
+    "excludedSourceLabelsOrBlanks": 4,
+    "structure": "pass",
+    "visual": "pass",
+    "visualFrameCount": 16
+  },
+  "width": 2169.0
+}

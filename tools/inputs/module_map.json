@@ -1,0 +1,1663 @@
+{
+  "schemaVersion": 1,
+  "source": "godot/chibi_remake",
+  "sourceFiles": 181,
+  "generated": "2026-11-20T08:08:10.200Z",
+  "statusCounts": {
+    "moved": 129,
+    "renamed": 4,
+    "retained": 47,
+    "deleted": 1
+  },
+  "phaseCounts": {
+    "P4b": 16,
+    "P4c": 1,
+    "P0": 32,
+    "P4a": 41,
+    "P5": 1,
+    "P2": 59,
+    "P1": 13,
+    "P4d": 1,
+    "P6": 8,
+    "P3": 9
+  },
+  "entries": [
+    {
+      "from": "app/acceptance_storage.gd",
+      "to": "app/saves/acceptance_storage.gd",
+      "phase": "P4b",
+      "note": "platform storage",
+      "status": "moved",
+      "package": "app/saves"
+    },
+    {
+      "from": "app/automation/menu_driver.gd",
+      "to": "testing/automation/menu_harness.gd",
+      "phase": "P4c",
+      "note": "acceptance harness; loaded only when Game.acceptance_enabled and a menu probe is requested",
+      "status": "renamed",
+      "package": "testing"
+    },
+    {
+      "from": "app/battle/battle_opening.gd",
+      "to": "app/battle/startup/battle_opening.gd",
+      "phase": "P4b",
+      "note": "battle opening",
+      "status": "moved",
+      "package": "app/battle"
+    },
+    {
+      "from": "app/battle/bootstrap.gd",
+      "to": "app/battle/startup/bootstrap.gd",
+      "phase": "P4b",
+      "note": "battle startup",
+      "status": "moved",
+      "package": "app/battle"
+    },
+    {
+      "from": "app/battle/cheat_controller.gd",
+      "to": "app/battle/runtime/cheat_controller.gd",
+      "phase": "P4b",
+      "note": "moved during P4b; presentation dependency injected in P5",
+      "status": "moved",
+      "package": "app/battle"
+    },
+    {
+      "from": "app/battle/duel_controller.gd",
+      "to": "app/battle/runtime/duel_session.gd",
+      "phase": "P5",
+      "note": "moved during P4b; presentation dependency injected in P5",
+      "status": "renamed",
+      "package": "app/battle"
+    },
+    {
+      "from": "app/battle/scene_controller.gd",
+      "to": "app/battle/runtime/scene_controller.gd",
+      "phase": "P4b",
+      "note": "moved during P4b; presentation dependency injected in P5",
+      "status": "moved",
+      "package": "app/battle"
+    },
+    {
+      "from": "app/battle_actions.gd",
+      "to": "app/battle/commands/battle_actions.gd",
+      "phase": "P4b",
+      "note": "battle commands",
+      "status": "moved",
+      "package": "app/battle"
+    },
+    {
+      "from": "app/battle_scene_state.gd",
+      "to": "app/battle/runtime/battle_scene_state.gd",
+      "phase": "P4b",
+      "note": "moved during P4b; presentation dependency injected in P5",
+      "status": "moved",
+      "package": "app/battle"
+    },
+    {
+      "from": "app/campaign_session.gd",
+      "to": "app/campaign/campaign_session.gd",
+      "phase": "P4b",
+      "note": "campaign",
+      "status": "moved",
+      "package": "app/campaign"
+    },
+    {
+      "from": "app/game.gd",
+      "to": "app/game.gd",
+      "phase": "P0",
+      "note": "autoload Game",
+      "status": "retained",
+      "package": "app"
+    },
+    {
+      "from": "app/json_store.gd",
+      "to": "app/saves/json_store.gd",
+      "phase": "P4b",
+      "note": "platform storage",
+      "status": "moved",
+      "package": "app/saves"
+    },
+    {
+      "from": "app/level_catalog.gd",
+      "to": "app/campaign/level_catalog.gd",
+      "phase": "P4b",
+      "note": "campaign",
+      "status": "moved",
+      "package": "app/campaign"
+    },
+    {
+      "from": "app/pause_stack.gd",
+      "to": "app/battle/session/pause_stack.gd",
+      "phase": "P4b",
+      "note": "battle session",
+      "status": "moved",
+      "package": "app/battle"
+    },
+    {
+      "from": "app/read_models/battle_queries.gd",
+      "to": "app/read_models/battle_queries.gd",
+      "phase": "P0",
+      "note": "already in target read-model package",
+      "status": "retained",
+      "package": "app/read_models"
+    },
+    {
+      "from": "app/read_models/context_projection.gd",
+      "to": "app/read_models/context_projection.gd",
+      "phase": "P0",
+      "note": "already in target read-model package",
+      "status": "retained",
+      "package": "app/read_models"
+    },
+    {
+      "from": "app/read_models/resource_projection.gd",
+      "to": "app/read_models/resource_projection.gd",
+      "phase": "P0",
+      "note": "already in target read-model package",
+      "status": "retained",
+      "package": "app/read_models"
+    },
+    {
+      "from": "app/read_models/unit_projection.gd",
+      "to": "app/read_models/unit_projection.gd",
+      "phase": "P0",
+      "note": "already in target read-model package",
+      "status": "retained",
+      "package": "app/read_models"
+    },
+    {
+      "from": "app/rules/native_backend.gd",
+      "to": "app/rules/native_backend.gd",
+      "phase": "P0",
+      "note": "already in target rules package",
+      "status": "retained",
+      "package": "app/rules"
+    },
+    {
+      "from": "app/rules/rule_loader.gd",
+      "to": "app/rules/rule_loader.gd",
+      "phase": "P0",
+      "note": "already in target rules package",
+      "status": "retained",
+      "package": "app/rules"
+    },
+    {
+      "from": "app/save_service.gd",
+      "to": "app/saves/save_service.gd",
+      "phase": "P4b",
+      "note": "save service",
+      "status": "moved",
+      "package": "app/saves"
+    },
+    {
+      "from": "app/saves/candidate_world.gd",
+      "to": "app/saves/candidate_world.gd",
+      "phase": "P0",
+      "note": "already in target save package",
+      "status": "retained",
+      "package": "app/saves"
+    },
+    {
+      "from": "app/saves/json_limits.gd",
+      "to": "app/saves/json_limits.gd",
+      "phase": "P0",
+      "note": "already in target save package",
+      "status": "retained",
+      "package": "app/saves"
+    },
+    {
+      "from": "app/saves/rules_identity.gd",
+      "to": "app/saves/rules_identity.gd",
+      "phase": "P0",
+      "note": "already in target save package",
+      "status": "retained",
+      "package": "app/saves"
+    },
+    {
+      "from": "app/saves/save_envelope.gd",
+      "to": "app/saves/save_envelope.gd",
+      "phase": "P0",
+      "note": "already in target save package",
+      "status": "retained",
+      "package": "app/saves"
+    },
+    {
+      "from": "app/saves/save_format.gd",
+      "to": "app/saves/save_format.gd",
+      "phase": "P0",
+      "note": "already in target save package",
+      "status": "retained",
+      "package": "app/saves"
+    },
+    {
+      "from": "app/saves/save_repository.gd",
+      "to": "app/saves/save_repository.gd",
+      "phase": "P0",
+      "note": "already in target save package",
+      "status": "retained",
+      "package": "app/saves"
+    },
+    {
+      "from": "app/saves/slot_catalog.gd",
+      "to": "app/saves/slot_catalog.gd",
+      "phase": "P0",
+      "note": "already in target save package",
+      "status": "retained",
+      "package": "app/saves"
+    },
+    {
+      "from": "app/saves/snapshot_restorer.gd",
+      "to": "app/saves/snapshot_restorer.gd",
+      "phase": "P0",
+      "note": "already in target save package",
+      "status": "retained",
+      "package": "app/saves"
+    },
+    {
+      "from": "app/saves/snapshot_semantics.gd",
+      "to": "app/saves/snapshot_semantics.gd",
+      "phase": "P0",
+      "note": "already in target save package",
+      "status": "retained",
+      "package": "app/saves"
+    },
+    {
+      "from": "app/saves/snapshot_validator.gd",
+      "to": "app/saves/snapshot_validator.gd",
+      "phase": "P0",
+      "note": "already in target save package",
+      "status": "retained",
+      "package": "app/saves"
+    },
+    {
+      "from": "app/saves/unit_relations.gd",
+      "to": "app/saves/unit_relations.gd",
+      "phase": "P0",
+      "note": "already in target save package",
+      "status": "retained",
+      "package": "app/saves"
+    },
+    {
+      "from": "app/saves/world_transaction.gd",
+      "to": "app/saves/world_transaction.gd",
+      "phase": "P0",
+      "note": "already in target save package",
+      "status": "retained",
+      "package": "app/saves"
+    },
+    {
+      "from": "app/session_actions.gd",
+      "to": "app/battle/session/session_actions.gd",
+      "phase": "P4b",
+      "note": "battle session",
+      "status": "moved",
+      "package": "app/battle"
+    },
+    {
+      "from": "app/user_storage.gd",
+      "to": "app/saves/user_storage.gd",
+      "phase": "P4b",
+      "note": "platform storage",
+      "status": "moved",
+      "package": "app/saves"
+    },
+    {
+      "from": "composition_contract.gd",
+      "to": "composition_contract.gd",
+      "phase": "P0",
+      "note": "wire contract",
+      "status": "retained",
+      "package": "root"
+    },
+    {
+      "from": "main.gd",
+      "to": "main.gd",
+      "phase": "P0",
+      "note": "composition root",
+      "status": "retained",
+      "package": "root"
+    },
+    {
+      "from": "menu.gd",
+      "to": "menu.gd",
+      "phase": "P0",
+      "note": "menu composition root",
+      "status": "retained",
+      "package": "root"
+    },
+    {
+      "from": "presentation/audio/bgm.gd",
+      "to": "presentation/audio/bgm.gd",
+      "phase": "P0",
+      "note": "already in target audio package",
+      "status": "retained",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/audio/generated_audio.gd",
+      "to": "presentation/audio/generated_audio.gd",
+      "phase": "P0",
+      "note": "already in target audio package",
+      "status": "retained",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/audio/sfx.gd",
+      "to": "presentation/audio/sfx.gd",
+      "phase": "P0",
+      "note": "already in target audio package",
+      "status": "retained",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/art_catalog.gd",
+      "to": "presentation/battle/resources/art_catalog.gd",
+      "phase": "P4a",
+      "note": "resources",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/battle_fog.gd",
+      "to": "presentation/battle/world/battle_fog.gd",
+      "phase": "P4a",
+      "note": "map world visual",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/battle_minimap.gd",
+      "to": "presentation/battle/hud/battle_minimap.gd",
+      "phase": "P4a",
+      "note": "hud",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/battle_resources.gd",
+      "to": "presentation/battle/world/battle_resources.gd",
+      "phase": "P4a",
+      "note": "world",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/battle_view.gd",
+      "to": "presentation/battle/view/battle_view.gd",
+      "phase": "P4a",
+      "note": "view",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/battle_view_context.gd",
+      "to": "presentation/battle/view/battle_view_context.gd",
+      "phase": "P4a",
+      "note": "view",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/build_preview.gd",
+      "to": "presentation/battle/world/build_preview.gd",
+      "phase": "P4a",
+      "note": "world",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/components/battle_view_state.gd",
+      "to": "presentation/battle/view/battle_view_state.gd",
+      "phase": "P4a",
+      "note": "view",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/components/camera_controller.gd",
+      "to": "presentation/battle/camera/camera_controller.gd",
+      "phase": "P4a",
+      "note": "camera",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/components/command_actions.gd",
+      "to": "presentation/battle/command/command_actions.gd",
+      "phase": "P4a",
+      "note": "command panel",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/components/command_art.gd",
+      "to": "presentation/battle/command/command_art.gd",
+      "phase": "P4a",
+      "note": "command panel",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/components/command_model.gd",
+      "to": "presentation/battle/command/command_model.gd",
+      "phase": "P4a",
+      "note": "command panel",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/components/controller.gd",
+      "to": "presentation/battle/view/controller.gd",
+      "phase": "P4a",
+      "note": "intro/end view component",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/components/hud_build.gd",
+      "to": "presentation/battle/hud/hud_build.gd",
+      "phase": "P4a",
+      "note": "hud",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/components/hud_input.gd",
+      "to": "presentation/battle/input/hud_input.gd",
+      "phase": "P4a",
+      "note": "input",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/components/hud_layout.gd",
+      "to": "presentation/battle/hud/hud_layout.gd",
+      "phase": "P4a",
+      "note": "hud",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/components/legacy_layout.gd",
+      "to": "presentation/battle/view/legacy_layout.gd",
+      "phase": "P4a",
+      "note": "retained as an active painted HUD layout",
+      "status": "moved",
+      "package": null
+    },
+    {
+      "from": "presentation/battle/components/selection_info.gd",
+      "to": "presentation/battle/units/selection_info.gd",
+      "phase": "P4a",
+      "note": "units",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/components/unit_visuals.gd",
+      "to": "presentation/battle/units/unit_visuals.gd",
+      "phase": "P4a",
+      "note": "units",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/components/world_layers.gd",
+      "to": "presentation/battle/world/world_layers.gd",
+      "phase": "P4a",
+      "note": "world",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/event_diagnostics.gd",
+      "to": "presentation/battle/view/event_diagnostics.gd",
+      "phase": "P4a",
+      "note": "view",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/full_art_catalog.gd",
+      "to": "presentation/battle/resources/full_art_catalog.gd",
+      "phase": "P4a",
+      "note": "resources",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/gate_module.gd",
+      "to": "presentation/battle/world/gate_module.gd",
+      "phase": "P4a",
+      "note": "world",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/gate_occlusion.gd",
+      "to": "presentation/battle/world/gate_occlusion.gd",
+      "phase": "P4a",
+      "note": "world",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/projectile_view.gd",
+      "to": "presentation/battle/effects/projectile_view.gd",
+      "phase": "P4a",
+      "note": "effects",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/runtime_textures.gd",
+      "to": "presentation/battle/resources/runtime_textures.gd",
+      "phase": "P4a",
+      "note": "resources",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/terrain_stream.gd",
+      "to": "presentation/battle/world/terrain_stream.gd",
+      "phase": "P4a",
+      "note": "world",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/view_math.gd",
+      "to": "presentation/battle/camera/view_math.gd",
+      "phase": "P4a",
+      "note": "camera",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/battle/world_nodes.gd",
+      "to": "presentation/battle/world/world_nodes.gd",
+      "phase": "P4a",
+      "note": "world",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/hud/battle_chrome.gd",
+      "to": "presentation/battle/hud/battle_chrome.gd",
+      "phase": "P4a",
+      "note": "battle hud",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/hud/battle_completion.gd",
+      "to": "presentation/battle/hud/battle_completion.gd",
+      "phase": "P4a",
+      "note": "battle hud",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/hud/battle_hud_panel.gd",
+      "to": "presentation/battle/hud/battle_hud_panel.gd",
+      "phase": "P4a",
+      "note": "battle hud",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/hud/battle_menu.gd",
+      "to": "presentation/screens/battle_menu.gd",
+      "phase": "P4a",
+      "note": "modal screen",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/hud/battle_skin.gd",
+      "to": "presentation/battle/hud/battle_skin.gd",
+      "phase": "P4a",
+      "note": "battle hud",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/hud/cheat_console.gd",
+      "to": "presentation/battle/hud/cheat_console.gd",
+      "phase": "P4a",
+      "note": "battle hud",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/hud/command_catalog.gd",
+      "to": "presentation/battle/command/command_catalog.gd",
+      "phase": "P4a",
+      "note": "command panel",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/hud/hud_metrics.gd",
+      "to": "presentation/battle/hud/hud_metrics.gd",
+      "phase": "P4a",
+      "note": "battle hud",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/hud/mission_briefing.gd",
+      "to": "presentation/battle/hud/mission_briefing.gd",
+      "phase": "P4a",
+      "note": "battle hud",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/hud/officer_portrait.gd",
+      "to": "presentation/battle/hud/officer_portrait.gd",
+      "phase": "P4a",
+      "note": "battle hud",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/hud/ornate_frame.gd",
+      "to": "presentation/battle/hud/ornate_frame.gd",
+      "phase": "P4a",
+      "note": "battle hud",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/hud/save_slots_dialog.gd",
+      "to": "presentation/shared/dialogs/save_slots_dialog.gd",
+      "phase": "P4a",
+      "note": "shared dialog",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/hud/software_cursor.gd",
+      "to": "presentation/shell/software_cursor.gd",
+      "phase": "P5",
+      "note": "persistent presentation host",
+      "status": "moved",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/media/event_view.gd",
+      "to": "presentation/media/event_view.gd",
+      "phase": "P0",
+      "note": "already in target media package",
+      "status": "retained",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/menu/campaign_dialog.gd",
+      "to": "presentation/menu/campaign_dialog.gd",
+      "phase": "P0",
+      "note": "already in target menu package",
+      "status": "retained",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/menu/controller.gd",
+      "to": "presentation/menu/controller.gd",
+      "phase": "P0",
+      "note": "already in target menu package",
+      "status": "retained",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/menu/level_dialog.gd",
+      "to": "presentation/menu/level_dialog.gd",
+      "phase": "P0",
+      "note": "already in target menu package",
+      "status": "retained",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/menu/menu_state.gd",
+      "to": "presentation/menu/menu_state.gd",
+      "phase": "P0",
+      "note": "already in target menu package",
+      "status": "retained",
+      "package": "presentation"
+    },
+    {
+      "from": "presentation/menu/menu_styles.gd",
+      "to": "presentation/menu/menu_styles.gd",
+      "phase": "P0",
+      "note": "already in target menu package",
+      "status": "retained",
+      "package": "presentation"
+    },
+    {
+      "from": "property_contract.gd",
+      "to": "property_contract.gd",
+      "phase": "P0",
+      "note": "property contract",
+      "status": "retained",
+      "package": "root"
+    },
+    {
+      "from": "simulation/battle/abilities.gd",
+      "to": "simulation/combat/abilities.gd",
+      "phase": "P2",
+      "note": "combat",
+      "status": "moved",
+      "package": "simulation/combat"
+    },
+    {
+      "from": "simulation/battle/ai_economy.gd",
+      "to": "simulation/ai/ai_economy.gd",
+      "phase": "P2",
+      "note": "ai",
+      "status": "moved",
+      "package": "simulation/ai"
+    },
+    {
+      "from": "simulation/battle/ai_orders.gd",
+      "to": "simulation/ai/ai_orders.gd",
+      "phase": "P2",
+      "note": "ai",
+      "status": "moved",
+      "package": "simulation/ai"
+    },
+    {
+      "from": "simulation/battle/battle_simulation.gd",
+      "to": "simulation/world/battle_simulation.gd",
+      "phase": "P1",
+      "note": "tick driver",
+      "status": "moved",
+      "package": "simulation/world"
+    },
+    {
+      "from": "simulation/battle/campaign.gd",
+      "to": "simulation/scenario/campaign.gd",
+      "phase": "P2",
+      "note": "scenario",
+      "status": "moved",
+      "package": "simulation/scenario"
+    },
+    {
+      "from": "simulation/battle/cheat_rules.gd",
+      "to": null,
+      "phase": "P4d",
+      "note": "split into simulation/ai/auto_control.gd + simulation/cheats/cheat_actions.gd",
+      "status": "deleted",
+      "package": "simulation/cheats"
+    },
+    {
+      "from": "simulation/battle/combat.gd",
+      "to": "simulation/combat/combat.gd",
+      "phase": "P2",
+      "note": "combat",
+      "status": "moved",
+      "package": "simulation/combat"
+    },
+    {
+      "from": "simulation/battle/command_groups.gd",
+      "to": "simulation/commands/command_groups.gd",
+      "phase": "P2",
+      "note": "commands",
+      "status": "moved",
+      "package": "simulation/commands"
+    },
+    {
+      "from": "simulation/battle/construction_orders.gd",
+      "to": "simulation/construction/construction_orders.gd",
+      "phase": "P2",
+      "note": "construction",
+      "status": "moved",
+      "package": "simulation/construction"
+    },
+    {
+      "from": "simulation/battle/entity_factory.gd",
+      "to": "simulation/units/entity_factory.gd",
+      "phase": "P2",
+      "note": "units",
+      "status": "moved",
+      "package": "simulation/units"
+    },
+    {
+      "from": "simulation/battle/harvest_orders.gd",
+      "to": "simulation/economy/harvest_orders.gd",
+      "phase": "P2",
+      "note": "economy",
+      "status": "moved",
+      "package": "simulation/economy"
+    },
+    {
+      "from": "simulation/battle/interaction_paths.gd",
+      "to": "simulation/navigation/interaction_paths.gd",
+      "phase": "P2",
+      "note": "navigation",
+      "status": "moved",
+      "package": "simulation/navigation"
+    },
+    {
+      "from": "simulation/battle/movement.gd",
+      "to": "simulation/movement/movement.gd",
+      "phase": "P2",
+      "note": "movement",
+      "status": "moved",
+      "package": "simulation/movement"
+    },
+    {
+      "from": "simulation/battle/officer_pool.gd",
+      "to": "simulation/officers/officer_pool.gd",
+      "phase": "P2",
+      "note": "officers",
+      "status": "moved",
+      "package": "simulation/officers"
+    },
+    {
+      "from": "simulation/battle/officer_teams.gd",
+      "to": "simulation/officers/officer_teams.gd",
+      "phase": "P2",
+      "note": "officers",
+      "status": "moved",
+      "package": "simulation/officers"
+    },
+    {
+      "from": "simulation/battle/production.gd",
+      "to": "simulation/production/production.gd",
+      "phase": "P2",
+      "note": "production",
+      "status": "moved",
+      "package": "simulation/production"
+    },
+    {
+      "from": "simulation/battle/selection.gd",
+      "to": "simulation/commands/selection.gd",
+      "phase": "P2",
+      "note": "commands",
+      "status": "moved",
+      "package": "simulation/commands"
+    },
+    {
+      "from": "simulation/battle/spatial_index.gd",
+      "to": "simulation/navigation/spatial_index.gd",
+      "phase": "P2",
+      "note": "navigation",
+      "status": "moved",
+      "package": "simulation/navigation"
+    },
+    {
+      "from": "simulation/battle/technology.gd",
+      "to": "simulation/technology/technology.gd",
+      "phase": "P2",
+      "note": "technology",
+      "status": "moved",
+      "package": "simulation/technology"
+    },
+    {
+      "from": "simulation/battle/transport_orders.gd",
+      "to": "simulation/transport/transport_orders.gd",
+      "phase": "P2",
+      "note": "transport",
+      "status": "moved",
+      "package": "simulation/transport"
+    },
+    {
+      "from": "simulation/battle/unit_actions.gd",
+      "to": "simulation/world/unit_tick_coordinator.gd",
+      "phase": "P6",
+      "note": "split: tick coordinator + units/unit_lifecycle + behavior steps to domains",
+      "status": "renamed",
+      "package": "simulation/world"
+    },
+    {
+      "from": "simulation/battle/world_orders.gd",
+      "to": "simulation/commands/world_orders.gd",
+      "phase": "P2",
+      "note": "commands",
+      "status": "moved",
+      "package": "simulation/commands"
+    },
+    {
+      "from": "simulation/battle_config.gd",
+      "to": "simulation/definitions/battle_config.gd",
+      "phase": "P1",
+      "note": "definitions",
+      "status": "moved",
+      "package": "simulation/definitions"
+    },
+    {
+      "from": "simulation/battle_effects.gd",
+      "to": "simulation/ports/battle_events.gd",
+      "phase": "P1",
+      "note": "renamed; concrete scene-free output port",
+      "status": "renamed",
+      "package": "simulation/ports"
+    },
+    {
+      "from": "simulation/battle_state.gd",
+      "to": "simulation/state/battle_state.gd",
+      "phase": "P1",
+      "note": "shared state container",
+      "status": "moved",
+      "package": "simulation/state"
+    },
+    {
+      "from": "simulation/battle_state_fields.gd",
+      "to": "simulation/state/battle_state_fields.gd",
+      "phase": "P1",
+      "note": "snapshot field policy",
+      "status": "moved",
+      "package": "simulation/state"
+    },
+    {
+      "from": "simulation/battle_world.gd",
+      "to": "simulation/world/battle_world.gd",
+      "phase": "P1",
+      "note": "composition root",
+      "status": "moved",
+      "package": "simulation/world"
+    },
+    {
+      "from": "simulation/definitions/action_visual.gd",
+      "to": "simulation/definitions/timing/action_visual.gd",
+      "phase": "P2",
+      "note": "read-only timing contract",
+      "status": "moved",
+      "package": "simulation/definitions"
+    },
+    {
+      "from": "simulation/definitions/balance_rules.gd",
+      "to": "simulation/definitions/balance_rules.gd",
+      "phase": "P2",
+      "note": "definitions",
+      "status": "retained",
+      "package": "simulation/definitions"
+    },
+    {
+      "from": "simulation/definitions/constant_contract.gd",
+      "to": "simulation/definitions/contracts/constant_contract.gd",
+      "phase": "P1",
+      "note": "contracts",
+      "status": "moved",
+      "package": "simulation/definitions"
+    },
+    {
+      "from": "simulation/definitions/death_visual.gd",
+      "to": "simulation/definitions/timing/death_visual.gd",
+      "phase": "P2",
+      "note": "read-only timing contract",
+      "status": "moved",
+      "package": "simulation/definitions"
+    },
+    {
+      "from": "simulation/definitions/frozen_data.gd",
+      "to": "simulation/definitions/frozen_data.gd",
+      "phase": "P2",
+      "note": "definitions",
+      "status": "retained",
+      "package": "simulation/definitions"
+    },
+    {
+      "from": "simulation/definitions/officer_grades.gd",
+      "to": "simulation/definitions/officer_grades.gd",
+      "phase": "P2",
+      "note": "definitions",
+      "status": "retained",
+      "package": "simulation/definitions"
+    },
+    {
+      "from": "simulation/definitions/opening_officers.gd",
+      "to": "app/battle/startup/opening_officers.gd",
+      "phase": "P4b",
+      "note": "app startup",
+      "status": "moved",
+      "package": "app/battle"
+    },
+    {
+      "from": "simulation/definitions/profile_clock.gd",
+      "to": "simulation/core/profile_clock.gd",
+      "phase": "P1",
+      "note": "clock mechanism",
+      "status": "moved",
+      "package": "simulation/core"
+    },
+    {
+      "from": "simulation/definitions/resource_cost.gd",
+      "to": "simulation/definitions/resource_cost.gd",
+      "phase": "P2",
+      "note": "definitions",
+      "status": "retained",
+      "package": "simulation/definitions"
+    },
+    {
+      "from": "simulation/definitions/rule_catalog.gd",
+      "to": "simulation/definitions/rule_catalog.gd",
+      "phase": "P2",
+      "note": "definitions",
+      "status": "retained",
+      "package": "simulation/definitions"
+    },
+    {
+      "from": "simulation/definitions/rule_contract.gd",
+      "to": "simulation/definitions/contracts/rule_contract.gd",
+      "phase": "P1",
+      "note": "contracts",
+      "status": "moved",
+      "package": "simulation/definitions"
+    },
+    {
+      "from": "simulation/definitions/scenario_contract.gd",
+      "to": "simulation/scenario/scenario_contract.gd",
+      "phase": "P1",
+      "note": "scenario",
+      "status": "moved",
+      "package": "simulation/scenario"
+    },
+    {
+      "from": "simulation/definitions/status_fields.gd",
+      "to": "simulation/definitions/status_fields.gd",
+      "phase": "P2",
+      "note": "definitions",
+      "status": "retained",
+      "package": "simulation/definitions"
+    },
+    {
+      "from": "simulation/definitions/technology_rules.gd",
+      "to": "simulation/definitions/technology_rules.gd",
+      "phase": "P2",
+      "note": "definitions",
+      "status": "retained",
+      "package": "simulation/definitions"
+    },
+    {
+      "from": "simulation/definitions/unit_roles.gd",
+      "to": "simulation/definitions/unit_roles.gd",
+      "phase": "P2",
+      "note": "definitions",
+      "status": "retained",
+      "package": "simulation/definitions"
+    },
+    {
+      "from": "simulation/definitions/unit_schema.gd",
+      "to": "simulation/units/unit_schema.gd",
+      "phase": "P1",
+      "note": "unit schema",
+      "status": "moved",
+      "package": "simulation/units"
+    },
+    {
+      "from": "simulation/native/math_kernel.gd",
+      "to": "simulation/native/math_kernel.gd",
+      "phase": "P3",
+      "note": "retained native backend",
+      "status": "retained",
+      "package": "simulation/native"
+    },
+    {
+      "from": "simulation/navigation/automatic_gates.gd",
+      "to": "simulation/navigation/automatic_gates.gd",
+      "phase": "P3",
+      "note": "already in target navigation package",
+      "status": "retained",
+      "package": "simulation/navigation"
+    },
+    {
+      "from": "simulation/navigation/grid_ray.gd",
+      "to": "simulation/navigation/grid_ray.gd",
+      "phase": "P3",
+      "note": "already in target navigation package",
+      "status": "retained",
+      "package": "simulation/navigation"
+    },
+    {
+      "from": "simulation/navigation/nav.gd",
+      "to": "simulation/navigation/nav.gd",
+      "phase": "P3",
+      "note": "already in target navigation package",
+      "status": "retained",
+      "package": "simulation/navigation"
+    },
+    {
+      "from": "simulation/navigation/navigation_grid.gd",
+      "to": "simulation/navigation/navigation_grid.gd",
+      "phase": "P3",
+      "note": "already in target navigation package",
+      "status": "retained",
+      "package": "simulation/navigation"
+    },
+    {
+      "from": "simulation/navigation/navigation_state.gd",
+      "to": "simulation/navigation/navigation_state.gd",
+      "phase": "P3",
+      "note": "already in target navigation package",
+      "status": "retained",
+      "package": "simulation/navigation"
+    },
+    {
+      "from": "simulation/navigation/path_queries.gd",
+      "to": "simulation/navigation/path_queries.gd",
+      "phase": "P3",
+      "note": "already in target navigation package",
+      "status": "retained",
+      "package": "simulation/navigation"
+    },
+    {
+      "from": "simulation/queries/construction_roster.gd",
+      "to": "simulation/construction/construction_roster.gd",
+      "phase": "P3",
+      "note": "split to economy/construction",
+      "status": "moved",
+      "package": "simulation/construction"
+    },
+    {
+      "from": "simulation/queries/resource_index.gd",
+      "to": "simulation/economy/resource_index.gd",
+      "phase": "P3",
+      "note": "split to economy/construction",
+      "status": "moved",
+      "package": "simulation/economy"
+    },
+    {
+      "from": "simulation/session_state.gd",
+      "to": "simulation/session/session_state.gd",
+      "phase": "P1",
+      "note": "session data",
+      "status": "moved",
+      "package": "simulation/session"
+    },
+    {
+      "from": "simulation/systems/action_clock.gd",
+      "to": "simulation/movement/action_clock.gd",
+      "phase": "P2",
+      "note": "movement",
+      "status": "moved",
+      "package": "simulation/movement"
+    },
+    {
+      "from": "simulation/systems/ai.gd",
+      "to": "simulation/ai/ai.gd",
+      "phase": "P2",
+      "note": "ai",
+      "status": "moved",
+      "package": "simulation/ai"
+    },
+    {
+      "from": "simulation/systems/ai_config.gd",
+      "to": "simulation/ai/ai_config.gd",
+      "phase": "P2",
+      "note": "ai",
+      "status": "moved",
+      "package": "simulation/ai"
+    },
+    {
+      "from": "simulation/systems/ai_decisions.gd",
+      "to": "simulation/ai/ai_decisions.gd",
+      "phase": "P2",
+      "note": "ai",
+      "status": "moved",
+      "package": "simulation/ai"
+    },
+    {
+      "from": "simulation/systems/ai_naval_slots.gd",
+      "to": "simulation/ai/ai_naval_slots.gd",
+      "phase": "P2",
+      "note": "ai",
+      "status": "moved",
+      "package": "simulation/ai"
+    },
+    {
+      "from": "simulation/systems/ai_state.gd",
+      "to": "simulation/ai/ai_state.gd",
+      "phase": "P2",
+      "note": "ai",
+      "status": "moved",
+      "package": "simulation/ai"
+    },
+    {
+      "from": "simulation/systems/ai_targets.gd",
+      "to": "simulation/ai/ai_targets.gd",
+      "phase": "P2",
+      "note": "ai",
+      "status": "moved",
+      "package": "simulation/ai"
+    },
+    {
+      "from": "simulation/systems/ai_training_slots.gd",
+      "to": "simulation/ai/ai_training_slots.gd",
+      "phase": "P2",
+      "note": "ai",
+      "status": "moved",
+      "package": "simulation/ai"
+    },
+    {
+      "from": "simulation/systems/animation_rules.gd",
+      "to": "simulation/combat/animation_rules.gd",
+      "phase": "P2",
+      "note": "combat",
+      "status": "moved",
+      "package": "simulation/combat"
+    },
+    {
+      "from": "simulation/systems/battle_clock.gd",
+      "to": "simulation/core/battle_clock.gd",
+      "phase": "P2",
+      "note": "clock mechanism",
+      "status": "moved",
+      "package": "simulation/core"
+    },
+    {
+      "from": "simulation/systems/battle_visibility.gd",
+      "to": "simulation/visibility/battle_visibility.gd",
+      "phase": "P2",
+      "note": "visibility",
+      "status": "moved",
+      "package": "simulation/visibility"
+    },
+    {
+      "from": "simulation/systems/building_rules.gd",
+      "to": "simulation/definitions/building_rules.gd",
+      "phase": "P2",
+      "note": "definitions",
+      "status": "moved",
+      "package": "simulation/definitions"
+    },
+    {
+      "from": "simulation/systems/combat_rules.gd",
+      "to": "simulation/definitions/combat_rules.gd",
+      "phase": "P2",
+      "note": "definitions",
+      "status": "moved",
+      "package": "simulation/definitions"
+    },
+    {
+      "from": "simulation/systems/command_rules.gd",
+      "to": "simulation/commands/command_policy.gd",
+      "phase": "P2",
+      "note": "renamed command_policy",
+      "status": "renamed",
+      "package": "simulation/commands"
+    },
+    {
+      "from": "simulation/systems/construction_interior.gd",
+      "to": "simulation/construction/construction_interior.gd",
+      "phase": "P2",
+      "note": "construction",
+      "status": "moved",
+      "package": "simulation/construction"
+    },
+    {
+      "from": "simulation/systems/economy.gd",
+      "to": "simulation/economy/economy.gd",
+      "phase": "P2",
+      "note": "economy",
+      "status": "moved",
+      "package": "simulation/economy"
+    },
+    {
+      "from": "simulation/systems/engagement.gd",
+      "to": "simulation/combat/engagement.gd",
+      "phase": "P2",
+      "note": "combat",
+      "status": "moved",
+      "package": "simulation/combat"
+    },
+    {
+      "from": "simulation/systems/fire_fields.gd",
+      "to": "simulation/combat/fire_fields.gd",
+      "phase": "P2",
+      "note": "combat",
+      "status": "moved",
+      "package": "simulation/combat"
+    },
+    {
+      "from": "simulation/systems/harvesting.gd",
+      "to": "simulation/economy/harvesting.gd",
+      "phase": "P2",
+      "note": "economy",
+      "status": "moved",
+      "package": "simulation/economy"
+    },
+    {
+      "from": "simulation/systems/locomotion.gd",
+      "to": "simulation/movement/locomotion.gd",
+      "phase": "P2",
+      "note": "movement",
+      "status": "moved",
+      "package": "simulation/movement"
+    },
+    {
+      "from": "simulation/systems/officer_progression.gd",
+      "to": "simulation/officers/officer_progression.gd",
+      "phase": "P2",
+      "note": "officers",
+      "status": "moved",
+      "package": "simulation/officers"
+    },
+    {
+      "from": "simulation/systems/player_commands.gd",
+      "to": "simulation/commands/player_commands.gd",
+      "phase": "P2",
+      "note": "commands",
+      "status": "moved",
+      "package": "simulation/commands"
+    },
+    {
+      "from": "simulation/systems/projectiles.gd",
+      "to": "simulation/combat/projectiles.gd",
+      "phase": "P2",
+      "note": "combat",
+      "status": "moved",
+      "package": "simulation/combat"
+    },
+    {
+      "from": "simulation/systems/scenario_rules.gd",
+      "to": "simulation/scenario/scenario_rules.gd",
+      "phase": "P2",
+      "note": "scenario",
+      "status": "moved",
+      "package": "simulation/scenario"
+    },
+    {
+      "from": "simulation/systems/state_digest.gd",
+      "to": "simulation/diagnostics/state_digest.gd",
+      "phase": "P1",
+      "note": "deterministic evidence",
+      "status": "moved",
+      "package": "simulation/diagnostics"
+    },
+    {
+      "from": "simulation/systems/stratagem_rules.gd",
+      "to": "simulation/combat/stratagem_rules.gd",
+      "phase": "P2",
+      "note": "combat",
+      "status": "moved",
+      "package": "simulation/combat"
+    },
+    {
+      "from": "simulation/systems/technology_state.gd",
+      "to": "simulation/technology/technology_state.gd",
+      "phase": "P2",
+      "note": "technology",
+      "status": "moved",
+      "package": "simulation/technology"
+    },
+    {
+      "from": "simulation/systems/tick_timers.gd",
+      "to": "simulation/movement/tick_timers.gd",
+      "phase": "P2",
+      "note": "movement",
+      "status": "moved",
+      "package": "simulation/movement"
+    },
+    {
+      "from": "simulation/systems/transports.gd",
+      "to": "simulation/transport/transports.gd",
+      "phase": "P2",
+      "note": "transport",
+      "status": "moved",
+      "package": "simulation/transport"
+    },
+    {
+      "from": "simulation/systems/unit_footprint.gd",
+      "to": "simulation/navigation/unit_footprint.gd",
+      "phase": "P2",
+      "note": "navigation",
+      "status": "moved",
+      "package": "simulation/navigation"
+    },
+    {
+      "from": "simulation/systems/unit_rules.gd",
+      "to": "simulation/definitions/unit_rules.gd",
+      "phase": "P2",
+      "note": "definitions",
+      "status": "moved",
+      "package": "simulation/definitions"
+    },
+    {
+      "from": "testing/driver/battle_selftest.gd",
+      "to": "testing/driver/battle_selftest.gd",
+      "phase": "P6",
+      "note": "driver",
+      "status": "moved",
+      "package": "testing"
+    },
+    {
+      "from": "testing/benchmark/full_battle_benchmark.gd",
+      "to": "testing/benchmark/full_battle_benchmark.gd",
+      "phase": "P6",
+      "note": "benchmark",
+      "status": "moved",
+      "package": "testing"
+    },
+    {
+      "from": "testing/checks/gathering_checks.gd",
+      "to": "testing/checks/gathering_checks.gd",
+      "phase": "P6",
+      "note": "checks",
+      "status": "moved",
+      "package": "testing"
+    },
+    {
+      "from": "testing/checks/groups_checks.gd",
+      "to": "testing/checks/groups_checks.gd",
+      "phase": "P6",
+      "note": "checks",
+      "status": "moved",
+      "package": "testing"
+    },
+    {
+      "from": "testing/native/native_save_acceptance.gd",
+      "to": "testing/native/native_save_acceptance.gd",
+      "phase": "P6",
+      "note": "native acceptance",
+      "status": "moved",
+      "package": "testing"
+    },
+    {
+      "from": "testing/checks/navigation_checks.gd",
+      "to": "testing/checks/navigation_checks.gd",
+      "phase": "P6",
+      "note": "checks",
+      "status": "moved",
+      "package": "testing"
+    },
+    {
+      "from": "testing/checks/technology_checks.gd",
+      "to": "testing/checks/technology_checks.gd",
+      "phase": "P6",
+      "note": "checks",
+      "status": "moved",
+      "package": "testing"
+    }
+  ],
+  "added": [
+    {
+      "to": "testing/automation/acceptance_hook.gd",
+      "phase": "P6",
+      "reason": "acceptance-only dispatcher"
+    },
+    {
+      "to": "simulation/movement/unit_path.gd",
+      "phase": "P6",
+      "reason": "Movement-owned path replacement"
+    },
+    {
+      "to": "testing/checks/checks_base.gd",
+      "phase": "P6",
+      "reason": "shared check base"
+    },
+    {
+      "to": "presentation/menu/menu_catalog.gd",
+      "phase": "P6",
+      "reason": "menu constants"
+    },
+    {
+      "to": "presentation/shared/dialogs/dialog_builder.gd",
+      "phase": "P6",
+      "reason": "shared dialog builder"
+    },
+    {
+      "to": "simulation/ai/auto_control.gd",
+      "phase": "P4d",
+      "reason": "auto-control policy (business owner AI)"
+    },
+    {
+      "to": "simulation/cheats/cheat_actions.gd",
+      "phase": "P4d",
+      "reason": "cheat actions"
+    },
+    {
+      "to": "presentation/shell/presentation_host.gd",
+      "phase": "P5",
+      "reason": "persistent presentation host"
+    },
+    {
+      "to": "simulation/units/unit_lifecycle.gd",
+      "phase": "P6",
+      "reason": "unit lifecycle"
+    },
+    {
+      "to": "app/read_models/unit_queries.gd",
+      "phase": "P6",
+      "reason": "battle query split"
+    },
+    {
+      "to": "app/read_models/map_queries.gd",
+      "phase": "P6",
+      "reason": "battle query split"
+    },
+    {
+      "to": "app/read_models/command_queries.gd",
+      "phase": "P6",
+      "reason": "battle query split"
+    },
+    {
+      "to": "app/read_models/battle_status_queries.gd",
+      "phase": "P6",
+      "reason": "battle query split"
+    },
+    {
+      "to": "presentation/battle/view/battle_presentation_factory.gd",
+      "phase": "P5",
+      "reason": "Presentation factory injected from the scene root"
+    },
+    {
+      "to": "simulation/cheats/cheat_session.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/combat/combat_state.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/commands/command_state.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/construction/work_state.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/economy/resource_state.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/movement/unit_motion.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/navigation/index_state.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/navigation/unit_position.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/officers/officer_state.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/production/training_queue.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/scenario/scenario_state.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/session/session_options.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/transport/manifest_state.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "simulation/world/world_inputs.gd",
+      "phase": "P7",
+      "reason": "Domain-owned state mutation entry point"
+    },
+    {
+      "to": "app/battle/runtime/battle_runtime.gd",
+      "phase": "P5",
+      "reason": "application lifecycle split from scene controller"
+    },
+    {
+      "to": "app/battle/runtime/battle_runtime_state.gd",
+      "phase": "P5",
+      "reason": "app save/ready state split from scene state"
+    },
+    {
+      "to": "presentation/battle/controller/battle_input_controller.gd",
+      "phase": "P5",
+      "reason": "input policy split from scene controller"
+    },
+    {
+      "to": "presentation/battle/controller/battle_frame_controller.gd",
+      "phase": "P5",
+      "reason": "frame/HUD policy split from scene controller"
+    },
+    {
+      "to": "presentation/battle/input/cheat_input.gd",
+      "phase": "P5",
+      "reason": "cheat console lifecycle"
+    },
+    {
+      "to": "presentation/battle/view/battle_presentation_state.gd",
+      "phase": "P5",
+      "reason": "presentation nodes/UI state"
+    },
+    {
+      "to": "app/battle/runtime/view_ops.gd",
+      "phase": "P5",
+      "reason": "narrow view transaction capability"
+    }
+  ],
+  "appliedStages": [
+    "P1",
+    "P2",
+    "P3",
+    "P4a",
+    "P4b",
+    "P4c",
+    "P4d",
+    "P5",
+    "P6",
+    "P7"
+  ]
+}
