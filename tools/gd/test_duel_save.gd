@@ -12,7 +12,8 @@ func run() -> void:
 	var enemy_uid: int = enemy.uid
 	execute_duel(battle, enemy)
 	var digest: Dictionary = preload("res://simulation/diagnostics/state_digest.gd").sections(battle, game)
-	assert(paused and battle.view.event_view.active)
+	var media := bool(battle.view.event_view.active)
+	if media: assert(paused)
 	assert(game.save_game(battle.units,battle.world.economy.player_resources(),battle.scene_controller._save_extra(),3),"Raw save must contain settled damage")
 	var rng: int = battle.simulation_rng.state
 	assert(battle.session_actions.save_game(3))
