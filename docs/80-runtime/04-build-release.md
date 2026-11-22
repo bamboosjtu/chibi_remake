@@ -96,7 +96,7 @@ GitHub Actions 只有一个 `ci` 工作流、四个作业：`contracts`（静态
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/release.ps1 -Mode preview
 
 # 发布包：干净工作区构建后分卷到 dist/package
-powershell -NoProfile -ExecutionPolicy Bypass -File tools/release.ps1 -Mode release -Tag v0.1.2
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/release.ps1 -Mode release -Tag v0.1.3
 ```
 
 - `preview` 写入 `release/versions/<时间>_<提交>_<ID>` 并切换 `release/current.json`，双击 `release\ChibiRTS.exe` 即可试玩；`-SkipBuild` 只打印当前版本。
@@ -105,9 +105,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/release.ps1 -Mode rele
 - 手动上传：
 
 ```powershell
-gh release create v0.1.2 dist/package/* --title "三国赤壁 · 高清重制 v0.1.2" --notes-file dist/release-body.md --prerelease
+gh release create v0.1.3 dist/package/* --title "三国赤壁 · 高清重制 v0.1.3" --notes-file dist/release-body.md --prerelease
 # 已存在的 Release：
-gh release upload v0.1.2 dist/package/* --clobber
+gh release upload v0.1.3 dist/package/* --clobber
 ```
 
 - 下载包后先运行 `join-release.ps1` 合并分卷并校验 SHA256，再启动 `ChibiRTS.exe`。

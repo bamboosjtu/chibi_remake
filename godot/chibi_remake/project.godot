@@ -22,7 +22,7 @@ PresentationHost="*res://presentation/shell/presentation_host.gd"
 config/name="三国赤壁 高清重制"
 config/description="非官方社区 MOD；致敬 1997《三国赤壁》与 1994《三国演义》。"
 run/main_scene="res://menu.tscn"
-config/version="0.1.2"
+config/version="0.1.3"
 config/chibi_hud_layout="painted"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 
