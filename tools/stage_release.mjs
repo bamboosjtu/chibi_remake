@@ -22,6 +22,8 @@ const snapshot=commit?readReleaseSnapshot(commit):null;
 const generated=file=>file.startsWith('art/full/terrain_chunks/');
 const resolveInput=file=>path.join(generated(file)?terrainRoot:source,file);
 const hasSource=file=>snapshot?snapshot.has(file):fs.existsSync(path.join(source,file));
+// Videos are local-only (never committed); treat the working copy as the source.
+const localVideo=file=>{const rel=file.replace(/^res:\/\//,'');return fs.existsSync(path.join(source,rel));};
 const readSource=file=>{
   if(!snapshot)return fs.readFileSync(path.join(source,file),'utf8');
   if(!snapshot.has(file))throw Error('Release input is not tracked at the build commit: '+file);
@@ -50,7 +52,8 @@ const selected=new Set();
 function add(file){
   file=file.replace(/^res:\/\//,'');
   if(file.includes('..')||path.isAbsolute(file))throw new Error('Unsafe resource path: '+file);
-  if(!(generated(file)?fs.existsSync(resolveInput(file)):hasSource(file)))throw new Error('Missing required resource: '+file);
+  const present=generated(file)||file.startsWith('media/videos/')?fs.existsSync(resolveInput(file)):hasSource(file);
+  if(!present)throw new Error('Missing required resource: '+file);
   selected.add(file);
 }
 // ⚠️ 必须排除点开头的东西：/\\.(gd|tscn|godot)$/ 的本意是匹配 project.godot，
@@ -90,8 +93,10 @@ for(const file of ['cursor-hd-v1.png','cursor-edges-hd-v1.svg'])add('art/full/ui
 // 内置中文字体（Noto Sans CJK SC / SIL OFL）与程序图标：不能依赖玩家系统字体回退。
 for(const file of ['assets/fonts/NotoSansCJKsc-Regular.otf','assets/fonts/OFL.txt','assets/icon.png','assets/icon.ico'])add(file);
 for(const file of listSource('data/db').filter(x=>x.endsWith('.json')))add('data/db/'+file);
+const localCampaign=new Set();
 const events=JSON.parse(readSource('data/db/events.json'));
-// Videos are not part of the package: players build their own from the documented source.
+// Videos are not tracked in Git/LFS; when present locally they ship inside the package.
+for(const event of Object.values(events.events))if(event.video&&localVideo(event.video))add(event.video.replace(/^res:\/\//,''));
 const videoCatalog=JSON.parse(readSource('data/db/video_catalog.json')).files;
 if(!videoCatalog['START.mp4']?.localOnly||Object.hasOwn(videoCatalog,'START.AVI'))throw Error('Startup must declare the private HD intro without a legacy fallback');
 const expectedCampaign=new Set(['START.mp4']);
@@ -99,6 +104,10 @@ for(const [name,entry] of Object.entries(videoCatalog)){
   if(!/^(?:[A-Z0-9]+\.AVI|(?:START|(?:CAO|LIU)[0-9]+[A-Z]?)\.mp4)$/.test(name)||entry.path!=='res://media/videos/'+name)throw Error('Invalid video catalog path: '+name);
   if((entry.localOnly===true)!==name.endsWith('.mp4'))throw Error('Invalid campaign media classification: '+name);
   if(entry.localOnly&&(entry.width!==1280||entry.height!==720||entry.codec!=='h264'||!(/^[a-f0-9]{64}$/).test(entry.sha256)))throw Error('Invalid HD media catalog entry: '+name);
+  if(!localVideo(entry.path))continue;
+  const file='media/videos/'+name, bytes=fs.readFileSync(path.join(source,file));
+  if(bytes.length!==entry.bytes||createHash('sha256').update(bytes).digest('hex')!==entry.sha256)throw Error('Local campaign media differs from catalog: '+name);
+  localCampaign.add(file);selected.add(file);
 }
 // All audio ships: SFX, OGG tracks and the WAV masters used to render them.
 for(const dir of ['media/sfx','media/music']){
@@ -129,7 +138,11 @@ fs.mkdirSync(stage,{recursive:true});
 for(const file of selected){
 
   const target=path.join(stage,file);fs.mkdirSync(path.dirname(target),{recursive:true});
-  if(snapshot&&!generated(file)){
+  if(localCampaign.has(file)){
+    fs.copyFileSync(resolveInput(file),target);
+    const bytes=fs.readFileSync(target),entry=videoCatalog[path.basename(file)];
+    if(bytes.length!==entry.bytes||createHash('sha256').update(bytes).digest('hex')!==entry.sha256)throw Error('Staged local campaign media differs from catalog: '+file);
+  }else if(snapshot&&!generated(file)){
     copyReleaseInput(snapshot,file,resolveInput(file),target);
   }else if(/\.(png|jpg|ogv|bin)$/.test(file)){
     // 已选定的二进制素材只读；同卷构建链接避免数万文件的重复复制。

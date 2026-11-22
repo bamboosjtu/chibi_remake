@@ -48,6 +48,6 @@ Godot 工程入口为 [`godot/chibi_remake/project.godot`](godot/chibi_remake/pr
 
 ## 致谢与权利
 
-感谢 **元茂大人** 的高清过场重制。来源与剪辑时间码见[高清过场素材来源与剪辑记录](campaign-media-provenance.md)。高清过场不分发，玩家可按[权利与分发](docs/95-legal/01-legal.md) §7 用 B 站高清修复母片自行剪辑。
+感谢 **元茂大人** 的高清过场重制。来源与剪辑时间码见[高清过场素材来源与剪辑记录](campaign-media-provenance.md)。高清过场随发布包分发但不进入仓库，来源与自制方法见[权利与分发](docs/95-legal/01-legal.md) §7。
 
 本项目并非官方产品，也未获原作权利人的授权或背书。原作及第三方素材的权利归各自权利人所有；使用者应自行合法持有原版《三国赤壁》。详见[许可](LICENSE)、[致谢与第三方声明](NOTICE.md)及[权利与分发说明](docs/95-legal/01-legal.md)。

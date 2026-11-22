@@ -23,7 +23,7 @@
 
 ## 社区与工具
 
-- 感谢 **元茂大人** 的高清过场重制。署名、母片来源、剪辑时间码与校验记录见仓库的[高清过场素材来源与剪辑记录](https://github.com/bamboosjtu/chibi_remake/blob/main/campaign-media-provenance.md)。此致谢不代表获得再分发授权；高清过场不随本 MOD 分发，玩家需自行制作并仅限个人使用。
+- 感谢 **元茂大人** 的高清过场重制。署名、母片来源、剪辑时间码与校验记录见仓库的[高清过场素材来源与剪辑记录](https://github.com/bamboosjtu/chibi_remake/blob/main/campaign-media-provenance.md)。此致谢不代表获得再分发授权；高清过场随发布包分发但不进入本仓库，玩家自行制作时仅限个人使用。
 - 感谢所有参与测试、提供原版截图与机制反馈的社区成员。
 - 高清素材使用图像生成/超分工具辅助制作，并由项目维护者筛选、切片、接入；逐项来源与提示词见 `godot/chibi_remake/art/production/`。
 - 本项目使用 AI 辅助编写部分代码与文档，最终由维护者审核。

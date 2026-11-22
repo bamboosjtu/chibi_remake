@@ -58,6 +58,9 @@ try {
     node tools/dedupe_terrain.mjs $stage
     if ($LASTEXITCODE -ne 0) { throw 'Terrain deduplication failed' }
     $inputs=Get-Content -Raw (Join-Path $stage 'release_inputs.json') | ConvertFrom-Json
+    $campaignMedia=@($inputs.files | Where-Object { $_ -match '^media/videos/(?:START|(?:CAO|LIU)[0-9]+[A-Z]?)\.mp4$' })
+    if ($inputs.files -contains 'media/videos/START.AVI') { throw 'Retired low-resolution startup must not enter any package' }
+    if ($campaignMedia.Count -gt 0 -and ($campaignMedia.Count -ne 35 -or $campaignMedia -notcontains 'media/videos/START.mp4')) { throw 'Campaign media must stage either none or the startup plus all 34 chapter intros' }
     foreach ($file in $inputs.files) { if (!(Test-Path -LiteralPath (Join-Path $stage $file))) { throw ('Missing staged resource: '+$file) } }
     $log=Join-Path $BuildRoot ('_work/build/import-'+$id+'.log')
     $importCache=Join-Path $BuildRoot '_work/build/import-cache'

@@ -6,7 +6,7 @@
 
 构建依赖 Node.js 22、PowerShell 5.1 或 7、Godot 4.7.2 Windows x86_64 引擎和同版本导出模板。启动器使用 Windows .NET Framework 4 的 `csc.exe` 编译。引擎放在仓库根目录；模板可通过 `CHIBI_GODOT_TEMPLATES` 指定。
 
-标准构建读取已提交的关卡 JSON、规则及 Git LFS 运行素材（不含视频；视频不分发）。最小运行集由 `tools/inputs/runtime_assets.sha256` 声明。`-SkipData` 不读取地图源文件、绘画母版或研究工具。重新导出数据才需要 `_work/iso`、`_work/dec` 与 `_work/hd` 等本地生产输入。
+标准构建读取已提交的关卡 JSON、规则及 Git LFS 运行素材；视频不在 Git/LFS，构建机本地存在时随包。最小运行集由 `tools/inputs/runtime_assets.sha256` 声明。`-SkipData` 不读取地图源文件、绘画母版或研究工具。重新导出数据才需要 `_work/iso`、`_work/dec` 与 `_work/hd` 等本地生产输入。
 
 ## 2. 构建入口
 
@@ -96,7 +96,7 @@ GitHub Actions 只有一个 `ci` 工作流、四个作业：`contracts`（静态
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/release.ps1 -Mode preview
 
 # 发布包：干净工作区构建后分卷到 dist/package
-powershell -NoProfile -ExecutionPolicy Bypass -File tools/release.ps1 -Mode release -Tag v0.1.3
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/release.ps1 -Mode release -Tag v0.1.4
 ```
 
 - `preview` 写入 `release/versions/<时间>_<提交>_<ID>` 并切换 `release/current.json`，双击 `release\ChibiRTS.exe` 即可试玩；`-SkipBuild` 只打印当前版本。
@@ -105,9 +105,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/release.ps1 -Mode rele
 - 手动上传：
 
 ```powershell
-gh release create v0.1.3 dist/package/* --title "三国赤壁 · 高清重制 v0.1.3" --notes-file dist/release-body.md --prerelease
+gh release create v0.1.4 dist/package/* --title "三国赤壁 · 高清重制 v0.1.4" --notes-file dist/release-body.md --prerelease
 # 已存在的 Release：
-gh release upload v0.1.3 dist/package/* --clobber
+gh release upload v0.1.4 dist/package/* --clobber
 ```
 
 - 下载包后先运行 `join-release.ps1` 合并分卷并校验 SHA256，再启动 `ChibiRTS.exe`。

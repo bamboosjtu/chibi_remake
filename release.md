@@ -83,7 +83,7 @@ candidate-<构建ID>/
 
 `-NoPublish` 只生成候选包，不改变 `release/current.json`。
 
-过场素材：35 个 MP4 与 12 个共享 AVI **不分发**，发布包内没有视频；缺视频时运行时跳过播放，不回退到低清视频。音乐、音效与美术由 Git LFS 跟踪。玩家自制方法与逐关时间点见 `docs/95-legal/01-legal.md` §7。
+过场素材：35 个 MP4 与 12 个共享 AVI 放在 `godot/chibi_remake/media/videos/`，**不进入 Git/LFS**，打包时随发布包分发；缺视频时运行时跳过播放。音乐、音效与美术由 Git LFS 跟踪。来源、自制方法与逐关时间点见 `docs/95-legal/01-legal.md` §7。
 
 ## 4. 安装为正式版本
 
