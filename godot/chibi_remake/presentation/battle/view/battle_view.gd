@@ -20,10 +20,6 @@ const GRID_FALLBACK := 8
 var _ui = preload("res://presentation/battle/view/battle_view_state.gd").new()
 var _world_nodes := preload("res://presentation/battle/world/world_nodes.gd").new(_ui)
 
-func stage_world_nodes() -> Dictionary: return _world_nodes.begin()
-func rollback_world_nodes(token: Dictionary) -> void: _world_nodes.rollback(token)
-func commit_world_nodes(token: Dictionary) -> void: _world_nodes.commit(token)
-
 func attach_loaded_world(rows: Array) -> bool:
 	for row: Dictionary in rows:
 		var unit: Dictionary = row.visual
@@ -230,19 +226,107 @@ func scroll_from_pointer(pointer: Vector2, delta: float) -> void:
 func build_terrain() -> void:
 	world_layers.build_terrain()
 
-func prepare_map_terrain(map_id: String) -> Dictionary:
-	return world_layers.terrain_plan(map_id)
+func stage_world_view(preview: Node2D, rows: Array, map_id: String, cross_map: bool) -> Dictionary:
+	var map_plan: Dictionary = world_layers.terrain_plan(map_id) if cross_map else {}
+	if cross_map and map_plan.is_empty(): return {}
+	var token := {"old_nodes": _world_nodes.begin()}
+	var stable_host: Node2D = _ui.host
+	_ui.host = preview
+	var complete := attach_loaded_world(rows)
+	if complete and cross_map:
+		complete = _stage_terrain_exchange(token, map_id, map_plan)
+	_ui.host = stable_host
+	if is_instance_valid(token.get("terrain")): token.terrain.host = stable_host
+	token.nodes = _world_nodes.begin()
+	_world_nodes.activate(token.old_nodes)
+	if not complete:
+		rollback_world_view(token)
+		return {}
+	return token
 
-func stage_map_terrain(map_id: String, plan: Dictionary) -> Node2D:
+func _stage_terrain_exchange(token: Dictionary, map_id: String, plan: Dictionary) -> bool:
+	if _ui.minimap != null:
+		token.minimap = _ui.minimap.prepare_map_texture(map_id)
+		if token.minimap == null: return false
+	token.old_camera = _ui.cam
+	if _ui.cam != null:
+		token.old_position = _ui.cam.position
+		token.old_zoom = _ui.cam.zoom
+	token.old_zoom_override = _ui.zoom_override
 	setup_camera()
-	return world_layers.stage_terrain(map_id, plan, DisplayServer.get_name() != "headless")
+	token.camera = _ui.cam
+	token.position = _ui.cam.position
+	token.zoom = _ui.cam.zoom
+	token.zoom_override = _ui.zoom_override
+	token.terrain = world_layers.stage_terrain(map_id, plan, DisplayServer.get_name() != "headless", _ui.cam)
+	_restore_world_camera(token)
+	if token.terrain == null: return false
+	token.terrain.hide()
+	token.old_terrain = world_layers.terrain
+	return true
 
-func commit_map_terrain(staged: Node2D) -> void:
-	world_layers.commit_terrain(staged)
+func _restore_world_camera(token: Dictionary) -> void:
+	_ui.cam = token.old_camera
+	_ui.zoom_override = token.old_zoom_override
+	if _ui.cam != null:
+		_ui.cam.position = token.old_position
+		_ui.cam.zoom = token.old_zoom
+		_ui.cam.force_update_scroll()
+	else:
+		token.camera.enabled = false
 
-func finish_map_change() -> void:
-	marquee_hide()
-	if _ui.minimap != null: _ui.minimap.reload_map_terrain()
+func apply_world_view_nodes(token: Dictionary) -> bool:
+	if not token.has("nodes"): return false
+	_world_nodes.activate(token.nodes)
+	token.nodes_applied = true
+	return true
+
+func apply_world_view_terrain(token: Dictionary) -> bool:
+	if not is_instance_valid(token.get("terrain")): return false
+	world_layers.terrain = token.terrain
+	token.terrain.show()
+	_ui.cam = token.camera
+	_ui.zoom_override = token.zoom_override
+	if token.old_camera == null:
+		_ui.cam.enabled = true
+		_ui.cam.make_current()
+	_ui.cam.position = token.position
+	_ui.cam.zoom = token.zoom
+	_ui.cam.force_update_scroll()
+	token.terrain_applied = true
+	return true
+
+func rollback_world_view(token: Dictionary) -> void:
+	if token.is_empty(): return
+	if token.get("nodes_applied", false): _world_nodes.activate(token.old_nodes)
+	_world_nodes.commit(token.nodes)
+	if token.get("terrain_applied", false):
+		world_layers.terrain = token.old_terrain
+		_restore_world_camera(token)
+	if token.has("camera") and token.old_camera == null: token.camera.queue_free()
+	if is_instance_valid(token.get("terrain")):
+		token.terrain.hide()
+		token.terrain.queue_free()
+	token.clear()
+
+func release_previous_world_view(token: Dictionary) -> void:
+	_world_nodes.commit(token.old_nodes)
+	if is_instance_valid(token.get("old_terrain")):
+		token.old_terrain.hide()
+		token.old_terrain.queue_free()
+
+func finish_world_view(token: Dictionary, rows: Array, ended: int) -> void:
+	if token.get("terrain_applied", false):
+		marquee_hide()
+		if token.has("minimap"): _ui.minimap.apply_map_texture(token.minimap)
+	token.clear()
+	finish_loaded_world(rows, ended)
+
+func request_window_close() -> bool:
+	if _ui.battle_menu == null: return false
+	await _ui.battle_menu.open()
+	_ui.battle_menu.quit_game()
+	return true
 func attach_unit(u: Dictionary, sheet: String, w: int, h: int, k: float) -> void:
 	unit_visuals.attach_unit(u, sheet, w, h, k)
 func free_unit(u: Dictionary) -> void:

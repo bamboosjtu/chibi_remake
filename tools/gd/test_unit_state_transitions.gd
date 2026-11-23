@@ -8,6 +8,7 @@ extends "test_contact_and_occupancy.gd"
 const ActionClock = preload("res://simulation/movement/action_clock.gd")
 const TickTimers = preload("res://simulation/movement/tick_timers.gd")
 const ResourceState = preload("res://simulation/economy/resource_state.gd")
+const Balance = preload("res://simulation/definitions/balance_rules.gd")
 
 func run() -> void:
 	root.get_node("Game").current_map="chibic1"
@@ -17,6 +18,8 @@ func run() -> void:
 	scene.scene.ready_to_save=false;scene.free()
 	attack_to_move()
 	gather_to_order()
+	gather_deliver_retarget()
+	wood_retry()
 	board_to_unload()
 	move_to_idle()
 	any_to_death()
@@ -24,6 +27,80 @@ func run() -> void:
 	sim.free();done=true
 	print("UNIT STATE TRANSITIONS PASS attack->move / gather->order / board->unload / move->idle / any->death / progress restore")
 	quit()
+
+func gather_deliver_retarget() -> void:
+	blank()
+	var worker := make(1, 3, 30, Vector2i(10, 9))
+	worker.vision = 3.0
+	var depot := make(2, 3, 10, Vector2i(6, 10))
+	depot.is_building = true
+	depot.occupied_cells = [Vector2i(6, 10)]
+	install([worker, depot])
+	_decor([[10, 10, 2], [12, 10, 2]])
+	var source: Dictionary = sim.decor_cells["10_10"]
+	var next: Dictionary = sim.decor_cells["12_10"]
+	var harvest := Balance.harvest()
+	var amount := float(harvest.extractAmount)
+	var stock := float(source.stock)
+	var capacity: float = sim.world.harvest_orders._food_capacity(3)
+	assert(capacity > 0)
+	sim.food = capacity
+	sim.world.harvest_orders._begin_gather(worker, source, [])
+	for tick in range(int(harvest.periodTicks)): sim.world.unit_actions._step_unit_inner(worker, sim.SIM_DT)
+	assert(worker.state == "deliver" and worker.carry == amount and worker.carry_kind == "food")
+	assert(source.stock == stock - amount and not source.alive and sim.food == capacity)
+	assert(worker.gather_ticks == 0 and worker.pi == 0 and worker.path.is_empty())
+
+	for tick in range(900):
+		sim.world.unit_actions._step_unit_inner(worker, sim.SIM_DT)
+		if worker.repath > 0.0 and sim.world.interaction_paths._deposit_ready(worker, depot): break
+	assert(worker.state == "deliver" and worker.repath > 0.0)
+	assert(is_same(worker.gather_obj, source) and worker.carry == amount and sim.food == capacity)
+	assert(Vector2(worker.ax, worker.ay).distance_to(Vector2(next.ax, next.ay)) > worker.vision * sim.tile_w)
+	sim.food = capacity - amount
+	for tick in range(120):
+		sim.world.unit_actions._step_unit_inner(worker, sim.SIM_DT)
+		if worker.state == "gather": break
+	assert(worker.state == "gather" and is_same(worker.gather_obj, next))
+	assert(worker.carry == 0.0 and worker.carry_kind.is_empty() and sim.food == capacity)
+	for tick in range(900):
+		sim.world.unit_actions._step_unit_inner(worker, sim.SIM_DT)
+		if worker.state == "deliver": break
+	assert(worker.carry == amount and worker.carry_kind == "food" and not next.alive)
+	assert(sim.food == capacity, "The first load was deposited exactly once")
+	print("HARVEST TRANSITIONS PASS extract / full depot / one deposit / disconnected crop")
+
+func wood_retry() -> void:
+	for cancel in [false, true]:
+		blank()
+		var worker := make(1, 3, 30, Vector2i(10, 10))
+		install([worker])
+		_decor([[15, 10, 0]])
+		var source: Dictionary = sim.decor_cells["15_10"]
+		assert(sim.world.harvest_orders._order_gather(source, [worker], 3) == 1)
+		var approaches: Array = sim.world.interaction_paths._edge_neighbors(source)
+		for cell in approaches: sim.nav.block(cell)
+		for tick in range(120):
+			sim.world.unit_actions._step_unit_inner(worker, sim.SIM_DT)
+			if worker.path.is_empty() and worker.repath > 0.0: break
+		assert(worker.state == "gather" and worker.repath > 0.0 and is_same(worker.gather_obj, source))
+		if cancel:
+			var point: Vector2 = sim.nav.anchor_of(8, 10)
+			assert(sim.world.world_orders._move_autonomous(worker, point))
+			assert(worker.gather_obj == null)
+		for cell in approaches: sim.nav.unblock(cell)
+		for tick in range(480):
+			sim.world.unit_actions._step_unit_inner(worker, sim.SIM_DT)
+			if worker.state == "deliver": break
+		if cancel:
+			assert(worker.state == "idle" and worker.carry == 0.0 and source.alive and worker.gather_obj == null)
+		else:
+			assert(worker.state == "deliver" and worker.carry_kind == "wood" and not source.alive)
+	print("WOOD TRANSITIONS PASS retry after reopening / replacement order cancels retry")
+
+func _decor(cells: Array) -> void:
+	sim.map_data.decor = cells
+	sim.world.harvest_orders._build_decor_targets()
 
 ## Attack -> Move: switching to a move order drops the attack target and resets
 ## the attack clock before the route is installed.

@@ -212,7 +212,9 @@
   {
    "script": "test_unit_state_transitions",
    "markers": [
-    "UNIT STATE TRANSITIONS PASS"
+    "UNIT STATE TRANSITIONS PASS",
+    "HARVEST TRANSITIONS PASS",
+    "WOOD TRANSITIONS PASS"
    ],
    "args": [
     "--noview"

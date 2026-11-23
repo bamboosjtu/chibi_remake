@@ -20,7 +20,11 @@ func run() -> void:
 	battle._notification(Node.NOTIFICATION_WM_CLOSE_REQUEST)
 	if mode in ["failure","uninitialized"]:
 		assert(FileAccess.get_sha256(game.SAVE_PATH) == old_hash)
-		if mode == "failure": assert(battle.view.battle_menu.is_open)
+		if mode == "failure":
+			if battle.view != null:
+				assert(battle.view.battle_menu.is_open)
+			else:
+				assert(battle.scene.feedback_text.contains("未退出"))
 	else:
 		var saved: Dictionary = game.load_save()
 		assert(saved.resources.gold == 4321 and saved.gameEnd == battle.game_end)

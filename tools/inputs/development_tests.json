@@ -414,7 +414,8 @@
     {
       "script": "test_world_exchange",
       "markers": [
-        "WORLD EXCHANGE PASS"
+        "WORLD EXCHANGE PASS",
+        "WORLD COMMIT PASS"
       ]
     },
     {

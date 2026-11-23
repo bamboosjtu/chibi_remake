@@ -12,7 +12,14 @@ func run() -> void:
 	for repeat in range(50):
 		var token: int = pauses.acquire(first,"repeat"); pauses.release(token)
 	assert(first.get_signal_connection_list("tree_exiting").is_empty(),"Closing a lease must remove its owner callback")
+	var shared: int = pauses.acquire(first, "outer operation")
+	pauses.acquire(first, "first inner operation")
+	pauses.acquire(first, "second inner operation")
+	assert(pauses.count() == 3 and first.get_signal_connection_list("tree_exiting").size() == 1)
+	pauses.release(shared)
+	assert(pauses.count() == 2 and first.get_signal_connection_list("tree_exiting").size() == 1)
 	first.free()
+	assert(not paused and pauses.count() == 0, "Owner exit releases all remaining leases")
 	if not "--pause-unit-only" in OS.get_cmdline_user_args():
 		_modals(pauses)
 		print("PAUSE MODALS PASS nesting / media cancellation / world rollback and exchange / old scene disposal")

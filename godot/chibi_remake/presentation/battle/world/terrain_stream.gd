@@ -62,15 +62,17 @@ static func read_manifest(map_id: String) -> Dictionary:
 			if not tile.get("texture") is String or tile.texture.is_empty(): return {}
 	return data
 
-func load_opening_view() -> bool:
-	if host.cam == null: return false
-	last_rect = _visible_rect()
+func load_opening_view(camera: Camera2D = null) -> bool:
+	if camera == null: camera = host.cam
+	if camera == null: return false
+	last_rect = _visible_rect(camera)
 	update_visible(last_rect)
 	return loading_error.is_empty() and not active.is_empty()
 
-func _visible_rect() -> Rect2:
-	var size: Vector2 = get_viewport_rect().size / host.cam.zoom
-	return Rect2(host.cam.position - size * 0.5, size).grow(256)
+func _visible_rect(camera: Camera2D = null) -> Rect2:
+	if camera == null: camera = host.cam
+	var size: Vector2 = get_viewport_rect().size / camera.zoom
+	return Rect2(camera.position - size * 0.5, size).grow(256)
 
 func _add_gate_patches(map_id: String) -> void:
 	var file := FileAccess.open("res://art/full/gate_terrain/manifest.json",FileAccess.READ)

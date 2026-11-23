@@ -6,8 +6,7 @@ func begin() -> Dictionary:
 	var token := {"nodes":_ui._nodes_by_uid,"motion":_ui._motion_previous,"gait":_ui._gait_previous}
 	_ui._nodes_by_uid = {}; _ui._motion_previous = {}; _ui._gait_previous = {}
 	return token
-func rollback(token: Dictionary) -> void:
-	release(_ui._nodes_by_uid)
+func activate(token: Dictionary) -> void:
 	_ui._nodes_by_uid = token.nodes; _ui._motion_previous = token.motion; _ui._gait_previous = token.gait
 func commit(token: Dictionary) -> void: release(token.nodes)
 func complete(units: Array) -> bool:

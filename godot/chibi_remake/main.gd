@@ -114,7 +114,8 @@ func _init() -> void:
 	if _api_missing.is_empty(): _activate_world()
 func run_acceptance(kind: String, argument: String = "") -> void:
 	if not Game.acceptance_enabled: push_error("Acceptance script requested without the companion"); get_tree().quit(1); return
-	await load("res://testing/automation/acceptance_hook.gd").new().run(self, kind, argument)
+	var hook: RefCounted = load("res://testing/automation/acceptance_hook.gd").new()
+	await hook.run(self, kind, argument)
 func create_view_context() -> Node2D: return create_view_context_for(preload("res://app/read_models/battle_queries.gd").new(self))
 
 func create_view_context_for(queries: Object, parent: Node = null) -> Node2D:
@@ -223,8 +224,6 @@ func dispose_services() -> void:
 	for service in [bootstrap, cheat_controller, duel_session, scene_controller]:
 		if is_instance_valid(service): service.free()
 	world.dispose()
-
-
 func _on_duel(outcome: String, onm: String, enm: String) -> void:
 	duel_session._present_duel(outcome, onm, enm)
 

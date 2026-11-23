@@ -20,7 +20,9 @@ func _init(h: Node2D,v: Node2D) -> void:
 	host=h;view=v;mouse_filter=Control.MOUSE_FILTER_IGNORE
 
 func _ready() -> void:
-	var image := _terrain_image()
+	var map_id := str(host.queries.map_id)
+	var decoded = _read_terrain(map_id)
+	var image: Image = decoded if decoded is Image else _missing_terrain(decoded, map_id)
 	map_texture=ImageTexture.create_from_image(image)
 	terrain=TextureRect.new();terrain.texture=map_texture
 	terrain.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
@@ -45,33 +47,37 @@ void fragment() {
 	camera_overlay=Control.new();camera_overlay.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	camera_overlay.draw.connect(_draw_camera);overlay.add_child(camera_overlay)
 
-func reload_map_terrain() -> void:
+func prepare_map_texture(map_id: String) -> ImageTexture:
+	var decoded = _read_terrain(map_id)
+	return ImageTexture.create_from_image(decoded) if decoded is Image else null
+
+func apply_map_texture(texture: ImageTexture) -> void:
 	terrain_error = ""
 	tooltip_text = ""
-	map_texture = ImageTexture.create_from_image(_terrain_image())
+	map_texture = texture
 	terrain.texture = map_texture
 	queue_redraw()
 
-func _terrain_image() -> Image:
+func _read_terrain(map_id: String) -> Variant:
 	if catalog.is_empty():
 		var file := FileAccess.open("res://data/db/minimap_terrain.json",FileAccess.READ)
-		if file == null: return _missing_terrain("缺少地形缩略图目录")
+		if file == null: return "缺少地形缩略图目录"
 		var parser := JSON.new()
 		if parser.parse(file.get_as_text()) != OK or not parser.data is Dictionary or not parser.data.get("maps") is Dictionary:
-			return _missing_terrain("地形缩略图目录损坏")
+			return "地形缩略图目录损坏"
 		catalog=parser.data.maps
-	var entry = catalog.get(str(host.queries.map_id))
+	var entry = catalog.get(map_id)
 	if not entry is Dictionary or not entry.get("png") is String:
-		return _missing_terrain("缺少当前关卡的地形缩略图")
+		return "缺少当前关卡的地形缩略图"
 	var bytes := Marshalls.base64_to_raw(entry.png)
 	if bytes.size() <= 8 or bytes.slice(0,8) != PackedByteArray([137,80,78,71,13,10,26,10]):
-		return _missing_terrain("地形缩略图不是有效 PNG")
+		return "地形缩略图不是有效 PNG"
 	var image := Image.new()
-	if image.load_png_from_buffer(bytes) != OK: return _missing_terrain("地形缩略图解码失败")
+	if image.load_png_from_buffer(bytes) != OK: return "地形缩略图解码失败"
 	return image
 
-func _missing_terrain(reason: String) -> Image:
-	terrain_error=reason+"："+str(host.queries.map_id)
+func _missing_terrain(reason: String, map_id: String) -> Image:
+	terrain_error=reason+"："+map_id
 	push_error(terrain_error)
 	tooltip_text="地形缩略图不可用；单位标记和镜头导航仍可使用。"
 	var image := Image.create(2,2,false,Image.FORMAT_RGBA8)

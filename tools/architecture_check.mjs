@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import {objectOwnershipErrors} from './lib/object_ownership.mjs';
 
 const args=process.argv.slice(2);
 const root = (args.includes('--root')?args[args.indexOf('--root')+1]:'godot/chibi_remake').replaceAll('\\','/');
@@ -40,27 +41,15 @@ const waive = (key, message) => {
   if (waived.has(key)) waivedHits++;
   else fail(message + ' [' + key + ']');
 };
-// `extends Object` has no reference counting: every subclass must be created by a
-// composition point that also releases it. Requiring an owning file catches a new
-// Object that nothing frees, which is a silent permanent leak.
-const objectScripts = [];
-const objectOwners = new Map();
-for (const file of files(root)) {
-  const relative = path.posix.relative(root, file);
-  const source = fs.readFileSync(file, 'utf8');
-  if (/^extends Object\b/m.test(source)) objectScripts.push(relative);
-  if (/_owned_(?:services|components)\(|\.free\(\)/.test(source)) objectOwners.set(relative, source);
-}
-for (const script of objectScripts) {
-  const reference = '"res://' + script + '"';
-  const owned = [...objectOwners.entries()].some(([owner, source]) => owner !== script && source.includes(reference));
-  if (!owned) fail(`${script}: Object subclass is not released by any composition point`);
-}
+const sources = new Map(files(root).map(file => [path.posix.relative(root, file), fs.readFileSync(file, 'utf8')]));
+for (const error of objectOwnershipErrors(sources)) fail(error);
 for (const file of files(root)) {
   const relative = path.posix.relative(root, file);
   const source = fs.readFileSync(file, 'utf8');
   const code = source.replace(/("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|#[^\r\n]*/g,(all,string)=>string??'');
   const executable = code.replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g, '""');
+  if (relative === 'app/battle/runtime/battle_runtime.gd' && /\.(?:battle_menu)\b|\b(?:CanvasLayer|ColorRect|Label|Camera2D)\.new\s*\(/.test(executable)) fail(relative + ': use scene presentation operations');
+  if (relative === 'app/saves/world_transaction.gd' && /\.(?:host|set_host|camera)\s*\(/.test(executable)) fail(relative + ': use the world view transaction operations');
   const count = source.trimEnd().split('\n').length;
   if(relative !== 'app/battle/session/pause_stack.gd' && /\.\s*paused\s*=(?!=)|\.(?:set|set_deferred)\(\s*['"]paused['"]/.test(code)) fail(`${relative}: SceneTree pause writes belong to PauseStack`);
   if(/^app\/battle\/(?:startup\/bootstrap|runtime\/(?:scene|cheat|duel)_controller)\.gd$/.test(relative) && /func _init\(\s*data\s*:/.test(code)) fail(`${relative}: application controllers must bind the live scene, not ignore an injected state`);

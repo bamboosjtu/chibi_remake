@@ -30,23 +30,7 @@ func _write_smoke(ok: bool, why: String) -> void:
 func _fatal(msg: String) -> void:
 	push_error(msg)
 	_write_smoke(false, msg)
-	var layer := CanvasLayer.new()
-	node.add_child(layer)
-	var bg := ColorRect.new()
-	bg.color = Color(0.10, 0.02, 0.02, 1.0)
-	bg.size = Vector2(1600, 900)
-	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	layer.add_child(bg)
-	var label := Label.new()
-	label.position = Vector2(60, 60)
-	label.add_theme_font_size_override("font_size", 26)
-	label.add_theme_color_override("font_color", Color(1.0, 0.8, 0.6))
-	label.text = "加载失败\n\n" + msg
-	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	layer.add_child(label)
-	scene.cam = Camera2D.new()
-	node.add_child(scene.cam)
-	scene.cam.make_current()
+	node.presentation.show_load_error(node, scene, msg)
 	if "--screenshot" in OS.get_cmdline_user_args():
 		await node.get_tree().create_timer(0.6).timeout
 		if screenshotter.is_valid(): await screenshotter.call()
@@ -71,10 +55,7 @@ func _notification(what: int) -> void:
 	if what != Node.NOTIFICATION_WM_CLOSE_REQUEST:
 		return
 	if scene.ready_to_save and scene.saver != null:
-		if scene.view != null and scene.view.battle_menu != null:
-			await scene.view.battle_menu.open()
-			scene.view.battle_menu.quit_game()
-			return
+		if scene.view != null and await scene.view.request_window_close(): return
 		if not await node.session_actions.wait_command_boundary():
 			return
 		if not node.session_actions.save_game():

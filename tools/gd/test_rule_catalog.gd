@@ -62,7 +62,13 @@ func _contracts() -> void:
 		assert(not Contract.valid(name, value), "Required gameplay fields: " + name)
 		documents[name] = backup
 	assert(not Contract.valid("unit_tuning.json", {"statusTicks":800,"hasteMoveMultiplier":0,"slowMoveMultiplier":0.5,"farsightCells":10}))
-	var bad: Dictionary = documents["unit_tuning.json"].duplicate(true); bad.statusTicks = 801
+	var bad: Dictionary = documents["unit_tuning.json"].duplicate(true)
+	var status = preload("res://simulation/definitions/status_fields.gd")
+	var schema = preload("res://simulation/units/unit_schema.gd")
+	bad.statusTicks = status.MAX_TICKS
+	assert(Contract.valid("unit_tuning.json", bad))
+	for field in status.KEYS: assert(schema.FIELDS[field].max == status.MAX_TICKS)
+	bad.statusTicks += 1
 	assert(not Contract.valid("unit_tuning.json", bad), "Status duration must match save/timer bounds")
 	bad = documents["scenario_rules.json"].duplicate(true)
 	bad.missions.values()[0].stages[0].condition = {"kind":"unhandled"}

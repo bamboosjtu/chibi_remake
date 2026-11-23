@@ -37,11 +37,11 @@ func install_terrain(map_id: String, plan: Dictionary, preflight := false) -> bo
 	commit_terrain(staged)
 	return true
 
-func stage_terrain(map_id: String, plan: Dictionary, preflight: bool) -> Node2D:
+func stage_terrain(map_id: String, plan: Dictionary, preflight: bool, camera: Camera2D = null) -> Node2D:
 	var staged := preload("res://presentation/battle/world/terrain_stream.gd").new(_ui.host, map_id, plan)
 	staged.process_mode = Node.PROCESS_MODE_ALWAYS
 	surface.add_child(staged)
-	if preflight and not staged.load_opening_view():
+	if preflight and not staged.load_opening_view(camera):
 		staged.free()
 		return null
 	return staged

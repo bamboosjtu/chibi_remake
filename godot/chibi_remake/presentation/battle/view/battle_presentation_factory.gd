@@ -1,4 +1,4 @@
-extends Object
+extends RefCounted
 ## Presentation construction boundary. main.gd owns this factory; app code receives
 ## it as an object so it never preloads presentation scripts.
 const View = preload("res://presentation/battle/view/battle_view.gd")
@@ -48,3 +48,22 @@ func create_view_context(scene: Object, queries: Object, actions: Object, sessio
 
 func screenshot(node: Node) -> void:
 	await View.screenshot(node)
+
+func show_load_error(surface: Node2D, scene: Object, message: String) -> void:
+	var layer := CanvasLayer.new()
+	surface.add_child(layer)
+	var background := ColorRect.new()
+	background.color = Color(0.10, 0.02, 0.02, 1.0)
+	background.size = Vector2(1600, 900)
+	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(background)
+	var label := Label.new()
+	label.position = Vector2(60, 60)
+	label.add_theme_font_size_override("font_size", 26)
+	label.add_theme_color_override("font_color", Color(1.0, 0.8, 0.6))
+	label.text = "加载失败\n\n" + message
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(label)
+	scene.cam = Camera2D.new()
+	surface.add_child(scene.cam)
+	scene.cam.make_current()

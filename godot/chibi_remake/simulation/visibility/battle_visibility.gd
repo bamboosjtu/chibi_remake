@@ -2,6 +2,7 @@ extends RefCounted
 ## 探索状态不依赖渲染节点；读档、无视图模拟与小地图共用。
 ## 44×22 世界像素是一格等距地面，遮罩用半格采样，保持原版阶梯轮廓。
 const CELL := Vector2(22, 11)
+const Catalog = preload("res://simulation/definitions/rule_catalog.gd")
 var width := 0
 var height := 0
 var explored := PackedByteArray()
@@ -24,8 +25,11 @@ func setup(size: Vector2) -> void:
 	reveals.resize(width * height); reveals.fill(0)
 	_sources.clear(); revision += 1
 
+static func _farsight_cells() -> float:
+	return float(Catalog.get_catalog("unit_tuning.json").farsightCells)
+
 static func effective_vision(unit: Dictionary) -> float:
-	return float(preload("res://simulation/combat/stratagem_rules.gd").config().farsightCells) if int(unit.get("farsight_t", 0)) > 0 else maxf(0.0, float(unit.get("vision", 0)))
+	return _farsight_cells() if int(unit.get("farsight_t", 0)) > 0 else maxf(0.0, float(unit.get("vision", 0)))
 
 func _cells(position: Vector2, vision: float) -> PackedInt32Array:
 	var cells := PackedInt32Array()
@@ -65,7 +69,7 @@ func update(units: Array, player: int) -> void:
 	var kernel:=preload("res://simulation/native/math_kernel.gd").get_kernel()
 	if kernel==null:
 		update_script(units,player);return
-	var result: Array=kernel.update_visibility(units,player,width,height,CELL,current,explored,reveals,_sources,full_reveal,float(preload("res://simulation/combat/stratagem_rules.gd").config().farsightCells))
+	var result: Array=kernel.update_visibility(units,player,width,height,CELL,current,explored,reveals,_sources,full_reveal,_farsight_cells())
 	current=result[1];explored=result[2];reveals=result[3]
 	if result[0]:revision+=1
 

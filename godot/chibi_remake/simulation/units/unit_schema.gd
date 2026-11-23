@@ -1,5 +1,6 @@
 extends RefCounted
 const Balance = preload("res://simulation/definitions/balance_rules.gd")
+const Status = preload("res://simulation/definitions/status_fields.gd")
 ## Authoritative unit field policy. Dictionary units remain the runtime model.
 const FIELDS := {
 	"gate_open": {"type":"bool", "default":false, "persist":false, "derived":true, "group":"derived"},
@@ -36,10 +37,10 @@ const FIELDS := {
 	"tech_hp_bonus": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar"},
 	"mou": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar"},
 	"formation": {"type": "int", "default": -1, "persist": true, "derived": false, "group": "scalar"},
-	"haste_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "status", "min": 0, "max": 800},
-	"slow_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "status", "min": 0, "max": 800},
-	"farsight_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "status", "min": 0, "max": 800},
-	"confused_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "status", "min": 0, "max": 800},
+	"haste_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "status", "min": 0, "max": Status.MAX_TICKS},
+	"slow_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "status", "min": 0, "max": Status.MAX_TICKS},
+	"farsight_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "status", "min": 0, "max": Status.MAX_TICKS},
+	"confused_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "status", "min": 0, "max": Status.MAX_TICKS},
 	"fo_x": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar"},
 	"fo_y": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "scalar"},
 	"site": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "scalar"},
@@ -50,7 +51,7 @@ const FIELDS := {
 	"action_started": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "action"},
 	"action_kind": {"type": "String", "default": "", "persist": true, "derived": false, "group": "action", "values": ["", "attack", "repair"]},
 	"action_target_uid": {"type": "int", "default": -1, "persist": true, "derived": false, "group": "action", "min": -1, "max": 2147483647},
-	"inspired_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "status", "min": 0, "max": 800},
+	"inspired_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "status", "min": 0, "max": Status.MAX_TICKS},
 	"stock": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "optional": true},
 	"stock_max": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar", "optional": true},
 	"attached": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "scalar"},
@@ -67,9 +68,9 @@ const FIELDS := {
 	"site_entry_y": {"type": "float", "default": 0.0, "persist": true, "derived": false, "group": "scalar"},
 	"site_exit_pending": {"type": "bool", "default": false, "persist": true, "derived": false, "group": "scalar"},
 	"build_cost": {"type": "Dictionary", "default": {}, "persist": true, "derived": false, "group": "scalar"},
-	"rolling_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "status", "min": 0, "max": 800},
+	"rolling_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "status", "min": 0, "max": Status.MAX_TICKS},
 	"rolling_ticks": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "elapsed", "min": 0, "max": 29},
-	"ambush_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "status", "min": 0, "max": 800},
+	"ambush_t": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "status", "min": 0, "max": Status.MAX_TICKS},
 	"effect_task": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "effect"},
 	"effect_tasks": {"type": "Array", "default": [], "persist": true, "derived": false, "group": "effect"},
 	"walk_tick": {"type": "int", "default": 0, "persist": true, "derived": false, "group": "locomotion", "min": 0, "max": 2147483647},

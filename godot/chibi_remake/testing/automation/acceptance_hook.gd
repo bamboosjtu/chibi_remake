@@ -1,4 +1,4 @@
-extends Object
+extends RefCounted
 ## Acceptance-only dispatcher. Loaded by main.gd only when Game.acceptance_enabled
 ## and a test argument is present; normal builds never reach this file.
 func run(node: Node, kind: String, argument: String = "") -> void:

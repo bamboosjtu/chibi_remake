@@ -3,7 +3,6 @@ extends RefCounted
 const FILES := ["unit_definitions.json", "production_units.json", "buildings.json", "unit_tuning.json", "officers.json", "officer_progression.json", "command_variants.json", "scenario_rules.json", "native_math.json", "tech.json", "unit_roles.json", "balance.json"]
 const Constants = preload("res://simulation/definitions/contracts/constant_contract.gd")
 const Scenario = preload("res://simulation/scenario/scenario_contract.gd")
-const UnitSchema = preload("res://simulation/units/unit_schema.gd")
 const Status = preload("res://simulation/definitions/status_fields.gd")
 
 static func errors(documents: Dictionary) -> Array:
@@ -33,9 +32,7 @@ static func valid(name: String, data) -> bool:
 	return false
 
 static func _tuning(data: Dictionary) -> bool:
-	if not whole(data.get("statusTicks"), 1): return false
-	for field in Status.KEYS:
-		if data.statusTicks > UnitSchema.FIELDS[field].max: return false
+	if not whole(data.get("statusTicks"), 1) or data.statusTicks > Status.MAX_TICKS: return false
 	return positive(data.get("hasteMoveMultiplier")) and positive(data.get("slowMoveMultiplier")) and whole(data.get("farsightCells"))
 
 static func valid_units(data, canonical := false) -> bool:

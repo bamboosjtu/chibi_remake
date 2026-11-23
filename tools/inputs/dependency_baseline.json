@@ -1,5 +1,21 @@
 {
   "schemaVersion": 1,
   "description": "Historical dependency edges the P0 gate must tolerate until the named stage removes them. Each entry records the current file edge and why it exists; stale entries fail the gate.",
-  "edges": []
+  "edges": [],
+  "cycles": [
+    {
+      "members": [
+        "app/saves/candidate_world.gd",
+        "app/saves/save_service.gd",
+        "app/saves/world_transaction.gd"
+      ],
+      "edges": [
+        {"from": "app/saves/candidate_world.gd", "to": "app/saves/save_service.gd"},
+        {"from": "app/saves/save_service.gd", "to": "app/saves/candidate_world.gd"},
+        {"from": "app/saves/save_service.gd", "to": "app/saves/world_transaction.gd"},
+        {"from": "app/saves/world_transaction.gd", "to": "app/saves/candidate_world.gd"}
+      ],
+      "reason": "Same-map and cross-map restores reuse SaveService's codec and validation on a scene-free candidate before installing it through WorldTransaction."
+    }
+  ]
 }

@@ -2,6 +2,12 @@
   "description": "Lightweight GitHub gate: no LFS assets, no export templates, first-map simulation and runtime script compilation.",
   "tests": [
     {
+      "script": "test_unit_state_transitions",
+      "markers": ["UNIT STATE TRANSITIONS PASS", "HARVEST TRANSITIONS PASS", "WOOD TRANSITIONS PASS"],
+      "args": ["--noview"],
+      "timeout": 120
+    },
+    {
       "script": "check_runtime_scripts",
       "markers": [
         "RUNTIME SCRIPTS PASS"

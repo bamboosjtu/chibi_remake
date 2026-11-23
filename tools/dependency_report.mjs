@@ -13,6 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
+import { sourceViews } from './lib/gdscript_source.mjs';
 
 function fail(message) {
   const err = new Error(message);
@@ -98,18 +99,20 @@ export function analyze(opts = {}) {
 
   const edges = [];
   for (const rel of files) {
-    const text = fs.readFileSync(path.join(projectRoot, rel), 'utf8');
+    const {uncommented: text, code} = sourceViews(fs.readFileSync(path.join(projectRoot, rel), 'utf8'));
     for (const [re, kind, confidence] of [
-      [/(?:preload|load)\(\s*"res:\/\/([^"]+\.gd)"\s*\)/g, 'import', 'confirmed'],
-      [/extends\s+"res:\/\/([^"]+\.gd)"/g, 'extends', 'confirmed'],
+      [/\b(?:preload|load)\s*\(\s*(['"])res:\/\/([^'"\r\n]+\.gd)\1\s*\)/g, 'import', 'confirmed'],
+      [/\bextends\s+(['"])res:\/\/([^'"\r\n]+\.gd)\1/g, 'extends', 'confirmed'],
     ]) {
       for (const m of text.matchAll(re)) {
-        const target = m[1].replaceAll('\\', '/');
+        if (code[m.index] !== text[m.index]) continue;
+        const target = m[2].replaceAll('\\', '/');
         if (!fileSet.has(target)) continue;
         edges.push({ from: rel, to: target, kind, confidence, line: text.slice(0, m.index).split('\n').length, evidence: m[0].trim() });
       }
     }
-    for (const m of text.matchAll(/\b(?:load|preload)\(\s*(?!")/g)) {
+    for (const m of text.matchAll(/\b(?:load|preload)\s*\((?!\s*['"])/g)) {
+      if (code[m.index] !== text[m.index]) continue;
       edges.push({ from: rel, to: null, kind: 'dynamic-load', confidence: 'dynamic', line: text.slice(0, m.index).split('\n').length, evidence: lineText(text, m.index) });
     }
     for (const m of text.matchAll(/(_dep_\w+)\s*=\s*(\w+)\.(\w+)/g)) {
@@ -168,14 +171,32 @@ export function analyze(opts = {}) {
       const comp = [];
       let w;
       do { w = stack.pop(); onStack.delete(w); comp.push(w); } while (w !== v);
-      if (comp.length > 1) sccs.push(comp.sort());
+      if (comp.length > 1 || adj.get(v).has(v)) sccs.push(comp.sort());
     }
   }
   for (const f of files) if (!indices.has(f)) strongconnect(f);
-  sccs.sort((a, b) => b.length - a.length);
+  sccs.sort((a, b) => b.length - a.length || a[0].localeCompare(b[0]));
 
   const matrix = fs.existsSync(matrixPath) ? JSON.parse(fs.readFileSync(matrixPath, 'utf8')) : { packages: {} };
   const baseline = fs.existsSync(baselinePath) ? JSON.parse(fs.readFileSync(baselinePath, 'utf8')) : { edges: [] };
+  const cycles = sccs.map(members => {
+    const contained = new Set(members);
+    return {members, references: confirmed.filter(e => contained.has(e.from) && contained.has(e.to))};
+  });
+  const cycleKey = (members, edges) => JSON.stringify([
+    [...members].sort(), [...new Set(edges.map(({from, to}) => JSON.stringify([from, to])))].sort(),
+  ]);
+  const registeredCycles = new Map();
+  for (const cycle of baseline.cycles ?? []) {
+    if (!Array.isArray(cycle.members) || cycle.members.length === 0 || !Array.isArray(cycle.edges) || !cycle.reason?.trim()
+        || cycle.edges.some(edge => !cycle.members.includes(edge.from) || !cycle.members.includes(edge.to))) {
+      fail('Invalid dependency cycle baseline');
+    }
+    const key = cycleKey(cycle.members, cycle.edges);
+    if (registeredCycles.has(key)) fail('Duplicate dependency cycle baseline');
+    registeredCycles.set(key, cycle);
+  }
+  const newCycles = cycles.filter(cycle => !registeredCycles.delete(cycleKey(cycle.members, cycle.references)));
   const exceptions = new Map((matrix.fileExceptions || []).map((e) => [e.file, new Set(e.allow || [])]));
 
   function allowed(fromPkg, toPkg) {
@@ -224,12 +245,31 @@ export function analyze(opts = {}) {
     unresolvedEdges: resolved.filter((e) => !e.to && !e.toPackageHint).length,
     packageEdges: [...packageEdges.values()].sort((a, b) => b.count - a.count),
     sccs,
+    cycles,
+    newCycles,
+    staleCycles: [...registeredCycles.values()],
     violations,
     unbaselined,
     baseline: { total: baselineEdges.length, matched: matchedBaseline.size, stale: staleBaseline.length },
     staleBaseline,
     fileExceptions: matrix.fileExceptions || [],
   };
+}
+
+export function printCycles(summary) {
+  for (const cycle of summary.cycles) {
+    console.log('  SCC: ' + cycle.members.join(', '));
+    for (const {from, to, line} of cycle.references) console.log('    ' + from + ':' + line + ' -> ' + to);
+  }
+}
+
+export function checkDependencies(summary) {
+  const errors = [];
+  for (const v of summary.unbaselined) errors.push('Unbaselined edge: ' + v.from + ':' + v.line + ' -> ' + (v.to ?? v.toPackage));
+  for (const b of summary.staleBaseline) errors.push('Stale baseline edge: ' + b.from + ' -> ' + b.to);
+  for (const cycle of summary.newCycles) errors.push('Unbaselined SCC: ' + cycle.members.join(', '));
+  for (const cycle of summary.staleCycles) errors.push('Stale SCC baseline: ' + cycle.members.join(', '));
+  return errors;
 }
 
 function main() {
@@ -259,13 +299,14 @@ function main() {
     console.log(`DEPENDENCY REPORT: ${summary.files} files, ${summary.edges} edges (${summary.confirmedEdges} confirmed, ${summary.dynamicEdges} dynamic, ${summary.unresolvedEdges} unresolved)`);
     console.log(`SCC: ${summary.sccs.length} components (largest ${summary.sccs[0]?.length || 0})`);
     console.log(`VIOLATIONS: ${summary.violations.length} (baselined ${summary.baseline.matched}, unbaselined ${summary.unbaselined.length}, stale baseline ${summary.baseline.stale})`);
-    for (const s of summary.sccs.slice(0, 5)) console.log(`  SCC ${s.length}: ${s.slice(0, 6).join(', ')}${s.length > 6 ? ', ...' : ''}`);
+    printCycles(summary);
     for (const v of summary.unbaselined.slice(0, 25)) console.log(`  NEW ${v.fromPackage} -> ${v.toPackage} ${v.from}:${v.line} (${v.kind})`);
     for (const b of summary.staleBaseline.slice(0, 25)) console.log(`  STALE ${b.from} -> ${b.to} (${b.reason || ''})`);
   }
   if (check) {
-    if (summary.unbaselined.length > 0 || summary.baseline.stale > 0) {
-      console.error(`DEPENDENCY CHECK FAIL: ${summary.unbaselined.length} unbaselined, ${summary.baseline.stale} stale baseline`);
+    const errors = checkDependencies(summary);
+    if (errors.length) {
+      console.error('DEPENDENCY CHECK FAIL:\n' + errors.join('\n'));
       process.exit(1);
     }
     console.log('DEPENDENCY CHECK PASS');
