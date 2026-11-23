@@ -94,9 +94,10 @@ for(const file of ['cursor-hd-v1.png','cursor-edges-hd-v1.svg'])add('art/full/ui
 for(const file of ['assets/fonts/NotoSansCJKsc-Regular.otf','assets/fonts/OFL.txt','assets/icon.png','assets/icon.ico'])add(file);
 for(const file of listSource('data/db').filter(x=>x.endsWith('.json')))add('data/db/'+file);
 const localCampaign=new Set();
+const omitVideos=process.argv.includes('--omit-videos');
 const events=JSON.parse(readSource('data/db/events.json'));
 // Videos are not tracked in Git/LFS; when present locally they ship inside the package.
-for(const event of Object.values(events.events))if(event.video&&localVideo(event.video))add(event.video.replace(/^res:\/\//,''));
+for(const event of Object.values(events.events))if(!omitVideos&&event.video&&localVideo(event.video))add(event.video.replace(/^res:\/\//,''));
 const videoCatalog=JSON.parse(readSource('data/db/video_catalog.json')).files;
 if(!videoCatalog['START.mp4']?.localOnly||Object.hasOwn(videoCatalog,'START.AVI'))throw Error('Startup must declare the private HD intro without a legacy fallback');
 const expectedCampaign=new Set(['START.mp4']);
@@ -104,7 +105,7 @@ for(const [name,entry] of Object.entries(videoCatalog)){
   if(!/^(?:[A-Z0-9]+\.AVI|(?:START|(?:CAO|LIU)[0-9]+[A-Z]?)\.mp4)$/.test(name)||entry.path!=='res://media/videos/'+name)throw Error('Invalid video catalog path: '+name);
   if((entry.localOnly===true)!==name.endsWith('.mp4'))throw Error('Invalid campaign media classification: '+name);
   if(entry.localOnly&&(entry.width!==1280||entry.height!==720||entry.codec!=='h264'||!(/^[a-f0-9]{64}$/).test(entry.sha256)))throw Error('Invalid HD media catalog entry: '+name);
-  if(!localVideo(entry.path))continue;
+  if(omitVideos||!localVideo(entry.path))continue;
   const file='media/videos/'+name, bytes=fs.readFileSync(path.join(source,file));
   if(bytes.length!==entry.bytes||createHash('sha256').update(bytes).digest('hex')!==entry.sha256)throw Error('Local campaign media differs from catalog: '+name);
   localCampaign.add(file);selected.add(file);

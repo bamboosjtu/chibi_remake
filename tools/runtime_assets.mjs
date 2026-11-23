@@ -10,7 +10,7 @@ if(!write&&!args.includes('--check'))throw Error('Usage: node tools/runtime_asse
 let expected;
 if(!versionedOnly){
  const listed=spawnSync(process.execPath,['tools/stage_release.mjs','_work/runtime-assets-'+process.pid,'--list-inputs',
-  ...(sourceCi?['--omit-generated-terrain']:[])],{encoding:'utf8',maxBuffer:16*1024*1024});
+  ...(sourceCi?['--omit-generated-terrain']:[]),'--omit-videos'],{encoding:'utf8',maxBuffer:16*1024*1024});
  if(listed.status!==0)throw Error(listed.stderr);
  expected=collectAssets(JSON.parse(listed.stdout));
 }
